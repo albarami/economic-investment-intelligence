@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "reason": "Supplementary symmetric two-slot swap and its valid control; original corpus and thresholds unchanged; hashed before executing this supplement.",
+  "files": {
+    "fixtures/paired-cases.json": "b81b24b1626adc9a17645796fa94bf0f87cd28d3946f24711a6301ebd8b44015",
+    "fixtures/catalogue-paired/claims.yaml": "7b02a89ccd920ef8e5fc0734c0faec415c7ac8a407fbe4380632cc4396b09cc4",
+    "fixtures/catalogue-paired/components.yaml": "aa0d9320a90dabf653123e90adda07481ea5358dd1ff68944b8a879ba27b2398",
+    "fixtures/catalogue-paired/fragments.yaml": "60370b8b27981e8b8f4f55c1ba05b12ead303e4cdbcf0a22157ad99f032ae7e5",
+    "fixtures/catalogue-paired/questions.yaml": "ae7ec05d1d0386413a573cd8a42e60e4813838052bf5053f1bf0b0cae0f613b5"
+  }
+}

@@ -30,7 +30,10 @@
     "spike:glyphs:record": "node spikes/glyphs/record.mjs",
     "spike:glyphs:verify-evidence": "node spikes/glyphs/verify-evidence.mjs",
     "spike:glyphs:capture": "node spikes/glyphs/tests/run.mjs --capture",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:spike:catalogue": "node --experimental-strip-types spikes/catalogue/tests/run.mjs",
+    "spike:catalogue:record": "node --experimental-strip-types spikes/catalogue/record.mjs",
+    "spike:catalogue:verify-evidence": "node --experimental-strip-types spikes/catalogue/verify-evidence.mjs"
   },
   "dependencies": {
     "@deck.gl/core": "9.4.1",

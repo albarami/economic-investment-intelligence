@@ -1,0 +1,1559 @@
+[
+  {
+    "id": "valid",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": null
+  },
+  {
+    "id": "withheld",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": true
+    },
+    "expected": null
+  },
+  {
+    "id": "malformed",
+    "raw": "{",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "JSON",
+      "item_path": "brief"
+    }
+  },
+  {
+    "id": "unknown_component",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"rogue\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_COMPONENT",
+      "item_path": "layout[0].component"
+    }
+  },
+  {
+    "id": "free_prose",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{\"text\":\"Invented prose\"}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_PROPERTY",
+      "item_path": "layout[0].props.text"
+    }
+  },
+  {
+    "id": "query",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\",\"query\":\"SELECT invented\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_PROPERTY",
+      "item_path": "stage[0].props.query"
+    }
+  },
+  {
+    "id": "unreturned_fact",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_FACT",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "unknown_action",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"execute\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_DIRECTIVE",
+      "item_path": "stage[0].component"
+    }
+  },
+  {
+    "id": "unknown_claim",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"rogue\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_CLAIM",
+      "item_path": "observed[0].claim_key"
+    }
+  },
+  {
+    "id": "unknown_fragment",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"rogue\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_FRAGMENT",
+      "item_path": "headline_key"
+    }
+  },
+  {
+    "id": "unknown_question",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"rogue\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_QUESTION",
+      "item_path": "next_questions[0].question_key"
+    }
+  },
+  {
+    "id": "unknown_directive",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"rogue\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_DIRECTIVE",
+      "item_path": "stage[0].component"
+    }
+  },
+  {
+    "id": "unknown_property",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}],\"note\":\"rogue\"}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "UNKNOWN_PROPERTY",
+      "item_path": "note"
+    }
+  },
+  {
+    "id": "excess_components",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}},{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "MAX_COUNT",
+      "item_path": "layout[1]"
+    }
+  },
+  {
+    "id": "swapped_valid_fact",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_METRIC",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "missing_slot",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_MISSING",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "extra_slot",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\",\"other\":\"f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_EXTRA",
+      "item_path": "observed[0].slots.other"
+    }
+  },
+  {
+    "id": "wrong_unit",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "index",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_UNIT",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "wrong_geography",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "national",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_GEOGRAPHY",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "wrong_period",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024-01",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_PERIOD",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "wrong_provenance",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "synthetic",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SLOT_PROVENANCE",
+      "item_path": "observed[0].slots.reading"
+    }
+  },
+  {
+    "id": "missing_lineage_ref",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": null,
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "LINEAGE_REF",
+      "item_path": "observed[0].slots.reading.lineage_ref"
+    }
+  },
+  {
+    "id": "missing_source_chain",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SOURCE_CHAIN",
+      "item_path": "lineage.lin_grid_people"
+    }
+  },
+  {
+    "id": "missing_companion",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "COMPANION",
+      "item_path": "companions"
+    }
+  },
+  {
+    "id": "unsupported_version",
+    "raw": "{\"catalogue_version\":\"unsupported\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "CATALOGUE_VERSION",
+      "item_path": "catalogue_version"
+    }
+  },
+  {
+    "id": "withheld_hidden_value",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": true
+    },
+    "expected": {
+      "rule_code": "WITHHELD",
+      "item_path": "observed"
+    }
+  },
+  {
+    "id": "assumption_invention",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [
+        "undeclared"
+      ],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "ASSUMPTIONS",
+      "item_path": "assumptions"
+    }
+  },
+  {
+    "id": "outside_scope",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "person",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "SCOPE",
+      "item_path": "scope"
+    }
+  },
+  {
+    "id": "missing_limits",
+    "raw": "{\"catalogue_version\":\"1dd21271829f19c20d15ae4f6cebb5d9c384cc06dac5ca3ee0fa7e8357caeb7f\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false
+    },
+    "expected": {
+      "rule_code": "LIMITS",
+      "item_path": "limits"
+    }
+  }
+]

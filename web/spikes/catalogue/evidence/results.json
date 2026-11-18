@@ -1,0 +1,2487 @@
+{
+  "schema": 1,
+  "contract_sha256": "5c202330e4f0a9120d16d637cf3e72f42883bb4f086caea1c666fb5df17d8eda",
+  "fixture_manifest_sha256": "aa4919d17a0ecefdd2136708f714d7c1fea87c1c4759c7313b36c9dbc97fd450",
+  "paired_manifest_sha256": "75f59efc8a26b3a8a7ed2a21a423053489f708132b938120bcdeabb5c8d68d06",
+  "environment": {
+    "node": "v22.22.3",
+    "platform": "linux",
+    "architecture": "x64",
+    "randomness": "none",
+    "provider": "none",
+    "affinity": "launcher cores 20,21"
+  },
+  "candidates": [
+    {
+      "name": "native",
+      "cases": [
+        {
+          "id": "valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "withheld",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>This result is withheld. Read the coverage reason.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "malformed",
+          "refusal": {
+            "rule_code": "JSON",
+            "item_path": "brief"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "refusal": {
+            "rule_code": "UNKNOWN_COMPONENT",
+            "item_path": "layout[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "layout[0].props.text"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "query",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "stage[0].props.query"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "refusal": {
+            "rule_code": "UNKNOWN_FACT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "refusal": {
+            "rule_code": "UNKNOWN_CLAIM",
+            "item_path": "observed[0].claim_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "refusal": {
+            "rule_code": "UNKNOWN_FRAGMENT",
+            "item_path": "headline_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "refusal": {
+            "rule_code": "UNKNOWN_QUESTION",
+            "item_path": "next_questions[0].question_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "note"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "refusal": {
+            "rule_code": "MAX_COUNT",
+            "item_path": "layout[1]"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "refusal": {
+            "rule_code": "SLOT_MISSING",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "refusal": {
+            "rule_code": "SLOT_EXTRA",
+            "item_path": "observed[0].slots.other"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "refusal": {
+            "rule_code": "SLOT_UNIT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "refusal": {
+            "rule_code": "SLOT_GEOGRAPHY",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "refusal": {
+            "rule_code": "SLOT_PERIOD",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "refusal": {
+            "rule_code": "SLOT_PROVENANCE",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "refusal": {
+            "rule_code": "LINEAGE_REF",
+            "item_path": "observed[0].slots.reading.lineage_ref"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "refusal": {
+            "rule_code": "SOURCE_CHAIN",
+            "item_path": "lineage.lin_grid_people"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "refusal": {
+            "rule_code": "COMPANION",
+            "item_path": "companions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "refusal": {
+            "rule_code": "CATALOGUE_VERSION",
+            "item_path": "catalogue_version"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "refusal": {
+            "rule_code": "WITHHELD",
+            "item_path": "observed"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "refusal": {
+            "rule_code": "ASSUMPTIONS",
+            "item_path": "assumptions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "refusal": {
+            "rule_code": "SCOPE",
+            "item_path": "scope"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "refusal": {
+            "rule_code": "LIMITS",
+            "item_path": "limits"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        }
+      ],
+      "renderer": "server markup only; live DOM BLOCKED"
+    },
+    {
+      "name": "a2ui",
+      "cases": [
+        {
+          "id": "valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "withheld",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "malformed",
+          "refusal": {
+            "rule_code": "JSON",
+            "item_path": "brief"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "refusal": {
+            "rule_code": "UNKNOWN_COMPONENT",
+            "item_path": "layout[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "layout[0].props.text"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "query",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "stage[0].props.query"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "refusal": {
+            "rule_code": "UNKNOWN_FACT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "refusal": {
+            "rule_code": "UNKNOWN_CLAIM",
+            "item_path": "observed[0].claim_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "refusal": {
+            "rule_code": "UNKNOWN_FRAGMENT",
+            "item_path": "headline_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "refusal": {
+            "rule_code": "UNKNOWN_QUESTION",
+            "item_path": "next_questions[0].question_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "note"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "refusal": {
+            "rule_code": "MAX_COUNT",
+            "item_path": "layout[1]"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "refusal": {
+            "rule_code": "SLOT_MISSING",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "refusal": {
+            "rule_code": "SLOT_EXTRA",
+            "item_path": "observed[0].slots.other"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "refusal": {
+            "rule_code": "SLOT_UNIT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "refusal": {
+            "rule_code": "SLOT_GEOGRAPHY",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "refusal": {
+            "rule_code": "SLOT_PERIOD",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "refusal": {
+            "rule_code": "SLOT_PROVENANCE",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "refusal": {
+            "rule_code": "LINEAGE_REF",
+            "item_path": "observed[0].slots.reading.lineage_ref"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "refusal": {
+            "rule_code": "SOURCE_CHAIN",
+            "item_path": "lineage.lin_grid_people"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "refusal": {
+            "rule_code": "COMPANION",
+            "item_path": "companions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "refusal": {
+            "rule_code": "CATALOGUE_VERSION",
+            "item_path": "catalogue_version"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "refusal": {
+            "rule_code": "WITHHELD",
+            "item_path": "observed"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "refusal": {
+            "rule_code": "ASSUMPTIONS",
+            "item_path": "assumptions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "refusal": {
+            "rule_code": "SCOPE",
+            "item_path": "scope"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "refusal": {
+            "rule_code": "LIMITS",
+            "item_path": "limits"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        }
+      ],
+      "renderer": "BLOCKED: requires browser HTMLElement and surface construction"
+    },
+    {
+      "name": "json-render",
+      "cases": [
+        {
+          "id": "valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "withheld",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>This result is withheld. Read the coverage reason.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "malformed",
+          "refusal": {
+            "rule_code": "JSON",
+            "item_path": "brief"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "refusal": {
+            "rule_code": "UNKNOWN_COMPONENT",
+            "item_path": "layout[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "layout[0].props.text"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "query",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "stage[0].props.query"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "refusal": {
+            "rule_code": "UNKNOWN_FACT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "refusal": {
+            "rule_code": "UNKNOWN_CLAIM",
+            "item_path": "observed[0].claim_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "refusal": {
+            "rule_code": "UNKNOWN_FRAGMENT",
+            "item_path": "headline_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "refusal": {
+            "rule_code": "UNKNOWN_QUESTION",
+            "item_path": "next_questions[0].question_key"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "refusal": {
+            "rule_code": "UNKNOWN_DIRECTIVE",
+            "item_path": "stage[0].component"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "refusal": {
+            "rule_code": "UNKNOWN_PROPERTY",
+            "item_path": "note"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "refusal": {
+            "rule_code": "MAX_COUNT",
+            "item_path": "layout[1]"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "refusal": {
+            "rule_code": "SLOT_MISSING",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "refusal": {
+            "rule_code": "SLOT_EXTRA",
+            "item_path": "observed[0].slots.other"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "refusal": {
+            "rule_code": "SLOT_UNIT",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "refusal": {
+            "rule_code": "SLOT_GEOGRAPHY",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "refusal": {
+            "rule_code": "SLOT_PERIOD",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "refusal": {
+            "rule_code": "SLOT_PROVENANCE",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "refusal": {
+            "rule_code": "LINEAGE_REF",
+            "item_path": "observed[0].slots.reading.lineage_ref"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "refusal": {
+            "rule_code": "SOURCE_CHAIN",
+            "item_path": "lineage.lin_grid_people"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "refusal": {
+            "rule_code": "COMPANION",
+            "item_path": "companions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "refusal": {
+            "rule_code": "CATALOGUE_VERSION",
+            "item_path": "catalogue_version"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "refusal": {
+            "rule_code": "WITHHELD",
+            "item_path": "observed"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "refusal": {
+            "rule_code": "ASSUMPTIONS",
+            "item_path": "assumptions"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "refusal": {
+            "rule_code": "SCOPE",
+            "item_path": "scope"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "refusal": {
+            "rule_code": "LIMITS",
+            "item_path": "limits"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "refusal": null,
+          "severity": null,
+          "sinkCommits": 1,
+          "markup": "<output>Catalogue selection checked. Fact display awaits the application component.</output>",
+          "timeline": [
+            "complete",
+            "accounting",
+            "instance-validation",
+            "commit"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "refusal": {
+            "rule_code": "SLOT_METRIC",
+            "item_path": "observed[0].slots.reading"
+          },
+          "severity": "blocking",
+          "sinkCommits": 0,
+          "markup": null,
+          "timeline": [
+            "complete",
+            "refused"
+          ]
+        }
+      ],
+      "renderer": "server markup only; live DOM BLOCKED"
+    }
+  ],
+  "streams": [
+    {
+      "candidate": "native",
+      "cuts": 18264,
+      "premature": 0,
+      "stale": 0,
+      "commits": 1787,
+      "cases": [
+        {
+          "id": "valid",
+          "cuts": 608,
+          "commits": 608,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "withheld",
+          "cuts": 526,
+          "commits": 526,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "malformed",
+          "cuts": 2,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "cuts": 598,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "cuts": 631,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "query",
+          "cuts": 634,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "cuts": 611,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "cuts": 604,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "cuts": 594,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "cuts": 593,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "cuts": 609,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "cuts": 623,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "cuts": 651,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "cuts": 562,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "cuts": 653,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "cuts": 555,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "cuts": 608,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "cuts": 653,
+          "commits": 653,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "cuts": 653,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "a2ui",
+      "cuts": 21279,
+      "premature": 0,
+      "stale": 0,
+      "commits": 2078,
+      "cases": [
+        {
+          "id": "valid",
+          "cuts": 707,
+          "commits": 707,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "withheld",
+          "cuts": 615,
+          "commits": 615,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "malformed",
+          "cuts": 31,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "cuts": 697,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "cuts": 734,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "query",
+          "cuts": 737,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "cuts": 710,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "cuts": 703,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "cuts": 693,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "cuts": 692,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "cuts": 708,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "cuts": 726,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "cuts": 756,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "cuts": 657,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "cuts": 756,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "cuts": 654,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "cuts": 707,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "cuts": 756,
+          "commits": 756,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "cuts": 756,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        }
+      ]
+    },
+    {
+      "candidate": "json-render",
+      "cuts": 20752,
+      "premature": 0,
+      "stale": 0,
+      "commits": 2027,
+      "cases": [
+        {
+          "id": "valid",
+          "cuts": 690,
+          "commits": 690,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "withheld",
+          "cuts": 598,
+          "commits": 598,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "malformed",
+          "cuts": 14,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_component",
+          "cuts": 680,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "free_prose",
+          "cuts": 717,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "query",
+          "cuts": 720,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unreturned_fact",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_action",
+          "cuts": 693,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_claim",
+          "cuts": 686,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_fragment",
+          "cuts": 676,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_question",
+          "cuts": 675,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_directive",
+          "cuts": 691,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unknown_property",
+          "cuts": 709,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "excess_components",
+          "cuts": 739,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "swapped_valid_fact",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_slot",
+          "cuts": 640,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "extra_slot",
+          "cuts": 739,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_unit",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_geography",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_period",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "wrong_provenance",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_lineage_ref",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_source_chain",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_companion",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "unsupported_version",
+          "cuts": 637,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "withheld_hidden_value",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "assumption_invention",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "outside_scope",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "missing_limits",
+          "cuts": 690,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        },
+        {
+          "id": "paired_valid",
+          "cuts": 739,
+          "commits": 739,
+          "timeline": [
+            "complete",
+            "validated",
+            "committed"
+          ]
+        },
+        {
+          "id": "paired_swap",
+          "cuts": 739,
+          "commits": 0,
+          "timeline": [
+            "complete",
+            "validated"
+          ]
+        }
+      ]
+    }
+  ],
+  "failureMatrix": [
+    {
+      "name": "plain-events",
+      "mode": "normal",
+      "commits": 1,
+      "outcome": "accepted"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "normal",
+      "commits": 1,
+      "outcome": "accepted"
+    },
+    {
+      "name": "plain-events",
+      "mode": "malformed",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "malformed",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "plain-events",
+      "mode": "interrupted",
+      "commits": 0,
+      "outcome": "cancelled"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "interrupted",
+      "commits": 0,
+      "outcome": "cancelled"
+    },
+    {
+      "name": "plain-events",
+      "mode": "duplicate",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "duplicate",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "plain-events",
+      "mode": "reordered",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "reordered",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "plain-events",
+      "mode": "late",
+      "commits": 0,
+      "outcome": "rejected"
+    },
+    {
+      "name": "ag-ui",
+      "mode": "late",
+      "commits": 0,
+      "outcome": "rejected"
+    }
+  ],
+  "fallback": [
+    {
+      "outcome": "invalid_repair",
+      "writer": "template",
+      "sameFacts": true,
+      "history": [
+        "original system turn",
+        "invented user turn",
+        "{\"role\":\"user\",\"request\":\"Correct structured data\",\"rule\":\"JSON\",\"path\":\"brief\"}"
+      ]
+    },
+    {
+      "outcome": "refusal",
+      "writer": "template",
+      "sameFacts": true,
+      "history": [
+        "original system turn",
+        "invented user turn"
+      ]
+    },
+    {
+      "outcome": "max_tokens",
+      "writer": "template",
+      "sameFacts": true,
+      "history": [
+        "original system turn",
+        "invented user turn"
+      ]
+    },
+    {
+      "outcome": "api_error",
+      "writer": "template",
+      "sameFacts": true,
+      "history": [
+        "original system turn",
+        "invented user turn"
+      ]
+    },
+    {
+      "outcome": "timeout",
+      "writer": "template",
+      "sameFacts": true,
+      "history": [
+        "original system turn",
+        "invented user turn"
+      ]
+    }
+  ],
+  "dispatcherPlants": [
+    "forged_receipt",
+    "receipt_replay",
+    "severity_downgrade",
+    "unknown_action",
+    "unactivated",
+    "forged_activation",
+    "activation_replay",
+    "activation_expired"
+  ],
+  "counts": {
+    "shared": {
+      "files": [
+        "native-dispatch.ts",
+        "stream.ts",
+        "repair.ts",
+        "transport.ts",
+        "wording.ts",
+        "oracle.py",
+        "network-guard.mjs"
+      ],
+      "maintained": true,
+      "lines": 412
+    },
+    "native": {
+      "files": [
+        "adapters/native.ts"
+      ],
+      "maintained": true,
+      "lines": 18
+    },
+    "a2ui": {
+      "files": [
+        "adapters/a2ui.ts",
+        "adapters/a2ui-runtime.ts"
+      ],
+      "maintained": true,
+      "lines": 21
+    },
+    "json-render": {
+      "files": [
+        "adapters/json-render.ts"
+      ],
+      "maintained": true,
+      "lines": 27
+    },
+    "plain-events": {
+      "files": [
+        "adapters/plain-events.ts"
+      ],
+      "maintained": true,
+      "lines": 5
+    },
+    "ag-ui": {
+      "files": [
+        "adapters/ag-ui.ts"
+      ],
+      "maintained": true,
+      "lines": 21
+    },
+    "harness": {
+      "files": [
+        "guards.mjs",
+        "record.mjs",
+        "verify-evidence.mjs",
+        "count-lines.mjs",
+        "fixture-builder.py",
+        "main.tsx",
+        "vite.config.ts",
+        "tests/run.mjs"
+      ],
+      "maintained": true,
+      "lines": 750
+    },
+    "tests": {
+      "files": [
+        "scenarios.mjs",
+        "tests/helpers.mjs",
+        "tests/guards.node-test.mjs"
+      ],
+      "maintained": true,
+      "lines": 547
+    },
+    "generated": {
+      "files": [
+        "fixtures/cases.json",
+        "fixtures/manifest.json",
+        "fixtures/paired-cases.json",
+        "fixtures/paired-manifest.json",
+        "fixtures/catalogue/claims.yaml",
+        "fixtures/catalogue/components.yaml",
+        "fixtures/catalogue/fragments.yaml",
+        "fixtures/catalogue/questions.yaml",
+        "fixtures/catalogue-paired/claims.yaml",
+        "fixtures/catalogue-paired/components.yaml",
+        "fixtures/catalogue-paired/fragments.yaml",
+        "fixtures/catalogue-paired/questions.yaml"
+      ],
+      "maintained": false,
+      "lines": 1947
+    },
+    "vendor": {
+      "files": [],
+      "maintained": false,
+      "lines": 0
+    }
+  },
+  "networkAttempts": 0,
+  "activation": "host seam tested; real browser user-event activation BLOCKED",
+  "selection": "native",
+  "selectionReason": "L-974 requires every criterion PASS and less code. Browser, Fact chips, official-page reading and independent review remain BLOCKED; every adapter adds maintained lines.",
+  "acceptance": [
+    {
+      "criterion": "predeclare_identical_fixtures",
+      "status": "PASS",
+      "evidence": "contract and fixture hashes; all candidates have every canonical envelope case"
+    },
+    {
+      "criterion": "zero_unauthorized_output",
+      "status": "BLOCKED",
+      "evidence": "oracle and dispatch sinks pass plants; native/json-render server markup only, A2UI and live DOM/accessibility/render commits need browser"
+    },
+    {
+      "criterion": "interrupted_streams",
+      "status": "BLOCKED",
+      "evidence": "every-byte harness commits and cancellation pass; transient browser observation pending"
+    },
+    {
+      "criterion": "shared_dispatcher",
+      "status": "PASS",
+      "evidence": "story, explore, assistant are the same entry function; equal corpus logs; forged receipt rejected"
+    },
+    {
+      "criterion": "versions_severity_activation",
+      "status": "BLOCKED",
+      "evidence": "version/severity/host activation seam plants pass; real same-turn user event proof pending"
+    },
+    {
+      "criterion": "closed_schema_slots",
+      "status": "PASS",
+      "evidence": "existing check_brief bridge; each invalid case has exact rule/path and valid control"
+    },
+    {
+      "criterion": "repair_fallback",
+      "status": "PASS",
+      "evidence": "append-only recorded turns, one repair, invalid repair and terminal statuses use validated same-facts template"
+    },
+    {
+      "criterion": "withheld_unchanged_controls",
+      "status": "BLOCKED",
+      "evidence": "withheld wording, full source-chain and companion plants pass; numeric Fact chip display absent, production accounting gate not claimed"
+    },
+    {
+      "criterion": "transport_comparison",
+      "status": "PASS",
+      "evidence": "frozen line lists plus both transports over every failure mode; these are CUSTOM-envelope harness events only"
+    },
+    {
+      "criterion": "decision_isolation",
+      "status": "BLOCKED",
+      "evidence": "native retained and import/evidence guards pass; lead confirms Proposed decision number and different-maker review"
+    }
+  ]
+}

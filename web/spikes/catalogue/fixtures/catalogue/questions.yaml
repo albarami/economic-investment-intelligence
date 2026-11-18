@@ -1,0 +1,20 @@
+version: 1
+questions:
+  - question_key: foundation_ask_shape
+    playbook: site_check
+    personas: [local]
+    slots: []
+    template_en: "What does the area you drew show?"
+    template_ar: "ماذا تظهر المنطقة التي رسمتها؟"
+  - question_key: foundation_ask_walk
+    playbook: site_check
+    personas: [local]
+    slots: []
+    template_en: "What does a walk area from this pin show?"
+    template_ar: "ماذا تظهر منطقة المشي من هذه النقطة؟"
+  - question_key: foundation_ask_context
+    playbook: site_check
+    personas: [local]
+    slots: []
+    template_en: "What public context does this area have?"
+    template_ar: "ما السياق العام لهذه المنطقة؟"
