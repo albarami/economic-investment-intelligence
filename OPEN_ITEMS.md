@@ -3581,8 +3581,6 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The split-policy run at 072ae84 overlapped another campaign and was explicitly not a normal-load replay. The forecast rerun exited 143, runner 3. S2-T26 approval still awaited three core timeout replays. No closure record for these is supplied.
 - NEEDED: The lead enumerates the exact mutant identities and replays them alone at normal load, retaining failures and cause analysis separately. Later hash-matched campaigns may answer survivors but do not erase these timeout incidents.
 
-### PO-S2-72 — Stateful caller keys can still change project identity after validation
-
 ### PO-S2-87 — Stateful caller keys can still change project identity after validation
 
 - ID: PO-S2-87
