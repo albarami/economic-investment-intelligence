@@ -191,7 +191,8 @@ def test_retry_sleep_and_reason(tmp_path):
     refused(
         "unreachable", lambda: run(tmp_path, dec, b"", send=send, sleep=sleeps.append)
     )
-    assert calls and sleeps
+    assert calls == [URL] * 4
+    assert sleeps == [1.0, 2.0, 4.0]
 
 
 @pytest.mark.parametrize(

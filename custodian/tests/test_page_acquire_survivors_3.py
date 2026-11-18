@@ -2,6 +2,7 @@
 
 import html
 import json
+import ssl
 
 import pytest
 from custodian.tests.test_page_acquire_survivors_1 import refused, run
@@ -19,6 +20,22 @@ from custodian.tests.test_s2_t29_live_shapes import (
 from eii_custodian.publicdata.fetch import page_acquire as acquire
 from eii_custodian.publicdata.fetch import page_requests, transport
 from eii_custodian.publicdata.fetch.certificate_pins import PinError
+
+
+@pytest.fixture(autouse=True)
+def isolated_ca_store(tmp_path, monkeypatch):
+    """Keep default contexts independent of the machine's certificate store."""
+    ca_file = tmp_path / "SYN-empty-ca.pem"
+    ca_file.write_bytes(b"")
+    ca_dir = tmp_path / "SYN-empty-ca-dir"
+    ca_dir.mkdir()
+    monkeypatch.setenv("SSL_CERT_FILE", str(ca_file))
+    monkeypatch.setenv("SSL_CERT_DIR", str(ca_dir))
+    assert ssl.create_default_context().get_ca_certs() == []
+
+
+def test_default_context_has_no_ambient_certificates():
+    assert ssl.create_default_context().get_ca_certs() == []
 
 
 @pytest.mark.parametrize("plant", ["valid", "duplicate", "malformed"])
@@ -62,7 +79,9 @@ def test_pinned_redirect_rechecks_context(tmp_path, invented_certs, monkeypatch)
 
     def context(host):
         calls.append(host)
-        return original(host)
+        result = original(host)
+        assert result.get_ca_certs(binary_form=True) == [invented_certs["intermediate"]]
+        return result
 
     monkeypatch.setattr(acquire, "page_context", context)
     result = run(
