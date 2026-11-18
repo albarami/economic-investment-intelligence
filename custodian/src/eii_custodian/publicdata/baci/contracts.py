@@ -96,11 +96,12 @@ def read_selected(cache: Path, selected: str) -> Release:
             manifest["terms_fingerprint_kind"] == "visible_text", "terms_fingerprint"
         )
         retrieved = receipt["retrieved_utc"]
+        try:
+            parsed_clock = datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            raise BaciError("retrieval_date") from None
         require(
-            datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ").strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            )
-            == retrieved,
+            parsed_clock.strftime("%Y-%m-%dT%H:%M:%SZ") == retrieved,
             "retrieval_date",
         )
         digest = manifest["archive_sha256"]

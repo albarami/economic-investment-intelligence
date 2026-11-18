@@ -274,10 +274,16 @@ def build_project_evidence(
             )
         seen_snapshots.add(item.identity)
         item = replace(item, rows=tuple(dict(row) for row in item.rows))
-        metadata = _metadata_failure(item)
-        if isinstance(metadata, InvestmentFailure):
-            return metadata
-        item = replace(item, snapshot=metadata)
+        # A Snapshot keeps the caller rows. Parser rows replace them.
+        authenticated: ProjectSnapshot | Snapshot | InvestmentFailure = (
+            _metadata_failure(item)
+        )
+        if isinstance(authenticated, InvestmentFailure):
+            return authenticated
+        if isinstance(authenticated, Snapshot):
+            item = replace(item, snapshot=authenticated)
+        else:
+            item = authenticated
         source_id = str(item.snapshot.sidecar.get("source_id", ""))
         current = {
             f"{row.get('source_id', '')}:project:{row.get('project_id', '')}"
@@ -412,6 +418,10 @@ def audit_project_evidence(
     canonical_projects = build_project_evidence(canonical_snapshots)
     if isinstance(canonical_projects, InvestmentFailure):
         return canonical_projects
+    if not canonical_snapshots:
+        unauthenticated = _refuse_unauthenticated_audit(evidence, expected, attempts)
+        if unauthenticated is not None:
+            return unauthenticated
     if (
         evidence.revisions != canonical_projects.revisions
         or evidence.absences != canonical_projects.absences
@@ -820,6 +830,30 @@ def _attempt_entry(
     )
 
 
+def _plain_text(value: object) -> bool:
+    return type(value) is str
+
+
+def _refuse_unauthenticated_audit(
+    evidence: ProjectEvidence,
+    expected: tuple[ExpectedInput, ...],
+    attempts: tuple[FetchAttempt, ...],
+) -> InvestmentFailure | None:
+    """Refuse caller objects when no authenticated parser row can replace them."""
+    if type(evidence.revisions) is not tuple or type(evidence.absences) is not tuple:
+        return _audit_failure("", "plain sequence")
+    for attempt in attempts:
+        if not _plain_text(attempt.source_id) or not _plain_text(attempt.key):
+            return _audit_failure("", "plain key")
+    for registration in expected:
+        if not _plain_text(registration.source_id) or not _plain_text(registration.key):
+            return _audit_failure("", "plain key")
+    for milestone in evidence.milestones:
+        if not _plain_text(milestone.candidate.source_id):
+            return _audit_failure("", "plain key")
+    return None
+
+
 def _audit_failure(source_id: str, observed: str) -> InvestmentFailure:
     return InvestmentFailure(
         1,
@@ -1214,8 +1248,8 @@ def _candidate_failure(
     )
 
 
-def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
-    """Return the verified snapshot, refusing conflicting receipt metadata."""
+def _metadata_failure(item: ProjectSnapshot) -> ProjectSnapshot | InvestmentFailure:
+    """Return the authenticated parser snapshot after archived-row equality."""
     snapshot = _reread_snapshot(item.snapshot, item.identity)
     side = snapshot.sidecar
     _ = snapshot.body
@@ -1294,7 +1328,7 @@ def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
         return _refusal(
             item, "invalid_evidence_metadata", "archived parser output", "mismatch"
         )
-    return snapshot
+    return canonical
 
 
 def _valid_assertion(assertion: SourceAssertion, *, correction: bool = False) -> bool:

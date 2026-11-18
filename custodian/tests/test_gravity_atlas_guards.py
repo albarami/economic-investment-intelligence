@@ -291,7 +291,7 @@ READER_PLANTS = [
     ("attribution", "wrong", "lineage"),
     ("publisher_mapping", "wrong", "publisher_mapping"),
     ("terms_fingerprint_kind", "wrong", "terms_fingerprint"),
-    ("receipt.retrieved_utc", "wrong", "selected_manifest_invalid"),
+    ("receipt.retrieved_utc", "wrong", "retrieval_date"),
     ("receipt.retrieved_utc", "2026-1-1T00:00:00Z", "retrieval_date"),
     ("receipt.publisher", "wrong", "source_chain"),
     ("receipt.landing_url", "wrong", "source_chain"),
