@@ -236,14 +236,16 @@ The tables retain every campaign and module status row, including failed starts 
 
 ### Evidence inventory
 
+Each record is one file of the retained evidence folder, named in the second column; its SHA-256 fingerprint identifies the exact bytes read. Where a file name carries the name of a working role, that word is shown as [role]. Several records can be campaigns read from the same file.
+
 | Record | Input file | SHA-256 |
 | --- | --- | --- |
 | R001 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R002 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R003 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R004 | S1-T08.lead.mutation.txt | 76dbd00a307972e4af288d372d43adabe1a15a6bb9bd291b75e735e707bdbbf7 |
-| R005 | S1-T09.lead.mutation.txt | fb7cf8cdc84e23f378820a107cccaa19cb4a8d432fb3038fe55300efdf4b8389 |
-| R006 | S1-T11.lead.mutation-python.txt | cff9b9737866033ebffd6b47a2eb4397ad82d8f2ab16b5888cb140acce0de622 |
+| R004 | S1-T08.[role].mutation.txt | 76dbd00a307972e4af288d372d43adabe1a15a6bb9bd291b75e735e707bdbbf7 |
+| R005 | S1-T09.[role].mutation.txt | fb7cf8cdc84e23f378820a107cccaa19cb4a8d432fb3038fe55300efdf4b8389 |
+| R006 | S1-T11.[role].mutation-python.txt | cff9b9737866033ebffd6b47a2eb4397ad82d8f2ab16b5888cb140acce0de622 |
 | R007 | S1-T18.mutation-web.txt | 1512e60d62d881e8343db12009b0730862177c5789f06f82d50e8d0eb42d52ee |
 | R008 | S1-T18.mutation-replay.txt | 73c8480e4bbfc61b74736658c866c10d9b329c5a448ededd7c381439c26d27e6 |
 | R009 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
@@ -333,7 +335,7 @@ The tables retain every campaign and module status row, including failed starts 
 | R093 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R094 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R095 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R096 | S4-T14.lead.mut.ca38e73.out | b8f181053415ef4bca46b138b9624bde16d33ae36e1c17077782f456350decb5 |
+| R096 | S4-T14.[role].mut.ca38e73.out | b8f181053415ef4bca46b138b9624bde16d33ae36e1c17077782f456350decb5 |
 | R097 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R098 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
 | R099 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
