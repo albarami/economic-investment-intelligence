@@ -2573,6 +2573,69 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - COMPARISON: OI-168 holds the namespace requirement itself and stays as it is; no existing item records that the runner tests run in no required check.
 - NEEDED: Every check of a change to `scripts/mutation.py` or its runner tests runs `uv run --locked python -m unittest scripts.tests.mutation_runner -v` with the group `mutation`; the slice S2 gate decides whether a required hosted check runs them.
 
+## OI-282 — S2-T09 source-check lineage is not resolved against registry and receipts
+
+- ID: OI-282
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, original review F9 at cfacc00276a6d887a2acc99a0fc7fcc56155fb8d (the file named revA actually reviewed lens B); fix pass 1 by Zhipu AI GLM-5.3; lead ruling L-984 requires the ledger entry.
+- CONCERNS: `custodian/src/eii_custodian/publicdata/method_card_validation.py`, `_lineage` and `validate_source_check_record`; `custodian/publicdata/sources.yaml`; the build-public provenance receipt contract; AGENTS.md rule 19; MTH-03 and TST-198.
+- EVIDENCE: The fixer recorded these words in `.overnight/IN/ledger/verdicts/S2-T09.fix1.return.md`, section F9:
+
+  > "OI (S2-T09 pass 2): the source-check record's checked lineage is
+  > format-checked and compared against the producer artifact only: `source_id`
+  > is never resolved against the source registry that
+  > `custodian/publicdata/sources.yaml` uses, and `sha256` is never matched
+  > against the build-public provenance receipt, so a wrong but self-consistent
+  > artifact passes. Pass 2 must resolve every checked `source_id` in that
+  > registry and every checked `sha256` against its receipt, with planted
+  > violations for an unknown `source_id` and for a hash that differs from the
+  > receipt." The lead records it.
+
+- DONE SO FAR: At WORK caf72aea4b13d0d086017bebc4a8ff8c9dd10c20, source-derived checked pins still require format-valid lineage that is compared only with the supplied producer artifact. No registry or provenance receipt is opened by that validator. Fix pass 3 changed configuration pins: the sixteen settings pins accept empty lineage and are checked against their recorded settings/configuration-byte hash; they must not acquire invented source lineage. This qualification preserves the source-pin defect rather than claiming fix pass 3 resolved it. See log.md's F9 after fix 3 lead mark and `.overnight/IN/ledger/verdicts/S2-T09.fix3.return.md`, F1/F2 and Open points.
+- NEEDED: In live pinning, resolve each source-derived checked source_id against the registry and match its sha256 against its build-public provenance receipt, with independently planted unknown-source and receipt-hash-mismatch failures. Retain configuration-only evidence for the sixteen settings pins. A self-consistent producer artifact alone is insufficient. Another maker confirms the fix and its plants; no item is closed here.
+- NEEDED BY: S2-T09 live pinning after S2-T08 part B; the slice S2 and S7 MTH-03 completion evidence.
+
+## OI-283 — All MTH-03 method-card pins await S2-T08 part B's live build
+
+- ID: OI-283
+- TYPE: OPEN
+- RAISED BY: S2-T09 pass-1 builder; confirmations cfB3, cfA4 and cfB4 require this ledger record for the still-pending pins. Their approval is of pass-1 infrastructure, not live pin completion.
+- CONCERNS: MTH-03, MTH-51 and TST-198; `custodian/publicdata/review/s2_t09_source_checks.yaml`; REQUIRED_PINS and `completion_evidence` in `custodian/src/eii_custodian/publicdata/method_card_validation.py`; the S2-T08 part B public build and recorded generation configuration; `docs/07_ECONOMIC_METHODS.md`.
+- EVIDENCE: At WORK caf72aea4b13d0d086017bebc4a8ff8c9dd10c20, the code and record each enumerate 29 required pins, with identical sets. Every record entry has checked_against_source false, empty values and lineage, and unpinned_reason "awaiting the live public build of S2-T08 part B". Count and names below come from those two tracked files, not from review counts.
+- PENDING PINS:
+  - `wilson.period`
+  - `c5.hhi`
+  - `c5.prior12`
+  - `c5.latest12`
+  - `c5.trend`
+  - `c6.seed`
+  - `c6.release_sha256`
+  - `c6.category_ids`
+  - `c6.candidate_set`
+  - `c6.box`
+  - `c6.confidence_min`
+  - `c6.radius_m`
+  - `c6.permutations`
+  - `c6.fdr`
+  - `c6.min_neighbours`
+  - `c6.min_clq`
+  - `c6.max_shown`
+  - `c6.expected_clq`
+  - `c6.expected_p`
+  - `c6.expected_q`
+  - `c7.coordinates`
+  - `c7.modes`
+  - `c7.cutoffs`
+  - `c7.speed_regime`
+  - `c7.district_weights`
+  - `c7.shared_b_given_a`
+  - `c7.shared_a_given_b`
+  - `c14.medians_2024`
+  - `c14.medians_2025`
+- DONE SO FAR: Pass 1 supplies the reviewed closed record validator, method-section synchronization, callable fail-closed S2/S7 completion evidence and invented-fixture arithmetic/replay tests. No live value is written; the method document is unchanged. Sixteen configuration-only pins and thirteen source-derived pins remain unpinned; configuration evidence is distinct from source lineage.
+- NEEDED: S2-T08 part B produces the exact regression inputs and recorded generation configuration. Confirm the real artifact/configuration paths, schemas, adapters and per-card readers; replay the exact inputs, including C14 riyal medians/deal counts, C5 parent review/windows, live C6 projection/category handling and C7 geometry. A different maker checks every source-derived value against its source/receipt and every setting against the recorded configuration, then checked values enter the governed method-card blocks. Integration owners call completion_evidence from the S2/S7 acceptance paths. Any value still unpinnable remains individually pending with its reason. No invented fixture or open-item entry clears either gate.
+- NEEDED BY: S2-T08 part B and the S2 gate; also the S7 gate under MTH-03/TST-198.
+
 ## OI-284 — Three wording notes of the mutation handoff's last check
 
 - ID: OI-284
