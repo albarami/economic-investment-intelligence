@@ -6,13 +6,19 @@ from collections import UserDict
 from dataclasses import replace
 
 import pytest
+import yaml
 from custodian.tests.test_s2_t29_awards import STAMP, profile
 from custodian.tests.test_s2_t29_fix import award_intake
 from custodian.tests.test_s2_t29_fix10 import config_file, make_pin
 from custodian.tests.test_s2_t29_fix10 import invented_certs as invented_certs
 from custodian.tests.test_s2_t29_live_awards import report
 
-from eii_custodian.publicdata.fetch import awards, certificate_pins, page_requests
+from eii_custodian.publicdata.fetch import (
+    awards,
+    certificate_pins,
+    page_records,
+    page_requests,
+)
 from eii_custodian.publicdata.fetch.award_checks import AwardError
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
@@ -23,7 +29,7 @@ from eii_custodian.publicdata.fetch.transport import _METADATA_LIMIT, Response
 def isolated_trust(tmp_path, monkeypatch, invented_certs):
     """Keep every SSL context in these pin tests on invented trust only."""
     root = tmp_path / "SYN-root.pem"
-    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]))
+    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]), encoding="utf-8")
     empty = tmp_path / "SYN-empty-certificates"
     empty.mkdir()
     monkeypatch.setenv("SSL_CERT_FILE", str(root))
@@ -75,8 +81,36 @@ def setup(tmp_path, monkeypatch, *, version=2, host="www.data.gov.qa"):
         (folder / "syn.csv").write_bytes(intake_body)
         manifest = json.loads((folder / "intake.json").read_text(encoding="utf-8"))
         manifest["sha256"] = sha256_hex(intake_body)
-        (folder / "intake.json").write_text(json.dumps(manifest))
-    monkeypatch.setattr(awards, "load_declaration", lambda _: dec)
+        (folder / "intake.json").write_text(json.dumps(manifest), encoding="utf-8")
+    path = tmp_path / "SYN-declaration.yaml"
+    real_load = page_records.load_declaration
+    calls = []
+
+    def load(source):
+        calls.append((source, path))
+        # Tests change dec after setup; persist that exact case before loading.
+        document = {"sources": {"awards_owner_scrape": dec}}
+        mapping = dec["profile"].get("proof_columns")
+        if isinstance(mapping, UserDict):
+            document = {
+                "sources": {
+                    "awards_owner_scrape": dict(
+                        dec, profile=dict(dec["profile"], proof_columns=dict(mapping))
+                    )
+                }
+            }
+        path.write_text(yaml.safe_dump(document), encoding="utf-8")
+        loaded = real_load(source, path)
+        assert calls == [("awards_owner_scrape", path)]
+        if isinstance(mapping, UserDict):
+            # YAML yields dicts. Preserve this separate in-memory type plant
+            # after the real loader has checked the document and source.
+            loaded["profile"]["proof_columns"] = UserDict(
+                loaded["profile"]["proof_columns"]
+            )
+        return loaded
+
+    monkeypatch.setattr(awards, "load_declaration", load)
     return entry, dec, body
 
 
@@ -213,7 +247,7 @@ def test_pin_selection_and_request_context(
     loaded = []
 
     def load(cache, source, config):
-        assert cache == tmp_path and source == awards.SOURCE
+        assert cache == tmp_path and source == "awards_owner_scrape"
         assert config == configured
         loaded.append(config)
         return real_load(cache, source, config)
@@ -240,12 +274,12 @@ def test_legacy_explicit_pin_off_tender_host(tmp_path, monkeypatch, isolated_tru
     der = isolated_trust["intermediate"]
     dec["pin"] = config_file(tmp_path, der, entry.fetch_host, awards.SOURCE)
     real_load = awards.load_pin
-    chosen = real_load(tmp_path, awards.SOURCE, dec["pin"])
+    chosen = real_load(tmp_path, "awards_owner_scrape", dec["pin"])
     assert chosen == make_pin(der, entry.fetch_host)
     loaded = []
 
     def load(cache, source, config):
-        assert (cache, source, config) == (tmp_path, awards.SOURCE, dec["pin"])
+        assert (cache, source, config) == (tmp_path, "awards_owner_scrape", dec["pin"])
         loaded.append(config)
         return real_load(cache, source, config)
 
@@ -354,7 +388,7 @@ def test_fetch_register_inputs_survive(tmp_path, monkeypatch):
     path = tmp_path / "intake" / awards.SOURCE / "intake.json"
     manifest = json.loads(path.read_text(encoding="utf-8"))
     manifest["register_selections"] = [selection]
-    path.write_text(json.dumps(manifest))
+    path.write_text(json.dumps(manifest), encoding="utf-8")
     result = fetch(entry, tmp_path, body)
     assert result.sidecar["registration_inputs"] == [
         {

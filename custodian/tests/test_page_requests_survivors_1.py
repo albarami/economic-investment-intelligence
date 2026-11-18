@@ -7,8 +7,13 @@ import pytest
 from custodian.tests import test_certificate_pins_survivors_1 as pin_tests
 
 from eii_custodian.publicdata.fetch import page_requests
-from eii_custodian.publicdata.fetch.page_schema import SCHOOL_FIELDS
 from eii_custodian.publicdata.fetch.transport import TransportFault
+
+SCHOOL_FIELDS = (
+    "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,"
+    "operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,"
+    "district_name,district_name_en,lat,long_"
+).split(",")
 
 SCHOOL = (
     "https://myschools.edu.gov.qa/SYN/arcgis/rest/services"

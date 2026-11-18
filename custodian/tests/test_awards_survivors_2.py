@@ -1,7 +1,5 @@
 """Archived register readers: invented JSON/CSV, precise refusals and lineage."""
 
-from dataclasses import replace
-
 import pytest
 from custodian.tests.test_s2_t29_awards import STAMP
 
@@ -16,6 +14,7 @@ def register(
     *,
     key="fc_register/SYN-part",
     format="csv_records",
+    receipt_changes=None,
     **side_changes,
 ):
     if body is None:
@@ -29,6 +28,7 @@ def register(
         retrieved_utc=STAMP,
     )
     side.update(side_changes)
+    side.update(receipt_changes or {})
     snap = publish_snapshot(
         tmp_path / key, "csv" if format == "csv_records" else "json", body, side
     )
@@ -79,8 +79,8 @@ def test_register_csv_bom_and_all_lineage(tmp_path):
         "name",
     ],
 )
-def test_register_closed_refusals(tmp_path, monkeypatch, plant):
-    snap, selection = register(tmp_path)
+def test_register_closed_refusals(tmp_path, plant):
+    _, selection = register(tmp_path)
     selections = [selection]
     reason = "register_schema_missing"
     if plant == "container":
@@ -112,12 +112,11 @@ def test_register_closed_refusals(tmp_path, monkeypatch, plant):
             "publisher": ("publisher", ""),
             "basis": ("licence_basis", ""),
         }[plant]
-        # read_snapshot is already independently tested for integrity; isolate
-        # the awards adapter's additional mandatory receipt fields.
-        side = dict(snap.sidecar, **{key: bad})
-        monkeypatch.setattr(
-            awards, "read_snapshot", lambda *args: replace(snap, sidecar=side)
-        )
+        # Publish a separate, integrity-valid archive with the malformed field.
+        cache = tmp_path / "SYN-malformed-receipt"
+        _, selection = register(cache, receipt_changes={key: bad})
+        tmp_path = cache
+        selections = [selection]
         reason = "receipt_missing"
     elif plant == "format":
         selection["format"] = "SYN unknown"

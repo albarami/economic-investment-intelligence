@@ -1,5 +1,7 @@
 """Partition-boundary and retry-provenance observations, without sockets."""
 
+from pathlib import Path
+
 from custodian.tests.test_partitions_survivors_1 import (
     PARTITION_URL,
     _reader,
@@ -7,17 +9,19 @@ from custodian.tests.test_partitions_survivors_1 import (
 )
 from custodian.tests.test_publicdata_behaviour import _ok
 
-from eii_custodian.publicdata.fetch import page_records, registry
+from eii_custodian.publicdata.fetch import registry
 from eii_custodian.publicdata.fetch.partitions import (
     bounded_partition_reader,
     load_partition_spans,
 )
-from eii_custodian.publicdata.fetch.transport import BACKOFF_S
 
 
 def test_partition_loader_uses_the_review_path(monkeypatch):
     def read(path):
-        assert path == page_records.REVIEW
+        assert path == (
+            Path(__file__).resolve().parents[1]
+            / "publicdata/review/s2_t29_sources.yaml"
+        )
         return {"accident_spans": {2001: [1, 2]}}
 
     monkeypatch.setattr(registry, "read_yaml", read)
@@ -49,7 +53,7 @@ def test_reader_retry_passes_the_sleep_callback():
     )
     assert result.body == b"x"
     assert attempts == [PARTITION_URL, PARTITION_URL]
-    assert delays == [BACKOFF_S[0]]
+    assert delays == [1.0]
 
 
 def test_reader_reports_undersized_body():

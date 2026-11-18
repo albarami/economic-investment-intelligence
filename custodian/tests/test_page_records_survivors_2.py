@@ -295,7 +295,8 @@ def test_terms_failure_retried_and_recorded_as_unread(tmp_path):
     seen = []
     pauses = []
     result = run(row, terms_transport(seen, fail=True), tmp_path, sleep=pauses.append)
-    assert pauses
+    assert pauses == [1.0, 2.0, 4.0]
+    assert [url for url, _ in seen] == [URL, TERMS, TERMS, TERMS, TERMS]
     assert result.sidecar["terms_unread"] == "unreachable"
     assert result.sidecar["terms_sha256"] is None
     assert not (tmp_path / row.key / "terms").exists()

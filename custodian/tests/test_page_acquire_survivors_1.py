@@ -174,12 +174,19 @@ def test_access_barrier(tmp_path, marker):
 
 @pytest.mark.parametrize("delta", [-1, 0])
 def test_byte_boundary(tmp_path, delta):
-    dec, body, _ = embedded()
+    dec, body, record = embedded()
     dec["max_bytes"] = len(body) + delta
     if delta:
         refused("metadata_bytes", lambda: run(tmp_path, dec, body))
     else:
-        assert json.loads(run(tmp_path, dec, body).body)["rows"]
+        assert json.loads(run(tmp_path, dec, body).body)["rows"] == [
+            {
+                "title": "SYN > event",
+                "start": "2031-02-03",
+                "end": "2031-02-04",
+                "published_record": record,
+            }
+        ]
 
 
 def test_retry_sleep_and_reason(tmp_path):
@@ -269,7 +276,7 @@ def test_complete_receipt_and_canonical_envelope(tmp_path, with_terms):
         "period_first": "2031-02-03",
         "period_last": "2031-02-04",
         "retrieved_utc": STAMP,
-        "method": acquire.METHOD,
+        "method": "page_acquire.fetch@v2",
         "provenance": "Public",
         "completeness": "unknown",
         "coverage": [],
@@ -284,7 +291,7 @@ def test_complete_receipt_and_canonical_envelope(tmp_path, with_terms):
         "terms_sha256": terms_hash or None,
         "period_first": "2031-02-03",
         "period_last": "2031-02-04",
-        "method": acquire.METHOD,
+        "method": "page_acquire.fetch@v2",
         "terms_unread": "",
     }.items():
         assert result.sidecar[name] == value

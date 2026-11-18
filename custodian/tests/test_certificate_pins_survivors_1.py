@@ -27,11 +27,14 @@ make_pin = fix10.make_pin
 def isolated_trust(tmp_path, monkeypatch, invented_certs):
     """Default contexts read only this disposable invented trust store."""
     root = tmp_path / "SYN-root.pem"
-    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]))
+    root.write_text(ssl.DER_cert_to_PEM_cert(invented_certs["root"]), encoding="utf-8")
     empty = tmp_path / "SYN-empty-trust"
     empty.mkdir()
     monkeypatch.setenv("SSL_CERT_FILE", str(root))
     monkeypatch.setenv("SSL_CERT_DIR", str(empty))
+    assert ssl.create_default_context().get_ca_certs(binary_form=True) == [
+        invented_certs["root"]
+    ]
 
 
 def test_default_context_trust_is_only_the_invented_root(invented_certs):
@@ -252,7 +255,7 @@ def test_load_capture_closed_reason(tmp_path, invented_certs, plant):
         record["hops"] = [URL, 5]
     if plant == "hops-text":
         record["hops"] = URL
-    path.write_text("{SYN" if plant == "json" else json.dumps(record))
+    path.write_text("{SYN" if plant == "json" else json.dumps(record), encoding="utf-8")
     with pytest.raises(certificates.PinError, match=exact("capture_evidence_missing")):
         certificates.load_capture(tmp_path, SOURCE, pin)
 
@@ -261,7 +264,7 @@ def test_load_capture_keeps_string_hops(tmp_path, invented_certs):
     pin, path, record = receipt(tmp_path, invented_certs)
     record["hops"] = [URL + "-SYN-a"]
     record["final_url"] = URL + "-SYN-a"
-    path.write_text(json.dumps(record))
+    path.write_text(json.dumps(record), encoding="utf-8")
     value = certificates.load_capture(tmp_path, SOURCE, pin)
     assert value is not None
     assert value.hops == (URL + "-SYN-a",)

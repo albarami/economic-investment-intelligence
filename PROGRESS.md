@@ -33960,3 +33960,55 @@ Initial inherited run: 131 passed, exit 0. Diagnosed fixture/backoff, seven repr
 | Date | Task and scope | Evidence | Maker and review |
 |---|---|---|---|
 | 2026-11-18 | Kill pass 4 review (rejected de70c0c): F1 two equivalence rows of `page_shapes.py` kept the hunk header `@@ -89,7 +89,7 @@` after fix 12 moved the code five lines; F2 two refusal tests expected any `ValueError`; F3 a code comment cited a workspace file git does not track | F1: both headers now `@@ -94,7 +94,7 @@`; a script that matches every `page_shapes.py` row's old lines against the current function finds 15 rows, 0 stale (2 stale before). F2: `test_page_shapes_survivors_1.py` expects the exact `zip()` longer and shorter messages; with the messages altered in a throwaway copy, 2 fail (exit 1), restored 61 pass. F3: the comment cites document 03, section "S2-T29 cached page and awards contracts", at the same line count, so no other hunk header moves. Checks: the nine kill-pass test files 171 passed; `ruff check`, `ruff format --check` (584 files), `mypy` (401 files), `check_docs.py`, `git diff --check` all exit 0; 897 explanation rows | Fix by the lead (Anthropic); confirmation by another maker owed |
+
+## S2-T29 — fix pass 13, test validity
+
+2026-11-18; OpenAI Codex (GPT-6), senior Python transport-security test engineer; strict mutation and test-integrity reviewer from another maker PENDING. Unchanged HEAD `7a0d22d61ce3afb6d97e3e7cbef4550c3aa9e154`; Git read-only, no commit/branch/push. Skills: task-standards, project-orientation, github-flow (read-only override), sanad-provenance, mutation-testing, muhasabah-gate; brief equivalents for unavailable test-driven-development, systematic-debugging and verification-before-completion.
+
+Replaced receipt stubs with real temporary snapshot archives and declaration stubs with UTF-8 YAML plus the real loader; preserved the explicit UserDict in-memory type plant after real document validation. Replaced production-derived expectations and nonempty rows/pauses/pin checks with independent exact values. The further 21-file C1–C7 scan strengthened school field fixtures, the policy refusal, scoped invented-root verification and UTF-8 fixture writes. Details and file/test/line references: `.overnight/RETURN.md`; scan hashes: `.overnight/tmp/fix13/scan-scope.json`; retained test names and assertion counts: `.overnight/tmp/fix13/scope-proof.json`.
+
+Exact supplied records only, no campaign: 329 awards-module records replayed in disposable copies; old tests killed 204, changed tests killed 204, zero lost kills. Original-code baselines exit 0; retained mutant kills exit 1 with copy import, SHA-256 and forwarded-call verification. Records not killed by these tests are not declared equivalent. No production or mutation-ledger change. Full matrix: `.overnight/tmp/fix13/replay-disposition.md`; logs and hashes: `replays-fast-v2.jsonl`, `replays-transitive.jsonl` under the same folder.
+
+Environment: Linux, uv 0.11.31, managed Python 3.14.6, taskset CPUs 16–19; bytecode disabled, offline uv, workspace-local cache and temporary paths. No world build/seed; pytest automatic seed not printed by quiet runs, no override.
+
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_partitions_survivors_2.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider`: exit 1; 1 failed, 183 passed in 3.03s; wall 3.741 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider`: exit 0; 18 passed in 0.30s; wall 0.993 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py custodian/tests/test_page_records_survivors_1.py custodian/tests/test_page_requests_survivors_1.py custodian/tests/test_page_schema_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/scan-tests`: exit 1; 1 failed, 195 passed in 1.05s; wall 1.806 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_awards_survivors_2`: exit 0; 18 passed in 0.33s; wall 1.078 s.
+- `python3 scripts/check_tree.py`: exit 0; checked 8 rules: OK; wall 0.119 s.
+- `uv run --locked ruff format --check .`: exit 0; 701 files already formatted; wall 0.232 s.
+- `uv run --locked ruff check .`: exit 1; 1 unsafe fix available with `--fix --unsafe-fixes`.; wall 0.28 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_awards_survivors_3`: exit 0; 29 passed in 2.39s; wall 3.367 s.
+- `uv run --locked ruff check .`: exit 0; All checks passed!; wall 0.075 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_certificate_pins_survivors_1`: exit 0; 32 passed in 0.68s; wall 1.555 s.
+- `uv run --locked mypy`: exit 0; Success: no issues found in 401 source files; wall 5.657 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_acquire_survivors_1`: exit 0; 58 passed in 0.59s; wall 1.417 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_2.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_acquire_survivors_2`: exit 0; 49 passed in 0.62s; wall 1.44 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_acquire_survivors_3`: exit 0; 11 passed in 0.70s; wall 1.482 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_records_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_records_survivors_1`: exit 0; 102 passed in 0.59s; wall 1.347 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_records_survivors_2`: exit 0; 14 passed in 0.67s; wall 1.439 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_requests_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_requests_survivors_1`: exit 0; 30 passed in 0.65s; wall 1.403 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_page_schema_survivors_1.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_page_schema_survivors_1`: exit 0; 32 passed in 0.45s; wall 1.275 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_partitions_survivors_2.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-test_partitions_survivors_2`: exit 0; 5 passed in 0.44s; wall 1.179 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_certificate_pins_survivors_1.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_html_survivors_1.py custodian/tests/test_page_records_survivors_1.py custodian/tests/test_page_records_survivors_2.py custodian/tests/test_page_requests_survivors_1.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_page_workbook_survivors_1.py custodian/tests/test_page_workbook_survivors_2.py custodian/tests/test_partitions_survivors_1.py custodian/tests/test_partitions_survivors_2.py custodian/tests/test_s2_t29_fix12.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/focused-all-kill-pass`: exit 0; 623 passed, 1 warning in 4.40s; wall 5.213 s.
+- `python3 scripts/check_docs.py`: exit 0; checked 981 text files, 107 Markdown files: OK; wall 1.312 s.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; (no output); wall 0.001 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/receipt-final`: exit 0; 18 passed in 0.33s; wall 1.046 s.
+- `taskset -c 16-19 uv run --locked python .overnight/tmp/fix13/old_baseline.py`: exit 0; 47 passed in 2.11s; wall 3.104 s.
+- `git diff --check`: exit 0; (no output); wall 0.003 s.
+- `taskset -c 16-19 uv run --locked python -m pytest custodian/tests core/tests -q -p no:cacheprovider --basetemp .overnight/tmp/fix13/full-tests`: exit 0; 7519 passed, 1 warning in 328.24s (0:05:28); wall 329.391 s.
+- `uv run --locked ruff format --check .`: exit 0; 701 files already formatted; wall 0.141 s.
+- `python3 scripts/check_tree.py`: exit 0; checked 8 rules: OK; wall 0.054 s.
+
+Initial helper-key, policy-literal and unused-variable failures were diagnosed and corrected, with original failures retained in the check log. Invalid replay setup runs (missing copied registry, missing workspace import) and the deliberate profiling-prototype stop are retained and excluded from kill counts. No random failure, skipped test, changed timeout/tolerance/runner setting, external write or network. The full suite remained below 600 seconds. Independent review remains pending; no slice approval is claimed. Muhasabah PASS.
+
+Post-write checks:
+
+- `python3 scripts/check_docs.py` — exit 0; checked 981 text files, 107 Markdown files: OK; wall 1.279 s.
+- `git diff --check` — exit 0; (no output); wall 0.021 s.
+- `taskset -c 16-19 uv run --locked python .overnight/tmp/fix13/replay_fast.py` — exit 0; 203 records, 196 retained kills, zero lost kills.
+- `taskset -c 16-19 uv run --locked python .overnight/tmp/fix13/replay_transitive.py` — exit 0; 126 records, 8 retained kills, zero lost kills.
+- `python3 .overnight/tmp/fix13/finish_report.py` — exit 0; verified 329 records, 204 retained kills, zero lost kills, unchanged source hash and original-test bytes.
+
+Closeout correction: appending the post-write results left a blank line at EOF; `git diff --check` exited 2 (log `diff-closeout-plant.log`, an unintentional formatting error despite the log label). This append-only closeout removes that EOF condition without rewriting earlier evidence.
+Final closeout `git diff --check`: exit 0; (no output); wall 0.021 s. The return is complete; independent review remains pending.

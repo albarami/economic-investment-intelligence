@@ -1,5 +1,6 @@
 """Scoped transport plants with invented certificates and no sockets."""
 
+import hashlib
 import html
 import json
 import ssl
@@ -19,7 +20,7 @@ from custodian.tests.test_s2_t29_live_shapes import (
 
 from eii_custodian.publicdata.fetch import page_acquire as acquire
 from eii_custodian.publicdata.fetch import page_requests, transport
-from eii_custodian.publicdata.fetch.certificate_pins import PinError
+from eii_custodian.publicdata.fetch.certificate_pins import Pin, PinError
 
 
 @pytest.fixture(autouse=True)
@@ -40,7 +41,7 @@ def test_default_context_has_no_ambient_certificates():
 
 @pytest.mark.parametrize("plant", ["valid", "duplicate", "malformed"])
 def test_pin_scope(tmp_path, invented_certs, plant):
-    dec, body, _ = embedded()
+    dec, body, record = embedded()
     pinned = "https://www.edu.gov.qa/SYN-page"
     dec["url"] = pinned
     dec["reviewed_urls"] = [pinned]
@@ -52,22 +53,34 @@ def test_pin_scope(tmp_path, invented_certs, plant):
     if plant == "malformed":
         dec["pins"].append("SYN-not-a-mapping")
     calls = []
+    der = invented_certs["intermediate"]
+    expected_pin = Pin("www.edu.gov.qa", hashlib.sha256(der).hexdigest(), der, True)
 
     def send(url):
         calls.append(url)
         assert page_requests.active()
-        assert page_requests._PINS.get() is not None
+        assert page_requests._PINS.get() == {"www.edu.gov.qa": expected_pin}
         return transport.Response(url, body, ())
 
     if plant == "valid":
-        assert json.loads(run(tmp_path, dec, body, row=row, send=send).body)["rows"]
+        assert json.loads(run(tmp_path, dec, body, row=row, send=send).body)[
+            "rows"
+        ] == [
+            {
+                "title": "SYN > event",
+                "start": "2031-02-03",
+                "end": "2031-02-04",
+                "published_record": record,
+            }
+        ]
+        assert calls == [pinned]
     else:
         refused("schema_missing", lambda: run(tmp_path, dec, body, row=row, send=send))
         assert calls == []
 
 
 def test_pinned_redirect_rechecks_context(tmp_path, invented_certs, monkeypatch):
-    dec, body, _ = embedded()
+    dec, body, record = embedded()
     target = "https://www.edu.gov.qa/SYN-page"
     dec["reviewed_urls"].append(target)
     row = entry(dec)
@@ -91,7 +104,14 @@ def test_pinned_redirect_rechecks_context(tmp_path, invented_certs, monkeypatch)
         row=row,
         send=lambda u: transport.Response(target, body, (target,)),
     )
-    assert json.loads(result.body)["rows"]
+    assert json.loads(result.body)["rows"] == [
+        {
+            "title": "SYN > event",
+            "start": "2031-02-03",
+            "end": "2031-02-04",
+            "published_record": record,
+        }
+    ]
     assert calls == ["www.edu.gov.qa", "www.edu.gov.qa"]
 
 
@@ -121,13 +141,20 @@ def test_unreviewed_page_is_typed_refusal(tmp_path):
 
 
 def test_metadata_limit_scoped_to_read(tmp_path):
-    dec, body, _ = embedded()
+    dec, body, record = embedded()
 
     def send(url):
         assert transport._METADATA_LIMIT.get() == dec["max_bytes"]
         return transport.Response(url, body, ())
 
-    assert json.loads(run(tmp_path, dec, body, send=send).body)["rows"]
+    assert json.loads(run(tmp_path, dec, body, send=send).body)["rows"] == [
+        {
+            "title": "SYN > event",
+            "start": "2031-02-03",
+            "end": "2031-02-04",
+            "published_record": record,
+        }
+    ]
     assert transport._METADATA_LIMIT.get() is None
 
 

@@ -188,7 +188,7 @@ def test_row_count_reason():
 )
 def test_declaration_shape_reason(tmp_path, document):
     path = tmp_path / "SYN-review.yaml"
-    path.write_text(yaml.safe_dump(document))
+    path.write_text(yaml.safe_dump(document), encoding="utf-8")
     with pytest.raises(PageError, match=exact("schema_missing")):
         page_records.load_declaration("events_visit_qatar", path)
 
@@ -210,8 +210,8 @@ def test_refused_use_keeps_policy_reason():
         "source",
         "public",
     )
-    reason = validate_split_use(request).reason
-    assert reason
+    reason = "invented_geography"
+    assert validate_split_use(request).reason == reason
     with pytest.raises(PageError) as caught:
         page_records.validate_use(request)
     assert str(caught.value) == reason
@@ -404,7 +404,9 @@ def test_non_role_link_in_key_folder_is_not_a_role(tmp_path):
 
 
 def select(cache, row, identity):
-    (cache / "snapshot_pins.json").write_text(json.dumps({row.key: identity}))
+    (cache / "snapshot_pins.json").write_text(
+        json.dumps({row.key: identity}), encoding="utf-8"
+    )
 
 
 def v1_cache(tmp_path, *, page_sha256=None, as_of="2024-02-03"):

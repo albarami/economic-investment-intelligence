@@ -13,7 +13,6 @@ from custodian.tests.test_s2_t29_live_shapes import (
 )
 
 from eii_custodian.publicdata.fetch.page_schema import (
-    SCHOOL_FIELDS,
     json_body,
     keys,
     path,
@@ -24,6 +23,12 @@ from eii_custodian.publicdata.fetch.page_schema import (
     validate_schema,
 )
 from eii_custodian.publicdata.fetch.page_shapes import blocks, parse
+
+SCHOOL_FIELDS = (
+    "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,"
+    "operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,"
+    "district_name,district_name_en,lat,long_"
+).split(",")
 
 
 def raises_missing(call, *args):

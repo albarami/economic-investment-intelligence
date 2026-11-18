@@ -151,6 +151,15 @@ def test_discovery_header_success(tmp_path):
 
     assert json.loads(run(tmp_path, dec, body, row=entry(dec, source), send=send).body)[
         "rows"
+    ] == [
+        {
+            "label": "SYN  rate",
+            "value": "7",
+            "currency": "QR",
+            "unit": "per square meter per year",
+            "page_url": URL,
+            "source_modified": "2031-02-03T00:00:00Z",
+        }
     ]
 
 
