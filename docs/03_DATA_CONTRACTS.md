@@ -1051,10 +1051,16 @@ Under lead ruling L-927, that guard scans every Python file under `custodian/src
 outside the tender adapter: it refuses the argument's keyword or string constant,
 `**` expansion into `open_https` or `_open_https` by name, attribute or imported
 alias, references to `_TENDER_CHAIN`, and imports or attribute uses of the tender
-wrapper. The parameter definition in `fetch/transport.py` remains allowed.
+wrapper. Only the `legacy_chain_sha256` argument node of the `open_https` function
+definition in `fetch/transport.py` remains allowed. Imported names retain all
+possible bindings; any protected binding makes the name or attribute chain a hit.
 Separate planted callers cover literal and variable keyword expansion, aliases,
 external tender scope and wrapper access, wrapper imports and runtime-built keys.
 This is a source boundary; runtime refusal does not inspect callers or signatures.
+Dynamic imports through `importlib.import_module`, `__import__`, or equivalent runtime mechanisms are outside this AST caller boundary and require code review.
+Wrapper lookup through `getattr` or another runtime attribute mechanism that is not a direct AST attribute chain is outside this caller boundary and require code review.
+Assignment-only aliases and other aliases requiring data-flow analysis are outside this caller boundary and require code review.
+`exec`, `eval`, and runtime-generated source are outside this AST caller boundary and require code review.
 The legacy hash never authorizes a redirect:
 without page scope or a valid current pin, every redirect to a page pin host,
 including the tender host itself, still refuses before hop recording or

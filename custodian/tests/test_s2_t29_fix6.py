@@ -358,13 +358,15 @@ def _fix8_legacy_chain_hits(source):
             if isinstance(node, ast.Import):
                 for item in node.names:
                     name = item.name if item.asname else item.name.split(".")[0]
-                    aliases[item.asname or name] = name
+                    aliases.setdefault(item.asname or name, set()).add(name)
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ""
                 if node.level:
                     module = resolve_name("." * node.level + module, package)
                 for item in node.names:
-                    aliases[item.asname or item.name] = module + "." + item.name
+                    aliases.setdefault(item.asname or item.name, set()).add(
+                        module + "." + item.name
+                    )
                     if module == tender and item.name in {"open_https", "*"}:
                         hits.add((relative, node.lineno, "tender-wrapper-import"))
                     if item.name == "_TENDER_CHAIN":
@@ -372,10 +374,30 @@ def _fix8_legacy_chain_hits(source):
 
         def qualified(node, aliases=aliases):
             if isinstance(node, ast.Name):
-                return aliases.get(node.id, node.id)
+                return aliases.get(node.id, {node.id})
             if isinstance(node, ast.Attribute):
-                return qualified(node.value) + "." + node.attr
-            return ""
+                return {name + "." + node.attr for name in qualified(node.value)}
+            return set()
+
+        legacy_parameter = None
+        if relative == "eii_custodian/publicdata/fetch/transport.py":
+            definition = next(
+                (
+                    node
+                    for node in tree.body
+                    if isinstance(node, ast.FunctionDef) and node.name == "open_https"
+                ),
+                None,
+            )
+            if definition is not None:
+                legacy_parameter = next(
+                    (
+                        arg
+                        for arg in definition.args.kwonlyargs
+                        if arg.arg == "legacy_chain_sha256"
+                    ),
+                    None,
+                )
 
         for node in ast.walk(tree):
             rule = None
@@ -386,28 +408,27 @@ def _fix8_legacy_chain_hits(source):
             elif (
                 isinstance(node, ast.arg)
                 and node.arg == "legacy_chain_sha256"
-                and relative != "eii_custodian/publicdata/fetch/transport.py"
+                and node is not legacy_parameter
             ):
                 rule = "legacy-chain-parameter"
             elif isinstance(node, (ast.Name, ast.Attribute)) and "_TENDER_CHAIN" in {
                 getattr(node, "id", None),
                 getattr(node, "attr", None),
-                qualified(node).split(".")[-1],
+                *(name.split(".")[-1] for name in qualified(node)),
             }:
                 rule = "tender-chain-reference"
             elif isinstance(node, ast.Constant) and node.value == "_TENDER_CHAIN":
                 rule = "tender-chain-string"
-            elif (
-                isinstance(node, ast.Attribute)
-                and qualified(node) == tender + ".open_https"
-            ):
+            elif isinstance(
+                node, ast.Attribute
+            ) and tender + ".open_https" in qualified(node):
                 rule = "tender-wrapper-attribute"
             elif (
                 isinstance(node, ast.Call)
                 and {
                     getattr(node.func, "id", None),
                     getattr(node.func, "attr", None),
-                    qualified(node.func).split(".")[-1],
+                    *(name.split(".")[-1] for name in qualified(node.func)),
                 }
                 & {"open_https", "_open_https"}
                 and any(keyword.arg is None for keyword in node.keywords)
@@ -450,13 +471,18 @@ def test_fix7_legacy_chain_source_guard_rejects_second_caller(tmp_path):
         _fix7_assert_legacy_chain_callers(source)
 
 
-def _fix8_assert_second_caller_refused(tmp_path, code):
+def _fix8_assert_second_caller_refused(tmp_path, code, expected_rules):
     source = tmp_path / "src"
     shutil.copytree(
         "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
     )
     _fix7_assert_legacy_chain_callers(source)
-    (source / "eii_custodian/publicdata/SYN_second_caller.py").write_text(code)
+    relative = "eii_custodian/publicdata/SYN_second_caller.py"
+    (source / relative).write_text(code)
+    actual_rules = {
+        rule for file, _, rule in _fix8_legacy_chain_hits(source) if file == relative
+    }
+    assert actual_rules == expected_rules, ("rule-set", actual_rules, expected_rules)
     with pytest.raises(AssertionError, match=r"SYN_second_caller\.py"):
         _fix7_assert_legacy_chain_callers(source)
 
@@ -465,6 +491,7 @@ def test_fix8_literal_dictionary_expansion_refused(tmp_path):
     _fix8_assert_second_caller_refused(
         tmp_path,
         'open_https(url, ssl_context=c, **{"legacy_chain_sha256": pin})\n',
+        {"legacy-chain-string", "https-keyword-expansion"},
     )
 
 
@@ -472,6 +499,7 @@ def test_fix8_variable_keyword_expansion_refused(tmp_path):
     _fix8_assert_second_caller_refused(
         tmp_path,
         'kwargs = {"ssl_context": c}\nopen_https(url, **kwargs)\n',
+        {"https-keyword-expansion"},
     )
 
 
@@ -493,33 +521,49 @@ def test_fix8_variable_keyword_expansion_refused(tmp_path):
     ],
 )
 def test_fix8_aliased_keyword_expansion_refused(tmp_path, code):
-    _fix8_assert_second_caller_refused(tmp_path, code)
+    _fix8_assert_second_caller_refused(tmp_path, code, {"https-keyword-expansion"})
 
 
 @pytest.mark.parametrize(
-    "code",
+    ("code", "expected_rules"),
     [
-        "from eii_custodian.publicdata.singles import tenders\n"
-        "tenders._TENDER_CHAIN.set((c, h))\ntenders.open_https(url, ssl_context=c)\n",
-        "from eii_custodian.publicdata.singles import tenders as t\n"
-        "t._TENDER_CHAIN.set((c, h))\n",
-        "from eii_custodian.publicdata.singles.tenders import _TENDER_CHAIN as chain\n"
-        "chain.set((c, h))\n",
-        "_TENDER_CHAIN.set((c, h))\n",
-        'getattr(tenders, "_TENDER_CHAIN").set((c, h))\n',
-        "from eii_custodian.publicdata.singles import tenders as t\n"
-        "exposed = t.open_https\n",
-        "import eii_custodian.publicdata.singles.tenders as t\n"
-        "exposed = t.open_https\n",
+        (
+            "from eii_custodian.publicdata.singles import tenders\n"
+            "tenders._TENDER_CHAIN.set((c, h))\ntenders.open_https(url, ssl_context=c)\n",
+            {"tender-chain-reference", "tender-wrapper-attribute"},
+        ),
+        (
+            "from eii_custodian.publicdata.singles import tenders as t\n"
+            "t._TENDER_CHAIN.set((c, h))\n",
+            {"tender-chain-reference"},
+        ),
+        (
+            "from eii_custodian.publicdata.singles.tenders import _TENDER_CHAIN as chain\n"
+            "chain.set((c, h))\n",
+            {"tender-chain-import", "tender-chain-reference"},
+        ),
+        ("_TENDER_CHAIN.set((c, h))\n", {"tender-chain-reference"}),
+        ('getattr(tenders, "_TENDER_CHAIN").set((c, h))\n', {"tender-chain-string"}),
+        (
+            "from eii_custodian.publicdata.singles import tenders as t\n"
+            "exposed = t.open_https\n",
+            {"tender-wrapper-attribute"},
+        ),
+        (
+            "import eii_custodian.publicdata.singles.tenders as t\n"
+            "exposed = t.open_https\n",
+            {"tender-wrapper-attribute"},
+        ),
         pytest.param(
             "from synthetic import unrelated as _TENDER_CHAIN\n"
             "_TENDER_CHAIN.set((c, h))\n",
+            {"tender-chain-reference"},
             id="literal_name_after_import",
         ),
     ],
 )
-def test_fix8_external_tender_chain_or_wrapper_refused(tmp_path, code):
-    _fix8_assert_second_caller_refused(tmp_path, code)
+def test_fix8_external_tender_chain_or_wrapper_refused(tmp_path, code, expected_rules):
+    _fix8_assert_second_caller_refused(tmp_path, code, expected_rules)
 
 
 @pytest.mark.parametrize(
@@ -532,7 +576,7 @@ def test_fix8_external_tender_chain_or_wrapper_refused(tmp_path, code):
     ],
 )
 def test_fix8_tender_wrapper_import_refused(tmp_path, code):
-    _fix8_assert_second_caller_refused(tmp_path, code)
+    _fix8_assert_second_caller_refused(tmp_path, code, {"tender-wrapper-import"})
 
 
 @pytest.mark.parametrize(
@@ -543,4 +587,85 @@ def test_fix8_tender_wrapper_import_refused(tmp_path, code):
     ],
 )
 def test_fix8_runtime_built_legacy_key_refused(tmp_path, code):
-    _fix8_assert_second_caller_refused(tmp_path, code)
+    _fix8_assert_second_caller_refused(tmp_path, code, {"legacy-chain-string"})
+
+
+@pytest.mark.parametrize(
+    ("code", "expected_rules"),
+    [
+        pytest.param(
+            "from eii_custodian.publicdata.fetch.transport import open_https as o\n"
+            "def syn_mask():\n"
+            "    from synthetic import unrelated as o\n"
+            "o(url, **kw)\n",
+            {"https-keyword-expansion"},
+            id="cross_scope_opener_mask",
+        ),
+        pytest.param(
+            "from eii_custodian.publicdata.singles import tenders as t\n"
+            "if False:\n"
+            "    from synthetic import unrelated as t\n"
+            "exposed = t.open_https\n",
+            {"tender-wrapper-attribute"},
+            id="unreachable_tender_mask",
+        ),
+    ],
+)
+def test_fix9_import_mask_refused(tmp_path, code, expected_rules):
+    _fix8_assert_second_caller_refused(tmp_path, code, expected_rules)
+
+
+def test_fix9_second_transport_parameter_refused(tmp_path):
+    source = tmp_path / "src"
+    shutil.copytree(
+        "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
+    )
+    _fix7_assert_legacy_chain_callers(source)
+    relative = "eii_custodian/publicdata/fetch/transport.py"
+    transport = source / relative
+    with transport.open("a") as output:
+        output.write("\ndef syn_second(legacy_chain_sha256):\n    pass\n")
+    hits = _fix8_legacy_chain_hits(source)
+    assert {(file, rule) for file, _, rule in hits} == {
+        (relative, "legacy-chain-parameter")
+    }
+    with pytest.raises(AssertionError, match="legacy-chain-parameter"):
+        _fix7_assert_legacy_chain_callers(source)
+
+
+@pytest.mark.parametrize(
+    ("code", "expected_rules"),
+    [
+        ("open_https(url, legacy_chain_sha256=pin)\n", {"legacy-chain-keyword"}),
+        ("def syn_call(legacy_chain_sha256):\n    pass\n", {"legacy-chain-parameter"}),
+        ("from synthetic import _TENDER_CHAIN\n", {"tender-chain-import"}),
+        ("open_https(url, **{key: pin})\n", {"https-keyword-expansion"}),
+    ],
+)
+def test_fix9_isolated_rules_refused(tmp_path, code, expected_rules):
+    _fix8_assert_second_caller_refused(tmp_path, code, expected_rules)
+
+
+@pytest.mark.parametrize(
+    "reported_rules",
+    [
+        {"legacy-chain-string"},
+        {"https-keyword-expansion", "legacy-chain-string"},
+    ],
+    ids=["missing_expected_rule", "unexpected_extra_rule"],
+)
+def test_fix9_helper_rejects_inexact_rule_set(tmp_path, reported_rules):
+    def planted_hits(source):
+        relative = "eii_custodian/publicdata/SYN_second_caller.py"
+        if not (source / relative).exists():
+            return []
+        return [(relative, 1, rule) for rule in sorted(reported_rules)]
+
+    with patch.dict(
+        _fix8_assert_second_caller_refused.__globals__,
+        _fix8_legacy_chain_hits=planted_hits,
+    ):
+        with pytest.raises(AssertionError, match="rule-set"):
+            _fix8_assert_second_caller_refused(
+                tmp_path, "open_https(url, **kw)\n", {"https-keyword-expansion"}
+            )

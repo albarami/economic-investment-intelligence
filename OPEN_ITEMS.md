@@ -3511,3 +3511,17 @@ transport and all pre-existing fix-7 tests remain unchanged. Reproducible exits
 and counts are in `.overnight/fix8-checks.jsonl` and `.overnight/RETURN.md`.
 Lens T confirmation of this fix and live TLS acceptance remain pending; no
 previous live-source hold or independent-review requirement is lifted.
+
+**Fix pass 9 caller-boundary corrections, 2026-11-18 (L-932):** Lens T's
+F8-1 to F8-3 are addressed in the offline source guard and its plants. Imported
+names retain every possible binding, the parameter exemption is limited to the
+`open_https` argument node in `fetch/transport.py`, and every caller plant asserts
+its complete rule set, with independent single-rule examples and the existing
+mixed integration plants retained. The corrected current-source scan found no
+hits. Cross-scope and unreachable-branch masks, the extra transport parameter,
+and missing/extra rule reports failed before correction and passed afterwards;
+commands, exits and counts are in `.overnight/fix9-checks.jsonl` and
+`.overnight/RETURN.md`. Document 03 states the dynamic-import, runtime-attribute,
+assignment-alias and generated-source review limits. Production transport and
+runtime refusal remain unchanged. Independent confirmation by another maker and
+live TLS acceptance remain pending; no previous live-source hold is lifted.
