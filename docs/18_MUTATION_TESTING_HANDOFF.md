@@ -182,7 +182,7 @@ R112 uses open-item identifiers also used for different issues in the repository
 - The repository's [OI-16 — Activity-mapping sign-off](../OPEN_ITEMS.md#oi-16--activity-mapping-sign-off) concerns who may approve activity mappings and whether batch approval is permitted. It is a separate unresolved decision. Until decided, no new mapping is admitted merely because its tests pass.
 - The repository's [OI-17 — Gateway measurement panel](../OPEN_ITEMS.md#oi-17--gateway-measurement-panel) concerns whether internal measurement scores are shown to visitors. Keep the current absence of a panel until that presentation decision is made. Internal scores must not be mistaken for product evidence or calibrated confidence.
 - A hostile in-process key object with stateful equality, or a sequence object that compares equal to empty, could bypass assumptions in `build_project_evidence`. The production callers recorded in R112 passed ordinary parsed strings and sequences, so that record treated this as a hardening question rather than a demonstrated external-input defect. Recheck the callers in the eventual source and decide whether to enforce plain values at the boundary. Earlier proposed equivalence reasons must not omit such reachable inputs.
-- The status rows identify exactly which explanation revisions resolve and which remain unknown. Reconcile unknown source versions and final task changes before treating a historical survivor as new work. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) defers mutation work until after go live while preserving ordinary checks; approval of its written record is pending. Empty investigation returns and missing per-change evidence must remain explicit gaps.
+- The status rows identify exactly which explanation revisions resolve and which remain unknown. Reconcile unknown source versions and final task changes before treating a historical survivor as new work. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) defers mutation work until after go live while preserving ordinary checks; the owner accepted its written record on 2026-11-18. Empty investigation returns and missing per-change evidence must remain explicit gaps.
 
 After go live, and only if the team accepts the deferred work, take it in this order:
 
@@ -236,123 +236,123 @@ The tables retain every campaign and module status row, including failed starts 
 
 ### Evidence inventory
 
-| Record | SHA-256 |
-| --- | --- |
-| R001 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R002 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R003 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R004 | 76dbd00a307972e4af288d372d43adabe1a15a6bb9bd291b75e735e707bdbbf7 |
-| R005 | fb7cf8cdc84e23f378820a107cccaa19cb4a8d432fb3038fe55300efdf4b8389 |
-| R006 | cff9b9737866033ebffd6b47a2eb4397ad82d8f2ab16b5888cb140acce0de622 |
-| R007 | 1512e60d62d881e8343db12009b0730862177c5789f06f82d50e8d0eb42d52ee |
-| R008 | 73c8480e4bbfc61b74736658c866c10d9b329c5a448ededd7c381439c26d27e6 |
-| R009 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R010 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R011 | 16512a8846e25fccc8ee53621ec7b29e8d46f4013d8f0c74e8138e4fbb4b06db |
-| R012 | f47a9a8caf2e6693c24a959e8814e8e8cb5f6a7007151144860dc0e2ff6157fc |
-| R013 | cdd09524837fd1dc939a3cc2bd4dd5477032e965e85b20ebc53649f284fad664 |
-| R014 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R015 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R016 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R017 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R018 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R019 | 28873e1448f02eee34ce1f5602d7bbf0916259f642a3a23c020bb9f671b58193 |
-| R020 | 87f1732f2439c07489e4d4587d1c4bf53fa8f86f3c6738f68bd1330b46029ca0 |
-| R021 | ba71d7a34dba28ea44aace04746a24328989db35994d9cef52532837b31af146 |
-| R022 | 661c7b29538a4627dafd654683763120ecbfa030c8d08c65cf5ac54531925106 |
-| R023 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R024 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R025 | 79ebfd5db4a5c3fccca32db51ea2c088ddacf3854690a9ba2644b84140434ae5 |
-| R026 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R027 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R028 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R029 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R030 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R031 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R032 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R033 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R034 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R035 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R036 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R037 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R038 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R039 | 7d1b9f7d077df6e9d9b910d8a08755b0693b5aa61a2d1bb60238d0d323f2732e |
-| R040 | 6dee56bc7e9165e9c6f2f4567d3823337ba8b61fa2c6374762c8e01193e870b0 |
-| R041 | b0e10d0bb422a45c17028dfd8e7b8eedb971f347b1f40bbe86637ce99df71c8f |
-| R042 | 53e002adc826b6fcb59a705f0051919d2296501aba9d8178775d2faa9efe0c37 |
-| R043 | eca9fb7804a8979556c48a66c8e78217160bedb26634484a5a3c0352e01f4d60 |
-| R044 | 730d23fb9b32bc555343d23bfaa51eb521f38651ccde12531a065eaa0b92e885 |
-| R045 | f8a762b05a330e3a09f2d29ce6300f9b60b29f19addd77ff8da1a5b83159c77a |
-| R046 | 518d2e14110019e9a6402f7164c901a08334c74d81c21844476ffe334da59805 |
-| R047 | 4dd5167b3dd1ac4585aa65c11a9559645abe098f7057b8d524266dc27bfc1b38 |
-| R048 | 181fa639e1fac368f456bfad0337c9962ae7f28f3582ec51afe9d9846760d344 |
-| R049 | eb1234832b8c214d0de0632d260ff76c516758f4414acbb663de7284d881f403 |
-| R050 | 2263dabb4d2d6bcd63fe79575c70fcccbcc2154a525f263999917b2b6b1689b1 |
-| R051 | 29e53302ff2a466596448c9bfde483caa28039f80380f060d76e61b5fef2264d |
-| R052 | db292d665a712537e094f1f0ecd9fccf797fbcbabcdb2de6e4181e091995e5f2 |
-| R053 | 6e9fbc47e9bc82322764530829125d5c499c7b4da26de05532fdba4578d2a0cd |
-| R054 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R055 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R056 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R057 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R058 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R059 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R060 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R061 | 9625cd15648bc3e5c519e1177e16acd7a6bb9d69b87893227278269c3a777d50 |
-| R062 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R063 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R064 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R065 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R066 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R067 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R068 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R069 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R070 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R071 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R072 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R073 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R074 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R075 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R076 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R077 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R078 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R079 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R080 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R081 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R082 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R083 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R084 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R085 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R086 | 7c13b92d5350021838aca27de540acd751c3b13da0d84b652cdd3b7bc895cd26 |
-| R087 | 8a9057317c38cac0c19c272ba52d93ce964ff7c06be37b1c8f857d03c2326511 |
-| R088 | a5e874894f502728555d18f727ecf802d343a3c21e1c4f9b7ca4543a17038391 |
-| R089 | 43dd5679234f27bd1a26a14b2309d7cb38922675f10026468a5236c7d3033d6d |
-| R090 | d07adc1131f1f0fa149463fc87d0527d9ed9a119fea49be02951644e722d8762 |
-| R091 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R092 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R093 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R094 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R095 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R096 | b8f181053415ef4bca46b138b9624bde16d33ae36e1c17077782f456350decb5 |
-| R097 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R098 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R099 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R100 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R101 | 2133869018140b1d7674c054e0bbbcc3ddccbfa505d29d6675b8a2afb7c03880 |
-| R102 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R103 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R104 | c1dfe9d480c8798504697628fc991c051b63c33d81920e1459f1ec4080920dfb |
-| R105 | 797683ecba6746de501c63e9a5bd89da94130f4162d42fcad6b5f0f8412fca20 |
-| R106 | 98272a0d5b34386895642c451f0026aef775924c7cd1668cba83cdcf615c530c |
-| R107 | e94ccd39a4fa363beddbc370406f2aa88ceefe07b3580d8cf7006327d6f921a2 |
-| R108 | 204f3fe053c86987a4fcd6ba35425ebf5b867be29beda0f0a18f1e3426781e4e |
-| R109 | 9cd88191994fb37d76791e5371ccc023502daf405b2c1d61da4b7893020288a4 |
-| R110 | 8e4d8f16a80e6894e2c9dcf21e5955f91abbfbb5104f54c2aa37bd3fa77627bd |
-| R111 | d3c0bd91d81fce83108cea94b67a5c46d0d1313a73030b12abca8577db5a40cd |
-| R112 | 0cb100cbd86b52b86b1de66365d1caab01e0d6a9e4c7993bd1b914feb1baf733 |
-| R113 | 4554eeea32edb8e78e427b521643c398d82a129af10f1d5516da25c4d3212c64 |
-| R114 | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
-| R115 | 4fc74496b19d1e79c5b3ca3a83a80802e420a8ca039661f8ac097cc3ea8a9aa1 |
+| Record | Input file | SHA-256 |
+| --- | --- | --- |
+| R001 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R002 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R003 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R004 | S1-T08.lead.mutation.txt | 76dbd00a307972e4af288d372d43adabe1a15a6bb9bd291b75e735e707bdbbf7 |
+| R005 | S1-T09.lead.mutation.txt | fb7cf8cdc84e23f378820a107cccaa19cb4a8d432fb3038fe55300efdf4b8389 |
+| R006 | S1-T11.lead.mutation-python.txt | cff9b9737866033ebffd6b47a2eb4397ad82d8f2ab16b5888cb140acce0de622 |
+| R007 | S1-T18.mutation-web.txt | 1512e60d62d881e8343db12009b0730862177c5789f06f82d50e8d0eb42d52ee |
+| R008 | S1-T18.mutation-replay.txt | 73c8480e4bbfc61b74736658c866c10d9b329c5a448ededd7c381439c26d27e6 |
+| R009 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R010 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R011 | S2-T03.mutation.txt | 16512a8846e25fccc8ee53621ec7b29e8d46f4013d8f0c74e8138e4fbb4b06db |
+| R012 | S2-T03.mutation-core.txt | f47a9a8caf2e6693c24a959e8814e8e8cb5f6a7007151144860dc0e2ff6157fc |
+| R013 | S2-T03.mutation-core.final.txt | cdd09524837fd1dc939a3cc2bd4dd5477032e965e85b20ebc53649f284fad664 |
+| R014 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R015 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R016 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R017 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R018 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R019 | S2-T08A.camp3 | 28873e1448f02eee34ce1f5602d7bbf0916259f642a3a23c020bb9f671b58193 |
+| R020 | S2-T08A.camp4.txt | 87f1732f2439c07489e4d4587d1c4bf53fa8f86f3c6738f68bd1330b46029ca0 |
+| R021 | S2-T08A.camp5.txt | ba71d7a34dba28ea44aace04746a24328989db35994d9cef52532837b31af146 |
+| R022 | S2-T08A.camp6.txt | 661c7b29538a4627dafd654683763120ecbfa030c8d08c65cf5ac54531925106 |
+| R023 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R024 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R025 | S2-T21.fix1d.campaign.txt | 79ebfd5db4a5c3fccca32db51ea2c088ddacf3854690a9ba2644b84140434ae5 |
+| R026 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R027 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R028 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R029 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R030 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R031 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R032 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R033 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R034 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R035 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R036 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R037 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R038 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R039 | S2-T29.camp1.txt | 7d1b9f7d077df6e9d9b910d8a08755b0693b5aa61a2d1bb60238d0d323f2732e |
+| R040 | S2-T29.camp2.txt | 6dee56bc7e9165e9c6f2f4567d3823337ba8b61fa2c6374762c8e01193e870b0 |
+| R041 | S2-T29.k3.camp.run1-baseline-fail.txt | b0e10d0bb422a45c17028dfd8e7b8eedb971f347b1f40bbe86637ce99df71c8f |
+| R042 | S2-T29.k3.camp.txt | 53e002adc826b6fcb59a705f0051919d2296501aba9d8178775d2faa9efe0c37 |
+| R043 | S2-T29.camp3.txt | eca9fb7804a8979556c48a66c8e78217160bedb26634484a5a3c0352e01f4d60 |
+| R044 | S2-T29.camp4.partial/RECORD.md | 730d23fb9b32bc555343d23bfaa51eb521f38651ccde12531a065eaa0b92e885 |
+| R045 | S2-T30.camp1.txt | f8a762b05a330e3a09f2d29ce6300f9b60b29f19addd77ff8da1a5b83159c77a |
+| R046 | S2-T30.k1c.camp.txt | 518d2e14110019e9a6402f7164c901a08334c74d81c21844476ffe334da59805 |
+| R047 | S2-T30.k1a.camp.txt | 4dd5167b3dd1ac4585aa65c11a9559645abe098f7057b8d524266dc27bfc1b38 |
+| R048 | S2-T30.k1c2.camp.txt | 181fa639e1fac368f456bfad0337c9962ae7f28f3582ec51afe9d9846760d344 |
+| R049 | S2-T30.k1b.camp.txt | eb1234832b8c214d0de0632d260ff76c516758f4414acbb663de7284d881f403 |
+| R050 | S2-T30.j1.camp.txt | 2263dabb4d2d6bcd63fe79575c70fcccbcc2154a525f263999917b2b6b1689b1 |
+| R051 | S2-T30.j2.camp.txt | 29e53302ff2a466596448c9bfde483caa28039f80380f060d76e61b5fef2264d |
+| R052 | S2-T30.k1d.camp.txt | db292d665a712537e094f1f0ecd9fccf797fbcbabcdb2de6e4181e091995e5f2 |
+| R053 | S2-T30.st.camp.txt | 6e9fbc47e9bc82322764530829125d5c499c7b4da26de05532fdba4578d2a0cd |
+| R054 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R055 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R056 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R057 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R058 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R059 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R060 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R061 | S3-T07mB.campaign.after.txt | 9625cd15648bc3e5c519e1177e16acd7a6bb9d69b87893227278269c3a777d50 |
+| R062 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R063 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R064 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R065 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R066 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R067 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R068 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R069 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R070 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R071 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R072 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R073 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R074 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R075 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R076 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R077 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R078 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R079 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R080 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R081 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R082 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R083 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R084 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R085 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R086 | S4-T04.camp-confirm | 7c13b92d5350021838aca27de540acd751c3b13da0d84b652cdd3b7bc895cd26 |
+| R087 | S4-T07.mutation.campaign5.txt | 8a9057317c38cac0c19c272ba52d93ce964ff7c06be37b1c8f857d03c2326511 |
+| R088 | S4-T07.mutation.txt | a5e874894f502728555d18f727ecf802d343a3c21e1c4f9b7ca4543a17038391 |
+| R089 | S4-T07.camp-replay | 43dd5679234f27bd1a26a14b2309d7cb38922675f10026468a5236c7d3033d6d |
+| R090 | S4-T08.camp-verify | d07adc1131f1f0fa149463fc87d0527d9ed9a119fea49be02951644e722d8762 |
+| R091 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R092 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R093 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R094 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R095 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R096 | S4-T14.lead.mut.ca38e73.out | b8f181053415ef4bca46b138b9624bde16d33ae36e1c17077782f456350decb5 |
+| R097 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R098 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R099 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R100 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R101 | T1.camp1.A.txt | 2133869018140b1d7674c054e0bbbcc3ddccbfa505d29d6675b8a2afb7c03880 |
+| R102 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R103 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R104 | T1.camp1.B.partial-record.md | c1dfe9d480c8798504697628fc991c051b63c33d81920e1459f1ec4080920dfb |
+| R105 | T1.camp1.C.txt | 797683ecba6746de501c63e9a5bd89da94130f4162d42fcad6b5f0f8412fca20 |
+| R106 | T1.campB2.baseline-fail.txt | 98272a0d5b34386895642c451f0026aef775924c7cd1668cba83cdcf615c530c |
+| R107 | T1.campB2a.txt | e94ccd39a4fa363beddbc370406f2aa88ceefe07b3580d8cf7006327d6f921a2 |
+| R108 | T1.campB3.partial/RECORD.md | 204f3fe053c86987a4fcd6ba35425ebf5b867be29beda0f0a18f1e3426781e4e |
+| R109 | T1.camp1.D.txt | 9cd88191994fb37d76791e5371ccc023502daf405b2c1d61da4b7893020288a4 |
+| R110 | T1.vcampD2.txt | 8e4d8f16a80e6894e2c9dcf21e5955f91abbfbb5104f54c2aa37bd3fa77627bd |
+| R111 | T1.vcampD1.txt | d3c0bd91d81fce83108cea94b67a5c46d0d1313a73030b12abca8577db5a40cd |
+| R112 | rules/LOG-mutation-lines.md | 0cb100cbd86b52b86b1de66365d1caab01e0d6a9e4c7993bd1b914feb1baf733 |
+| R113 | T3.camp2.txt | 4554eeea32edb8e78e427b521643c398d82a129af10f1d5516da25c4d3212c64 |
+| R114 | MUTATION_VALUE.tsv | 0395b7ef4baa1e2d86d851fa6daef068546eca5e768c8ce8ef6f7baa880804ba |
+| R115 | TRAIN-B4.campaign.custodian.txt | 4fc74496b19d1e79c5b3ca3a83a80802e420a8ca039661f8ac097cc3ea8a9aa1 |
 
 ### Status for every campaign and module
 
@@ -2490,4 +2490,4 @@ R108 retains no comparable original and changed lines for this file. Its outcome
 
 Each status, count, cost and change row names its R-numbered original record; section 9 gives the fingerprints. The explanation comparison column identifies the commits read and the commit whose exact file-and-change entry matched. Unknown revisions and missing change text remain unresolved.
 
-Repository context: [Testing and Quality](12_TESTING_AND_QUALITY.md), [Task ledger](../TASKS.md), [Open items](../OPEN_ITEMS.md), [background-campaign decision](decisions/0052-mutation-campaigns-run-in-a-background-lane.md), and [decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md), which defers mutation work until after go live while preserving ordinary checks; approval of its written record is pending.
+Repository context: [Testing and Quality](12_TESTING_AND_QUALITY.md), [Task ledger](../TASKS.md), [Open items](../OPEN_ITEMS.md), [background-campaign decision](decisions/0052-mutation-campaigns-run-in-a-background-lane.md), and [decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md), which defers mutation work until after go live while preserving ordinary checks; the owner accepted its written record on 2026-11-18.

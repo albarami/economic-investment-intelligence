@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (rows TST-277 and TST-278); amended by decision 0055 on 2026-11-18 (proposed; mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed); amended by decision 0032 on 2026-11-15; amended by decision 0035 on 2026-11-15 |
+| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (rows TST-277 and TST-278); amended by decision 0055 on 2026-11-18 (mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed); amended by decision 0032 on 2026-11-15; amended by decision 0035 on 2026-11-15 |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Define every kind of test, the CI pipeline, the evidence that proves each slice gate, and the definition of done. |

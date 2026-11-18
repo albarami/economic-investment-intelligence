@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Proposed, for the owner's approval as the record of the owner's decision of 2026-11-18 14:10 |
+| Status | Accepted, 2026-11-18 15:44: the owner approved this written record of the owner's decision of 2026-11-18 14:10 |
 | Date | 2026-11-18 |
 | Owner | The owner |
-| Decided by | The owner's decision of 2026-11-18 14:10, under AGENTS.md rule 46; approval of this written record is pending |
+| Decided by | The owner's decision of 2026-11-18 14:10, under AGENTS.md rule 46; the owner approved this written record on 2026-11-18 at 15:44 |
 | Amends | Decision 0052 items 1 to 7 as specified below; TASKS.md queue rules and S2-T22; document 12 sections 4, 6.1, 6.2 and 6.3; document 14 PLN-31; the decision index of docs/README.md |
 | Purpose | Defer mutation campaigns, kill passes and survivor-fix tasks until after go live, preserve their unfinished work for handoff, and remove campaign closure from slice gates. |
 | Read first | [Decision 0052](0052-mutation-campaigns-run-in-a-background-lane.md); [document 12](../12_TESTING_AND_QUALITY.md) sections 6.1 and 6.2; [document 14](../14_IMPLEMENTATION_PLAN.md) PLN-31; AGENTS.md rules 12, 16, 35, 36, 37 and 46 |
@@ -38,7 +38,7 @@ The build can proceed through its ordinary checks and slice gates without waitin
 - TASKS.md: the queue rules state the deferral and its narrow exception to mutation-only open-item closure; S2-T22's campaign criterion ceases to be a gate requirement. Previously completed campaign evidence remains historical evidence.
 - Document 12: sections 4 and 6.3 retain the earlier pilot procedure as deferred reference; TST-277 and TST-278 state the new schedule; TST-168 exempts only mutation-only handoff items from its closure requirement.
 - Document 14: PLN-31 preserves the other merge conditions and changes the active lane and slice-gate wait to deferred handoff records.
-- docs/README.md: decision 0055 is listed as proposed and decision 0052 points to this amendment, pending approval of the record.
+- docs/README.md: decision 0055 is listed as accepted and decision 0052 points to this amendment.
 
 ## Sources
 
