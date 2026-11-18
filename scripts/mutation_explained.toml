@@ -4304,3 +4304,100 @@ reason = "Every coordinate reaching scalar came from json_body, which yields onl
 module = "custodian/src/eii_custodian/publicdata/fetch/page_html.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/page_html.py\n+++ src/eii_custodian/publicdata/fetch/page_html.py\n@@ -3,7 +3,7 @@\n     self.root = Node(\"root\")\n     self.current = self.root\n     try:\n-        self.feed(body.decode(\"utf-8\"))\n+        self.feed(body.decode(\"UTF-8\"))\n         self.close()\n     except UnicodeError:\n         raise ShapeError(\"schema_missing\") from None"
 reason = "For all byte strings, Python resolves UTF-8 and utf-8 to the identical UTF-8 codec, with identical decoded output or UnicodeError handling."
+
+# S2-T29 award intake/proof survivor pass: universal equivalences only.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/award_checks.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/award_checks.py\n+++ src/eii_custodian/publicdata/fetch/award_checks.py\n@@ -13,7 +13,7 @@\n     matched = 0\n     for row in rows:\n         registration = row.get(profile[\"registration\"], \"\")\n-        names = by_registration.get(registration, [])\n+        names = by_registration.get(registration, None)\n         name = normalise_name(row.get(profile[\"company\"], \"\"))\n         reason = \"registration_unmatched\"\n         if registration.strip() and names:"
+reason = "For an absent registration the default names value is only tested for truthiness, so both the original empty list and None skip the matching branch and produce the same unmatched report; a present key is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/award_checks.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/award_checks.py\n+++ src/eii_custodian/publicdata/fetch/award_checks.py\n@@ -13,7 +13,7 @@\n     matched = 0\n     for row in rows:\n         registration = row.get(profile[\"registration\"], \"\")\n-        names = by_registration.get(registration, [])\n+        names = by_registration.get(registration, )\n         name = normalise_name(row.get(profile[\"company\"], \"\"))\n         reason = \"registration_unmatched\"\n         if registration.strip() and names:"
+reason = "For an absent registration the default names value is only tested for truthiness, so both the original empty list and None skip the matching branch and produce the same unmatched report; a present key is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -19,8 +19,7 @@\n         or bool(set(value) - expected - {\"row_count\", \"dated_rows\", \"proof_columns\"})\n         or value[\"format\"] not in {\"csv\", \"xlsx\"}\n         or not isinstance(columns, list)\n-        or not columns\n-        or len(set(columns)) != len(columns)\n+        or not columns and len(set(columns)) != len(columns)\n         or any(not isinstance(c, str) or not c for c in columns)\n         or \"report_url\" not in columns\n         or any("
+reason = "An empty columns list always lacks the mandatory report_url column and is refused by the later unchanged membership guard, so merging its empty-list predicate with the duplicate predicate changes no acceptance or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -19,7 +19,7 @@\n         raise AwardError(\"snapshot_hash_mismatch\")\n     try:\n         raw = (\n-            list(csv.reader(io.StringIO(body.decode(\"utf-8-sig\"))))\n+            list(csv.reader(io.StringIO(body.decode(\"UTF-8-SIG\"))))\n             if schema[\"format\"] == \"csv\"\n             else _xlsx(body, schema[\"sheet\"])\n         )"
+reason = "Python resolves utf-8-sig and UTF-8-SIG to the same registered codec, including BOM consumption and identical decoding errors, for every byte string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -31,7 +31,7 @@\n     dates: list[str] = []\n     unparsed = blank = 0\n     for cells in raw[1:]:\n-        if schema[\"format\"] == \"xlsx\" and len(cells) < len(raw[0]):\n+        if schema[\"format\"] == \"xlsx\" and len(cells) <= len(raw[0]):\n             cells += [\"\"] * (len(raw[0]) - len(cells))\n         if len(cells) != len(raw[0]):\n             raise AwardError(\"schema_missing\")"
+reason = "At the sole newly admitted boundary the cell and header lengths are equal, so padding adds an empty list to a local plain row list and leaves every cell and downstream result unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=None)\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], )\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=False)\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, strict=None))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, ))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, strict=False))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -29,7 +29,7 @@\n         publisher=entry.publisher,\n         source_modified=SCRAPE_DATE,\n         row_count=len(batch.rows),\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     side.update(\n         as_of=utc(stamp).date().isoformat(),"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -104,7 +104,7 @@\n                 raise AwardError(\"metadata_bytes\")\n             if failure is not None and failure.check == \"blocked_host\":\n                 raise AwardError(\"blocked_host\")\n-            if failure or response is None:\n+            if failure and response is None:\n                 raise AwardError(\"proof_fetch_failed\")\n             if any(\n                 address not in declaration[\"reviewed_urls\"]"
+reason = "The unchanged read_bounded implementation returns either a non-null Response with no failure or None with a truthy AttemptFailure, so failure or response-is-None and failure and response-is-None agree for every result this call can return."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -126,7 +126,7 @@\n                 fetch_host=entry.fetch_host,\n                 retrieved_utc=stamp,\n                 publisher=entry.publisher,\n-                source_modified=\"\",\n+                source_modified=None,\n                 row_count=len(rows),\n                 terms_sha256=\"\",\n             )"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -128,7 +128,7 @@\n                 publisher=entry.publisher,\n                 source_modified=\"\",\n                 row_count=len(rows),\n-                terms_sha256=\"\",\n+                terms_sha256=None,\n             )\n             proof_body = response.body\n             if version_two:"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -34,7 +34,7 @@\n                 records = json.loads(snapshot.body)\n             elif selection[\"format\"] == \"csv_records\":\n                 records = list(\n-                    csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n+                    csv.DictReader(io.StringIO(snapshot.body.decode(\"UTF-8-SIG\")))\n                 )\n             else:\n                 raise AwardError(\"register_schema_missing\")"
+reason = "Python resolves utf-8-sig and UTF-8-SIG to the same registered codec, including BOM consumption and identical decoding errors, for every byte string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(None)\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(\"XXregister_schema_missingXX\")\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(\"REGISTER_SCHEMA_MISSING\")\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."

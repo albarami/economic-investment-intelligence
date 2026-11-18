@@ -33801,3 +33801,76 @@ approval are not claimed. The lead must stage and commit the resolved merge.
 - Existing source, acquisition-bound, pin-approval and independent-review holds remain unchanged. Muhasabah: PASS for this bounded handoff; no approval or broader completion claim.
 
 - S2-T29 fix KILL1FIX (2026-11-18), commit `1c91b70ea509b1b18c0d1145e61422f01ec87628` plus uncommitted fix; OpenAI Codex / GPT-6, senior Python test engineer; later another-maker strict mutation and transport-security reviewer pending. Skills: project-orientation, task-standards, mutation-testing, github-flow (read-only Git), sanad-provenance, muhasabah-gate; unavailable test-driven-development, systematic-debugging and verification-before-completion applied as brief-specified red/green, diagnosis and fresh verification. F1 isolates SSL_CERT_FILE/SSL_CERT_DIR with restored empty temporary stores, proves default CA list empty and redirected context exactly the invented intermediate DER; F2 asserts four calls and sleeps [1.0, 2.0, 4.0]. G11/103, G12/111, G13/115, G14/116, G15/117, G17/136, G47/385, G59/225, G60/305 and four finding-specific plants each red 1 / green 0 (13 pairs); no campaign. Focused exit 0 (154 passed in 1.05s); full custodian/core exit 0 (7050 passed in 281.73s (0:04:41)), wall 282.77 s. Ruff lint/format, mypy, docs, tree, cmp AGENTS.md CLAUDE.md, git diff --check and unchanged production/explanations each exit 0; exact commands/counts in `.overnight/RETURN.md`, `.overnight/tmp/checks.jsonl` and `.overnight/tmp/kill1fix/proof-results.jsonl`. Python 3.14.6, uv 0.11.31, OpenSSL 3.5.7, CPUs 4-7, PYTHONDONTWRITEBYTECODE=1, UV_OFFLINE=1, Hypothesis seed 2901; workspace-local caches/temp; no world seed, network or production edit; Git read-only. No unexpected/random failure; existing source/pin holds and lead review remain open; Muhasabah PASS.
+
+## S2-T29 — award survivor pass kill2c
+
+2026-11-18. OpenAI Codex (GPT-6), senior Python test engineer for mutation
+testing of transport security and public-page parsing. Strict mutation and
+equivalence reviewer from another maker: PENDING, assigned later by the lead.
+Skills: project-orientation, task-standards, mutation-testing, sanad-provenance,
+muhasabah-gate and github-flow (read-only Git override from the task brief).
+Named skills test-driven-development, systematic-debugging and
+verification-before-completion were unavailable; the brief's equivalent
+red/green, diagnosis and evidence rules were applied.
+
+Task source: `.overnight/BRIEF.md`, TASKS.md S2-T29, and document 03,
+**S2-T29 cached page and awards contracts**. Base full commit `59d52110bd96153ee9663cefbb6f62890c503327`;
+implementation commit PENDING (Git remains read-only for the lead).
+No production source, existing test/assertion, runner, dependency or gate changed.
+The four new test files are `custodian/tests/test_award_checks_survivors_1.py`
+and `custodian/tests/test_awards_survivors_1.py`, `_2.py`, `_3.py`.
+`scripts/mutation_explained.toml` has nineteen appended exact-diff equivalences.
+
+The input `.overnight/IN/survivors-camp2.jsonl` has 415 records. Exhaustive
+accounting at `.overnight/tmp/table.md` and `.overnight/tmp/counts.json` gives
+`award_checks.py`: K 84, E 2, D 0; `awards.py`: K 312, E 17, D 0.
+K means the named new behavior test kills the change; one exact representative
+per group was replayed, not a complete campaign. All 32 representatives returned
+RED exit 1 with failed tests and GREEN exit 0 on original production code.
+The throwaway copies live under `.overnight/tmp/representative-*`; the replay
+bootstrap verifies import from that copy and removes the repository custodian
+source from pytest's configured path. The exact commands, group members, exits
+and last lines are `.overnight/tmp/representatives.md` and
+`.overnight/tmp/evidence/replays.jsonl`; their 64 per-color logs are beside it.
+No D was reproduced; no production fix or defect reproducer was needed.
+
+Environment: Python 3.14.6, pytest 9.2.0, locked uv environment, CPUs 4-7,
+PYTHONDONTWRITEBYTECODE=1, UV_OFFLINE=1, EII_DECISION_PROVIDER=none; cache and
+temporary write paths confined beneath `.overnight/tmp/`. Fixture seed 73;
+final new tests specify Hypothesis seed 7329. The full quiet command uses the
+existing bootstrap's automatic Hypothesis seed and does not emit that seed;
+no world build or world seed, live fetch, key or mutation campaign was used.
+Commands, actual exits, last lines and wall times are append-only in
+`.overnight/tmp/evidence/checks.jsonl`, with sanitized complete logs there.
+
+- New tests, final: `taskset -c 4-7 uv run --locked python -m pytest custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider --hypothesis-seed=7329 --basetemp=.overnight/tmp/pytest-new-final`: exit 0; `114 passed in 2.04s`; wall 2.803 s.
+- `taskset -c 4-7 uv run --locked python -m pytest custodian/tests core/tests -q -p no:cacheprovider --basetemp=.overnight/tmp/pytest-full`: exit 0; `7010 passed in 339.16s (0:05:39)`; wall 340.825 s.
+- `uv run --locked ruff check .`: exit 0; `All checks passed!`.
+- `uv run --locked ruff format --check .`: exit 0; `684 files already formatted`.
+- `uv run --locked mypy`: exit 0; `Success: no issues found in 401 source files`.
+- `python3 scripts/check_docs.py`: exit 0; `checked 964 text files, 107 Markdown files: OK` before this append; final record check is in `.overnight/RETURN.md`.
+- `python3 scripts/check_tree.py`: exit 0; `checked 8 rules: OK`.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; no output.
+- `git diff --check`: exit 0; no output.
+- `python3 .overnight/tmp/account.py`: exit 0; all 415 records accounted; every E row present with byte-identical mutation text and every K test/group linked to red/green evidence.
+- `git diff --exit-code HEAD -- custodian/src core/src product/src`: exit 0; no output.
+
+Development corrections, retained candidly: the first new-test run was exit 1,
+`1 failed, 71 passed in 0.58s`, because the expected parsed empty string should
+be null under the contract; the next was exit 1,
+`1 failed, 112 passed in 2.07s`, because the invented form control did not use
+the contract's credential-control name. Correcting those fixture expectations
+and names gave exit 0, `114 passed in 2.29s`, before representative replay.
+The final new-test run above verifies the final files. Initial focused lint
+was exit 1 with five diagnostics (three Unicode-literal ambiguity diagnostics,
+import order and one unused import); equivalent Unicode escapes and import
+cleanup resolved them. Applying the formatter returned exit 0, four files
+reformatted. These were diagnosed authoring errors, not random failures.
+Three unsupported-format message mutations were moved from provisional K to E
+after tracing their unconditional catch-and-replace handler; no recorded test
+outcome or earlier ledger evidence was rewritten.
+
+The lead's full mutation campaign and another-maker review remain PENDING;
+all pre-existing source acquisition, profile, pin and live-evidence holds remain
+open. No review approval or final campaign result is claimed. Muhasabah PASS
+for this bounded handoff and its explicitly stated evidence limits.
