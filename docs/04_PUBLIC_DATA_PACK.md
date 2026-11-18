@@ -977,7 +977,7 @@ landing_url: https://www.data.gov.qa/explore/dataset/electricity-total-consumpti
 licence_id: CC-BY-4.0          # one of the ids in section 4
 licence_basis: dataset         # dataset | portal_terms | owner_decision (personal, local project, PUB-12) | provider_terms (PUB-95, PUB-97, and the Comtrade keyed interface un_comtrade under decision 0040 item 2)
 licence_url: https://www.data.gov.qa/pages/license/annexes
-terms_sha256: null             # hash of every source's terms or licence page: SHA-256 of the terms or licence page's normalised visible text (scripts, styles, comments and tags removed; entities decoded; white space collapsed; Unicode NFC). The build log records terms_fingerprint visible_text beside it; a previous raw-byte digest has no such kind and is not compared; its own wording and date read are recorded in document 04 (PUB-12)
+terms_sha256: null             # hash of every source's terms or licence page: SHA-256 of the terms or licence page's normalised visible text (scripts, styles, comments and tags removed; entities decoded; white space collapsed; Unicode NFC). The build log records terms_fingerprint visible_text beside it; a previous raw-byte digest has no such kind and is not compared; its own wording and date read are recorded in document 04 (PUB-12). A benchmark receipt reuses this field for kind recorded_terms, defined with the S2-T26 benchmark mappings; that kind is not visible_text and is not compared as a page hash.
 terms_words: "terms to be read" # the publisher's own words, or the marker `terms to be read` (PUB-12, decision 0026 item 3)
 terms_read_on: "2026-11-14"     # example value; the date read, or the date checked (PUB-12, decision 0026 item 3)
 decision_record: null          # owner_decision only: 0026, the personal, local basis; no per-source grant (PUB-12)
@@ -1591,7 +1591,12 @@ receipts, exact licence words and count/byte evidence remain lead-owned work.
 The offline adapter and its limitations are recorded in the benchmarks README.
 
 The offline benchmark receipts now include raw/excluded coverage, per-series last
-periods, ZIP member hashes and recorded-terms fingerprints. The reconciliation
+periods and ZIP member hashes. Their terms digest is kind `recorded_terms`: the
+SHA-256 of the canonical JSON of the recorded registry terms fields (terms words,
+date read, licence basis, licence id, terms URL and licence URL). That kind is
+not the visible-text page digest of section 3.1, whose kind is `visible_text`.
+A benchmark receipt whose `terms_fingerprint` is `visible_text` or any other
+kind fails. The reconciliation
 selection remains inactive; an explicit reviewed selection produces cache-only
 input/comparison tables and a replay-verified manifest with owner obstacles. These
 technical fixture paths do not establish a successful live fetch (PUB-19).

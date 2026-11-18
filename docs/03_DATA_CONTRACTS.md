@@ -2297,6 +2297,13 @@ hashes, binding evidence and the full native row. Calculated calendar rows inste
 carry ordered constituent input references. pub_trade_reconciliation (PairResult)
 retains partner/year/flow/scope, both source-role identities, nullable input IDs,
 nullable exact gap, mismatch codes, recorded cause codes/evidence and unknown_cause.
+A cell with more than one annual figure for one source and role carries
+`duplicate_annual`. That code is kept beside `missing_side` only when the other
+side has no annual figure. A calculated calendar accepts only the twelve
+zero-padded months `YYYY-MM` of one year and orders them by parsed month. For
+that form, text order and chronological order match. An unpadded month is not
+a native period: text order would place `2020-10` before `2020-2`, and the
+sum is refused.
 The composite comparison key is the requested cell and both source-role identities.
 The cache manifest pins the selection hash, method, output hash and counts; its
 reader reopens selected native readers and recomputes both collections. An absent

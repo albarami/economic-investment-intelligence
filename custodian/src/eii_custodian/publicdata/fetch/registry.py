@@ -188,6 +188,22 @@ REQUIRED = frozenset(
 
 _REGISTRY = Path(__file__).resolve().parents[4] / "publicdata" / "sources.yaml"
 _UNCONFIRMED_REFETCH = Cadence("none", "frequency_unconfirmed", "")
+_CONTRACT_SPLIT_SOURCES = frozenset(
+    {"sec_hr_comp_occ", "wage_bands_priv", "ref_min_wage"}
+)
+
+
+def _splits_carried_by_columns(
+    columns: tuple[tuple[str, str], ...],
+) -> tuple[str, ...]:
+    """Sex and nationality splits implied by recorded column names."""
+    names = {name for name, _kind in columns}
+    carried: list[str] = []
+    if names & {"sex", "gender"}:
+        carried.append("sex")
+    if any("nationality" in name for name in names):
+        carried.append("nationality")
+    return tuple(carried)
 
 
 class RegistryError(Exception):
@@ -461,6 +477,11 @@ def _entry(row: object) -> Entry:
     if any("nationality" in name for name, _kind in columns):
         if "nationality" not in public_splits:
             raise RegistryError("nationality field requires public_splits nationality")
+    if (
+        source_id in _CONTRACT_SPLIT_SOURCES
+        and public_splits != _splits_carried_by_columns(columns)
+    ):
+        raise RegistryError("public_splits contract mismatch")
     return Entry(
         refetch=refetch,
         key=_text(row, "key"),

@@ -50,6 +50,7 @@ def _fetch_benchmark(
         stream_download,
     )
     from eii_custodian.publicdata.fetch.receipts import sidecar_for
+    from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_RECORDED_TERMS
 
     from .config import METHOD, require, safe_url
     from .parse import parse_with_coverage
@@ -124,6 +125,7 @@ def _fetch_benchmark(
             row_count=len(rows),
             terms_sha256=terms_fingerprint(entry),
         )
+        receipt["terms_fingerprint"] = FINGERPRINT_RECORDED_TERMS
         receipt["coverage"] = parsed.coverage
         encoded_entry = {
             key: value
@@ -224,7 +226,7 @@ def fetch_benchmark(
 
 
 def terms_fingerprint(entry: Entry) -> str:
-    """Bind recorded terms words, date and basis, without claiming a live page read."""
+    """Bind recorded terms fields. The receipt kind is ``recorded_terms``, not a page."""
     import hashlib
     import json
 

@@ -1,5 +1,13 @@
-"""Exact source-separated trade differences. No conversion or inferred equivalence."""
+"""Exact source-separated trade differences. No conversion or inferred equivalence.
 
+A calculated calendar accepts only the twelve zero-padded months ``YYYY-MM``
+of one year. Lineage is ordered by parsed year and month. For that form, text
+order and chronological order match. An unpadded month is refused, because
+text order would place ``2020-10`` before ``2020-2``. Two annual figures for
+one source and role are ``duplicate_annual``, not only a missing side.
+"""
+
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
@@ -130,6 +138,32 @@ def compare_trade_sources(
     return Comparison(left, right, _text(gap), ())
 
 
+_MONTH_TEXT = re.compile(r"\A([0-9]{4})-([0-9]{1,2})\Z")
+
+
+def _row_month_rank(row: TradeFigure) -> tuple[int, int]:
+    """Rank one monthly row. Any other period shape is not a native month."""
+    if len(row.periods) != 1:
+        raise ValueError("annual_coverage")
+    return monthly_period_rank(row.periods[0])
+
+
+def monthly_period_rank(period: str) -> tuple[int, int]:
+    """Rank a month by year and month number, not by text order.
+
+    Accepted native months of a calculated calendar stay the zero-padded
+    ``YYYY-MM`` set. An unpadded month still ranks by its number, so
+    ``2020-2`` precedes ``2020-10``.
+    """
+    match = _MONTH_TEXT.fullmatch(period)
+    if match is None:
+        raise ValueError("annual_coverage")
+    month = int(match.group(2))
+    if month < 1 or month > 12:
+        raise ValueError("annual_coverage")
+    return (int(match.group(1)), month)
+
+
 def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeFigure:
     """Sum one native product scope across a complete calendar, never components."""
     from dataclasses import replace
@@ -168,7 +202,8 @@ def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeF
         value=_text(total),
         figure_kind="calculated",
         lineage=tuple(
-            row.input_id for row in sorted(rows, key=lambda row: row.periods)
+            row.input_id
+            for row in sorted(rows, key=lambda row: monthly_period_rank(row.periods[0]))
         ),
     )
 
@@ -216,6 +251,8 @@ def all_pairs(
     )
     for partner, year, flow, scope in requested:
         candidates: dict[tuple[str, str], TradeFigure] = {}
+        absent: set[tuple[str, str]] = set()
+        duplicated: set[tuple[str, str]] = set()
         for source in sources:
             rows = tuple(
                 r
@@ -225,10 +262,15 @@ def all_pairs(
                 == (partner, year, flow, scope)
             )
             if not rows:
+                absent.add(source)
                 continue
             annual = tuple(r for r in rows if r.periods == (str(year),))
-            if len(annual) == 1:
+            if len(annual) > 1:
+                duplicated.add(source)
+            elif len(annual) == 1:
                 candidates[source] = annual[0]
+            else:
+                absent.add(source)
         for left_key, right_key in pairs:
             left, right = candidates.get(left_key), candidates.get(right_key)
             comparison = compare_trade_sources(left, right)
@@ -240,9 +282,12 @@ def all_pairs(
                 and (r.source_id, r.role) not in candidates
                 for r in figures
             )
-            codes = comparison.mismatch_codes + (
-                ("incomplete_calendar",) if incomplete else ()
-            )
+            codes = comparison.mismatch_codes
+            if left_key in duplicated or right_key in duplicated:
+                if left_key not in absent and right_key not in absent:
+                    codes = tuple(code for code in codes if code != "missing_side")
+                codes = (*codes, "duplicate_annual")
+            codes = codes + (("incomplete_calendar",) if incomplete else ())
             results.append(
                 PairResult(
                     partner,
@@ -277,8 +322,8 @@ def comparison_figures(rows: tuple[TradeFigure, ...]) -> tuple[TradeFigure, ...]
     for group in groups.values():
         if any(r.periods == (str(r.year),) for r in group):
             continue
-        ordered = tuple(sorted(group, key=lambda r: r.periods))
         try:
+            ordered = tuple(sorted(group, key=_row_month_rank))
             aggregates.append(
                 annual_trade_sum(
                     ordered, output_id="annual:" + ":".join(r.input_id for r in ordered)
