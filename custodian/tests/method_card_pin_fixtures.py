@@ -7,12 +7,21 @@ interchange shape, not a claim about the S2-T08 live output.
 The invented methods document carries the five governed sections of the sync
 check, one per card anchor, and the record's hash covers exactly those spans,
 mirroring the production definition for the invented layout.
+
+The c5 pin values are per basket line and the c5 settings carry the per-line
+parent review under the same line names; the data replay tests use the same
+line names ("pasta", "other"). A configuration pin (the 16 "none named"
+setting pins) carries no source lineage: its evidence is the recorded
+configuration itself, so the record and the artifact rows hold an empty
+lineage for it.
 """
 
 import hashlib
 import json
 
 import yaml
+
+from eii_custodian.publicdata.method_card_validation import CONFIGURATION_PINS
 
 PIN_GROUPS = {
     "wilson": ("period",),
@@ -50,6 +59,8 @@ PRIOR = [f"2024-{month:02}" for month in range(1, 13)]
 LATEST = [f"2025-{month:02}" for month in range(7, 13)] + [
     f"2026-{month:02}" for month in range(1, 7)
 ]
+# The same line names as the data replay's LINES; every line starts clean.
+C5_LINES = ("pasta", "other")
 SECTION_PROSE = "No public value appears in this fixture."
 SECTIONS = (
     ("wilson", "## 3. Shared interval method and reliability mark"),
@@ -133,17 +144,31 @@ def case(tmp_path):
             settings = {
                 "prior_months": PRIOR,
                 "latest_months": LATEST,
-                "parent_contains_excluded": False,
-                "parent_treatment": "clean",
+                "lines": {
+                    line: {
+                        "parent_contains_excluded": False,
+                        "parent_treatment": "clean",
+                    }
+                    for line in C5_LINES
+                },
             }
         configuration["pins"][pin] = settings
-        values = {"value": "invented:" + pin}
+        values = (
+            {line: "invented:" + pin + ":" + line for line in C5_LINES}
+            if pin.startswith("c5.")
+            else {"value": "invented:" + pin}
+        )
+        # A configuration pin is checked by its recorded settings, never by an
+        # invented source lineage, so its record and artifact rows hold none.
+        pin_lineage = (
+            [] if pin in CONFIGURATION_PINS else [link.copy() for link in lineage]
+        )
         artifact["pins"].append(
             {
                 "pin_id": pin,
                 "values": values.copy(),
                 "settings": settings.copy(),
-                "source_lineage": [link.copy() for link in lineage],
+                "source_lineage": pin_lineage.copy(),
             }
         )
         rows.append(
@@ -154,7 +179,7 @@ def case(tmp_path):
                 "reviewer_maker": "Google",
                 "review_date": "2026-11-18",
                 "checked_against_source": True,
-                "source_lineage": [link.copy() for link in lineage],
+                "source_lineage": pin_lineage.copy(),
                 "settings_sha256": None,
                 "values": values.copy(),
                 "unpinned_reason": None,

@@ -14,6 +14,7 @@ import pytest
 import yaml
 
 from eii_custodian.publicdata.method_card_validation import (
+    CONFIGURATION_PINS,
     completion_evidence,
     validate_source_check_record,
     verify_method_cards_sync,
@@ -119,11 +120,16 @@ def test_plant_unpinned_at_gate_even_with_open_item(tmp_path, gate, pin):
 
 @pytest.mark.parametrize("treatment", ["", "clean"])
 def test_plant_contaminated_c5_parent(tmp_path, treatment):
+    # Per basket line: every reviewed line of every c5 pin is contaminated,
+    # so only the contaminated-treatment guard can fail.
     paths, record, artifact, config = case(tmp_path)
     for pin, settings in config["pins"].items():
         if pin.startswith("c5."):
-            settings["parent_contains_excluded"] = True
-            settings["parent_treatment"] = treatment
+            for line in settings["lines"]:
+                settings["lines"][line] = {
+                    "parent_contains_excluded": True,
+                    "parent_treatment": treatment,
+                }
     for produced in artifact["pins"]:
         produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
     write_json(paths[2], config)
@@ -185,11 +191,17 @@ def test_plant_c5_latest_window_substitute(tmp_path, substitute, code):
         validate_source_check_record(*paths[:3])
 
 
-def test_plant_c5_parent_review_missing(tmp_path):
+@pytest.mark.parametrize("defect", ["lines_key", "review_field"])
+def test_plant_c5_parent_review_missing(tmp_path, defect):
+    # The per-line parent review is recorded in settings under "lines": a c5
+    # pin without it, or with a malformed line review, has no parent review.
     paths, record, artifact, config = case(tmp_path)
-    for settings in config["pins"].values():
-        if "parent_contains_excluded" in settings:
-            settings.pop("parent_contains_excluded")
+    for pin, settings in config["pins"].items():
+        if pin.startswith("c5."):
+            if defect == "lines_key":
+                settings.pop("lines")
+            else:
+                next(iter(settings["lines"].values())).pop("parent_contains_excluded")
     for produced in artifact["pins"]:
         produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
     write_json(paths[2], config)
@@ -200,12 +212,44 @@ def test_plant_c5_parent_review_missing(tmp_path):
         validate_source_check_record(*paths[:3])
 
 
+@pytest.mark.parametrize(
+    "defect",
+    ["value_line_without_review", "reviewed_line_without_value"],
+)
+def test_plant_c5_value_lines_do_not_match_parent_review(tmp_path, defect):
+    # The per-line c5 values and the reviewed lines are the same key set: a
+    # released line without a review, or a review without a released line,
+    # is a missing parent review. Record and artifact agree, so only the
+    # record's own guard can fail.
+    paths, record, artifact, _ = case(tmp_path)
+    for row in record["pins"]:
+        if row["pin_id"].startswith("c5."):
+            if defect == "value_line_without_review":
+                row["values"]["unreviewed line"] = "1"
+            else:
+                row["values"].pop("pasta")
+    for produced in artifact["pins"]:
+        if produced["pin_id"].startswith("c5."):
+            produced["values"] = next(
+                row["values"].copy()
+                for row in record["pins"]
+                if row["pin_id"] == produced["pin_id"]
+            )
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="c5_parent_review_missing"):
+        validate_source_check_record(*paths[:3])
+
+
 def test_plant_c5_clean_parent_with_withheld_treatment(tmp_path):
+    # Per basket line: an uncontaminated line reviewed as withheld.
     paths, record, artifact, config = case(tmp_path)
     for pin, settings in config["pins"].items():
         if pin.startswith("c5."):
-            settings["parent_contains_excluded"] = False
-            settings["parent_treatment"] = "withheld"
+            for line in settings["lines"]:
+                settings["lines"][line] = {
+                    "parent_contains_excluded": False,
+                    "parent_treatment": "withheld",
+                }
     for produced in artifact["pins"]:
         produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
     write_json(paths[2], config)
@@ -217,19 +261,26 @@ def test_plant_c5_clean_parent_with_withheld_treatment(tmp_path):
 
 
 def test_plant_c5_withheld_with_value(tmp_path):
+    # Per basket line: every line withheld, and the prior12/trend values are
+    # per-line plain values instead of the withheld encoding.
     paths, record, artifact, config = case(tmp_path)
     for pin, settings in config["pins"].items():
         if pin.startswith("c5."):
-            settings["parent_contains_excluded"] = True
-            settings["parent_treatment"] = "withheld"
+            for line in settings["lines"]:
+                settings["lines"][line] = {
+                    "parent_contains_excluded": True,
+                    "parent_treatment": "withheld",
+                }
     for produced in artifact["pins"]:
         pin = produced["pin_id"]
         produced["settings"] = copy.deepcopy(config["pins"][pin])
         if pin in ("c5.prior12", "c5.trend"):
-            produced["values"] = {"value": "1"}
+            produced["values"] = {line: "1" for line in config["pins"][pin]["lines"]}
     for row in record["pins"]:
         if row["pin_id"] in ("c5.prior12", "c5.trend"):
-            row["values"] = {"value": "1"}
+            row["values"] = {
+                line: "1" for line in config["pins"][row["pin_id"]]["lines"]
+            }
     write_json(paths[2], config)
     for row in record["pins"]:
         row["settings_sha256"] = digest(paths[2].read_bytes())
@@ -289,7 +340,9 @@ def test_plant_artifact_row_missing(tmp_path):
 
 def test_plant_artifact_lineage_mismatch(tmp_path):
     paths, _, artifact, _ = case(tmp_path)
-    artifact["pins"][0]["source_lineage"][0]["sha256"] = digest(b"different rows")
+    # c5.hhi is a source pin (pins[1]); pins[0] wilson.period is a
+    # configuration pin whose record and artifact lineage are both empty.
+    artifact["pins"][1]["source_lineage"][0]["sha256"] = digest(b"different rows")
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_lineage_mismatch"):
         validate_source_check_record(*paths[:3])
@@ -298,9 +351,10 @@ def test_plant_artifact_lineage_mismatch(tmp_path):
 def test_plant_lineage_date_without_timezone(tmp_path):
     paths, record, artifact, _ = case(tmp_path)
     # The naive timestamp is planted in the record and in the artifact row of
-    # the same pin, so only the record's own lineage-date guard can fail.
-    record["pins"][0]["source_lineage"][0]["retrieved_utc"] = "2026-11-18T00:00:00"
-    artifact["pins"][0]["source_lineage"][0]["retrieved_utc"] = "2026-11-18T00:00:00"
+    # the same source pin (c5.hhi), so only the record's own lineage-date
+    # guard can fail.
+    record["pins"][1]["source_lineage"][0]["retrieved_utc"] = "2026-11-18T00:00:00"
+    artifact["pins"][1]["source_lineage"][0]["retrieved_utc"] = "2026-11-18T00:00:00"
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_lineage_date"):
@@ -310,12 +364,13 @@ def test_plant_lineage_date_without_timezone(tmp_path):
 def test_plant_lineage_row_duplicated(tmp_path):
     paths, record, artifact, _ = case(tmp_path)
     # The duplicate lineage row is planted in the record and in the artifact
-    # row of the same pin, so only the record's own duplicate guard can fail.
-    record["pins"][0]["source_lineage"].append(
-        dict(record["pins"][0]["source_lineage"][0])
+    # row of the same source pin (c5.hhi), so only the record's own duplicate
+    # guard can fail.
+    record["pins"][1]["source_lineage"].append(
+        dict(record["pins"][1]["source_lineage"][0])
     )
-    artifact["pins"][0]["source_lineage"].append(
-        dict(artifact["pins"][0]["source_lineage"][0])
+    artifact["pins"][1]["source_lineage"].append(
+        dict(artifact["pins"][1]["source_lineage"][0])
     )
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
@@ -426,6 +481,31 @@ def test_plant_card_sync_block_outside_governed_sections(tmp_path):
         verify_method_cards_sync(paths[0], paths[3])
 
 
+def test_plant_card_sync_missing_block(tmp_path):
+    # A checked pin whose block was deleted entirely: the block-free baseline
+    # is unchanged and no marker survives, so only the missing-block guard
+    # can fail.
+    paths, record, _, _ = case(tmp_path)
+    block = blocks(record["pins"][:1])
+    paths[3].write_text(paths[3].read_text().replace(block, ""))
+    with pytest.raises(ValueError, match="card_sync_missing_block"):
+        verify_method_cards_sync(paths[0], paths[3])
+
+
+def test_plant_card_sync_malformed_block(tmp_path):
+    # An unclosed method-pin marker left inside a governed span: no block
+    # matches it, so it survives into the block-free baseline and only the
+    # malformed-marker guard can fail.
+    paths, record, _, _ = case(tmp_path)
+    text = paths[3].read_text()
+    last = blocks([row for row in record["pins"] if row["pin_id"].startswith("c14.")])
+    paths[3].write_text(
+        text.replace(last, last + "<!-- method-pin:wilson.period -->\n")
+    )
+    with pytest.raises(ValueError, match="card_sync_malformed_block"):
+        verify_method_cards_sync(paths[0], paths[3])
+
+
 @pytest.mark.parametrize("defect", ["missing", "duplicated"])
 def test_plant_card_sync_governed_heading_count(tmp_path, defect):
     paths, _, _, _ = case(tmp_path)
@@ -507,9 +587,10 @@ def test_closed_record_schema(tmp_path, defect, code):
         record["pins"][0]["checked_against_source"] = 1
     elif defect == "lineage":
         # The empty licence is planted in the record and in the artifact row
-        # of the same pin, so only the record's own text guard can fail.
-        record["pins"][0]["source_lineage"][0]["licence_id"] = ""
-        artifact["pins"][0]["source_lineage"][0]["licence_id"] = ""
+        # of the same source pin (c5.hhi), so only the record's own text
+        # guard can fail.
+        record["pins"][1]["source_lineage"][0]["licence_id"] = ""
+        artifact["pins"][1]["source_lineage"][0]["licence_id"] = ""
     else:
         record["pins"][0]["review_date"] = "not-a-date"
     write_yaml(paths[0], record)
@@ -532,9 +613,12 @@ def test_pending_fixture_needs_no_live_file(tmp_path):
     assert yaml.safe_load(paths[0].read_text())["pins"][0]["values"] == {}
 
 
-def test_plant_setting_removed_from_both_artifact_and_config(tmp_path):
+@pytest.mark.parametrize("pin", sorted(CONFIGURATION_PINS))
+def test_plant_setting_removed_from_both_artifact_and_config(tmp_path, pin):
+    # Every configuration pin: removing the recorded settings from both the
+    # artifact row and the config leaves the pin's value unrecorded, and only
+    # the configuration-pin guard can refuse it.
     paths, record, artifact, config = case(tmp_path)
-    pin = "c6.seed"
     config["pins"][pin] = {}
     next(row for row in artifact["pins"] if row["pin_id"] == pin)["settings"] = {}
     write_json(paths[2], config)
@@ -545,12 +629,51 @@ def test_plant_setting_removed_from_both_artifact_and_config(tmp_path):
         validate_source_check_record(*paths[:3])
 
 
+def test_c6_release_sha256_source_pin_needs_no_settings_value(tmp_path):
+    # c6.release_sha256 is a places_ovt source pin with lineage, not one of
+    # the 16 "none named" configuration pins: its checked value is checked by
+    # its recorded settings hash and its source lineage, never by a copy of
+    # its own value in the settings.
+    paths, record, artifact, config = case(tmp_path)
+    pin = "c6.release_sha256"
+    config["pins"][pin].pop("value")
+    next(row for row in artifact["pins"] if row["pin_id"] == pin)["settings"].pop(
+        "value"
+    )
+    write_json(paths[2], config)
+    for row in record["pins"]:
+        row["settings_sha256"] = digest(paths[2].read_bytes())
+    save(paths, record, artifact)
+    entries = validate_source_check_record(*paths[:3])
+    assert entries[pin].values == {"value": "invented:" + pin}
+    assert entries[pin].source_lineage != ()
+
+
+def test_plant_source_pin_with_empty_lineage(tmp_path):
+    # Empty lineage is accepted only for a configuration pin: on the source
+    # pin c5.hhi the checked-evidence guard refuses it. The record and the
+    # artifact row agree, so only the record's own guard can fail.
+    paths, record, artifact, _ = case(tmp_path)
+    record["pins"][1]["source_lineage"] = []
+    artifact["pins"][1]["source_lineage"] = []
+    write_yaml(paths[0], record)
+    write_json(paths[1], artifact)
+    with pytest.raises(ValueError, match="pin_checked_evidence_missing"):
+        validate_source_check_record(*paths[:3])
+
+
 def test_plant_contamination_label_not_recorded_with_value(tmp_path):
+    # Per basket line: every line reviewed "includes excluded lines", and the
+    # prior12/trend values keep the fixture's unmarked per-line values, so only
+    # the visible-label guard can fail.
     paths, record, artifact, config = case(tmp_path)
     for pin, settings in config["pins"].items():
         if pin.startswith("c5."):
-            settings["parent_contains_excluded"] = True
-            settings["parent_treatment"] = "includes excluded lines"
+            for line in settings["lines"]:
+                settings["lines"][line] = {
+                    "parent_contains_excluded": True,
+                    "parent_treatment": "includes excluded lines",
+                }
     for produced in artifact["pins"]:
         produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
     write_json(paths[2], config)
@@ -561,6 +684,106 @@ def test_plant_contamination_label_not_recorded_with_value(tmp_path):
         validate_source_check_record(*paths[:3])
 
 
+def _mixed_lines(config, other_contains, other_treatment):
+    """One clean line (pasta) and one reviewed line (other) in one pin."""
+    for pin, settings in config["pins"].items():
+        if pin.startswith("c5."):
+            settings["lines"]["pasta"] = {
+                "parent_contains_excluded": False,
+                "parent_treatment": "clean",
+            }
+            settings["lines"]["other"] = {
+                "parent_contains_excluded": other_contains,
+                "parent_treatment": other_treatment,
+            }
+
+
+def test_plant_mixed_basket_withheld_line_carrying_a_value(tmp_path):
+    # Mixed basket: the clean line keeps its plain value, the withheld line
+    # still carries a plain value, so only the withheld-value guard can fail.
+    paths, record, artifact, config = case(tmp_path)
+    _mixed_lines(config, True, "withheld")
+    for produced in artifact["pins"]:
+        produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
+    write_json(paths[2], config)
+    for row in record["pins"]:
+        row["settings_sha256"] = digest(paths[2].read_bytes())
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="c5_parent_withheld_value"):
+        validate_source_check_record(*paths[:3])
+
+
+def test_plant_mixed_basket_includes_line_without_visible_label(tmp_path):
+    # Mixed basket: the clean line keeps its plain value, the "includes
+    # excluded lines" line lacks the visible caveat suffix, so only the
+    # visible-label guard can fail.
+    paths, record, artifact, config = case(tmp_path)
+    _mixed_lines(config, True, "includes excluded lines")
+    for produced in artifact["pins"]:
+        produced["settings"] = copy.deepcopy(config["pins"][produced["pin_id"]])
+    write_json(paths[2], config)
+    for row in record["pins"]:
+        row["settings_sha256"] = digest(paths[2].read_bytes())
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="c5_parent_visible_label_missing"):
+        validate_source_check_record(*paths[:3])
+
+
+def test_plant_mixed_basket_clean_line_carrying_a_marker(tmp_path):
+    # Mixed basket: the "includes excluded lines" line is marked correctly,
+    # but the clean line also carries the caveat suffix, and a clean line
+    # never carries either marker.
+    paths, record, artifact, config = case(tmp_path)
+    _mixed_lines(config, True, "includes excluded lines")
+    for row in record["pins"]:
+        if row["pin_id"] in ("c5.prior12", "c5.trend"):
+            for line in row["values"]:
+                row["values"][line] = "1;caveat=includes excluded lines"
+    for produced in artifact["pins"]:
+        pin = produced["pin_id"]
+        produced["settings"] = copy.deepcopy(config["pins"][pin])
+        produced["values"] = next(
+            row["values"].copy() for row in record["pins"] if row["pin_id"] == pin
+        )
+    write_json(paths[2], config)
+    for row in record["pins"]:
+        row["settings_sha256"] = digest(paths[2].read_bytes())
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="c5_parent_treatment"):
+        validate_source_check_record(*paths[:3])
+
+
+@pytest.mark.parametrize(
+    "other_treatment,other_value",
+    [
+        ("withheld", "NO_DATA:includes excluded lines"),
+        ("includes excluded lines", "1;caveat=includes excluded lines"),
+    ],
+)
+def test_mixed_basket_parent_review_accepts_one_clean_and_one_contaminated_line(
+    tmp_path, other_treatment, other_value
+):
+    # The clean case: one clean line and one contaminated line in one pin,
+    # each line's own review governing its own value, is accepted.
+    paths, record, artifact, config = case(tmp_path)
+    _mixed_lines(config, True, other_treatment)
+    for row in record["pins"]:
+        if row["pin_id"] in ("c5.prior12", "c5.trend"):
+            row["values"]["other"] = other_value
+    for produced in artifact["pins"]:
+        pin = produced["pin_id"]
+        produced["settings"] = copy.deepcopy(config["pins"][pin])
+        produced["values"] = next(
+            row["values"].copy() for row in record["pins"] if row["pin_id"] == pin
+        )
+    write_json(paths[2], config)
+    for row in record["pins"]:
+        row["settings_sha256"] = digest(paths[2].read_bytes())
+    save(paths, record, artifact)
+    entries = validate_source_check_record(*paths[:3])
+    assert entries["c5.prior12"].checked_against_source
+
+
 @pytest.mark.parametrize("treatment", ["includes excluded lines", "withheld"])
 def test_reviewed_contaminated_parent_must_label_or_withhold_values(
     tmp_path, treatment
@@ -568,17 +791,19 @@ def test_reviewed_contaminated_parent_must_label_or_withhold_values(
     paths, record, artifact, config = case(tmp_path)
     for pin, settings in config["pins"].items():
         if pin.startswith("c5."):
-            settings["parent_contains_excluded"] = True
-            settings["parent_treatment"] = treatment
+            for line in settings["lines"]:
+                settings["lines"][line] = {
+                    "parent_contains_excluded": True,
+                    "parent_treatment": treatment,
+                }
     for row in record["pins"]:
         if row["pin_id"] in ("c5.prior12", "c5.trend"):
-            if treatment == "withheld":
-                row["values"] = {
-                    "value": "NO_DATA",
-                    "reason": "includes excluded lines",
-                }
-            else:
-                row["values"]["caveat"] = "includes excluded lines"
+            for line in row["values"]:
+                row["values"][line] = (
+                    "NO_DATA:includes excluded lines"
+                    if treatment == "withheld"
+                    else "1;caveat=includes excluded lines"
+                )
     for produced in artifact["pins"]:
         pin = produced["pin_id"]
         produced["settings"] = copy.deepcopy(config["pins"][pin])

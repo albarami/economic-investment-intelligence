@@ -7,13 +7,16 @@ on this tree: their tests exercise independent reference arithmetic only; they
 are not evidence that a production implementation exists.
 """
 
+import json
 from decimal import Decimal as D
+from pathlib import Path
 
 import pytest
 
 from eii_core.calc.facts import Measure, SourceChain
 from eii_core.calc.public_methods import TradeRow, supplier_metrics, wilson
 from eii_core.calc.public_series import rounded
+from eii_custodian.publicdata.series.parse import customs_code
 
 from .method_card_data_replay import (
     replay_c5,
@@ -30,6 +33,10 @@ LATEST = tuple(f"2025-{m:02}" for m in range(1, 13))
 # The card computes HHI, shares and the trend per basket line (docs/07 C5).
 LINES = {"pasta": ("1902.11.10.0000",), "other": ("1902.19.10.0000",)}
 POOLED = {"pooled": ("1902.11.10.0000", "1902.19.10.0000")}
+# The row shapes confirmed on main for the licence and customs sources.
+CONFIRMED_SHAPES = (
+    Path(__file__).resolve().parent / "fixtures" / "series" / "confirmed_shapes.json"
+)
 
 
 def test_independent_wilson_paths_and_arithmetic(tmp_path):
@@ -76,6 +83,25 @@ def test_independent_wilson_paths_and_arithmetic(tmp_path):
     assert result["z"] == "1.96"
 
 
+def test_replay_wilson_skips_the_undated_cancelled_row_of_the_confirmed_shape(tmp_path):
+    # The shapes confirmed on main: an undated cancelled-licence row carries
+    # a null year and month. It is skipped, never a crash, and only the dated
+    # 2020-07 row of the confirmed shapes enters k.
+    shapes = json.loads(CONFIRMED_SHAPES.read_text(encoding="utf-8"))
+    result = replay_wilson(
+        write_json(tmp_path / "confirmed-active.json", shapes["lic_active"]),
+        write_json(tmp_path / "confirmed-cancelled.json", shapes["lic_cancelled"]),
+        municipality="بلدية تجريبية",
+        activity="invented-code",
+        period=("2020-07",),
+    )
+    assert result["period"] == "2020-07..2020-07"
+    assert (result["k"], result["n"]) == (3, 3)
+    low, high = wilson(result["k"], result["n"])
+    assert rounded(low, 6) == result["low"]
+    assert rounded(high, 6) == result["high"]
+
+
 def customs_files(tmp_path):
     # Raw source field names follow the registry; extra publisher columns and
     # actual null/number encodings still require the live check in pass 2.
@@ -105,7 +131,9 @@ def customs_files(tmp_path):
         {
             "year": "2025",
             "month": m,
-            "harmonized_system_code": "1902.11.10.0000",
+            # The confirmed cus_imp_2025 shape carries integer codes; the
+            # series parser's own rule reads them (never a second rule).
+            "harmonized_system_code": 190211100000,
             "country_of_origin": origin,
             "weight_in_kilograms": weight,
             "value_in_qatari_riyals": value,
@@ -120,7 +148,7 @@ def customs_files(tmp_path):
         {
             "year": "2025",
             "month": m,
-            "harmonized_system_code": "1902.19.10.0000",
+            "harmonized_system_code": 190219100000,
             "country_of_origin": origin,
             "weight_in_kilograms": weight,
             "value_in_qatari_riyals": value,
@@ -136,7 +164,7 @@ def customs_files(tmp_path):
     latest.append(
         dict(
             latest[0],
-            harmonized_system_code="1902.30.10.0000",
+            harmonized_system_code=190230100000,
             value_in_qatari_riyals=999,
         )
     )
@@ -165,6 +193,40 @@ def test_independent_c5_paths(tmp_path):
     assert result["other"]["hhi"] != pooled["hhi"]
 
 
+def test_replay_c5_reads_integer_codes_as_the_series_parser_reads_them(tmp_path):
+    # The shapes confirmed on main: the 2025 table carries integer
+    # harmonized_system_code values. The replay reads them exactly as the
+    # series parser does (never a second rule), so a chapter 01 to 09 code
+    # whose leading zero the integer encoding dropped is restored and kept,
+    # not silently dropped from its line.
+    shapes = json.loads(CONFIRMED_SHAPES.read_text(encoding="utf-8"))
+    latest = [
+        *shapes["cus_imp_2025"],
+        dict(
+            shapes["cus_imp_2025"][0],
+            harmonized_system_code=int("0406.20.00.0001".replace(".", "")),
+            country_of_origin="invented cheese origin",
+            value_in_qatari_riyals=7,
+        ),
+    ]
+    result = replay_c5(
+        write_json(tmp_path / "confirmed-prior.json", shapes["cus_imp_2019"]),
+        write_json(tmp_path / "confirmed-latest.json", latest),
+        prior_months=("2019-01",),
+        latest_months=("2025-01",),
+        basket_lines={"pasta": ("1902.00.00.0001",), "cheese": ("0406.20.00.0001",)},
+    )
+    # The confirmed 2025 row: one origin (null), so a fully concentrated line.
+    assert result["pasta"]["latest12"] == D(2000000000)
+    assert result["pasta"]["hhi"] == D(10000)
+    # The confirmed 2019 row is a different eight-digit parent: no prior row.
+    assert result["pasta"]["prior12"] == D(0)
+    assert result["pasta"]["trend"] == "NO_DATA"
+    # The chapter 04 row is kept by its restored leading zero, not dropped.
+    assert result["cheese"]["latest12"] == D(7)
+    assert result["cheese"]["hhi"] == D(10000)
+
+
 def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
     before, after = customs_files(tmp_path)
     expected = replay_c5(
@@ -172,8 +234,6 @@ def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
     )
     # This adapter copies the invented raw fields; the independent oracle above
     # never calls this adapter or supplier_metrics.
-    import json
-
     chain = SourceChain(
         "invented",
         "invented_table",
@@ -224,7 +284,9 @@ def test_c5_arithmetic_on_exact_replayed_inputs(tmp_path):
         new = [
             trade(row, product, False)
             for row in json.loads(after.read_text())
-            if row["harmonized_system_code"] in codes
+            # Integer source codes are read by the series parser's own rule.
+            if customs_code("cus_imp_2025", row["harmonized_system_code"])
+            == product.replace(".", "")
         ]
         result = supplier_metrics(
             new,

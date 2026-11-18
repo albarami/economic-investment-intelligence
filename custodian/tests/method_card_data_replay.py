@@ -1,7 +1,14 @@
 """Independent MTH-03 file-path replays, for invented pass-1 inputs only.
 
-Assumed shapes for pass 2 confirmation:
-* Wilson/customs/property: JSON row arrays with the registry's column names.
+Assumed shapes, now anchored to the shapes confirmed on main for the licence
+and customs sources (custodian/tests/fixtures/series/confirmed_shapes.json):
+* Wilson/customs/property: JSON row arrays with the registry's column names;
+  an undated cancelled-licence row (null year and month) is skipped, never a
+  crash.
+* The 2025 customs codes are integers and are read exactly as the series
+  parser of eii_custodian.publicdata.series reads them (never a second
+  rule), so a chapter 01 to 09 code keeps its dropped leading zero; the 2019
+  codes are dotted eight-digit strings.
 * C5: per basket line, the mapping of invented line name to its fine codes.
 * C6: Overture-shaped Parquet through the existing file reader, with an
   explicitly supplied projection from longitude/latitude to metric coordinates
@@ -24,6 +31,8 @@ from decimal import localcontext
 from pathlib import Path
 from statistics import median
 
+from eii_custodian.publicdata.series.parse import customs_code
+
 
 def rows(path):
     value = json.loads(Path(path).read_text(encoding="utf-8"), parse_float=D)
@@ -42,7 +51,11 @@ def replay_wilson(active_path, cancelled_path, *, municipality, activity, period
     cancelled = [
         row
         for row in rows(cancelled_path)
-        if selected(row) and f"{row['sn_llg']}-{int(row['shhr_llg']):02}" in period
+        # An undated cancellation row (null year and month) is skipped.
+        if selected(row)
+        and row["sn_llg"] is not None
+        and row["shhr_llg"] is not None
+        and f"{row['sn_llg']}-{int(row['shhr_llg']):02}" in period
     ]
     n = sum(row["dd_lrkhs_lnsht"] for row in active)
     k = sum(row["dd_lrkhs_lmlg"] for row in cancelled)
@@ -80,7 +93,12 @@ def replay_c5(prior_path, latest_path, *, prior_months, latest_months, basket_li
         selected_new = [
             row
             for row in current
-            if row["harmonized_system_code"].replace(".", "") in codes
+            # Integer 2025 codes are read by the series parser's own rule,
+            # which restores the dropped leading zero of chapter 01 to 09;
+            # its sentinel code reads as None and the row is skipped.
+            if (code := customs_code("cus_imp_2025", row["harmonized_system_code"]))
+            is not None
+            and code in codes
             and f"{row['year']}-{int(row['month']):02}" in latest_months
         ]
         prior = sum((D(row["value_qr"]) for row in selected_old), D(0))

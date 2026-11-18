@@ -63,11 +63,30 @@ REQUIRED_PINS = frozenset(
     c7.coordinates c7.modes c7.cutoffs c7.speed_regime c7.district_weights
     c7.shared_b_given_a c7.shared_a_given_b c14.medians_2024 c14.medians_2025""".split()
 )
+# The 16 "none named" setting pins of the pass-1 source map: wilson.period
+# and the C6/C7 settings whose only evidence is the recorded configuration
+# itself. A configuration pin is checked by its recorded settings and their
+# hash, never by an invented source lineage; c6.release_sha256 is a
+# places_ovt source pin with lineage, so it is not one of them.
 CONFIGURATION_PINS = frozenset(
-    pin
-    for pin in REQUIRED_PINS
-    if (pin.startswith("c6.") and not pin.startswith("c6.expected_"))
-    or pin in {"c7.coordinates", "c7.modes", "c7.cutoffs", "c7.speed_regime"}
+    {
+        "wilson.period",
+        "c6.seed",
+        "c6.category_ids",
+        "c6.candidate_set",
+        "c6.box",
+        "c6.confidence_min",
+        "c6.radius_m",
+        "c6.permutations",
+        "c6.fdr",
+        "c6.min_neighbours",
+        "c6.min_clq",
+        "c6.max_shown",
+        "c7.coordinates",
+        "c7.modes",
+        "c7.cutoffs",
+        "c7.speed_regime",
+    }
 )
 _SHA = re.compile(r"[a-f0-9]{64}")
 _HEADING = re.compile(r"^(#{1,6}) ")
@@ -196,7 +215,14 @@ def _entry(value: object) -> CheckedPinEntry:
                 raise ValueError("review_date_format")
         except ValueError:
             raise ValueError("pin_review_date") from None
-        if not values or not lineage or row["unpinned_reason"] is not None:
+        # A configuration pin is checked by its recorded settings and their
+        # hash, never by an invented source lineage: empty lineage is
+        # accepted only for a configuration pin and refused for a source pin.
+        if (
+            not values
+            or row["unpinned_reason"] is not None
+            or (pin not in CONFIGURATION_PINS and not lineage)
+        ):
             raise ValueError("pin_checked_evidence_missing")
         settings_hash = _sha(row["settings_sha256"])
         reason = None
@@ -310,28 +336,49 @@ def _c5_settings(settings: dict[str, object], entry: CheckedPinEntry) -> None:
     calendar = [f"{year}-{month:02}" for year in (2025, 2026) for month in range(1, 13)]
     if latest not in [calendar[start : start + 12] for start in range(13)]:
         raise ValueError("c5_window_latest_2025_2026_required")
-    contaminated = settings.get("parent_contains_excluded")
-    treatment = settings.get("parent_treatment")
-    if type(contaminated) is not bool:
+    # The parent review is per basket line, matching the per-line c5 values:
+    # a released line without a reviewed parent, or a review without its
+    # released line, is a missing parent review.
+    lines = settings.get("lines")
+    if (
+        not isinstance(lines, dict)
+        or not lines
+        or any(not isinstance(key, str) or not key for key in lines)
+    ):
         raise ValueError("c5_parent_review_missing")
-    if contaminated and treatment not in ("includes excluded lines", "withheld"):
-        raise ValueError("c5_parent_requires_includes excluded lines_or_withheld")
-    if (
-        contaminated
-        and treatment == "includes excluded lines"
-        and entry.pin_id in ("c5.prior12", "c5.trend")
-        and entry.values.get("caveat") != "includes excluded lines"
-    ):
-        raise ValueError("c5_parent_visible_label_missing")
-    if not contaminated and treatment != "clean":
-        raise ValueError("c5_parent_treatment")
-    if (
-        contaminated
-        and treatment == "withheld"
-        and entry.pin_id in ("c5.prior12", "c5.trend")
-    ):
-        if entry.values != {"value": "NO_DATA", "reason": "includes excluded lines"}:
-            raise ValueError("c5_parent_withheld_value")
+    if set(entry.values) != set(lines):
+        raise ValueError("c5_parent_review_missing")
+    for line, review in lines.items():
+        if (
+            not isinstance(review, dict)
+            or set(review) != {"parent_contains_excluded", "parent_treatment"}
+            or type(review["parent_contains_excluded"]) is not bool
+        ):
+            raise ValueError("c5_parent_review_missing")
+        contaminated = review["parent_contains_excluded"]
+        treatment = review["parent_treatment"]
+        if contaminated and treatment not in ("includes excluded lines", "withheld"):
+            raise ValueError("c5_parent_requires_includes excluded lines_or_withheld")
+        if not contaminated and treatment != "clean":
+            raise ValueError("c5_parent_treatment")
+        # MTH-30/PUB-44 wording: an earlier-period value over a parent that
+        # also holds excluded lines is marked "includes excluded lines" or
+        # withheld. Only the prior-12 and trend pins carry the mark.
+        if entry.pin_id in ("c5.prior12", "c5.trend"):
+            value = entry.values[line]
+            if treatment == "withheld":
+                if value != "NO_DATA:includes excluded lines":
+                    raise ValueError("c5_parent_withheld_value")
+            elif treatment == "includes excluded lines":
+                if not isinstance(value, str) or not value.endswith(
+                    ";caveat=includes excluded lines"
+                ):
+                    raise ValueError("c5_parent_visible_label_missing")
+            elif isinstance(value, str) and (
+                "NO_DATA:includes excluded lines" in value
+                or ";caveat=includes excluded lines" in value
+            ):
+                raise ValueError("c5_parent_treatment")
 
 
 def validate_source_check_record(
@@ -431,11 +478,11 @@ def verify_method_cards_sync(record_path: Path, methods_doc_path: Path) -> None:
         _BLOCK.sub("", document[spans[section][0] : spans[section][1]])
         for section in GOVERNED_HEADINGS
     )
-    if (
-        seen != expected
-        or "method-pin:" in baseline
-        or hashlib.sha256(baseline.encode("utf-8")).hexdigest() != baseline_hash
-    ):
+    if seen != expected:
+        raise ValueError("card_sync_missing_block")
+    if "method-pin:" in baseline:
+        raise ValueError("card_sync_malformed_block")
+    if hashlib.sha256(baseline.encode("utf-8")).hexdigest() != baseline_hash:
         raise ValueError("card_sync_baseline_or_missing_value")
 
 
