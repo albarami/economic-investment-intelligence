@@ -73,7 +73,7 @@ def setup(tmp_path, monkeypatch, *, version=2, host="www.data.gov.qa"):
             .replace(previous.encode(), current.encode())
         )
         (folder / "syn.csv").write_bytes(intake_body)
-        manifest = json.loads((folder / "intake.json").read_text())
+        manifest = json.loads((folder / "intake.json").read_text(encoding="utf-8"))
         manifest["sha256"] = sha256_hex(intake_body)
         (folder / "intake.json").write_text(json.dumps(manifest))
     monkeypatch.setattr(awards, "load_declaration", lambda _: dec)
@@ -352,7 +352,7 @@ def test_fetch_register_inputs_survive(tmp_path, monkeypatch):
     entry, _, body = setup(tmp_path, monkeypatch, version=1)
     snap, selection = register(tmp_path)
     path = tmp_path / "intake" / awards.SOURCE / "intake.json"
-    manifest = json.loads(path.read_text())
+    manifest = json.loads(path.read_text(encoding="utf-8"))
     manifest["register_selections"] = [selection]
     path.write_text(json.dumps(manifest))
     result = fetch(entry, tmp_path, body)
