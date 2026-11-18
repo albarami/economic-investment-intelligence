@@ -49,8 +49,8 @@ def test_discard_candidate_handles_incomplete_current_manifest(
     build._discard_candidate(
         tmp_path, "SYN-source", source / "SYN-table.json", source / "SYN-new.json"
     )
-    assert (source / "loadable.json").read_text() == pointer
-    assert (source / "manifests/SYN-kept.json").read_text() == "{}"
+    assert (source / "loadable.json").read_text(encoding="utf-8") == pointer
+    assert (source / "manifests/SYN-kept.json").read_text(encoding="utf-8") == "{}"
 
 
 def test_clear_partials_tolerates_a_disappearing_file(
@@ -84,27 +84,43 @@ def test_read_json_returns_only_decoded_document(tmp_path: Path) -> None:
 
 
 def test_text_io_is_utf8_even_with_ascii_process_locale(tmp_path: Path) -> None:
+    module_path = Path(build.__file__).resolve()
+    source_root = module_path.parents[2]
     source = tmp_path / "SYN-input.json"
     source.write_bytes(b'{"SYN-text": "caf\xc3\xa9"}')
     destination = tmp_path / "SYN-output.txt"
     program = (
         "import sys\n"
         "from pathlib import Path\n"
-        "from eii_custodian.publicdata.investment_build import _read_json, _atomic_write\n"
-        "assert _read_json(Path(sys.argv[1])) == {'SYN-text': 'caf\\u00e9'}\n"
-        "_atomic_write(Path(sys.argv[2]), 'caf\\u00e9')\n"
+        "from eii_custodian.publicdata import investment_build\n"
+        "assert Path(investment_build.__file__).resolve() == Path(sys.argv[3])\n"
+        "assert investment_build._read_json(Path(sys.argv[1])) == {'SYN-text': 'caf\\u00e9'}\n"
+        "investment_build._atomic_write(Path(sys.argv[2]), 'caf\\u00e9')\n"
         "assert Path(sys.argv[2]).read_bytes() == b'caf\\xc3\\xa9'\n"
     )
     result = subprocess.run(
-        [sys.executable, "-X", "utf8=0", "-c", program, str(source), str(destination)],
+        [
+            sys.executable,
+            "-X",
+            "utf8=0",
+            "-c",
+            program,
+            str(source),
+            str(destination),
+            str(module_path),
+        ],
         env={
             **os.environ,
+            "PYTHONPATH": os.pathsep.join(
+                (str(source_root), os.environ.get("PYTHONPATH", ""))
+            ),
             "LC_ALL": "C",
             "PYTHONCOERCECLOCALE": "0",
             "PYTHONDONTWRITEBYTECODE": "1",
         },
         capture_output=True,
         text=True,
+        encoding="utf-8",
         check=False,
     )
     assert result.returncode == 0, result.stderr

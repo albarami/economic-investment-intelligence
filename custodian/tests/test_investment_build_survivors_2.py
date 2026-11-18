@@ -97,7 +97,7 @@ def test_dashboard_publishes_exact_document_and_page_metadata(
     ]
     assert (
         tmp_path / "data/public_cache/fdi_projects/empty_coordinates.txt"
-    ).read_text() == "fdi_projects empty_coordinates=1\n"
+    ).read_text(encoding="utf-8") == "fdi_projects empty_coordinates=1\n"
 
 
 def test_agency_publishes_exact_counts_and_each_kind(
@@ -405,7 +405,9 @@ def test_commit_archive_refusal_removes_candidate_only(
             "1|fdi_projects|https://syn.invalid/page|snapshot_invalid|verified manifest evidence|invalid",
         )
     assert len(calls) == fail_at
-    assert (source / "loadable.json").read_text() == '{"manifest_sha256": "SYN-old"}'
+    assert (source / "loadable.json").read_text(
+        encoding="utf-8"
+    ) == '{"manifest_sha256": "SYN-old"}'
     assert [p.name for p in (source / "staging").iterdir()] == ["SYN-table.json"]
     assert [p.name for p in (source / "manifests").iterdir()] == ["SYN-old.json"]
     assert (source / "staging/SYN-table.json").read_bytes() == b"SYN-retained"

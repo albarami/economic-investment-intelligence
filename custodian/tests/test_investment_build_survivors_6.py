@@ -36,8 +36,32 @@ def test_public_dashboard_missing_body_or_receipt_names_original_source(
 ) -> None:
     shape = DashboardShape(
         "fdi-dashboard-v2",
-        frozenset(build.COLUMN_FROM_PAGE),
-        dict(build.COLUMN_FROM_PAGE),
+        frozenset(
+            {
+                "announced",
+                "business_function",
+                "capex_value",
+                "company",
+                "jobs",
+                "location_text",
+                "project_type",
+                "sector",
+                "source_country",
+                "sub_sector",
+            }
+        ),
+        {
+            "company": "investing_company_name",
+            "source_country": "src_country_name",
+            "sector": "sector_name",
+            "sub_sector": "sub_sector_name",
+            "business_function": "function_name",
+            "project_type": "project_type_name",
+            "capex_value": "capex",
+            "jobs": "jobs",
+            "announced": "project_date",
+            "location_text": "project_address",
+        },
         {},
         {},
         {},

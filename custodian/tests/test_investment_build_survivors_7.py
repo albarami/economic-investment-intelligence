@@ -25,8 +25,33 @@ def test_dashboard_rejects_missing_field_before_reading_cache(tmp_path: Path) ->
     # PUB-07 requires every mapped field; capex_value is deliberately absent.
     shape = DashboardShape(
         "fdi-dashboard-v2",
-        frozenset(build.COLUMN_FROM_PAGE) - {"capex_value"},
-        dict(build.COLUMN_FROM_PAGE),
+        frozenset(
+            {
+                "announced",
+                "business_function",
+                "capex_value",
+                "company",
+                "jobs",
+                "location_text",
+                "project_type",
+                "sector",
+                "source_country",
+                "sub_sector",
+            }
+        )
+        - {"capex_value"},
+        {
+            "company": "investing_company_name",
+            "source_country": "src_country_name",
+            "sector": "sector_name",
+            "sub_sector": "sub_sector_name",
+            "business_function": "function_name",
+            "project_type": "project_type_name",
+            "capex_value": "capex",
+            "jobs": "jobs",
+            "announced": "project_date",
+            "location_text": "project_address",
+        },
         {},
         {},
         {},
@@ -80,9 +105,9 @@ def test_read_json_uses_utf8_with_ascii_default(
 ) -> None:
     source = tmp_path / "SYN-input.json"
     source.write_bytes(b'{"SYN-text": "caf\xc3\xa9"}')
-    # Prove the simulated default distinguishes the two encodings on this host.
-    with pytest.raises(UnicodeDecodeError):
-        source.read_text()
+    # Pin the simulated default without relying on an implicit-encoding read.
+    assert io.text_encoding(None) == "ascii"
+    assert source.read_text(encoding="utf-8") == '{"SYN-text": "caf\u00e9"}'
     assert build._read_json(source) == {"SYN-text": "caf\u00e9"}
 
 
@@ -90,8 +115,9 @@ def test_atomic_write_uses_utf8_with_ascii_default(
     tmp_path: Path, ascii_default_encoding: None
 ) -> None:
     default_path = tmp_path / "SYN-default.txt"
-    with pytest.raises(UnicodeEncodeError):
-        default_path.write_text("caf\u00e9")
+    assert io.text_encoding(None) == "ascii"
+    default_path.write_text("caf\u00e9", encoding="utf-8")
+    assert default_path.read_bytes() == b"caf\xc3\xa9"
     destination = tmp_path / "SYN-nested/SYN-output.txt"
     build._atomic_write(destination, "caf\u00e9\n")
     assert destination.read_bytes() == b"caf\xc3\xa9\n"
