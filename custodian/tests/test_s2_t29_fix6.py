@@ -237,7 +237,7 @@ def test_fix7_legacy_tender_checked_chain_reaches_transport(tmp_path):
         patch("urllib.request.build_opener") as opener,
     ):
         response = opener.return_value.open.return_value.__enter__.return_value
-        response.read.return_value = b"SYN-page"
+        response.read.side_effect = [b"SYN-page", b""]
         response.geturl.return_value = url
         response.headers = {}
         result = tenders.tender_https(row, chain_file=chain)(

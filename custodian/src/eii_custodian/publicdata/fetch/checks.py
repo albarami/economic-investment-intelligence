@@ -30,10 +30,18 @@ def count_failure(
     """Fail when the row count is missing or outside the declared range."""
     if entry.row_count_min is None and entry.row_count_max is None:
         return None
+    return count_value_failure(entry, None if rows is None else len(rows), url)
+
+
+def count_value_failure(
+    entry: Entry, count: int | None, url: str
+) -> AttemptFailure | None:
+    """The same count gate for row streams, without retaining their records."""
+    if entry.row_count_min is None and entry.row_count_max is None:
+        return None
     span = _count_span(entry)
-    if rows is None:
+    if count is None:
         return AttemptFailure(1, url, "row_count", span, "unreadable")
-    count = len(rows)
     if entry.row_count_min is not None and count < entry.row_count_min:
         return AttemptFailure(1, url, "row_count", span, str(count))
     if entry.row_count_max is not None and count > entry.row_count_max:

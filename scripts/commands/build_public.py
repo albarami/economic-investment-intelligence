@@ -83,6 +83,7 @@ def run(
     gravity_stream: StreamTransport | None = None,
     atlas_stream: StreamTransport | None = None,
     benchmark_stream: StreamTransport | None = None,
+    large_stream: StreamTransport | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
     if len(args) != 0:
@@ -179,6 +180,11 @@ def run(
         utc_now,
         pause,
         stream_transport=stream,
+        large_stream=(
+            open_https_stream
+            if transport is None and large_stream is None
+            else large_stream
+        ),
         baci_config=baci_config,
         gravity_config=gravity_config,
         atlas_config=atlas_config,

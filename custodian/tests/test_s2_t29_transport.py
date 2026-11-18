@@ -561,7 +561,9 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
             return self.url
 
         def read(self, size=-1):
-            return b"SYN-no-day-folder"
+            body = b"SYN-no-day-folder" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body
 
     def open_request(request, **kwargs):
         sent.append((request.full_url, request.get_header("Authorization")))
@@ -605,11 +607,16 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
 
     def read_body(self, size=-1):
         if self.url == entry.url:
-            return b'<a href="001/">SYN-day</a>'
-        if self.url == day:
-            return b'<a href="VNP46A3.A2024001.h23v06.SYN.h5">SYN-granule</a>'
-        assert self.url == granule
-        return body
+            answer = b'<a href="001/">SYN-day</a>'
+        elif self.url == day:
+            answer = b'<a href="VNP46A3.A2024001.h23v06.SYN.h5">SYN-granule</a>'
+        else:
+            assert self.url == granule
+            answer = body
+        position = getattr(self, "position", 0)
+        result = answer[position:] if size < 0 else answer[position : position + size]
+        self.position = position + len(result)
+        return result
 
     monkeypatch.setattr(Body, "read", read_body)
     monkeypatch.setattr(command, "load_registry", lambda: (entry,))

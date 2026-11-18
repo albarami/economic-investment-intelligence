@@ -254,7 +254,9 @@ def test_f4_handler_selects_context_each_redirect(host, reverse, invented_certs)
             pass
 
         def read(self, limit=None):
-            return b"SYN body"
+            body = b"SYN body" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body
 
         def geturl(self):
             return target

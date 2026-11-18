@@ -33,7 +33,7 @@ def metadata_limit(max_bytes: int) -> Iterator[None]:
     """Bound HTTPS reads through existing one-argument transport wrappers.
 
     The scope is local to this call context and reset even after a refusal.
-    Other callers retain the unbounded interface.
+    Other callers retain the general intake ceiling.
     """
     token = _METADATA_LIMIT.set(max_bytes)
     try:
@@ -89,11 +89,11 @@ class TransportFault(Exception):
         super().__init__(f"{kind} {self.url}")
 
 
-# S2-T08 part B, mismatch class 8: the general intake ceiling for one response
-# body read by open_https. This value is a lead default awaiting the owner's
-# answer; a lower scoped cap (metadata_limit) keeps its own read and refusal.
+# The owner ruling of 2026-11-18 retains the general ceiling; required large
+# sources use the file-stream intake. Lower source caps keep their own refusal.
 INTAKE_CEILING_BYTES = 300 * 1024 * 1024
-INTAKE_CEILING_STATUS = "lead default awaiting the owner's answer"
+INTAKE_CEILING_STATUS = "bounded intake with required-source streams"
+READ_CHUNK_BYTES = 65536
 
 
 class BodyTooLarge(TransportFault):
@@ -117,6 +117,7 @@ class StreamResponse:
     hops: tuple[str, ...]
     declared_length: int | None
     chunks: Iterator[bytes]
+    etag: str | None = None
 
 
 StreamTransport = Callable[[str], AbstractContextManager[StreamResponse]]
@@ -292,29 +293,32 @@ def open_https(
 
 
 def _bounded_body(response: HTTPResponse, url: str) -> bytes:
-    """Read one body under the scoped cap or, where none is lower, the ceiling.
-
-    A lower scoped cap reads its own limit and one byte, and its caller refuses
-    by its own name. Otherwise a declared length above the ceiling is refused
-    before any read, and an undeclared body is read at most to the ceiling and
-    one byte, then refused. No read asks for more than the ceiling and one byte.
-    """
+    """Read fixed chunks, refusing the general cap and preserving lower caps."""
     limit = _METADATA_LIMIT.get()
-    ceiling = INTAKE_CEILING_BYTES
-    if limit is not None and limit <= ceiling:
-        return response.read(limit + 1)
+    scoped = limit is not None and limit <= INTAKE_CEILING_BYTES
+    ceiling = limit if scoped and limit is not None else INTAKE_CEILING_BYTES
+    if scoped and ceiling + 1 <= READ_CHUNK_BYTES:
+        return response.read(ceiling + 1)
     declared = response.headers.get("Content-Length")
     if (
-        isinstance(declared, str)
+        not scoped
+        and isinstance(declared, str)
         and declared.isascii()
         and declared.isdigit()
         and int(declared) > ceiling
     ):
         raise BodyTooLarge(url, ceiling, f"declared {int(declared)}")
-    body = response.read(ceiling + 1)
-    if len(body) > ceiling:
-        raise BodyTooLarge(url, ceiling, f"more than {ceiling}")
-    return body
+    chunks: list[bytes] = []
+    count = 0
+    while count <= ceiling:
+        chunk = response.read(min(READ_CHUNK_BYTES, ceiling + 1 - count))
+        if not chunk:
+            break
+        count += len(chunk)
+        if count > ceiling and not scoped:
+            raise BodyTooLarge(url, ceiling, f"more than {ceiling}")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _redirect_guard(
@@ -411,7 +415,11 @@ def open_https_stream(
                     yield chunk
 
             yield StreamResponse(
-                final, tuple(hops), None if length is None else int(length), chunks()
+                final,
+                tuple(hops),
+                None if length is None else int(length),
+                chunks(),
+                response.headers.get("ETag"),
             )
     except TransportFault:
         raise
@@ -467,7 +475,9 @@ def open_attempt(request: PreparedRequest) -> AttemptResult:
     opener = urllib.request.build_opener(_Stop)
     try:
         with opener.open(call, timeout=HTTP_TIMEOUT_S) as response:
-            body = response.read()
+            body = _bounded_body(response, request.url)
+    except BodyTooLarge:
+        raise OpenerFault("body_bytes") from None
     except OpenerFault:
         raise
     except urllib.error.HTTPError:

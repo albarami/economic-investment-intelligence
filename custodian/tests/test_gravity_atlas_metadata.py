@@ -106,7 +106,9 @@ def test_unscoped_transport_reads_to_the_intake_ceiling(monkeypatch):
 
         def read(self, size=-1):
             reads.append(size)
-            return b"invented other source"
+            body = b"invented other source" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body
 
     monkeypatch.setattr(
         transport.urllib.request,
@@ -114,7 +116,7 @@ def test_unscoped_transport_reads_to_the_intake_ceiling(monkeypatch):
         lambda *args: SimpleNamespace(open=lambda *args, **kwargs: Body()),
     )
     assert transport.open_https(url).body == b"invented other source"
-    assert reads == [transport.INTAKE_CEILING_BYTES + 1]
+    assert reads == [transport.READ_CHUNK_BYTES, transport.READ_CHUNK_BYTES]
 
 
 def test_metadata_limit_resets_after_exception(monkeypatch):
@@ -137,7 +139,9 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
 
         def read(self, size=-1):
             reads.append(size)
-            return b"invented"
+            body = b"invented" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body[:size]
 
     monkeypatch.setattr(
         transport.urllib.request,
@@ -154,7 +158,7 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
     transport.open_https(url)
     # The last read has no scoped limit and stops at the intake ceiling and one
     # byte (S2-T08 part B, mismatch class 8).
-    assert reads == [8, 4, 8, transport.INTAKE_CEILING_BYTES + 1]
+    assert reads == [8, 4, 8, transport.READ_CHUNK_BYTES, transport.READ_CHUNK_BYTES]
 
 
 def test_baci_metadata_read_stays_unbounded():

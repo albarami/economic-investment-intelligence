@@ -3,7 +3,8 @@
 The live shape pack's Mismatches item 8 shows one file declaring about two
 gigabytes and two portal exports passing the probe's 300 MiB cap with no
 Content-Length, all read whole by ``open_https``. The general intake ceiling of
-300 MiB is a lead default awaiting the owner's answer. It refuses a declared
+300 MiB has required-source streaming exceptions under the owner ruling of
+2026-11-18. It refuses a declared
 size above it before any read and an undeclared body as soon as one byte more
 than the ceiling arrives. A lower scoped source cap keeps its own refusal. A
 refused body is never published and an earlier snapshot is never touched.
@@ -51,7 +52,9 @@ class _Body:
 
     def read(self, size: int = -1) -> bytes:
         self.reads.append(size)
-        return self._body if size < 0 else self._body[:size]
+        body = self._body if size < 0 else self._body[:size]
+        self._body = b"" if size < 0 else self._body[size:]
+        return body
 
 
 def _serve(monkeypatch: pytest.MonkeyPatch, body: bytes, length: str | None) -> _Body:
@@ -69,9 +72,9 @@ def small(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(transport, "INTAKE_CEILING_BYTES", SMALL)
 
 
-def test_the_ceiling_is_300_mib_and_marked_as_the_lead_default() -> None:
+def test_the_ceiling_is_300_mib_with_required_source_streams() -> None:
     assert INTAKE_CEILING_BYTES == 300 * 1024 * 1024
-    assert INTAKE_CEILING_STATUS == "lead default awaiting the owner's answer"
+    assert INTAKE_CEILING_STATUS == "bounded intake with required-source streams"
     assert issubclass(BodyTooLarge, TransportFault)
 
 

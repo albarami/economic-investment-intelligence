@@ -14,7 +14,12 @@ from eii_custodian.publicdata.fetch.receipts import (
     sidecar_for,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
-from eii_custodian.publicdata.fetch.transport import Response, Transport, TransportFault
+from eii_custodian.publicdata.fetch.transport import (
+    Response,
+    StreamTransport,
+    Transport,
+    TransportFault,
+)
 
 FILE_KEYS = (
     "places_ovt/part-00014",
@@ -56,9 +61,10 @@ def fetch_place_file(
     cache: Path,
     clock: Clock,
     sleep: Sleeper,
+    *,
+    large_stream: StreamTransport | None = None,
 ) -> tuple[FileFetch | None, FileFailure | None]:
     """Fetch the whole file once. Size and ETag are the recorded registry values."""
-    del sleep
     if _ranged(entry.url):
         return None, FileFailure(1, entry.url, "byte_range", "whole file", entry.url)
     decision = approve(entry.url)
@@ -69,6 +75,22 @@ def fetch_place_file(
     recorded, failure = _recorded(entry)
     if failure is not None or recorded is None:
         return None, failure
+    if large_stream is not None:
+        from eii_custodian.publicdata.fetch.large import IntakeError, fetch_large
+
+        try:
+            result = fetch_large(entry, transport, large_stream, cache, clock, sleep)
+        except IntakeError as exc:
+            return None, FileFailure(
+                1, entry.url, str(exc), "complete streamed input", "NO_DATA"
+            )
+        except TransportFault as exc:
+            return None, _fault(exc)
+        except (OSError, ValueError):
+            return None, FileFailure(
+                1, entry.url, "write_failed", "stored file", "NO_DATA"
+            )
+        return FileFetch(result.digest, result.fetch_host), None
     try:
         response = transport(entry.url)
     except TransportFault as exc:

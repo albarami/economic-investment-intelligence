@@ -221,6 +221,77 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         export, failure = _call(entry, entry.url, reader)
         if failure is not None or export is None:
             return _failed(entry, failure)
+    info = portal_metadata(entry, meta)
+    if info.failure is not None:
+        return info
+    publisher, modified = info.publisher, info.source_modified
+    licence, licence_url = info.portal_licence, info.portal_licence_url
+    if entry.key == "accident":
+        from eii_custodian.publicdata.fetch.partitions import partition_export
+
+        body, requests, failure = partition_export(entry, meta, reader)
+        export = Response(entry.url, body, ())
+    if failure is not None or export is None:
+        return _failed(entry, failure)
+    rows = _json_rows(export.body)
+    counted = count_failure(entry, rows, export.final_url)
+    if counted is not None:
+        return _failed(entry, counted)
+    schema = schema_failure(entry, rows, export.final_url)
+    if schema is not None:
+        return _failed(entry, schema)
+    if rows is not None:
+        for record in rows:
+            if isinstance(record, dict) and undeclared_public_split(
+                entry, list(record)
+            ):
+                return _failed(
+                    entry,
+                    AttemptFailure(
+                        1,
+                        export.final_url,
+                        "public_split_undeclared",
+                        "declared Public split",
+                        "undeclared",
+                    ),
+                )
+    period = period_failure(entry, rows, export.final_url)
+    if period is not None:
+        return _failed(entry, period)
+    measured = _measure_failure(entry, rows, export.final_url)
+    if measured is not None:
+        return _failed(entry, measured)
+    count = len(rows) if rows is not None else None
+    try:
+        first, last, saw_periods, coverage_note = _observed_periods(entry, rows)
+    except FamilyPeriodError as exc:
+        return _failed(
+            entry,
+            AttemptFailure(
+                1, export.final_url, "period_label", exc.source_id, exc.field
+            ),
+        )
+    return Prepared(
+        export.body,
+        export.final_url,
+        host_of(export.final_url),
+        publisher,
+        modified,
+        count,
+        "",
+        None,
+        licence,
+        licence_url,
+        first,
+        last,
+        saw_periods,
+        coverage_note=coverage_note,
+        requests=requests,
+    )
+
+
+def portal_metadata(entry: Entry, meta: Response) -> Prepared:
+    """Validate the same publisher and licence for buffered and streamed exports."""
     observed = _portal_meta(meta.body)
     if observed is None:
         return _failed(
@@ -285,67 +356,17 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
                 _licence_observed(licence, licence_url),
             ),
         )
-    if entry.key == "accident":
-        from eii_custodian.publicdata.fetch.partitions import partition_export
-
-        body, requests, failure = partition_export(entry, meta, reader)
-        export = Response(entry.url, body, ())
-    if failure is not None or export is None:
-        return _failed(entry, failure)
-    rows = _json_rows(export.body)
-    counted = count_failure(entry, rows, export.final_url)
-    if counted is not None:
-        return _failed(entry, counted)
-    schema = schema_failure(entry, rows, export.final_url)
-    if schema is not None:
-        return _failed(entry, schema)
-    if rows is not None:
-        for record in rows:
-            if isinstance(record, dict) and undeclared_public_split(
-                entry, list(record)
-            ):
-                return _failed(
-                    entry,
-                    AttemptFailure(
-                        1,
-                        export.final_url,
-                        "public_split_undeclared",
-                        "declared Public split",
-                        "undeclared",
-                    ),
-                )
-    period = period_failure(entry, rows, export.final_url)
-    if period is not None:
-        return _failed(entry, period)
-    measured = _measure_failure(entry, rows, export.final_url)
-    if measured is not None:
-        return _failed(entry, measured)
-    count = len(rows) if rows is not None else None
-    try:
-        first, last, saw_periods, coverage_note = _observed_periods(entry, rows)
-    except FamilyPeriodError as exc:
-        return _failed(
-            entry,
-            AttemptFailure(
-                1, export.final_url, "period_label", exc.source_id, exc.field
-            ),
-        )
     return Prepared(
-        export.body,
-        export.final_url,
-        host_of(export.final_url),
+        b"",
+        entry.url,
+        entry.fetch_host,
         publisher,
         modified,
-        count,
+        None,
         "",
         None,
-        licence,
-        licence_url,
-        first,
-        last,
-        saw_periods,
-        coverage_note=coverage_note,
-        requests=requests,
+        portal_licence=licence,
+        portal_licence_url=licence_url,
     )
 
 

@@ -9,6 +9,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict
 
 from eii_custodian.publicdata.additions.common import (
     ADDITION_FAMILIES as _ADDITION_FAMILIES,
@@ -63,6 +64,7 @@ from eii_custodian.publicdata.fetch.transport import (
     SlotReader,
     StreamTransport,
     Transport,
+    TransportFault,
     public_address,
 )
 from eii_custodian.publicdata.gravity.config import Config as GravityConfig
@@ -98,6 +100,15 @@ LOG_NAME = "build-log.json"
 Sleeper = Callable[[float], None]
 Clock = Callable[[], str]
 TOKEN_SOURCE = "ntl_blackmarble"
+
+
+class _StreamOptions(TypedDict, total=False):
+    large_stream: StreamTransport
+
+
+def _stream_options(stream: StreamTransport | None) -> _StreamOptions:
+    """Keep the existing callback signature when no stream was configured."""
+    return {} if stream is None else {"large_stream": stream}
 
 
 @dataclass(frozen=True)
@@ -215,9 +226,13 @@ def fetch_entry(
     clock: Clock,
     sleep: Sleeper,
     token: str = "",
+    *,
+    large_stream: StreamTransport | None = None,
 ) -> FetchFailure | None:
     """Fetch one row. An unlisted host is refused before the transport is called."""
-    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep, token)
+    _fetched, failure = _fetch_row(
+        entry, transport, cache, clock, sleep, token, **_stream_options(large_stream)
+    )
     return failure
 
 
@@ -229,6 +244,7 @@ def _fetch_row(
     sleep: Sleeper,
     token: str = "",
     registry_entries: tuple[Entry, ...] | None = None,
+    large_stream: StreamTransport | None = None,
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -240,6 +256,36 @@ def _fetch_row(
             "allow-listed host",
             entry.url,
         )
+    from .large import REQUIRED_KEYS, IntakeError, fetch_large
+
+    if large_stream is not None and entry.key in REQUIRED_KEYS:
+        try:
+            found = fetch_large(entry, transport, large_stream, cache, clock, sleep)
+        except IntakeError as exc:
+            return None, FetchFailure(
+                1,
+                entry.source_id,
+                entry.url,
+                str(exc),
+                "complete streamed input",
+                "NO_DATA",
+            )
+        except TransportFault as exc:
+            return None, FetchFailure(
+                6 if exc.kind == "unreachable" else 1,
+                entry.source_id,
+                entry.url,
+                exc.kind,
+                "complete streamed input",
+                "NO_DATA",
+            )
+        except (OSError, ValueError):
+            return None, FetchFailure(
+                1, entry.source_id, entry.url, "write_failed", "stored file", "NO_DATA"
+            )
+        return _Fetched(
+            found.digest, found.fetch_host, found.retrieved_utc, "", ""
+        ), None
     try:
         prepared = (
             prepare_grid(entry, transport, sleep, token)
@@ -376,6 +422,7 @@ def run_build(
     benchmark_stream: StreamTransport | None = None,
     reconciliation_selection: Selection | None = None,
     environ: Mapping[str, str] | None = None,
+    large_stream: StreamTransport | None = None,
 ) -> BuildOutcome:
     """Fetch each row in order, then run the public_data stage."""
     # One injected UTC clock sample governs every verification in this build.
@@ -706,7 +753,7 @@ def run_build(
             continue
         if is_place_file(entry):
             placed, place_failure = fetch_place_file(
-                entry, transport, cache, clock, sleep
+                entry, transport, cache, clock, sleep, **_stream_options(large_stream)
             )
             if place_failure is not None:
                 lines.append(
@@ -757,6 +804,7 @@ def run_build(
             sleep,
             token,
             registry_entries=tuple(entries),
+            **_stream_options(large_stream),
         )
         if result is not None:
             if entry.source_id in INVESTMENT_SOURCES:
