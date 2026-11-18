@@ -492,17 +492,7 @@ def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path)
     from .method_card_data_replay import assert_record_matches_replay
     from .method_card_pin_fixtures import case, save
 
-    paths, record, artifact, _ = case(tmp_path)
-    tampered = {"invented district|نوع تجريبي أ": "median=16;count=2"}
-    for row in record["pins"]:
-        if row["pin_id"] == "c14.medians_2024":
-            row["values"] = tampered.copy()
-    for row in artifact["pins"]:
-        if row["pin_id"] == "c14.medians_2024":
-            row["values"] = tampered.copy()
-    save(paths, record, artifact)
-    # The artifact comparison is blind to this: record and artifact agree.
-    entries = validate_source_check_record(*paths[:3])
+    # The replay is computed first, before anything is written.
     deals, crosswalk = property_files(tmp_path)
     c14 = replay_c14(deals, crosswalk)
     replayed = {
@@ -512,5 +502,32 @@ def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path)
             if year == "2024"
         }
     }
+    paths, record, artifact, _ = case(tmp_path)
+    # The plant is the replay's own encoding with one tampered value: the
+    # key set is exactly the replay's, so only the value can differ.
+    tampered = dict(replayed["c14.medians_2024"])
+    tampered["invented_district|نوع تجريبي أ"] = "median=16;count=2"
+    assert set(tampered) == set(replayed["c14.medians_2024"])
+    for row in record["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = tampered.copy()
+    for row in artifact["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = tampered.copy()
+    save(paths, record, artifact)
+    # The artifact comparison is blind to this: record and artifact agree.
+    entries = validate_source_check_record(*paths[:3])
     with pytest.raises(AssertionError, match="replay_value_mismatch"):
         assert_record_matches_replay(entries, replayed)
+    # Positive control: the same record holding the untampered replayed
+    # value passes the replay comparison.
+    paths, record, artifact, _ = case(tmp_path)
+    for row in record["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = replayed["c14.medians_2024"].copy()
+    for row in artifact["pins"]:
+        if row["pin_id"] == "c14.medians_2024":
+            row["values"] = replayed["c14.medians_2024"].copy()
+    save(paths, record, artifact)
+    entries = validate_source_check_record(*paths[:3])
+    assert assert_record_matches_replay(entries, replayed)
