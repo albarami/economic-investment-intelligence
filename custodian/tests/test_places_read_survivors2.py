@@ -451,3 +451,13 @@ def test_write_place_points_names_its_codec(tmp_path: Path) -> None:
         text=True,
     )
     assert completed.returncode == 0, completed.stderr
+
+
+@pytest.mark.parametrize("value,expected", [(0.12345, "0.1234"), (1, "1.0000")])
+def test_stored_confidence_float_and_int_own_precision_and_traps(value, expected):
+    with localcontext() as context:
+        context.prec = 1
+        context.rounding = ROUND_UP
+        context.traps[InvalidOperation] = True
+        context.traps[Inexact] = True
+        assert stored_confidence(value) == Decimal(expected)

@@ -3,6 +3,7 @@
 import ast
 import builtins
 import datetime
+import importlib
 import io
 import random
 import socket
@@ -20,14 +21,17 @@ import pytest
 from method_rows import energy, measure, trade
 
 from eii_core.calc import (
-    building_heights,
     facts,
     public_methods,
     public_series,
     sector_economics,
 )
 
-MODULES = (building_heights, facts, public_methods, public_series, sector_economics)
+MODULES = tuple(
+    importlib.import_module("eii_core.calc." + path.stem)
+    for path in sorted(Path(facts.__file__).parent.glob("*.py"))
+    if path.stem != "__init__"
+)
 ALLOWED_IMPORTS = {
     "__future__",
     "collections.abc",
@@ -117,9 +121,28 @@ def assert_pure(source, *, allow_datetime=False):
             assert not names & FORBIDDEN_CALLS
 
 
+def assert_calculation_directory(folder):
+    for path in sorted(folder.rglob("*.py")):
+        assert_pure(path.read_text(), allow_datetime=path == folder / "facts.py")
+
+
+@pytest.mark.parametrize(
+    "name,source",
+    [
+        ("new_calculation.py", 'def helper(): return open("invented")'),
+        ("nested/facts.py", "from datetime import datetime"),
+    ],
+)
+def test_unlisted_calculation_module_is_checked(tmp_path, name, source):
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source)
+    with pytest.raises(AssertionError):
+        assert_calculation_directory(tmp_path)
+
+
 def test_purity_guard_and_planted_io_helper():
-    for module in MODULES:
-        assert_pure(Path(module.__file__).read_text(), allow_datetime=module is facts)
+    assert_calculation_directory(Path(facts.__file__).parent)
     for plant in [
         'def helper():\n return open("invented")',
         "import os",

@@ -87,14 +87,36 @@ def _text(value: Fraction) -> str:
     return sign + (digits[:-places] + "." + digits[-places:] if places else digits)
 
 
+def _attributes(row: TradeFigure) -> dict[str, str | int | tuple[str, ...]]:
+    """Closed compatibility fields, without dynamic attribute access."""
+    return {
+        "partner": row.partner,
+        "flow": row.flow,
+        "year": row.year,
+        "periods": row.periods,
+        "classification": row.classification,
+        "hs_revision": row.hs_revision,
+        "product_scope": row.product_scope,
+        "coverage_key": row.coverage_key,
+        "currency": row.currency,
+        "unit": row.unit,
+        "scale": row.scale,
+        "valuation_basis": row.valuation_basis,
+        "source_id": row.source_id,
+        "source_version": row.source_version,
+        "role": row.role,
+    }
+
+
 def compare_trade_sources(
     left: TradeFigure | None, right: TradeFigure | None
 ) -> Comparison:
     if left is None or right is None:
         return Comparison(left, right, None, ("missing_side",))
     mismatches = []
+    left_fields, right_fields = _attributes(left), _attributes(right)
     for name in COMPATIBILITY:
-        a, b = getattr(left, name), getattr(right, name)
+        a, b = left_fields[name], right_fields[name]
         if a != b or (isinstance(a, str) and a in UNKNOWN) or not a:
             mismatches.append(name)
     if not left.lineage or not right.lineage:
@@ -123,12 +145,14 @@ def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeF
         or len({row.input_id for row in rows}) != len(rows)
     ):
         raise ValueError("annual_coverage")
+    first_fields = _attributes(first)
     for row in rows:
+        row_fields = _attributes(row)
         for name in (*COMPATIBILITY, "source_id", "source_version", "role"):
             if name == "periods":
                 continue
-            value = getattr(row, name)
-            if value != getattr(first, name) or (
+            value = row_fields[name]
+            if value != first_fields[name] or (
                 isinstance(value, str) and value in UNKNOWN
             ):
                 raise ValueError("annual_compatibility")
@@ -177,10 +201,20 @@ def all_pairs(
     scopes: tuple[str, ...],
 ) -> tuple[PairResult, ...]:
     """Retain every requested source-role pair, even two absent sides."""
-    from itertools import combinations, product
-
     results = []
-    for partner, year, flow, scope in product(partners, years, flows, scopes):
+    requested = (
+        (partner, year, flow, scope)
+        for partner in partners
+        for year in years
+        for flow in flows
+        for scope in scopes
+    )
+    pairs = tuple(
+        (left, right)
+        for index, left in enumerate(sources)
+        for right in sources[index + 1 :]
+    )
+    for partner, year, flow, scope in requested:
         candidates: dict[tuple[str, str], TradeFigure] = {}
         for source in sources:
             rows = tuple(
@@ -195,7 +229,7 @@ def all_pairs(
             annual = tuple(r for r in rows if r.periods == (str(year),))
             if len(annual) == 1:
                 candidates[source] = annual[0]
-        for left_key, right_key in combinations(sources, 2):
+        for left_key, right_key in pairs:
             left, right = candidates.get(left_key), candidates.get(right_key)
             comparison = compare_trade_sources(left, right)
             incomplete = any(

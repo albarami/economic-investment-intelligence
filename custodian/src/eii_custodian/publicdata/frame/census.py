@@ -36,7 +36,6 @@ def census_rows(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     if (
         entry.skip_reason
-        or entry.licence_basis == "none_stated"
         or table not in entry.release_tables
         or SOURCES.get(entry.source_id) != table
     ):

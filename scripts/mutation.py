@@ -8,7 +8,11 @@ package test that asks git about an ignore rule gets git's own answer.
 The copy has an empty index: a path tracked despite an ignore rule can differ
 from the checkout (nothing under the cache path is tracked). Its local exclude
 file is the fresh template, not the checkout's local excludes. User-level
-excludes apply to both. This does not reproduce the checkout's complete git state.
+excludes apply to both. Ordinary Git configuration is retained, but repository
+discovery must resolve to the workspace before listing and to the disposable
+copy before package tests. The package inherits the root's strict pytest settings,
+markers, Hypothesis profile and nightly filter, with relocated import paths and
+the same root conftest bootstrap. This does not reproduce the checkout's complete git state.
 The four typed-decision modules run from the copy's root with evals/ as their
 source root and scripts/tests/test_requalify.py as their test selection.
 Optional S1-T20 pilot discovery, subset and report exports; the default path is local.
@@ -72,6 +76,21 @@ def package_environment() -> dict[str, str]:
     return {
         name: value for name, value in os.environ.items() if name not in GIT_REDIRECTS
     }
+
+
+def repository_matches(folder: Path, environment: dict[str, str] | None = None) -> bool:
+    """Refuse caller configuration that makes git discover another work tree."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=folder,
+        env=environment,
+        capture_output=True,
+        check=False,
+    )
+    return (
+        result.returncode == 0
+        and Path(result.stdout.decode().strip()).resolve() == folder.resolve()
+    )
 
 
 # OI-168: every tester process, including pilot discovery, gets its own PID space.
@@ -477,6 +496,9 @@ def run_packages(
             capture_output=True,
             env=environment,
         )
+    if packages and not repository_matches(folder, environment):
+        print("Refusing git repository outside the mutation copy", file=sys.stderr)
+        return 2
     for package in packages:
         selected = [
             str(Path(module).relative_to(package))
@@ -489,11 +511,29 @@ def run_packages(
             shutil.copytree(folder / "docs", work / "docs")
         config = work / "pyproject.toml"
         original = config.read_text()
+        pytest_settings = dict(
+            tomllib.loads((folder / "pyproject.toml").read_text())
+            .get("tool", {})
+            .get("pytest", {})
+        )
+        # Instrumented tests run one level below the package; only paths change.
+        pytest_settings["pythonpath"] = [
+            "src",
+            "../..",
+            "../../scripts",
+            "../../scripts/tests",
+        ]
+        bootstrap = folder / "conftest.py"
+        if bootstrap.is_file():
+            shutil.copyfile(bootstrap, work / "conftest.py")
         config.write_text(
             original
             + "\n[tool.pytest]\n"
-            + 'addopts = ["--import-mode=importlib", "-p", "no:cacheprovider"]\n'
-            + 'pythonpath = ["src", "../..", "../../scripts", "../../scripts/tests"]\n'
+            + "\n".join(
+                name + " = " + json.dumps(value)
+                for name, value in pytest_settings.items()
+            )
+            + "\n"
         )
         try:
             code, _survivors = run_copy(
@@ -520,6 +560,8 @@ def main() -> int:
     parser.add_argument("--shard-index", type=int)
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
+    if not repository_matches(ROOT):
+        parser.error("git repository is outside the workspace or cannot be verified")
     pilot_options = None
     if any(
         v is not None

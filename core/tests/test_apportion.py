@@ -1,6 +1,6 @@
 """C18 regressions and planted eligibility violations; invented fixtures only."""
 
-from dataclasses import replace
+from dataclasses import fields, replace
 from decimal import Decimal as D
 from decimal import Inexact, Rounded, localcontext
 
@@ -239,16 +239,7 @@ def test_forbidden_input_refused(changes):
 
 @pytest.mark.parametrize(
     "field",
-    [
-        "source_id",
-        "publisher",
-        "page",
-        "licence",
-        "retrieved",
-        "sha256",
-        "method",
-        "method_version",
-    ],
+    [field.name for field in fields(Lineage)],
 )
 def test_every_lineage_field_required(field):
     assert (

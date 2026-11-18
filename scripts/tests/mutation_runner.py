@@ -193,7 +193,12 @@ class MutationRunnerTests(unittest.TestCase):
                 arguments: list[str], **kwargs: Any
             ) -> subprocess.CompletedProcess[Any]:
                 if arguments[0] == "git":
-                    return subprocess.CompletedProcess(arguments, 0, stdout=listed)
+                    stdout = (
+                        str(kwargs["cwd"]).encode()
+                        if "rev-parse" in arguments
+                        else listed
+                    )
+                    return subprocess.CompletedProcess(arguments, 0, stdout=stdout)
                 return real_run(arguments, **kwargs)
 
             with (
@@ -227,6 +232,7 @@ class MutationRunnerTests(unittest.TestCase):
         runner = importlib.import_module("scripts.mutation")
         with TemporaryDirectory(prefix="synthetic-survivor-package-") as temporary:
             root = Path(temporary)
+            (root / "pyproject.toml").write_text("")
             package = root / "product"
             (package / "src/synthetic").mkdir(parents=True)
             (package / "tests").mkdir()
@@ -261,6 +267,7 @@ class MutationRunnerTests(unittest.TestCase):
         runner = importlib.import_module("scripts.mutation")
         with TemporaryDirectory(prefix="synthetic-script-path-") as temporary:
             root = Path(temporary)
+            (root / "pyproject.toml").write_text("")
             package = root / "custodian"
             (package / "src/synthetic").mkdir(parents=True)
             (package / "tests").mkdir()
@@ -304,6 +311,7 @@ class MutationRunnerTests(unittest.TestCase):
             TemporaryDirectory(prefix="synthetic-sentinel-") as outside,
         ):
             root = Path(temporary)
+            (root / "pyproject.toml").write_text("")
             package = root / "custodian"
             (package / "src/synthetic").mkdir(parents=True)
             (package / "tests").mkdir()
@@ -461,6 +469,12 @@ class EvalMutationRunnerTest(unittest.TestCase):
                 args: list[str], **kwargs: Any
             ) -> subprocess.CompletedProcess[Any]:
                 if args[0] == "git":
+                    if "rev-parse" in args:
+                        self.assertEqual(args, ["git", "rev-parse", "--show-toplevel"])
+                        self.assertEqual(kwargs["cwd"], root)
+                        return subprocess.CompletedProcess(
+                            args, 0, stdout=str(root).encode()
+                        )
                     self.assertEqual(
                         args,
                         [

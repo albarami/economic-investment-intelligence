@@ -396,7 +396,7 @@ def test_census_missing_fields_date_and_disabled_source_fail():
         census_rows(source, [], "", "pub_census_zone")
     for changed in (
         replace(source, skip_reason="SYN-disabled"),
-        replace(source, licence_basis="none_stated"),
+        replace(source, source_id="invented_wrong_source"),
         replace(source, release_tables=()),
     ):
         with pytest.raises(FrameError, match="release source"):
@@ -1519,10 +1519,10 @@ def test_r4_no_second_fixture_assembler():
     assert not hasattr(build, "build_staged_frame")
 
 
-def test_r4_validation_only_boundary_is_refused_before_cache(tmp_path):
+def test_r4_boundary_without_release_tables_is_refused_before_cache(tmp_path):
     from eii_custodian.publicdata.frame.build import build_frame
 
-    source = replace(entry("bnd_hdx"), licence_basis="none_stated")
+    source = replace(entry("bnd_hdx"), release_tables=())
     with pytest.raises(FrameError, match="bnd_hdx: invalid release source"):
         build_frame(tmp_path, (source,), REVIEW)
 
