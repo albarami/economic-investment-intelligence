@@ -45,12 +45,14 @@ from eii_custodian.publicdata.fetch.receipts import (
 )
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import (
+    TERMS_HOST_NOT_LISTED,
     citation_line,
     coverage_line,
     evidence_line,
     fail_line,
     pass_line,
     skip_line,
+    terms_attempt_record,
     terms_changed_line,
     terms_host_line,
     terms_unread_line,
@@ -391,6 +393,7 @@ def run_build(
     lines: list[str] = []
     pending: list[Entry] = []
     terms: list[dict[str, object]] = []
+    terms_attempts: list[dict[str, object]] = []
     benchmark_obstacles: list[dict[str, object]] = []
     previous = _previous_term_hashes(cache)
     failure: FetchFailure | None = None
@@ -613,7 +616,15 @@ def run_build(
                 )
             if entry.terms_url and entry.kind not in {"public_page", "awards_intake"}:
                 _read_terms_apart(
-                    entry, transport, sleep, clock, lines, terms, previous, cache
+                    entry,
+                    transport,
+                    sleep,
+                    clock,
+                    lines,
+                    terms,
+                    previous,
+                    cache,
+                    terms_attempts,
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
             continue
@@ -767,10 +778,18 @@ def run_build(
             break
         assert fetched is not None
         if entry.kind == "terms_page":
-            _note_fetched_terms(entry, fetched, lines, terms, previous)
+            _note_fetched_terms(entry, fetched, lines, terms, previous, terms_attempts)
         elif entry.terms_url:
             _read_terms_apart(
-                entry, transport, sleep, clock, lines, terms, previous, cache
+                entry,
+                transport,
+                sleep,
+                clock,
+                lines,
+                terms,
+                previous,
+                cache,
+                terms_attempts,
             )
         if entry.source_id in _ADDITION_FAMILIES:
             selected.append((entry.key, fetched.digest))
@@ -878,7 +897,7 @@ def run_build(
                 )
             )
         if failure is None:
-            failure = _heights(cache, entries, lines)
+            failure = _heights(cache, entries, lines, terms_attempts)
 
     if benchmark_obstacles:
         cache.mkdir(parents=True, exist_ok=True)
@@ -997,7 +1016,7 @@ def run_build(
     from eii_custodian.publicdata.busyness.security import assert_clean
 
     assert_clean(environ if environ is not None else {}, lines)
-    _write_log(cache, lines, terms)
+    _write_log(cache, lines, terms, terms_attempts)
     return BuildOutcome(tuple(lines), failure, manifests)
 
 
@@ -1152,6 +1171,7 @@ def _heights(
     cache: Path,
     entries: tuple[Entry, ...] | list[Entry],
     lines: list[str],
+    terms_attempts: list[dict[str, object]],
 ) -> FetchFailure | None:
     """Run the heights step after the stage; a missing table only skips (B10)."""
     from eii_custodian.publicdata.heights.step import (
@@ -1169,6 +1189,7 @@ def _heights(
             root / BUILDINGS_RELATIVE,
             root / HEIGHTS_RELATIVE,
             lines,
+            terms_attempts=tuple(terms_attempts),
         )
     except HeightError as error:
         lines.append(
@@ -1192,6 +1213,7 @@ def _note_fetched_terms(
     lines: list[str],
     terms: list[dict[str, object]],
     previous: dict[str, str],
+    attempts: list[dict[str, object]],
 ) -> None:
     """Record the fingerprint a terms_page row already read inside its fetch."""
     if not entry.terms_url:
@@ -1200,10 +1222,16 @@ def _note_fetched_terms(
         lines.append(
             terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
+        attempts.append(
+            terms_attempt_record(entry, TERMS_HOST_NOT_LISTED, fetched.retrieved_utc)
+        )
         return
     if fetched.terms_unread:
         lines.append(
             terms_unread_line(entry.key, fetched.terms_unread, entry.terms_url)
+        )
+        attempts.append(
+            terms_attempt_record(entry, fetched.terms_unread, fetched.retrieved_utc)
         )
         return
     if fetched.terms_sha256:
@@ -1226,16 +1254,23 @@ def _read_terms_apart(
     terms: list[dict[str, object]],
     previous: dict[str, str],
     cache: Path,
+    attempts: list[dict[str, object]],
 ) -> None:
-    """Read a terms page that the row's own fetch does not read."""
+    """Read a terms page that the row's own fetch does not read.
+
+    An unread page keeps its advisory line and adds one attempt record with the
+    attempt time and reason; the recorded reading date is never set from it.
+    """
     if not approve(entry.terms_url).ok:
         lines.append(
             terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
+        attempts.append(terms_attempt_record(entry, TERMS_HOST_NOT_LISTED, clock()))
         return
     read = read_terms_page(entry, transport, sleep)
     if read.failure is not None:
         lines.append(terms_unread_line(entry.key, read.failure.check, entry.terms_url))
+        attempts.append(terms_attempt_record(entry, read.failure.check, clock()))
         return
     retrieved = clock()
     archive_auxiliary(
@@ -1320,9 +1355,20 @@ def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
     commit_citation(cache_directory(cache, entry.key), sidecar)
 
 
-def _write_log(cache: Path, lines: list[str], terms: list[dict[str, object]]) -> None:
+def _write_log(
+    cache: Path,
+    lines: list[str],
+    terms: list[dict[str, object]],
+    terms_attempts: list[dict[str, object]],
+) -> None:
     cache.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps({"lines": lines, "terms": terms}, sort_keys=True) + "\n"
+    payload = (
+        json.dumps(
+            {"lines": lines, "terms": terms, "terms_attempts": terms_attempts},
+            sort_keys=True,
+        )
+        + "\n"
+    )
     partial = cache / ".build-log.json.partial"
     final = cache / LOG_NAME
     try:

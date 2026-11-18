@@ -364,6 +364,43 @@ def test_absence_caveat_must_be_declared():
     assert not any(row["state"] == "NO_DATA" for row in record)
 
 
+@pytest.mark.parametrize(
+    "row",
+    [
+        "| `family` | invented | invented |",
+        "| `family` | invented | invented | portal `slug-a` |",
+        "| `family` | invented |",
+        "| `family` |",
+    ],
+)
+def test_truncated_family_row_refuses_before_the_width_skip(row):
+    # PO-S2-72: under a five-column header a truncated family row is refused by
+    # name instead of being skipped by the width test.
+    text = f"""### 2.1 Identity
+| source_id | Dataset | Publisher | How fetched | Licence |
+|---|---|---|---|---|
+{row}
+### 2.3 Trade
+| source_id | Publisher | Use |
+### 2.4 Pages
+| source_id | Publisher | Use |
+"""
+    with pytest.raises(ValueError, match=r"^pack_family_row_truncated$"):
+        c.pack_sources(text, {"family": 1})
+
+
+def test_short_ordinary_row_is_still_skipped_by_width():
+    text = """### 2.1 Identity
+| source_id | Dataset | Publisher | How fetched | Licence |
+| `ordinary` | invented |
+### 2.3 Trade
+| source_id | Publisher | Use |
+### 2.4 Pages
+| source_id | Publisher | Use |
+"""
+    assert c.pack_sources(text, {}).sources == {}
+
+
 def test_pack_source_duplicate_refuses():
     text = """### 2.1 Identity
 | source_id | Dataset | Publisher | How fetched | Licence |

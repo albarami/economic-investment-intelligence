@@ -286,9 +286,9 @@ def test_finish_build_selects_exact_support(tmp_path, plant, key):
         )
         assert lines[-2:] == [
             "FAIL " + key + " " + reason,
-            "FAIL series selected input refused",
+            "FAIL series selected_input_refused",
         ]
-        assert result.observed == "ValueError"
+        assert result.observed == "selected_input_refused"
         assert not (tmp_path / "series/regression/PUB-67.json").exists()
 
 
@@ -416,11 +416,16 @@ def test_pub67_build_unmatched_source_municipality_refused(tmp_path):
     body = json.dumps(rows).encode()
     write_cached(tmp_path, entry_by_key(entries, "lic_active"), body)
     selected["lic_active"] = sha256_hex(body)
-    result = build(tmp_path, entries, selected)
-    assert result["blocked"] == {
-        "lic_active": ("regression: PUB-67 unresolved source municipality",)
-    }
-    assert "PUB-67" not in result["checks"]
+    # S2-T08 part B, B13: an unmapped spelling now refuses the build by its word
+    # before any table is written (was: blocked by the PUB-67 regression).
+    from eii_custodian.publicdata.series.parse import SeriesRefused
+
+    with pytest.raises(SeriesRefused) as caught:
+        build(tmp_path, entries, selected)
+    assert caught.value.word == "unmapped_municipality_spelling"
+    coverage = json.loads((tmp_path / "series/internal/coverage.json").read_text())
+    assert coverage["lic_active.municipality_exact_match"] == ["SYN unmatched"]
+    assert not (tmp_path / "series/internal/pub_licence_active.json").exists()
     assert not (tmp_path / "series/regression/PUB-67.json").exists()
 
 

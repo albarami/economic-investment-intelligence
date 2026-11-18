@@ -63,6 +63,36 @@ BULLETIN_FIELDS = frozenset(
     }
 )
 
+# S2-T08 part B, mismatch class 3: the observed prop_sales export, in the portal
+# metadata's order (live shape pack of 2026-11-18, export hash 9f4867dc...).
+SALES_EXPORT_FIELDS = (
+    "registration_date",
+    "encrypted_transaction_number",
+    "encrypted_parcel_number",
+    "sm_lbldy",
+    "municipality_name",
+    "sm_lmntq",
+    "district_name",
+    "nw_l_qr",
+    "property_type",
+    "lstkhdm",
+    "usage",
+    "area_square_meters",
+    "share_area",
+    "price_per_square_foot",
+    "price_per_square_meter",
+    "number_of_shares_2400",
+    "share_value",
+    "property_value",
+)
+# Their meaning (a part of a property, or of its value) is not confirmed: a
+# value in any of them refuses the export by name. None is read as a whole deal.
+SALES_SHARE_FIELDS = ("share_area", "number_of_shares_2400", "share_value")
+# Published fields the deal rule does not read: the Arabic twin of the usage
+# field (the reviewed use map reads ``usage``) and the source's own price per
+# square foot (card C41 computes it from the price and the published area).
+_SALES_UNREAD = frozenset({"lstkhdm", "price_per_square_foot"})
+
 
 @dataclass(frozen=True)
 class Deal:
@@ -103,6 +133,39 @@ def refuse_release_identifiers(
 ) -> None:
     """Fail when a release row carries an identifier field or value (DR1(c))."""
     _refuse_identifier_text(repr(list(rows)), identifiers)
+
+
+def sales_export_rows(rows: object) -> list[dict[str, object]]:
+    """Return the ``prop_sales`` export rows in the bulletin's own field names.
+
+    Every row must hold exactly the observed fields. ``usage`` becomes the
+    bulletin's usage field, the published square metres stay the floor area,
+    square feet stay absent, and no share field or unread field is passed on.
+    A share field that holds any value refuses the export by name.
+    """
+    if not isinstance(rows, list):
+        raise AdditionError("bulletin_rows")
+    expected = frozenset(SALES_EXPORT_FIELDS)
+    adapted: list[dict[str, object]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            raise AdditionError("bulletin_row")
+        if set(row) - expected:
+            raise AdditionError("unknown_source_field")
+        if expected - set(row):
+            raise AdditionError("source_field_missing")
+        if any(row[field] is not None for field in SALES_SHARE_FIELDS):
+            raise AdditionError("share_semantics_unconfirmed")
+        kept = {
+            name: row[name]
+            for name in SALES_EXPORT_FIELDS
+            if name not in _SALES_UNREAD
+            and name not in SALES_SHARE_FIELDS
+            and name != "usage"
+        }
+        kept["property_usage"] = row["usage"]
+        adapted.append(kept)
+    return adapted
 
 
 def parse_bulletin(

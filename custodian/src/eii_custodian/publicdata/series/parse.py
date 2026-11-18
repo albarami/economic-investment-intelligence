@@ -398,24 +398,90 @@ def customs_code(source: str, value: object) -> str | None:
     return text.zfill(12)
 
 
+# B13 (plan r3 section 3): the one closed tuple of series refusal words. The
+# word travels on the exception; no line or record ever reads its text or type.
+SERIES_REFUSALS = (
+    "municipality_frame_not_supplied",
+    "unmapped_municipality_spelling",
+    "municipality_names_refused",
+    "selected_input_refused",
+)
+# The committed review folder that holds municipality_names.csv (S2-T02).
+MUNICIPALITY_NAMES_REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
+
+
+class SeriesRefused(ValueError):
+    """A refusal of the series build carrying one word of SERIES_REFUSALS."""
+
+    def __init__(self, word: str, message: str) -> None:
+        if word not in SERIES_REFUSALS:
+            raise ValueError("series_refusal_unknown")
+        self.word = word
+        super().__init__(message)
+
+
+def _bind(names: dict[str, str], name: str, code: str) -> None:
+    if names.get(name, code) != code:
+        raise SeriesRefused(
+            "municipality_names_refused", "municipality names: one name, two codes"
+        )
+    names[name] = code
+
+
 def municipality_names(
     frame: Sequence[Municipality], review: Path | None = None
 ) -> dict[str, str]:
-    """Exact frame names, followed only by explicitly reviewed alias rows."""
-    names = {item.name_ar: item.code for item in frame}
+    """Frame names, the reviewed spellings, then explicitly reviewed aliases.
+
+    Keys are compared after ``normalise_name`` (whitespace only). The reviewed
+    spellings are read by ``load_municipality_names`` with the names file's own
+    codes; a spelling counts only for a code of this frame (the check of the
+    file's codes against the built frame stays in ``frame/live.py``).
+    """
+    from eii_custodian.publicdata.frame.checks import FrameError
+    from eii_custodian.publicdata.frame.crosswalk import (
+        load_municipality_names,
+        normalise_name,
+        read_csv,
+    )
+
+    names: dict[str, str] = {}
+    for item in frame:
+        _bind(names, normalise_name(item.name_ar), item.code)
+    codes = {item.code for item in frame}
+    frame_names = set(names)
+    folder = MUNICIPALITY_NAMES_REVIEW
+    try:
+        csv_rows = read_csv(folder / "municipality_names.csv")
+        own = {row["municipality_code"] for row in csv_rows}
+        reviewed = load_municipality_names(folder, own)
+    except (FrameError, OSError, KeyError, ValueError) as exc:
+        raise SeriesRefused("municipality_names_refused", str(exc)) from None
+    for row in reviewed:
+        if row["municipality_code"] in codes:
+            _bind(names, row["name"], row["municipality_code"])
     path = (
         review
         if review is not None
         else Path(__file__).resolve().parents[4]
         / "publicdata/review/municipality_aliases.json"
     )
-    for row in json.loads(path.read_text()):
-        if (
-            not row.get("reviewer_role")
-            or not row.get("review_date")
-            or row.get("frame_name_ar") not in names
-        ):
-            raise ValueError("municipality alias: missing review or frame name")
-        date.fromisoformat(row["review_date"])
-        names[row["source_name_ar"]] = names[row["frame_name_ar"]]
+    try:
+        for row in json.loads(path.read_text()):
+            if (
+                not row.get("reviewer_role")
+                or not row.get("review_date")
+                or normalise_name(row.get("frame_name_ar") or "") not in frame_names
+            ):
+                raise ValueError("municipality alias: missing review or frame name")
+            date.fromisoformat(row["review_date"])
+            _bind(
+                names,
+                normalise_name(row["source_name_ar"]),
+                names[normalise_name(row["frame_name_ar"])],
+            )
+    except SeriesRefused:
+        raise
+    except (OSError, KeyError, TypeError, AttributeError, ValueError) as exc:
+        raise SeriesRefused("municipality_names_refused", str(exc)) from None
     return names

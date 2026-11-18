@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from eii_custodian.publicdata.fetch.registry import Entry
 
 _SOURCE_KEY = re.compile(r"^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$")
 _BARE_DIGITS = re.compile(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])")
@@ -76,6 +80,28 @@ def terms_host_line(key: str, host: str, terms_url: str) -> str:
 def terms_unread_line(key: str, check: str, terms_url: str) -> str:
     """Return the advisory when a terms page cannot be read."""
     return f"TERMS {key} not read: {check} ({terms_url})"
+
+
+TERMS_HOST_NOT_LISTED = "host_not_allow_listed"
+
+
+def terms_attempt_record(
+    entry: Entry, reason: str, attempted_utc: str
+) -> dict[str, object]:
+    """Return one unread-terms attempt for the build log (S2-T08 part B, class 9).
+
+    The attempt time and reason are kept apart from the row's recorded
+    ``terms_read_on`` and own words, which are copied unchanged: an attempt is
+    never a reading, so no reading date is made from it.
+    """
+    return {
+        "key": entry.key,
+        "terms_url": entry.terms_url,
+        "terms_attempted_utc": attempted_utc,
+        "terms_unread_reason": reason,
+        "terms_read_on": entry.terms_read_on,
+        "terms_words": entry.terms_words,
+    }
 
 
 def citation_line(key: str) -> str:

@@ -187,3 +187,35 @@ def match_register(
                 matched += 1
         report.append({"original": dict(row), "reason": reason})
     return {"matched": matched, "unmatched": len(rows) - matched, "rows": report}
+
+
+def double_space_only(
+    match: Mapping[str, object],
+    profile: Mapping[str, Any],
+    registers: Sequence[Mapping[str, str]],
+) -> int:
+    """OI-277: count unmatched names that differ from their one register name
+    only by a double space left by the ruled normalisation. Matching is not
+    changed; only a count is returned, never a name.
+    """
+    by_registration: dict[str, list[str]] = {}
+    for company in registers:
+        registration = company.get("registration", "")
+        if registration.strip():
+            by_registration.setdefault(registration, []).append(company.get("name", ""))
+    rows = match.get("rows")
+    count = 0
+    for item in rows if isinstance(rows, list) else ():
+        if not isinstance(item, dict) or item.get("reason") != "name_mismatch":
+            continue
+        original = item.get("original")
+        if not isinstance(original, dict):
+            continue
+        names = by_registration.get(original.get(profile["registration"], ""), [])
+        if len(names) != 1:
+            continue
+        award = normalise_name(original.get(profile["company"], ""))
+        listed = normalise_name(names[0])
+        if award != listed and award.split() == listed.split() and award.split():
+            count += 1
+    return count

@@ -96,15 +96,17 @@ def pack_sources(text: str, family_counts: Mapping[str, int]) -> Pack:
         width = len(header.split("|"))
         for line in block.splitlines():
             cells = [cell.strip() for cell in line.split("|")]
-            if len(cells) < max(width, 4) or not re.fullmatch(
-                r"`[a-z0-9_]+`", cells[1]
-            ):
+            if len(cells) < 2 or not re.fullmatch(r"`[a-z0-9_]+`", cells[1]):
                 continue
             source = cells[1].strip("`")
+            # PO-S2-72: a family row is held to the larger of the header width
+            # and five cells before the width skip can pass over it.
+            if source in family_counts and len(cells) < max(width, 5):
+                raise ValueError("pack_family_row_truncated")
+            if len(cells) < max(width, 4):
+                continue
             if source in sources:
                 raise ValueError("pack_source_duplicate")
-            if source in family_counts and len(cells) < 5:
-                raise ValueError("pack_family_row_truncated")
             sources[source] = (
                 tuple(re.findall(r"`([^`]+)`", cells[4]))
                 if source in family_counts

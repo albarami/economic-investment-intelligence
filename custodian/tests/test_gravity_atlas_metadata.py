@@ -83,8 +83,12 @@ def test_metadata_acquisition_bound(source, phase, case, tmp_path, monkeypatch):
         assert not list(tmp_path.rglob("*.zip"))
 
 
-def test_unbounded_transport_default_unchanged(monkeypatch):
-    """All other sources keep the pre-existing no-limit interface."""
+def test_unscoped_transport_reads_to_the_intake_ceiling(monkeypatch):
+    """All other sources keep no scoped limit and read to the intake ceiling.
+
+    S2-T08 part B, mismatch class 8: the former whole-body read is bounded by
+    the general intake ceiling and one byte.
+    """
     reads = []
     url = "https://www.data.gov.qa/invented-other-page"
 
@@ -110,7 +114,7 @@ def test_unbounded_transport_default_unchanged(monkeypatch):
         lambda *args: SimpleNamespace(open=lambda *args, **kwargs: Body()),
     )
     assert transport.open_https(url).body == b"invented other source"
-    assert reads == [-1]
+    assert reads == [transport.INTAKE_CEILING_BYTES + 1]
 
 
 def test_metadata_limit_resets_after_exception(monkeypatch):
@@ -148,7 +152,9 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
             transport.open_https(url)
             raise LookupError("invented failure")
     transport.open_https(url)
-    assert reads == [8, 4, 8, -1]
+    # The last read has no scoped limit and stops at the intake ceiling and one
+    # byte (S2-T08 part B, mismatch class 8).
+    assert reads == [8, 4, 8, transport.INTAKE_CEILING_BYTES + 1]
 
 
 def test_baci_metadata_read_stays_unbounded():

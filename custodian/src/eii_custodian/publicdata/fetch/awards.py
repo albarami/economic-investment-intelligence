@@ -20,6 +20,7 @@ from .allowlist import approve, host_of
 from .award_checks import (
     AwardError,
     check_awards,
+    double_space_only,
     match_register,
     validate_check_receipt,
 )
@@ -247,6 +248,7 @@ def _publish_awards(
         method=METHOD,
         original_scrape_date=SCRAPE_DATE,
         registration_match=match,
+        registration_double_space_only=double_space_only(match, profile, registers),
         registration_inputs=registration_inputs or [],
     )
     validate_check_receipt(side)

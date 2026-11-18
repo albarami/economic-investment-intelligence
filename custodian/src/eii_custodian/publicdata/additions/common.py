@@ -52,7 +52,9 @@ PERIOD_FORMS = frozenset(
 )
 FIELD_UNCONFIRMED = "to_be_confirmed"
 METHOD_VERSION = "1"
-_YEAR = re.compile(r"^\d{4}$")
+# S2-T08 part B (mismatch 2): a year is four ASCII digits; \d alone admits any
+# script's digits, which would also sort after every ASCII year.
+_YEAR = re.compile(r"^\d{4}$", re.ASCII)
 _YEAR_MONTH = re.compile(r"^(\d{4})-(\d{2})$")
 _DATE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
 _SCHOOL = re.compile(r"^(\d{4})-(\d{4})$")

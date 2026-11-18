@@ -50,7 +50,9 @@ from eii_custodian.publicdata.series.frame import (
 )
 from eii_custodian.publicdata.series.parse import (
     FIELD_MAP,
+    SERIES_REFUSALS,
     Municipality,
+    SeriesRefused,
     confirmed_rows,
     country_crosswalk,
     customs_code,
@@ -289,7 +291,7 @@ def contract_rows(
                 )
                 period = source_period(source, row[year], row[month])
             converted = {
-                "municipality_code": names.get(str(row["lbldy"])),
+                "municipality_code": names.get(normalise_name(str(row["lbldy"]))),
                 "activity_code": row["rmz_lnsht_ltjry"],
                 "period": period,
                 target: row[field],
@@ -837,6 +839,14 @@ def build_series(
             )
             if not municipalities:
                 blocked[source] = ("municipality_frame_not_supplied",)
+            elif coverage[source + ".municipality_exact_match"]:
+                # B13: a spelling neither the frame nor the reviewed names file
+                # holds refuses the build before any table file is written.
+                _write(root / "internal" / "coverage.json", coverage)
+                raise SeriesRefused(
+                    "unmapped_municipality_spelling",
+                    source + " unmapped municipality spelling",
+                )
         _write(root / "internal" / "coverage.json", coverage)
         tables.setdefault(table, []).extend(converted)
         table_sources.setdefault(table, []).append(source)
@@ -998,6 +1008,16 @@ def build_series(
     return result
 
 
+def _refused(lines: list[str], word: str) -> FetchFailure:
+    """One closed word for the line and the record; never an exception's text."""
+    from eii_custodian.publicdata.fetch.build import FetchFailure
+
+    if word not in SERIES_REFUSALS:
+        raise ValueError("series_refusal_unknown")
+    lines.append("FAIL series " + word)
+    return FetchFailure(1, "series", "", "public_data", "valid selected input", word)
+
+
 def finish_build(
     entries: Sequence[Entry], cache: Path, lines: list[str]
 ) -> FetchFailure | None:
@@ -1069,14 +1089,13 @@ def finish_build(
             municipalities=municipalities,
             supporting_selected=supporting_selected,
         )
-    except (OSError, ValueError, KeyError) as exc:
-        lines.append("FAIL series selected input refused")
-        return FetchFailure(
-            1, "series", "", "public_data", "valid selected input", type(exc).__name__
-        )
+    except SeriesRefused as exc:
+        return _refused(lines, exc.word)
+    except (OSError, ValueError, KeyError):
+        return _refused(lines, "selected_input_refused")
+    # B15: a blocked source always leaves its figure's regression file absent,
+    # so the real stage names that figure; no fallback word is needed here.
     mismatch = str(result["mismatch"])
-    if result["blocked"]:
-        mismatch = mismatch or "series_mapping"
     if mismatch:
         lines.append("FAIL " + mismatch + " public_data selected-cache check")
         return FetchFailure(

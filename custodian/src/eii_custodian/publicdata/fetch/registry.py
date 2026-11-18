@@ -32,6 +32,9 @@ KINDS = frozenset(
         "awards_intake",
     }
 )
+# S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
+# in a GeoJSON Feature (live shape pack of 2026-11-18, Mismatches item 4).
+FEATURE_POLYGON_SOURCES = frozenset({"bnd_muni_2025"})
 COLLECTED_FAMILIES = frozenset(
     {
         "trade_ext",
@@ -429,6 +432,12 @@ def _entry(row: object) -> Entry:
     except ValueError as exc:
         raise RegistryError(str(exc)) from None
     columns = _columns(row.get("columns"))
+    if source_id not in FEATURE_POLYGON_SOURCES and any(
+        kind == "geojson_feature_polygon" for _name, kind in columns
+    ):
+        raise RegistryError(
+            "geojson_feature_polygon is declared for bnd_muni_2025 only"
+        )
     public_splits = _strings(row, "public_splits")
     if any(name in {"sex", "gender"} for name, _kind in columns):
         if "sex" not in public_splits:
@@ -772,6 +781,7 @@ def _columns(value: object) -> tuple[tuple[str, str], ...]:
             "object",
             "point_2d",
             "geojson_geometry",
+            "geojson_feature_polygon",
         }:
             raise RegistryError("unknown column type")
         found.append((name, kind))

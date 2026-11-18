@@ -28,7 +28,10 @@ class _Answer:
         self.headers = _Headers(etag)
         self._url = url
 
-    def read(self) -> bytes:
+    def read(self, size: int = -1) -> bytes:
+        # The opener reads at most the intake ceiling and one byte (S2-T08 part B,
+        # mismatch class 8).
+        del size
         return b"SYN"
 
     def geturl(self) -> str:

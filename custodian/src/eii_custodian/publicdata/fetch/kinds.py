@@ -30,6 +30,7 @@ from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
     BACKOFF_S,
     MAX_RETRIES,
+    BodyTooLarge,
     Response,
     Transport,
     TransportFault,
@@ -136,7 +137,8 @@ def _reader(transport: Transport, sleep: Callable[[float], None]) -> Read:
             try:
                 response = transport(url)
             except TransportFault as exc:
-                if exc.kind == "blocked_host":
+                # A size refusal is not retried: the same body would be read again.
+                if exc.kind in {"blocked_host", "body_bytes"}:
                     raise
                 fault = exc
                 if attempt < MAX_RETRIES:
@@ -189,6 +191,10 @@ def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure |
     except _HopRefused as exc:
         return None, AttemptFailure(
             1, exc.url, "blocked_host", "allow-listed host", exc.url
+        )
+    except BodyTooLarge as exc:
+        return None, AttemptFailure(
+            1, exc.url, "body_bytes", f"at most {exc.ceiling} bytes", exc.observed
         )
     except TransportFault as exc:
         if exc.kind == "unreachable":
@@ -845,7 +851,9 @@ def _paged_declared(
                     ),
                 )
             final = page.final_url
-            refused = _declared_features(layer, batch, oid_name, page.final_url)
+            refused = _inherit_page_reference(batch, page.body, page.final_url)
+            if refused is None:
+                refused = _declared_features(layer, batch, oid_name, page.final_url)
             if refused is not None:
                 return _failed(entry, refused)
             features.extend(batch)
@@ -1004,6 +1012,37 @@ def _declared_features(
             )
         if not _wkid_4326(geometry):
             return AttemptFailure(1, url, "spatial_reference", "4326", "other")
+    return None
+
+
+def _inherit_page_reference(
+    features: list[dict[str, object]], body: bytes, url: str
+) -> AttemptFailure | None:
+    """Copy a page's validated EPSG:4326 reference into geometries lacking one.
+
+    S2-T08 part B, mismatch class 1: a declared layer's server states the
+    reference once at the page's top level. Only a page reference that passes
+    ``_wkid_4326`` is copied; a geometry whose own reference disagrees with a
+    stated page reference refuses. ``_declared_features`` still checks every
+    geometry, so a missing, boolean or other reference refuses there.
+    """
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return None
+    stated = isinstance(loaded, dict) and "spatialReference" in loaded
+    page = loaded.get("spatialReference") if stated else None
+    valid = _wkid_4326({"spatialReference": page})
+    for feature in features:
+        geometry = _text_dict(feature.get("geometry"))
+        if geometry is None:
+            continue
+        if "spatialReference" not in geometry:
+            if valid and isinstance(page, dict):
+                geometry["spatialReference"] = dict(page)
+                feature["geometry"] = geometry
+        elif stated and not (valid and _wkid_4326(geometry)):
+            return AttemptFailure(1, url, "spatial_reference", "4326", "conflicting")
     return None
 
 

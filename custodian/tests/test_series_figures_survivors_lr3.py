@@ -148,15 +148,33 @@ def test_support_reaches_internal_and_display_tables(tmp_path, monkeypatch):
 
 
 def test_refused_checks_do_not_rewrite_internal_support(tmp_path):
+    # S2-T08 part B, B13: an unmapped spelling now refuses before any table, so
+    # the refused check is planted by a frame without the PUB-67 target.
     entries, selected = selected_fixture(tmp_path)
     rows = active_rows()
-    rows[0]["lbldy"] = "SYN unmatched"
+    for row in rows:
+        row["lbldy"] = FRAME[1].name_ar
+    output = tmp_path / "frame_s2_t02/municipalities.json"
+    frame = json.loads(output.read_text())
+    frame.update(
+        count=1,
+        municipalities=[
+            {"municipality_code": FRAME[1].code, "name_ar": FRAME[1].name_ar}
+        ],
+    )
+    output.write_text(json.dumps(frame))
     body = json.dumps(rows).encode()
     write_cached(tmp_path, entry_by_key(entries, "lic_active"), body)
     selected["lic_active"] = sha256_hex(body)
-    result = build(tmp_path, entries, selected)
+    result = figures.build_series(
+        tmp_path,
+        entries,
+        {"lic_active": selected["lic_active"]},
+        municipalities=(FRAME[1],),
+        supporting_selected={k: v for k, v in selected.items() if k != "lic_active"},
+    )
     assert result["blocked"] == {
-        "lic_active": ("regression: PUB-67 unresolved source municipality",)
+        "lic_active": ("regression: PUB-67 target municipality absent or ambiguous",)
     }
     envelope = json.loads(
         (tmp_path / "series/internal/pub_licence_active.json").read_text()
@@ -200,7 +218,7 @@ def test_caught_support_refusal_whole_text(tmp_path, plant):
     finally:
         sys.settrace(previous)
     assert result is not None
-    assert result.observed == "ValueError"
+    assert result.observed == "selected_input_refused"
     assert seen
     _whole_text(seen[0], literal)
 

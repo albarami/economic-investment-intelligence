@@ -89,6 +89,26 @@ class TransportFault(Exception):
         super().__init__(f"{kind} {self.url}")
 
 
+# S2-T08 part B, mismatch class 8: the general intake ceiling for one response
+# body read by open_https. This value is a lead default awaiting the owner's
+# answer; a lower scoped cap (metadata_limit) keeps its own read and refusal.
+INTAKE_CEILING_BYTES = 300 * 1024 * 1024
+INTAKE_CEILING_STATUS = "lead default awaiting the owner's answer"
+
+
+class BodyTooLarge(TransportFault):
+    """A body above the intake ceiling: declared by its header, or read past it.
+
+    observed is ``declared N`` or ``more than C``; no full size or hash of a
+    refused body is claimed.
+    """
+
+    def __init__(self, url: str, ceiling: int, observed: str) -> None:
+        super().__init__("body_bytes", url)
+        self.ceiling = ceiling
+        self.observed = observed
+
+
 @dataclass(frozen=True)
 class StreamResponse:
     """Metadata and bounded chunks; consumed only inside its open context."""
@@ -224,8 +244,7 @@ def open_https(
     fault: str | None = None
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
-            limit = _METADATA_LIMIT.get()
-            body = response.read() if limit is None else response.read(limit + 1)
+            body = _bounded_body(response, str(url))
             final = str(response.geturl())
             if reviewed_urls is not None and (
                 final not in reviewed_urls or not _stream_allowed(final)
@@ -270,6 +289,32 @@ def open_https(
         body_sha256=digest,
         headers=public_headers,
     )
+
+
+def _bounded_body(response: HTTPResponse, url: str) -> bytes:
+    """Read one body under the scoped cap or, where none is lower, the ceiling.
+
+    A lower scoped cap reads its own limit and one byte, and its caller refuses
+    by its own name. Otherwise a declared length above the ceiling is refused
+    before any read, and an undeclared body is read at most to the ceiling and
+    one byte, then refused. No read asks for more than the ceiling and one byte.
+    """
+    limit = _METADATA_LIMIT.get()
+    ceiling = INTAKE_CEILING_BYTES
+    if limit is not None and limit <= ceiling:
+        return response.read(limit + 1)
+    declared = response.headers.get("Content-Length")
+    if (
+        isinstance(declared, str)
+        and declared.isascii()
+        and declared.isdigit()
+        and int(declared) > ceiling
+    ):
+        raise BodyTooLarge(url, ceiling, f"declared {int(declared)}")
+    body = response.read(ceiling + 1)
+    if len(body) > ceiling:
+        raise BodyTooLarge(url, ceiling, f"more than {ceiling}")
+    return body
 
 
 def _redirect_guard(

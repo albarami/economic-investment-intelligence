@@ -11,6 +11,7 @@ from unittest.mock import patch
 from urllib.request import HTTPSHandler
 
 import pytest
+from custodian.tests.fixtures.invented_chain import intermediate_pem
 from custodian.tests.test_s2_t29_live_shapes import STAMP, embedded, entry
 
 from eii_custodian.publicdata.fetch import certificate_pins as certificates
@@ -132,11 +133,14 @@ def test_f2_tender_requires_root_chain(tmp_path, monkeypatch):
         check_hostname = True
         verify_flags = ssl.VERIFY_X509_PARTIAL_CHAIN
 
-        def load_verify_locations(self, *, cafile):
-            assert cafile == str(chain)
+        def load_verify_locations(self, *, cadata):
+            # S2-T08 part B, mismatch 7: trust is added from the inspected
+            # bytes, never from the path, and the file is an invented
+            # intermediate because a text stand-in is now refused.
+            assert cadata == ssl.PEM_cert_to_DER_cert(chain.read_text())
 
     chain = tmp_path / "SYN.pem"
-    chain.write_bytes(b"SYN chain")
+    chain.write_bytes(intermediate_pem())
     context = Context()
     monkeypatch.setattr(tenders.ssl, "create_default_context", lambda: context)
     assert (

@@ -92,8 +92,30 @@ def _error_block(errors: dict[str, FallbackError]) -> dict[str, object]:
     return block
 
 
-def _credits(rules: Rules, results: dict[str, SourceResult]) -> dict[str, object]:
-    """The doc-04 credit text for 3D-GloBFP; WSF 3D keeps its recorded terms."""
+def _attempts_of(
+    source_id: str, terms_attempts: tuple[dict[str, object], ...]
+) -> list[dict[str, object]]:
+    """This source's unread-terms attempts of the run, in key order."""
+    found = [
+        dict(item)
+        for item in terms_attempts
+        if isinstance(item.get("key"), str)
+        and (item["key"] == source_id or str(item["key"]).startswith(source_id + "/"))
+    ]
+    return sorted(found, key=lambda item: str(item["key"]))
+
+
+def _credits(
+    rules: Rules,
+    results: dict[str, SourceResult],
+    terms_attempts: tuple[dict[str, object], ...] = (),
+) -> dict[str, object]:
+    """The doc-04 credit text for 3D-GloBFP; WSF 3D keeps its recorded terms.
+
+    An unread terms page of this run is carried as an attempt beside the
+    recorded reading date and words, which stay as the registry holds them
+    (S2-T08 part B, mismatch class 9).
+    """
     globfp = results["bldg_3dglobfp"]
     credit = ""
     if globfp.retrieved_utc:
@@ -101,10 +123,12 @@ def _credits(rules: Rules, results: dict[str, SourceResult]) -> dict[str, object
     return {
         "bldg_3dglobfp": {
             "credit": credit,
+            "terms_attempts": _attempts_of("bldg_3dglobfp", terms_attempts),
             "terms_read_on": globfp.terms_read_on,
             "terms_words": globfp.terms_words,
         },
         "bldg_wsf3d": {
+            "terms_attempts": _attempts_of("bldg_wsf3d", terms_attempts),
             "terms_read_on": results["bldg_wsf3d"].terms_read_on,
             "terms_words": results["bldg_wsf3d"].terms_words,
         },
@@ -117,6 +141,8 @@ def manifest_block(
     counts: HeightCounts,
     errors: dict[str, FallbackError],
     input_files: list[dict[str, object]],
+    *,
+    terms_attempts: tuple[dict[str, object], ...] = (),
 ) -> dict[str, object]:
     """The height block of the asset manifest (FE-96)."""
     files: list[dict[str, object]] = list(input_files)
@@ -126,7 +152,7 @@ def manifest_block(
     return {
         "card": CARD_ID,
         "counts": counts.by_source,
-        "credits": _credits(rules, results),
+        "credits": _credits(rules, results, terms_attempts),
         "errors": _error_block(errors),
         "estimate_label": ESTIMATE_LABEL,
         "files": files,

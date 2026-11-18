@@ -262,3 +262,62 @@ def test_duplicate_confirmation_task_refuses():
         g.confirmations(
             [item, replace(item, references=("invented other review",))], [], {}
         )
+
+
+# B14 (plan r3 section 3): malformed dispositions stay pending by key.
+@pytest.mark.parametrize("key", ["R1", "R2"])
+@pytest.mark.parametrize(
+    "planted",
+    [
+        None,
+        7,
+        "closed: not published",
+        ["closed: not published"],
+        {"status": None},
+        {"status": ""},
+        {"status": " \t\n"},
+        {"status": 7},
+        {"status": ["closed: not published"]},
+        {},
+    ],
+)
+def test_malformed_disposition_entry_is_pending_by_key(key, planted):
+    args = reconciliation()
+    args["dispositions"][key] = planted
+    report = g.oi03_line(**args)
+    assert report["state"] == "pending"
+    assert report["dispositions"][key] == "pending"
+    other = "R2" if key == "R1" else "R1"
+    assert report["dispositions"][other] == args["dispositions"][other]["status"]
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [b"{not json", b"\xff\xfe\x00", b"[1, 2]", b'"text"', b"null", b"", b"7"],
+)
+def test_dispositions_file_that_is_not_a_json_object_is_pending(raw):
+    loaded = g.load_dispositions(raw)
+    assert loaded == {}
+    args = reconciliation()
+    args["dispositions"] = loaded
+    report = g.oi03_line(**args)
+    assert report["state"] == "pending"
+    assert report["dispositions"] == {"R1": "pending", "R2": "pending"}
+
+
+def test_dispositions_file_round_trip_keeps_recorded_state():
+    import json
+
+    args = reconciliation()
+    raw = json.dumps(args["dispositions"]).encode("utf-8")
+    args["dispositions"] = g.load_dispositions(raw)
+    assert g.oi03_line(**args)["state"] == "recorded"
+
+
+def test_decision_that_is_not_utf8_is_not_recorded():
+    args = reconciliation()
+    args["decision"] = b"| Status | Accepted |\n\xff"
+    args["signoff"]["record_sha256"] = hashlib.sha256(args["decision"]).hexdigest()
+    report = g.oi03_line(**args)
+    assert report["state"] == "pending"
+    assert report["decision_status"] == "not recorded"

@@ -16,7 +16,6 @@ from eii_custodian.publicdata.fetch.build import FetchFailure
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.review.activity import entry_by_key
 from eii_custodian.publicdata.series import figures
-from eii_custodian.publicdata.stage import StageResult
 
 
 def _whole_text(found: object, literal: str) -> None:
@@ -220,9 +219,14 @@ def test_finish_selected_line_separator(tmp_path, suffix):
         _whole_text(lines[-1], "FAIL PUB-62 public_data selected-cache check")
     else:
         assert got == FetchFailure(
-            1, "series", "", "public_data", "valid selected input", "ValueError"
+            1,
+            "series",
+            "",
+            "public_data",
+            "valid selected input",
+            "selected_input_refused",
         )
-        _whole_text(lines[-1], "FAIL series selected input refused")
+        _whole_text(lines[-1], "FAIL series selected_input_refused")
 
 
 @pytest.mark.parametrize("count", [0, 2])
@@ -247,18 +251,6 @@ def test_finish_frame_refusal_all_fields(tmp_path):
         "municipality_frame_absent",
     )
     _whole_text(lines[-1], "FAIL series municipality_frame_not_supplied lic_active")
-
-
-def test_finish_blocked_regression_all_fields(tmp_path, monkeypatch):
-    entry, digest = series_cache(tmp_path, "util_elec", [_shapes()["util_elec"][0]])
-    monkeypatch.setattr(
-        "eii_custodian.publicdata.stage.run_stage", lambda *a, **k: StageResult((), "")
-    )
-    lines = [f"PASS util_elec sha256={digest} host=invented"]
-    assert figures.finish_build([entry], tmp_path, lines) == FetchFailure(
-        1, "series_mapping", "", "public_data", "section 10 anchor", "series_mapping"
-    )
-    _whole_text(lines[-1], "FAIL series_mapping public_data selected-cache check")
 
 
 def test_empty_cancellations_refuse_nonpositive_denominator():

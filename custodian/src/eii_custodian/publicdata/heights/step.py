@@ -135,6 +135,8 @@ def build_heights(
     out_dir: Path,
     lines: list[str],
     rules_path: Path | None = None,
+    *,
+    terms_attempts: tuple[dict[str, object], ...] = (),
 ) -> None:
     """Run the heights step: skip on an absent table, refuse on a bad input.
 
@@ -179,6 +181,7 @@ def build_heights(
         counts,
         errors,
         input_files,
+        terms_attempts=terms_attempts,
     )
     write_outputs(
         out_dir,
