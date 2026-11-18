@@ -12,15 +12,15 @@
 
 Mutation testing asks whether tests notice deliberately wrong code. This work strengthened tests, exposed real defects and left substantial unfinished investigation. A surviving change is a question to investigate, rather than proof that the unchanged application is wrong.
 
-The owner stopped mutation campaigns because their elapsed time was delaying the work. The present application uses invented labour and residence records; the owner wants a full team to consider this additional work after go live, particularly before a future move to real records. No campaign or new survivor investigation is to start before then. The team chooses how to carry out the work.
+Decision 0055 records the stop of mutation campaigns because their elapsed time was delaying the work. The present application uses invented labour and residence records; decision 0055 leaves this additional work for the full team to consider after go live, particularly before a future move to real records. No campaign or new survivor investigation is to start before then. The team chooses how to carry out the work.
 
-[Decision on background campaigns](decisions/0052-mutation-campaigns-run-in-a-background-lane.md) previously allowed ordinary development to proceed while mutation work continued, but required every campaign to close before its slice could finish. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) records the owner’s deferral of mutation campaigns and survivor investigations until after go live, without a pre-launch wait for closure; the written record was accepted on 2026-11-18. Ordinary unit, property, integration and parity tests, independent review, provenance accounting, privacy checks, numerical checks and the complete test suite with fresh seeds remain required. A confirmed wrong number or wrong refusal remains recorded work; postponement does not erase it.
+[Decision on background campaigns](decisions/0052-mutation-campaigns-run-in-a-background-lane.md) previously allowed ordinary development to proceed while mutation work continued, but required every campaign to close before its slice could finish. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) records the deferral of mutation campaigns and survivor investigations until after go live, without a pre-launch wait for closure; the written record was accepted on 2026-11-18. Ordinary unit, property, integration and parity tests, independent review, provenance accounting, privacy checks, numerical checks and the complete test suite with fresh seeds remain required. A confirmed wrong number or wrong refusal remains recorded work; postponement does not erase it.
 
 This document is an evidence snapshot. Its status tables preserve repeated runs and unsuccessful starts. A last recorded measurement is not proof that the eventual merged version has been measured. Recorded repairs remain historical claims until their source and tests are checked on the delivered version.
 
 ## 1. How to read the evidence
 
-Start with the method and the test-quality rules, then find a task and source file in the campaign table. The original run records are not kept in the repository; this document holds every figure taken from them. A record identifier such as R001 names one original record, and its fingerprint lets anyone who later holds that record check that it has the same bytes. A record fingerprint is not the fingerprint of the source file under test; retain both when completing future work.
+Start with the method and the test-quality rules, then find a task and source file in the campaign table. The original run records are not available with this repository; this document holds every figure taken from them. A record identifier such as R001 names one original record, and its fingerprint lets anyone who later holds that record check that it has the same bytes. A record fingerprint is not the fingerprint of the source file under test; retain both when completing future work.
 
 The meanings of the outcome columns are:
 
@@ -83,7 +83,7 @@ For a new test, prove both sides: it fails on the exact deliberate change and pa
 
 A campaign closes only on the version that merges. If production code, test behavior or a relied-on contract changes, repeat the affected campaign on the final version. An earlier successful run remains historical evidence and does not close a different source fingerprint. A shared file changed by several tasks needs a campaign on the version containing their combined changes.
 
-The earlier rule for stopping a superseded run required all of the following: the replacing change had passed an execution check in the environment where it would run and was approved; the affected module was measured again immediately on that replacement; and readable per-module counts and the killed, survived and timed-out identities were preserved before stopping. All other work was allowed to finish, except for a safety or quality failure or a hung run with no output. An earlier stop that did not meet those conditions does not establish closure. The owner's later postponement explicitly authorised the remaining stops after partial records were saved; it did not transform those partial results into completed campaigns.
+The earlier rule for stopping a superseded run required all of the following: the replacing change had passed an execution check in the environment where it would run and was approved; the affected module was measured again immediately on that replacement; and readable per-module counts and the killed, survived and timed-out identities were preserved before stopping. All other work was allowed to finish, except for a safety or quality failure or a hung run with no output. An earlier stop that did not meet those conditions does not establish closure. The postponement recorded in decision 0055 explicitly authorised the remaining stops after partial records were saved; it did not transform those partial results into completed campaigns.
 
 Stop a changed test run that exceeds a fixed time allowance and record it as timed out. Keep the exact alteration and repeat it alone at normal load before interpreting the outcome. Preserve the allowance, the intended change set and test selection; changing them to obtain a better result destroys comparability. Record any resource exhaustion separately from behavior detected by a test. Bound process growth and terminate the whole affected process family when containment fails; an infrastructure termination is not a kill or survival.
 
@@ -180,21 +180,21 @@ An equivalence reason must cover every reachable caller and branch, including re
 OI-M16 and OI-M17 are identifiers local to this document for the issues recorded in R112; they are not the repository register’s items.
 
 - The **OI-M16** is an unexplained operating-system failure in the unmodified tests of the pinned-page campaign. Temporary storage exhaustion during overlapping work was a proposed cause, but the actual error number was not captured. It remains open. A later successful run does not explain or close it. Record the error number, storage state and overlap on a reproducible failing case before deciding the cause.
-- The **OI-M17** is loss of exact timeout identities when temporary changed source was removed. Some complete campaign records contain timeout counts without the alterations needed to repeat them. Preserve the exact text and stable identity of every timed-out change in future records, and recover missing changes before claiming that the old repeats were completed.
+- The **OI-M17** is loss of exact timeout identities when temporary changed source was removed. Some complete campaign records contain timeout counts without the alterations needed to repeat them. Preserve the exact text and stable identity of every timed-out change in future records. Section 9 identifies each affected record and module; their missing historical identities cannot be recovered from this repository. After the deferral, run fresh campaigns of those modules on the current merged source and treat their results as new evidence, without claiming to reproduce the old changes or complete their old repeats.
 - The repository's [OI-16 — Activity-mapping sign-off](../OPEN_ITEMS.md#oi-16--activity-mapping-sign-off) concerns who may approve activity mappings and whether batch approval is permitted. It is a separate unresolved decision. Until decided, no new mapping is admitted merely because its tests pass.
 - The repository's [OI-17 — Gateway measurement panel](../OPEN_ITEMS.md#oi-17--gateway-measurement-panel) concerns whether internal measurement scores are shown to visitors. Keep the current absence of a panel until that presentation decision is made. Internal scores must not be mistaken for product evidence or calibrated confidence.
 - A hostile in-process key object with stateful equality, or a sequence object that compares equal to empty, could bypass assumptions in `build_project_evidence` in `custodian/src/eii_custodian/publicdata/investment_evidence.py`. R112 reports this as a hardening question rather than a demonstrated external-input defect. At `81e62db`, `build_cache_evidence` passes parsed archive rows in tuple containers, and `audit_project_evidence` passes canonical snapshots to the same function; these caller paths can be checked in that tracked file. Recheck the callers in the eventual source and decide whether to enforce plain values at the boundary. Earlier proposed equivalence reasons must not omit such reachable inputs.
-- The status rows identify exactly which explanation revisions resolve and which remain unknown. Reconcile unknown source versions and final task changes before treating a historical survivor as new work. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) defers mutation work until after go live while preserving ordinary checks; the owner accepted its written record on 2026-11-18. Empty investigation returns and missing per-change evidence must remain explicit gaps.
+- The status rows identify exactly which explanation revisions resolve and which remain unknown. Check final task changes against the record-specific limits in section 9; a missing execution version stays unknown, and a fresh campaign supplies new evidence only. [Decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) defers mutation work until after go live while preserving ordinary checks; its written record was accepted on 2026-11-18. Empty investigation returns and missing per-change evidence must remain explicit gaps.
 
 After go live, and only if the team accepts the deferred work, take it in this order:
 
-1. Establish the source version actually merged. Inventory all affected numerical, refusal and provenance code, including shared files and browser-facing modules not yet measured. Recover final tests, written reasons, full commit identities and file fingerprints. Read the decision amendment and reconcile any task-status changes made with it.
+1. Establish the source version actually merged. Inventory all affected numerical, refusal and provenance code, including shared files and browser-facing modules not yet measured. Read the merged tests and written reasons, and record the merged full commit identities and file fingerprints. Where a historical execution identity is missing, use the record-specific limits in section 9; do not infer that identity from the merged source. Read the decision amendment and reconcile any task-status changes made with it.
 2. Verify the recorded production repairs above in that source and preserve a failing reproducer and passing repair test for each. Resolve any confirmed wrong result or wrong refusal that remains; keep these separate from missing-test investigations.
 3. Repair the test environment and test validity first. Apply C1 through C7 to existing tests, resolve the unexplained operating-system failure, isolate certificate trust, prove source selection, and prevent inherited-lock hangs. Preserve unsuccessful evidence while doing so.
-4. Recover the exact alterations for the incomplete page-source and registry campaigns and for unidentified timeouts. Use the partial-function register below as an index to missing changes, not as a substitute for their text. The last page-source run did not finish all enumerated changes. The archive module with no generated changes needs explicit behavior tests and a coverage assessment; an empty result cannot qualify it.
+4. R044 lacks the exact alterations for the final partial page-source campaign, R104 lacks the original and changed lines for its partial fetch-validation and preparation work and the exact timed-out changes in its registry work, and R108 lacks the exact alterations for its partial registry campaign; these missing identities cannot be recovered from this repository. The timeout and execution-identity gaps for other records are listed separately in section 9. After the deferral, run a fresh campaign of each affected module on the current merged source, retaining its complete changes and identities as new evidence without claiming to reproduce the old changes. Use the partial-function register only to locate areas to inspect; its suffixes cannot reconstruct an alteration. The last page-source run did not finish all enumerated changes. The archive module with no generated changes needs explicit behavior tests and a coverage assessment; an empty result cannot qualify it.
 5. Reconcile shared public-build work across its tasks. A measurement of an earlier build file does not cover later task additions. Establish complete measurement coverage of the combined source before declaring that family finished. Review unmeasured browser-facing source as part of the inventory rather than assuming the earlier page experiment covered it.
 6. Work through unmatched changes from the latest measurements below. Investigate actual output, refusal and provenance effects first. Prove each distinguishing test on the precise alteration, or write a complete equivalence reason. Historical proposals can guide investigation, but become accepted explanations only after exact matching and checking their contracts on the current version.
-7. Repeat timed-out changes individually at normal load, keeping their identity, allowance, outcome and cause. Resolve changes not covered and changes not run. Then complete each affected module's campaign on the final version containing all accepted changes.
+7. Repeat newly recorded timed-out changes individually at normal load, keeping their identity, allowance, outcome and cause. Historical timeouts whose exact identities are missing remain unresolved; follow section 9’s fresh-campaign procedures without claiming to repeat those old changes. Resolve changes not covered and changes not run. Then complete each affected module's campaign on the final version containing all accepted changes.
 8. Preserve the resulting evidence and accepted dispositions together with that final source version. Compare the recorded identities with the merged identities. Any intervening code or relevant test change reopens the affected measurement.
 
 Sources: [repository open items](../OPEN_ITEMS.md), R112 for the distinct run-local issues and caller-boundary investigation, and R043 and R108 for the partial results. The order above is a proposed work sequence; it makes no duration estimate.
@@ -212,7 +212,7 @@ A module is finished only when all the following can be checked from its retaine
 - Confirmed production defects have separately verified repairs. A test that merely reproduces a wrong result is not a repair.
 - The dispositions, their evidence and the final source identities are confirmed independently before a module counts as finished. Superseded records remain available and clearly marked.
 
-These are completion criteria for deferred mutation work. They do not reinstate a pre-launch wait that the owner removed.
+These are completion criteria for deferred mutation work. They do not reinstate the pre-launch wait removed by decision 0055.
 
 ## 8. Measurement limits and risks
 
@@ -238,7 +238,7 @@ The tables retain every campaign and module status row, including failed starts 
 
 ### Evidence inventory
 
-Each record is one file of the retained evidence folder, named in the second column; its SHA-256 fingerprint identifies the exact bytes read. Where a file name carries the name of a working role, that word is shown as [role]; a language implementation word in a record filename is shown as [language]. Several records can be campaigns read from the same file.
+Each record identifies a historical input file; the second column gives its filename as an identifier only, not a retrieval location. Its SHA-256 fingerprint identifies the exact bytes read. Where a file name carries the name of a working role, that word is shown as [role]; a language implementation word in a record filename is shown as [language]. Several records can be campaigns read from the same file.
 
 | Record | Input file | SHA-256 |
 | --- | --- | --- |
@@ -645,7 +645,7 @@ Unknown is missing evidence. Not compared means survivor text is absent. Explain
 | Exact unmatched change occurrences, latest measurement per task and file | 2072 |
 | Exact unmatched change occurrences, latest detailed measurement per file | 982 |
 | Detailed work-list change occurrences including earlier unmeasured code | 1063 |
-| Work-list changes requiring source recovery without item rows | 60 |
+| Work-list changes with unavailable original spans, without item rows | 60 |
 | Detailed work-list item rows | 1003 |
 | Survivors without comparable text, all recorded versions | 6015 |
 | Survivors without comparable text, latest measurements | 3027 |
@@ -814,136 +814,314 @@ Wall hours are elapsed campaign time, summed across runs, including overlap; the
 
 | Record | Source file | Survived | What is missing |
 |---|---|---|---|
-| R004 | evals/typed_decisions/requalify.py | 11 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/award_checks.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/awards.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | 18 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | 16 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_schema.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_shapes.py | 19 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_workbook.py | 39 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R104 | custodian/src/eii_custodian/publicdata/fetch/checks.py | 129 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R104 | custodian/src/eii_custodian/publicdata/fetch/kinds.py | 73 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R015 | custodian/src/eii_custodian/publicdata/places/fetch.py | 102 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R016 | custodian/src/eii_custodian/publicdata/places/fetch.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R060 | product/src/eii_product/tools/sector_facts.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R077 | custodian/src/eii_custodian/worldgen/employment/stock.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R077 | custodian/src/eii_custodian/worldgen/calibration/table.py | 7 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R077 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R078 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R080 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R079 | custodian/src/eii_custodian/worldgen/employment/stock.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R024 | custodian/src/eii_custodian/publicdata/additions/property_venues.py | 17 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R026 | custodian/src/eii_custodian/publicdata/baci/config.py | 97 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R026 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 86 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R026 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 54 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R026 | custodian/src/eii_custodian/publicdata/baci/parse.py | 134 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R028 | custodian/src/eii_custodian/publicdata/baci/config.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R028 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 8 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R028 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 17 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R028 | custodian/src/eii_custodian/publicdata/baci/parse.py | 6 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R029 | custodian/src/eii_custodian/publicdata/baci/config.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R029 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 8 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R029 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 4 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R029 | custodian/src/eii_custodian/publicdata/baci/parse.py | 6 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R054 | custodian/src/eii_custodian/publicdata/additions/split_policy.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R014 | custodian/src/eii_custodian/publicdata/series/figures.py | 159 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R014 | custodian/src/eii_custodian/publicdata/series/frame.py | 5 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R014 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | 15 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R030 | core/src/eii_core/calc/trade_reconciliation.py | 51 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R031 | custodian/src/eii_custodian/publicdata/fetch/cadence.py | 17 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R031 | custodian/src/eii_custodian/publicdata/fetch/snapshots.py | 65 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R031 | custodian/src/eii_custodian/publicdata/fetch/receipts.py | 32 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R032 | custodian/src/eii_custodian/publicdata/fetch/build.py | 362 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R032 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | 296 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R033 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | 50 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R062 | product/src/eii_product/assistant/accounting.py | 72 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R063 | product/src/eii_product/api/answers.py | 76 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R063 | product/src/eii_product/api/playbooks.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R063 | product/src/eii_product/ledger/local.py | 4 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R063 | product/src/eii_product/tools/areas.py | 8 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R063 | product/src/eii_product/assistant/catalogue/brief.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R064 | product/src/eii_product/assistant/accounting.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R068 | core/src/eii_core/calc/firms_per_tower.py | 45 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R069 | product/src/eii_product/register_file.py | 89 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R069 | product/src/eii_product/api/layers.py | 142 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R070 | product/src/eii_product/api/layers.py | 8 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R071 | product/src/eii_product/api/layers.py | 7 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R097 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 41 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R099 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R100 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 7 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R034 | custodian/src/eii_custodian/publicdata/fetch/partitions.py | 43 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R037 | custodian/src/eii_custodian/publicdata/fetch/build.py | 143 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R036 | custodian/src/eii_custodian/publicdata/fetch/listing.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R065 | product/src/eii_product/api/map_modes.py | 44 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R065 | product/src/eii_product/photoreal_tiles/limit.py | 47 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R065 | product/src/eii_product/photoreal_tiles/proxy.py | 44 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R067 | product/src/eii_product/api/map_modes.py | 6 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R067 | product/src/eii_product/photoreal_tiles/limit.py | 5 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R067 | product/src/eii_product/photoreal_tiles/proxy.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R091 | custodian/src/eii_custodian/worldgen/employment/gender.py | 37 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R091 | custodian/src/eii_custodian/worldgen/employment/stock.py | 34 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R091 | custodian/src/eii_custodian/conformance/rules_employment.py | 247 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R091 | custodian/src/eii_custodian/conformance/coverage_check.py | 161 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R091 | custodian/src/eii_custodian/conformance/feed.py | 369 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R092 | custodian/src/eii_custodian/worldgen/employment/gender.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R092 | custodian/src/eii_custodian/worldgen/employment/stock.py | 17 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R093 | custodian/src/eii_custodian/conformance/rules_employment.py | 19 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R093 | custodian/src/eii_custodian/conformance/coverage_check.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R094 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | 24 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R095 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | 4 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R056 | custodian/src/eii_custodian/publicdata/property/bulletin.py | 28 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R056 | custodian/src/eii_custodian/publicdata/property/quarter.py | 31 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R056 | custodian/src/eii_custodian/publicdata/property/use_map.py | 4 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R056 | custodian/src/eii_custodian/publicdata/fetch/forecast_series.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R058 | custodian/src/eii_custodian/publicdata/singles/tenders.py | 196 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R058 | custodian/src/eii_custodian/publicdata/singles/dcool.py | 14 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R058 | custodian/src/eii_custodian/publicdata/singles/bank_credit.py | 26 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/series/figures.py | 75 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/series/support.py | 10 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/series/frame.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/series/parse.py | 36 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/places/integrate.py | 3 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/frame/build.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/frame/live.py | 11 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R001 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R002 | 9 modules (combined) (individual files not recorded) | 59 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R003 | custodian/src/eii_custodian/publicdata/series/figures.py | 38 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R003 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R114 | custodian/src/eii_custodian/publicdata/series/figures.py | 19 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R114 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R018 | custodian/src/eii_custodian/publicdata/completeness.py | 182 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R018 | custodian/src/eii_custodian/publicdata/draw.py | 24 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R018 | custodian/src/eii_custodian/publicdata/figures_review.py | 11 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R018 | custodian/src/eii_custodian/publicdata/gate_report.py | 82 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R083 | custodian/src/eii_custodian/linkage/wages.py | 6 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R083 | custodian/src/eii_custodian/linkage/dedup.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R083 | custodian/src/eii_custodian/linkage/assemble.py | 12 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R084 | custodian/src/eii_custodian/worldgen/wages/coverage.py | 7 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R084 | custodian/src/eii_custodian/worldgen/wages/levels.py | 84 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R084 | custodian/src/eii_custodian/worldgen/wages/reference.py | 163 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R085 | custodian/src/eii_custodian/linkage/wages.py | 1 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R085 | custodian/src/eii_custodian/linkage/dedup.py | 2 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R085 | custodian/src/eii_custodian/linkage/assemble.py | 9 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R085 | custodian/src/eii_custodian/worldgen/wages/levels.py | 4 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R085 | custodian/src/eii_custodian/worldgen/wages/reference.py | 5 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R074 | custodian/src/eii_custodian/conformance/readers.py | 35 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R074 | custodian/src/eii_custodian/conformance/release.py | 508 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R074 | custodian/src/eii_custodian/conformance/feed.py | 362 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R075 | custodian/src/eii_custodian/conformance/readers.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R075 | custodian/src/eii_custodian/conformance/feed.py | 35 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R076 | custodian/src/eii_custodian/conformance/readers.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R076 | custodian/src/eii_custodian/conformance/feed.py | 31 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R010 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | 3 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R009 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | 3 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
-| R112 | custodian/src/eii_custodian/publicdata/fetch/registry.py | 13 | Original and changed lines absent; recover the exact change before deciding a test or equivalence |
+| R004 | evals/typed_decisions/requalify.py | 11 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/award_checks.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/awards.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | 18 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | 16 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_schema.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_shapes.py | 19 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_workbook.py | 39 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R104 | custodian/src/eii_custodian/publicdata/fetch/checks.py | 129 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R104 | custodian/src/eii_custodian/publicdata/fetch/kinds.py | 73 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R015 | custodian/src/eii_custodian/publicdata/places/fetch.py | 102 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R016 | custodian/src/eii_custodian/publicdata/places/fetch.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R060 | product/src/eii_product/tools/sector_facts.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/employment/stock.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/calibration/table.py | 7 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R078 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R080 | custodian/src/eii_custodian/worldgen/employment/allocation.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R079 | custodian/src/eii_custodian/worldgen/employment/stock.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R024 | custodian/src/eii_custodian/publicdata/additions/property_venues.py | 17 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/config.py | 97 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 86 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 54 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/parse.py | 134 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/config.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 8 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 17 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/parse.py | 6 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/config.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/contracts.py | 8 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/fetch.py | 4 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/parse.py | 6 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R054 | custodian/src/eii_custodian/publicdata/additions/split_policy.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/series/figures.py | 159 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/series/frame.py | 5 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | 15 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R030 | core/src/eii_core/calc/trade_reconciliation.py | 51 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/cadence.py | 17 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/snapshots.py | 65 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/receipts.py | 32 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R032 | custodian/src/eii_custodian/publicdata/fetch/build.py | 362 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R032 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | 296 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R033 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | 50 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R062 | product/src/eii_product/assistant/accounting.py | 72 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/api/answers.py | 76 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/api/playbooks.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/ledger/local.py | 4 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/tools/areas.py | 8 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/assistant/catalogue/brief.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R064 | product/src/eii_product/assistant/accounting.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R068 | core/src/eii_core/calc/firms_per_tower.py | 45 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R069 | product/src/eii_product/register_file.py | 89 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R069 | product/src/eii_product/api/layers.py | 142 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R070 | product/src/eii_product/api/layers.py | 8 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R071 | product/src/eii_product/api/layers.py | 7 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R097 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 41 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R099 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R100 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | 7 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R034 | custodian/src/eii_custodian/publicdata/fetch/partitions.py | 43 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R037 | custodian/src/eii_custodian/publicdata/fetch/build.py | 143 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R036 | custodian/src/eii_custodian/publicdata/fetch/listing.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/api/map_modes.py | 44 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/photoreal_tiles/limit.py | 47 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/photoreal_tiles/proxy.py | 44 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R067 | product/src/eii_product/api/map_modes.py | 6 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R067 | product/src/eii_product/photoreal_tiles/limit.py | 5 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R067 | product/src/eii_product/photoreal_tiles/proxy.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/worldgen/employment/gender.py | 37 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/worldgen/employment/stock.py | 34 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/rules_employment.py | 247 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/coverage_check.py | 161 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/feed.py | 369 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R092 | custodian/src/eii_custodian/worldgen/employment/gender.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R092 | custodian/src/eii_custodian/worldgen/employment/stock.py | 17 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R093 | custodian/src/eii_custodian/conformance/rules_employment.py | 19 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R093 | custodian/src/eii_custodian/conformance/coverage_check.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R094 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | 24 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R095 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | 4 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/bulletin.py | 28 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/quarter.py | 31 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/use_map.py | 4 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/fetch/forecast_series.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/tenders.py | 196 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/dcool.py | 14 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/bank_credit.py | 26 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/figures.py | 75 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/support.py | 10 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/frame.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/parse.py | 36 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/places/integrate.py | 3 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/frame/build.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/frame/live.py | 11 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R002 | 9 modules (combined) (individual files not recorded) | 59 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R003 | custodian/src/eii_custodian/publicdata/series/figures.py | 38 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R003 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R114 | custodian/src/eii_custodian/publicdata/series/figures.py | 19 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R114 | custodian/src/eii_custodian/publicdata/stage.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/completeness.py | 182 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/draw.py | 24 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/figures_review.py | 11 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/gate_report.py | 82 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R083 | custodian/src/eii_custodian/linkage/wages.py | 6 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R083 | custodian/src/eii_custodian/linkage/dedup.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R083 | custodian/src/eii_custodian/linkage/assemble.py | 12 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/coverage.py | 7 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/levels.py | 84 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/reference.py | 163 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/wages.py | 1 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/dedup.py | 2 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/assemble.py | 9 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/worldgen/wages/levels.py | 4 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/worldgen/wages/reference.py | 5 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R074 | custodian/src/eii_custodian/conformance/readers.py | 35 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R074 | custodian/src/eii_custodian/conformance/release.py | 508 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R074 | custodian/src/eii_custodian/conformance/feed.py | 362 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R075 | custodian/src/eii_custodian/conformance/readers.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R075 | custodian/src/eii_custodian/conformance/feed.py | 35 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R076 | custodian/src/eii_custodian/conformance/readers.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R076 | custodian/src/eii_custodian/conformance/feed.py | 31 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R010 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | 3 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R009 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | 3 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+| R112 | custodian/src/eii_custodian/publicdata/fetch/registry.py | 13 | Original and changed lines absent; this missing identity cannot be recovered from this repository. After the deferral, run a fresh campaign of this module on the current merged source; retain new evidence without claiming to reproduce the old changes |
+
+### Missing historical identities
+
+Each row identifies a historical gap and its feasible next procedure; a new campaign does not complete or reproduce the unavailable historical changes. Where the historical file split is absent, establish the new scope from the task’s current merged files rather than inventing that split. If a named path is absent from the current merged source, identify its replacement within that task or record its retirement; measure a replacement as new scope rather than recreate a historical file.
+
+| Record | Source file / recorded scope | Missing historical identity | Feasible next procedure |
+|---|---|---|---|
+| R001 | custodian/src/eii_custodian/publicdata/frame/build.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/frame/live.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/places/integrate.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/figures.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/frame.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/parse.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/series/support.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R001 | custodian/src/eii_custodian/publicdata/stage.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R002 | 9 modules (combined) (individual files not recorded) | original and changed survivor text absent; individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R003 | custodian/src/eii_custodian/publicdata/series/figures.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R003 | custodian/src/eii_custodian/publicdata/stage.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R004 | evals/typed_decisions/requalify.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R005 | individual file not recorded | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R006 | custodian/src/eii_custodian/assignment_spike/assign.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | custodian/src/eii_custodian/assignment_spike/delay.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | custodian/src/eii_custodian/assignment_spike/inputs.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | custodian/src/eii_custodian/assignment_spike/params.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | custodian/src/eii_custodian/assignment_spike/paths.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | custodian/src/eii_custodian/assignment_spike/run.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R006 | product/src/eii_product/areas_spike/traffic.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R007 | web/spikes/performance/main.ts | execution version unrecorded; original spans and enclosing functions absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R007 | web/spikes/performance/server.mjs | execution version unrecorded; original spans and enclosing functions absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R008 | web/spikes/performance/server.mjs | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R009 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R010 | custodian/src/eii_custodian/publicdata/places_fsq/policy.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R011 | custodian/src/eii_custodian/publicdata/series/baskets.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R011 | custodian/src/eii_custodian/publicdata/series/figures.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R011 | custodian/src/eii_custodian/publicdata/series/reconcile.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R013 | core/src/eii_core/calc/public_series.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/frame/municipality_output.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/series/figures.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R014 | custodian/src/eii_custodian/publicdata/series/frame.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R015 | custodian/src/eii_custodian/publicdata/places/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R016 | custodian/src/eii_custodian/publicdata/places/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R017 | completeness, draw, figures_review, gate_report (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R018 | custodian/src/eii_custodian/publicdata/completeness.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/draw.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/figures_review.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R018 | custodian/src/eii_custodian/publicdata/gate_report.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R023 | custodian/src/eii_custodian/publicdata/additions/property_venues.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R024 | custodian/src/eii_custodian/publicdata/additions/property_venues.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R025 | custodian/src/eii_custodian/publicdata/fetch/build.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R025 | custodian/src/eii_custodian/publicdata/fetch/kinds.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R025 | custodian/src/eii_custodian/publicdata/fetch/registry.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/config.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/contracts.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R026 | custodian/src/eii_custodian/publicdata/baci/parse.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R027 | baci modules (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R028 | custodian/src/eii_custodian/publicdata/baci/config.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/contracts.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R028 | custodian/src/eii_custodian/publicdata/baci/parse.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/config.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/contracts.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R029 | custodian/src/eii_custodian/publicdata/baci/parse.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R030 | core/src/eii_core/calc/trade_reconciliation.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/cadence.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/receipts.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R031 | custodian/src/eii_custodian/publicdata/fetch/snapshots.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R032 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R032 | custodian/src/eii_custodian/publicdata/fetch/build.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R033 | custodian/src/eii_custodian/publicdata/comtrade/fetch.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R034 | custodian/src/eii_custodian/publicdata/fetch/partitions.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R036 | custodian/src/eii_custodian/publicdata/fetch/listing.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R037 | custodian/src/eii_custodian/publicdata/fetch/build.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R040 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R041 | custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R041 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R041 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/award_checks.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/awards.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_schema.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_shapes.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_workbook.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R054 | custodian/src/eii_custodian/publicdata/additions/split_policy.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R055 | heights read.py/match.py (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R056 | custodian/src/eii_custodian/publicdata/fetch/forecast_series.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/bulletin.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/quarter.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R056 | custodian/src/eii_custodian/publicdata/property/use_map.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/bank_credit.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/dcool.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R058 | custodian/src/eii_custodian/publicdata/singles/tenders.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R059 | not logged (individual files not recorded) | execution version unrecorded; complete exact timed-out alterations absent from this handoff; individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R060 | product/src/eii_product/tools/sector_facts.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R061 | product/src/eii_product/assistant/catalogue/directives.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R061 | product/src/eii_product/assistant/catalogue/entries.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R062 | product/src/eii_product/assistant/accounting.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R062 | product/src/eii_product/assistant/playbooks/registry.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/api/answers.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/api/playbooks.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/assistant/catalogue/brief.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/ledger/local.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R063 | product/src/eii_product/tools/areas.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R064 | product/src/eii_product/assistant/accounting.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/api/map_modes.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/photoreal_tiles/limit.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R065 | product/src/eii_product/photoreal_tiles/proxy.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R066 | map_modes, limit, proxy (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R067 | product/src/eii_product/api/map_modes.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R067 | product/src/eii_product/photoreal_tiles/limit.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R067 | product/src/eii_product/photoreal_tiles/proxy.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R068 | core/src/eii_core/calc/firms_per_tower.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R069 | product/src/eii_product/api/layers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R069 | product/src/eii_product/register_file.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R070 | product/src/eii_product/api/layers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R071 | product/src/eii_product/api/layers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R072 | readers, release, feed (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R073 | readers, release, feed (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R074 | custodian/src/eii_custodian/conformance/feed.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R074 | custodian/src/eii_custodian/conformance/readers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R074 | custodian/src/eii_custodian/conformance/release.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R075 | custodian/src/eii_custodian/conformance/feed.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R075 | custodian/src/eii_custodian/conformance/readers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R076 | custodian/src/eii_custodian/conformance/feed.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R076 | custodian/src/eii_custodian/conformance/readers.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/calibration/table.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/employment/allocation.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R077 | custodian/src/eii_custodian/worldgen/employment/stock.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R078 | custodian/src/eii_custodian/worldgen/employment/allocation.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R079 | custodian/src/eii_custodian/worldgen/employment/stock.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R080 | custodian/src/eii_custodian/worldgen/employment/allocation.py | original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R081 | linkage modules (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R082 | linkage modules (individual files not recorded) | individual source-file identities absent; these missing identities cannot be recovered from this repository | Establish new scope from the task's current merged files, then run fresh campaigns after the deferral; retain new evidence without claiming to reproduce the old changes or reconstruct the historical file split |
+| R083 | custodian/src/eii_custodian/linkage/assemble.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R083 | custodian/src/eii_custodian/linkage/dedup.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R083 | custodian/src/eii_custodian/linkage/wages.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/coverage.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/levels.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R084 | custodian/src/eii_custodian/worldgen/wages/reference.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/assemble.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/dedup.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/linkage/wages.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/worldgen/wages/levels.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R085 | custodian/src/eii_custodian/worldgen/wages/reference.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R087 | custodian/src/eii_custodian/mobility/visitors.py | execution version unrecorded; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R088 | custodian/src/eii_custodian/mobility/visitors.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R089 | custodian/src/eii_custodian/mobility/visitors.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/coverage_check.py | execution version unrecorded; original and changed survivor text absent; complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/feed.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/conformance/rules_employment.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/worldgen/employment/gender.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R091 | custodian/src/eii_custodian/worldgen/employment/stock.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R092 | custodian/src/eii_custodian/worldgen/employment/gender.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R092 | custodian/src/eii_custodian/worldgen/employment/stock.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R093 | custodian/src/eii_custodian/conformance/coverage_check.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R093 | custodian/src/eii_custodian/conformance/rules_employment.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R094 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R095 | custodian/src/eii_custodian/worldgen/adapters/employment_swap.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R097 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R098 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R099 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R100 | custodian/src/eii_custodian/worldgen/adapters/wage_swap.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R102 | custodian/src/eii_custodian/publicdata/fetch/build.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R104 | custodian/src/eii_custodian/publicdata/fetch/checks.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R104 | custodian/src/eii_custodian/publicdata/fetch/kinds.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R104 | custodian/src/eii_custodian/publicdata/fetch/registry.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R108 | custodian/src/eii_custodian/publicdata/fetch/registry.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R110 | custodian/src/eii_custodian/publicdata/baci/fetch.py | complete exact timed-out alterations absent from this handoff; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R112 | custodian/src/eii_custodian/publicdata/fetch/registry.py | execution version unrecorded; original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R114 | custodian/src/eii_custodian/publicdata/series/figures.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R114 | custodian/src/eii_custodian/publicdata/stage.py | original and changed survivor text absent; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R115 | custodian/src/eii_custodian/publicdata/review/activity.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
+| R115 | custodian/src/eii_custodian/publicdata/review/graph.py | execution version unrecorded; these missing identities cannot be recovered from this repository | Run a fresh campaign of this module on the current merged source after the deferral; retain new evidence without claiming to reproduce the old changes |
 
 ### Partial survivor register
 
-The recorded suffixes identify variants within each function; they do not encode the alteration. Every listed variant remains not compared. Recover its exact changed text before deciding whether a test is missing or the change is equivalent. For each function, exercise its valid control and its refusal or boundary case using the test-quality rules above.
+For R044, the recorded suffixes identify variants within each function but do not encode the alteration; the missing exact changed text cannot be recovered from this repository. Every listed variant remains not compared. Run fresh campaigns of the listed modules on the current merged source after the deferral and keep their results as new evidence without claiming to reproduce those R044 changes. Exercise each function with its valid control and its refusal or boundary case using the test-quality rules above.
 
 | Record | Source file | Function | Variants | Recorded variant suffixes | Disposition |
 |---|---|---|---|---|---|
@@ -980,7 +1158,7 @@ Item numbers belong to the stated record and file. Measured commits are checked 
 
 For R006, `custodian/src/eii_custodian/assignment_spike/assign.py` was read at current `origin/main` (`81e62db`).
 
-The execution commit for `custodian/src/eii_custodian/assignment_spike/assign.py` in R006 was not recorded; `81e62db` is comparison context only.
+The execution commit for `custodian/src/eii_custodian/assignment_spike/assign.py` in R006 was not recorded and cannot be recovered from this repository; `81e62db` is comparison context only, so assess this module with a fresh campaign on the current merged source after the deferral and treat its results as new evidence without claiming to reproduce the old changes.
 
 For R045, R050, R046, R048, `custodian/src/eii_custodian/publicdata/fetch/report.py` was read at current `origin/main` (`81e62db`).
 
@@ -1024,7 +1202,7 @@ The measured source `5106e3b` for `custodian/src/eii_custodian/publicdata/invest
 
 For R006, `product/src/eii_product/areas_spike/traffic.py` was read at current `origin/main` (`81e62db`).
 
-The execution commit for `product/src/eii_product/areas_spike/traffic.py` in R006 was not recorded; `81e62db` is comparison context only.
+The execution commit for `product/src/eii_product/areas_spike/traffic.py` in R006 was not recorded and cannot be recovered from this repository; `81e62db` is comparison context only, so assess this module with a fresh campaign on the current merged source after the deferral and treat its results as new evidence without claiming to reproduce the old changes.
 
 The column **Diff-relative line / recorded span** copies the original-side hunk start after `@@ -` in the recorded difference block, or the retained browser span start, without converting it to a source-file line; two different changes may both show 1 because each of their own hunks starts at 1.
 
@@ -1032,7 +1210,7 @@ The column **Diff-relative line / recorded span** copies the original-side hunk 
 
 Task coverage for `web/spikes/performance/main.ts`: S1-T18; latest measurement R007.
 
-R007 retains 60 unmatched changes for `web/spikes/performance/main.ts` without the original statements, enclosing functions or measured source identity. The replacement fragments alone cannot identify executable alterations, so no distinguishing test can be written from this document for those changes. Recover R007's exact measured source and commit, then bind every full original-and-changed statement to its enclosing function and retained span before investigating tests or equivalence; current `origin/main` (`81e62db`) supplies comparison context only.
+R007 retains 60 unmatched changes for `web/spikes/performance/main.ts` without the original statements, enclosing functions or measured source identity. The replacement fragments alone cannot identify executable alterations, so no distinguishing test can be written from this document for those changes. R007's missing measured source identity, original statements and enclosing functions cannot be recovered from this repository; run a fresh campaign of this module on the current merged source after the deferral and treat its results as new evidence without claiming to reproduce the old changes, while `origin/main` (`81e62db`) remains historical comparison context only.
 
 ### R007 — web/spikes/performance/server.mjs
 
@@ -1042,7 +1220,7 @@ The measured commit is unrecorded for R007; the description of `web/spikes/perfo
 
 #### R007 — enclosing function not retained
 
-R007 retains replacement locations but no original spans or enclosing functions for the local trace receiver. The fallback file separates `send`, `receiveTrace`, `serveStatic` and `handle`; bind every recorded location to the measured version before attributing a replacement to one of them. Items 1–4 remove or bypass response completion and request validation: recover the original statements, then require a same-origin valid trace to finish with the exact successful response and a wrong-origin trace to finish with `wrong-origin` and no stored trace. Items 5–16 erase response strings or fields; identify each original field and branch before requiring its literal status, content type, refusal value or saved path, since an empty replacement alone cannot tell which output was lost. Items 17–18 change a condition or erase a block near the later request handler; recover that condition and full block, then send the specific disallowed method and unknown-route cases it controls, requiring their exact refusal status and body. These are source-recovery tasks until the missing spans and handler identities are established; the fallback implementation is useful context but cannot certify R007's precise branch mapping.
+R007 retains replacement locations but no original spans or enclosing functions for the local trace receiver. The comparison file separates `send`, `receiveTrace`, `serveStatic` and `handle`, but R007’s missing original spans, enclosing-function mapping and execution identity cannot be recovered from this repository; run a fresh campaign of this module on the current merged source after the deferral and retain new evidence without claiming to reproduce R007’s old changes. Items 1–4 suggest removal or bypass of response completion and request validation, without identifying the original statements; for newly generated changes affecting these behaviours, require a same-origin valid trace to finish with the exact successful response and a wrong-origin trace to finish with `wrong-origin` and no stored trace. Items 5–16 erase response strings or fields; the missing original field and branch prevent historical replay, so assess newly generated changes against its literal status, content type, refusal value or saved path, since an empty replacement alone cannot tell which output was lost. Items 17–18 suggest a changed condition or erased block near the later request handler without identifying the original code; in the fresh campaign, test the specific disallowed method and unknown-route cases it controls, requiring their exact refusal status and body. These replacement rows remain historical identifiers only; comparison text cannot certify R007's precise branch mapping or substitute for the new campaign’s complete differences.
 
 Changes in R007:
 
@@ -1075,7 +1253,7 @@ The measured commit is unrecorded for R013; the description of `core/src/eii_cor
 
 #### R013 — rounded
 
-`rounded` formats an exact amount to the requested decimal places. Item 1 changes the coefficient passed to decimal quantisation; the original statement is present in comparison source `2ae067e`, while `81e62db` performs rational rounding explicitly. Recover the exact execution version and its decimal-context precision before treating this as a missing assertion: a quantisation operand with coefficient two can still specify exactly the same exponent, so the alteration may preserve every accepted result. Verify the admitted finite values, precision failures and rounding boundaries before writing that equivalence reason.
+`rounded` formats an exact amount to the requested decimal places. Item 1 changes the coefficient passed to decimal quantisation; the original statement is present in comparison source `2ae067e`, while `81e62db` performs rational rounding explicitly. R013’s execution identity and decimal-context precision cannot be recovered from this repository, so this historical alteration cannot establish a current missing assertion. A quantisation operand with coefficient two can specify the same exponent, which is a possible equivalence to investigate only if the current merged implementation still uses it; run a fresh campaign of this module after the deferral and retain its results as new evidence without claiming to reproduce R013’s old changes. For any newly generated counterpart, verify the admitted finite values, precision failures and rounding boundaries before writing an equivalence reason.
 
 Changes in R013:
 
@@ -1085,7 +1263,7 @@ Changes in R013:
 
 #### R013 — weighted_mean
 
-`weighted_mean` returns the worker total and wage mean; the current `81e62db` version accumulates rational values after validating nonnegative integral worker counts. Items 2–3 remove the explicit zero from the historical worker and wage-bill sums, respectively. The original sum statements occur in comparison source `2ae067e`, but that source is not proof of the unrecorded execution version; recover its decimal context first. For that version, compare an empty mapping's exact refusal and a single zero-count group with a positive-count control; equivalence needs a proof that the implicit integer zero and explicit decimal zero promote identically for every admitted group and do not change an empty-total refusal.
+`weighted_mean` returns the worker total and wage mean; the current `81e62db` version accumulates rational values after validating nonnegative integral worker counts. Items 2–3 remove the explicit zero from the historical worker and wage-bill sums, respectively. The original sum statements occur in comparison source `2ae067e`, but that source cannot supply the unrecorded execution version or decimal context, which cannot be recovered from this repository for R013. After the deferral, run a fresh campaign on the current merged implementation and treat its results as new evidence without claiming to reproduce those earlier changes. If a newly generated change removes an initial sum value, compare an empty mapping's exact refusal and a single zero-count group with a positive-count control; equivalence needs a proof that the implicit integer zero and explicit decimal zero promote identically for every admitted group and do not change an empty-total refusal.
 
 Changes in R013:
 
@@ -1137,6 +1315,8 @@ Changes in R101:
 
 `_comtrade_dispatch` routes a trade entry through an injected opener and copies its outcome into the build report. Items 6–23 corrupt the missing-opener failure: without an opener require code 1, the entry's source, `transport_uninjected`, expected `injected opener` and observed `absent`, and the corresponding failure line, with no request. Items 24–37 change forwarding or invert the success check; a valid invented descriptor must reach the real child fetch with the intended cache, fixed clock, sleeper, opener and slot reader. Items 38–61 damage the returned child refusal and its report; make that child refuse and compare every copied field with the child result. Items 62–68 alter the success report; require the exact entry key, digest and host returned by the successful child, followed by a null failure.
 
+The earlier notation `empty` meant deletion of the removed fragment: the recorded difference block had removed lines and no added lines, not an empty string or a literal identifier. Such rows now show the original and changed hunk, including the unchanged context with the fragment removed from the changed side; `<br>` separates displayed lines and character entities escape table syntax. The complete difference blocks below preserve the exact text for these entries: in `scripts/mutation_explained.toml`, `module` must be the full repository path in the file heading and `mutation` must equal the entire corresponding block, including its file headers, hunk header, leading spaces and newline separators, with no final newline; do not substitute either table cell or the former notation. Every such item here retains its complete block, so none of these deletion identities is unsettled.
+
 Changes in R101:
 
 | Item | Function | Diff-relative line / recorded span | Original | Changed to |
@@ -1179,10 +1359,10 @@ Changes in R101:
 | 41 | _comtrade_dispatch | 35 | `                traded.failure.check,` | `                None,` |
 | 42 | _comtrade_dispatch | 36 | `                traded.failure.check,` | `                None,` |
 | 43 | _comtrade_dispatch | 37 | `                traded.failure.endpoint_id,` | `                None,` |
-| 44 | _comtrade_dispatch | 33 | `                entry.key,` | `empty` |
-| 45 | _comtrade_dispatch | 34 | `                traded.failure.safe_url,` | `empty` |
-| 46 | _comtrade_dispatch | 36 | `                traded.failure.check,` | `empty` |
-| 47 | _comtrade_dispatch | 36 | `                traded.failure.check,` | `empty` |
+| 44 | _comtrade_dispatch | 33 | `    if traded.failure is not None:<br>        lines.append(<br>            fail_line(<br>                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.check,` | `    if traded.failure is not None:<br>        lines.append(<br>            fail_line(<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.check,` |
+| 45 | _comtrade_dispatch | 34 | `        lines.append(<br>            fail_line(<br>                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,` | `        lines.append(<br>            fail_line(<br>                entry.key,<br>                traded.failure.check,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,` |
+| 46 | _comtrade_dispatch | 36 | `                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,<br>            )<br>        )` | `                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,<br>            )<br>        )` |
+| 47 | _comtrade_dispatch | 36 | `                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,<br>            )<br>        )` | `                entry.key,<br>                traded.failure.safe_url,<br>                traded.failure.check,<br>                traded.failure.endpoint_id,<br>            )<br>        )` |
 | 48 | _comtrade_dispatch | 37 | `                traded.failure.endpoint_id,<br>            )` | `                )` |
 | 49 | _comtrade_dispatch | 41 | `            1,` | `            None,` |
 | 50 | _comtrade_dispatch | 42 | `            entry.source_id,` | `            None,` |
@@ -1190,11 +1370,11 @@ Changes in R101:
 | 52 | _comtrade_dispatch | 44 | `            traded.failure.check,` | `            None,` |
 | 53 | _comtrade_dispatch | 45 | `            traded.failure.check,` | `            None,` |
 | 54 | _comtrade_dispatch | 46 | `            traded.failure.endpoint_id,` | `            None,` |
-| 55 | _comtrade_dispatch | 41 | `            1,` | `empty` |
-| 56 | _comtrade_dispatch | 42 | `            entry.source_id,` | `empty` |
-| 57 | _comtrade_dispatch | 43 | `            traded.failure.safe_url,` | `empty` |
-| 58 | _comtrade_dispatch | 45 | `            traded.failure.check,` | `empty` |
-| 59 | _comtrade_dispatch | 45 | `            traded.failure.check,` | `empty` |
+| 55 | _comtrade_dispatch | 41 | `            )<br>        )<br>        return FetchFailure(<br>            1,<br>            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,` | `            )<br>        )<br>        return FetchFailure(<br>            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,` |
+| 56 | _comtrade_dispatch | 42 | `        )<br>        return FetchFailure(<br>            1,<br>            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.check,` | `        )<br>        return FetchFailure(<br>            1,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.check,` |
+| 57 | _comtrade_dispatch | 43 | `        return FetchFailure(<br>            1,<br>            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,` | `        return FetchFailure(<br>            1,<br>            entry.source_id,<br>            traded.failure.check,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,` |
+| 58 | _comtrade_dispatch | 45 | `            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,<br>        )<br>    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,<br>        )<br>    lines.append(pass_line(entry.key, traded.digest, traded.host))` |
+| 59 | _comtrade_dispatch | 45 | `            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,<br>        )<br>    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `            entry.source_id,<br>            traded.failure.safe_url,<br>            traded.failure.check,<br>            traded.failure.endpoint_id,<br>        )<br>    lines.append(pass_line(entry.key, traded.digest, traded.host))` |
 | 60 | _comtrade_dispatch | 46 | `            traded.failure.endpoint_id,<br>        )` | `            )` |
 | 61 | _comtrade_dispatch | 41 | `            1,` | `            2,` |
 | 62 | _comtrade_dispatch | 48 | `    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `    lines.append(None)` |
@@ -1204,6 +1384,141 @@ Changes in R101:
 | 66 | _comtrade_dispatch | 48 | `    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `    lines.append(pass_line(traded.digest, traded.host))` |
 | 67 | _comtrade_dispatch | 48 | `    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `    lines.append(pass_line(entry.key, traded.host))` |
 | 68 | _comtrade_dispatch | 48 | `    lines.append(pass_line(entry.key, traded.digest, traded.host))` | `    lines.append(pass_line(entry.key, traded.digest, ))` |
+
+##### R101 item 44 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -33,7 +33,6 @@
+     if traded.failure is not None:
+         lines.append(
+             fail_line(
+-                entry.key,
+                 traded.failure.safe_url,
+                 traded.failure.check,
+                 traded.failure.check,
+```
+
+##### R101 item 45 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -34,7 +34,6 @@
+         lines.append(
+             fail_line(
+                 entry.key,
+-                traded.failure.safe_url,
+                 traded.failure.check,
+                 traded.failure.check,
+                 traded.failure.endpoint_id,
+```
+
+##### R101 item 46 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -36,7 +36,6 @@
+                 entry.key,
+                 traded.failure.safe_url,
+                 traded.failure.check,
+-                traded.failure.check,
+                 traded.failure.endpoint_id,
+             )
+         )
+```
+
+##### R101 item 47 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -36,7 +36,6 @@
+                 entry.key,
+                 traded.failure.safe_url,
+                 traded.failure.check,
+-                traded.failure.check,
+                 traded.failure.endpoint_id,
+             )
+         )
+```
+
+##### R101 item 55 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -41,7 +41,6 @@
+             )
+         )
+         return FetchFailure(
+-            1,
+             entry.source_id,
+             traded.failure.safe_url,
+             traded.failure.check,
+```
+
+##### R101 item 56 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -42,7 +42,6 @@
+         )
+         return FetchFailure(
+             1,
+-            entry.source_id,
+             traded.failure.safe_url,
+             traded.failure.check,
+             traded.failure.check,
+```
+
+##### R101 item 57 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -43,7 +43,6 @@
+         return FetchFailure(
+             1,
+             entry.source_id,
+-            traded.failure.safe_url,
+             traded.failure.check,
+             traded.failure.check,
+             traded.failure.endpoint_id,
+```
+
+##### R101 item 58 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -45,7 +45,6 @@
+             entry.source_id,
+             traded.failure.safe_url,
+             traded.failure.check,
+-            traded.failure.check,
+             traded.failure.endpoint_id,
+         )
+     lines.append(pass_line(entry.key, traded.digest, traded.host))
+```
+
+##### R101 item 59 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -45,7 +45,6 @@
+             entry.source_id,
+             traded.failure.safe_url,
+             traded.failure.check,
+-            traded.failure.check,
+             traded.failure.endpoint_id,
+         )
+     lines.append(pass_line(entry.key, traded.digest, traded.host))
+```
 
 #### R101 — utc_now
 
@@ -1263,17 +1578,92 @@ Changes in R101:
 | 98 | _fetch_row | 98 | `                response.body,` | `                None,` |
 | 99 | _fetch_row | 99 | `                retrieved,` | `                None,` |
 | 100 | _fetch_row | 100 | `                response.final_url,` | `                None,` |
-| 101 | _fetch_row | 95 | `                entry,` | `empty` |
-| 102 | _fetch_row | 96 | `                cache / entry.key,` | `empty` |
-| 103 | _fetch_row | 97 | `                "inputs",` | `empty` |
-| 104 | _fetch_row | 98 | `                response.body,` | `empty` |
-| 105 | _fetch_row | 99 | `                retrieved,` | `empty` |
+| 101 | _fetch_row | 95 | `        )<br>        for response in prepared.auxiliary:<br>            archive_auxiliary(<br>                entry,<br>                cache / entry.key,<br>                "inputs",<br>                response.body,` | `        )<br>        for response in prepared.auxiliary:<br>            archive_auxiliary(<br>                cache / entry.key,<br>                "inputs",<br>                response.body,` |
+| 102 | _fetch_row | 96 | `        for response in prepared.auxiliary:<br>            archive_auxiliary(<br>                entry,<br>                cache / entry.key,<br>                "inputs",<br>                response.body,<br>                retrieved,` | `        for response in prepared.auxiliary:<br>            archive_auxiliary(<br>                entry,<br>                "inputs",<br>                response.body,<br>                retrieved,` |
+| 103 | _fetch_row | 97 | `            archive_auxiliary(<br>                entry,<br>                cache / entry.key,<br>                "inputs",<br>                response.body,<br>                retrieved,<br>                response.final_url,` | `            archive_auxiliary(<br>                entry,<br>                cache / entry.key,<br>                response.body,<br>                retrieved,<br>                response.final_url,` |
+| 104 | _fetch_row | 98 | `                entry,<br>                cache / entry.key,<br>                "inputs",<br>                response.body,<br>                retrieved,<br>                response.final_url,<br>            )` | `                entry,<br>                cache / entry.key,<br>                "inputs",<br>                retrieved,<br>                response.final_url,<br>            )` |
+| 105 | _fetch_row | 99 | `                cache / entry.key,<br>                "inputs",<br>                response.body,<br>                retrieved,<br>                response.final_url,<br>            )<br>    except (OSError, ValueError):` | `                cache / entry.key,<br>                "inputs",<br>                response.body,<br>                response.final_url,<br>            )<br>    except (OSError, ValueError):` |
 | 106 | _fetch_row | 100 | `                response.final_url,<br>            )` | `                )` |
 | 107 | _fetch_row | 97 | `                "inputs",` | `                "XXinputsXX",` |
 | 108 | _fetch_row | 97 | `                "inputs",` | `                "INPUTS",` |
 | 109 | _fetch_row | 104 | `            1,` | `            None,` |
 | 110 | _fetch_row | 106 | `            stored_url,` | `            None,` |
 | 111 | _fetch_row | 104 | `            1,` | `            2,` |
+
+##### R101 item 101 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -95,7 +95,6 @@
+         )
+         for response in prepared.auxiliary:
+             archive_auxiliary(
+-                entry,
+                 cache / entry.key,
+                 "inputs",
+                 response.body,
+```
+
+##### R101 item 102 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -96,7 +96,6 @@
+         for response in prepared.auxiliary:
+             archive_auxiliary(
+                 entry,
+-                cache / entry.key,
+                 "inputs",
+                 response.body,
+                 retrieved,
+```
+
+##### R101 item 103 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -97,7 +97,6 @@
+             archive_auxiliary(
+                 entry,
+                 cache / entry.key,
+-                "inputs",
+                 response.body,
+                 retrieved,
+                 response.final_url,
+```
+
+##### R101 item 104 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -98,7 +98,6 @@
+                 entry,
+                 cache / entry.key,
+                 "inputs",
+-                response.body,
+                 retrieved,
+                 response.final_url,
+             )
+```
+
+##### R101 item 105 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -99,7 +99,6 @@
+                 cache / entry.key,
+                 "inputs",
+                 response.body,
+-                retrieved,
+                 response.final_url,
+             )
+     except (OSError, ValueError):
+```
 
 #### R101 — run_build
 
@@ -1858,11 +2248,11 @@ Changes in R045:
 | 39 | _archive_investment_attempts | 72 | `            "evidence_audit_incomplete",` | `            None,` |
 | 40 | _archive_investment_attempts | 73 | `            "archived attempt evidence",` | `            None,` |
 | 41 | _archive_investment_attempts | 74 | `            "write or verification failed",` | `            None,` |
-| 42 | _archive_investment_attempts | 69 | `            1,` | `empty` |
-| 43 | _archive_investment_attempts | 70 | `            "investment_evidence",` | `empty` |
-| 44 | _archive_investment_attempts | 71 | `            "",` | `empty` |
-| 45 | _archive_investment_attempts | 72 | `            "evidence_audit_incomplete",` | `empty` |
-| 46 | _archive_investment_attempts | 73 | `            "archived attempt evidence",` | `empty` |
+| 42 | _archive_investment_attempts | 69 | `        )<br>    except (OSError, ValueError):<br>        audited = InvestmentFailure(<br>            1,<br>            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",` | `        )<br>    except (OSError, ValueError):<br>        audited = InvestmentFailure(<br>            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",` |
+| 43 | _archive_investment_attempts | 70 | `    except (OSError, ValueError):<br>        audited = InvestmentFailure(<br>            1,<br>            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",` | `    except (OSError, ValueError):<br>        audited = InvestmentFailure(<br>            1,<br>            "",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",` |
+| 44 | _archive_investment_attempts | 71 | `        audited = InvestmentFailure(<br>            1,<br>            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",<br>            "write or verification failed",` | `        audited = InvestmentFailure(<br>            1,<br>            "investment_evidence",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",<br>            "write or verification failed",` |
+| 45 | _archive_investment_attempts | 72 | `            1,<br>            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",<br>            "write or verification failed",<br>        )` | `            1,<br>            "investment_evidence",<br>            "",<br>            "archived attempt evidence",<br>            "write or verification failed",<br>        )` |
+| 46 | _archive_investment_attempts | 73 | `            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",<br>            "archived attempt evidence",<br>            "write or verification failed",<br>        )<br>    if isinstance(audited, InvestmentFailure):` | `            "investment_evidence",<br>            "",<br>            "evidence_audit_incomplete",<br>            "write or verification failed",<br>        )<br>    if isinstance(audited, InvestmentFailure):` |
 | 47 | _archive_investment_attempts | 74 | `            "write or verification failed",<br>        )` | `            )` |
 | 48 | _archive_investment_attempts | 69 | `            1,` | `            2,` |
 | 49 | _archive_investment_attempts | 70 | `            "investment_evidence",` | `            "XXinvestment_evidenceXX",` |
@@ -1880,10 +2270,10 @@ Changes in R045:
 | 61 | _archive_investment_attempts | 81 | `                audited.check,` | `                None,` |
 | 62 | _archive_investment_attempts | 82 | `                audited.expected,` | `                None,` |
 | 63 | _archive_investment_attempts | 83 | `                audited.observed,` | `                None,` |
-| 64 | _archive_investment_attempts | 79 | `                audited.source_id,` | `empty` |
-| 65 | _archive_investment_attempts | 80 | `                audited.url,` | `empty` |
-| 66 | _archive_investment_attempts | 81 | `                audited.check,` | `empty` |
-| 67 | _archive_investment_attempts | 82 | `                audited.expected,` | `empty` |
+| 64 | _archive_investment_attempts | 79 | `    if isinstance(audited, InvestmentFailure):<br>        lines.append(<br>            fail_line(<br>                audited.source_id,<br>                audited.url,<br>                audited.check,<br>                audited.expected,` | `    if isinstance(audited, InvestmentFailure):<br>        lines.append(<br>            fail_line(<br>                audited.url,<br>                audited.check,<br>                audited.expected,` |
+| 65 | _archive_investment_attempts | 80 | `        lines.append(<br>            fail_line(<br>                audited.source_id,<br>                audited.url,<br>                audited.check,<br>                audited.expected,<br>                audited.observed,` | `        lines.append(<br>            fail_line(<br>                audited.source_id,<br>                audited.check,<br>                audited.expected,<br>                audited.observed,` |
+| 66 | _archive_investment_attempts | 81 | `            fail_line(<br>                audited.source_id,<br>                audited.url,<br>                audited.check,<br>                audited.expected,<br>                audited.observed,<br>            )` | `            fail_line(<br>                audited.source_id,<br>                audited.url,<br>                audited.expected,<br>                audited.observed,<br>            )` |
+| 67 | _archive_investment_attempts | 82 | `                audited.source_id,<br>                audited.url,<br>                audited.check,<br>                audited.expected,<br>                audited.observed,<br>            )<br>        )` | `                audited.source_id,<br>                audited.url,<br>                audited.check,<br>                audited.observed,<br>            )<br>        )` |
 | 68 | _archive_investment_attempts | 83 | `                audited.observed,<br>            )` | `                )` |
 | 69 | _archive_investment_attempts | 87 | `            1,` | `            None,` |
 | 70 | _archive_investment_attempts | 88 | `            audited.source_id,` | `            None,` |
@@ -1891,13 +2281,223 @@ Changes in R045:
 | 72 | _archive_investment_attempts | 90 | `            audited.check,` | `            None,` |
 | 73 | _archive_investment_attempts | 91 | `            audited.expected,` | `            None,` |
 | 74 | _archive_investment_attempts | 92 | `            audited.observed,` | `            None,` |
-| 75 | _archive_investment_attempts | 87 | `            1,` | `empty` |
-| 76 | _archive_investment_attempts | 88 | `            audited.source_id,` | `empty` |
-| 77 | _archive_investment_attempts | 89 | `            audited.url,` | `empty` |
-| 78 | _archive_investment_attempts | 90 | `            audited.check,` | `empty` |
-| 79 | _archive_investment_attempts | 91 | `            audited.expected,` | `empty` |
+| 75 | _archive_investment_attempts | 87 | `            )<br>        )<br>        return FetchFailure(<br>            1,<br>            audited.source_id,<br>            audited.url,<br>            audited.check,` | `            )<br>        )<br>        return FetchFailure(<br>            audited.source_id,<br>            audited.url,<br>            audited.check,` |
+| 76 | _archive_investment_attempts | 88 | `        )<br>        return FetchFailure(<br>            1,<br>            audited.source_id,<br>            audited.url,<br>            audited.check,<br>            audited.expected,` | `        )<br>        return FetchFailure(<br>            1,<br>            audited.url,<br>            audited.check,<br>            audited.expected,` |
+| 77 | _archive_investment_attempts | 89 | `        return FetchFailure(<br>            1,<br>            audited.source_id,<br>            audited.url,<br>            audited.check,<br>            audited.expected,<br>            audited.observed,` | `        return FetchFailure(<br>            1,<br>            audited.source_id,<br>            audited.check,<br>            audited.expected,<br>            audited.observed,` |
+| 78 | _archive_investment_attempts | 90 | `            1,<br>            audited.source_id,<br>            audited.url,<br>            audited.check,<br>            audited.expected,<br>            audited.observed,<br>        )` | `            1,<br>            audited.source_id,<br>            audited.url,<br>            audited.expected,<br>            audited.observed,<br>        )` |
+| 79 | _archive_investment_attempts | 91 | `            audited.source_id,<br>            audited.url,<br>            audited.check,<br>            audited.expected,<br>            audited.observed,<br>        )<br>    registry_keys = frozenset(registration.key for registration in expected)` | `            audited.source_id,<br>            audited.url,<br>            audited.check,<br>            audited.observed,<br>        )<br>    registry_keys = frozenset(registration.key for registration in expected)` |
 | 80 | _archive_investment_attempts | 92 | `            audited.observed,<br>        )` | `            )` |
 | 81 | _archive_investment_attempts | 87 | `            1,` | `            2,` |
+
+##### R045 item 42 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -69,7 +69,6 @@
+         )
+     except (OSError, ValueError):
+         audited = InvestmentFailure(
+-            1,
+             "investment_evidence",
+             "",
+             "evidence_audit_incomplete",
+```
+
+##### R045 item 43 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -70,7 +70,6 @@
+     except (OSError, ValueError):
+         audited = InvestmentFailure(
+             1,
+-            "investment_evidence",
+             "",
+             "evidence_audit_incomplete",
+             "archived attempt evidence",
+```
+
+##### R045 item 44 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -71,7 +71,6 @@
+         audited = InvestmentFailure(
+             1,
+             "investment_evidence",
+-            "",
+             "evidence_audit_incomplete",
+             "archived attempt evidence",
+             "write or verification failed",
+```
+
+##### R045 item 45 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -72,7 +72,6 @@
+             1,
+             "investment_evidence",
+             "",
+-            "evidence_audit_incomplete",
+             "archived attempt evidence",
+             "write or verification failed",
+         )
+```
+
+##### R045 item 46 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -73,7 +73,6 @@
+             "investment_evidence",
+             "",
+             "evidence_audit_incomplete",
+-            "archived attempt evidence",
+             "write or verification failed",
+         )
+     if isinstance(audited, InvestmentFailure):
+```
+
+##### R045 item 64 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -79,7 +79,6 @@
+     if isinstance(audited, InvestmentFailure):
+         lines.append(
+             fail_line(
+-                audited.source_id,
+                 audited.url,
+                 audited.check,
+                 audited.expected,
+```
+
+##### R045 item 65 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -80,7 +80,6 @@
+         lines.append(
+             fail_line(
+                 audited.source_id,
+-                audited.url,
+                 audited.check,
+                 audited.expected,
+                 audited.observed,
+```
+
+##### R045 item 66 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -81,7 +81,6 @@
+             fail_line(
+                 audited.source_id,
+                 audited.url,
+-                audited.check,
+                 audited.expected,
+                 audited.observed,
+             )
+```
+
+##### R045 item 67 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -82,7 +82,6 @@
+                 audited.source_id,
+                 audited.url,
+                 audited.check,
+-                audited.expected,
+                 audited.observed,
+             )
+         )
+```
+
+##### R045 item 75 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -87,7 +87,6 @@
+             )
+         )
+         return FetchFailure(
+-            1,
+             audited.source_id,
+             audited.url,
+             audited.check,
+```
+
+##### R045 item 76 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -88,7 +88,6 @@
+         )
+         return FetchFailure(
+             1,
+-            audited.source_id,
+             audited.url,
+             audited.check,
+             audited.expected,
+```
+
+##### R045 item 77 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -89,7 +89,6 @@
+         return FetchFailure(
+             1,
+             audited.source_id,
+-            audited.url,
+             audited.check,
+             audited.expected,
+             audited.observed,
+```
+
+##### R045 item 78 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -90,7 +90,6 @@
+             1,
+             audited.source_id,
+             audited.url,
+-            audited.check,
+             audited.expected,
+             audited.observed,
+         )
+```
+
+##### R045 item 79 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/build.py
++++ src/eii_custodian/publicdata/fetch/build.py
+@@ -91,7 +91,6 @@
+             audited.source_id,
+             audited.url,
+             audited.check,
+-            audited.expected,
+             audited.observed,
+         )
+     registry_keys = frozenset(registration.key for registration in expected)
+```
 
 ### R105 — custodian/src/eii_custodian/publicdata/fetch/transport.py
 
@@ -1922,9 +2522,9 @@ Changes in R105:
 | 7 | open_https | 21 | `        token,` | `        None,` |
 | 8 | open_https | 22 | `        strict=reviewed_urls is not None,` | `        strict=None,` |
 | 9 | open_https | 23 | `        reviewed_urls=reviewed_urls,` | `        reviewed_urls=None,` |
-| 10 | open_https | 21 | `        token,` | `empty` |
-| 11 | open_https | 22 | `        strict=reviewed_urls is not None,` | `empty` |
-| 12 | open_https | 23 | `        reviewed_urls=reviewed_urls,` | `empty` |
+| 10 | open_https | 21 | `    hops: list[str] = []<br>    guard = _redirect_guard(<br>        hops,<br>        token,<br>        strict=reviewed_urls is not None,<br>        reviewed_urls=reviewed_urls,<br>        keyed_url=str(url) if keyed else None,` | `    hops: list[str] = []<br>    guard = _redirect_guard(<br>        hops,<br>        strict=reviewed_urls is not None,<br>        reviewed_urls=reviewed_urls,<br>        keyed_url=str(url) if keyed else None,` |
+| 11 | open_https | 22 | `    guard = _redirect_guard(<br>        hops,<br>        token,<br>        strict=reviewed_urls is not None,<br>        reviewed_urls=reviewed_urls,<br>        keyed_url=str(url) if keyed else None,<br>    )` | `    guard = _redirect_guard(<br>        hops,<br>        token,<br>        reviewed_urls=reviewed_urls,<br>        keyed_url=str(url) if keyed else None,<br>    )` |
+| 12 | open_https | 23 | `        hops,<br>        token,<br>        strict=reviewed_urls is not None,<br>        reviewed_urls=reviewed_urls,<br>        keyed_url=str(url) if keyed else None,<br>    )<br>    if ssl_context is None:` | `        hops,<br>        token,<br>        strict=reviewed_urls is not None,<br>        keyed_url=str(url) if keyed else None,<br>    )<br>    if ssl_context is None:` |
 | 13 | open_https | 22 | `        strict=reviewed_urls is not None,` | `        strict=reviewed_urls is None,` |
 | 14 | open_https | 24 | `        keyed_url=str(url) if keyed else None,` | `        keyed_url=str(None) if keyed else None,` |
 | 15 | open_https | 29 | `        opener = urllib.request.build_opener(<br>            guard, urllib.request.HTTPSHandler(context=ssl_context)<br>        )` | `        opener = None` |
@@ -1960,6 +2560,51 @@ Changes in R105:
 | 45 | open_https | 80 | `            body = json.dumps(_clean(json.loads(body))).encode()` | `            body = json.dumps(None).encode()` |
 | 46 | open_https | 80 | `            body = json.dumps(_clean(json.loads(body))).encode()` | `            body = json.dumps(_clean(None)).encode()` |
 | 47 | open_https | 83 | `        final, hops, etag = str(url), [], None` | `        final, hops, etag = str(None), [], None` |
+
+##### R105 item 10 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/transport.py
++++ src/eii_custodian/publicdata/fetch/transport.py
+@@ -21,7 +21,6 @@
+     hops: list[str] = []
+     guard = _redirect_guard(
+         hops,
+-        token,
+         strict=reviewed_urls is not None,
+         reviewed_urls=reviewed_urls,
+         keyed_url=str(url) if keyed else None,
+```
+
+##### R105 item 11 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/transport.py
++++ src/eii_custodian/publicdata/fetch/transport.py
+@@ -22,7 +22,6 @@
+     guard = _redirect_guard(
+         hops,
+         token,
+-        strict=reviewed_urls is not None,
+         reviewed_urls=reviewed_urls,
+         keyed_url=str(url) if keyed else None,
+     )
+```
+
+##### R105 item 12 — exact difference block
+
+```diff
+--- src/eii_custodian/publicdata/fetch/transport.py
++++ src/eii_custodian/publicdata/fetch/transport.py
+@@ -23,7 +23,6 @@
+         hops,
+         token,
+         strict=reviewed_urls is not None,
+-        reviewed_urls=reviewed_urls,
+         keyed_url=str(url) if keyed else None,
+     )
+     if ssl_context is None:
+```
 
 #### R105 — _redirect_guard
 
@@ -2478,7 +3123,7 @@ Task coverage for `custodian/src/eii_custodian/publicdata/fetch/registry.py`: ba
 
 R025: 119 earlier unmatched occurrences; see this file’s R108 work list; R108 is incomplete, so overlap and closure remain unproved.
 
-R108 retains no comparable original and changed lines for this file. Its outcome counts and named partial variants remain in section 9; recover each original span and enclosing function at the measured commit before choosing a test. Earlier text cannot establish the missing alteration identities.
+R108 retains no comparable original and changed lines for this file. Its outcome counts and named partial variants remain in section 9, but the missing original spans, changed text and enclosing-function identities cannot be recovered from this repository. Run a fresh campaign of this module on the current merged source after the deferral and retain its results as new evidence, without claiming to reproduce the old changes; earlier text cannot establish those missing identities.
 
 For R108, `custodian/src/eii_custodian/publicdata/fetch/registry.py` was read at measured commit `4432bc3`. `custodian/src/eii_custodian/publicdata/fetch/registry.py` was also read at current `origin/main` (`81e62db`) for the R108 comparison.
 
@@ -2487,4 +3132,4 @@ For R108, `custodian/src/eii_custodian/publicdata/fetch/registry.py` was read at
 
 Each status, count, cost and change row names its R-numbered original record; section 9 gives the fingerprints. The explanation comparison column identifies the commits read and the commit whose exact file-and-change entry matched. Unknown revisions and missing change text remain unresolved.
 
-Repository context: [Testing and Quality](12_TESTING_AND_QUALITY.md), [Task ledger](../TASKS.md), [Open items](../OPEN_ITEMS.md), [background-campaign decision](decisions/0052-mutation-campaigns-run-in-a-background-lane.md), and [decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md), which defers mutation work until after go live while preserving ordinary checks; the owner accepted its written record on 2026-11-18.
+Repository context: [Testing and Quality](12_TESTING_AND_QUALITY.md), [Task ledger](../TASKS.md), [Open items](../OPEN_ITEMS.md), [background-campaign decision](decisions/0052-mutation-campaigns-run-in-a-background-lane.md), and [decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md), which defers mutation work until after go live while preserving ordinary checks; its written record was accepted on 2026-11-18.
