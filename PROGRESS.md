@@ -34696,3 +34696,14 @@ Post-write checks:
 
 Closeout correction: appending the post-write results left a blank line at EOF; `git diff --check` exited 2 (log `diff-closeout-plant.log`, an unintentional formatting error despite the log label). This append-only closeout removes that EOF condition without rewriting earlier evidence.
 Final closeout `git diff --check`: exit 0; (no output); wall 0.021 s. The return is complete; independent review remains pending.
+
+## S2-T29 — correction, 2026-11-18: the two fix pass 10 confirmations
+
+The fix pass 10 section and the main-join section above name the pin-security confirmation and the lens T confirmation
+as pending. Both returned on 2026-11-18 on head `6aa8a39265b40f610e65f98831895a0a30d34506`; the earlier rows stay as
+written.
+
+| Date | Task and scope | Evidence | Maker and review |
+|---|---|---|---|
+| 2026-11-18 | Pin-security confirmation of fix pass 10 (L-935 F1 to F4) | Read-only review, tree clean before and after; verdict file of job S2-T29.pinsec2, exit 0, 424 s | Anthropic Claude Fable 5.2 (login C), another maker than the builder (OpenAI): APPROVED, no findings |
+| 2026-11-18 | Lens T confirmation 10 of fix pass 10 | Read-only review; verdict file of job S2-T29.cf10T, exit 0, 225 s | Moonshot AI Kimi K3.1 Pro (Droid), another maker than the builder: APPROVED, no findings |
