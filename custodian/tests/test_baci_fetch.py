@@ -386,9 +386,10 @@ def test_baci_dispatch_isolated(tmp_path):
     "field,value,reason",
     [
         ("publisher", "invented-other", "publisher"),
+        # A pending basis with a stale owner-decision record is a malformed
+        # record, not a pending state; the pending basis alone is planted below.
         ("licence_basis", "", "licence_basis"),
         ("terms_read_on", "2026-99-99", "terms_date"),
-        ("terms_words", "", "terms_metadata"),
         ("commit_allowed", True, "registry_policy"),
         ("nightly_live_fetch", False, "registry_policy"),
         ("row_count_min", 3, "raw_bounds"),
@@ -404,6 +405,29 @@ def test_baci_entry_plants(tmp_path, field, value, reason):
     result = build(tmp_path, source=replace(entry(), **{field: value}))
     assert result.failure.check == reason
     assert not result.manifests
+
+
+def test_baci_pending_terms_state_still_fetches_and_reads(tmp_path):
+    """Ruling L-1001: pending terms fields never refuse the fetch or the release."""
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.baci.contracts import read_selected
+
+    source = replace(
+        entry(),
+        terms_words="terms to be read",
+        terms_read_on="pending",
+        licence_basis="pending",
+        decision_record="",
+    )
+    result = build(tmp_path, source=source)
+    assert result.failure is None
+    assert result.manifests["cepii_baci"]
+    release = read_selected(tmp_path, result.manifests["cepii_baci"])
+    assert len(release.trade) == 3
+    assert release.manifest["receipt"]["terms_read_on"] == "pending"
+    assert release.manifest["receipt"]["licence_basis"] == "pending"
+    assert release.manifest["entry"]["terms_words"] == "terms to be read"
 
 
 def test_baci_empty_userinfo_rejected():

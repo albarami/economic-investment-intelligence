@@ -12,8 +12,13 @@ import yaml
 from eii_custodian.publicdata.fetch.cadence import Cadence, parse_cadence
 
 LICENCE_BASES = frozenset(
-    {"dataset", "portal_terms", "provider_terms", "owner_decision"}
+    {"dataset", "portal_terms", "provider_terms", "owner_decision", "pending"}
 )
+# Ruling L-1001: a pending terms reading is a record, never a gate. These are
+# the exact pending values the reader records; no other word is accepted.
+LICENCE_BASIS_PENDING = "pending"
+TERMS_READ_ON_PENDING = "pending"
+TERMS_WORDS_PENDING = "terms to be read"
 DECISION_RECORD = "0026"
 _DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
 _SKIP_LICENCE = "licen"
@@ -247,6 +252,11 @@ class Entry:
     skip_reason: str
     extension: str
     landing_url: str
+    # A blank terms_words loads as the unread-terms pending marker
+    # TERMS_WORDS_PENDING ("terms to be read"); a blank terms_read_on loads as
+    # the exact pending value TERMS_READ_ON_PENDING ("pending"). Ruling L-1001:
+    # both are records that hold no source back; only a malformed non-empty
+    # date or a row without a required field is refused.
     terms_words: str
     terms_read_on: str
     licence_url: str = ""
@@ -403,6 +413,11 @@ def _entry(row: object) -> Entry:
     layer = _layer(row, kind)
     comtrade_policy = _comtrade_policy(row, kind)
     basis = _text(row, "licence_basis")
+    if basis == "":
+        # Ruling L-1001: a missing basis of use is recorded as pending, never
+        # refused; only a row without the field is malformed. A pending basis is
+        # never committable and needs no decision record.
+        basis = LICENCE_BASIS_PENDING
     if basis not in LICENCE_BASES:
         raise RegistryError("unknown licence_basis")
     record = _text(row, "decision_record")
@@ -415,7 +430,7 @@ def _entry(row: object) -> Entry:
     if commit and basis != "dataset":
         raise RegistryError("cannot be committed")
     terms_words = _terms_words(row)
-    terms_read_on = _calendar_date(row, "terms_read_on")
+    terms_read_on = _terms_read_on(row)
     terms_watch = _terms_watch(row)
     basis_note = _basis_note(row)
     if terms_watch and basis_note.strip() == "":
@@ -649,11 +664,30 @@ def _basis_note(row: dict[object, object]) -> str:
 
 
 def _terms_words(row: dict[object, object]) -> str:
-    """Return the publisher's words, or the marker. Blank text is refused."""
+    """Return the publisher's words, or the unread-terms pending marker.
+
+    A blank value is the pending reading of ruling L-1001 and loads as
+    TERMS_WORDS_PENDING, the marker the registry already uses for unread
+    terms; a row without the field is refused as malformed.
+    """
     value = _text(row, "terms_words")
     if value.strip() == "":
-        raise RegistryError("terms_words is empty")
+        return TERMS_WORDS_PENDING
     return value
+
+
+def _terms_read_on(row: dict[object, object]) -> str:
+    """Return the reading date, or the exact pending value "pending".
+
+    A blank date is the pending reading of ruling L-1001 and loads as
+    TERMS_READ_ON_PENDING, and so does the marker itself when a stored
+    entry is read back; a non-empty date that is not a real YYYY-MM-DD
+    text date is a typing error and keeps its refusal.
+    """
+    value = _text(row, "terms_read_on")
+    if value.strip() == "" or value == TERMS_READ_ON_PENDING:
+        return TERMS_READ_ON_PENDING
+    return _calendar_date(row, "terms_read_on")
 
 
 def _calendar_date(row: dict[object, object], name: str) -> str:

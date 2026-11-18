@@ -119,6 +119,48 @@ def test_pending_gate_evidence_cannot_return_success(tmp_path: Path) -> None:
         require_complete(state.audit)
 
 
+def _complete_audit() -> dict[str, object]:
+    return {
+        "completeness": [{"state": "in use"}],
+        "terms": [{"own_words_state": "recorded"}],
+        "oi03": {"state": "recorded"},
+        "confirmations": [
+            {"task": task, "state": "recorded"}
+            for task in ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+        ],
+        "regressions": {"missing": [], "mismatch": ""},
+    }
+
+
+def test_pending_terms_rows_do_not_hold_back_a_complete_build() -> None:
+    """Ruling L-1001: every terms row pending, every other gate recorded, passes."""
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    audit = _complete_audit()
+    audit["terms"] = [
+        {"id": "invented-a", "own_words_state": "pending"},
+        {"id": "invented-b", "own_words_state": "pending"},
+    ]
+    require_complete(audit)
+
+
+def test_a_malformed_terms_list_is_still_refused() -> None:
+    """The terms list must stay present and well formed; only the state gate drops."""
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    for planted in (
+        [],
+        "invented",
+        [{"own_words_state": "invented"}],
+        [{"id": "invented-a"}],
+        ["invented"],
+    ):
+        audit = _complete_audit()
+        audit["terms"] = planted
+        with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+            require_complete(audit)
+
+
 def test_each_missing_or_pending_gate_is_refused() -> None:
     from eii_custodian.publicdata.assembly_reports import require_complete
 

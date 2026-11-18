@@ -51,6 +51,7 @@ from eii_custodian.publicdata.fetch.report import (
     coverage_line,
     evidence_line,
     fail_line,
+    licence_pending_line,
     pass_line,
     skip_line,
     terms_attempt_record,
@@ -158,6 +159,8 @@ class _Fetched:
     retrieved_utc: str
     terms_sha256: str
     terms_unread: str
+    # Ruling L-1001: the observed licence when it differs from the registry.
+    licence_pending: str = ""
 
 
 def _digest_pages(directory: Path) -> str:
@@ -325,6 +328,7 @@ def _fetch_row(
                 clock(),
                 prepared.terms_sha256,
                 prepared.terms_unread,
+                prepared.licence_pending,
             ),
             None,
         )
@@ -399,6 +403,7 @@ def _fetch_row(
             retrieved,
             prepared.terms_sha256,
             prepared.terms_unread,
+            prepared.licence_pending,
         ),
         None,
     )
@@ -993,6 +998,17 @@ def run_build(
                 FetchAttempt(entry.source_id, entry.key, "success", fetched.digest, "")
             )
         lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
+        if fetched.licence_pending:
+            # Ruling L-1001: the differing licence is recorded with the date
+            # read, pending a reviewer's record, and fails nothing.
+            lines.append(
+                licence_pending_line(
+                    entry.key,
+                    entry.licence_id,
+                    fetched.licence_pending,
+                    fetched.retrieved_utc,
+                )
+            )
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())

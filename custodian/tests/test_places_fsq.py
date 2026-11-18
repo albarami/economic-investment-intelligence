@@ -5,6 +5,7 @@ Fixtures are invented. No live response is read or stored.
 
 from __future__ import annotations
 
+import json
 import math
 import os
 import struct
@@ -181,10 +182,8 @@ def test_build_fetches_only_the_qatar_file_and_no_foreign_host(tmp_path: Path) -
     assert "planted-token-value" not in stored
 
 
-def test_foreign_redirect_login_and_changed_licence_store_nothing(
-    tmp_path: Path,
-) -> None:
-    """A hop off the list, a sign-in page and a different licence each refuse."""
+def test_foreign_redirect_or_login_demand_store_nothing(tmp_path: Path) -> None:
+    """A hop off the list and a sign-in page each refuse."""
     entry = _release_entry()
     foreign = _run(
         entry, tmp_path / "foreign", _README, hops=("https://evil.example/x",)
@@ -195,11 +194,45 @@ def test_foreign_redirect_login_and_changed_licence_store_nothing(
     login = _run(entry, tmp_path / "login", b"Please sign in to continue")
     assert login.failure is not None
     assert login.failure.check == "sign_in_demand"
-    changed = _run(entry, tmp_path / "licence", b"Proprietary terms only.")
-    assert changed.failure is not None
-    assert changed.failure.check == "licence_mismatch"
-    for folder in ("foreign", "login", "licence"):
+    for folder in ("foreign", "login"):
         assert not (tmp_path / folder / RELEASE_KEY / "manifest.json").exists()
+
+
+def test_a_licence_different_from_the_registry_is_recorded_pending(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1001 (PUB-97): a licence text that differs from the registry is
+    archived with its hash and the date read, pending a reviewer's record, and
+    the release completes."""
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    data = tmp_path / "near.parquet"
+    write_places(data, [place()])
+    actual = {**_NEAR, "longitude": (51.5, 51.5), "latitude": (25.3, 25.3)}
+    body = metadata_bytes((actual,), dataset_geo_bbox=(0.0, 0.0, 1.0, 1.0))
+    entry = _release_entry()
+
+    def transport(url: str) -> Response:
+        if url == entry.url:
+            return Response(final_url=url, body=body, hops=())
+        if url == entry.terms_url:
+            return Response(final_url=url, body=b"Proprietary terms only.", hops=())
+        return Response(final_url=url, body=data.read_bytes(), hops=())
+
+    os.environ["PLACES_FSQ_TOKEN"] = "planted-token-value"
+    try:
+        outcome = run_build((entry,), transport, tmp_path / "licence", _clock, _sleep)
+    finally:
+        del os.environ["PLACES_FSQ_TOKEN"]
+    assert outcome.failure is None
+    manifest = json.loads(
+        (tmp_path / "licence" / RELEASE_KEY / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert manifest["licence_review"] == "pending"
+    assert manifest["terms_sha256"] == terms_text_sha256(b"Proprietary terms only.")
+    assert manifest["retrieved_utc"] == _clock()
 
 
 def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_does(
@@ -634,10 +667,15 @@ def test_parser_refuses_wrong_types_and_a_geometry_that_is_not_a_swap(
     assert is_eligible(parse_file(outside)[0], FRAME_BOX, ()) is False
 
 
-def test_fetch_refuses_transport_faults_sign_in_and_a_partial_licence(
+def test_fetch_refuses_transport_faults_sign_in_and_unreadable_metadata(
     tmp_path: Path,
 ) -> None:
-    """A fault, a sign-in page and a licence missing one phrase each refuse."""
+    """A transport fault, a sign-in page and an unreadable summary each refuse.
+
+    Ruling L-1001 (PUB-97): a licence text that differs from the registry no
+    longer refuses the release; the pending record it leaves is proved by the
+    test that reads one to the end.
+    """
     entry = _release_entry()
     blocked = _fault(
         entry, tmp_path / "blocked", TransportFault("blocked_host", entry.url)
@@ -653,14 +691,6 @@ def test_fetch_refuses_transport_faults_sign_in_and_a_partial_licence(
     other = _run(entry, tmp_path / "other", _README, metadata=b"not a parquet file")
     assert other.failure is not None
     assert other.failure.check == "metadata_unreadable"
-    copyright_only = _run(entry, tmp_path / "copy", COPYRIGHT_LINE.encode())
-    assert copyright_only.failure is not None
-    assert copyright_only.failure.check == "licence_mismatch"
-    licence_only = _run(
-        entry, tmp_path / "lic", f"Licensed under the {LICENCE_NAME}.".encode()
-    )
-    assert licence_only.failure is not None
-    assert licence_only.failure.check == "licence_mismatch"
 
 
 def test_table_mapping_and_names_cover_the_remaining_plants(tmp_path: Path) -> None:

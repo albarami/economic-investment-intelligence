@@ -70,6 +70,9 @@ class Prepared:
     coverage_note: str = ""
     auxiliary: tuple[Response, ...] = ()
     requests: tuple[dict[str, object], ...] = ()
+    # Ruling L-1001: the observed licence when it differs from the registry
+    # licence id, recorded with the date read pending a reviewer's record.
+    licence_pending: str = ""
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
@@ -287,6 +290,7 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         saw_periods,
         coverage_note=coverage_note,
         requests=requests,
+        licence_pending=info.licence_pending,
     )
 
 
@@ -345,17 +349,13 @@ def portal_metadata(entry: Entry, meta: Response) -> Prepared:
             )
         licence = ""
         licence_url = ""
-    elif not _licence_matches(licence, licence_url, entry.licence_id):
-        return _failed(
-            entry,
-            AttemptFailure(
-                1,
-                meta.final_url,
-                "licence_mismatch",
-                _licence_expected(entry.licence_id),
-                _licence_observed(licence, licence_url),
-            ),
-        )
+    licence_pending = ""
+    if licence and not _licence_matches(licence, licence_url, entry.licence_id):
+        # Ruling L-1001 (decision 0059, PUB-09 and PUB-97): a licence different
+        # from the registry is recorded with the date read, pending a
+        # reviewer's record, and fails nothing. The receipt keeps the registry
+        # licence beside the observed one; the build log names the difference.
+        licence_pending = licence
     return Prepared(
         b"",
         entry.url,
@@ -367,6 +367,7 @@ def portal_metadata(entry: Entry, meta: Response) -> Prepared:
         None,
         portal_licence=licence,
         portal_licence_url=licence_url,
+        licence_pending=licence_pending,
     )
 
 

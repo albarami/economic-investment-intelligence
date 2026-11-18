@@ -248,12 +248,6 @@ def test_tender_handoff(fail, cached, tmp_path, monkeypatch):
             "Planted publisher",
             "",
         ),
-        (
-            _portal_meta("Planted publisher", licence="different"),
-            "licence_mismatch",
-            "text:invented-licence url:",
-            "text:different url:https://creativecommons.org/licenses/by/4.0/",
-        ),
     ],
 )
 def test_portal_metadata_coercion_and_other_licence(meta, check, expected, observed):
@@ -267,6 +261,18 @@ def test_portal_metadata_coercion_and_other_licence(meta, check, expected, obser
         expected,
         observed,
     )
+
+
+def test_other_licence_against_the_registry_is_recorded_pending():
+    """Ruling L-1001 (PUB-09): a licence different from the registry licence id
+    is recorded pending a reviewer's record and fails nothing."""
+    result = kinds.prepare(
+        portal(licence_id="invented-licence"),
+        transport(_portal_meta("Planted publisher", licence="different"), []),
+        _sleep,
+    )
+    assert result.failure is None
+    assert result.licence_pending == "different"
 
 
 def test_other_licence_and_whitespace_publisher():

@@ -63,14 +63,24 @@ def test_snapshot_metadata_and_lineage(tmp_path: Path) -> None:
     assert revision.correction.value is None
     assert revision.correction.absence_reason == "not_stated_by_source"
 
-    missing_terms = replace(
+    # Ruling L-1001 (S2-T30): a row with a cleared terms hash against a receipt
+    # that holds a reading is a substituted record and still fails.
+    substituted = replace(
         first,
         rows=({**first.rows[0], "terms_sha256": ""},),
     )
     assert (
-        getattr(build_project_evidence((missing_terms,)), "check", "")
-        == "missing_terms"
+        getattr(build_project_evidence((substituted,)), "check", "")
+        == "invalid_evidence_metadata"
     )
+    # A snapshot whose own recorded reading is pending retains its revision.
+    pending = _project_snapshot(
+        tmp_path, day="2026-11-16", capex="16.5", marker="pending", pending_terms=True
+    )
+    kept = build_project_evidence((pending,))
+    assert not hasattr(kept, "check")
+    assert len(kept.revisions) == 1
+    assert kept.revisions[0].checksum == pending.snapshot.sha256
     missing_method = replace(
         first,
         rows=({**first.rows[0], "method": ""},),
@@ -354,14 +364,17 @@ def test_reviewed_crosswalk_and_milestone_lineage(tmp_path: Path) -> None:
     )
     assert getattr(refused, "check", "") == "project_identity_unresolved"
 
-    missing_terms = replace(
+    # Ruling L-1001 (S2-T30): a pending terms reading in the source chain is
+    # recorded and never refuses the milestone; the value stays truthful.
+    pending_terms = replace(
         candidate,
         source_chain={**candidate.source_chain, "terms_sha256": ""},
     )
-    refused = evidence_module.require_independent_milestone(
-        missing_terms, direct_link, identities
+    kept = evidence_module.require_independent_milestone(
+        pending_terms, direct_link, identities
     )
-    assert getattr(refused, "check", "") == "missing_terms"
+    assert not hasattr(kept, "check")
+    assert kept.candidate.source_chain["terms_sha256"] == ""
     synthetic = replace(
         candidate,
         source_chain={**candidate.source_chain, "provenance": "synthetic"},
@@ -885,13 +898,16 @@ def _project_snapshot(
     capex: str,
     marker: str,
     records: tuple[dict[str, object], ...] | None = None,
+    pending_terms: bool = False,
 ) -> ProjectSnapshot:
     from custodian.tests.investment_fixtures import invented_record
 
     del marker
     if records is None:
         records = (invented_record(project_id=1001, capex=("n", capex)),)
-    identity = _archive_dashboard(root / "cache", day, records)
+    identity = _archive_dashboard(
+        root / "cache", day, records, pending_terms=pending_terms
+    )
     snapshot = read_snapshot(root / "cache" / "fdi_projects", identity)
     parsed = evidence_module._parse_project_snapshot(snapshot, coverage={})
     assert not hasattr(parsed, "check")
@@ -1727,7 +1743,11 @@ def test_assertion_precision_equals_parsed_granularity() -> None:
 
 
 def _archive_dashboard(
-    cache: Path, day: str, records: tuple[dict[str, object], ...]
+    cache: Path,
+    day: str,
+    records: tuple[dict[str, object], ...],
+    *,
+    pending_terms: bool = False,
 ) -> str:
     from custodian.tests.investment_fixtures import dashboard_page
 
@@ -1742,8 +1762,8 @@ def _archive_dashboard(
         "licence_id": "invented-public-terms",
         "licence_basis": "owner_decision",
         "decision_record": "invented-review",
-        "terms_sha256": "ab" * 32,
-        "terms_url": "https://terms.invalid/terms",
+        "terms_sha256": "" if pending_terms else "ab" * 32,
+        "terms_url": "" if pending_terms else "https://terms.invalid/terms",
         "method": "eii_custodian.publicdata.investment_parse.parse_fdi",
         "method_version": "1",
     }

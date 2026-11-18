@@ -71,7 +71,6 @@ def test_registry_sources_and_receipts():
 @pytest.mark.parametrize(
     "plant,reason",
     [
-        ("basis", "receipt_missing"),
         ("commit", "commit_refused"),
         ("columns", "schema_missing"),
         ("date", "snapshot_date_missing"),
@@ -85,8 +84,6 @@ def test_page_guards_before_publication(tmp_path, plant, reason):
     from eii_custodian.publicdata.fetch.page_records import PageError, fetch_page
 
     row, declaration, body = page_entry(), review(), BODY
-    if plant == "basis":
-        row = replace(row, licence_basis="")
     if plant == "commit":
         row = replace(row, commit_allowed=True)
     if plant == "columns":
@@ -112,6 +109,68 @@ def test_page_guards_before_publication(tmp_path, plant, reason):
             declaration=declaration,
         )
     assert not list(tmp_path.rglob("index/*.json"))
+
+
+def test_pending_basis_still_fetches_and_records(tmp_path):
+    """Ruling L-1001: a pending licence basis never refuses the page fetch."""
+    from eii_custodian.publicdata.fetch.page_records import fetch_page
+
+    row = replace(page_entry(), licence_basis="")
+    result = fetch_page(
+        row,
+        lambda url: Response(url, BODY, ()),
+        tmp_path,
+        lambda: STAMP,
+        lambda _: None,
+        declaration=review(),
+    )
+    payload = json.loads(result.body)
+    assert payload["rows"] == [{"syn_name": "SYN-item", "syn_count": 7}]
+    assert result.sidecar["licence_basis"] == ""
+
+
+def test_a_pending_basis_stays_in_use_and_is_refused_for_commit(tmp_path):
+    """Ruling L-1001 (S2-T29 criterion 1): a planted missing basis is recorded
+    with basis 'pending', stays in use and is refused for commit; the off-host
+    request and missing receipt plants still fail."""
+    from eii_custodian.publicdata import completeness as c
+    from eii_custodian.publicdata.fetch.page_records import PageError, fetch_page
+
+    row = replace(page_entry(), licence_basis="pending")
+    result = fetch_page(
+        row,
+        lambda url: Response(url, BODY, ()),
+        tmp_path,
+        lambda: STAMP,
+        lambda _: None,
+        declaration=review(),
+    )
+    assert json.loads(result.body)["rows"]
+    assert result.sidecar["licence_basis"] == "pending"
+    receipt = dict(result.sidecar, sha256=result.sha256, bytes=len(result.body))
+    assert c.in_use(row, {row.key: receipt}) is True
+    committed = replace(row, commit_allowed=True)
+    with pytest.raises(PageError, match="commit_refused"):
+        fetch_page(
+            committed,
+            lambda url: Response(url, BODY, ()),
+            tmp_path / "committed",
+            lambda: STAMP,
+            lambda _: None,
+            declaration=review(),
+        )
+    offhost = review()
+    offhost["url"] = "https://example.invalid/syn-page"
+    with pytest.raises(PageError, match="blocked_host"):
+        fetch_page(
+            row,
+            lambda url: Response(url, BODY, ()),
+            tmp_path / "offhost",
+            lambda: STAMP,
+            lambda _: None,
+            declaration=offhost,
+        )
+    assert not list((tmp_path / "offhost").rglob("index/*.json"))
 
 
 def test_page_snapshot_selected_history(tmp_path):

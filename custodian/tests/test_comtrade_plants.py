@@ -235,7 +235,7 @@ def test_policy_shape_plants() -> None:
 
 
 def test_fetch_status_echo_terms_and_signal(tmp_path: Path) -> None:
-    """Status, echo, empty terms and a foreign exhaustion signal each stop the run."""
+    """Status, echo and a foreign exhaustion signal stop; empty terms words do not."""
     sent: list[str] = []
 
     def http(_request: PreparedRequest) -> AttemptResult:
@@ -270,17 +270,26 @@ def test_fetch_status_echo_terms_and_signal(tmp_path: Path) -> None:
     assert echoed.failure.check == "provider_error"
     assert MARKER not in _stored(tmp_path / "echo")
 
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+
     terms = fetch_source(
         replace(invented_entry(_narrow()), terms_words=""),
         tmp_path / "terms",
         _clock,
         _sleep,
-        http,
+        lambda request: AttemptResult("ok", body_for(request)),
         SlotSecrets("primary-marker", ""),
     )
-    assert terms.failure is not None
-    assert terms.failure.check == "commit_forbidden"
-    assert sent == ["http", "echo"]
+    # Ruling L-1001: pending terms words never stop the run; every cell is asked.
+    assert terms.failure is None
+    assert terms.requested_cells == 2
+    assert terms.present_cells == 2
+    assert terms.gap_cells == 0
+    metas = sorted((tmp_path / "terms" / "un_comtrade").glob("*.meta.json"))
+    assert metas
+    for path in metas:
+        side = json.loads(path.read_text(encoding="utf-8"))
+        assert side["terms_sha256"] == sha256_hex(b"")
 
     signal_sent: list[str] = []
 

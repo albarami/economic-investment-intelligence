@@ -189,12 +189,10 @@ def entry_check(entry: Entry, policy: Policy) -> None:
             "native_schema",
         )
     require((entry.row_count_min, entry.row_count_max) == policy.raw_rows, "raw_bounds")
-    require(
-        bool(entry.licence_id)
-        and bool(entry.terms_words)
-        and bool(entry.terms_read_on),
-        "terms_metadata",
-    )
+    # Ruling L-1001: pending terms fields (words, reading date, blank or the
+    # pending value) are records and never refuse an entry; only a missing
+    # licence id still does.
+    require(bool(entry.licence_id), "licence_metadata")
 
 
 @dataclass(frozen=True)

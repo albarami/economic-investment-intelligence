@@ -256,8 +256,8 @@ def test_portal_records_the_host_that_served_the_file(tmp_path: Path) -> None:
     assert side["source_modified"] == "2026-08-04"
 
 
-def test_portal_publisher_or_licence_mismatch_stores_nothing(tmp_path: Path) -> None:
-    """A publisher or licence that is not the registered one stores nothing."""
+def test_portal_publisher_mismatch_stores_nothing(tmp_path: Path) -> None:
+    """A publisher that is not the registered one stores nothing (PUB-09)."""
     entry = replace(
         _entry(),
         kind="portal_dataset",
@@ -275,13 +275,33 @@ def test_portal_publisher_or_licence_mismatch_stores_nothing(tmp_path: Path) -> 
     assert failure.check == "publisher_mismatch"
     assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
 
+
+def test_portal_licence_different_from_the_registry_is_recorded_pending(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1001: a licence different from the registry is recorded with the
+    date read, pending a reviewer's record, and fails nothing (PUB-09, PUB-97)."""
+    entry = replace(
+        _entry(),
+        kind="portal_dataset",
+        extension="json",
+        url=PORTAL,
+        publisher="Kahramaa",
+    )
+
     def licence(url: str) -> Response:
         payload = {"metas": {"default": {"publisher": "Kahramaa", "license": "closed"}}}
         return _ok(url, json.dumps(payload).encode("utf-8"))
 
-    failure = fetch_entry(entry, licence, tmp_path, _clock, _sleep)
-    assert failure is not None
-    assert failure.check == "licence_mismatch"
+    assert fetch_entry(entry, licence, tmp_path, _clock, _sleep) is None
+    side = _sidecar(tmp_path)
+    # The registry licence stays, the observed licence is recorded beside it
+    # with the date read, and nothing is refused pending a reviewer's record.
+    assert side["licence_id"] == "CC-BY-4.0"
+    assert side["portal_licence"] == "closed"
+    assert side["retrieved_utc"] == "2026-11-13T08:00:00Z"
+    assert side["licence_basis"] == "dataset"
+    assert side["terms_words"] == entry.terms_words
 
 
 def test_missing_publisher_stores_nothing(tmp_path: Path) -> None:
@@ -416,8 +436,10 @@ def test_dataset_portal_without_a_licence_fails(tmp_path: Path) -> None:
     assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
 
 
-def test_owner_decision_portal_licence_mismatch_stores_nothing(tmp_path: Path) -> None:
-    """A licence the portal names, when it differs, fails for owner_decision too."""
+def test_owner_decision_portal_licence_difference_is_recorded_pending(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1001: a differing licence is recorded pending on every basis."""
     entry = replace(
         _entry(),
         kind="portal_dataset",
@@ -436,10 +458,17 @@ def test_owner_decision_portal_licence_mismatch_stores_nothing(tmp_path: Path) -
         }
         return _ok(url, json.dumps(payload).encode("utf-8"))
 
-    failure = fetch_entry(entry, licence, tmp_path, _clock, _sleep)
-    assert failure is not None
-    assert failure.check == "licence_mismatch"
-    assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
+    from eii_custodian.publicdata.fetch.report import licence_pending_line
+
+    outcome = run_build((entry,), licence, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    assert (
+        licence_pending_line(entry.key, entry.licence_id, "closed", _clock())
+        in outcome.lines
+    )
+    side = _sidecar(tmp_path)
+    assert side["licence_id"] == "CC-BY-4.0"
+    assert side["portal_licence"] == "closed"
 
 
 def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) -> None:

@@ -76,10 +76,8 @@ def test_validate_source_kind(source):
         ("kind", "schema_missing"),
         ("commit", "commit_refused"),
         ("publisher", "receipt_missing"),
-        ("terms_words", "receipt_missing"),
-        ("terms_read_on", "receipt_missing"),
-        ("licence_basis", "receipt_missing"),
         ("decision_record", "receipt_missing"),
+        ("licence_basis_unknown", "receipt_missing"),
         ("url", "blocked_host"),
         ("empty_urls", "blocked_host"),
         ("bad_url", "blocked_host"),
@@ -96,16 +94,13 @@ def test_validate_refusal(plant, reason):
         row = replace(row, source_id="SYN-unknown")
     elif plant == "commit":
         row = replace(row, commit_allowed=True)
-    elif plant in {
-        "publisher",
-        "terms_words",
-        "terms_read_on",
-        "licence_basis",
-        "decision_record",
-    }:
+    elif plant in {"publisher", "decision_record"}:
         row = replace(row, **{plant: ""})
         if plant == "decision_record":
             row = replace(row, licence_basis="owner_decision")
+    elif plant == "licence_basis_unknown":
+        # A pending basis never refuses; an unknown non-empty one still does.
+        row = replace(row, licence_basis="SYN-basis")
     elif plant == "url":
         row = replace(row, url=URL + "/SYN-other")
         dec["reviewed_urls"].append(row.url)
@@ -124,10 +119,29 @@ def test_validate_refusal(plant, reason):
     refused(reason, lambda: acquire.validate_entry(row, dec))
 
 
-@pytest.mark.parametrize("basis", ["dataset", "portal_terms", "provider_terms"])
+@pytest.mark.parametrize(
+    "basis", ["dataset", "portal_terms", "provider_terms", "pending", ""]
+)
 def test_validate_licence_basis(basis):
     dec, _, _ = embedded()
     acquire.validate_entry(replace(entry(dec), licence_basis=basis), dec)
+
+
+def test_pending_terms_fields_still_fetch_and_record(tmp_path):
+    """Ruling L-1001: pending terms fields never refuse the page fetch."""
+    dec, body, _ = embedded()
+    row = replace(
+        entry(dec),
+        terms_words="",
+        terms_read_on="",
+        licence_basis="",
+    )
+    result = run(tmp_path, dec, body, row=row)
+    payload = json.loads(result.body)
+    assert payload["rows"]
+    assert result.sidecar["terms_words"] == ""
+    assert result.sidecar["terms_read_on"] == ""
+    assert result.sidecar["licence_basis"] == ""
 
 
 def test_validate_observed_bounds():

@@ -160,7 +160,6 @@ ENTRY_PLANTS = [
     ("licence_basis", "wrong", "licence_basis"),
     ("licence_id", "", "licence_basis"),
     ("decision_record", "", "licence_basis"),
-    ("terms_words", " ", "terms_metadata"),
     ("terms_read_on", "wrong", "terms_date"),
     ("terms_read_on", "2026" + "1116", "terms_date"),
     ("publisher", "wrong", "publisher"),
@@ -198,6 +197,36 @@ def test_entry_plants(source, field, value, reason, tmp_path):
             lambda _: None,
         )
     assert not list(tmp_path.rglob("*.manifest.json"))
+
+
+@pytest.mark.parametrize("source", ["gravity", "atlas"])
+def test_pending_terms_state_still_fetches_and_reads(source, tmp_path):
+    """Ruling L-1001: pending terms fields never refuse the fetch or the release."""
+    m = modules(source)
+    row = replace(
+        m.fixture.entry(),
+        terms_words="terms to be read",
+        terms_read_on="pending",
+        licence_basis="pending",
+        decision_record="",
+    )
+    result = getattr(m.fetch, "fetch_" + source)(
+        row,
+        m.config.Config.from_mapping(m.fixture.configuration()),
+        m.fixture.metadata,
+        m.fixture.stream,
+        tmp_path,
+        lambda: CLOCK,
+        lambda _: None,
+    )
+    release = m.contracts.read_selected(tmp_path, result.digest)
+    if source == "gravity":
+        assert len(release.bilateral) == 2
+    else:
+        assert release.country_product_year
+    assert release.manifest["receipt"]["terms_read_on"] == "pending"
+    assert release.manifest["receipt"]["licence_basis"] == "pending"
+    assert release.manifest["entry"]["terms_words"] == "terms to be read"
 
 
 @pytest.mark.parametrize("source", ["gravity", "atlas"])

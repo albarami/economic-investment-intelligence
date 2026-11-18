@@ -807,7 +807,7 @@ def test_dataset_row_rejects_a_decision_record(tmp_path: Path) -> None:
 
 
 def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
-    """Missing, empty or blank terms_words are refused. The marker loads."""
+    """A missing key is refused; empty or blank words load as the pending marker."""
 
     def missing(document: dict[str, object]) -> None:
         _row(document, "roads_osm").pop("terms_words")
@@ -818,14 +818,16 @@ def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
     def empty(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["terms_words"] = ""
 
-    with pytest.raises(RegistryError, match=r"^terms_words is empty$"):
-        load_registry(_mutated(tmp_path, "empty-words.yaml", empty))
+    loaded = load_registry(_mutated(tmp_path, "empty-words.yaml", empty))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_words == _MARKER
 
     def spaces(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["terms_words"] = "   "
 
-    with pytest.raises(RegistryError, match=r"^terms_words is empty$"):
-        load_registry(_mutated(tmp_path, "space-words.yaml", spaces))
+    loaded = load_registry(_mutated(tmp_path, "space-words.yaml", spaces))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_words == _MARKER
 
     def marker(document: dict[str, object]) -> None:
         row = _row(document, "roads_osm")
@@ -839,13 +841,20 @@ def test_terms_words_must_be_present_text(tmp_path: Path) -> None:
 
 
 def test_terms_read_on_must_be_a_real_text_date(tmp_path: Path) -> None:
-    """A missing, impossible, non-ISO or unquoted date is refused."""
+    """An empty date loads as the pending value; malformed non-empty dates refuse."""
 
     def missing(document: dict[str, object]) -> None:
         _row(document, "roads_osm").pop("terms_read_on")
 
     with pytest.raises(RegistryError, match="missing field"):
         load_registry(_mutated(tmp_path, "missing-date.yaml", missing))
+
+    def empty(document: dict[str, object]) -> None:
+        _row(document, "roads_osm")["terms_read_on"] = ""
+
+    loaded = load_registry(_mutated(tmp_path, "empty-date.yaml", empty))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_read_on == "pending"
 
     def impossible(document: dict[str, object]) -> None:
         _row(document, "roads_osm")["terms_read_on"] = "2026-13-01"
@@ -873,6 +882,51 @@ def test_terms_read_on_must_be_a_real_text_date(tmp_path: Path) -> None:
     path.write_text(unquoted, encoding="utf-8")
     with pytest.raises(RegistryError, match="not text"):
         load_registry(path)
+
+
+def test_pending_terms_fields_load_and_never_commit(tmp_path: Path) -> None:
+    """Empty terms fields load as pending values, and a pending basis never commits."""
+
+    def pending(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_words"] = ""
+        row["terms_read_on"] = ""
+        row["licence_basis"] = ""
+
+    loaded = load_registry(_mutated(tmp_path, "pending.yaml", pending))
+    roads = [entry for entry in loaded if entry.source_id == "roads_osm"]
+    assert roads[0].terms_words == _MARKER
+    assert roads[0].terms_read_on == "pending"
+    assert roads[0].licence_basis == "pending"
+    assert roads[0].commit_allowed is False
+
+    def committed(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_words"] = ""
+        row["terms_read_on"] = ""
+        row["licence_basis"] = ""
+        row["commit_allowed"] = True
+
+    with pytest.raises(RegistryError, match="cannot be committed"):
+        load_registry(_mutated(tmp_path, "committed.yaml", committed))
+
+    def unknown(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_words"] = ""
+        row["terms_read_on"] = ""
+        row["licence_basis"] = "invented_basis"
+
+    with pytest.raises(RegistryError, match="unknown licence_basis"):
+        load_registry(_mutated(tmp_path, "unknown.yaml", unknown))
+
+    def malformed(document: dict[str, object]) -> None:
+        row = _row(document, "roads_osm")
+        row["terms_words"] = ""
+        row["terms_read_on"] = "14/11/2026"
+        row["licence_basis"] = ""
+
+    with pytest.raises(RegistryError, match="not a date"):
+        load_registry(_mutated(tmp_path, "malformed.yaml", malformed))
 
 
 def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:

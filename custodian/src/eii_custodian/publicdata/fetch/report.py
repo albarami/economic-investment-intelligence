@@ -82,6 +82,21 @@ def terms_unread_line(key: str, check: str, terms_url: str) -> str:
     return f"TERMS {key} not read: {check} ({terms_url})"
 
 
+def licence_pending_line(
+    key: str, licence_id: str, observed: str, date_read: str
+) -> str:
+    """Return the advisory when a fetched licence differs from the registry.
+
+    Ruling L-1001 (decision 0059, the PUB-09 and PUB-97 passages): a licence
+    different from the registry is recorded with the date read, pending a
+    reviewer's record, and fails nothing.
+    """
+    return (
+        f"LICENCE {key} read {date_read}: observed {observed} "
+        f"differs from registry {licence_id}; pending a reviewer's record"
+    )
+
+
 TERMS_HOST_NOT_LISTED = "host_not_allow_listed"
 
 

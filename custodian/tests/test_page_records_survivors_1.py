@@ -236,8 +236,6 @@ def refused(reason, entry=None, **changes):
     "changes,reason",
     [
         ({"commit_allowed": True}, "commit_refused"),
-        ({"terms_words": ""}, "receipt_missing"),
-        ({"terms_read_on": ""}, "receipt_missing"),
         ({"licence_basis": "SYN-basis"}, "receipt_missing"),
         ({"publisher": ""}, "receipt_missing"),
         (
@@ -254,6 +252,14 @@ def test_entry_refusals_exact(changes, reason):
     refused(reason, replace(pages.page_entry(), **changes))
 
 
+def test_entry_pending_terms_fields_never_refuse():
+    """Ruling L-1001: pending terms fields never refuse a page row."""
+    row = replace(
+        pages.page_entry(), terms_words="", terms_read_on="", licence_basis=""
+    )
+    assert check(row) is None
+
+
 @pytest.mark.parametrize(
     "changes",
     [
@@ -261,12 +267,34 @@ def test_entry_refusals_exact(changes, reason):
         {"licence_basis": "portal_terms"},
         {"licence_basis": "provider_terms"},
         {"licence_basis": "dataset"},
+        {"licence_basis": "pending"},
+        {"licence_basis": ""},
         {"period_last": "2024"},
         {"period_last": "2023"},
     ],
 )
 def test_entry_variants_pass(changes):
     assert check(replace(pages.page_entry(), **changes)) is None
+
+
+def test_pending_terms_fields_still_fetch_and_record(tmp_path):
+    """Ruling L-1001: a pending page row fetches, parses and records its pending values."""
+    row = replace(
+        pages.page_entry(), terms_words="", terms_read_on="", licence_basis=""
+    )
+    result = page_records.fetch_page(
+        row,
+        lambda url: pages.Response(url, pages.BODY, ()),
+        tmp_path,
+        lambda: STAMP,
+        lambda _: None,
+        declaration=pages.review(row),
+    )
+    payload = json.loads(result.body)
+    assert payload["rows"] == [{"syn_name": "SYN-item", "syn_count": 7}]
+    assert result.sidecar["terms_words"] == ""
+    assert result.sidecar["terms_read_on"] == ""
+    assert result.sidecar["licence_basis"] == ""
 
 
 @pytest.mark.parametrize(
@@ -512,7 +540,6 @@ def test_selected_v2_payload_returned(tmp_path):
         ({"side": {"as_of": "2024-02-04"}}, "receipt_missing"),
         ({"item": {"key": "inputs/input-1"}}, "receipt_missing"),
         ({"item": {"sha256": "0" * 64}}, "receipt_missing"),
-        ({"raw_side": {"licence_basis": ""}}, "receipt_missing"),
         ({"raw_side": {"source_id": "SYN-other"}}, "receipt_missing"),
         ({"link": True}, "cache_path_refused"),
     ],
@@ -521,6 +548,12 @@ def test_selected_v2_refusals_exact(tmp_path, changes, reason):
     row, _ = v2_cache(tmp_path, **changes)
     with pytest.raises(PageError, match=exact(reason)):
         page_records.selected_page(tmp_path, row)
+
+
+def test_selected_v2_accepts_a_pending_basis(tmp_path):
+    """Ruling L-1001: a stored input receipt with a pending basis is still selected."""
+    row, parsed = v2_cache(tmp_path, raw_side={"licence_basis": ""})
+    assert page_records.selected_page(tmp_path, row).sha256 == parsed.sha256
 
 
 def test_selected_v2_inputs_folder_link_out_refused(tmp_path):

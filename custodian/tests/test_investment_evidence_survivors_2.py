@@ -348,8 +348,6 @@ def test_parser_requires_a_complete_confirmed_shape(changed: dict[str, object]) 
     ("field", "check", "expected"),
     [
         ("publisher", "missing_lineage", "publisher"),
-        ("terms_sha256", "missing_terms", "terms_sha256"),
-        ("terms_url", "missing_terms", "terms_url"),
         ("method", "missing_lineage", "method"),
     ],
 )
@@ -360,6 +358,18 @@ def test_parser_lineage_refusals_are_exact(
         milestone_body(), shape(), replace(envelope(), **{field: ""})
     )
     assert result == failure(SOURCE, URL, check, expected, "absent")
+
+
+def test_parser_records_a_pending_terms_reading_without_refusing() -> None:
+    """Ruling L-1001 (S2-T30): an empty terms field is a pending reading that
+    fails nothing and is carried truthfully into every candidate's chain."""
+    for field in ("terms_sha256", "terms_url"):
+        result = evidence.parse_milestone_page(
+            milestone_body(), shape(), replace(envelope(), **{field: ""})
+        )
+        assert not hasattr(result, "check")
+        assert result
+        assert all(candidate.source_chain[field] == "" for candidate in result)
 
 
 @pytest.mark.parametrize(

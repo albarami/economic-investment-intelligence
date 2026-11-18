@@ -395,20 +395,35 @@ def test_changed_page_is_kept_and_terms_stay_admitted(
     ).is_file()
 
 
-def test_missing_terms_and_drift_publish_nothing(
+def test_a_missing_terms_reading_is_pending_and_publishes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A missing terms page, a retyped field, an extra field and a late bad row publish nothing."""
+    """Ruling L-1001: an unread terms page is recorded as pending and publishes."""
 
     def transport(url: str) -> Response:
+        if url == _fdi_entry().terms_url:
+            raise TransportFault("unreachable", url)
         if url == DASHBOARD_URL:
             return Response(final_url=url, body=dashboard_page(), hops=())
-        raise TransportFault("unreachable", url)
+        if url == _fdi_entry().url:
+            return Response(
+                final_url=url, body=b"<html>Invented landing.</html>", hops=()
+            )
+        raise AssertionError(url)
 
-    assert _execute(tmp_path, monkeypatch, _fdi_entry(), transport) != 0
-    assert not (
-        tmp_path / "data" / "public_cache" / "fdi_projects" / "loadable.json"
-    ).exists()
+    assert _execute(tmp_path, monkeypatch, _fdi_entry(), transport) == 0
+    _pointer, _manifest, table = _batch(tmp_path, "fdi_projects")
+    assert table["rows"]
+    # The pending reading is recorded truthfully: no hash, nothing invented.
+    assert all(row["terms_sha256"] == "" for row in table["rows"])
+    log = _log(tmp_path)
+    assert any(line.startswith("TERMS fdi_projects") for line in log["lines"])
+
+
+def test_drift_plants_publish_nothing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A retyped field, an extra field and a late bad row publish nothing."""
     retyped = tmp_path / "retyped"
     page = dashboard_page((invented_record(jobs="many"),))
     assert _run(retyped, monkeypatch, _fdi_entry(), {DASHBOARD_URL: page}) != 0
@@ -461,7 +476,7 @@ def test_bounds_lineage_confirmation_and_public_only() -> None:
     unconfirmed = Bounds(1, 2, "announced", "2000", False)
     refused = validate_investment((row,), unconfirmed, spec.confirmation, envelope)
     assert getattr(refused, "check", "") == "unconfirmed"
-    for name in ("publisher", "terms_sha256", "retrieved_utc", "page_sha256"):
+    for name in ("publisher", "retrieved_utc", "page_sha256"):
         broken = dict(row)
         broken[name] = ""
         refused = validate_investment(
@@ -471,6 +486,34 @@ def test_bounds_lineage_confirmation_and_public_only() -> None:
             envelope,
         )
         assert getattr(refused, "check", "") == "missing_lineage"
+    # Ruling L-1001: a pending terms reading, in the row or the envelope,
+    # never refuses the batch; the empty value is the recorded pending state.
+    pending_row = dict(row)
+    pending_row["terms_sha256"] = ""
+    accepted = validate_investment(
+        (pending_row,),
+        Bounds(1, 2, "announced", "2000", True),
+        spec.confirmation,
+        envelope,
+    )
+    assert not hasattr(accepted, "check")
+    pending_envelope = replace(envelope, terms_sha256="", terms_url="")
+    accepted = validate_investment(
+        (row,),
+        Bounds(1, 2, "announced", "2000", True),
+        spec.confirmation,
+        pending_envelope,
+    )
+    assert not hasattr(accepted, "check")
+    broken = dict(row)
+    broken["page_url"] = ""
+    refused = validate_investment(
+        (broken,),
+        Bounds(1, 2, "announced", "2000", True),
+        spec.confirmation,
+        pending_envelope,
+    )
+    assert getattr(refused, "check", "") == "missing_lineage"
     gap = Confirmation(False, True, True, False)
     refused = validate_investment(
         (row,), Bounds(1, 2, "announced", "2000", True), gap, envelope

@@ -29,7 +29,7 @@ from .certificate_pins import (
 from .kinds import read_bounded, read_terms_page
 from .page_archive import staged_source
 from .receipts import archive_auxiliary, sha256_hex, sidecar_for
-from .registry import Entry, read_yaml
+from .registry import LICENCE_BASES, Entry, read_yaml
 from .snapshots import (
     Snapshot,
     SnapshotError,
@@ -210,12 +210,11 @@ def parse_body(
 def _validate(entry: Entry, declaration: Mapping[str, Any]) -> None:
     if entry.commit_allowed:
         raise PageError("commit_refused")
-    if (
-        not entry.publisher
-        or entry.licence_basis
-        not in {"owner_decision", "dataset", "portal_terms", "provider_terms"}
-        or not entry.terms_words
-        or not entry.terms_read_on
+    # Ruling L-1001: pending terms fields (words, reading date) and a pending
+    # basis of use (blank or the recorded "pending" value) are records and
+    # never refuse the row; an unknown basis still does.
+    if not entry.publisher or (
+        entry.licence_basis not in LICENCE_BASES and entry.licence_basis != ""
     ):
         raise PageError("receipt_missing")
     if entry.licence_basis == "owner_decision" and entry.decision_record != "0026":
@@ -405,8 +404,13 @@ def parse_page_snapshot(
     snapshot: Snapshot, entry: Entry, declaration: Mapping[str, Any]
 ) -> dict[str, object]:
     _validate(entry, declaration)
-    if snapshot.sidecar.get("source_id") != entry.source_id or not snapshot.sidecar.get(
-        "licence_basis"
+    # Ruling L-1001: a pending basis (blank or the recorded "pending" value)
+    # is a record, never a missing receipt; a receipt that holds no basis
+    # record at all is malformed and still refuses, and so does a foreign
+    # source id.
+    if (
+        snapshot.sidecar.get("source_id") != entry.source_id
+        or "licence_basis" not in snapshot.sidecar
     ):
         raise PageError("receipt_missing")
     return {
@@ -469,8 +473,8 @@ def selected_page(cache: Path, entry: Entry) -> Snapshot:
             raw_input = read_snapshot(input_directory, item["identity"])
             if (
                 raw_input.sha256 != item["sha256"]
+                # Ruling L-1001: a pending basis is recorded, never missing.
                 or raw_input.sidecar.get("source_id") != entry.source_id
-                or not raw_input.sidecar.get("licence_basis")
             ):
                 raise PageError("receipt_missing")
         return parsed

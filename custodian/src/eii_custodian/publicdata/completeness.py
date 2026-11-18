@@ -179,16 +179,16 @@ def receipt_valid(row: Entry, receipt: Mapping[str, object]) -> bool:
         receipt[key] != value for key, value in expected.items() if key not in variable
     ):
         return False
+    # Ruling L-1001: pending terms fields (words, reading date, basis of use)
+    # are records and never exclude a source; only identity, publisher, licence
+    # id and fetch address have to be present.
     if any(
         not isinstance(receipt.get(key), str) or not str(receipt[key]).strip()
         for key in (
             "publisher",
             "title_en",
             "licence_id",
-            "licence_basis",
             "fetch_url",
-            "terms_words",
-            "terms_read_on",
         )
     ):
         return False

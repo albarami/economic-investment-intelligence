@@ -286,9 +286,7 @@ ENTRY_PLANTS = [
     ("columns", "columns", (), "release_contract"),
     ("raw_min", "row_count_min", 2, "raw_bounds"),
     ("raw_max", "row_count_max", 6, "raw_bounds"),
-    ("licence", "licence_id", "", "terms_metadata"),
-    ("terms", "terms_words", "", "terms_metadata"),
-    ("terms_date", "terms_read_on", "", "terms_metadata"),
+    ("licence", "licence_id", "", "licence_metadata"),
 ]
 
 
@@ -303,6 +301,19 @@ def test_entry_plants(case, field, value, reason):
     entry_check(entry, p)
     with pytest.raises(ValueError, match=rf"^{reason}$"):
         entry_check(replace(entry, **{field: value}), p)
+
+
+@pytest.mark.parametrize(
+    "value", ["", " ", "pending"], ids=["empty", "blank", "marker"]
+)
+def test_entry_pending_terms_fields_never_refuse(value):
+    """Ruling L-1001: a pending terms field refuses no benchmark entry."""
+    from eii_custodian.publicdata.benchmarks.fetch import entry_check
+
+    p = native()
+    entry = aligned_entry(p)
+    entry_check(replace(entry, terms_words=value), p)
+    entry_check(replace(entry, terms_read_on=value), p)
 
 
 PARSE_PLANTS = [

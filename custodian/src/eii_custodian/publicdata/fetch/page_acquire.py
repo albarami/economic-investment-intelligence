@@ -18,7 +18,7 @@ from .page_requests import PIN_HOSTS, check_target, page_context, page_requests
 from .page_schema import SCHOOL_FIELDS, json_body, path, period, scalar, typed, validate
 from .page_shapes import page_end, parse
 from .receipts import sha256_hex, sidecar_for
-from .registry import Entry
+from .registry import LICENCE_BASES, Entry
 from .snapshots import Snapshot, publish_snapshot, read_snapshot, utc
 from .terms_text import terms_text_sha256
 from .transport import Response, Transport, metadata_limit
@@ -100,12 +100,12 @@ def validate_entry(entry: Entry, review: Mapping[str, Any]) -> None:
         raise ShapeError("schema_missing")
     if entry.commit_allowed:
         raise ShapeError("commit_refused")
+    # Ruling L-1001: pending terms fields (words, reading date) and a pending
+    # basis of use (blank or the recorded "pending" value) are records and
+    # never refuse the fetch; an unknown basis still does.
     if (
         not entry.publisher
-        or entry.licence_basis
-        not in {"owner_decision", "dataset", "portal_terms", "provider_terms"}
-        or not entry.terms_words
-        or not entry.terms_read_on
+        or (entry.licence_basis not in LICENCE_BASES and entry.licence_basis != "")
         or (entry.licence_basis == "owner_decision" and entry.decision_record != "0026")
     ):
         raise ShapeError("receipt_missing")

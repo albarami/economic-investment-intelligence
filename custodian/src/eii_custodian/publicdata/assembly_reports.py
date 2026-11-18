@@ -735,7 +735,12 @@ def write_reports(build: Production) -> dict[str, str]:
 
 
 def require_complete(audit: dict[str, Any]) -> None:
-    """A report that names a pending gate is never a successful public build."""
+    """A report that names a pending gate is never a successful public build.
+
+    Ruling L-1001: a terms row's own-words reading is a record, never a gate,
+    so a pending ``own_words_state`` fails no criterion. The terms list itself
+    stays required and well formed: a missing or malformed list is refused.
+    """
     from .gate_report import CONFIRMATION_TASKS
 
     completeness = audit.get("completeness")
@@ -753,7 +758,8 @@ def require_complete(audit: dict[str, Any]) -> None:
         or not isinstance(terms, list)
         or not terms
         or any(
-            not isinstance(row, dict) or row.get("own_words_state") != "recorded"
+            not isinstance(row, dict)
+            or row.get("own_words_state") not in {"recorded", "pending"}
             for row in terms
         )
         or audit.get("oi03", {}).get("state") != "recorded"

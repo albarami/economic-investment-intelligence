@@ -218,7 +218,8 @@ def _publish_awards(
     registration_inputs: list[dict[str, object]] | None = None,
 ) -> Snapshot:
     """Append one intake snapshot with the sample check on its registry receipt."""
-    if entry.source_id != SOURCE or entry.commit_allowed or not entry.licence_basis:
+    # Ruling L-1001: a pending basis of use is a record and never refuses.
+    if entry.source_id != SOURCE or entry.commit_allowed:
         raise AwardError("receipt_missing")
     for row in batch.rows:
         utc(row.get("retrieved_utc"))
@@ -316,10 +317,10 @@ def fetch_awards(
         ):
             raise AwardError("awards_profile_pending")
     cache_directory(cache, entry)
+    # Ruling L-1001: a pending basis of use is a record and never refuses.
     if (
         not entry.publisher
         or entry.commit_allowed
-        or not entry.licence_basis
         or entry.url != declaration.get("url")
         or not approve(entry.url).ok
     ):
@@ -477,11 +478,12 @@ def read_registers(
         if not directory.resolve().is_relative_to(cache.resolve()):
             raise AwardError("intake_path_refused")
         snapshot = read_snapshot(directory, selection["identity"])
+        # Ruling L-1001: a pending basis in a stored receipt is a record, never
+        # a missing one; identity, key and publisher still have to match.
         if (
             snapshot.sidecar.get("source_id") != source
             or snapshot.sidecar.get("key") != key
             or not snapshot.sidecar.get("publisher")
-            or not snapshot.sidecar.get("licence_basis")
         ):
             raise AwardError("receipt_missing")
         try:

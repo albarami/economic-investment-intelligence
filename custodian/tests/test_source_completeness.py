@@ -146,6 +146,16 @@ def test_missing_or_substituted_receipt_chain(field):
     assert failures(c.check(**args))
 
 
+def test_pending_terms_receipt_fields_do_not_exclude():
+    """Ruling L-1001: a receipt with pending terms fields keeps the source in use."""
+    row = entry(terms_words="", terms_read_on="", licence_basis="")
+    assert c.in_use(row, {row.key: receipt(row)}) is True
+    args = inputs()
+    args["entries"] = [row]
+    args["receipts"] = {row.key: receipt(row)}
+    assert not failures(c.check(**args))
+
+
 def test_absence_is_exact_and_terms_do_not_exclude():
     args = inputs()
     args["receipts"] = {}

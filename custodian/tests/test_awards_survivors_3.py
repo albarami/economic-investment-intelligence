@@ -201,20 +201,28 @@ def test_v2_declaration_closed_refusals(tmp_path, monkeypatch, plant, reason):
         )
 
 
-@pytest.mark.parametrize("plant", ["url", "basis", "commit", "publisher"])
+@pytest.mark.parametrize("plant", ["url", "commit", "publisher"])
 def test_fetch_entry_independent_refusals(tmp_path, monkeypatch, plant):
     entry, _, body = setup(tmp_path, monkeypatch)
     entry = replace(
         entry,
         **{
             "url": {"url": "https://www.data.gov.qa/SYN-wrong"},
-            "basis": {"licence_basis": ""},
             "commit": {"commit_allowed": True},
             "publisher": {"publisher": ""},
         }[plant],
     )
     (tmp_path / "intake" / awards.SOURCE / "intake.json").unlink()
     with pytest.raises(AwardError, match=r"^receipt_missing$"):
+        fetch(entry, tmp_path, body)
+
+
+def test_fetch_entry_pending_basis_is_a_record_not_a_refusal(tmp_path, monkeypatch):
+    """Ruling L-1001: a pending basis of use never refuses the awards fetch."""
+    entry, _, body = setup(tmp_path, monkeypatch)
+    entry = replace(entry, licence_basis="")
+    (tmp_path / "intake" / awards.SOURCE / "intake.json").unlink()
+    with pytest.raises(AwardError, match=r"^intake_missing$"):
         fetch(entry, tmp_path, body)
 
 
