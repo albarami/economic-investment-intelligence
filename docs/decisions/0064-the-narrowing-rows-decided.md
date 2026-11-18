@@ -6,7 +6,7 @@
 | Date | 2026-11-19 |
 | Owner | The owner |
 | Decided by | The owner's note of 2026-11-19, relayed by the owner's advisor at 00:59, agreeing to the advisor's recommendation for each of rows 1 to 21 of the narrowing table, with rows 22 to 58 proceeding as suggested; recorded by the lead's ruling L-1029, under AGENTS.md rule 46; read with the owner's note relayed at 00:35 and the lead's ruling L-1026 (no terms, licence or permission question is put to the owner; [decision 0059](0059-publisher-terms-are-a-record-not-a-gate.md)) |
-| Amends | TASKS.md: the queue rules (item 45); the acceptance criteria of S2-T04, S2-T06, S2-T08, S2-T10, S2-T14, S2-T16, S2-T19, S2-T20, S2-T24 to S2-T29, S3-T03, S3-T09, S3-T16, S4-T02, S4-T05, S4-T08, S4-T13, S5-T09, S6-T04, S6-T10, S6-T14, S6-T15, S6-T17 and S6-T19, by one amendment line each; new tasks S2-T35 to S2-T39, S3-T23 and S7-T25 to S7-T27. OPEN_ITEMS.md: OI-130 and OI-136 to OI-139 closed; OI-27, OI-96, OI-123, OI-144, OI-170, OI-171, OI-214 and OI-257 updated; OI-304 to OI-313 opened. AI-129 and the open questions of document 09; section 12 and the open questions of document 04; the traffic-provider open questions of documents 02 and 13; the open points on the Qatarization planner and the recovery tracker in documents 01, 09 and 10 and the glossary; the slice lists and an open question of document 14; the decision index of docs/README.md. [Decision 0016](0016-version-1-covers-the-whole-initiative.md) item 21 (a cross-country entry comparison stays out) and [decision 0019](0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21 (the places copy dated 2025-01-10) are amended in those points only, by items 21 and 14 |
+| Amends | TASKS.md: the queue rules (item 45); the acceptance criteria of S2-T04, S2-T06, S2-T08, S2-T10, S2-T14, S2-T16, S2-T19, S2-T20, S2-T24 to S2-T29, S3-T03, S3-T09, S3-T16, S4-T02, S4-T05, S4-T08, S4-T13, S5-T09, S6-T04, S6-T10, S6-T14, S6-T15, S6-T17 and S6-T19, by amendment lines, each citing its item; new tasks S2-T35 to S2-T39, S3-T23 and S7-T25 to S7-T27. OPEN_ITEMS.md: OI-130 and OI-136 to OI-139 closed; OI-27, OI-96, OI-123, OI-144, OI-170, OI-171, OI-214 and OI-257 updated; OI-304 to OI-313 opened. AI-129 and the open questions of document 09; section 12 and the open questions of document 04; the traffic-provider open questions of documents 02 and 13; the open points on the Qatarization planner and the recovery tracker in documents 01, 09 and 10 and the glossary; the slice lists and an open question of document 14; the decision index of docs/README.md. [Decision 0016](0016-version-1-covers-the-whole-initiative.md) item 21 (a cross-country entry comparison stays out) and [decision 0019](0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21 (the places copy dated 2025-01-10) are amended in those points only, by items 21 and 14 |
 | Purpose | Record the owner's decision on every row of the narrowing table: what is kept, restored, changed, reopened or not yet decided, and the task or open item that carries each. |
 | Read first | [Decision 0059](0059-publisher-terms-are-a-record-not-a-gate.md); [decision 0055](0055-mutation-testing-moves-to-after-go-live.md); [decision 0026](0026-public-sources-used-in-full-locally.md); AGENTS.md rules 3, 4, 8, 10, 12, 24, 25 and 27 |
 
@@ -19,8 +19,8 @@ value or spend choice: no row asks the owner a terms, licence or permission ques
 as a record and never a gate (decision 0059), and a KEEP that a hard rule holds names the rule.
 
 The advisor's message of 00:49 gave a recommendation for each of rows 1 to 21 and asked the owner to answer by row
-number. The owner answered at 00:59: "I agree good night I will check when I wake up make sure he keeps working and
-developing utilizing the capacity and clis". The advisor applied the recommendations, with the subscription rule of
+number. The owner answered at 00:59 that they agreed with the recommendation for every row and asked that work continue on
+every free seat and tool. The advisor applied the recommendations, with the subscription rule of
 00:55 for rows 2 and 6 (a paid plan goes on the subscriptions file for the owner), and rows 22 to 58 proceed as the
 table suggests. Ruling L-1029 records this and asks the lead to apply each row to TASKS.md and OPEN_ITEMS.md through
 the normal task flow.
@@ -221,7 +221,7 @@ holds what is still to confirm. The row numbers are the table's.
 
 ## Passages amended
 
-- TASKS.md: one queue rule (item 45); one amendment line, citing its item, in each task named in the header; new tasks
+- TASKS.md: one queue rule (item 45); amendment lines, each citing its item, in the tasks named in the header; new tasks
   S2-T35 to S2-T39, S3-T23 and S7-T25 to S7-T27, each with status queued. No criterion is ticked and no status that
   records a merge is changed.
 - OPEN_ITEMS.md: OI-130 closed by item 2; OI-136, OI-137, OI-138 and OI-139 closed by item 12; updates on OI-27 (item
@@ -248,7 +248,13 @@ reviewed change, as decision 0059 left its code to S2-T08 part B:
   and the spend row of document 13; the meter, the warning at 80 percent and the unchanged hard stop take their place.
 - Item 6 (S3-T23): OPS-73, TST-248, OPS-41 and the freeze bundle list of document 13, for offline tiles only, once the
   owner holds the plan.
-- Item 14 (S2-T37): PUB-102 and the source row of `places_fsq` in document 04.
+- Item 14 (S2-T37): every statement of the fixed release dated 2025-01-10: in document 04, the `places_fsq` rows of
+  sections 2.1 and 2.2 and of section 4, PUB-102 in section 8, and its note under "Open questions and assumptions";
+  the OI-96 settled point of document 01; ARC-136 of document 02; DAT-157 and the `pub_place_fsq` contract note of
+  document 03; the `places_fsq` method note of document 07; the `places_fsq` backend note of document 08; the OI-96
+  point of document 09; OPS-72 of document 13; the section 10 (slice S2) paragraph and the OI-96 point of document 14;
+  and the sources answer of document 16. Decision 0019 item 21 and decision 0040's held-tables row stay as accepted
+  records, read with item 14.
 - Item 15 (S2-T38): the contract of `pub_population_municipality` in document 03.
 
 ## What does not change
