@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from eii_custodian.publicdata.investment_contracts import (
-    PROVENANCE_PUBLIC,
     SourceEnvelope,
     accept_project_slot,
     https_url,
@@ -115,11 +114,11 @@ def test_accept_project_slot_mutations() -> None:
     assert failure1.source_id == "fdi_projects"
     assert failure1.url == ""
     assert failure1.check == "provenance"
-    assert failure1.expected == PROVENANCE_PUBLIC
+    assert failure1.expected == "public"
     assert failure1.observed == "SYN_PROV"
 
     # 44-55: Invalid join key
-    failure2 = accept_project_slot(PROVENANCE_PUBLIC, "SYN_JOIN")
+    failure2 = accept_project_slot("public", "SYN_JOIN")
     assert failure2 is not None
     assert failure2.code == 1
     assert failure2.source_id == "fdi_projects"
