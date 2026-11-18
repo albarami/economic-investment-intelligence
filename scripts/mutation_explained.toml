@@ -4209,3 +4209,98 @@ reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same 
 module = "custodian/src/eii_custodian/publicdata/draw.py"
 mutation = "--- src/eii_custodian/publicdata/draw.py\n+++ src/eii_custodian/publicdata/draw.py\n@@ -11,7 +11,7 @@\n     if type(seed) is not int:\n         raise ValueError(\"figure_seed_invalid\")\n     loaded = (\n-        json.loads(log_path.read_text(encoding=\"utf-8\")) if log_path.exists() else {}\n+        json.loads(log_path.read_text(encoding=\"UTF-8\")) if log_path.exists() else {}\n     )\n     if not isinstance(loaded, dict):\n         raise ValueError(\"figure_log_invalid\")"
 reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the bytes and text are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -16,7 +16,7 @@\n         if node.tag == \"root\":\n             return text\n         attrs = \"\".join(\n-            \" \" + k + ('=\"' + html.escape(v, quote=True) + '\"' if v is not None else \"\")\n+            \" \" + k + ('=\"' + html.escape(v, ) + '\"' if v is not None else \"\")\n             for k, v in node.attrs.items()\n         )\n         start = \"<\" + node.tag + attrs + \">\""
+reason = "For every string-valued HTML attribute, html.escape defaults quote to True, so omitting that explicit keyword produces identical bytes and exceptions."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -56,7 +56,7 @@\n                 page_context(host_of(url))\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n-            if failure or response is None:\n+            if failure and response is None:\n                 reason = failure.check if failure else \"access_failed\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if (failure) or True else \"access_failed\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if failure else \"XXaccess_failedXX\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if failure else \"ACCESS_FAILED\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], None, projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], \"XXjsonXX\", projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], \"JSON\", projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, None, extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, \"XXjsonXX\", extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, \"JSON\", extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, None, extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, \"XXjsonXX\", extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, \"JSON\", extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -112,7 +112,7 @@\n             link = path(record, discovery[\"link_path\"])\n             if not isinstance(link, str):\n                 raise ShapeError(\"schema_missing\")\n-            link = urljoin(discovery[\"url\"], quote(link, safe=\":/%\"))\n+            link = urljoin(discovery[\"url\"], quote(link, safe=\"XX:/%XX\"))\n             links.append(link)\n             item: dict[str, object] = {\"url\": link}\n             if discovery[\"length_path\"] is not None:"
+reason = "urllib.parse.quote always leaves ASCII letters unescaped, so adding X to safe=:/% cannot change any link for any string input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -311,7 +311,7 @@\n         raise ShapeError(\"row_count\")\n     # Terms must use the same reviewed URL/pin policy. They are optional evidence,\n     # never a reason to turn off a visitor-readable source.\n-    terms_hash: str | None = None\n+    terms_hash: str | None = \"\"\n     terms_unread = \"\"\n     if entry.terms_url:\n         try:"
+reason = "The initial None or empty-string terms_hash is consumed only by terms_hash or empty-string in the sidecars unless overwritten by the same successful terms hash, yielding identical archives for every request outcome."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -338,7 +338,7 @@\n                 fetch_host=host_of(response.final_url),\n                 retrieved_utc=stamp,\n                 publisher=entry.publisher,\n-                source_modified=\"\",\n+                source_modified=None,\n                 row_count=None,\n                 terms_sha256=terms_hash or \"\",\n             )"
+reason = "The raw-input source_modified argument is always empty-string and receipts.sidecar_for normalizes both that value and None to None, yielding identical sidecars for every input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -254,7 +254,7 @@\n                         coordinate, \"is_finite\"\n                     ):\n                         raise ShapeError(\"schema_missing\")\n-                    scalar(coordinate, \"number\")\n+                    scalar(None, \"number\")\n                 identifier = attrs[\"objectid\"]\n                 if last_id is not None and identifier <= last_id:\n                     raise ShapeError(\"paging_incomplete\")"
+reason = "Every coordinate reaching scalar came from json_body, which yields only integers or finite Decimal numbers after the preceding type guard and nonfinite-constant refusal, so scalar always succeeds and its discarded result (including the replacement None) cannot change any row, host, pin, scope, redirect or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_html.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_html.py\n+++ src/eii_custodian/publicdata/fetch/page_html.py\n@@ -3,7 +3,7 @@\n     self.root = Node(\"root\")\n     self.current = self.root\n     try:\n-        self.feed(body.decode(\"utf-8\"))\n+        self.feed(body.decode(\"UTF-8\"))\n         self.close()\n     except UnicodeError:\n         raise ShapeError(\"schema_missing\") from None"
+reason = "For all byte strings, Python resolves UTF-8 and utf-8 to the identical UTF-8 codec, with identical decoded output or UnicodeError handling."
