@@ -13,7 +13,6 @@ from typing import TextIO
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import ci_environment
 import run_tests_counts as counts
 import run_tests_exec as runner_exec
 
@@ -75,10 +74,7 @@ _SEED_DETAIL = "seed must be ten decimal digits from 1000000000 to 4294967295"
 
 
 def suite_timeout(suite: Suite, environ: Mapping[str, str]) -> int:
-    """Return the limit of one suite, raised for the web checks on a hosted runner."""
-    if suite.name == "web-checks" and ci_environment.is_hosted_runner(environ):
-        # The hosted value is a stopgap of S1-T16 by the owner's decision of 2026-11-14 and returns to 1,800 s when S1-T15 makes the suite fast enough on slow runners.
-        return 3000
+    """Use the table limit on every runner (decision 0027 item 4)."""
     return suite.timeout
 
 

@@ -791,7 +791,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_population_municipality` | `municipality_code`; `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_census_national` | `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_census_district` | `district_key`; `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
-| `pub_place` | `place_id` string (source identifier); `name` string; `name_ar` string (Y); `category` string (`basic_category`); `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string; `source_provider` string; `licence` string; `confidence` decimal(5,4); `merged_ids` string (Y, semicolon-separated reviewed source identifiers) |
+| `pub_place` | `place_id` string (source identifier); `name` string; `name_ar` string (Y); `category` string (`basic_category`); `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string; `source_provider` string; `licence` string; `confidence` decimal(5,4) (source range checked before conversion; round half to even to four decimal places); `merged_ids` string (Y, semicolon-separated reviewed source identifiers) |
 | `pub_place_verification` | `place_id` string; `check_date` date; `reviewer_role` string; `verification_link` string; `status` (`verified_open`, `closed_or_moved`, `not_found`, `duplicate`); `source_id` |
 | `pub_hotel_monthly` | `period`; `star_class` string; `indicator` (`occupancy`, `adr`, `revpar`, `supply`, `demand`); `value` decimal(14,2); `unit` |
 | `pub_price_index` | `period`; `group_code` string; `index_value` decimal(10,2); `base_period` string |
@@ -957,6 +957,184 @@ manifest hash, false commit flag and attribution. Lineage binds to
 are null. No latest-file discovery is allowed. Live page, licence, version and
 host values remain pending the lead.
 
+### S2-T29 cached page and awards contracts
+
+These are custodian cache contracts under section 7.3, not new release-manifest
+entries. The retained v1 table contract supports existing archived inputs.
+`page_acquire.fetch@v2` binds a closed reviewed parser kind:
+`xlsx_sheet`, `embedded_json`, `html_blocks`, `html_table` or `arcgis_query`.
+A source cannot be redeclared under another parser kind to bypass its guards.
+The supplier row is `refusal` only under decision 0026 item 2 and lead ruling
+L-899: it records the dated access refusal without opening any request.
+Under lead ruling L-914, its data and terms URLs remain non-fetched evidence
+metadata on hosts outside PUB-03. Only the host allow-list check is exempt for
+this closed refusal kind; scheme, credential, schema, receipt and source-kind
+checks still apply. Fetching rows receive no exemption.
+
+A v2 table retains `version`, `source_id`, typed `rows`, ordered `inputs`,
+`as_of`, optional `publisher_date`, `period_first`, `period_last`, `retrieved_utc`,
+`method`, `provenance: Public`, `completeness: unknown` and per-page `coverage`.
+The snapshot's `as_of` is its own UTC retrieval date; missing or malformed dates
+refuse. A publisher date is separate provenance and never supplies the period.
+Periods are observed row periods or both null when no period field is declared
+(document 04 section 3.1; L-900). An input without a measured table count has null `row_count`, never zero;
+the parsed table count comes from its validated rows. Each input has an explicit confined archive key,
+identity, body hash, upstream hash, representation, extension and reviewed URL.
+Consumers select a reviewed table hash and verify every input receipt and hash;
+symlinked input folders or children refuse before an input read.
+no directory scan or newest-file choice is admitted.
+
+HTML inputs remove hidden form credential controls through the HTML parser before
+archiving. The original received bytes have their own `upstream_sha256`; the
+archived representation has its own hash and `form_secret_removed` label. The
+SharePoint discovery response archives a `reviewed_projection` of URL, string
+length converted by code, and publisher modification metadata, excluding expanded
+personal metadata. It never claims that projection is the full response. Original
+workbook and field-restricted school responses retain their own bytes. QNCC stays
+held pending its missing nested schema and a safe input representation: its full
+script contains credential-bearing and person-related fields outside the table.
+No credential is cached or used to make another request.
+
+Workbook declarations bind sheet name, relationship, sheet id, part, exact header
+cells, merged ranges, annual and quarterly coordinates, blank and footer rows.
+Only insurance accepts formula cached results; formulas are never evaluated,
+and missing cached results refuse. Awards intake retains its formula refusal.
+The first declared quarterly row may be any quarter and must carry its year.
+Later quarters in that year advance one quarter with an empty year cell. A later
+Q1 must follow Q4 and carry the immediately following year; any gap refuses with
+`schema_missing` before the parser returns periods.
+Manateq declares both Pricing layouts
+and each location's tariff or `no tariff on page` state; the latter yields no
+rate, never zero. Rates accept whole-number text followed by QR only.
+Classified activity sections are siblings bound by the argument N of
+`openCompanyDataModel(N)` to `CompanyData-N`, never row order. Supplier expiry
+comes from its heading; contractor expiry comes from its row. Registration pairs
+are retained verbatim, with their part meanings unconfirmed.
+
+School queries request only the seventeen reviewed fields, closed `where=1=1`,
+`orderByFields=objectid` and bounded offsets/counts at most `maxRecordCount`.
+A non-allow-listed field refuses before even the metadata request; response
+extras refuse before any archive write. Counts, unique ordered object ids and
+the final false `exceededTransferLimit` must agree. Capacity, enrolment, catchment
+and press-seat claims remain forbidden. Public split uses retain PUB-90.
+The query response envelope permits only `objectIdFieldName`, `geometryType`,
+`spatialReference`, `hasZ`, `hasM`, `fields`, `features` and
+`exceededTransferLimit`, as evidenced by the supplied school query reading.
+The cached count envelope permits only `count`. Any other top-level member
+refuses with `school_field_refused` before processing or retaining the response.
+Related discovery, page, count, terms and parsed objects publish as one staged
+source tree; acquisition or final validation failure preserves the old tree.
+Actual acquisition maxima and observed row bounds remain lead evidence, never
+helper counts promoted into limits.
+
+The retained version-1 school capture seam requires initial/final URLs and
+ordered redirect URLs, capture tool, UTC capture date, raw SHA-256, verified
+issuing-intermediate DER hash and exact host, TLS verification enabled, and
+visitor access. Every URL must pass the normal allow-list and reviewed URL set.
+No browser is installed or operated by this adapter. Missing evidence records
+a dated technical failure. Capture admission is not reachable from the eight
+version-2 declarations: their `page_acquire.fetch@v2` path has no capture intake.
+Only the school directory's normal fetch attempt uses the browser user agent;
+terms reads, other pages and award proofs retain the default agent.
+The four page pin hosts are `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
+`www.edu.gov.qa` and `myschools.edu.gov.qa`. An initial request or redirect to
+one of these hosts without a page-request scope or valid legacy pin refuses
+with `certificate_chain_incomplete` before constructing an opener or redirected
+request. The stream and attempt openers unconditionally refuse these hosts,
+even inside a page scope, before constructing any opener. Pins loaded for page
+requests must name one of these hosts and belong to the row's reviewed URL hosts.
+The file must decode, by itself in an empty client trust store, to exactly one
+non-self-signed authority certificate; the stored DER must match the file exactly.
+The pin completes the chain; it does not restrict the issuer. System-root chain
+validation and hostname verification remain required, with partial-chain trust
+cleared in both page and tender contexts. A supplied context with partial-chain
+trust enabled is refused. The existing legacy pin validation remains.
+A supplied SSL context alone
+does not constitute a legacy pin. Under lead ruling L-921, the tender adapter
+forwards the registry's `chain_intermediate_sha256`, already checked against the
+chain file by `chain_context`, through `open_https`'s keyword-only
+`legacy_chain_sha256`. This unscoped initial-request bridge requires both a
+verifying SSL context and a complete hexadecimal SHA-256 string; absent or
+malformed pins refuse before opener construction. The existing disabled-context
+`unreachable` refusal keeps its precedence. The injectable tender seam retains
+its original signature: a context-local scope binds the checked hash to that
+exact SSL context and tender host, and resets on success or exception. Only
+`singles/tenders.py` may supply the new argument, enforced by a source AST guard.
+Under lead ruling L-927, that guard scans every Python file under `custodian/src`
+outside the tender adapter: it refuses the argument's keyword or string constant,
+`**` expansion into `open_https` or `_open_https` by name, attribute or imported
+alias, references to `_TENDER_CHAIN`, and imports or attribute uses of the tender
+wrapper. Only the `legacy_chain_sha256` argument node of the `open_https` function
+definition in `fetch/transport.py` remains allowed. Imported names retain all
+possible bindings; any protected binding makes the name or attribute chain a hit.
+Separate planted callers cover literal and variable keyword expansion, aliases,
+external tender scope and wrapper access, wrapper imports and string-literal
+keys used in runtime lookups or construction. Computed nonliteral keys are not
+independently recognised; keyword expansion at a recognised opener is refused.
+This is a source boundary; runtime refusal does not inspect callers or signatures.
+Dynamic imports through `importlib.import_module`, `__import__`, or equivalent runtime mechanisms are outside this AST caller boundary and require code review.
+Wrapper lookup through `getattr` or another runtime attribute mechanism that is not a direct AST attribute chain is outside this caller boundary and require code review.
+Assignment-only aliases and other aliases requiring data-flow analysis are outside this caller boundary and require code review.
+`exec`, `eval`, and runtime-generated source are outside this AST caller boundary and require code review.
+The legacy hash never authorizes a redirect:
+without page scope or a valid current pin, every redirect to a page pin host,
+including the tender host itself, still refuses before hop recording or
+redirected-request construction. See OPEN_ITEMS.md,
+**S2-T29 fix pass 6 — legacy tender pin scope**, for the offline resolution and
+remaining live-evidence and independent-review limits.
+
+`awards.ingest_awards@v1` reads a hash-pinned file from the uncommitted intake folder
+`data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile
+names the original columns and their string/integer/number types, format, sheet and company,
+registration, value and date columns; no real profile or row is committed here.
+CSV and OOXML cells are supported; formulas and unknown structures refuse.
+Aggregate-profile row and dated-row counts remain leads; measured counts always
+come from the admitted bytes. The intake manifest names `file`, `sha256`, `seed`
+and `register_selections`. Each register selection names an archived public
+register key and identity, JSON-records or CSV-records format, and the registration
+and name columns. The receipt retains those input hashes; no inline register
+rows are accepted by this manifest.
+Each row keeps `original`, typed `parsed` cells, `normalised_date`, `report_url`
+and `retrieved_utc`. Original blanks remain blank; parsed empty numeric cells
+are null, never zero. Every row requires a valid UTC retrieval timestamp before
+proof checks or publication. Dates use day/month/year; invalid dates are counted.
+The summary records row count, dated/invalid/blank counts, date range and unknown
+completeness. The original scrape date is distinct from the intake UTC date.
+
+The `awards_owner_scrape` archive registry receipt carries `award_check`: lead
+seed, distinct nonblank URL frame count, selected count, matched/mismatched/failed
+counts, match rate, incomplete status and per-link result. Above thirty links the
+seed selects exactly thirty without replacement; otherwise all links are read.
+The rate is matching selected links divided by all selected links, including
+failed fetches; an empty frame has null rate. Short frames and failed fetches
+are incomplete. Only transport or bounded-read failures count as failed fetches.
+The shared `open_https` transport classifies a response-body `HTTPException`
+(including `IncompleteRead`) as `TransportFault("unreachable")`, with no upstream
+diagnostic text; keyed requests retain the same closed fault. Existing registry
+sources now retry this mid-body failure and record `unreachable` after the
+existing attempt limit, instead of letting it crash the build. Award proofs use
+the same retries, count an exhausted read as a failed fetch and mark the check
+incomplete. Certificate refusals retain their exact closed reason even when
+raised by the redirect guard before a redirected send;
+blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
+failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
+with every intake row using it: each intake winner must match a row in the
+complete awarded-company table. One or more winner rows are retained; zero
+refuses. The table is bound to its preceding award heading, excluding the
+opened-bids table, and the award date is read from `span#lblAwardedDate`. The registration match report retains every original
+row and its match/refusal reason. Registration equality precedes exact company
+name equality after the closed normalization in document 04, section 2.4.
+Whitespace-only registrations never match, and duplicate register entries remain
+ambiguous. Awarded values never become turnover or sales, and identifiers stay in
+the custodian matching boundary. Release consumers remain separate tasks.
+
+Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
+rows, are staged together within the cache. A failed write or final validation
+publishes none of that attempt's source tree and preserves its previous tree.
+The single-writer build validates the complete staged archive before replacing
+the source directory; replacement may briefly make an existing source unavailable.
+Dated school access-failure receipts remain separate from successful page output.
+
 ## 8. The manifest and the loader
 
 Public source selections identify a reviewed immutable snapshot by hash. Its
@@ -1057,6 +1235,19 @@ both release kinds. A run-time privacy receipt of an answer is not a release art
 | DAT-131 | For a `protected` release, the manifest lists every privacy artefact at the exact path in the inventory above and no second file with the same role. A `public_only` release does not require a privacy artefact. Every signed JSON artefact is one canonical envelope containing its payload, `signature_algorithm` equal to `Ed25519`, `public_key_id` and `signature`; its manifest SHA-256 covers the complete envelope. The fixture identifier for each scene artefact is `scene:` followed by that lowercase manifest SHA-256. Every artefact and report follows the release-identity rule of DAT-80. The artefact scan also fails on any untreated aggregate, knowledge-fixture value, target value or other person-level or employer-level true value. | Protected-release exact-path and one-role checks; missing, renamed, duplicate-role, unsigned, tampered, wrong-release-name, forbidden-identity-field and true-value fixtures fail. A `public_only` fixture without privacy artefacts passes. The attacker-view report fixture proves that target-class counts, solve counts, outward-rounded interval widths, elapsed time and pass or fail are representable without a true value. |
 | DAT-132 | For a `protected` release, `manifest.parameter_set` equals the shared `export_parameter_set` and exactly that set's protected tables occur in `manifest.tables`. The default `export_parameter_set` is `A` and is fixed, with `window_months`, at the slice S1 gate before the first world build; OI-35 permits an owner or data owner to overrule it only before that gate. `survival_report`, `artefacts/reports/survival_detail_report.json` and `artefacts/reports/attack_report.json` retain aggregate A and B results. No unselected protected table or row occurs anywhere in the release. A `public_only` release has no `parameter_set`, protected table, Simulated table or protected-window field and is never frozen or registered. | Protected candidate build with both table sets fails; a protected candidate with the wrong selected set fails; a missing or post-gate selection fails; aggregate report fixtures for both sets pass; a `public_only` fixture with any forbidden table or field, freeze descriptor or register line fails. |
 | DAT-133 | `./eii freeze` accepts a `protected` release only, is run twice and takes no new flag; a `public_only` release is never frozen or entered in the export register. On its first run on the build machine, it requires the current test pass and a recorded human release review with fields `reviewer_role`, `review_date`, `survival_report_read`, `attack_report_read`, `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set`; the two report-read fields are true and the four release fields equal the verified manifest. It writes the data bundle and checksum list, copies the review record into the bundle as `review.json`, writes `freeze.json` with `release_id`, `window_key`, `protected_sha256`, `world_seed`, `frozen_commit`, `review_record` equal to `review.json` and `state: pending`, and appends exactly one JSON line to `infra/export_register.jsonl` with these fields in order: `window_key`, `protected_sha256`, `world_seed`, `rules_version_id`, `parameter_set`, `release_id`, `code_version`; every value equals the verified manifest. The line reaches the base branch through a normal pull request. On its second run, from a base-branch commit containing that line, the same command builds the application archive from that commit, verifies an offline installation, writes the archive checksum beside the bundle and changes only `freeze.json.state` to `complete`. A protected release is frozen when its bundle has `freeze.json`. For a frozen release only, the installer and `./eii up` require `state: complete` and the matching `window_key` and `protected_sha256` line in the register shipped inside the installed application; either failure exits 7. A release under `data/releases/` on the build machine has no `freeze.json` and is not checked. Continuous integration checks the register alone: existing lines are immutable, one `protected_sha256` is allowed per `window_key`, and one `window_key` per `world_seed`. A freeze is refused when the release is `public_only`, the same `window_key` is registered with different protected tables or the same `world_seed` with a different `window_key`. After a freeze, any change of rules version, exported set, treatment code or world generator requires a new `world_seed` and a new build before another freeze (PRV-120). A frozen bundle refused at install or start because its line is missing from the installed application's register or its freeze is incomplete is remedied by finishing this two-run freeze, not by changing the seed. No signed export-register receipt or substitute file is created. | A `public_only` freeze or register-entry attempt fails; missing-role, missing-date, unread-report, missing-`world_seed` and manifest-mismatch fixtures fail; the first run writes the bundle, checksum list, pending descriptor, `review.json` and one register line; the second no-flag run appends no line, runs only from the containing base-branch commit, verifies offline installation, writes the archive checksum and marks the descriptor complete. A second protected hash for one window key, a second window key for one world seed, a changed line or a removed line fails in a clean continuous-integration checkout using the register alone. Installation and start of a frozen bundle exit 7 when its line is absent from the installed application's register or `freeze.json` is not complete; an unfrozen build release is not checked. A planted signed export-register receipt does not satisfy any check. |
+
+Internal calculation outputs ending `_unrounded` are not display facts (DAT-90).
+The suffix marks internal results excluded by `sector_economics.output_keys`,
+including non-number metadata in `public_methods`: `reliability_unrounded`
+(a reliability label), `geography_unrounded` (a geography key),
+`bulk_months_unrounded` and `order_unrounded` (tuples of month or zone keys),
+and `ranked_unrounded` (a boolean). `interval_unrounded`,
+`including_interval_unrounded` and `excluding_interval_unrounded` hold pairs
+of numbers or an absent interval, not scalar facts. Numeric internal fields may
+also be null when the calculation has no denominator or comparison input;
+that null is not a display fact. These fields are never
+rendered as facts by virtue of their suffix; a display slot still needs a
+validated fact under DAT-90 and DAT-134.
 
 ## 9. The fact object
 

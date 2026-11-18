@@ -915,7 +915,7 @@ Open items from the master design that touch this document:
 - OI-14: the typed-decision gateway has no front-end or run-time role without an approved route.
 - OI-17: no typed-decision measurement panel appears in the Proof room; only the activity-spine lineage line appears.
 
-Questions for the spike in slice S1: whether `FillStyleExtension` and `PathStyleExtension` work through `H3HexagonLayer`; how moving dashes are animated; the origin watermark mechanism is withdrawn by decision 0035; Arabic glyph route (glyph files or font-faces); tabular figures in the chosen font files; the pixel-ratio cap value; the drawing approach; whether road links with a static dash texture and width by class, and crowd density at every stored hour, hold the frame-rate gate; whether the live traffic picture layer is a MapLibre raster source or a deck.gl tile layer; whether the 3D view holds the frame-rate gate.
+Questions for the spike in slice S1: whether `FillStyleExtension` and `PathStyleExtension` work through `H3HexagonLayer`; how moving dashes are animated; the origin watermark mechanism is withdrawn by decision 0035; Arabic glyph route (glyph files or font-faces); tabular figures in the chosen font files; the pixel-ratio cap value; the drawing approach; whether road links with a static dash texture and width by class, and crowd density at every stored hour, hold the frame-rate gate; whether the live traffic picture layer is a MapLibre raster source or a deck.gl tile layer. Whether the 3D view holds the frame-rate gate is answered by S6-T18 under TST-242, using the slice S1 frame-rate configuration as its reference.
 
 ## Sources
 

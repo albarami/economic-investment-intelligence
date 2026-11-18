@@ -1,6 +1,6 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -45,7 +45,7 @@ export async function runSuite() {
     return 1;
   }
   const outDir = await buildPage();
-  const sink = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-trace-'));
+  const sink = temporaryFolder('eii-perf-trace-');
   const server = await startStaticServer({
     mode: 'development',
     root: outDir,

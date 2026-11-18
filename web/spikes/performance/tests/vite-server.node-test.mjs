@@ -1,7 +1,7 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import http from 'node:http';
-import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -135,7 +135,7 @@ function ask(origin, input) {
 }
 
 async function withViteServer(check) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-vite-'));
+  const root = temporaryFolder('eii-perf-vite-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);

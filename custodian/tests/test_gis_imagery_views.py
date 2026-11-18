@@ -300,8 +300,11 @@ def test_absent_imagery_row_makes_no_request(tmp_path: Path) -> None:
 
     outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
     assert calls == []
-    assert entry.url == ""
-    assert entry.skip_reason == "direct_url_unconfirmed"
+    assert (
+        entry.url
+        == "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer"
+    )
+    assert entry.skip_reason == "schema_unconfirmed"
     assert f"SKIP {entry.key} {entry.skip_reason}" in outcome.lines
     assert outcome.failure is None
     stored = [

@@ -1,3 +1,4 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { test } from 'node:test';
@@ -171,11 +172,10 @@ test('the named regeneration command writes exactly the canonical payload', asyn
 
 for (const patch of [{ day_type: 'weekend' }, { summer: true }]) {
   test(`page payload refuses another situation ${JSON.stringify(patch)}`, async () => {
-    const { mkdtempSync, writeFileSync, rmSync } = fs;
-    const { tmpdir } = await import('node:os');
+    const { writeFileSync, rmSync } = fs;
     const { join } = await import('node:path');
     const { pathToFileURL } = await import('node:url');
-    const folder = mkdtempSync(join(tmpdir(), 'synthetic-road-input-'));
+    const folder = temporaryFolder('synthetic-road-input-');
     try {
       const recorded = structuredClone(source);
       Object.assign(recorded.rows[0], patch);

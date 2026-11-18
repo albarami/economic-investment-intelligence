@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Callable
+from typing import NoReturn
 from urllib.parse import urlencode
 
 from eii_custodian.publicdata.fetch.checks import AttemptFailure, schema_failure
@@ -123,3 +126,91 @@ def _plan(body: bytes) -> list[tuple[int, int]] | None:
             return None
         found.append((year, count))
     return found
+
+
+class PartitionError(Exception):
+    """Closed bounded-reader refusal; not converted into an upstream diagnostic."""
+
+
+def load_partition_spans() -> dict[int, tuple[int, int]]:
+    """Only the lead's observed per-year spans may activate the live adapter."""
+    from .page_records import REVIEW
+    from .registry import read_yaml
+
+    document = read_yaml(REVIEW)
+    spans = document.get("accident_spans") if isinstance(document, dict) else None
+    if not isinstance(spans, dict) or not spans:
+        raise PartitionError("partition_byte_bound_unconfirmed")
+    result: dict[int, tuple[int, int]] = {}
+    for year, span in spans.items():
+        if (
+            type(year) is not int
+            or not 1000 <= year <= 9999
+            or not isinstance(span, list)
+            or len(span) != 2
+            or any(type(value) is not int for value in span)
+            or not 0 < span[0] <= span[1]
+        ):
+            raise PartitionError("partition_byte_bound_unconfirmed")
+        result[year] = (span[0], span[1])
+    return result
+
+
+def bounded_partition_reader(
+    transport: Read,
+    spans: dict[int, tuple[int, int]],
+    sleep: Callable[[float], None],
+) -> Read:
+    """Adapt query-bearing exports to S2-T25's bounded metadata reader."""
+    from urllib.parse import parse_qs, urlsplit
+
+    from .allowlist import approve
+    from .bounded import read_metadata, within
+
+    def refuse(reason: str) -> NoReturn:
+        raise PartitionError(reason)
+
+    def review(url: str) -> None:
+        if not approve(url).ok:
+            refuse("blocked_host")
+
+    def read(url: str) -> Response:
+        query = parse_qs(urlsplit(url).query)
+        if not urlsplit(url).path.endswith("/exports/json"):
+            return transport(url)
+        where = query.get("where", [])
+        match = (
+            re.fullmatch(r"year\(accident_year\)=(\d{4})", where[0])
+            if len(where) == 1
+            else None
+        )
+        if match is None or int(match[1]) not in spans:
+            refuse("partition_byte_bound_unconfirmed")
+        span = spans[int(match[1])]
+        if (
+            len(span) != 2
+            or any(type(n) is not int for n in span)
+            or not 0 < span[0] <= span[1]
+        ):
+            refuse("partition_byte_bound_unconfirmed")
+        responses: list[Response] = []
+
+        def capture(address: str) -> Response:
+            response = transport(address)
+            responses.append(response)
+            return response
+
+        body = read_metadata(
+            url,
+            capture,
+            review=review,
+            max_bytes=span[1],
+            sleep=sleep,
+            refuse=refuse,
+            bounded_read=True,
+        )
+        if not within(len(body), span):
+            refuse("metadata_bytes")
+        return responses[-1]
+
+    return read

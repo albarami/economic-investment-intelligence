@@ -147,11 +147,11 @@ def test_exact_block_and_metadata():
         entry = entries[row["key"]]
         assert entry.publisher and entry.title_en
         assert entry.terms_words and entry.terms_read_on
-        assert entry.skip_reason in {"", "direct_url_unconfirmed"}
+        assert entry.skip_reason in {"", "schema_unconfirmed"}
         assert not entry.commit_allowed
         if entry.key in {"gis_boundaries", "gis_imagery_history"}:
-            assert entry.url == "" and entry.layer is None
-            assert entry.skip_reason == "direct_url_unconfirmed"
+            assert approve(entry.url).ok and entry.layer is None
+            assert entry.skip_reason == "schema_unconfirmed"
         else:
             assert approve(entry.url).ok
             assert entry.skip_reason == ""
@@ -199,7 +199,17 @@ def test_exact_hosts_and_pack_list():
         "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
         "besttime.app",
     }
-    added = {"services.gisqatar.org.qa", "monaqasat.mof.gov.qa"}
+    added = {
+        "services.gisqatar.org.qa",
+        "monaqasat.mof.gov.qa",
+        "www.qcb.gov.qa",
+        "visitqatar.com",
+        "www.qncc.qa",
+        "manateq.qa",
+        "www.edu.gov.qa",
+        "myschool.edu.gov.qa",
+        "myschools.edu.gov.qa",
+    }
     assert ALLOWED_HOSTS == baseline | added
     pub03 = next(
         line
@@ -619,7 +629,15 @@ def test_confirmation_matches_registered_not_fetched_states():
         )
         assert row["retrieved_utc"] is None and row["sha256"] is None
         for field in ("terms_words", "terms_read_on", "licence_basis", "skip_reason"):
-            assert row[field] == getattr(entry, field)
+            if field == "skip_reason" and entry.key in {
+                "gis_boundaries",
+                "gis_imagery_history",
+            }:
+                # Preserve the earlier confirmation as history; S2-T29 only confirms URLs.
+                assert row[field] == "direct_url_unconfirmed"
+                assert entry.skip_reason == "schema_unconfirmed" and entry.layer is None
+            else:
+                assert row[field] == getattr(entry, field)
         assert row["review_ref"] and row["note"]
 
 

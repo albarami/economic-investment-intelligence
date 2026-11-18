@@ -33,6 +33,14 @@ ALLOWED_HOSTS = frozenset(
         "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
         "download.geoservice.dlr.de",
         "besttime.app",
+        # S2-T29, L-892 and EVIDENCE-items-1-2, reviewed page/redirect hosts.
+        "www.qcb.gov.qa",
+        "visitqatar.com",
+        "www.qncc.qa",
+        "manateq.qa",
+        "www.edu.gov.qa",
+        "myschool.edu.gov.qa",
+        "myschools.edu.gov.qa",
     }
 )
 

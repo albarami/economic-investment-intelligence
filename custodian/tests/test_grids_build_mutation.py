@@ -232,17 +232,18 @@ def test_population_chain_rows_are_the_hand_written_record(tmp_path: Path) -> No
 
 
 def test_one_receipt_is_required_by_name(tmp_path: Path) -> None:
-    """Zero receipts and two receipts are the same named refusal."""
+    """Neither an empty archive nor ambiguous history permits an unselected read."""
     row = _population()
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: expected one cache receipt"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_selection_invalid"
     body = b"SYN-body"
     store(tmp_path, row, body)
     (tmp_path / KEY / "second.meta.json").write_text("{}\n", encoding="utf-8")
+    (tmp_path / "snapshot_pins.json").unlink()
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: expected one cache receipt"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_selection_invalid"
 
 
 def test_receipt_shape_and_fields_are_named(tmp_path: Path) -> None:
@@ -253,15 +254,17 @@ def test_receipt_shape_and_fields_are_named(tmp_path: Path) -> None:
     digest = _digest(body)
     meta = tmp_path / KEY / f"{digest}.meta.json"
     meta.write_text("[]\n", encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: unreadable receipt"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
     fields_cache = tmp_path / "fields"
     store(fields_cache, row, body)
     meta = fields_cache / KEY / f"{digest}.meta.json"
     loaded = json.loads(meta.read_text(encoding="utf-8"))
     loaded["publisher"] = ""
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(fields_cache, digest, meta)
     with pytest.raises(GridError) as caught:
         cached_bytes(fields_cache, row)
     assert str(caught.value) == "worldpop_qat_agesex: missing receipt publisher"
@@ -272,6 +275,7 @@ def test_receipt_shape_and_fields_are_named(tmp_path: Path) -> None:
     loaded["publisher"] = "SYN-publisher"
     loaded["switched_off"] = True
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(switched_cache, digest, meta)
     with pytest.raises(GridError) as caught:
         cached_bytes(switched_cache, row)
     assert str(caught.value) == "worldpop_qat_agesex: source switched off"
@@ -287,14 +291,24 @@ def test_hash_must_be_64_lower_hex_digits(tmp_path: Path) -> None:
     loaded = json.loads(meta.read_text(encoding="utf-8"))
     loaded["sha256"] = "ab" * 31 + "a"
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
+    index = tmp_path / KEY / "index" / f"{digest}.json"
+    envelope = json.loads(index.read_text())
+    envelope["sha256"] = loaded["sha256"]
+    index.write_text(json.dumps(envelope))
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: malformed hash"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
     loaded["sha256"] = "X" * 64
     meta.write_text(json.dumps(loaded), encoding="utf-8")
+    _reseal_invented_receipt(tmp_path, digest, meta)
+    index = tmp_path / KEY / "index" / f"{digest}.json"
+    envelope = json.loads(index.read_text())
+    envelope["sha256"] = loaded["sha256"]
+    index.write_text(json.dumps(envelope))
     with pytest.raises(GridError) as caught:
         cached_bytes(tmp_path, row)
-    assert str(caught.value) == "worldpop_qat_agesex: malformed hash"
+    assert str(caught.value) == "worldpop_qat_agesex: snapshot_index_invalid"
 
 
 def test_each_missing_citation_is_refused(tmp_path: Path) -> None:
@@ -633,3 +647,11 @@ def test_a_failed_write_with_no_partial_reraises(tmp_path: Path, monkeypatch) ->
     with pytest.raises(OSError, match="SYN-invented write failure"):
         build_grids(tmp_path, (row,), {})
     assert list((tmp_path / "grids").glob(".manifest.json.partial")) == []
+
+
+def _reseal_invented_receipt(cache: Path, digest: str, meta: Path) -> None:
+    """Make a consistent invented archive to reach semantic receipt guards."""
+    index = cache / KEY / "index" / f"{digest}.json"
+    value = json.loads(index.read_text(encoding="utf-8"))
+    value["receipt_sha256"] = _digest(meta.read_bytes())
+    index.write_text(json.dumps(value), encoding="utf-8")

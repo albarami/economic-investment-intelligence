@@ -12,6 +12,7 @@ import pytest
 from custodian.tests.fixtures.grids.invented import (
     entry,
     night_file,
+    reseal_receipt,
     store,
     write_night_root,
     write_scale_offset,
@@ -618,7 +619,7 @@ def test_night_frame_table_refuses_a_tampered_file(tmp_path):
     body = night_file(tmp_path / "SYN.h5").read_bytes()
     digest = store(tmp_path, row, body)
     (tmp_path / row.key / f"{digest}.h5").write_bytes(b"tampered")
-    with pytest.raises(GridError, match="content hash mismatch"):
+    with pytest.raises(GridError, match="snapshot_hash_mismatch"):
         build_grids(tmp_path, (row,), {1: box(0, 0, 1, 1)})
 
 
@@ -630,6 +631,7 @@ def test_night_frame_table_refuses_a_diverged_receipt(tmp_path):
     loaded = json.loads(path.read_text("utf-8"))
     loaded["file"]["tile"] = "h22v06"
     path.write_text(json.dumps(loaded), encoding="utf-8")
+    reseal_receipt(tmp_path, row, digest, path)
     with pytest.raises(GridError, match="receipt file mismatch"):
         build_grids(tmp_path, (row,), {1: box(0, 0, 1, 1)})
 

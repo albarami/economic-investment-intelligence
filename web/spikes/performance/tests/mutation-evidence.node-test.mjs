@@ -1,7 +1,7 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { parseCapture, verifyEvidence } from '../verify-evidence.mjs';
@@ -53,9 +53,7 @@ test('capture parsing accepts whitespace and comments but rejects every malforme
 });
 
 test('evidence verification checks both tracked files, containment, bytes and JSON', () => {
-  const root = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'synthetic-verification-'),
-  );
+  const root = temporaryFolder('synthetic-verification-');
   const relative = 'web/spikes/performance/evidence/synthetic.json';
   const file = path.join(root, relative);
   const evidenceDir = path.dirname(file);

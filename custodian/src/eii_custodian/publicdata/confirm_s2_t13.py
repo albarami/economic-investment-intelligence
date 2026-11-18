@@ -2,7 +2,9 @@
 
 S2-T19 supplies the registry Entry and its fetch sidecar, after a reviewer reads
 terms for buying-entity/category use. It materializes an evidenced none_found
-outcome in the registry too. S2-T08 calls completion_evidence before recording
+outcome in the registry too: its skip_reason is exactly "none_found" and its
+release_tables is empty. Terms outcomes are not switch-offs under decision 0026;
+a recorded visitor-readable source keeps an empty skip_reason and its release tables. S2-T08 calls completion_evidence before recording
 both confirmations under PLN-25. Pending evidence never completes that gate.
 The committed YAML uses JSON syntax (a YAML subset) and is read as strict JSON.
 """

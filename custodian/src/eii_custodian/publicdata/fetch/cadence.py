@@ -25,6 +25,7 @@ FAMILIES = {
     "overture_release": "monthly",
     "tender_notices": "daily",
     "event_pages": "daily",
+    "award_reports": "weekly",
     "incentive_windows": "daily",
     "gis_layers": "weekly",
     "supplier_credentials": "weekly",
@@ -32,6 +33,11 @@ FAMILIES = {
     "statistical_series": "as_published",
 }
 RECORDED_FAMILIES = {
+    "events_visit_qatar": "event_pages",
+    "events_qncc": "event_pages",
+    "suppliers_tawteen": "supplier_credentials",
+    "monaqasat_classified": "supplier_credentials",
+    "awards_owner_scrape": "award_reports",
     "fdi_projects": "investment_pages",
     "investqa_pages": "investment_pages",
     "lic_active": "registers",

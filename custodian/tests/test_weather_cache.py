@@ -4,7 +4,7 @@ import json
 from copy import deepcopy
 
 import pytest
-from custodian.tests.fixtures.grids.invented import entry, store
+from custodian.tests.fixtures.grids.invented import entry, reseal_receipt, store
 
 from eii_custodian.publicdata.fetch.allowlist import (
     ALLOWED_HOSTS,
@@ -136,7 +136,7 @@ def test_weather_cache_refuses_a_tampered_file(tmp_path):
     body = json.dumps(payload()).encode("utf-8")
     digest = store(tmp_path, row, body)
     (tmp_path / row.key / f"{digest}.json").write_bytes(b"{}")
-    with pytest.raises(GridError, match="content hash mismatch"):
+    with pytest.raises(GridError, match="snapshot_hash_mismatch"):
         build_grids(tmp_path, (row,), {})
 
 
@@ -157,6 +157,7 @@ def test_weather_cache_refuses_a_diverged_receipt(tmp_path):
     loaded = json.loads(path.read_text("utf-8"))
     loaded["file"]["cache_role"] = "release_table"
     path.write_text(json.dumps(loaded), encoding="utf-8")
+    reseal_receipt(tmp_path, row, digest, path)
     with pytest.raises(GridError, match="receipt file mismatch"):
         build_grids(tmp_path, (row,), {})
 

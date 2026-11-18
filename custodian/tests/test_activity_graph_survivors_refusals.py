@@ -390,7 +390,11 @@ def test_conflicting_edge_is_named() -> None:
 
 
 def test_every_lineage_edge_type_has_a_lineage_node_at_one_end() -> None:
-    """Every lineage edge type has a lineage node type at one end."""
+    """The only reader of LINEAGE_NODE_TYPES checks every lineage edge type.
+
+    The join removed its last production reader; this declaration still guards
+    against giving a lineage edge type two public ends.
+    """
     unlisted = set(LINEAGE_EDGE_TYPES) - set(_EDGE_ENDS)
     assert unlisted == {"sourced_from"}
     assert "source" in LINEAGE_NODE_TYPES

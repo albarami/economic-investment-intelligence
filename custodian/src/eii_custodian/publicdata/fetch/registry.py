@@ -28,6 +28,8 @@ KINDS = frozenset(
         "paged_cards",
         "comtrade_api",
         "besttime",
+        "public_page",
+        "awards_intake",
     }
 )
 COLLECTED_FAMILIES = frozenset(
