@@ -14,6 +14,7 @@ from pathlib import Path
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
 from eii_custodian.publicdata.fetch.receipts import (
+    archive_auxiliary,
     cache_directory,
     commit_pair,
     sha256_hex,
@@ -250,11 +251,23 @@ def _store(
     }
     payload = json.dumps(manifest, sort_keys=True).encode("utf-8")
     digest = sha256_hex(payload)
+    if terms:
+        archive_auxiliary(entry, directory, "terms", terms, retrieved, terms_url)
+    commit_pair(
+        directory / "manifests",
+        digest,
+        "json",
+        payload,
+        _sidecar(entry, digest, payload, entry.url, host, retrieved, terms),
+    )
     final = directory / "manifest.json"
     partial = directory / ".manifest.json.partial"
     directory.mkdir(parents=True, exist_ok=True)
-    partial.write_bytes(payload)
-    os.replace(partial, final)
+    try:
+        partial.write_bytes(payload)
+        os.replace(partial, final)
+    finally:
+        partial.unlink(missing_ok=True)
     return digest
 
 

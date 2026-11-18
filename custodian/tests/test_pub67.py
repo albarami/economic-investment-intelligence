@@ -5,9 +5,11 @@ import json
 from dataclasses import replace
 
 import pytest
+from custodian.tests.snapshot_fixture import update_receipt
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.review.activity import entry_by_key, parse_isic_rows
 from eii_custodian.publicdata.review.cache_fixture import class_csv, write_cached
 from eii_custodian.publicdata.series.figures import (
@@ -206,9 +208,9 @@ def test_pub67_selected_support_and_stage_admission(tmp_path, monkeypatch):
     "plant,reason",
     [
         ("missing_support", "supporting provenance selections required"),
-        ("missing_body", "FileNotFoundError"),
-        ("missing_receipt", "FileNotFoundError"),
-        ("body", "selected body hash mismatch"),
+        ("missing_body", "snapshot_missing"),
+        ("missing_receipt", "snapshot_missing"),
+        ("body", "snapshot_hash_mismatch"),
         ("receipt", "selected receipt mismatch"),
         ("missing_frame", "FileNotFoundError"),
         ("frame_disagrees", "supporting provenance frame inputs differ"),
@@ -220,18 +222,19 @@ def test_pub67_selected_support_plants(tmp_path, plant, reason):
     if plant == "missing_support":
         del selected["cls_isic4"]
     elif plant == "missing_body":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".csv")).unlink()
+        read_snapshot(tmp_path / "cls_isic4", selected["cls_isic4"]).path.unlink()
     elif plant == "missing_receipt":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")).unlink()
+        read_snapshot(
+            tmp_path / "cls_isic4", selected["cls_isic4"]
+        ).receipt_path.unlink()
     elif plant == "body":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".csv")).write_bytes(
+        read_snapshot(tmp_path / "cls_isic4", selected["cls_isic4"]).path.write_bytes(
             b"wrong"
         )
     elif plant == "receipt":
-        path = tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")
-        meta = json.loads(path.read_text())
-        meta["source_id"] = "wrong"
-        path.write_text(json.dumps(meta))
+        update_receipt(
+            tmp_path, "cls_isic4", selected["cls_isic4"], {"source_id": "wrong"}
+        )
     elif plant == "missing_frame":
         (tmp_path / "frame_s2_t02/municipalities.json").unlink()
     elif plant == "frame_disagrees":
@@ -331,7 +334,7 @@ def test_pub67_nested_lineage_plants(tmp_path, path, value):
         ("title_en", "", "invalid supporting provenance dataset"),
         ("title_en", 3, "invalid supporting provenance dataset"),
         ("publisher", "", "incomplete receipt"),
-        ("retrieved_utc", "bad", "invalid supporting provenance"),
+        ("retrieved_utc", "bad", "snapshot_date_missing"),
         ("licence_basis", "wrong", "selected receipt mismatch"),
         ("key", "wrong", "selected receipt mismatch"),
         ("release_tables", ["invented"], "selected receipt mismatch"),
@@ -339,10 +342,7 @@ def test_pub67_nested_lineage_plants(tmp_path, path, value):
 )
 def test_pub67_support_receipt_lineage_plants(tmp_path, field, value, reason):
     entries, selected = selected_fixture(tmp_path)
-    path = tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")
-    receipt = json.loads(path.read_text())
-    receipt[field] = value
-    path.write_text(json.dumps(receipt))
+    update_receipt(tmp_path, "cls_isic4", selected["cls_isic4"], {field: value})
     result = build(tmp_path, entries, selected)
     assert result["blocked"] == {"lic_active": ("regression: " + reason,)}
     assert "PUB-67" not in result["checks"]
@@ -380,7 +380,7 @@ def test_pub67_bucket_reconciliation_plant(monkeypatch, field):
     "plant,reason",
     [
         ("invalid_hash", "invalid selected hash"),
-        ("non_object_receipt", "selected receipt mismatch"),
+        ("non_object_receipt", "snapshot_index_invalid"),
         ("extra_selection", "supporting provenance selections required"),
         ("duplicate_registry", "supporting provenance registry identity"),
         ("missing_registry", "supporting provenance registry identity"),
@@ -391,9 +391,13 @@ def test_pub67_selected_support_shape_plants(tmp_path, plant, reason):
     if plant == "invalid_hash":
         selected["cls_isic4"] = "invalid"
     elif plant == "non_object_receipt":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")).write_text(
-            "[]"
-        )
+        directory = tmp_path / "cls_isic4"
+        snapshot = read_snapshot(directory, selected["cls_isic4"])
+        snapshot.receipt_path.write_text("[]", encoding="utf-8")
+        index = directory / "index" / (selected["cls_isic4"] + ".json")
+        envelope = json.loads(index.read_text(encoding="utf-8"))
+        envelope["receipt_sha256"] = sha256_hex(snapshot.receipt_path.read_bytes())
+        index.write_text(json.dumps(envelope), encoding="utf-8")
     elif plant == "extra_selection":
         selected["unknown"] = "a" * 64
     elif plant == "duplicate_registry":
@@ -507,15 +511,20 @@ def test_pub67_missing_support_file_reason_has_no_cache_path(
 
     entries, selected = selected_fixture(tmp_path)
     if plant == "body":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".csv")).unlink()
+        read_snapshot(tmp_path / "cls_isic4", selected["cls_isic4"]).path.unlink()
     elif plant == "receipt":
-        (tmp_path / "cls_isic4" / (selected["cls_isic4"] + ".meta.json")).unlink()
+        read_snapshot(
+            tmp_path / "cls_isic4", selected["cls_isic4"]
+        ).receipt_path.unlink()
     elif plant == "frame":
         (tmp_path / "frame_s2_t02/municipalities.json").unlink()
     else:
         monkeypatch.setattr(support, "_REVIEW", tmp_path / "SYN-missing-review")
     result = build(tmp_path, entries, selected)
-    assert result["blocked"] == {"lic_active": ("regression: FileNotFoundError",)}
+    expected = (
+        "snapshot_missing" if plant in {"body", "receipt"} else "FileNotFoundError"
+    )
+    assert result["blocked"] == {"lic_active": ("regression: " + expected,)}
     reason = result["blocked"]["lic_active"][0]
     assert "/" not in reason and "\\" not in reason
     evidence = (tmp_path / "series/internal/build.json").read_text()

@@ -14,6 +14,7 @@ from eii_custodian.publicdata.confirm_s2_t13 import (
     load_confirmation,
     tender_disposition,
 )
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
 
@@ -23,6 +24,7 @@ RECORD = (
 
 
 REGISTRY_FIXTURE_BASE = Entry(
+    refetch=Cadence("none", "frequency_unconfirmed", ""),
     key="tenders_pub",
     source_id="tenders_pub",
     slug="",
@@ -222,12 +224,16 @@ def test_none_found_requires_search_evidence_and_registry_handoff():
 
 
 def test_committed_pending_is_incomplete():
-    c = load_confirmation(RECORD)
-    assert c.tender.outcome == "not_yet_recorded"
-    assert c.weight == WeightConfirmation()
-    assert tender_disposition(c.tender, None, None).status == "NO_DATA"
+    # S2-T19 fills the committed block. The pending guard is the constructed record.
+    pending = Confirmation(Tender(), WeightConfirmation())
+    assert pending.tender.outcome == "not_yet_recorded"
+    assert pending.weight == WeightConfirmation()
+    assert tender_disposition(pending.tender, None, None).status == "NO_DATA"
     with pytest.raises(ValueError, match="incomplete"):
-        completion_evidence(c, None, None)
+        completion_evidence(pending, None, None)
+    recorded = load_confirmation(RECORD)
+    assert recorded.tender.outcome == "terms_do_not_cover"
+    assert recorded.tender.shown is True
 
 
 @pytest.mark.parametrize("missing", ["tender", "weight"])
@@ -314,10 +320,9 @@ def test_adverse_terms_still_need_terms_evidence(outcome, field):
 
 
 def test_pending_must_not_name_release_tables():
-    c = load_confirmation(RECORD)
     with pytest.raises(ValueError, match="pending"):
         tender_disposition(
-            replace(c.tender, release_tables=("pub_tenders",)), None, None
+            replace(Tender(), release_tables=("pub_tenders",)), None, None
         )
 
 
@@ -653,7 +658,7 @@ def test_flags_and_tables_refused_by_named_guard(tmp_path, field, value):
 
 
 def test_pending_stays_hidden_even_with_matching_fetch_metadata():
-    t = load_confirmation(RECORD).tender
+    t = Tender()
     e = registry_record(t)
     assert not tender_disposition(t, e, receipt(t, e)).shown
 

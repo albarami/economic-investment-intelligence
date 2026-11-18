@@ -1,0 +1,137 @@
+# Reviewed field map for the municipal families.
+# Geography is the source's own municipality. Spellings resolve only through
+# municipality_names.csv. Monthly files have no municipality field; published_names
+# stays empty until the lead records the two spellings the lookup already holds.
+version: 1
+geography:
+  "permits_muni/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit":
+    grain: municipality
+    name_fields: [municipality, lbldy]
+  "permits_muni/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of":
+    grain: municipality
+    name_fields: [municipality, lbldy]
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-doha-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "permits_muni/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality":
+    grain: municipality
+    name_fields: []
+    published_names: []
+  "pop_muni_age/population-by-municipality-and-age-groups":
+    grain: municipality
+    name_fields: [municipality, lbldy]
+  "hotels_muni/hotels-and-hotel-apartments-by-municipality":
+    grain: municipality
+    name_fields: [municipality, lbldy]
+  "est_census_2015_muni/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015":
+    grain: municipality
+    name_fields: [municipality, lbldy]
+monthly_permit_pairs:
+  - ["Additions", "إضافات"]
+  - ["Fencing", "تحويط"]
+  - ["New Building", "مباني جديدة"]
+annual_building_pairs:
+  - ["ADDITIONS AND FENCING", "الاضافات والتحويط"]
+  - ["NON-RESIDENTIAL BUILDINGS", "مباني غير سكنية"]
+  - ["RESIDENTIAL BUILDINGS", "مباني سكنية"]
+certificate_building_type:
+  - "ADDITIONS"
+  - "NON-RESIDENTIAL BUILDINGS"
+  - "RESIDENTIAL BUILDINGS"
+certificate_building_pairs:
+  - ["ADDITIONS", "الاضافات"]
+annual_permit_type:
+  - "ADDITION"
+  - "COMMERCIAL BLDG."
+  - "DWELLINGS OF HOUSING LOANS"
+  - "FENCING"
+  - "MOSQUE"
+  - "MULTI-STOREYED BUILDING"
+  - "OTHERS (NON-RESIDENTIAL)"
+  - "OTHERS (RESIDENTIAL)"
+  - "PUBLIC BUILDING"
+  - "VILLA"
+  - "WORKSHOP/FACTORY"
+annual_permit_type_ar:
+  - "أخرى (سكني)"
+  - "أخرى (غير سكني)"
+  - "ادارة حكومية"
+  - "اضافة"
+  - "تحويط"
+  - "عمارة"
+  - "فيلا"
+  - "مبنى تجاري"
+  - "مساكن قروض الاسكان"
+  - "مسجد"
+  - "ورشة/مصنع"
+certificate_type:
+  - "ADDITION"
+  - "COMMERCIAL BLDG."
+  - "DWELLINGS OF HOUSING LOANS"
+  - "MOSQUE"
+  - "MULTI-STOREYED BUILDING"
+  - "OTHERS (NON-RESIDENTIAL)"
+  - "OTHERS (RESIDENTIAL)"
+  - "PUBLIC BUILDING"
+  - "VILLA"
+  - "WORKSHOP/FACTORY"
+facility_pairs:
+  - ["Hotels", "الفنادق"]
+  - ["Hotel Apartments", "الشقق الفندقية"]
+age_groups:
+  - "0"
+  - "1 - 4"
+  - "5 - 9"
+  - "10 - 14"
+  - "15 - 19"
+  - "20 - 24"
+  - "25 - 29"
+  - "30 - 34"
+  - "35 - 39"
+  - "40 - 44"
+  - "45 - 49"
+  - "50 - 54"
+  - "55 - 59"
+  - "60 - 64"
+  - "65 - 69"
+  - "70 - 74"
+  - "75 - 79"
+  - "80 +"
+census_counts:
+  - indicator: establishments
+    field: establishments_number_dd_lmnshat
+    unit: establishments
+  - indicator: employees
+    field: employees_number_dd_lmshtglwn
+    unit: persons
+census_percent_fields:
+  - establishments_lmnshat
+  - employees_lmshtglwn
+census_geometry_fields:
+  - geo_point
+  - geo_shape

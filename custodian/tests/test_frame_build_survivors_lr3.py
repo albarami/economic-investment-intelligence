@@ -1,12 +1,13 @@
 """LR3 frame receipt and report survivors; all receipts are invented."""
 
-import json
 from dataclasses import replace
 
 import pytest
+from custodian.tests.snapshot_fixture import update_receipt
 from custodian.tests.test_frame_census import cache_fixture, entry
 from custodian.tests.test_frame_live_survivors import _ascii_locale
 
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.build import build_frame, read_cached
 from eii_custodian.publicdata.frame.checks import FrameError
 
@@ -17,27 +18,23 @@ def _whole_text(found: object, literal: str) -> None:
 
 def test_receipt_is_utf8_under_ascii_locale(tmp_path):
     source = entry("util_elec")
-    path = cache_fixture(tmp_path, source, [])
-    receipt_path = path.with_suffix(".meta.json")
-    receipt = json.loads(receipt_path.read_text())
-    receipt["publisher"] = "SYN éditeur"
-    receipt_path.write_text(json.dumps(receipt, ensure_ascii=False), encoding="utf-8")
+    cache_fixture(tmp_path, source, [])
+    digest = reviewed_selections(tmp_path)[source.key]
+    update_receipt(tmp_path, source.key, digest, {"publisher": "SYN éditeur"})
     with _ascii_locale():
-        body, loaded = read_cached(tmp_path, source)
+        body, loaded = read_cached(tmp_path, source, digest=digest)
     assert body == []
     assert loaded["publisher"] == "SYN éditeur"
 
 
 def test_marker_character_is_not_a_hash_digit(tmp_path):
     source = entry("util_elec")
-    path = cache_fixture(tmp_path, source, [])
-    receipt_path = path.with_suffix(".meta.json")
-    receipt = json.loads(receipt_path.read_text())
-    receipt["sha256"] = "X" * 64
-    receipt_path.write_text(json.dumps(receipt))
+    cache_fixture(tmp_path, source, [])
+    digest = reviewed_selections(tmp_path)[source.key]
+    update_receipt(tmp_path, source.key, digest, {"sha256": "X" * 64})
     with pytest.raises(FrameError) as caught:
-        read_cached(tmp_path, source)
-    _whole_text(caught.value, "util_elec: malformed hash")
+        read_cached(tmp_path, source, digest=digest)
+    _whole_text(caught.value, "util_elec: snapshot_index_invalid")
 
 
 @pytest.mark.parametrize("target", ["cache", "review"])

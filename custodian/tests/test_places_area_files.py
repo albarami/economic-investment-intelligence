@@ -349,15 +349,9 @@ def _areas(cache: Path) -> Path:
 
 
 def _install_road(cache: Path) -> str:
-    body = b"SYN-ROAD"
-    digest = sha256_hex(body)
-    directory = cache / "roads_osm"
-    directory.mkdir(parents=True, exist_ok=True)
-    (directory / f"{digest}.pbf").write_bytes(body)
-    (directory / f"{digest}.meta.json").write_text(
-        json.dumps({"sha256": digest}), encoding="utf-8"
-    )
-    return digest
+    from custodian.tests.snapshot_fixture import road
+
+    return road(cache, b"SYN-ROAD")
 
 
 def _write_valid(cache: Path, **change: object) -> None:

@@ -15,6 +15,7 @@ import unicodedata
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -62,6 +63,7 @@ def _page(*, token: str, nonce: str, sentence: str) -> bytes:
 
 def _watched() -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key="watched_source",
         source_id="watched_source",
         slug="watched-slug",

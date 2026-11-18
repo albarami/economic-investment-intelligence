@@ -13,18 +13,17 @@ CACHE = ROOT / "data/public_cache"
 
 def cached(cache: Path, source: str, digest: str):
     entry = next(row for row in load_registry() if row.key == source)
-    body = cache / source / f"{digest}.{entry.extension}"
-    receipt_path = cache / source / f"{digest}.meta.json"
-    if not body.is_file() or not receipt_path.is_file():
-        raise ValueError("public_cache_missing:" + source)
-    receipt = json.loads(receipt_path.read_text())
-    if receipt.get("sha256") != digest:
-        raise ValueError("receipt_hash_mismatch:" + source)
     try:
         rows, receipt = selected_source(cache, entry, digest)
     except ValueError as error:
-        if "hash mismatch" in str(error):
+        if "hash_mismatch" in str(error) or "hash mismatch" in str(error):
             raise ValueError("receipt_hash_mismatch:" + source) from error
+        if str(error) in {
+            "snapshot_missing",
+            "snapshot_index_invalid",
+            "snapshot_path_invalid",
+        }:
+            raise ValueError("public_cache_missing:" + source) from None
         raise
     rows = confirmed_rows(entry, rows)
     chain = SourceChain(

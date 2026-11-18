@@ -32,6 +32,7 @@ from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.frame.build import FrameResult, build_frame
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.live import district_aliases
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 _RETRIEVED = "2026-11-14T00:00:00Z"
 _PUBLISHER = "Invented test publisher"
@@ -103,6 +104,7 @@ def _store(cache: Path, source: Entry, body: bytes) -> None:
         terms_sha256="",
     )
     commit_pair(directory, digest, source.extension, body, receipt)
+    select_fixture(cache, str(receipt["key"]), digest)
 
 
 def _active(key: str) -> Entry:

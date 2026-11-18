@@ -1,0 +1,32 @@
+[
+  {
+    "registration_date": "2025-10-02",
+    "encrypted_transaction_number": "SYN-TX-L1",
+    "encrypted_parcel_number": "SYN-PX-L1",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-LAND-1",
+    "property_type": "SYN-EN-LAND",
+    "property_usage": "SYN-USE-RESI",
+    "area_square_meters": null,
+    "area_square_feet": 2000,
+    "property_value": 1000000
+  },
+  {
+    "registration_date": "2025-10-09",
+    "encrypted_transaction_number": "SYN-TX-L2",
+    "encrypted_parcel_number": "SYN-PX-L2",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-LAND-1",
+    "property_type": "SYN-EN-LAND",
+    "property_usage": "SYN-USE-RESI",
+    "area_square_meters": null,
+    "area_square_feet": 2500,
+    "property_value": 1500000
+  }
+]

@@ -11,6 +11,7 @@ import pytest
 from custodian.tests.repository_root import repository_root
 
 from check_tree import DATA_PROBES
+from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import FIELDS, Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.investment_build import (
@@ -971,6 +972,7 @@ def _base(
     period_field: str,
 ) -> Entry:
     return Entry(
+        refetch=Cadence("none", "frequency_unconfirmed", ""),
         key=source_id,
         source_id=source_id,
         slug="",

@@ -176,7 +176,7 @@ def test_only_an_active_buildings_row_with_a_receipt_is_read(tmp_path: Path) -> 
     paths, receipts = _buildings_from_registry(
         cache, (other, skipped, marked, bare, active)
     )
-    assert paths == (active_path,)
+    assert paths == (next(active_path.parent.glob("*/*.parquet")),)
     assert receipts == (receipt_for(active_path, "bldg_ovt/part-90001"),)
 
 
@@ -190,7 +190,9 @@ def test_two_bodies_under_one_receipt_are_refused(tmp_path: Path) -> None:
     first.write_bytes(b"SYN-B-ONE")
     (folder / "b_syn.parquet").write_bytes(b"SYN-B-TWO")
     _receipt(first)
-    assert _receipt_of(cache, row) is None
+    selected = _receipt_of(cache, row)
+    assert selected is not None
+    assert selected[0].read_bytes() == b"SYN-B-ONE"
 
 
 def test_a_receipt_is_read_as_utf_8_and_kept_whole(tmp_path: Path) -> None:
@@ -203,11 +205,11 @@ def test_a_receipt_is_read_as_utf_8_and_kept_whole(tmp_path: Path) -> None:
     """
     cache = tmp_path / "cache"
     row = _row("bldg_ovt/part-90001", "bldg_ovt")
-    path = _receipted(cache, "bldg_ovt/part-90001", b"SYN-B-ONE")
-    _receipt(path, publisher="ناشر")
+    path = _receipted(cache, "bldg_ovt/part-90001", b"SYN-B-ONE", publisher="ناشر")
+
     with _ascii_locale():
         assert _receipt_of(cache, row) == (
-            path,
+            next(path.parent.glob("*/*.parquet")),
             FileReceipt(
                 "bldg_ovt/part-90001",
                 hashlib.sha256(b"SYN-B-ONE").hexdigest(),

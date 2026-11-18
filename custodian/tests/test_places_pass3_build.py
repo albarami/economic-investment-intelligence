@@ -77,6 +77,15 @@ def test_run_build_reaches_the_frame_only_when_ready(tmp_path: Path) -> None:
     entries.append(places)
     bodies = _frame_bodies(entries, body)
     _install_road(cache)
+    from eii_custodian.publicdata.review.cache_fixture import select_fixture
+
+    fetched = run_build(tuple(entries), _frame_transport(bodies), cache, _clock, _sleep)
+    assert fetched.failure is None
+    assert "stage frame frame_refused" in fetched.lines
+    for line in fetched.lines:
+        if line.startswith("PASS ") and "sha256=" in line:
+            fields = line.split()
+            select_fixture(cache, fields[1], fields[2].removeprefix("sha256="))
     ready = run_build(tuple(entries), _frame_transport(bodies), cache, _clock, _sleep)
     assert ready.failure is None
     assert "areas: nothing to do" in ready.lines

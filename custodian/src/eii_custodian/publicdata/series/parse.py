@@ -11,8 +11,8 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
 
 def selected_body(
@@ -21,10 +21,8 @@ def selected_body(
     """No latest-file search and no network; bind the body to its exact receipt."""
     if re.fullmatch(r"[a-f0-9]{64}", digest) is None:
         raise ValueError("invalid selected hash")
-    body = (cache / entry.key / f"{digest}.{entry.extension}").read_bytes()
-    if sha256_hex(body) != digest:
-        raise ValueError("selected body hash mismatch")
-    receipt = json.loads((cache / entry.key / f"{digest}.meta.json").read_text())
+    selected = read_snapshot(cache / entry.key, digest)
+    body, receipt = selected.body, selected.sidecar
     if not isinstance(receipt, dict):
         raise ValueError("selected receipt mismatch")
     expected = {
@@ -40,7 +38,8 @@ def selected_body(
     if any(receipt.get(key) != value for key, value in expected.items()):
         raise ValueError("selected receipt mismatch")
     for key in ("publisher", "retrieved_utc", "licence_id", "fetch_url"):
-        if not isinstance(receipt.get(key), str) or not receipt[key].strip():
+        value = receipt.get(key)
+        if not isinstance(value, str) or not value.strip():
             raise ValueError("incomplete receipt")
     return body, receipt
 

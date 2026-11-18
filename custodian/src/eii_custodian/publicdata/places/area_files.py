@@ -12,6 +12,11 @@ from typing import Protocol
 from shapely.geometry import Polygon
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    read_snapshot,
+    reviewed_selections,
+)
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.areas import (
     AreaCutoff,
@@ -274,26 +279,16 @@ def _areas(cache: Path) -> Path:
 
 
 def _load_road(cache: Path) -> tuple[bytes, str]:
-    directory = cache / ROAD_KEY
-    if not directory.is_dir():
+    digest = reviewed_selections(cache).get(ROAD_KEY)
+    if digest is None:
         raise AreaError("road_file_missing")
-    files = sorted(path for path in directory.glob("*.pbf") if path.is_file())
-    if len(files) != 1:
-        raise AreaError("road_file_missing")
-    body = files[0].read_bytes()
-    digest = sha256_hex(body)
-    if files[0].name != f"{digest}.pbf":
-        raise AreaError("road_file_unreceipted")
-    receipt = directory / f"{digest}.meta.json"
-    if not receipt.is_file():
-        raise AreaError("road_file_unreceipted")
     try:
-        loaded = json.loads(receipt.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise AreaError("road_file_unreceipted") from exc
-    if not isinstance(loaded, dict) or loaded.get("sha256") != digest:
-        raise AreaError("road_file_unreceipted")
-    return body, digest
+        snapshot = read_snapshot(cache / ROAD_KEY, digest)
+        if snapshot.sidecar.get("key") != ROAD_KEY:
+            raise AreaError("road_file_unreceipted")
+        return snapshot.body, snapshot.sha256
+    except SnapshotError:
+        raise AreaError("road_file_unreceipted") from None
 
 
 def _receipt_sha(cache: Path) -> str:
