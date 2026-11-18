@@ -253,7 +253,8 @@ reviewed change, as decision 0059 left its code to S2-T08 part B:
   the OI-96 settled point of document 01; ARC-136 of document 02; DAT-157 and the `pub_place_fsq` contract note of
   document 03; the `places_fsq` method note of document 07; the `places_fsq` backend note of document 08; the OI-96
   point of document 09; OPS-72 of document 13; the section 10 (slice S2) paragraph and the OI-96 point of document 14;
-  and the sources answer of document 16. Decision 0019 item 21 and decision 0040's held-tables row stay as accepted
+  the sources answer of document 16; and the `places_fsq` entries of the Sources lists of documents 01, 03 and 07.
+  Decision 0019 item 21 and decision 0040's held-tables row stay as accepted
   records, read with item 14.
 - Item 15 (S2-T38): the contract of `pub_population_municipality` in document 03.
 
