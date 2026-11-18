@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13; amended by decision 0032 on 2026-11-15 |
+| Status | Draft v0.3, amended by decisions 0016, 0017 and 0019 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13; amended by decision 0032 on 2026-11-15; amended by decision 0054 on 2026-11-18 |
 | Date | 2026-11-13 |
 | Owner | albarami |
 | Purpose | Give every coding agent the binding safety, accuracy, workflow and evidence rules. |
@@ -63,7 +63,7 @@
 39. Record unresolved decisions, assumptions and random failures in [OPEN_ITEMS.md](OPEN_ITEMS.md). A green re-run alone does not close a random failure.
 40. Push one at a time. Never push to the base branch and never force-push. Follow the task's review gate before merge.
 41. Use the top model only for architecture, privacy/security rules, final disagreement rulings, hard debugging and phase reviews; use a strong mid-tier model for most planning, building and review, a fast cheap model for mechanical work, and other makers for independent review. Keep agent counts lean.
-42. Read current official documentation before using libraries newer than most training data, especially MapLibre GL JS 6, deck.gl 9.4, DuckDB 2.0, PostgreSQL 18 and the current Claude API. Confirm exact pins and written retreat pins at slice S1.
+42. Before using a library newer than most training data (for example MapLibre GL JS 6, deck.gl 9.4, DuckDB 2.0, PostgreSQL 18, the current Claude API), read only the current official documentation for the parts the task uses, and confirm exact pins and written retreat pins at slice S1. Each brief names the documentation pages it used (decision 0054).
 
 ## Skills and personas
 
