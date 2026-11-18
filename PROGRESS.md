@@ -33557,6 +33557,581 @@ Seed:      none
 Notes:     All 100 reachable train commits (84 distinct incoming work commits, 13 original outer joins, the move join and both S2-T31 merges) have Conventional Commit subjects; rewritten joins preserve trees and approved second parents.
 ```
 
+### S2-T30 — Announced-project evidence tracker (decision 0047): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/85)
+
+- Specification author: OpenAI Codex (GPT-6), senior release engineer; strict reviewer persona for the specification's self-check: release-evidence reviewer. This is an evidence specification, not a new independent approval. Skills used: project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate. Historical makers, models and verdicts below are attributed to the named input files, with the lead's launch labels distinguished from the returns' self-identification. The underlying build names a senior public-data engineer and a principal data-quality and provenance reviewer from another maker. Mutation builders name senior Python mutation-test engineers; their reviewers name strict test-integrity or equivalence reviewers. Source root for the supplied records is `.overnight/IN/ledger/`; record filenames below are relative to its `verdicts/` directory unless stated otherwise.
+
+#### Plan and plan review
+
+- `S2-T30.plan.return.md` identifies its author as OpenAI, GPT-6 (Codex). It records an initial plan and facts file, no tracked changes, and two lead questions: real milestone registrations and reviewed identity links, and nullable source-time/correction assertions. It says the supplied dependency material did not yet expose S2-T27's archive interface. `S2-T30.plan.rev2.last.md` says both drafts were revised against that actual interface; it is a planner's return, not a review verdict. The lead's `log-lines.md`, entries 3228 and 3237, names the planning lane OpenAI GPT-6.1 Sol, records the revised plan/facts as 74 and 81 lines, and records L-792: reviewed links only, crosswalk uncommitted, explicit unknowns, build on the train-1 join. These names are preserved as distinct reported identities rather than silently reconciled. No plan review was held, and the run's method owes one only for Deep tasks: the task's Delivery line in TASKS.md names it Standard. The lead accepted plan revision 2 under ruling L-792 (2026-11-17 09:39, "Standard: no design review"). OI-n1 maps to the still-open PO-S2-70; L-792 settles OI-n2's explicit unknowns without confirming a real source.
+
+#### Build and review cycle
+
+- Build: Moonshot AI, Kimi through Factory Droid in `S2-T30.build.return.md`; the lead names Kimi K3.1 Pro in `log-lines.md` 3357. Base `c4a9302eb98da15463f68d81db5b456a2bb3b526`; original build commit `e494b76b47f80e81c9ece7aed0dd69d52972bbdb`, replayed as `b0e9e8fb8bcf1bc2d499d11b9b20befcc4907518`. The new `investment_evidence.py`, contracts, immutable parsed artifacts, fetch-attempt archive and closed evidence report are built on invented archived fixtures. The builder reports 11 evidence tests, 28 build tests and 5,511 custodian/core tests passing, with lint, format, mypy, documentation, tree and parity checks exit 0. The lead's first check, entry 3364, exits 1 on the inherited pin-heading test, while the other named checks pass; that is a failure, not a whole-suite pass. The lead says it reverted builder-owned TASKS.md ticks and the draft ledger row because the ledger owns them. PO-S2-70 and PO-S2-71 remain open. No real milestone page, schema or crosswalk was confirmed by this build.
+
+- First review: `S2-T30.rev.last.md`, OpenAI GPT-6 (Codex), principal data-quality and provenance reviewer, **REJECTED** `e494b76b47f80e81c9ece7aed0dd69d52972bbdb`. The lead's lane label is GPT-6 Astra. F1: no production-called tracker adapter. F2: a syntactically valid crosswalk hash was accepted without its archive/receipt. F3: supplied facts were not authenticated against archived bytes and receipts. F4: one snapshot-wide geography rejected multi-location batches. F5: another source's archive could satisfy registration. F6: report text was shape-filtered rather than closed. F7: declared time precision could disagree with the parsed value. The review explicitly ran no tests.
+
+- Fix 1: `S2-T30.fix1.return.md`, Moonshot AI Kimi through Factory Droid; original `22611f134dcec89d707d925628cd5ba72fd9c82b`, replay `d299f54c46b80c54e86cf65d2b59881834166431`. Adds the production cache adapter, verifies crosswalk contents, reparses archived facts, retains per-project geography, binds registration source/key/kind/identity, closes report vocabularies and matches parsed precision. The first nine-test red run includes one fixture constructor error; a corrected empty-snapshot red was run separately. The builder reports 49 investment tests passing and 4,782 custodian tests passing in each startup form, exit 0. Those custodian runs exceeded the whole-runner's 600-second bound; they are direct-pytest results, not proof that the bounded suite passed.
+
+- Confirmation 2: `S2-T30.cf2.last.md`, OpenAI GPT-6 (Codex), **REJECTED** `22611f134dcec89d707d925628cd5ba72fd9c82b`. F1/F2/F4/F6/F7 accepted. F3 remains because caller-held sidecars can be changed together with row/candidate lineage. New F8: an omitted nonempty archive passes as empty coverage. New F9: digit-run and crosswalk plants are rejected before reaching the intended guards. `log-lines.md` 3382 also records a stopped lead check in a worktree being reused by the builder; the stopped run is not a result.
+
+- Fix 2: `S2-T30.fix2.return.md`, Moonshot AI Kimi K3.1 Pro; original `89fee94b5053aeebfed0995af94edb8e11b6daa3`, replay `6eb0a49d563a8fdfb5028fdb2c85b0b90e278fae`. Rereads selected receipts, derives audit contents from parsed archives, turns omitted-dashboard rows into a negative plant, keeps a genuine empty milestone positive and supplies seven effective guard plants. Baseline 15 tests: 6 failed and 9 passed, exit 1; the same set after correction: 15 passed, exit 0. Each of the seven removed guards produces a failure, then the restored group passes. Both investment files: 63 passed. Confirmation 3, `S2-T30.cf3.last.md`, OpenAI GPT-6 (Codex), **REJECTED** `89fee94b5053aeebfed0995af94edb8e11b6daa3`: F8/F9 accepted, residual F3 reads the caller's retrieval time after validating a fresh receipt. The review identifies this as a newly introduced acceptance path and runs no tests.
+
+- Fix 3: `S2-T30.fix3.return.md`, Moonshot AI Kimi K3.1 Pro; original `7111474486d7d4eb81c649854331783c7fcd3fdd`, replay `49eec99c8474cda54e069b2ddaf77911163f6e78`. Rejects conflicting supplied receipt fields and constructs revisions from the verified snapshot, including retrieval time, checksum and source grouping. The two sidecar-only plants fail on the prior head, then pass on the corrected implementation with rows/body/receipt/index unchanged; both investment files report 65 passed. Confirmation 4, `S2-T30.cf4.last.md`, OpenAI GPT-6 (Codex), **APPROVED** `7111474486d7d4eb81c649854331783c7fcd3fdd`, R1-R4 met and no findings. It inspects the remaining-read inventory and retained guards; it explicitly does not run tests and does not mark the whole task complete. The lead's Astra label and this file's GPT-6 identity are both retained here.
+
+#### Initial campaign and kill passes
+
+- Campaign results in this log are copied from the supplied `.camp.txt` files; they are not executable command rows. Each summary below retains made, killed, survived, timed_out, not_covered and incomplete separately. A nonzero campaign exit is never called a pass. The first campaign at `7111474486d7d4eb81c649854331783c7fcd3fdd` is `S2-T30.camp1.txt` (lead `log-lines.md` 3696); it leaves task-owned survivors and the shared `fetch/build.py` debt. Its exact summaries follow in the campaign appendix. The lead assigned kill 1a to investment_build, 1b to investment_evidence, and 1c to investment_contracts/fetch/report. Shared fetch/build was expressly outside those kill passes and assigned to the moved shared-module work. The campaign of fetch/build.py is still open, and under decision 0052 items 1, 5 and 7 this ledger names its lane row instead of a result: the lane row "fetch/build.py re-cut" runs on main after the S2-T30 and S2e joins, over the whole module with its file hash, and its survivors (this task's 151 added lines among them) go to one shared kill task of S2-T27, S2-T28, S2e and S2-T30 with a confirmation by another maker. Under decision 0052 item 6 no slice S2 gate is approved while that campaign is open. The survivors of the module on lines main already held are also open item PO-S2-68.
+
+- Kill 1a: `S2-T30.kill1a.return.md` identifies OpenAI GPT-6 (Codex), exact serving revision not exposed; lead entry 3716 names GPT-6.1 Sol. Original `6ca418b5e90c36c5c6ed6a0db0bdbd06a8ca1077`, later replay `4291644658d3097d87fc3fd9a8eef2dabe204710` from the join-source commit `109a18e1036e88c5502627a4ae1bcec1a49efb1e`. Adds six test files, 198 cases, representative red/restored checks and 33 equivalence proposals. Its 4,996-passed custodian run precedes a final assertion extension, which was then checked by focused runs; it is not a current-head total. It found that audit_snapshot neither authenticated the manifest digest nor rejected empty pages. `S2-T30.k1a.camp.txt` at `6ca418b5e90c36c5c6ed6a0db0bdbd06a8ca1077` still exits 1; nine real survivors remain after the 33 proposals are accepted by the lead.
+
+- Kill 1a2: `S2-T30.kill1a2.return.md`, OpenAI GPT-6 (Codex), exact serving revision not exposed; the lead names Sol. The original follow-up is `059e8da3577d2842636bb9814cc4cc0485a87cc3`, incorporated in join-source `ec3a5131e6c18aa7e4e696f393fb4f682efa5232` and replayed as `5f4a80d2b15e7343df0ef4d2e7210b9b7a43d283`. Five exact mutants fail their new direct active-module tests and pass when restored. The old fresh-interpreter encoding test had imported the installed source rather than the mutated copy, so its earlier claimed kills were not valid. Four remaining cases are proposed equivalent; the lead accepts them under L-943 and enters four rows in addition to the builder's 33. The final follow-up file has four tests, and its direct custodian run reports 5,000 passed, exit 0. The new tests preserve explicit UTF-8 behavior without altering the runner.
+
+- Kill 1b: lead entry 3705 records the Moonshot AI Kimi K3.1 Pro attempt ending early with an insufficient-permission tool refusal, leaving four draft test files and no return. This was not a test failure or a completed pass. OpenAI continues as kill 1b2, `S2-T30.kill1b2.return.md`, self-identified Codex GPT-6, exact serving variant not exposed; the lead names GPT-6.1 Sol. Original `d94340782330566d545105f76f29e63eb2a2e0b0`, join-source `337ea64294db9c3c001593e611765f44c1a8c27f`, replay `142e3feab42547d8ba5699d69bef02a51ae7b4c6`. It preserves 63 inherited cases and yields 102 cases across seven files, with 78 representative red groups, 49 proposed equivalents and 16 records withheld for a lead check. Its direct custodian run reports 4,900 passed, exit 0. `S2-T30.k1b.camp.txt` still exits 1 with 68 survivors: the 49 proposals, 16 withheld and three unaccounted. The builder also identifies caller-controlled milestone independence, duplicate-attempt overwrite and post-comparison mapping reads; these feed fix 4. The complete kill 1a, 1a2 and 1b2 test additions (14 test files, 37 explanation rows) had no other-maker review until the lead found the gap while drafting this ledger; see the review paragraph under the re-cut below: `S2-T30.krev1ab.last.md` (Google Gemini 3.1 Pro through Factory Droid) REJECTED the join head on those files, fix 5 (OpenAI GPT-6.1 Sol) repaired them, and `S2-T30.conffix5.last.md` (Google Gemini 3.1 Pro) APPROVED WORK `7b6cac9eea8294395d32375dff5d0f29257430f1`..
+
+- Kill 1c: `S2-T30.kill1c.return.md` labels COMPANY Factory and MODEL Gemini 3.1 Pro; the lead and later returns identify Google Gemini 3.1 Pro through Factory Droid. Original `15452124cfbced404a4334fd20944e394bfe411d`, join-source `8fab1a9b36c27179f394cca52a3dfafd4dc27a77`, replay `fcef1061b21097fa38f2e0526dca91770f5db375`. Adds contracts/report tests and seven equivalence arguments. The initial focused run passes 11 tests, but custodian collection exits 2 with 63 errors and mypy exits 1 with 21 errors because the worktree was not equipped (lead entry 3701). The lead equips the three worktrees and records 158 investment tests and clean mypy; those corrections do not erase the failures. `S2-T30.k1c.camp.txt` exits 1 with nine contracts survivors: seven equivalent and two non-ASCII key defects; all report mutants are killed.
+
+- Kill 1c2: `S2-T30.kill1c2.return.md`, Google Gemini 3.1 Pro. Original `f6c9aaf0cf0ff03a2d353f565167c48ffc858989`, join-source `5b162c523cb4b88efec0ba2f8896623534489b1b`, replay `7dc1a827056da016ec3fba660654221c9524d520`. Adds an independently computed non-ASCII project-key literal. Each ensure_ascii mutant fails; restored contracts tests pass. Seven exact explanation rows are entered. `S2-T30.k1c2.camp.txt` exits 0 with seven explained contracts survivors and no report survivor. Review `S2-T30.k1crev.last.md`, OpenAI GPT-6 (Codex), **REJECTED** `f6c9aaf0cf0ff03a2d353f565167c48ffc858989`: the seven equivalences are accepted, but a provenance expectation and join argument follow the production constant instead of an independent literal.
+
+- Kill 1c3: `S2-T30.kill1c3.return.md`, Google Gemini 3.1 Pro. Original `d39384f0451c32db5331b0a4bd5588067c85b270`, join-source `e201c77df9b7b55460778af22937c499e5c28786`, replay `775af19e85a370fb363249236f0c2e28b84d221c`. Replaces both uses by literal public and drops the import. The changed constant plant fails, then all 11 tests pass after restoration. `S2-T30.k1ccf.return.md`, Moonshot AI Kimi K3.1 Pro, **APPROVED** `d39384f0451c32db5331b0a4bd5588067c85b270` (head supplied by lead entry 3737): exact fix and scope confirmed, no remaining constant-derived expectation in those two files. This reviewer performs source inspection only. The lead records that the stronger literal test preserves the prior campaign kills; no new campaign is claimed here.
+
+#### Fix 4, joined fixture repair and final kill passes
+
+- Fix 4: `S2-T30.fix4.return.md`, Moonshot AI Kimi K3.1 Pro; original `b198113e1535800e9a32dc53f0d409c6de41f740`, replay `4ba66c1c82db983f02b90243909b31f906e5a265`. Authenticates the exact compatibility-manifest bytes before parsing; refuses empty pages; derives milestone independence from the archived candidate; rejects duplicate attempts before writing; copies supplied mappings before comparisons and reads. Eight new cases are red first and then green. The initial full custodian/core run fails one earlier malformed-manifest fixture; resealing it with its actual digest preserves its unreadable-page assertion. Corrected full run: 5,545 passed, exit 0. Review `S2-T30.rev4.last.md`, OpenAI GPT-6 (Codex), **APPROVED** `b198113e1535800e9a32dc53f0d409c6de41f740`, no findings; reviews the four defects, exact assertions and document 03's account, without executing tests.
+
+- Join of the fix and kill passes: the lead records the combined head `ec3a5131e6c18aa7e4e696f393fb4f682efa5232` and two 1a fixture failures behind fix 4's new integrity guards. `S2-T30.joinfix.return.md`, OpenAI GPT-6 (Codex), makes only fixture changes: manifest bytes under their actual digest, and a real archived page/digest to reach the second archive refusal. Every old assertion and refusal call remains byte-identical; each removed target guard makes its test fail, restored tests pass. New joined head `38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24`, replay `f0db2cb162921506aed77e4bab80d5432c4fda08`. Its direct custodian run reports 5,122 passed in 590.57 seconds. `S2-T30.joinrev.return.md`, Moonshot AI Kimi K3.1 Pro (lead says via OpenRouter), **APPROVED** `38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24`, confirms just these two forced fixture differences, their reachability and preserved mutation kills; no test execution by the reviewer. `S2-T30.j1.camp.txt` is associated by the lead with `337ea64294db9c3c001593e611765f44c1a8c27f`; `S2-T30.j2.camp.txt` with `38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24`. Both exit 1, leading to 1d/1e rather than an unearned pass.
+
+- Kill 1d: `S2-T30.kill1d.return.md`, OpenAI Codex GPT-6, exact serving variant not exposed; lead lane Sol. Original `5106e3b79f83cd0a7eb175804852ea6b78b7d6da`, replay `2ef55bf6ec5805248b0eb812cd62b84c2abce992`. Disposes of all 73 assigned records: 45 individually replayed kills and 28 exact equivalents; all 16 withheld and five new fix-4 records are killed, and 22 earlier equivalence proposals become kills. Adds the eighth evidence-survivor file and 28 rows. The supplied direct custodian run reports 5,141 passed in 589.77 seconds, exit 0; it is near the unchanged 600-second bound and not an idle-reservation measurement. The stateful caller-key/tuple issue is raised as PO-S2-72 locally and correctly renumbered PO-S2-87 at WORK. The lead and later reviewer say ordinary production callers supply parser-created objects, so this remains hardening outside the reachable-input defect scope, not a claimed fix. `S2-T30.k1d.camp.txt` at `5106e3b79f83cd0a7eb175804852ea6b78b7d6da` exits 0; every surviving exact diff matches its explanation.
+
+- Kill 1e: `S2-T30.kill1e.return.md`, OpenAI GPT-6 Codex; lead lane Sol. Original `7b422a0a726d2532cf0954af30a30220b0dada55`, replay `a11db1d77d61c2676bf7ffe21ad008276140cdfc`. Disposes of all 83 assigned build records: 47 exact kills, 36 existing equivalent rows, no deferred record, with seven new cases. The empty agency digest test kills a mutant that an earlier caller-limited row had explained. The builder flags rather than edits that historical row; the lead removes it in the join-source commit, so WORK keeps the test and no stale row for that mutant. The direct custodian run is 5,129 passed in 597.19 seconds, wall 598.449 seconds, seed 301005; the bound is unchanged. Review `S2-T30.krev1de.md`, Google Gemini 3.1 Pro, **REJECTED** `7b422a0a726d2532cf0954af30a30220b0dada55`: accepts all 28 new evidence equivalents, spot-checks ten build equivalents, agrees the obsolete row must go and that PO-S2-87 is not reached by production; rejects negative-only identifier assertions in the new 1d test.
+
+- Exact-identifier correction: the lead (Anthropic Claude Opus 5.5, per the source commit message) strengthens every successful case to its exact identity, source, project and absence values, checking the project key against an ordinary control build, and updates the comments to PO-S2-87. Original `1b797809b58cfeeda26a3c6174aac1879e98b3a0`, replay `7b20c2939bb6ae97ad1cb5d59992049390f599c4`. `S2-T30.kconf1de.md`, Google Gemini 3.1 Pro, **APPROVED** `1b797809b58cfeeda26a3c6174aac1879e98b3a0` (head supplied by lead entry 3816), no findings. `S2-T30.st.camp.txt` runs the unchanged build module from `7b422a0a726d2532cf0954af30a30220b0dada55`, exits 0 and explains every survivor. The later correction changes only evidence tests; no later campaign run is invented.
+
+#### Campaign appendix — verbatim summary lines
+
+- `S2-T30.camp1.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_evidence.py: made=2619 killed=1638 survived=950 timed_out=0 not_covered=31 incomplete=0
+custodian/src/eii_custodian/publicdata/investment_build.py: made=2586 killed=1329 survived=1239 timed_out=0 not_covered=18 incomplete=0
+custodian/src/eii_custodian/publicdata/investment_contracts.py: made=197 killed=129 survived=57 timed_out=0 not_covered=11 incomplete=0
+custodian/src/eii_custodian/publicdata/fetch/report.py: made=26 killed=23 survived=3 timed_out=0 not_covered=0 incomplete=0
+custodian/src/eii_custodian/publicdata/fetch/build.py: made=1811 killed=1217 survived=586 timed_out=0 not_covered=8 incomplete=0
+exit 1
+```
+
+- `S2-T30.k1a.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_build.py: made=2586 killed=2544 survived=42 timed_out=0 not_covered=0 incomplete=0
+exit 1
+```
+
+- `S2-T30.k1b.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_evidence.py: made=2619 killed=2551 survived=68 timed_out=0 not_covered=0 incomplete=0
+exit 1
+```
+
+- `S2-T30.k1c.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_contracts.py: made=197 killed=188 survived=9 timed_out=0 not_covered=0 incomplete=0
+custodian/src/eii_custodian/publicdata/fetch/report.py: made=26 killed=26 survived=0 timed_out=0 not_covered=0 incomplete=0
+exit 1
+```
+
+- `S2-T30.k1c2.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_contracts.py: made=197 killed=190 survived=7 timed_out=0 not_covered=0 incomplete=0
+custodian/src/eii_custodian/publicdata/fetch/report.py: made=26 killed=26 survived=0 timed_out=0 not_covered=0 incomplete=0
+exit 0
+```
+
+- `S2-T30.j1.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_evidence.py: made=2650 killed=2577 survived=73 timed_out=0 not_covered=0 incomplete=0
+custodian/src/eii_custodian/publicdata/investment_contracts.py: made=197 killed=190 survived=7 timed_out=0 not_covered=0 incomplete=0
+custodian/src/eii_custodian/publicdata/fetch/report.py: made=26 killed=26 survived=0 timed_out=0 not_covered=0 incomplete=0
+exit 1
+```
+
+- `S2-T30.j2.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_build.py: made=2664 killed=2581 survived=83 timed_out=0 not_covered=0 incomplete=0
+exit 1
+```
+
+- `S2-T30.k1d.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_evidence.py: made=2650 killed=2622 survived=28 timed_out=0 not_covered=0 incomplete=0
+exit 0
+```
+
+- `S2-T30.st.camp.txt`:
+
+```text
+custodian/src/eii_custodian/publicdata/investment_build.py: made=2664 killed=2628 survived=36 timed_out=0 not_covered=0 incomplete=0
+exit 0
+```
+
+#### Re-cut onto main and join confirmation
+
+- The lead's `log-lines.md` 3534 sets train 2 to S2-T30 alone. Entries 3839 and 3846 record the final re-cut: BASE `a5219f52f5e96bb3e2fe7da7f55198d1722438c3`, join head `769edaa2ee6ef1ceda4558b791de21ddf0dcaaef`; 17 commits, comprising 15 ordered replays with their original-source trailers, then `64383ea1dbd60d4fd4c8c2dcdd793aa1dbaa8328` and the join head `769edaa2ee6ef1ceda4558b791de21ddf0dcaaef`; fix 5 (WORK `7b6cac9eea8294395d32375dff5d0f29257430f1`, below) makes 18. The change is 32 files, 20 added and 12 modified. `.overnight/IN/JOIN-PROOF.txt` and its source `.overnight/IN/joinproof.sh` compare the approved range `c4a9302eb98da15463f68d81db5b456a2bb3b526..1b797809b58cfeeda26a3c6174aac1879e98b3a0` with the joined range: 25 files are byte-identical; seven preserve the task's additions/deletions apart from D1-D4. The specification generator rechecks the commit/trailer sequence, exact file set, blob identities and addition/deletion multisets from Git; it does not execute the supplied shell proof, which writes temporary files.
+
+- D1 places PO-S2-70 and PO-S2-71 alongside main's records and keeps PO-S2-87 without the superseded stateful-caller PO-S2-72 heading. D2 renumbers this task's test record from TST-277 to TST-279 because main already owns TST-277/TST-278. D3 preserves both independent sidecar fields in fetch/build.py: main's requests and this task's terms_url. D4 retains both sides' appended PROGRESS.md and mutation explanation records, including the first task row's restored table header. The seven files are OPEN_ITEMS.md, PROGRESS.md, fetch/build.py, documents 03/04/12 and scripts/mutation_explained.toml. Nothing outside the approved task's file set is added. These are the stated reasons for the join differences, not new feature work.
+
+- `S2-T30.joinconf.last.md`: OpenAI GPT-6 (Codex), strict release and merge-integrity reviewer, **APPROVED** `769edaa2ee6ef1ceda4558b791de21ddf0dcaaef`, no findings; the lead names the lane Codex Astra. It independently verifies the 15 source trailers, two join commits, 32-file scope, 25 identical files and seven reconciled files. It traces D3's separate named lookups and sorted serialization, finds one TST-279 definition and its reference, and parses 905 explanation rows without duplicate module/mutation pairs. It runs only read-only comparisons, rules parity and diff checking; it explicitly does not execute the documentation/tree scripts or full suite. This is join-integrity approval, not a substitute for missing task/pass review evidence or execution gates.
+
+- Review of the kill-pass test additions by another maker (rule 35), found missing by the lead on 2026-11-18 while drafting this ledger: `S2-T30.krev1ab.last.md`, Google Gemini 3.1 Pro through Factory Droid (it named itself after the builder in its header; the run's status line records Droid with Gemini 3.1 Pro), **REJECTED** `769edaa2ee6ef1ceda4558b791de21ddf0dcaaef` on the 14 kill-pass test files and 37 explanation rows of kill 1a (`4291644`), kill 1b2 (`142e3fe`) and kill 1a2 (`5f4a80d`). Findings: two text reads without an encoding (checklist C5), an expectation read from the production constant `COLUMN_FROM_PAGE` (C3), a fresh-interpreter test that did not prove it imported the module under test (C6), and an equivalence claim for the `retrieved_utc` default of `investment_evidence.py` (C7). The lead confirmed the first three in the code and did not adopt the fourth: `read_snapshot` refuses an index whose retrieval time is not a UTC string and a receipt whose retrieval time differs from the index, before any revision is built.
+
+- Fix 5, `S2-T30.fix5.return.md`, OpenAI GPT-6.1 Sol through Codex (default tier), commit WORK `7b6cac9eea8294395d32375dff5d0f29257430f1` on the join head: explicit UTF-8 on every text read and write in the 14 files; literal dashboard fields and mapping; the subprocess test asserts that its child imports the same module file; and test_project_archive_requires_retrieval_time_before_building_revisions pins both refusals (`snapshot_date_missing` and `snapshot_index_invalid`) with no revision built, which keeps the explanation row. Builder plants: the production-constant fault and an ASCII read in a source copy each turned the corrected test red. Scope: six test files and one appended PROGRESS.md section; no production code or explanation row changed. The lead's own checks at WORK: 115 changed tests passed; ruff, format, mypy, docs, agent parity and diff check exited 0; the ASCII plant turned the subprocess test red.
+
+- `S2-T30.conffix5.last.md`: Google Gemini 3.1 Pro through Factory Droid, strict test-integrity reviewer, **APPROVED** `7b6cac9eea8294395d32375dff5d0f29257430f1`, findings none. Its plants were COLUMN_FROM_PAGE["jobs"] changed (14 failures) and an ASCII read in `_read_json` (UnicodeDecodeError from the child), each restored with an empty diff. It independently judged the six stub sites the builder raised (tests that replace `read_snapshot`, `commit_pair` or `_metadata_failure` to reach the caller's own re-check) not a breach of checklist C1, which names pin and TLS loaders, openers and contexts.
+
+- Lead execution failures remain visible (`log-lines.md` 3836, 3850): the old ledger suite at the pre-recut head `1b797809b58cfeeda26a3c6174aac1879e98b3a0`, seed 4181558111, exited 1; the extract calls its cause known but does not state that cause. Its one failure was scripts/tests/test_pin_rulings.py::PinRulings::test_every_pin_has_a_ruling_and_retreat (python-guards 883 passed, 1 failed; every other suite 0 failed; evidence/S2-T30.eiitest.log): the pin headings of three pins that train 1 brought were owed by train 1's ledger and were absent from that pre-recut base, the same known failure as the lead's checks at e494b76 and 89fee94 (log-lines.md 3364, 3400). The re-cut onto main a5219f5, which holds those headings, superseded the head; at WORK the test passes (second suite below). At WORK, first suite seed 1383635576 exited 1: the lead attributes 77 failures to the unequipped worktree, with 30 Python-guard failures, 47 web-check failures and web-unit unable to start; core 739, custodian 6,055 and product 786 passed. After equipment correction, the lead launches a second suite at WORK, seed 2956554839, on cores 24-27. It exited 0 at 2026-11-18 13:17:43 after 1,189.1 s wall: 9,322 passed, 0 failed, 0 skipped in 6 suites (python-guards 884, python-core 739, python-custodian 6,055, python-product 786, web-checks 857, web-unit 1; evidence/S2-T30pr.eiitest.log). The suite prints a suite's duration only when that suite fails, so the custodian duration of this run is not recorded. These failed runs are not replaced by a claim of success. The ledger's suite command will record its own supplied fresh seed and actual exit/counts at WORK; no dry-run seed is represented as execution evidence.
+
+#### Acceptance mapping and remaining scope
+
+- Proposed tick for TASKS.md acceptance criterion 1: the implemented revision/history contract and its planted overwrite/checksum/source-chain refusals are established by the builder/fix returns, the accepted F1/F2/F4/F7 behavior in cf2/cf3, and cf4's APPROVED R1-R4 at `7111474486d7d4eb81c649854331783c7fcd3fdd`. The first criterion is treated as the implementation over selected, captured inputs. Its evidence is invented archives; no real independent-milestone registration, shape or link is claimed. PO-S2-70 still limits live applicability. Relevant tests: test_revision_history_is_immutable, test_snapshot_metadata_and_lineage, test_project_identity_continuity, test_source_times_and_corrections, test_referenced_older_snapshot_and_tamper, test_archive_adapter_retains_history_and_failed_refresh and the sidecar/receipt substitution plants in test_investment_evidence.py.
+
+- Proposed tick for acceptance criterion 2: the independent-milestone, reviewed crosswalk, missing-evidence and announcement/observed-investment separation guards are accepted by cf4 and further hardened by rev4's APPROVED verdict at `b198113e1535800e9a32dc53f0d409c6de41f740`; the later mutation/test reviews strengthen these cases. Relevant tests: test_independent_milestone_requires_independent_evidence, test_reviewed_crosswalk_and_milestone_lineage, test_announcement_and_observation_are_separate, test_cache_adapter_retains_unresolved_milestone, test_audit_rechecks_independence_instead_of_supplied_validation and test_unsupported_completion_or_investment_inference_is_refused. No aggregation, forecast, completion value or new real source is introduced by this tick.
+
+- Leave acceptance criterion 3 unticked. The archive-derived projection and audit plants are implemented and accepted under F8: test_audit_lists_every_revision_and_absence, test_failed_fetch_is_never_closure, test_registration_cannot_substitute_another_sources_archive, test_nonempty_archived_dashboard_rejects_omitted_rows and test_standalone_audit_rereads_missing_and_tampered_archives. However, the supplied records leave actual S2-T08 bundle consumption/completeness integration pending (PO-S2-71); no end-to-end S2-T08 result is supplied. This specification does not turn the local projection checks into a downstream integration claim.
+
+- Existing records are retained, not duplicated: TST-279 in document 12; PO-S2-70 (real milestone registration), PO-S2-71 (downstream assembly and evidence gates), PO-S2-87 (stateful in-process caller objects) in OPEN_ITEMS.md. The older PO-S2-71 text still describes the pre-review/pre-campaign state; this appended log supplies the later approvals and campaign evidence without rewriting its historical statement. PO-S2-84 already records the custodian-duration concern. Kill 1e's temporary request for an item on the stale explanation is resolved by removal of that row, accepted by krev1de; it does not require another new PO. No new items.md or po_items.md is written.
+
+- The closing record of pull request 59, train B5, is already in PROGRESS.md at BASE: the paragraph states its squash merge on 2026-11-15, merge commit `baf525b12566bf0b1192812373796f3503e6a832`, following its head-check and hosted-check paragraphs. Therefore `pre` is empty. The task's Delivery line is proposed as status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/85), using the model ledger's form; this is not a done or merged status.
+
+- Limits: all imported review/confirmation verdicts here are static inspections unless their files explicitly identify a read-only comparison command. Test counts belong to named builder/lead runs and heads, never to this specification author. The author runs no ledger command, product test, mutation campaign, live fetch or network operation. Real-source confirmation and downstream S2-T08 work remain open; no privacy rule, source rule, test limit, runner, baseline or dependency is changed. The six required hosted checks, exact merge-result test and merge are future lead gates, not results of this specification. Evidence commands are the separate commands.json rows at `7b6cac9eea8294395d32375dff5d0f29257430f1`.
+
+#### Evidence for the work commit `7b6cac9eea8294395d32375dff5d0f29257430f1`
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_report_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Closed evidence-line output, registry keys, reasons and independent literal expectations. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_breaks.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Parser, precision, bounds, receipt and manifest-page refusal messages. Fix 4 reseals the malformed-page fixture without changing its unreadable-page assertion. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Ordinary investment publication, full mapped fields, lineage, immutable parsed revisions, equal-byte retrieval preservation, failed refresh and unattempted inputs; manifest hash and empty-page guards. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Atomic bytes, public entry refusals, source specification, confirmation/count boundaries, page families, release selection and manifest/page failures. Join repair preserves the non-dictionary-page guard. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Dashboard and agency publication, exact manifests and archive identity, verified receipts, missing rules and transport forwarding. Join repair makes the second archive refusal reachable. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    67 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Bounds, source envelopes, cached body integrity, receipt/row lineage, Public provenance, protected-join refusal, caveats, parent relationships and source periods. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_4.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    73 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Dashboard/agency specification contracts and refusal branches, page families, kind rules, literal confirmations and bounds diagnostics. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_5.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Candidate cleanup, missing artifacts, partial cleanup, JSON-only reads, UTF-8 behavior, sorted escaped JSON, exact digest and atomic replacement. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Original-source diagnostics, terms on both archived objects and manifest, public agency call forwarding and cleanup of an empty manifest stem. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_7.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Kill pass 1a2: missing-field refusal before cache access, agency landing-page lineage, and direct active-module UTF-8 reads/writes under an ASCII-default probe. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_8.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Kill pass 1e: every field of manifest hash/parse/type/empty-page refusals and the empty agency landing digest that invalidated one historical explanation. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_contracts_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Missing lineage, typed failures, decimal/date parsing, keys/URLs, Public-only slots, source years and future periods; fixed non-ASCII project-key literal and literal public provenance. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Tracker criteria plants: immutable revisions, parser- and receipt-bound metadata, per-project geography, verified crosswalks, independent milestones, exhaustive archive audit, failed retrieval, explicit pins, report safety, precision and fix-round-4 guards. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Archive selection identity, milestone registration, crosswalk and direct links, parser forwarding, envelope normalization, reread identity and complete diagnostics. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Archive validation, selected coverage, snapshotless milestones, exact archived audit/attempt documents, parser contracts and typed assertions. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Exact revision and absence projections, duplicate snapshots and project identities, observed-investment boundary, audit completeness and fetch refusals. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_4.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Milestone Public/lineage/review/independence guards, archived mapping, receipt/registry terms, metadata binding, date truth table and forbidden completion/investment inference. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_5.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Unavailable crosswalks, verified archive metadata, archive ordering, non-success attempt states, receipt binding, correction metadata, unknown precision and empty join values. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Receipt defaults and overrides, bound receipt filenames, verified body and hash, content-key collisions, observed-investment sources and separate source histories. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_7.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Exact source diagnostics, verified metadata after validation and complete typed failure fields. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence_survivors_8.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Kill pass 1d: archive-derived crosswalk keys, independent milestone states, duplicate-attempt diagnostics, terms fallback, caller-object boundary and exact revision/absence identifiers after confirmation. PO-S2-87 remains open. Run this file alone at WORK on invented fixtures; no real source cache or network. Counts come from this run, not an earlier builder return.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . --collect-only -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "8474 tests collected in 1.51s"
+Seed:      none
+Notes:     Collect the configured repository tests under safe-path isolated startup. This proves collection only, including the S2-T30 additions; it neither runs their bodies nor replaces the full suite.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    878 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Scripts guards at WORK, with no failed or skipped tests. Earlier S2-T30 checks failed test_pin_rulings on the pre-ledger base; this run must establish the current result and may not waive it.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint the joined work tree including both tracker modules and every added survivor test; no suppression or skip is introduced by this specification.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "678 files already formatted"
+Seed:      none
+Notes:     Read-only formatting check of WORK; historical formatter corrections are recorded in the task log, not silently retried here.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 391 source files"
+Seed:      none
+Notes:     Type-check the joined tree, including tracker contracts and archive adapters. Earlier counts belong to their earlier heads, so this row fixes no count.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 957 text files, 107 Markdown files: OK"
+Seed:      none
+Notes:     Check the S2-T30 contract, source-history documentation, TST-279 renumbering and existing PO records. This does not establish live-source applicability.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Check repository layout at WORK; the task adds its tracker and tests within existing custodian directories.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lock consistency at WORK. S2-T30 changes neither dependency declarations nor the lock file.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     Validate the existing reference-note anchors against pins and pack documents; this task changes no library pin or reference note.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     The rules files must remain byte-identical; neither is in this task diff.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   uv run --locked python scripts/ci_history_scan.py scan
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "history scan: range HEAD, 100 commits, at least 99 to list, RESULT: PASSED"
+Seed:      none
+Notes:     Pinned history scan on WORK including all replays and joins. A successful historical scan is not substituted for this command.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a5219f52f5e96bb3e2fe7da7f55198d1722438c3...7b6cac9eea8294395d32375dff5d0f29257430f1'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/publicdata/investment_evidence.py A:custodian/tests/test_fetch_report_survivors.py A:custodian/tests/test_investment_build_survivors.py A:custodian/tests/test_investment_build_survivors_2.py A:custodian/tests/test_investment_build_survivors_3.py A:custodian/tests/test_investment_build_survivors_4.py A:custodian/tests/test_investment_build_survivors_5.py A:custodian/tests/test_investment_build_survivors_6.py A:custodian/tests/test_investment_build_survivors_7.py A:custodian/tests/test_investment_build_survivors_8.py A:custodian/tests/test_investment_contracts_survivors.py A:custodian/tests/test_investment_evidence.py A:custodian/tests/test_investment_evidence_survivors.py A:custodian/tests/test_investment_evidence_survivors_2.py A:custodian/tests/test_investment_evidence_survivors_3.py A:custodian/tests/test_investment_evidence_survivors_4.py A:custodian/tests/test_investment_evidence_survivors_5.py A:custodian/tests/test_investment_evidence_survivors_6.py A:custodian/tests/test_investment_evidence_survivors_7.py A:custodian/tests/test_investment_evidence_survivors_8.py M:OPEN_ITEMS.md M:PROGRESS.md M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/report.py M:custodian/src/eii_custodian/publicdata/investment_build.py M:custodian/src/eii_custodian/publicdata/investment_contracts.py M:custodian/tests/test_investment_breaks.py M:custodian/tests/test_investment_build.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/12_TESTING_AND_QUALITY.md M:scripts/mutation_explained.toml'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; output "32 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     S2-T30 alone: 32 files (20 added, 12 modified), exactly the approved task scope. Five custodian implementation files, 21 test files, three pack documents, OPEN_ITEMS.md, PROGRESS.md and mutation_explained.toml. D1-D4 account for the seven files differing from the approved head; 25 are byte-identical. No dependency, rule or runner change.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   ./eii test --seed 3125065821
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    9324 passed, 0 failed, 0 skipped
+Seed:      3125065821
+Notes:     Whole test on WORK with the lead-supplied fresh seed. Provider none, no network or real public cache; no mutation campaign. Retain failures and custodian duration against its unchanged 600-second limit (PO-S2-84). The real seed/result are produced by the ledger, never inferred from the dry arguments.
+```
+
+```text
+### S2-T30 — Announced-project evidence tracker (decision 0047)
+Commit:    7b6cac9eea8294395d32375dff5d0f29257430f1
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a5219f52f5e96bb3e2fe7da7f55198d1722438c3..7b6cac9eea8294395d32375dff5d0f29257430f1'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-18
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     All 17 work commits must have Conventional Commit subjects: 15 replayed task commits and two join-record repairs. Original source trailers and exact order are independently asserted by make_spec.py.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -33625,3 +34200,113 @@ Notes:     All 100 reachable train commits (84 distinct incoming work commits, 1
 | Date | Item | Evidence | By |
 |---|---|---|---|
 | 2026-11-18 | S2-T31 fix 2, F1 to F4 under ruling L-916 and decision 0053 | Working-tree changes over `4432bc39d7a9cb3124b414e8d3e8fdc3f935ea6e`; Git read-only, lead commits. Only the registry test module, decision 0053 Consequences sentence and S2-T31 guard description changed before this appended row. F1 guards both committed reader inputs against tabs and surrogate escapes, pins D1 to D4 including exact depth 5000 and depth-200 control, and extends value parity to both inputs. F2 requires direct calls and plain imports and refuses module/member aliases. F3 keeps all old spellings in independent fixtures beside one approved call, with a positive control and separately named missing/loader-less cases. Initial targeted red: exit 1, 18 failed, 3 passed, 49 deselected (eight absent source refusals, eight diagnostic-message mismatches, two unimplemented text guards); green after implementation: exit 0, 42 passed, 28 deselected. Isolated old-reader plant: exit 1, 6 failed, 1 passed; tracked loader untouched. Additional wrong-call loader-member plant: red exit 1, 1 failed, 26 passed, 51 deselected; green after tightening its context: exit 0, 50 passed, 28 deselected. Five F3 guard-removal proofs and F4 rewritten-module proof: exit 0, repeated on final helper; removing only the targeted guard accepts each of the five new forbidden constructs, and an extra Loader=None at the module-file path is rejected there while the actual guard passes through repository_root from mutants/tests. Initial proof launcher exited 1 for a missing repository import path; an explicit relative PYTHONPATH corrected the identified launcher defect. All throwaway copies and runners removed. Required registry command `uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider`: exit 0, 78 passed in 24.62 s. Whole command `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider`, wrapped by timeout 600 and system time: exit 0, 5665 passed in 240.89 s, wall 241.59 s. All test runs used taskset -c 0-3 and PYTHONDONTWRITEBYTECODE=1; uv offline with worktree-local temporary caches; quiet pytest did not print its automatic seed. Environment: Linux 6.6.114.1-microsoft-standard-WSL2, Python 3.14.6, uv 0.11.31, PyYAML 6.0.3, libyaml True. Ruff check exit 0; format check exit 0 (658 files); mypy exit 0 (390 source files); docs exit 0 (936 text files, 106 Markdown); tree exit 0 (8 rules); cmp AGENTS.md CLAUDE.md and git diff --check exit 0. AST comparison: only three existing helper/test definitions changed, no existing definition removed, other existing definitions unchanged; decision changed only the required sentence. Records are checked again after this append; final exits and commands are in `.overnight/RETURN.md`. No production, limit, timeout, runner, dependency, lock, pin, skip, deselection or mutation-setting change; no network or mutation campaign. Independent review and commit remain with the lead. | OpenAI GPT-6 (Codex); builder: senior Python test and supply-chain security engineer; reviewers: strict security reviewer and strict records reviewer, other makers later with the lead. Loaded: project-orientation, task-standards, github-flow, sanad-provenance, muhasabah-gate. Requested test-driven-development, systematic-debugging and verification-before-completion unavailable; their plain-meaning red-first, root-cause and final-verification procedures applied. |
+
+```text
+### S2-T30 — Fix round 4: manifest authentication, audit-derived milestone state, duplicate attempts and plain row copies
+Commit:    7111474486d7d4eb81c649854331783c7fcd3fdd (base; the fix-round changes are uncommitted)
+Command:   Planted pytest selections, then both changed investment files, custodian/tests with core/tests, ruff check, ruff format --check, mypy, uv lock --check, check_docs.py, check_tree.py, cmp AGENTS.md CLAUDE.md and git diff --check; test commands used PYTHONDONTWRITEBYTECODE=1 and taskset -c 0-3.
+Exit code: RED 1 for each item before production changes: item 1 (2 failed, 28 deselected), item 2 (1 failed), item 3 (1 failed), item 4 (4 failed). GREEN 0 after each fix: item 1 (2 passed), item 2 (1 passed), item 3 (1 passed), item 4 (4 passed). Combined new tests 0 (8 passed, 65 deselected); changed investment files 0 (73 passed). First full suite 1 (5,544 passed, 1 failed); final full suite 0 (5,545 passed). First format check 1 (3 files) and first mypy 1 (1 error), both corrected; final ruff check, format check, mypy, lock check, documentation check, tree check, rules-file comparison and diff check each 0.
+Date:      2026-11-18
+Run by:    builder (local), Moonshot AI Kimi K3.1 Pro through Droid
+Counts:    Eight new planted cases; 73 focused tests; 5,545 final custodian/core tests; 607 files formatted; 374 source files type-checked; 69 locked packages; 881 text files and 103 Markdown files documented; 8 tree rules.
+Seed:      none
+Notes:     Item 1 authenticates manifest bytes against manifest_sha256 as hash_mismatch before parsing and refuses an empty compatibility page list as missing_artifact/pages/empty; document 03, Cache-only announced-project evidence (S2-T30), distinguishes this from a valid empty milestone page. Item 2 derives independent audit state from the archived candidate's independence as well as supplied status, yielding missing_evidence/unvalidated_milestone/milestone_not_independent for the publisher plant. Item 3 refuses duplicate source/key attempts as evidence_audit_incomplete/duplicate fetch attempt before writing. Item 4 compares and reads only plain dictionary copies. The pre-existing malformed-page test kept its assertion; its manifest fixture now has a matching hash so it still reaches the page-type guard. OPEN_ITEMS.md and TASKS.md are unchanged because no open item or round-named status changed. Skills: project-orientation, task-standards, sanad-provenance, test-driven-development, systematic-debugging, verification-before-completion and muhasabah-gate. No commit, network, mutation campaign, database operation or cache read.
+```
+
+```text
+### S2-T30 — Kill pass 1d: supplied joined-head survivor dispositions
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; pass remains uncommitted)
+Command:   PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/run_proofs.py; each subprocess prefixes taskset -c 4-7 uv run --locked python and runs the exact isolated mutant or original pytest node.
+Exit code: Harness 0; each of eight exact mutant tests 1 and each corresponding original-code test 0; new test file 0 (11 passed).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Reviewer:  Strict mutation and equivalence reviewer from another maker, pending with the lead
+Counts:    Supplied records 73; K 8; E 65 (64 unique exact TOML rows because records 38 and 39 have identical diffs); 49 prior proposals rechecked; withheld 16 resolved as 15 E and 1 K.
+Seed:      No explicit seed supplied; repository conftest selects a clock-based Hypothesis seed; new tests use deterministic invented inputs.
+Environment: Python bytecode disabled, affinity 4-7, UV_OFFLINE=1, uv/ruff/mypy caches and TMPDIR confined to .overnight/tmp; existing locked environment; no network or source-cache read.
+Evidence:  .overnight/tmp/proofs.json records commands, real exits, summaries and wall times; .overnight/tmp/replays/ holds exact mutant copies and red/green logs; .overnight/tmp/prior49-recheck.json maps every earlier proposal to the current hunk; .overnight/tmp/equivalence_recheck.json records the current proofs.
+Notes:     New tests preserve selected crosswalk linkage, supplied audit reasons, independent empty-reason state, duplicate-attempt source diagnostics and verified-registry terms fallback. Record 25 is killed rather than explained: a typed caller value equal to null can survive dictionary equality, while the geography guard still normalizes it to absence. Fifteen withheld default mutations cannot read an absent key after plain row copying and metadata validation. All N1-N5 are individually replayed. No production code, inherited test or existing explanation row changed; no mutation campaign, Git mutation or independent approval claimed. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, github-flow, muhasabah-gate; test-driven-development, systematic-debugging and verification-before-completion unavailable by name, so brief-specified plain-meaning rules applied.
+```
+
+```text
+### S2-T30 — Kill pass 1d correction: retained key objects defeat the proposed default equivalences
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; no commit made)
+Command:   PYTHONDONTWRITEBYTECODE=1 taskset -c 4-7 uv run --locked python .overnight/tmp/key_boundary.py; focused pytest of test_investment_evidence_survivors_8.py; .overnight/tmp/run_extra_proofs.py applies each of the fifteen additional exact mutants in an isolated copy.
+Exit code: Boundary reproducer 0; focused fixture attempts 1 (5 failed, 11 passed) twice, then 0 (16 passed).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Seed:      Repository clock-based seed, no explicit seed argument; deterministic invented inputs
+Counts:    Corrected final partition: K 23, E 50, 49 unique new exact explanation rows; all sixteen previously withheld records are K. All 49 earlier equivalence proposals remain E; the additional equivalent is the default ensure_ascii argument.
+Notes:     Correction to the earlier entry's proposed fifteen E rows: dict copying preserves str-subclass keys, so their stateful equality can hide a key after metadata validation. Removed only this pass's uncommitted proposed explanations, preserving every pre-existing row, and added five negative tests of fabricated identifier text. PO-S2-87 records the unremediated production-boundary issue; no test blesses acceptance of empty identity parts and future metadata refusal is allowed. The first fixture attempt reused identical raw bytes for two revisions and correctly met revision_overwrite; the second used an unsupported float fixture token. Distinct body bytes and the existing fixture's exact numeric-token form corrected both causes. These were deterministic fixture-construction errors, not random suite failures. The earlier whole-suite run began before these additional cases, so a final whole-suite run is required after the added tests.
+```
+
+```text
+### S2-T30 — Kill pass 1d intermediate whole-suite and completed kill proofs
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; uncommitted)
+Command:   .overnight/tmp/run_checks.py and .overnight/tmp/run_extra_proofs.py; commands and environments recorded in their JSON evidence.
+Exit code: Both harnesses 0; 23 individual mutant tests each 1 and 23 corresponding original tests each 0; first whole custodian suite 0 (5,133 passed in 578.67s; measured subprocess wall 579.740s, below 600s).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6)
+Seed:      Initial commands use the repository clock-based seed, not explicitly captured; the final command will supply and record a runtime-generated seed.
+Counts:    Focused initial investment suite 482 passed, 4,651 deselected; 624 formatted files; 374 typed source files; 898 text files and 103 Markdown files; 8 tree rules; 73 of 73 dispositions (23 K, 50 E, 49 unique E rows). All 720 pre-existing TOML rows were checked unchanged as a byte-identical prefix.
+Notes:     ruff check, format check, mypy, documentation check, tree check, AGENTS/CLAUDE comparison, git diff --check, disposition verification and production-source diff each exited 0. The first full run collected the 11-case file before the five key cases were appended; the final required run therefore follows the completed 16-case file. No failure, baseline refresh, skip or retry is concealed. Initial check evidence is .overnight/tmp/checks-initial.json; all 46 individual red/green results are in .overnight/tmp/proofs.json. PO-S2-87 remains open.
+```
+
+```text
+### S2-T30 — Kill pass 1d correction: typed tuple equality and redundant snapshot validation
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; no commit made)
+Command:   .overnight/tmp/run_fallback_proofs.py; .overnight/tmp/run_selection_proof.py; new-file pytest; second whole-suite result retained in .overnight/tmp/checks-second.json.
+Exit code: Both proof harnesses 0; all 22 additional exact mutant tests 1 and original witnesses 0; new-file pytest 0 (18 cases after tuple plants, then 19 after selection plant); second whole custodian suite 0 (5,138 passed in 575.08s; measured wall 576.038s, below 600s).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6)
+Seed:      Second whole suite 1794987182; new isolated witnesses use deterministic invented inputs and the repository's automatic seed.
+Counts:    Corrected final partition: K 45, E 28, 28 unique exact TOML rows. The 49 earlier proposals resolve as 22 K and 27 E; the additional E is json.dumps default ensure_ascii=True. All sixteen withheld mutants and N1-N5 remain K. There are now nineteen cases across eight test functions, with 45 exact red/green pairs.
+Notes:     Correction to the earlier empty-history proofs: a tuple subclass can override comparison with empty canonical history while retaining iterable revisions or absences, reaching the audit fallback. Twenty-one proposed dead-branch explanations were removed from this pass's uncommitted additions and individually killed by two tests. A stateful selection key also makes the duplicate archive validation detect a conflict, so dropping snapshots changes a refusal; that earlier proposal is now K. Every pre-existing explanation row remains untouched. The original-code tuple fallback is an additional unremediated caller-object boundary under PO-S2-87; the new tests permit a future refusal and only constrain fields if emitted. The second whole run collected before these final three cases, so a final whole run follows the nineteen-case file. Its intermediate disposition check saw 44 K and 29 E before the selection proof completed; the final checker will verify 45 K and 28 E. Earlier rows are preserved as history, not current completion claims.
+```
+
+```text
+### S2-T30 — Kill pass 1d final verification
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; all pass changes remain uncommitted)
+Command:   PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/run_final_checks.py; every exact subprocess command is recorded in .overnight/tmp/checks-final.json.
+Exit code: All twelve final checks 0; all 45 isolated exact mutant replays 1 and original-code witnesses 0; no mutation campaign run.
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Reviewer:  Strict mutation and equivalence reviewer from another maker, pending with the lead
+Seed:      1794987883, explicitly supplied to all three final pytest commands
+Environment: Existing locked environment; PYTHONDONTWRITEBYTECODE=1; taskset -c 4-7; UV_OFFLINE=1; uv, ruff and mypy caches plus TMPDIR confined to .overnight/tmp.
+Counts:    new-tests: 19 passed in 0.32s; investment: 490 passed, 4651 deselected in 19.27s; custodian: 5141 passed in 589.77s (0:09:49); ruff: All checks passed!; format: 624 files already formatted; mypy: Success: no issues found in 374 source files; docs: checked 898 text files, 103 Markdown files: OK; tree: checked 8 rules: OK; agent-parity: (no output); diff: (no output); dispositions: 73 of 73; K=45; E=28; unique E rows=28; exact mutation text verified; production-unchanged: (no output)
+Wall time: Final whole custodian suite 590.824 seconds, below the unchanged 600-second limit.
+Evidence:  .overnight/tmp/checks-final.json, .overnight/tmp/final-check-*.log, .overnight/tmp/proofs.json, .overnight/tmp/dispositions.json, .overnight/tmp/dispositions.md, .overnight/tmp/explanations-preserved.json and .overnight/RETURN.md.
+Notes:     Final partition is 45 K and 28 E, with 28 new exact TOML rows and 73 of 73 records accounted for. Every prior explanation row remains byte-identical. All sixteen withheld mutants and N1-N5 have exact individual red/green proofs. Eight functions add nineteen cases. Production sources and inherited tests are unchanged. PO-S2-87 remains open because this pass may not fix the caller-key boundary. The lead's campaign and independent different-maker review remain pending. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, github-flow and muhasabah-gate; unavailable test-driven-development, systematic-debugging and verification-before-completion applied through the brief's plain-meaning rules. Muhasabah: PASS for scope and attributed evidence, with no production-fix or approval claim.
+
+### S2-T30 — Kill pass 1e: exact survivor dispositions and complete audit refusals
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; changes remain uncommitted)
+Command:   python3 .overnight/tmp/assigned_proofs.py prove (only assigned exact K records, disposable copies); python3 .overnight/tmp/assigned_proofs.py check; taskset -c 20-23 uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_8.py -q -p no:cacheprovider; taskset -c 20-23 uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k investment; taskset -c 20-23 uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider; uv run --locked ruff check .; uv run --locked ruff format --check .; uv run --locked mypy; python3 scripts/check_docs.py; python3 scripts/check_tree.py; cmp AGENTS.md CLAUDE.md; git diff --check. Exact expanded arguments, test nodes, temporary paths, commands and last lines are retained in .overnight/tmp/proof-results.json and .overnight/tmp/checks.jsonl.
+Exit code: Every one of 47 exact-mutant representative tests RED 1; all five representative unchanged-code selections GREEN 0. Initial seven-case new-file test 0; focused investment suite 0; full custodian suite 0; ruff check, format check, mypy, documentation check (including after the open-item addition), tree check, rules comparison, diff check and exact disposition audit each 0.
+Date:      2026-11-18
+Run by:    OpenAI GPT-6 Codex, senior Python test engineer for provenance mutation testing; later reviewer persona: strict mutation and equivalence reviewer from another maker (pending).
+Counts:    83 assigned records: 47 K, 36 E with exact pre-existing TOML rows, 0 D. Five new test functions, seven new cases. Focused suite: 478 passed, 4651 deselected in 20.19 s, process wall 21.134 s. Full custodian: 5129 passed in 597.19 s, process wall 598.449 s, within the unchanged enforced 600 s bound. Formatter: 624 files; mypy: 374 source files; documentation: 898 text files and 103 Markdown files; tree: eight rules.
+Seed:      301005 for the exact-mutant proofs, representative green selections and both final suites; initial seven-case smoke test used the repository's automatic seed.
+Environment: PYTHONDONTWRITEBYTECODE=1, UV_OFFLINE=1, CPUs 20-23, local temporary folders under .overnight/tmp. Offline injected transport only; no network request, database operation or general mutation campaign. Git read-only; no commit, branch, stash or reset.
+Notes:     Complete failure-field assertions kill the malformed-manifest and empty-page survivors. Record 67 is distinguished by an empty typed landing digest plus a valid compatibility receipt: original missing_lineage/page_sha256/absent versus mutant missing_artifact/empty/missing. The original is correct; no production defect is claimed. The lead removed that narrower historical row in the same commit, since this test now kills the mutant. All other E arguments trace every input through unused fields, receipt constraints, normalization, snapshot identity, exception handling or standard-library defaults; .overnight/tmp/equivalence.md records the consumer proofs. No production file, existing test, assertion, expectation or explanation row changed. The target bytes match HEAD, SHA-256 0c97c4d58c6be5394ba49f682540c88997cf45797d0c92809fa842f54160f517. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, muhasabah-gate, github-flow; named TDD, systematic-debugging and verification-before-completion files unavailable, with the brief's plain-meaning rules applied. Independent review and the lead's later campaign remain pending. Muhasabah: PASS for the assigned builder pass; no approval or merge claimed.
+```
+
+
+```text
+### S2-T30 — FIX5: encoding, literal contract and subprocess identity repairs
+Commit:    769edaa2ee6ef1ceda4558b791de21ddf0dcaaef (base; git read-only, no commit made)
+Date:      2026-11-18
+Run by:    OpenAI GPT-6 (Codex), senior Python test engineer
+Reviewer:  Strict test-integrity and provenance reviewer from another maker; confirmation pending with lead
+Skills:    project-orientation, task-standards, mutation-testing, muhasabah-gate, sanad-provenance, github-flow; strict-reviewer self-assessment. Missing test-driven-development and verification-before-completion applied by plain meaning.
+Command:   PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/fix5/prove.py ascii before; mapping before; ascii after; mapping after. PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/fix5/checks.py changed; full; static. The harnesses record every expanded command, exit, last line and wall time in .overnight/tmp/fix5/proofs.jsonl; each command has its own log.
+Environment: Python 3.14.6, Linux x86_64, uv 0.11.31, existing locked environment; UV_OFFLINE=1; PYTHONDONTWRITEBYTECODE=1; CPUs 20-23 through taskset; seed 301005; UV/ruff/mypy caches and temporary files under .overnight/tmp/fix5. No network or mutation campaign.
+Exit code:  Changed-file pytest, full custodian pytest, ruff check, ruff format --check, mypy, check_docs, check_tree, AGENTS/CLAUDE cmp and git diff --check all 0. Saved initial encoding audit 1 (six violations), current audit 0 (none). Original tests with planted ASCII reader or changed jobs mapping both 0 (one case each); corrected tests with those same individual copied-source faults both 1 (one failed case each), detecting faults the original tests missed.
+Counts:    Changed tests: 115 passed in 0.94s. Whole custodian: 6057 passed in 227.83s (0:03:47); measured process wall 228.476 s. Ruff: All checks passed!. Format: 678 files already formatted. Mypy: Success: no issues found in 391 source files. Docs: checked 957 text files, 107 Markdown files: OK. Tree: checked 8 rules: OK. Rules cmp and diff: no output, exit 0.
+F1/F2/F3:  Explicit UTF-8 at all six implicit I/O sites in the fourteen named files; literal expected frozenset/mapping and literal dependent fixtures replace production constant reads; subprocess preserves inherited environment, prepends the module-under-test source root and asserts exact imported file. Disposable ASCII-copy fault fails inside the child after identity validation.
+F4:        Both receipt and index missing retrieved_utc -> exact snapshot_date_missing; receipt alone missing it with valid receipt hash -> exact snapshot_index_invalid. Each isolated case passed (exit 0; 0.09 s and 0.10 s), forwarding revision-constructor spy called zero times. The existing timestamp-default equivalence row is unchanged.
+Scope:     Six kill-pass test files and this appended evidence section; no production source, TOML row, runner, skip, tolerance or limit changed. Operational report .overnight/RETURN.md contains per-test locations and evidence.
+Open:      Different-maker confirmation pending. Literal C1 sweep also flagged inherited non-forwarding snapshot/metadata diagnostic seams at test_investment_build_survivors_2.py:252/260, test_investment_evidence_survivors.py:239/476 and test_investment_evidence_survivors_6.py:126/181, retained outside F1-F4 and listed for lead follow-up in the return report. No blanket checklist approval claimed. F4 found no production defect. Muhasabah PASS for scoped changes and truthful evidence.
+```
+
+Final record checks for FIX5: after writing the return and ledger section, check_docs (957 text files, 107 Markdown files), check_tree (eight rules), AGENTS/CLAUDE comparison, git diff --check and git diff --exit-code for custodian/src plus scripts/mutation_explained.toml each exited 0. Exact commands, last lines and wall times are appended to .overnight/tmp/fix5/proofs.jsonl.

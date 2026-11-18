@@ -16,7 +16,11 @@ from pathlib import Path
 from eii_custodian.publicdata.fetch.kinds import read_bounded
 from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry, RegistryError, read_yaml
-from eii_custodian.publicdata.fetch.snapshots import SnapshotError
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    publish_snapshot,
+    read_snapshot,
+)
 from eii_custodian.publicdata.fetch.transport import Transport
 from eii_custodian.publicdata.investment_contracts import (
     AGENCY_KINDS,
@@ -248,7 +252,20 @@ def audit_snapshot(cache: Path, source_id: str) -> InvestmentFailure | None:
             1, source_id, "", "missing_artifact", "manifest", "missing"
         )
     manifest_path = cache / source_id / "manifests" / f"{digest}.json"
-    manifest = _read_json(manifest_path)
+    try:
+        manifest_body = manifest_path.read_bytes()
+    except OSError:
+        return InvestmentFailure(
+            1, source_id, "", "missing_artifact", digest, "missing"
+        )
+    if sha256_hex(manifest_body) != digest:
+        return InvestmentFailure(1, source_id, "", "hash_mismatch", digest, "mismatch")
+    try:
+        manifest: object = json.loads(manifest_body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return InvestmentFailure(
+            1, source_id, "", "missing_artifact", digest, "missing"
+        )
     if not isinstance(manifest, dict):
         return InvestmentFailure(
             1, source_id, "", "missing_artifact", digest, "missing"
@@ -265,6 +282,8 @@ def _audit_pages(
         return InvestmentFailure(
             1, source_id, "", "missing_artifact", "pages", "missing"
         )
+    if not pages:
+        return InvestmentFailure(1, source_id, "", "missing_artifact", "pages", "empty")
     for page in pages:
         if not isinstance(page, dict):
             return InvestmentFailure(
@@ -468,11 +487,15 @@ def _fetch_page(
     )
     try:
         commit_pair(directory, page_digest, entry.extension, response.body, side)
+        snapshot = read_snapshot(directory, page_digest)
+        archived_retrieved = snapshot.sidecar["retrieved_utc"]
+        if not isinstance(archived_retrieved, str):
+            raise SnapshotError("snapshot_index_invalid")
+        return page_digest, archived_retrieved, snapshot.body
     except SnapshotError:
         return InvestmentFailure(
             1, entry.source_id, url, "snapshot_invalid", "verified snapshot", "invalid"
         )
-    return page_digest, retrieved, response.body
 
 
 def _commit_batch(
@@ -489,6 +512,20 @@ def _commit_batch(
     table_digest = sha256_hex(text.encode("utf-8"))
     table_path = cache / entry.source_id / "staging" / f"{table_digest}.json"
     _atomic_write(table_path, text)
+    try:
+        _archive_evidence(
+            cache, entry, envelope, terms, retrieved, table_digest, text.encode()
+        )
+    except SnapshotError:
+        _discard_candidate(cache, entry.source_id, table_path, table_path)
+        return InvestmentFailure(
+            1,
+            entry.source_id,
+            envelope.page_url,
+            "snapshot_invalid",
+            "verified parsed evidence",
+            "invalid",
+        )
     manifest = {
         "schema_version": SCHEMA_MANIFEST,
         "source_id": entry.source_id,
@@ -507,6 +544,7 @@ def _commit_batch(
         "parser_method": envelope.method,
         "parser_version": envelope.method_version,
         "table_sha256": table_digest,
+        "table_snapshot_identity": table_digest,
         "pages": list(pages),
     }
     manifest_text = _dump(manifest)
@@ -517,13 +555,67 @@ def _commit_batch(
     if audited is not None:
         _discard_candidate(cache, entry.source_id, table_path, manifest_path)
         return audited
+    try:
+        _archive_evidence(
+            cache,
+            entry,
+            envelope,
+            terms,
+            retrieved,
+            manifest_digest,
+            manifest_text.encode(),
+        )
+    except SnapshotError:
+        _discard_candidate(cache, entry.source_id, table_path, manifest_path)
+        return InvestmentFailure(
+            1,
+            entry.source_id,
+            envelope.page_url,
+            "snapshot_invalid",
+            "verified manifest evidence",
+            "invalid",
+        )
     pointer = {
         "source_id": entry.source_id,
         "manifest_sha256": manifest_digest,
+        "evidence_manifest_identity": manifest_digest,
         "release_selected": False,
     }
     _atomic_json(cache / entry.source_id / "loadable.json", pointer)
     return None
+
+
+def _archive_evidence(
+    cache: Path,
+    entry: Entry,
+    envelope: SourceEnvelope,
+    terms: str,
+    retrieved: str,
+    identity: str,
+    body: bytes,
+) -> None:
+    """Retain one parsed object and its immutable receipt below evidence/."""
+    side = sidecar_for(
+        entry,
+        digest=identity,
+        nbytes=len(body),
+        fetch_url=envelope.page_url,
+        fetch_host=entry.fetch_host,
+        retrieved_utc=retrieved,
+        publisher=envelope.publisher,
+        source_modified="",
+        row_count=None,
+        terms_sha256=terms,
+    )
+    side["parser_method"] = envelope.method
+    side["parser_version"] = envelope.method_version
+    publish_snapshot(
+        cache / entry.source_id / "evidence",
+        "json",
+        body,
+        side,
+        identity=identity,
+    )
 
 
 def _bounds(entry: Entry, spec: SourceSpec) -> Bounds:
