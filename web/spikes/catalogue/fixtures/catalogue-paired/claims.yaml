@@ -1,0 +1,25 @@
+version: 1
+claims:
+  - claim_key: area_note
+    section: observed
+    subject: area
+    slots:
+      - name: reading
+        metric_key: population_grid_people
+        unit: count
+        geography_role: area_shape
+        period_rule: calendar_year
+        allowed_provenance: [public]
+        breakdown: none
+      - name: light
+        metric_key: night_lights_radiance
+        unit: radiance_nw_cm2_sr
+        geography_role: area_shape
+        period_rule: calendar_year
+        allowed_provenance: [public]
+        breakdown: none
+    required_caveat_keys: []
+    required_companions: []
+    strengths_allowed: []
+    template_en: "See {reading} and {light}."
+    template_ar: "انظر {reading} و{light}."

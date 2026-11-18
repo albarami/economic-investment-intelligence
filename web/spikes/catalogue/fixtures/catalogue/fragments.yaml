@@ -1,0 +1,12 @@
+version: 1
+fragments:
+  - fragment_key: foundation_headline
+    kind: headline
+    template_en: "What the area shows"
+    template_ar: "ما تظهره المنطقة"
+  - fragment_key: foundation_decision
+    kind: decision
+    lead_en: "The figures are the ones the tools returned."
+    lead_ar: "الأرقام هي التي أعادتها الأدوات"
+    cheapest_test_en: "Read the source chain of each figure."
+    cheapest_test_ar: "اقرأ سلسلة المصدر لكل قيمة"

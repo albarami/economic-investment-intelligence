@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "files": {
+    "contract.json": "5c202330e4f0a9120d16d637cf3e72f42883bb4f086caea1c666fb5df17d8eda",
+    "fixtures/cases.json": "86d90bc07ba28bd25e9d7b2a10935ee351ee7c21f1fea3752bda7a1b72b99f5f",
+    "fixtures/catalogue/claims.yaml": "bb710483adb7e4c03e920e3a67753aace65dcdf01a99d2b000bb798986933d63",
+    "fixtures/catalogue/components.yaml": "aa0d9320a90dabf653123e90adda07481ea5358dd1ff68944b8a879ba27b2398",
+    "fixtures/catalogue/fragments.yaml": "60370b8b27981e8b8f4f55c1ba05b12ead303e4cdbcf0a22157ad99f032ae7e5",
+    "fixtures/catalogue/questions.yaml": "ae7ec05d1d0386413a573cd8a42e60e4813838052bf5053f1bf0b0cae0f613b5"
+  }
+}

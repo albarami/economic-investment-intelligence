@@ -25,6 +25,7 @@ export default defineConfig([
     'node_modules/',
     'spikes/glyphs/dist/',
     'spikes/performance/dist/',
+    'spikes/catalogue/dist/',
   ]),
   {
     files: ['**/*.{js,mjs,cjs,jsx}'],

@@ -30,7 +30,10 @@
     "spike:glyphs:record": "node spikes/glyphs/record.mjs",
     "spike:glyphs:verify-evidence": "node spikes/glyphs/verify-evidence.mjs",
     "spike:glyphs:capture": "node spikes/glyphs/tests/run.mjs --capture",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:spike:catalogue": "node --experimental-strip-types spikes/catalogue/tests/run.mjs",
+    "spike:catalogue:record": "node --experimental-strip-types spikes/catalogue/record.mjs",
+    "spike:catalogue:verify-evidence": "node --experimental-strip-types spikes/catalogue/verify-evidence.mjs"
   },
   "dependencies": {
     "@deck.gl/core": "9.4.1",
@@ -51,7 +54,11 @@
     "fflate": "0.7.5"
   },
   "devDependencies": {
+    "@a2ui/react": "0.15.0",
+    "@ag-ui/core": "1.0.3",
     "@eslint/js": "10.0.1",
+    "@json-render/core": "0.21.4",
+    "@json-render/react": "0.21.4",
     "@playwright/test": "1.65.0",
     "@stryker-mutator/core": "10.1.1",
     "@types/react": "19.3.0",
