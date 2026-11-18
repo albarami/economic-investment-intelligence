@@ -2636,6 +2636,15 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: S2-T08 part B produces the exact regression inputs and recorded generation configuration. Confirm the real artifact/configuration paths, schemas, adapters and per-card readers; replay the exact inputs, including C14 riyal medians/deal counts, C5 parent review/windows, live C6 projection/category handling and C7 geometry. A different maker checks every source-derived value against its source/receipt and every setting against the recorded configuration, then checked values enter the governed method-card blocks. Integration owners call completion_evidence from the S2/S7 acceptance paths. Any value still unpinnable remains individually pending with its reason. No invented fixture or open-item entry clears either gate.
 - NEEDED BY: S2-T08 part B and the S2 gate; also the S7 gate under MTH-03/TST-198.
 
+## OI-284 — Three wording notes of the mutation handoff's last check
+
+- ID: OI-284
+- TYPE: OPEN
+- RAISED BY: the other-maker check of the mutation handoff at `e8eed7b` (Z.ai GLM-5.3, APPROVED), after five cold reads and four fix passes
+- CONCERNS: [document 18](docs/18_MUTATION_TESTING_HANDOFF.md)
+- EVIDENCE: The check returned three notes, never rejections. N1, record R013 (`weighted_mean`) keeps the earlier phrase "the current `81e62db` version"; it names the revision and asserts no absence, but "current" beside a hash is loose. N2, "the S2-T29 train" uses the repository's train vocabulary; the hash beside it is the anchor. N3, the fixer's first pass briefly regenerated the explanation-data paragraph X001 from the merged tree and then restored it; the checker's byte comparison shows the shipped paragraph unchanged.
+- NEEDED: At the handoff to the receiving team under [decision 0055](docs/decisions/0055-mutation-testing-moves-to-after-go-live.md), replace "the current `81e62db` version" in R013 with "the `81e62db` version" and keep the hash beside every train name; N3 needs no change. No measurement, count or outcome changes.
+
 ## OI-285 — The hosted custodian suite of pull request 87 ran out of its 600-second limit
 
 - ID: OI-285

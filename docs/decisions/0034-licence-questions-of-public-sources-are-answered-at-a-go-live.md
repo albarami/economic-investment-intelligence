@@ -23,6 +23,7 @@ The lead first prepared these matters as questions for the owner. The owner answ
 ## Decision
 
 1. **Licence questions wait for a go-live.** Version 1 is a personal, local project. Whether the licence or the terms of a source allow a figure, name or key of that source to stand in the repository, in a record or in a test is not decided in version 1. It is answered when the owner prepares a go-live, by the legal route of that day. Until then no such matter is put to the owner as a question, an option or a finding.
+   Amended 2026-11-18 on the owner's words of 20:23: the owner's own go-live is personal and is not the trigger; "a go-live" in this record reads as "a deployment of the system with real data integrated", and the owner raises licence and terms matters on that day.
 
 2. **What was done stands.** The repair of task S2-T22 stands: the four places it changed stay as it left them, no figure it removed is put back, and its guard stays. Decision 0026 stands whole, and its item 5 stays the rule for every new commit: fetched data stays in the uncommitted cache, tests use invented stand-ins, and every registry row keeps `commit_allowed: false`.
 
