@@ -3498,3 +3498,16 @@ fixtures because their injected seam retains the original signature; the scoped
 wrapper corrects that interface without editing those files. This is a found
 cause, not a random failure. Independent review by another maker and live TLS
 acceptance remain pending; no invented-chain interface probe claims either.
+
+**Fix pass 8 caller boundary, 2026-11-18 (L-927):** the lead confirmed Lens T's
+F1 against fix pass 7. The extended AST guard found no prohibited existing use
+outside `singles/tenders.py` before edits. It now covers every Python file under
+`custodian/src` for legacy-pin keywords/string constants, keyword expansion into
+the HTTPS opener or its imported aliases, tender context references and tender
+wrapper imports/attributes; the transport parameter definition stays permitted.
+The six separate planted-caller tests fail against the old guard and pass against
+the extended guard, including relative imports and attribute aliases. Runtime
+transport and all pre-existing fix-7 tests remain unchanged. Reproducible exits
+and counts are in `.overnight/fix8-checks.jsonl` and `.overnight/RETURN.md`.
+Lens T confirmation of this fix and live TLS acceptance remain pending; no
+previous live-source hold or independent-review requirement is lifted.

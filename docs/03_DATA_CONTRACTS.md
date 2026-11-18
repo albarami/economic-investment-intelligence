@@ -1046,8 +1046,16 @@ malformed pins refuse before opener construction. The existing disabled-context
 `unreachable` refusal keeps its precedence. The injectable tender seam retains
 its original signature: a context-local scope binds the checked hash to that
 exact SSL context and tender host, and resets on success or exception. Only
-`singles/tenders.py` may supply the new argument, enforced by a source AST guard
-with a planted second caller. The legacy hash never authorizes a redirect:
+`singles/tenders.py` may supply the new argument, enforced by a source AST guard.
+Under lead ruling L-927, that guard scans every Python file under `custodian/src`
+outside the tender adapter: it refuses the argument's keyword or string constant,
+`**` expansion into `open_https` or `_open_https` by name, attribute or imported
+alias, references to `_TENDER_CHAIN`, and imports or attribute uses of the tender
+wrapper. The parameter definition in `fetch/transport.py` remains allowed.
+Separate planted callers cover literal and variable keyword expansion, aliases,
+external tender scope and wrapper access, wrapper imports and runtime-built keys.
+This is a source boundary; runtime refusal does not inspect callers or signatures.
+The legacy hash never authorizes a redirect:
 without page scope or a valid current pin, every redirect to a page pin host,
 including the tender host itself, still refuses before hop recording or
 redirected-request construction. See OPEN_ITEMS.md,
