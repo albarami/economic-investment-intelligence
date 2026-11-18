@@ -421,19 +421,24 @@ def test_empty_portal_licence_is_returned_as_empty_strings() -> None:
     assert prepared.portal_licence_url == ""
 
 
-def test_dataset_portal_without_a_licence_fails(tmp_path: Path) -> None:
-    """A dataset row claims a stated open licence, so a missing one fails."""
+def test_dataset_portal_without_a_licence_is_fetched_and_used(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1016 (applying L-1001): a dataset row whose portal states no
+    licence fetches and is used; the licence is recorded pending with the date
+    read, and the build lines carry the advisory."""
+    from eii_custodian.publicdata import completeness
+    from eii_custodian.publicdata.fetch.report import licence_unstated_line
+
     entry = replace(_entry(), kind="portal_dataset", extension="json", url=PORTAL)
-    failure = fetch_entry(entry, _portal_without_licence, tmp_path, _clock, _sleep)
-    assert failure is not None
-    assert failure.code == 1
-    assert failure.url == META
-    assert failure.check == "licence_missing"
-    assert failure.expected == (
-        "text:CC BY url:https://creativecommons.org/licenses/by/4.0/"
-    )
-    assert failure.observed == "text: url:"
-    assert [path for path in tmp_path.rglob("*") if path.is_file()] == []
+    outcome = run_build((entry,), _portal_without_licence, tmp_path, _clock, _sleep)
+    assert outcome.failure is None
+    assert licence_unstated_line(entry.key, entry.licence_id, _clock()) in outcome.lines
+    side = _sidecar(tmp_path)
+    assert side["portal_licence"] is None
+    assert side["licence_review"] == "pending"
+    assert side["retrieved_utc"] == _clock()
+    assert completeness.in_use(entry, {entry.key: side}) is True
 
 
 def test_owner_decision_portal_licence_difference_is_recorded_pending(

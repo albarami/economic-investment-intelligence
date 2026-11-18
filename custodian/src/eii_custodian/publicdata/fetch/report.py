@@ -97,6 +97,20 @@ def licence_pending_line(
     )
 
 
+def licence_unstated_line(key: str, licence_id: str, date_read: str) -> str:
+    """Return the advisory when a portal states no licence at all.
+
+    Ruling L-1016 (applying L-1001): a publisher-terms reading is a record,
+    never a gate; a dataset-basis portal row that states no licence is
+    recorded with the date read, pending a reviewer's record, and fails
+    nothing. publisher_missing and publisher_mismatch stay refusals.
+    """
+    return (
+        f"LICENCE {key} read {date_read}: no licence stated where registry "
+        f"{licence_id} was expected; pending a reviewer's record"
+    )
+
+
 TERMS_HOST_NOT_LISTED = "host_not_allow_listed"
 
 

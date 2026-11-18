@@ -52,6 +52,7 @@ from eii_custodian.publicdata.fetch.report import (
     evidence_line,
     fail_line,
     licence_pending_line,
+    licence_unstated_line,
     pass_line,
     skip_line,
     terms_attempt_record,
@@ -161,6 +162,9 @@ class _Fetched:
     terms_unread: str
     # Ruling L-1001: the observed licence when it differs from the registry.
     licence_pending: str = ""
+    # Ruling L-1016 (applying L-1001): the portal stated no licence at all on a
+    # dataset-basis row; the licence is recorded pending, never a gate.
+    licence_unstated: bool = False
 
 
 def _digest_pages(directory: Path) -> str:
@@ -329,6 +333,7 @@ def _fetch_row(
                 prepared.terms_sha256,
                 prepared.terms_unread,
                 prepared.licence_pending,
+                prepared.licence_unstated,
             ),
             None,
         )
@@ -368,6 +373,11 @@ def _fetch_row(
     )
     if prepared.requests:
         sidecar["requests"] = list(prepared.requests)
+    if prepared.licence_unstated:
+        # Ruling L-1016 (applying L-1001): the licence the portal did not state
+        # is recorded pending, with the date read in retrieved_utc, and fails
+        # nothing.
+        sidecar["licence_review"] = "pending"
     if entry.source_id in INVESTMENT_SOURCES:
         sidecar["terms_url"] = entry.terms_url
     try:
@@ -404,6 +414,7 @@ def _fetch_row(
             prepared.terms_sha256,
             prepared.terms_unread,
             prepared.licence_pending,
+            prepared.licence_unstated,
         ),
         None,
     )
@@ -1007,6 +1018,15 @@ def run_build(
                     entry.licence_id,
                     fetched.licence_pending,
                     fetched.retrieved_utc,
+                )
+            )
+        elif fetched.licence_unstated:
+            # Ruling L-1016 (applying L-1001): the licence the portal did not
+            # state is recorded with the date read, pending a reviewer's
+            # record, and fails nothing.
+            lines.append(
+                licence_unstated_line(
+                    entry.key, entry.licence_id, fetched.retrieved_utc
                 )
             )
         counted = cache / entry.source_id / "empty_coordinates.txt"

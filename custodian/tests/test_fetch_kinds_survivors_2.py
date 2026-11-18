@@ -89,6 +89,19 @@ def test_portal_licence_difference_is_recorded_pending():
     assert result.licence_pending == "invented licence"
 
 
+def test_portal_licence_absence_on_a_dataset_row_is_recorded_pending():
+    """Ruling L-1016 (applying L-1001): a dataset-basis portal row whose portal
+    states no licence is a record, never a gate; it fails nothing, and the
+    publisher plants above still refuse."""
+    meta = _portal_meta("Planted publisher", licence="")
+    result = kinds.prepare(
+        portal(publisher="Planted publisher"), transport(meta, []), _sleep
+    )
+    assert result.failure is None
+    assert result.portal_licence == ""
+    assert result.licence_unstated is True
+
+
 @pytest.mark.parametrize(
     "changes,rows,check,expected,observed",
     [

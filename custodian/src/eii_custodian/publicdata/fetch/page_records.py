@@ -473,8 +473,13 @@ def selected_page(cache: Path, entry: Entry) -> Snapshot:
             raw_input = read_snapshot(input_directory, item["identity"])
             if (
                 raw_input.sha256 != item["sha256"]
-                # Ruling L-1001: a pending basis is recorded, never missing.
+                # Ruling L-1001: a pending basis value (blank or the recorded
+                # "pending") is a record, never missing. Ruling L-1016 (applying
+                # L-1001): the build itself writes this receipt, so a receipt
+                # with the licence_basis key absent is a defect, not a terms
+                # reading, and still refuses.
                 or raw_input.sidecar.get("source_id") != entry.source_id
+                or "licence_basis" not in raw_input.sidecar
             ):
                 raise PageError("receipt_missing")
         return parsed

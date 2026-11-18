@@ -489,6 +489,8 @@ def v2_cache(
         "licence_basis": "owner_decision",
     }
     raw_fields.update(raw_side or {})
+    # A None value removes the key, for the absent-key plant.
+    raw_fields = {k: v for k, v in raw_fields.items() if v is not None}
     folder = row.key + ("/SYN-real-input" if link else "/inputs/input-0")
     raw = publish_snapshot(tmp_path / folder, "html", b"SYN input", raw_fields)
     if link:
@@ -550,10 +552,20 @@ def test_selected_v2_refusals_exact(tmp_path, changes, reason):
         page_records.selected_page(tmp_path, row)
 
 
-def test_selected_v2_accepts_a_pending_basis(tmp_path):
+@pytest.mark.parametrize("basis", ["", "pending"])
+def test_selected_v2_accepts_a_pending_basis(tmp_path, basis):
     """Ruling L-1001: a stored input receipt with a pending basis is still selected."""
-    row, parsed = v2_cache(tmp_path, raw_side={"licence_basis": ""})
+    row, parsed = v2_cache(tmp_path, raw_side={"licence_basis": basis})
     assert page_records.selected_page(tmp_path, row).sha256 == parsed.sha256
+
+
+def test_selected_v2_input_receipt_without_the_basis_key_refuses(tmp_path):
+    """Ruling L-1016 (applying L-1001): a receipt the build itself wrote holds
+    the licence_basis key; a receipt with the key absent is a defect, not a
+    terms reading, and refuses receipt_missing."""
+    row, _ = v2_cache(tmp_path, raw_side={"licence_basis": None})
+    with pytest.raises(PageError, match=exact("receipt_missing")):
+        page_records.selected_page(tmp_path, row)
 
 
 def test_selected_v2_inputs_folder_link_out_refused(tmp_path):

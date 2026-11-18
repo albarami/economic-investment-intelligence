@@ -73,6 +73,9 @@ class Prepared:
     # Ruling L-1001: the observed licence when it differs from the registry
     # licence id, recorded with the date read pending a reviewer's record.
     licence_pending: str = ""
+    # Ruling L-1016 (applying L-1001): a dataset-basis row whose portal states
+    # no licence at all; the licence is recorded pending, never a gate.
+    licence_unstated: bool = False
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
@@ -291,6 +294,7 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         coverage_note=coverage_note,
         requests=requests,
         licence_pending=info.licence_pending,
+        licence_unstated=info.licence_unstated,
     )
 
 
@@ -335,18 +339,15 @@ def portal_metadata(entry: Entry, meta: Response) -> Prepared:
                 1, meta.final_url, "publisher_mismatch", entry.publisher, publisher
             ),
         )
+    licence_unstated = False
     if licence == "":
         if entry.licence_basis == "dataset":
-            return _failed(
-                entry,
-                AttemptFailure(
-                    1,
-                    meta.final_url,
-                    "licence_missing",
-                    _licence_expected(entry.licence_id),
-                    _licence_observed("", licence_url),
-                ),
-            )
+            # Ruling L-1016 (applying L-1001): a publisher-terms reading is a
+            # record, never a gate. A dataset row whose portal states no
+            # licence fetches and is used; the licence is recorded pending
+            # with the date read, and the build log names the absence. The
+            # publisher_missing and publisher_mismatch refusals above stay.
+            licence_unstated = True
         licence = ""
         licence_url = ""
     licence_pending = ""
@@ -368,6 +369,7 @@ def portal_metadata(entry: Entry, meta: Response) -> Prepared:
         portal_licence=licence,
         portal_licence_url=licence_url,
         licence_pending=licence_pending,
+        licence_unstated=licence_unstated,
     )
 
 
@@ -727,18 +729,6 @@ def _same_publisher(observed: str, expected: str) -> bool:
 def _folded_publisher(name: str) -> str:
     """Fold case and collapse each run of white space to one space."""
     return _SPACE_RUN.sub(" ", name.casefold()).strip()
-
-
-def _licence_expected(licence_id: str) -> str:
-    """Return the portal statement a registry licence id requires."""
-    if licence_id == "CC-BY-4.0":
-        return _licence_observed(_CC_BY_4_TEXT, _CC_BY_4_URL)
-    return _licence_observed(licence_id, "")
-
-
-def _licence_observed(text: str, url: str) -> str:
-    """Return the portal licence text and URL as read."""
-    return f"text:{text} url:{url}"
 
 
 def _licence_matches(text: str, url: str, licence_id: str) -> bool:
