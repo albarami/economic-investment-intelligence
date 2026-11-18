@@ -14,11 +14,19 @@ import re
 import unicodedata
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
+import pytest
+
+from eii_custodian.publicdata.fetch.build import (
+    BuildOutcome,
+    FetchFailure,
+    _previous_term_hashes,
+    run_build,
+)
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.stage import StageResult
 
 PAGE = "https://fdiprojects.invest.qa/"
 TERMS = "https://fdiprojects.invest.qa/terms"
@@ -254,3 +262,65 @@ def test_raw_byte_previous_log_does_not_print_a_false_terms_line(
     assert loaded["terms"][0]["terms_sha256"] == _visible_sha256(VISIBLE)
     assert loaded["terms"][0]["terms_sha256"] != sha256_hex(later)
     assert loaded["terms"][0].get("terms_fingerprint") == "visible_text"
+
+
+@pytest.mark.parametrize("failure_mode", ["raise", "return"])
+def test_failed_build_keeps_terms_baseline_and_local_statuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure_mode: str
+) -> None:
+    """A later failed run cannot hide changed terms from the next build."""
+    watched = _watched()
+    _, earlier = _build(
+        tmp_path, _page(token="token-one", nonce="nonce-one", sentence=VISIBLE)
+    )
+    # Preserve complete historical rows, including metadata and legacy kinds.
+    earlier["terms"][0]["planted_metadata"] = "SYN-preserve-verbatim"
+    earlier["terms"].append(
+        {"key": "legacy_source", "terms_sha256": "SYN-raw-byte-digest"}
+    )
+    log_path = tmp_path / "build-log.json"
+    log_path.write_text(json.dumps(earlier), encoding="utf-8")
+    expected_hashes = {watched.key: _visible_sha256(VISIBLE)}
+    changed = _page(token="token-two", nonce="nonce-two", sentence=CHANGED)
+    failure = FetchFailure(1, watched.key, "", "planted_failure", "valid", "refused")
+
+    def failed_stage(*args: object, **kwargs: object) -> StageResult:
+        if failure_mode == "raise":
+            raise ValueError("SYN-planted-stage-refusal")
+        return StageResult((), "", failure=failure)
+
+    with monkeypatch.context() as patch:
+        patch.setattr("eii_custodian.publicdata.fetch.build.run_stage", failed_stage)
+        for _ in range(2):
+            if failure_mode == "raise":
+                with pytest.raises(ValueError, match="SYN-planted-stage-refusal"):
+                    _build(tmp_path, changed)
+            else:
+                outcome, _ = _build(tmp_path, changed)
+                assert outcome.failure == failure
+            assert _previous_term_hashes(tmp_path) == expected_hashes
+            report = json.loads(log_path.read_text(encoding="utf-8"))
+            assert report["terms"] == earlier["terms"]
+            assert report["local_files"] == {
+                "local_expectations/PUB-71.json": "absent",
+                "review/district_layer_aliases.csv": "absent",
+            }
+
+    outcome, completed = _build(tmp_path, changed)
+    assert outcome.failure is None
+    assert (
+        f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
+        in outcome.lines
+    )
+    assert set(completed) == {"lines", "terms", "terms_attempts", "local_files"}
+    assert completed["terms"] == [
+        {
+            "key": watched.key,
+            "retrieved_utc": _clock(),
+            "terms_sha256": _visible_sha256(CHANGED),
+            "terms_fingerprint": "visible_text",
+            "terms_url": watched.terms_url,
+            "terms_words": watched.terms_words,
+            "terms_read_on": watched.terms_read_on,
+        }
+    ]

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -53,6 +53,7 @@ from eii_custodian.publicdata.fetch.report import (
     fail_line,
     licence_pending_line,
     licence_unstated_line,
+    local_file_statuses,
     pass_line,
     skip_line,
     terms_attempt_record,
@@ -582,7 +583,11 @@ def run_build(
     terms: list[dict[str, object]] = []
     terms_attempts: list[dict[str, object]] = []
     benchmark_obstacles: list[dict[str, object]] = []
-    previous = _previous_term_hashes(cache)
+    previous_terms = _previous_terms(cache)
+    previous = _term_hashes(previous_terms)
+    # Keep local-input status even when an existing parser later raises. The
+    # terms baseline advances only after a successful build.
+    _write_log(cache, lines, previous_terms, [])
     failure: FetchFailure | None = None
     selected: list[tuple[str, str]] = []
     fetched_entries: list[Entry] = []
@@ -1241,7 +1246,9 @@ def run_build(
     from eii_custodian.publicdata.busyness.security import assert_clean
 
     assert_clean(environ if environ is not None else {}, lines)
-    _write_log(cache, lines, terms, terms_attempts)
+    _write_log(
+        cache, lines, terms if failure is None else previous_terms, terms_attempts
+    )
     return BuildOutcome(tuple(lines), failure, manifests)
 
 
@@ -1559,18 +1566,28 @@ def _previous_term_hashes(cache: Path) -> dict[str, str]:
     A row with no ``terms_fingerprint`` of ``visible_text`` was hashed from
     raw page bytes and is not compared.
     """
+    return _term_hashes(_previous_terms(cache))
+
+
+def _previous_terms(cache: Path) -> list[object]:
+    """Read historical terms rows once, preserving their complete contents."""
     path = cache / LOG_NAME
     if not path.is_file():
-        return {}
+        return []
     try:
         loaded: object = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return {}
+        return []
     if not isinstance(loaded, dict):
-        return {}
+        return []
     rows = loaded.get("terms")
     if not isinstance(rows, list):
-        return {}
+        return []
+    return rows
+
+
+def _term_hashes(rows: Sequence[object]) -> dict[str, str]:
+    """Select only visible-text fingerprints from the historical rows."""
     found: dict[str, str] = {}
     for item in rows:
         if not isinstance(item, dict):
@@ -1607,13 +1624,18 @@ def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
 def _write_log(
     cache: Path,
     lines: list[str],
-    terms: list[dict[str, object]],
+    terms: Sequence[object],
     terms_attempts: list[dict[str, object]],
 ) -> None:
     cache.mkdir(parents=True, exist_ok=True)
     payload = (
         json.dumps(
-            {"lines": lines, "terms": terms, "terms_attempts": terms_attempts},
+            {
+                "lines": lines,
+                "terms": terms,
+                "terms_attempts": terms_attempts,
+                "local_files": local_file_statuses(cache, _review_dir()),
+            },
             sort_keys=True,
         )
         + "\n"

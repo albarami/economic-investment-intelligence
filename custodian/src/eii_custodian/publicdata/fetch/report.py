@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+from pathlib import Path
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from eii_custodian.publicdata.fetch.registry import Entry
+
+LocalFileStatus = Literal["present", "absent", "invalid"]
 
 _SOURCE_KEY = re.compile(r"^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$")
 _BARE_DIGITS = re.compile(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])")
@@ -20,6 +24,34 @@ _EVIDENCE_REASONS = frozenset(
         "snapshot_selection_missing",
     }
 )
+
+
+def local_file_statuses(cache: Path, review: Path) -> dict[str, LocalFileStatus]:
+    """Describe the two hand-written local inputs without exporting their values.
+
+    The production readers alone decide validity. Reporting a refusal does not
+    replace the stage's own refusal or make an absent alias file a build error.
+    """
+    from eii_custodian.publicdata.frame.live import district_aliases
+    from eii_custodian.publicdata.stage import LOCAL_EXPECTATIONS_DIR, _local_expected
+
+    def status(path: Path, reader: Callable[[], object]) -> LocalFileStatus:
+        if not path.is_file():
+            return "absent"
+        try:
+            reader()
+        except (OSError, ValueError):
+            return "invalid"
+        return "present"
+
+    expectations = f"{LOCAL_EXPECTATIONS_DIR}/PUB-71.json"
+    aliases = "review/district_layer_aliases.csv"
+    return {
+        expectations: status(
+            cache / expectations, lambda: _local_expected(cache, "PUB-71")
+        ),
+        aliases: status(cache / aliases, lambda: district_aliases(review, cache)),
+    }
 
 
 def evidence_line(

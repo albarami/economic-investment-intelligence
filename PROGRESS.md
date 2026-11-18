@@ -36001,3 +36001,86 @@ Senior expert persona: senior test-infrastructure engineer (builder: OpenAI GPT-
 | 2026-11-18 | Lead check lv1, split as built | `./eii test --seed 3740962858`, cores 4 to 7: exit 0, 10473 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3178, python-product 786, web-checks 861, web-unit 1). | lead |
 | 2026-11-18 | Lead check lv2 on head `dbaebe0ca1344612584ad74341fa7ecc74508340` | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0; `ruff check` 0; `ruff format --check` 0; `mypy` 0; `check_docs.py` 0; `check_tree.py` 0; `cmp AGENTS.md CLAUDE.md` 0; `git diff --check b380109 HEAD` 0; heights tests 82 passed, exit 0. Then `./eii test --seed 2082766191` (tmp/eiitest_bg.sh): exit 0, 10479 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3184, python-product 786, web-checks 861, web-unit 1). | lead |
 | 2026-11-18 | Review | APPROVED `dbaebe0ca1344612584ad74341fa7ecc74508340`, R1 to R5 PASS; whole collection 7195 = part 1 4011 + part 2 3184 (base 7189 plus the 6 clock tests); 96 focused tests passed; ruff and mypy exit 0. | Google Gemini 3.1 Pro |
+
+## S2-T10 part E batch c — pass c2, PO-S2-33 reporting
+
+2026-11-19. Working-tree changes over `4772483e5319f33291d9275928b89d472ee29f44`; Git read-only, lead commits. Builder: OpenAI Codex, based on GPT-6; senior Python engineer for typed public-data contracts and regression tests. Strict reviewer persona: independent provenance and regression reviewer from another maker, pending the lead's assignment; no independent approval claimed. Skills read and applied: project-orientation, task-standards, sanad-provenance, muhasabah-gate and github-flow under the brief's read-only restriction; strict-reviewer read for the self-check. The requested test-driven-development and verification-before-completion skill files were not found in the available roots; the brief's explicit red-before-green and completion-check procedures were followed.
+
+Under ruling L-1027 item (a), the existing atomic `build-log.json` writer now adds `local_files` statuses (`present`, `absent`, `invalid`) for `local_expectations/PUB-71.json` and the local `review/district_layer_aliases.csv`. The existing parsers decide validity; their values and exception text are not serialised. An initial report retains status when a stage raises, and normal completion updates it. The frame README records this selected policy. `stage.py` and `frame/live.py` are unchanged; no scaffold or failing absence check was added. The proposed FIXED closure is in `.overnight/RETURN.md`, for the lead and independent review; the main open-item record is unchanged.
+
+Environment: Linux, Python 3.14.6, uv 0.11.31, cores `4,5`, provider `none`, offline uv. `TMPDIR` was the absolute workspace `.overnight/tmp`; uv and mypy caches stayed under that directory. Each pytest run used seed `71035`, disabled the cache provider and used a distinct basetemp there. Invented fixtures only; no network or real source-cache inspection. Test-first red was observed with only the new six-case test added to the implementation head: five missing-status failures and one missing-report failure after the existing malformed-record refusal. The same assertions passed after implementation. The affected-module selection and exact commands are retained under `.overnight/OUT/c2/`. Full custodian verification passed: `7195 passed, 1 warning in 291.94s (0:04:51)`; its warning is the existing duplicate ZIP-member fixture, not a failure or skip. No test, assertion, tolerance, baseline or gate was weakened.
+
+| Check | Command | Exit | Last output line |
+|---|---|---:|---|
+| red | `taskset -c 4,5 uv run --locked pytest custodian/tests/test_local_file_report.py -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c2-red --hypothesis-seed=71035` | 1 | 6 failed in 0.18s |
+| green | `taskset -c 4,5 uv run --locked pytest custodian/tests/test_local_file_report.py -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c2-green --hypothesis-seed=71035` | 0 | 6 passed in 0.17s |
+| format-apply | `taskset -c 4,5 uv run --locked ruff format custodian/src/eii_custodian/publicdata/fetch/report.py custodian/src/eii_custodian/publicdata/fetch/build.py custodian/tests/test_local_file_report.py` | 0 | 1 file reformatted, 2 files left unchanged |
+| diff | `taskset -c 4,5 git diff --check` | 0 | (no output) |
+| ruff | `taskset -c 4,5 uv run --locked ruff check .` | 0 | All checks passed! |
+| format | `taskset -c 4,5 uv run --locked ruff format --check .` | 0 | 727 files already formatted |
+| parity | `taskset -c 4,5 cmp AGENTS.md CLAUDE.md` | 0 | (no output) |
+| tree | `taskset -c 4,5 python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| mypy | `taskset -c 4,5 uv run --locked mypy` | 0 | Success: no issues found in 405 source files |
+| docs | `taskset -c 4,5 python3 scripts/check_docs.py` | 0 | checked 1007 text files, 107 Markdown files: OK |
+| focused | `taskset -c 4,5 uv run --locked pytest custodian/tests/test_additions_fetch.py custodian/tests/test_atlas_fetch.py custodian/tests/test_baci_fetch.py custodian/tests/test_benchmark_access.py custodian/tests/test_benchmarks_fetch.py custodian/tests/test_comtrade_plants.py custodian/tests/test_fetch_report_survivors.py custodian/tests/test_figure_draw.py custodian/tests/test_frame_alias_headers.py custodian/tests/test_frame_census.py custodian/tests/test_frame_gazetteer.py custodian/tests/test_frame_live_survivors.py custodian/tests/test_frame_live_survivors_lr3.py custodian/tests/test_frame_seventh.py custodian/tests/test_gis_imagery_views.py custodian/tests/test_gis_layers.py custodian/tests/test_gis_paged.py custodian/tests/test_gravity_atlas_review.py custodian/tests/test_gravity_fetch.py custodian/tests/test_investment_build.py custodian/tests/test_investment_evidence.py custodian/tests/test_investment_parse.py custodian/tests/test_local_file_report.py custodian/tests/test_night_lights.py custodian/tests/test_open_licence_commit_guard.py custodian/tests/test_places_build_date.py custodian/tests/test_places_fetch.py custodian/tests/test_places_fsq.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_pass2.py custodian/tests/test_places_pass3.py custodian/tests/test_places_pass3_build.py custodian/tests/test_property_quarter.py custodian/tests/test_pub67.py custodian/tests/test_public_cadence.py custodian/tests/test_public_data_stage.py custodian/tests/test_public_data_stage_survivors.py custodian/tests/test_public_series.py custodian/tests/test_public_snapshots.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_besttime_build.py custodian/tests/test_publicdata_fetch.py custodian/tests/test_publicdata_heights.py custodian/tests/test_publicdata_licence.py custodian/tests/test_publicdata_unblocked.py custodian/tests/test_publicdata_unblocked_round2.py custodian/tests/test_publicdata_unblocked_round3.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_series_exact_regressions.py custodian/tests/test_series_figures_survivors.py custodian/tests/test_series_figures_survivors_build.py custodian/tests/test_series_figures_survivors_lr3.py custodian/tests/test_series_frame.py custodian/tests/test_snapshot_refusals.py custodian/tests/test_tenders.py custodian/tests/test_terms_fingerprint.py custodian/tests/test_trade_reconciliation_release.py -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c2-focused --hypothesis-seed=71035` | 0 | 2004 passed in 138.53s (0:02:18) |
+| custodian | `taskset -c 4,5 uv run --locked pytest custodian/tests -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c2-custodian --hypothesis-seed=71035` | 0 | 7195 passed, 1 warning in 291.94s (0:04:51) |
+
+These results precede this append. Documentation and whitespace checks are repeated after it; their final results are recorded in `.overnight/RETURN.md`. Earlier progress bytes are retained as an exact prefix. Different-maker review and the lead commit remain pending.
+
+## S2-T10 part E batch c — pass c3, terms-baseline correction
+
+Builder: OpenAI Codex, based on GPT-6; senior Python engineer continuing the c2 public-data reporting work. Strict reviewer persona: independent provenance and regression reviewer from another maker, pending the lead's assignment. No independent approval is claimed.
+
+Skills read and applied: project-orientation, task-standards, github-flow (under the brief's read-only Git restriction), sanad-provenance and muhasabah-gate. Strict-reviewer was read for self-review. The requested test-driven-development, systematic-debugging and verification-before-completion skill files were not found in the available skill roots. Their procedures were applied through the brief's explicit requirements: reproduce the planted defect before editing production code, trace the shared read/write path, make the smallest fix, then verify the same tests and all required checks.
+
+Base: `4772483e5319f33291d9275928b89d472ee29f44` with the inherited uncommitted c2 changes; Git remained read-only and the lead commits. Date: 2026-11-19. Environment: Linux, test Python 3.14.6, recorder Python 3.14.4, uv 0.11.31, cores `8,9`, `EII_DECISION_PROVIDER=none`, `UV_OFFLINE=1`. `TMPDIR` was the absolute workspace `.overnight/tmp` directory; uv and mypy caches stayed below it. All pytest runs used seed `71036`, no cache provider and distinct basetemp directories below `.overnight/tmp`. Only invented fixtures were used; no network or real data cache was read. The evidence recorder preserves each subprocess exit and redacts absolute runtime paths without altering diagnostics or outcomes.
+
+Correction to the pass-c2 entry above: its initial report's empty `terms` list erased the prior baseline if a stage raised. Pass c3 preserves the complete prior terms rows in the initial report and on returned failure; only success advances the baseline. The existing JSON reader was extracted and reused, with the existing visible-text filter separate from it; no second parser or completed-log field was added. The README now records these semantics. Earlier evidence is retained verbatim.
+
+Tests were added before the production fix. Both planted cases failed at the baseline assertion: a raised stage left `{}`, and a returned failure replaced the earlier fingerprint with the changed one. After the fix, the same two cases preserve full rows through repeated failed builds, keep both statuses readable, and verify that the next successful build emits TERMS and has exactly its own normal terms row and log fields. All six c2 status cases remain unchanged and green. The affected set is the same 61 modules listed in `.overnight/OUT/c3/focused-modules.txt`.
+
+- `red.txt`: exit **1**; last line: `2 failed, 4 deselected in 0.19s`.
+
+  Command: `taskset -c 8,9 uv run --locked pytest custodian/tests/test_terms_fingerprint.py -k failed_build -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c3-red --hypothesis-seed=71036`
+
+- `green.txt`: exit **0**; last line: `12 passed in 0.21s`.
+
+  Command: `taskset -c 8,9 uv run --locked pytest custodian/tests/test_terms_fingerprint.py custodian/tests/test_local_file_report.py -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c3-green --hypothesis-seed=71036`
+
+- `format.txt`: exit **0**; last line: `727 files already formatted`.
+
+  Command: `taskset -c 8,9 uv run --locked ruff format --check .`
+
+- `ruff.txt`: exit **0**; last line: `All checks passed!`.
+
+  Command: `taskset -c 8,9 uv run --locked ruff check .`
+
+- `mypy.txt`: exit **0**; last line: `Success: no issues found in 405 source files`.
+
+  Command: `taskset -c 8,9 uv run --locked mypy`
+
+- `parity.txt`: exit **0**; last line: `(no output)`.
+
+  Command: `taskset -c 8,9 cmp AGENTS.md CLAUDE.md`
+
+- `diff.txt`: exit **0**; last line: `(no output)`.
+
+  Command: `taskset -c 8,9 git diff --check`
+
+- `tree.txt`: exit **0**; last line: `checked 8 rules: OK`.
+
+  Command: `taskset -c 8,9 python3 scripts/check_tree.py`
+
+- `docs.txt`: exit **0**; last line: `checked 1007 text files, 107 Markdown files: OK`.
+
+  Command: `taskset -c 8,9 python3 scripts/check_docs.py`
+
+- `focused.txt`: exit **0**; last line: `2006 passed in 144.39s (0:02:24)`.
+
+  Command: `taskset -c 8,9 uv run --locked pytest custodian/tests/test_additions_fetch.py custodian/tests/test_atlas_fetch.py custodian/tests/test_baci_fetch.py custodian/tests/test_benchmark_access.py custodian/tests/test_benchmarks_fetch.py custodian/tests/test_comtrade_plants.py custodian/tests/test_fetch_report_survivors.py custodian/tests/test_figure_draw.py custodian/tests/test_frame_alias_headers.py custodian/tests/test_frame_census.py custodian/tests/test_frame_gazetteer.py custodian/tests/test_frame_live_survivors.py custodian/tests/test_frame_live_survivors_lr3.py custodian/tests/test_frame_seventh.py custodian/tests/test_gis_imagery_views.py custodian/tests/test_gis_layers.py custodian/tests/test_gis_paged.py custodian/tests/test_gravity_atlas_review.py custodian/tests/test_gravity_fetch.py custodian/tests/test_investment_build.py custodian/tests/test_investment_evidence.py custodian/tests/test_investment_parse.py custodian/tests/test_local_file_report.py custodian/tests/test_night_lights.py custodian/tests/test_open_licence_commit_guard.py custodian/tests/test_places_build_date.py custodian/tests/test_places_fetch.py custodian/tests/test_places_fsq.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_pass2.py custodian/tests/test_places_pass3.py custodian/tests/test_places_pass3_build.py custodian/tests/test_property_quarter.py custodian/tests/test_pub67.py custodian/tests/test_public_cadence.py custodian/tests/test_public_data_stage.py custodian/tests/test_public_data_stage_survivors.py custodian/tests/test_public_series.py custodian/tests/test_public_snapshots.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_besttime_build.py custodian/tests/test_publicdata_fetch.py custodian/tests/test_publicdata_heights.py custodian/tests/test_publicdata_licence.py custodian/tests/test_publicdata_unblocked.py custodian/tests/test_publicdata_unblocked_round2.py custodian/tests/test_publicdata_unblocked_round3.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_series_exact_regressions.py custodian/tests/test_series_figures_survivors.py custodian/tests/test_series_figures_survivors_build.py custodian/tests/test_series_figures_survivors_lr3.py custodian/tests/test_series_frame.py custodian/tests/test_snapshot_refusals.py custodian/tests/test_tenders.py custodian/tests/test_terms_fingerprint.py custodian/tests/test_trade_reconciliation_release.py -q --tb=short -p no:cacheprovider --basetemp .overnight/tmp/c3-focused --hypothesis-seed=71036`
+
+- `custodian.txt`: exit **0**; last line: `================= 7197 passed, 1 warning in 275.98s (0:04:35) ==================`.
+
+  Command: `taskset -c 8,9 uv run --locked pytest custodian/tests -p no:cacheprovider --basetemp .overnight/tmp/c3-custodian --hypothesis-seed=71036`
+
+Documentation, tree, instruction parity, whitespace and preservation checks are repeated after this append; final results and the proposed PO-S2-33 closure are recorded in `.overnight/RETURN.md`. The open-item ledger is unchanged; different-maker review and the lead commit remain pending. No unexpected check failure occurred. No assertion, gate, bound or baseline was weakened.
