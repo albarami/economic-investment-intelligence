@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Callable, Mapping, Sequence
 from functools import partial
@@ -85,10 +86,17 @@ def run(
     benchmark_stream: StreamTransport | None = None,
     large_stream: StreamTransport | None = None,
 ) -> int:
-    """Fetch the registry. Extra arguments are a usage error and open nothing."""
-    if len(args) != 0:
-        table.write_usage()
-        return 2
+    """Validate the draw seed before any input or credential read."""
+    seed = 0
+    if args:
+        if (
+            len(args) != 2
+            or args[0] != "--seed"
+            or re.fullmatch(r"[0-9]{1,20}", args[1]) is None
+        ):
+            table.write_usage()
+            return 2
+        seed = int(args[1])
     token = earthdata_token(environ)
     opener = open_https if transport is None else transport
     if transport is None and token:
@@ -197,6 +205,7 @@ def run(
         token=token,
         key_name=VARIABLE,
         environ=environ,
+        seed=seed,
     )
     for line in outcome.lines:
         print(line)

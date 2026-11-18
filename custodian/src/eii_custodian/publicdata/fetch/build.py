@@ -9,7 +9,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from eii_custodian.publicdata.additions.common import (
     ADDITION_FAMILIES as _ADDITION_FAMILIES,
@@ -77,9 +77,12 @@ from eii_custodian.publicdata.investment_build import (
     publish_investment,
 )
 from eii_custodian.publicdata.investment_contracts import (
+    EvidenceAuditEntry,
+    EvidenceProjection,
     ExpectedInput,
     FetchAttempt,
     InvestmentFailure,
+    MilestoneArchiveSelection,
     ProjectArchiveSelection,
 )
 from eii_custodian.publicdata.investment_evidence import (
@@ -141,6 +144,9 @@ class BuildOutcome:
     lines: tuple[str, ...]
     failure: FetchFailure | None
     manifests: dict[str, str] = field(default_factory=dict)
+    investment_attempts: tuple[FetchAttempt, ...] = ()
+    terms: tuple[dict[str, object], ...] = ()
+    terms_attempts: tuple[dict[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -423,8 +429,117 @@ def run_build(
     reconciliation_selection: Selection | None = None,
     environ: Mapping[str, str] | None = None,
     large_stream: StreamTransport | None = None,
+    seed: int | None = None,
+    _fetch_only: bool = False,
 ) -> BuildOutcome:
-    """Fetch each row in order, then run the public_data stage."""
+    """Run the production assembly when a seed is supplied; retain the fetch seam."""
+    if seed is not None:
+        from eii_custodian.publicdata.assembly import AssemblyError
+        from eii_custodian.publicdata.assembly_adapters import Production
+
+        if type(seed) is not int or seed < 0:
+            raise AssemblyError("figure_seed_invalid")
+
+        def fetch_only() -> BuildOutcome:
+            return run_build(
+                entries,
+                transport,
+                cache,
+                clock,
+                sleep,
+                stream_transport=stream_transport,
+                baci_config=baci_config,
+                gravity_config=gravity_config,
+                atlas_config=atlas_config,
+                gravity_stream=gravity_stream,
+                atlas_stream=atlas_stream,
+                opener=opener,
+                slots=slots,
+                token=token,
+                key_name=key_name,
+                benchmark_policies=benchmark_policies,
+                benchmark_stream=benchmark_stream,
+                environ=environ,
+                large_stream=large_stream,
+                _fetch_only=True,
+            )
+
+        build = Production(
+            tuple(entries),
+            cache,
+            _review_dir(),
+            cache.parent.parent,
+            transport,
+            clock,
+            sleep,
+            seed,
+            environ or {},
+            fetcher=fetch_only,
+            reconciliation_selection=reconciliation_selection,
+        )
+        try:
+            build.run()
+        except Exception as exc:
+            # No exception text crosses the source/credential boundary. Preserve
+            # an existing structured fetch failure and its network exit code.
+            if build.fetched is not None and build.fetched.failure is not None:
+                return cast(BuildOutcome, build.fetched)
+            from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
+            from eii_custodian.publicdata.series.parse import (
+                SERIES_REFUSALS,
+                SeriesRefused,
+            )
+
+            reason = "assembly_build_refused"
+            if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
+                reason = exc.word
+            elif (
+                isinstance(exc, MunicipalityFrameRefused)
+                and exc.reason in SERIES_REFUSALS
+            ):
+                reason = exc.reason
+            if isinstance(exc, AssemblyError) and str(exc) in {
+                "snapshot_selection_invalid",
+                "assembly_gate_pending",
+                "assembly_frame_incomplete",
+                "assembly_places_incomplete",
+                "assembly_membership_invalid",
+                "assembly_regression_refused",
+                "assembly_intake_invalid",
+                "assembly_tender_pages_incomplete",
+            }:
+                reason = str(exc)
+            assembly_failure = FetchFailure(
+                1,
+                "assembly",
+                "",
+                reason,
+                "verified ordered outputs",
+                "NO_DATA",
+            )
+            build.lines.append(
+                fail_line(
+                    "assembly",
+                    "",
+                    assembly_failure.check,
+                    assembly_failure.expected,
+                    assembly_failure.observed,
+                )
+            )
+            _write_log(
+                cache,
+                build.lines,
+                list(build.fetched.terms) if build.fetched else [],
+                list(build.fetched.terms_attempts) if build.fetched else [],
+            )
+            return BuildOutcome(tuple(build.lines), assembly_failure)
+        _write_log(
+            cache,
+            build.lines,
+            list(build.fetched.terms) if build.fetched else [],
+            list(build.fetched.terms_attempts) if build.fetched else [],
+        )
+        return BuildOutcome(tuple(build.lines), None)
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
     if (
@@ -881,6 +996,23 @@ def run_build(
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    if _fetch_only:
+        from eii_custodian.publicdata.busyness.security import assert_clean
+
+        if failure is not None:
+            _archive_investment_attempts(
+                entries, investment_attempts, cache, clock, lines
+            )
+        assert_clean(environ if environ is not None else {}, lines)
+        _write_log(cache, lines, terms, terms_attempts)
+        return BuildOutcome(
+            tuple(lines),
+            failure,
+            manifests,
+            tuple(investment_attempts),
+            tuple(terms),
+            tuple(terms_attempts),
+        )
     attempt_failure = _archive_investment_attempts(
         entries, investment_attempts, cache, clock, lines
     )
@@ -1074,6 +1206,10 @@ def _archive_investment_attempts(
     cache: Path,
     clock: Clock,
     lines: list[str],
+    *,
+    audit_history: bool = False,
+    audit_entries: list[EvidenceAuditEntry] | None = None,
+    milestones: tuple[MilestoneArchiveSelection, ...] = (),
 ) -> FetchFailure | None:
     """Retain investment attempts without changing fetch fail-fast behaviour."""
     expected = tuple(
@@ -1081,7 +1217,7 @@ def _archive_investment_attempts(
         for entry in entries
         if entry.source_id in INVESTMENT_SOURCES
     )
-    if not expected:
+    if not expected and not milestones:
         return None
     retrieved = clock()
     sidecars = {
@@ -1107,7 +1243,7 @@ def _archive_investment_attempts(
             if registration.source_id == "fdi_projects"
         )
         projection = None
-        if project_registrations:
+        if project_registrations or milestones:
             selections = tuple(
                 ProjectArchiveSelection(
                     registration.key, str(attempt.snapshot_identity), {}
@@ -1119,11 +1255,25 @@ def _archive_investment_attempts(
                 and attempt.status == "success"
                 and isinstance(attempt.snapshot_identity, str)
             )
+            if audit_history:
+                # History is an audit input only. Release consumers still require
+                # their explicit reviewed selection and never choose a latest file.
+                selections = tuple(
+                    ProjectArchiveSelection(registration.key, path.stem, {})
+                    for registration in project_registrations
+                    for path in sorted(
+                        (cache / registration.key / "index").glob("*.json")
+                    )
+                )
             projection = build_cache_evidence(
                 cache,
                 projects=selections,
-                milestones=(),
-                expected=project_registrations,
+                milestones=milestones,
+                expected=project_registrations
+                + tuple(
+                    ExpectedInput(item.envelope.source_id, item.key, "milestone")
+                    for item in milestones
+                ),
                 attempts=tuple(attempts),
             )
         audited = (
@@ -1163,6 +1313,12 @@ def _archive_investment_attempts(
             audited.check,
             audited.expected,
             audited.observed,
+        )
+    if audit_entries is not None:
+        if isinstance(projection, EvidenceProjection):
+            audit_entries.extend(projection.audit.entries)
+        audit_entries.extend(
+            entry for entry in audited.entries if entry not in audit_entries
         )
     registry_keys = frozenset(registration.key for registration in expected)
     for entry in audited.entries:

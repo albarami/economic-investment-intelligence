@@ -1011,9 +1011,28 @@ def _execute(
     monkeypatch.setattr("eii_custodian.publicdata.fetch.build.approve", allow)
     monkeypatch.setattr("eii_custodian.publicdata.fetch.kinds.approve", allow)
     monkeypatch.setattr(publication, "load_source_spec", loading)
-    return build_public.run(
-        root, {}, (), transport=transport, sleep=lambda _seconds: None
+    # These are source-publication fixtures. The production command now also
+    # requires the complete reviewed assembly; exercise its existing fetch seam
+    # directly here, retaining every publication and refusal assertion below.
+    from commands import exits
+    from eii_custodian.publicdata.fetch.build import run_build
+    from eii_custodian.publicdata.fetch.report import log_line
+
+    outcome = run_build(
+        (entry,),
+        transport,
+        root / "data/public_cache",
+        lambda: RETRIEVED,
+        lambda _seconds: None,
     )
+    for line in outcome.lines:
+        print(line)
+    print(log_line("data/public_cache/build-log.json"))
+    if outcome.failure is not None:
+        return exits.finish(
+            outcome.failure.code, "build-public", outcome.failure.detail
+        )
+    return 0
 
 
 def _family_pages(sector: str, incentive: str) -> tuple[PageSpec, ...]:

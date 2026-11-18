@@ -258,9 +258,10 @@ def test_build_public_page_dispatch(tmp_path, monkeypatch):
             transport=lambda url: Response(url, BODY, ()),
             sleep=lambda _: None,
         )
-        == 0
+        == 1
     )
     cache = tmp_path / "data/public_cache"
+    assert "snapshot_selection_invalid" in (cache / "build-log.json").read_text()
     assert list((cache / row.key / "index").glob("*.json"))
 
 

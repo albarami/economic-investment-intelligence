@@ -730,7 +730,11 @@ def test_night_absent_key_continues_and_omits_the_layer(tmp_path, monkeypatch, c
     monkeypatch.setattr(build_public, "utc_now", lambda: "2026-11-14T00:00:00Z")
     code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
     captured = capsys.readouterr()
-    assert code == 0
+    assert code == 1
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "data/public_cache/build-log.json").read_text()
+    )
     assert (
         "OMIT ntl_blackmarble: EARTHDATA_API_KEY absent; night-lights layer left out"
         in captured.out
@@ -770,7 +774,11 @@ def test_skipped_month_keeps_its_skip_line_and_one_omit(tmp_path, monkeypatch, c
     monkeypatch.setattr(build_public, "utc_now", lambda: "2026-11-14T00:00:00Z")
     code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
     captured = capsys.readouterr()
-    assert code == 0
+    assert code == 1
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "data/public_cache/build-log.json").read_text()
+    )
     assert f"SKIP {skipped.key} {skipped.skip_reason}" in captured.out
     assert (
         captured.out.count(
@@ -806,10 +814,13 @@ def test_night_present_key_fetches_the_month(tmp_path, monkeypatch, capsys):
         sleep=_sleep,
     )
     captured = capsys.readouterr()
-    assert code == 0
-    assert [line for line in captured.out.splitlines() if "absent" in line] == [
-        "SKIP heights building_table_absent"
-    ]
+    assert code == 1
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "data/public_cache/build-log.json").read_text()
+    )
+    # The assembly refuses the missing reviewed pins before the height phase.
+    assert [line for line in captured.out.splitlines() if "absent" in line] == []
     assert seen == [YEAR_URL, DAY_URL, FILE_URL]
     cache = tmp_path / "data" / "public_cache"
     assert not (cache / "grids").exists()

@@ -75,7 +75,12 @@ def test_metadata_acquisition_bound(source, phase, case, tmp_path, monkeypatch):
     assert all(size == limit + 1 for _, size in reads)
     assert len(reads) == len(closed)
     if case == "exact":
-        assert code == 0
+        # A completed source fetch is retained; the full assembly needs pins.
+        assert code == 1
+        assert (
+            "snapshot_selection_invalid"
+            in (tmp_path / "data/public_cache/build-log.json").read_text()
+        )
         assert list(tmp_path.rglob("*.manifest.json"))
     else:
         assert code == 1

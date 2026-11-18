@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping, Sequence, Set
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
@@ -94,6 +94,7 @@ def pack_sources(text: str, family_counts: Mapping[str, int]) -> Pack:
             (line for line in block.splitlines() if line.startswith("| ")), ""
         )
         width = len(header.split("|"))
+        block_seen: set[str] = set()
         for line in block.splitlines():
             cells = [cell.strip() for cell in line.split("|")]
             if len(cells) < 2 or not re.fullmatch(r"`[a-z0-9_]+`", cells[1]):
@@ -105,8 +106,16 @@ def pack_sources(text: str, family_counts: Mapping[str, int]) -> Pack:
                 raise ValueError("pack_family_row_truncated")
             if len(cells) < max(width, 4):
                 continue
-            if source in sources:
+            if source in block_seen or (
+                source in sources
+                and not (
+                    source == "un_comtrade"
+                    and prefix == "### 2.3 "
+                    and not sources[source]
+                )
+            ):
                 raise ValueError("pack_source_duplicate")
+            block_seen.add(source)
             sources[source] = (
                 tuple(re.findall(r"`([^`]+)`", cells[4]))
                 if source in family_counts
@@ -134,8 +143,15 @@ def receipt_valid(row: Entry, receipt: Mapping[str, object]) -> bool:
             return False
     elif not isinstance(digest, str) or re.fullmatch(r"[a-f0-9]{64}", digest) is None:
         return False
+    stored_row = row
+    if (
+        row.key == row.source_id
+        and row.key in {"places_ovt", "bldg_ovt"}
+        and receipt.get("key") == row.key + "/listing"
+    ):
+        stored_row = replace(row, key=row.key + "/listing", extension="json")
     expected = sidecar_for(
-        row,
+        stored_row,
         digest=str(digest),
         nbytes=0,
         fetch_url=row.url,
@@ -255,6 +271,16 @@ def check(
                 fail(source, "source_completeness: pack slugs")
             if sorted(row.slug for row in rows) != sorted(slugs):
                 fail(source, "source_completeness: registry slugs")
+        elif components.get(source):
+            expected_components = set(components[source])
+            actual_keys = {row.key for row in entries if row.source_id == source}
+            # A closed component family can have a named parent or consist
+            # wholly of independently inventoried leaf sources. Unknown,
+            # jointly omitted and duplicated rows still fail below.
+            if actual_keys not in (expected_components, expected_components | {source}):
+                fail(source, "source_completeness: component keys")
+            if rows and (len(rows) != 1 or rows[0].key != source):
+                fail(source, "source_completeness: duplicate or missing row")
         elif len(rows) != 1:
             fail(source, "source_completeness: duplicate or missing row")
     if family_counts is not None:

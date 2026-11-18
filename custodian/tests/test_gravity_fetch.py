@@ -295,7 +295,11 @@ def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
             sleep=lambda _: None,
             gravity_stream=stream,
         )
-        == 0
+        == 1
+    )
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "cmd-ok" / "data/public_cache/build-log.json").read_text()
     )
 
 
@@ -320,5 +324,9 @@ def test_gravity_production_binding_is_separate(tmp_path: Path, monkeypatch) -> 
     monkeypatch.setattr(build_public, "load_gravity_config", lambda: config)
     monkeypatch.setattr(build_public, "open_https", byte)
     monkeypatch.setattr(build_public, "open_https_stream", chunks)
-    assert build_public.run(tmp_path, {}, [], sleep=lambda _: None) == 0
+    assert build_public.run(tmp_path, {}, [], sleep=lambda _: None) == 1
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "data/public_cache/build-log.json").read_text()
+    )
     assert observed == [config.reviewed_urls, config.reviewed_urls]

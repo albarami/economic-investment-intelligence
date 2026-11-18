@@ -165,6 +165,8 @@ def usage_form(command: str) -> str:
     """Map an architecture command to the usage line."""
     if command == "test":
         return TEST_FORM
+    if command == "build-public":
+        return "build-public [--seed N]"
     return command
 
 

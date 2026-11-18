@@ -1072,10 +1072,10 @@ def test_run_build_skips_heights_on_an_absent_table(tmp_path: Path) -> None:
     assert outcome.lines.count("SKIP heights building_table_absent") == 1
 
 
-def test_build_public_returns_0_and_prints_the_skip_line(
+def test_build_public_requires_assembly_pins_before_the_height_phase(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
-    """B10: `./eii build-public` stays green while the table is absent."""
+    """An empty registry cannot pass the complete assembly; B10 stays on the height seam."""
     import commands.build_public as build_public
 
     def transport(url: str) -> Response:
@@ -1084,8 +1084,10 @@ def test_build_public_returns_0_and_prints_the_skip_line(
     monkeypatch.setattr(build_public, "load_registry", lambda: ())
     monkeypatch.setattr(build_public, "utc_now", lambda: _clock())
     code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
-    assert code == 0
-    assert "SKIP heights building_table_absent" in capsys.readouterr().out
+    assert code == 1
+    output = capsys.readouterr().out
+    assert "snapshot_selection_invalid" in output
+    assert "SKIP heights building_table_absent" not in output
 
 
 def test_an_fe50_table_fails_the_build_and_writes_no_heights(
