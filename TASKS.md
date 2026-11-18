@@ -508,6 +508,13 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Depends: S2-T12 and S2-T27.
 - Requirements: C28, C30; PUB-01, PUB-04, PUB-07, PUB-10, PUB-16, PUB-86, PUB-87, PUB-88; DAT-142, DAT-143; TST-210, TST-211.
 - Delivery: Standard; reason: the task extends S2-T12's parser and S2-T27's hash archive without a new trust boundary or privacy control. Builder persona: senior public-data engineer; strict reviewer persona: principal data-quality and provenance reviewer from another maker; status queued.
+### S2-T31 — The source registry is read with the C safe loader (decision 0053)
+- Goal: Remove repeated pure-Python source-registry parsing overhead while preserving safe loading and the suite's regression alarm, under lead ruling L-902.
+- Acceptance criteria: [ ] B1: only `read_yaml` changes to `yaml.load(..., Loader=yaml.CSafeLoader)`, with no pure-Python fallback and unchanged `RegistryError("malformed yaml")` for every `yaml.YAMLError`; [ ] B2: replace the old text guard with unsafe-tag behaviour, safe-loader-only source scanning, locked libyaml availability and committed-registry value parity guards, each with planted violations and red-first evidence where practical, with no other test changes; [ ] B3: record [decision 0053](docs/decisions/0053-the-source-registry-is-read-with-the-c-safe-loader.md), index it and update any document sentence naming the registry's old loader; [ ] the custodian suite completes under its 600 s limit with margin.
+- Scope: Registry `read_yaml`, its existing test module, decision 0053 and its index, affected registry-loader documentation and the suite-time open item. No other module's loader, runner, limit, timeout, dependency pin or mutation campaign.
+- Depends: S2-T01; train-1 head `8d00c27`.
+- Requirements: AGENTS.md rules 12, 35, 36 and 37; decision 0053 items 1 to 3.
+- Delivery: Standard; builder persona: senior Python performance and supply-chain security engineer; strict reviewer persona: strict security reviewer of another maker; status in review.
 ### S2-T08 — Public pack assembly and source review
 - Decision 0040 named sub-step — **trade-source assembly**: [ ] Include S2-T23 to S2-T26 receipts, their lawful-access gaps and the reconciliation record in source completeness; no successful fetch is inferred from a registry row. Additional input dependencies: S2-T23, S2-T24, S2-T25, S2-T26. Existing scope extends only to this source wiring; all original acceptance criteria, gates and reviews remain.
 - Goal: Assemble the Public pack and close the slice S2 evidence bundle.
