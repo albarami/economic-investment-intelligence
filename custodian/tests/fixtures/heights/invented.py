@@ -144,8 +144,22 @@ def zip_members(members: dict, compression: int = zipfile.ZIP_DEFLATED) -> bytes
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", compression) as archive:
         for name, body in members.items():
-            archive.writestr(name, body)
+            archive.writestr(_member(name), body, compress_type=compression)
     return out.getvalue()
+
+
+def _member(name: str) -> zipfile.ZipInfo:
+    """One member header with a fixed time, so a body never carries the clock.
+
+    A member written by name takes the wall-clock time of its writing, and
+    the manifest records each input's hash: two builds of one fixture that
+    fell on either side of a two-second step of the zip time field gave
+    different bytes. The fixed time is the zip format's first date; the
+    permission bits are the ones a member written by name receives.
+    """
+    info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+    info.external_attr = 0o600 << 16
+    return info
 
 
 def shapefile_zip(
@@ -271,9 +285,13 @@ def zip_members_duplicated(members: dict, name: str, drop: str = "") -> bytes:
             for member, member_body in members.items():
                 if member.endswith(f".{drop}"):
                     continue
-                archive.writestr(member, member_body)
+                archive.writestr(
+                    _member(member), member_body, compress_type=zipfile.ZIP_DEFLATED
+                )
                 if member == name:
-                    archive.writestr(member, member_body)
+                    archive.writestr(
+                        _member(member), member_body, compress_type=zipfile.ZIP_DEFLATED
+                    )
     return out.getvalue()
 
 
