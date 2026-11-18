@@ -32,6 +32,7 @@ from eii_custodian.publicdata.fetch.receipts import (
     sidecar_for,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 ALLOWED_HOST = "syn-heights.invalid"
 BLOCKED_HOST = "invented-unlisted.example"
@@ -491,6 +492,7 @@ def store(cache, row: Entry, body: bytes, publisher: str = "SYN-publisher"):
         terms_sha256="",
     )
     commit_pair(cache_directory(cache, row.key), digest, row.extension, body, sidecar)
+    select_fixture(cache, row.key, digest)
     return digest
 
 

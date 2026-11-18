@@ -1,7 +1,7 @@
 """B6: read the cached height files under their declared structure (PUB-07).
 
-The receipt and hash checks copy the frame's `read_cached`, minus its JSON
-parse, because the bodies here are raster and vector files. A row that is
+The reviewed identity selects one dated archive. Its index, receipt and body
+are verified before decoding the raster or vector file. A row that is
 skipped or has no cached file is not a failure: its source is absent with the
 row's own technical reason. A declared value still holding the marker
 `to be confirmed` keeps its source absent with `structure_unconfirmed`; an
@@ -32,6 +32,11 @@ from shapely.geometry.base import BaseGeometry
 from eii_core.calc.building_heights import positive_height
 from eii_custodian.publicdata.fetch.receipts import cache_directory
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import (
+    SnapshotError,
+    read_snapshot,
+    reviewed_selections,
+)
 
 from .model import (
     SOURCE_IDS,
@@ -133,23 +138,31 @@ def _local_file(cache: Path, path: Path) -> Path:
 
 
 def _verified_body(cache: Path, entry: Entry) -> tuple[Path, dict[str, object]] | None:
-    """The receipt and hash checks of `read_cached`, minus the JSON parse.
+    """Read the reviewed dated archive, without decoding its binary body.
 
     Returns None when the row has no cached file (`not_fetched`); every other
     defect is a refusal. The body is hashed in pieces, never held in memory.
     """
     directory = cache_directory(cache, entry.key)
-    receipts = sorted(directory.glob("*.meta.json"))
-    if not receipts:
-        return None
-    if len(receipts) != 1:
-        raise HeightError("cache_receipt")
     try:
-        receipt = unique_json(receipts[0].read_text(encoding="utf-8"), "cache_receipt")
-    except OSError:
-        raise HeightError("cache_receipt") from None
+        identity = reviewed_selections(cache).get(entry.key)
+        if identity is None:
+            if any(directory.glob("*.meta.json")) or any(
+                (directory / "index").glob("*.json")
+            ):
+                raise HeightError("snapshot_selection_invalid")
+            return None
+        selected = read_snapshot(directory, identity)
+        receipt = unique_json(
+            selected.receipt_path.read_text(encoding="utf-8"), "cache_receipt"
+        )
+    except (SnapshotError, OSError):
+        raise HeightError("selected_input_refused") from None
     if not isinstance(receipt, dict):
         raise HeightError("cache_receipt")
+    if receipt != selected.sidecar:
+        raise HeightError("selected_input_refused")
+    receipt = selected.sidecar
     for field, expected in (
         ("source_id", entry.source_id),
         ("key", entry.key),
@@ -166,10 +179,9 @@ def _verified_body(cache: Path, entry: Entry) -> tuple[Path, dict[str, object]] 
     digest = str(receipt["sha256"])
     if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
         raise HeightError("malformed_hash")
-    body_path = directory / f"{digest}.{entry.extension}"
-    if not body_path.is_file() or sha256_path(body_path) != digest:
-        raise HeightError("content_hash_mismatch")
-    return body_path, receipt
+    if selected.path.suffix != "." + entry.extension:
+        raise HeightError("cache_receipt_mismatch")
+    return selected.path, receipt
 
 
 def _file_record(

@@ -10,6 +10,7 @@ from pathlib import Path
 
 import duckdb
 import pytest
+from custodian.tests.snapshot_fixture import update_receipt
 
 from eii_custodian.publicdata.additions.build import (
     _field_map,
@@ -29,6 +30,7 @@ from eii_custodian.publicdata.additions.common import (
 )
 from eii_custodian.publicdata.additions.storage import write_parquet
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.review.cache_fixture import write_cached
 
 _REVIEW = Path(__file__).resolve().parents[1] / "publicdata" / "review"
 _REVIEW_FILES = (
@@ -553,15 +555,9 @@ def test_a_receipt_hash_other_than_the_body_publishes_nothing(tmp_path: Path) ->
         }
     ]
     body = json.dumps(raw).encode("utf-8")
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(
-        json.dumps({"retrieved_utc": _RETRIEVED, "sha256": "0" * 64}),
-        encoding="utf-8",
-    )
+    digest = write_cached(cache, entry, body).stem
+    update_receipt(cache, entry.key, digest, {"sha256": "0" * 64})
     review = tmp_path / "review"
     review.mkdir()
     for name in _REVIEW_FILES:
@@ -575,7 +571,7 @@ def test_a_receipt_hash_other_than_the_body_publishes_nothing(tmp_path: Path) ->
         build_additions(
             cache, (entry,), {entry.key: digest}, review, frame, tmp_path / "out"
         )
-    assert caught.value.name == "hash_mismatch"
+    assert caught.value.name == "selected_input_refused"
     assert not (tmp_path / "out" / "current" / "manifest.json").exists()
 
 
@@ -704,7 +700,7 @@ def test_a_non_dict_receipt_is_unreadable(tmp_path: Path) -> None:
             tmp_path / "frame",
             tmp_path / "out",
         )
-    assert caught.value.name == "export_unreadable"
+    assert caught.value.name == "selected_input_refused"
     assert not (tmp_path / "out" / "current" / "manifest.json").exists()
 
 
@@ -816,14 +812,7 @@ def test_a_bad_column_name_writes_no_parquet(tmp_path: Path) -> None:
 
 
 def _cached(cache: Path, entry: Entry, body: bytes) -> str:
-    digest = hashlib.sha256(body).hexdigest()
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.{entry.extension}").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(
-        json.dumps({"sha256": digest}), encoding="utf-8"
-    )
-    return digest
+    return write_cached(cache, entry, body).stem
 
 
 def _review(path: Path) -> Path:
@@ -841,13 +830,11 @@ def _review(path: Path) -> Path:
 def _export(
     tmp_path: Path, entry: Entry, body: bytes, side: str
 ) -> tuple[Path, Path, str]:
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.{entry.extension}").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(side, encoding="utf-8")
-    return cache, _review(tmp_path / "review"), digest
+    path = write_cached(cache, entry, body)
+    if not isinstance(json.loads(side), dict):
+        path.with_suffix(".meta.json").write_text(side, encoding="utf-8")
+    return cache, _review(tmp_path / "review"), path.stem
 
 
 def _entry(source_id: str, slug: str) -> Entry:
@@ -868,15 +855,8 @@ def _publish(
 ) -> tuple[Path, str, Entry]:
     entry = _entry(source_id, slug)
     body = json.dumps(raw).encode("utf-8")
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(
-        json.dumps({"retrieved_utc": _RETRIEVED, "sha256": digest}),
-        encoding="utf-8",
-    )
+    digest = write_cached(cache, entry, body, retrieved_utc=_RETRIEVED).stem
     review = tmp_path / "review"
     review.mkdir()
     for name in _REVIEW_FILES:

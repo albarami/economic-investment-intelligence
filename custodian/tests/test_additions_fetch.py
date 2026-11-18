@@ -414,14 +414,10 @@ def test_a_later_pass_without_a_parser_is_pending(
     monkeypatch.delitem(industry.PARSERS, "est_size_act")
     entry = _family("est_size_act")
     body = b"[]"
-    digest = __import__("hashlib").sha256(body).hexdigest()
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(
-        json.dumps({"sha256": digest}), encoding="utf-8"
-    )
+    digest = write_cached(cache, entry, body).stem
     review = tmp_path / "review"
     review.mkdir()
     (review / "additions_property_venues.yaml").write_text(

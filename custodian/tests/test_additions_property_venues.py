@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from decimal import ROUND_DOWN, Context, Decimal, localcontext
 from pathlib import Path
@@ -28,6 +27,7 @@ from eii_custodian.publicdata.additions.property_venues import (
 )
 from eii_custodian.publicdata.additions.storage import publish
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.review.cache_fixture import write_cached
 
 REVIEW = Path(__file__).resolve().parents[1] / "publicdata" / "review"
 RECEIPT = {"retrieved_utc": "2026-03-04T05:06:07Z", "sha256": "ab" * 32}
@@ -429,12 +429,10 @@ def test_duplicate_selection_hash_and_publish_failures(tmp_path: Path) -> None:
     assert repeated.value.name == "duplicate_slug_selection"
     entry = _entry("visits_museum")
     body = json.dumps([_museum_row()]).encode()
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(b"not-the-body")
-    (folder / f"{digest}.meta.json").write_text(json.dumps(RECEIPT), encoding="utf-8")
+    path = write_cached(cache, entry, body)
+    digest = path.stem
+    path.write_bytes(b"not-the-body")
     review = tmp_path / "review"
     _venues(review, _LINKS)
     (review / "additions_property_venues.yaml").write_text(
@@ -445,13 +443,13 @@ def test_duplicate_selection_hash_and_publish_failures(tmp_path: Path) -> None:
         build_additions(
             cache, (entry,), {entry.key: digest}, review, review, tmp_path / "out"
         )
-    assert mismatch.value.name == "hash_mismatch"
+    assert mismatch.value.name == "selected_input_refused"
     assert not (tmp_path / "out" / "current").exists()
     with pytest.raises(AdditionError) as absent:
         build_additions(
             cache, (entry,), {entry.key: "cd" * 32}, review, review, tmp_path / "out"
         )
-    assert absent.value.name == "hash_absent"
+    assert absent.value.name == "selected_input_refused"
     output = tmp_path / "kept"
     publish(
         output,
@@ -474,14 +472,10 @@ def test_built_property_table_round_trips_and_lineage_is_required(
         _deal(encrypted_transaction_number="SYN-DEAL-B", price_per_square_meter=20),
     ]
     body = json.dumps(rows).encode()
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(body)
-    side = dict(RECEIPT)
-    side["sha256"] = digest
-    (folder / f"{digest}.meta.json").write_text(json.dumps(side), encoding="utf-8")
+    digest = write_cached(
+        cache, entry, body, retrieved_utc=str(RECEIPT["retrieved_utc"])
+    ).stem
     review = tmp_path / "review"
     review.mkdir()
     (review / "additions_property_venues.yaml").write_text(
@@ -522,14 +516,10 @@ def test_two_rows_that_share_a_venue_period_publish_nothing(tmp_path: Path) -> N
         encoding="utf-8",
     )
     body = json.dumps([_museum_row(), _museum_row()]).encode()
-    digest = hashlib.sha256(body).hexdigest()
     cache = tmp_path / "cache"
-    folder = cache / entry.key
-    folder.mkdir(parents=True)
-    (folder / f"{digest}.json").write_bytes(body)
-    (folder / f"{digest}.meta.json").write_text(
-        json.dumps(RECEIPT | {"sha256": digest}), encoding="utf-8"
-    )
+    digest = write_cached(
+        cache, entry, body, retrieved_utc=str(RECEIPT["retrieved_utc"])
+    ).stem
     with pytest.raises(AdditionError) as duplicate:
         build_additions(
             cache, (entry,), {entry.key: digest}, review, review, tmp_path / "out"
