@@ -129,6 +129,11 @@ def workbook(body: bytes, shape: Mapping[str, Any]) -> list[dict[str, object]]:
                         raise ShapeError("schema_missing")
                     q = int(match[1])
                     preliminary = bool(match[2])
+                    if q == 1 and previous_quarter not in (None, 4):
+                        raise ShapeError("schema_missing")
+                    # The first observation may be any quarter; no evidence for
+                    # requiring Q1 was found. The declared O1.a shape evidence
+                    # (.overnight/IN/EVIDENCE-shapes.md) is absent here.
                     if previous_quarter is None or q == 1:
                         if re.fullmatch(r"[1-9][0-9]{3}", raw_year) is None:
                             raise ShapeError("schema_missing")

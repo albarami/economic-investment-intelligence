@@ -999,8 +999,11 @@ Workbook declarations bind sheet name, relationship, sheet id, part, exact heade
 cells, merged ranges, annual and quarterly coordinates, blank and footer rows.
 Only insurance accepts formula cached results; formulas are never evaluated,
 and missing cached results refuse. Awards intake retains its formula refusal.
-Quarter years carry from the first declared quarter of each year, with quarter
-sequence and year transitions checked. Manateq declares both Pricing layouts
+The first declared quarterly row may be any quarter and must carry its year.
+Later quarters in that year advance one quarter with an empty year cell. A later
+Q1 must follow Q4 and carry the immediately following year; any gap refuses with
+`schema_missing` before the parser returns periods.
+Manateq declares both Pricing layouts
 and each location's tariff or `no tariff on page` state; the latter yields no
 rate, never zero. Rates accept whole-number text followed by QR only.
 Classified activity sections are siblings bound by the argument N of
