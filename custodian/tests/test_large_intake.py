@@ -187,7 +187,11 @@ def test_portal_row_limit_is_named(monkeypatch, chunk):
         assert source.tell() <= 11
 
 
-def meta(entry):
+def meta(
+    entry,
+    licence="CC BY",
+    licence_url="https://creativecommons.org/licenses/by/4.0/",
+):
     return Response(
         entry.url.removesuffix("/exports/json"),
         json.dumps(
@@ -195,8 +199,8 @@ def meta(entry):
                 "metas": {
                     "default": {
                         "publisher": entry.publisher,
-                        "license": "CC BY",
-                        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                        "license": licence,
+                        "license_url": licence_url,
                         "modified": "2026-11-18",
                     }
                 }
@@ -228,6 +232,83 @@ def test_imports_archive_exact_bytes_and_validate_every_row(entries, tmp_path):
     assert result.digest == hashlib.sha256(raw).hexdigest()
     assert snapshot.sidecar["portal_licence"] == "CC BY"
     assert not list(tmp_path.glob(".large-*"))
+
+
+def _streamed_entry(entries):
+    # The key stays "cus_imp_2019" so the build dispatches this row to the
+    # required streamed path; the invented source_id keeps the post-fetch
+    # series stage from building trade figures from this isolated test cache.
+    # The fetch path under test reads neither.
+    return replace(
+        entries["cus_imp_2019"],
+        source_id="planted-large",
+        columns=(("value", "number"),),
+        row_count_min=2,
+        row_count_max=2,
+        release_tables=(),
+    )
+
+
+def test_streamed_dataset_without_a_licence_records_pending(entries, tmp_path):
+    """Ruling L-1025 item b, applying L-1016 (L-1001): a streamed dataset-basis
+    row whose portal states no licence records the same pending state as the
+    ordinary path; the sidecar holds licence_review "pending" with the date in
+    retrieved_utc, the build log carries the advisory, and nothing fails."""
+    from eii_custodian.publicdata import completeness
+    from eii_custodian.publicdata.fetch.build import run_build
+    from eii_custodian.publicdata.fetch.report import licence_unstated_line
+
+    entry = _streamed_entry(entries)
+    raw = b'[ {"value": 1}, {"value": 2} ]'
+    stamp = "2026-11-18T00:00:00Z"
+    no_licence = meta(entry, licence="", licence_url="")
+    outcome = run_build(
+        (entry,),
+        lambda _url: no_licence,
+        tmp_path,
+        lambda: stamp,
+        lambda _s: None,
+        large_stream=stream(entry, [raw], len(raw)),
+    )
+    assert outcome.failure is None
+    assert licence_unstated_line(entry.key, entry.licence_id, stamp) in outcome.lines
+    side = read_snapshot(tmp_path / entry.key, hashlib.sha256(raw).hexdigest()).sidecar
+    assert side["portal_licence"] is None
+    assert side["licence_review"] == "pending"
+    assert side["retrieved_utc"] == stamp
+    assert completeness.in_use(entry, {entry.key: side}) is True
+
+
+def test_streamed_differing_licence_records_pending(entries, tmp_path):
+    """Ruling L-1025 item b, applying L-1001: a streamed row whose portal states
+    a differing licence records the same pending state as the ordinary path;
+    the build log carries the licence_pending_line advisory, the sidecar keeps
+    the observed licence, and nothing fails."""
+    from eii_custodian.publicdata.fetch.build import run_build
+    from eii_custodian.publicdata.fetch.report import licence_pending_line
+
+    entry = _streamed_entry(entries)
+    raw = b'[ {"value": 1}, {"value": 2} ]'
+    stamp = "2026-11-18T00:00:00Z"
+    observed = "SYN planted licence"
+    differing = meta(
+        entry, licence=observed, licence_url="https://www.data.gov.qa/SYN-licence"
+    )
+    outcome = run_build(
+        (entry,),
+        lambda _url: differing,
+        tmp_path,
+        lambda: stamp,
+        lambda _s: None,
+        large_stream=stream(entry, [raw], len(raw)),
+    )
+    assert outcome.failure is None
+    assert licence_pending_line(entry.key, entry.licence_id, observed, stamp) in (
+        outcome.lines
+    )
+    side = read_snapshot(tmp_path / entry.key, hashlib.sha256(raw).hexdigest()).sidecar
+    assert side["portal_licence"] == observed
+    assert "licence_review" not in side
 
 
 @pytest.mark.parametrize(

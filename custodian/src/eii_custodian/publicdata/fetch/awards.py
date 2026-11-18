@@ -480,10 +480,15 @@ def read_registers(
         snapshot = read_snapshot(directory, selection["identity"])
         # Ruling L-1001: a pending basis in a stored receipt is a record, never
         # a missing one; identity, key and publisher still have to match.
+        # Ruling L-1016 R3 (ruling L-1025 item a): the build itself writes every
+        # stored receipt, so a sidecar without the licence_basis key is a
+        # defect, not a terms reading, and refuses; a blank or "pending" value
+        # stays a record.
         if (
             snapshot.sidecar.get("source_id") != source
             or snapshot.sidecar.get("key") != key
             or not snapshot.sidecar.get("publisher")
+            or "licence_basis" not in snapshot.sidecar
         ):
             raise AwardError("receipt_missing")
         try:

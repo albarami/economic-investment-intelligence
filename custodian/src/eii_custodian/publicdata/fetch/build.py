@@ -296,9 +296,18 @@ def _fetch_row(
             return None, FetchFailure(
                 1, entry.source_id, entry.url, "write_failed", "stored file", "NO_DATA"
             )
-        return _Fetched(
-            found.digest, found.fetch_host, found.retrieved_utc, "", ""
-        ), None
+        return (
+            _Fetched(
+                found.digest,
+                found.fetch_host,
+                found.retrieved_utc,
+                "",
+                "",
+                found.licence_pending,
+                found.licence_unstated,
+            ),
+            None,
+        )
     try:
         prepared = (
             prepare_grid(entry, transport, sleep, token)

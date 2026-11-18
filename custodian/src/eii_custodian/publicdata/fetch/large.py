@@ -63,6 +63,10 @@ class Fetched:
     retrieved_utc: str
     terms_sha256: str = ""
     terms_unread: str = ""
+    # Ruling L-1025 item b (applying L-1001 and L-1016): the streamed path
+    # records the same pending licence state as the ordinary path.
+    licence_pending: str = ""
+    licence_unstated: bool = False
 
 
 def recorded_size(entry: Entry) -> int | None:
@@ -303,7 +307,18 @@ def fetch_large(
             portal_licence=info.portal_licence if info is not None else "",
             portal_licence_url=info.portal_licence_url if info is not None else "",
         )
+        if info is not None and info.licence_unstated:
+            # Ruling L-1025 item b (applying L-1016 and L-1001): the streamed
+            # path records the same pending licence as the ordinary path, with
+            # the date read in retrieved_utc, and fails nothing.
+            sidecar["licence_review"] = "pending"
         publish_file(
             cache / entry.key, entry.extension, staged, sidecar, compatibility=True
         )
-    return Fetched(received.sha256, host_of(received.final_url), retrieved)
+    return Fetched(
+        received.sha256,
+        host_of(received.final_url),
+        retrieved,
+        licence_pending=info.licence_pending if info is not None else "",
+        licence_unstated=info.licence_unstated if info is not None else False,
+    )
