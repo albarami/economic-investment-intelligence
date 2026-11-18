@@ -4411,11 +4411,6 @@ reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec indepen
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/investment_build.py"
-mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, None, terms, landing_retrieved, method=\"\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
-reason = "Equivalent under the actual callers: the final agency envelope's page digest is the computed nonempty SHA-256 of the landing page; SourceEnvelope.missing refuses only an empty string, so None passes as the digest does, and validate_investment and _commit_batch read only its source, URL, publisher, licence, terms URL and method fields (lead ruling L-943)."
-
-[[survivors]]
-module = "custodian/src/eii_custodian/publicdata/investment_build.py"
 mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, None, landing_retrieved, method=\"\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
 reason = "Equivalent under the actual callers: _receipt already requires nonempty terms; SourceEnvelope.missing refuses only an empty string, so None passes as the terms hash does, and the manifest and sidecars take the separate terms argument, never the final envelope's terms hash (lead ruling L-943)."
 

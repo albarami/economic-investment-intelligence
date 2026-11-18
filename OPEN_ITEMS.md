@@ -3583,7 +3583,9 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 
 ### PO-S2-72 — Stateful caller keys can still change project identity after validation
 
-- ID: PO-S2-72
+### PO-S2-87 — Stateful caller keys can still change project identity after validation
+
+- ID: PO-S2-87
 - TYPE: OPEN
 - RAISED BY: the S2-T30 kill-pass 1d builder (OpenAI Codex), 2026-11-18
 - CONCERNS: `custodian/src/eii_custodian/publicdata/investment_evidence.py`, `build_project_evidence` and `_metadata_failure`; document 03, Cache-only announced-project evidence (S2-T30)
