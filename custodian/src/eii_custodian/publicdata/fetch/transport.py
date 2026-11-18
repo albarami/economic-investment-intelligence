@@ -52,7 +52,18 @@ GRANULE_SUFFIX = ".h5"
 def public_address(url: str) -> str:
     """Return scheme, host and path. A query string is never part of an error."""
     parts = urlsplit(url)
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
+    netloc = parts.netloc
+    if parts.username is not None or parts.password is not None:
+        # Userinfo never reaches an error: rebuild the netloc from host and port.
+        host = parts.hostname or ""
+        netloc = f"[{host}]" if ":" in host else host
+        try:
+            port = parts.port
+        except ValueError:
+            port = None
+        if port is not None:
+            netloc = f"{netloc}:{port}"
+    return urlunsplit((parts.scheme, netloc, parts.path, "", ""))
 
 
 def authorization_header(url: str, token: str) -> dict[str, str]:

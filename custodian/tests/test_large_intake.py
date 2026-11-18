@@ -154,6 +154,14 @@ def test_stream_refusals(entries, declared, body, reason):
         large.receive(entry, stream(entry, body, declared), Sink())
 
 
+def test_body_longer_than_declared_length_writes_nothing(entries):
+    entry = entries["bldg_wsf3d"]
+    sink = Sink()
+    with pytest.raises(large.IntakeError, match="length_mismatch"):
+        large.receive(entry, stream(entry, [b"abcdef"], 1), sink)
+    assert sink.count == 0
+
+
 @pytest.mark.parametrize(
     "text", ["{}", "[{},]", "[{}]x", "[{},", "[true]", '[{"x":', '[{"x":"bad\n"}]']
 )
@@ -449,6 +457,67 @@ def test_stream_source_and_hosts_are_closed(entries):
         large.receive(
             entry, stream(entry, [b"x"], final="https://unlisted.invalid/SYN"), Sink()
         )
+
+
+def test_redirect_userinfo_is_absent_from_the_failure(entries, tmp_path, monkeypatch):
+    import http.client
+
+    from eii_custodian.publicdata.fetch.report import fail_line
+    from eii_custodian.publicdata.fetch.transport import open_https_stream
+    from eii_custodian.publicdata.places.fetch import fetch_place_file
+
+    entry = replace(
+        entries["places_ovt/part-00014"],
+        url="https://www.data.gov.qa/invented-bypass",
+        basis_note="recorded_bytes: 3\nrecorded_etag: SYN-tag",
+    )
+    secret = "SYN-SECRET-HEADER"
+    landed = f"https://user:{secret}@evil.example/landed"
+    payload = (
+        "HTTP/1.1 302 Found\r\n"
+        f"Location: {landed}\r\n"
+        "Content-Length: 0\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+    ).encode("ascii")
+
+    class _ScriptedSocket:
+        def sendall(self, data: bytes) -> None:
+            return None
+
+        def send(self, data: bytes) -> int:
+            return len(data)
+
+        def makefile(
+            self, mode: str = "rb", *_args: object, **_kwargs: object
+        ) -> io.BytesIO:
+            return io.BytesIO(payload)
+
+        def close(self) -> None:
+            return None
+
+    def connect(connection: http.client.HTTPSConnection) -> None:
+        connection.sock = _ScriptedSocket()
+
+    monkeypatch.setattr(http.client.HTTPSConnection, "connect", connect)
+    fetched, failure = fetch_place_file(
+        entry,
+        lambda _u: pytest.fail("whole body read"),
+        tmp_path,
+        lambda: "2026-11-18T00:00:00Z",
+        lambda _s: None,
+        large_stream=open_https_stream,
+    )
+    assert fetched is None
+    assert failure is not None
+    assert failure.check == "blocked_host"
+    line = fail_line(
+        entry.key, failure.url, failure.check, failure.expected, failure.observed
+    )
+    assert secret not in failure.url
+    assert secret not in failure.observed
+    assert secret not in repr(failure)
+    assert secret not in line
 
 
 def test_publication_rehashes_the_whole_staged_body(entries, tmp_path, monkeypatch):

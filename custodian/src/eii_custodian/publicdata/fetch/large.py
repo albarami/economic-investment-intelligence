@@ -126,6 +126,8 @@ def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Receive
                 raise IntakeError("size_mismatch")
             if cap is not None and count > cap:
                 raise IntakeError("body_bytes")
+            if length is not None and count > length:
+                raise IntakeError("length_mismatch")
             output.write(chunk)
             digest.update(chunk)
         if length is not None and count != length:
