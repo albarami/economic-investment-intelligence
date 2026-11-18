@@ -1414,7 +1414,7 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Scope: chart spike and build measurements, native trace page and checker; no invented forecast calculation and no existing performance gate relaxed.
 - Depends: S1-T12; accepted decision 0042 merged.
 - Requirements: decision 0042 items 2, 8, 9 and 13; FE-39, FE-41, FE-62, FE-63, FE-82, FE-88, FE-89, TST-132.
-- Delivery: hard; personas Frontend; status queued.
+- Delivery: hard; personas Frontend; status part-one partial; acceptance BLOCKED pending shared Fact chips, reviewed native instrumentation and owner devices; offline evidence in PROGRESS.md heading "S6-T34 — Chart spike part one".
 
 ### S6-T35 — Spike: Arabic and accessibility of the component layer
 - Goal: Verify the component layer across languages, input methods and themes on the Stage shell.

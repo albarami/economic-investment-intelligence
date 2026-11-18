@@ -110,6 +110,7 @@
 | [0053](decisions/0053-the-source-registry-is-read-with-the-c-safe-loader.md) | Source registry read with the C safe loader; no fallback and unchanged suite limit | Accepted, 2026-11-18 |
 | [0054](decisions/0054-read-only-the-documentation-a-task-uses.md) | Rule 42 reads only the current official documentation of the parts a task uses, with the pages named in its brief; pins and retreat pins unchanged | Accepted, 2026-11-18 |
 | [0056](decisions/0056-catalogue-and-transport-spike-result.md) | S6-T33 offline catalogue and transport spike result; native retained, missing evidence blocked | Proposed, 2026-11-18; lead confirms number |
+| [0057](decisions/0057-chart-spike-part-one.md) | Chart spike offline build evidence; native and Fact-chip acceptance blocked; ECharts baseline retained | Proposed, 2026-11-18 |
 
 ## Identifiers and change control
 

@@ -1,0 +1,20 @@
+{
+  "version": "charts-proposal-v1",
+  "status": "PROPOSED-NOT-NATIVE-QUALIFIED",
+  "fixtures": ["hourly", "comparison", "range"],
+  "libraries": ["echarts", "plot", "visx"],
+  "languages": ["en", "ar"],
+  "devices": ["laptop", "phone"],
+  "runs": 3,
+  "warmups": 20,
+  "selections": 200,
+  "playbackMs": 30000,
+  "p95ExclusiveMs": 100,
+  "fpsExclusiveMinimum": 30,
+  "frameMaximumMs": 33,
+  "crossfadeMaximumMs": 800,
+  "fullStoryLoops": 3,
+  "fullStoryHeapExclusiveMB": 50,
+  "scale": { "x": [0, 24], "y": [0, 100] },
+  "cardinalityStatus": "proposed; owner/lead confirmation required before measurement"
+}

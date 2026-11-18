@@ -4066,3 +4066,19 @@ requires every prior ledger row to remain unchanged, so this worker preserved
 them and leaves their disposition to the lead. Full commands, actual exits and
 file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 `.overnight/RETURN.md`. No existing S2-T29 review or live-source hold is closed.
+
+## S6-T34 part-one handoff — numbering reserved to the lead
+
+Source: approved S6-T34 plan, lead ruling L-974(b), (d), (e), and decision
+0057, Evidence and acceptance. Still open: shared S3 Fact chip family and actual
+DOM governance; owner laptop and phone matrix; phone OS/browser/loopback transport;
+reviewed presented-paint, parse and full-story heap instrumentation; fixture
+cardinalities and committed pre-run identity; publisher web-page reading by the
+lead; digest-bound capture and complete matrix validator; another-maker build
+review; confirmation of decision number 0057. No native or chip acceptance is
+claimed. Descriptor and timing-policy unit tests do not close these items.
+
+S6-T34 correction: the offline matrix validator now has passing invented digest,
+attestation/device/viewport-binding and completeness controls. The open item is
+qualified collector integration and instrumentation review, not the absence of
+all matrix-checking code. This does not close native acceptance or C6.

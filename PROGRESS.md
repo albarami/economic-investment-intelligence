@@ -35747,3 +35747,136 @@ Final read-only invariant check (Python byte comparisons against git show HEAD),
 S6-T33 FIX1 final broad-suite result: `npm run test:checks` from web/ exited 0; 859 tests passed, zero failed/cancelled/skipped/todo; last line `# duration_ms 585043.441792`. Full retained output: .overnight/tmp/test-checks.log. It completed after the pending row above; no retry or skip. Final spike suite: 80 passed with zero failures or skips; native/browser limitations stay BLOCKED. Required root and web check exits are recorded in .overnight/tmp/checks.jsonl and .overnight/RETURN.md. Fresh different-maker confirmation remains pending; no commit was made.
 
 S6-T33 FIX1 post-report verification: docs-final: exit 0, last line checked 991 text files, 109 Markdown files: OK; tree-final: exit 0, last line checked 8 rules: OK; cmp-final: exit 0, last line (no output); diff-final: exit 0, last line (no output). The return lists every required command and retained red/green log; all checks exit 0, with independent review still pending.
+
+## S6-T34 — Chart spike part one
+
+2026-11-18. Builder: OpenAI GPT-6 Codex, senior frontend architect for measured
+technology spikes. Strict reviewer persona: strict design and code reviewer for
+frontend spikes, another maker, later; no independent build verdict obtained.
+Skills loaded: project-orientation, task-standards, sanad-provenance,
+muhasabah-gate. Requested test-driven-development, verification-before-completion,
+dataviz and frontend-design-pro are absent from the supplied installed catalog;
+their plain meaning was applied. No delegation or review impersonation.
+
+Base commit: `5e9f80ad1e03024600587396f66ad92887f81eae`.
+No new commit or push (brief requires an uncommitted working tree). Linux x64,
+Node v22.22.3, pinned installed web dependencies, affinity cores 22,23. No random
+seed: fixed invented renderer fixture and deterministic unit controls only.
+Authority: TASKS.md S6-T34, approved plan and design review in the assignment,
+lead ruling L-974(a), (b), (d), (e), decision 0042 items 2, 8, 9 and 13.
+
+Implementation evidence: web/spikes/charts/README.md, contract.json,
+fixtures/profiles.json, closed workload.ts, selective adapters, policy tests,
+product import-graph traversal with plants, matrix digest/completeness controls,
+and evidence/bundle.json. No production import, model call, native capture,
+shared Fact family, economic forecast or adoption result. The numeric adapters
+are not mounted; the bilingual loopback page renders a blocked message.
+
+Commands below use `taskset -c 22,23`; web commands run from web unless shown
+with `--prefix web` from the root. Exits are observed, not inferred.
+
+- Initial `node --test web/spikes/charts/tests/guards.node-test.mjs`: exit 1,
+  missing guard module, expected red before implementation.
+- Initial `node --test web/spikes/charts/tests/trace.node-test.mjs`: exit 1,
+  missing trace module, expected red before implementation.
+- First combined node test run: exit 1, 31 passed and one failed. The malformed
+  plant incorrectly spread an empty array into a valid object; corrected to
+  submit the malformed array itself. This was a deterministic test-fixture bug,
+  not an intermittent failure or changed acceptance baseline.
+- `npm run test:spike:charts --prefix web`: exit 0, 36 tests, after that correction.
+- First `npm run spike:charts:build`: exit 2, installed Plot export map hid its
+  declarations; fixed by spike-local type-path mapping, runtime unchanged.
+- Second `npm run spike:charts:build --prefix web`: exit 2, TypeScript rejected
+  deprecated baseUrl; removed baseUrl and used a relative paths entry.
+- Subsequent `npm run spike:charts:build --prefix web`: exit 0.
+- First `npm run lint`: exit 1, React hook rule mistook ECharts `use` for a hook;
+  aliased the imported function to registerCharts; no rule disabled.
+- `npm run format --prefix web`: exit 0, formatter applied to new spike files;
+  existing files outside task scope reported unchanged.
+- `npm run test:spike:charts`: exit 0, 39 tests before matrix validation additions.
+- Matrix tests written before implementation: `npm run test:spike:charts --prefix
+  web` exit 1, missing evidence module, expected red.
+- Final `npm run test:spike:charts`: exit 0, 48 passed, zero failed/skipped.
+- Final `npm run spike:charts:build`: exit 0; spike-local types and optimized
+  blocked-page build passed. This does not assert visual correctness.
+- `npm run spike:charts:measure`: exit 0; final report records source, fixture,
+  contract and lock hashes, environment and compression settings. Earlier runs
+  were superseded after source formatting/alias changes, not selected by result.
+- `npm run spike:charts:verify-evidence`: exit 1, expected BLOCKED because the
+  native capture matrix is missing. No native evidence is manufactured.
+- Final `npm run check`: exit 0, layout/version/import/host checks passed.
+- Final `npm run lint`: exit 0.
+- Final `npm run typecheck`: exit 0.
+- `npm run format:check`: exit 0.
+- `python3 scripts/check_docs.py`: exit 0, checked 971 text files and 109 Markdown
+  files before this log append; final post-log check recorded below.
+- `python3 scripts/check_tree.py`: exit 0, eight rules.
+- `cmp AGENTS.md CLAUDE.md`: exit 0.
+- `git diff --check`: exit 0 before final evidence append; final check below.
+
+Acceptance C1–C6 remains BLOCKED for every library for the reasons in decision
+0057, Evidence and acceptance. C7 passes the part-one reporting/baseline-retention
+disposition only. Structural descriptor tests do not establish actual Fact-chip
+lineage, DOM accessibility or native capture qualification. Bundle deltas are
+adapter-entry costs, not integrated product bundle evidence; parse and memory
+remain BLOCKED. No gate or threshold was relaxed. Full-owner-device runs and the
+lead's whole-repository test remain outstanding. OPEN_ITEMS.md records the handoff
+without inventing lead-owned item numbers. Missing skills and native dependencies
+are not silently treated as passes. Self-audit: evidence claims match this limited
+scope; no claim of full task acceptance.
+
+Observed adapter-entry incremental bytes from evidence/bundle.json (gzip, Brotli):
+
+- echarts: gzip 183971 bytes; Brotli 152785 bytes.
+- plot: gzip 102813 bytes; Brotli 84812 bytes.
+- visx: gzip 229640 bytes; Brotli 157927 bytes.
+
+Correction appended after the initial part-one evidence: github-flow was also
+loaded and applied to the uncommitted handoff; the explicit brief overrides its
+normal commit/push steps. Added benchmark.tsx so all variants now use the same
+React shell and change only their renderer import. The earlier direct-entry byte
+figures above remain historical, not final common-shell measurements.
+
+The first common-shell measurement attempt exited 1: Vite resolved the virtual
+entry to an absolute entry name before the plugin matched it. An attempted edit
+from the web working directory used a root-relative path and exited 1; the next
+measurement consequently also exited 1 with the unchanged entry-resolution
+error. Applied the edit from repository root and matched both forms. This is a
+deterministic implementation/working-directory correction, not a flaky run or a
+relaxed acceptance rule. No output from that failed run replaced the evidence.
+Subsequent common-shell measurement exited 0; final post-format measurement and
+final browser-suite exits are appended below. The chart build including the
+common shell exited 0 and lint exited 0 before final formatting.
+
+Final common-shell measurement: `npm run spike:charts:measure`, exit 0.
+Same React benchmark shell, gzip level 9, Brotli quality 11, Linux x64 Node v22.22.3. Source identities are in bundle.json.
+- echarts: incremental gzip 183816 bytes; incremental Brotli 151885 bytes.
+- plot: incremental gzip 102803 bytes; incremental Brotli 83981 bytes.
+- visx: incremental gzip 15362 bytes; incremental Brotli 13804 bytes.
+
+Final blocked-page typography correction: loaded arabic-rtl and its web/copy
+references; root lang/dir remains locale-owned, and both installed project fonts
+are imported locally with line height and zero tracking. No numeral is displayed.
+The first chart build after CSS imports exited 2 (side-effect CSS declaration
+missing); added Vite's installed client asset declarations in the spike-local
+tsconfig, without a suppression or product config change. Format exited 0;
+lint, root web typecheck and the 48-test spike suite exited 0 after the page change.
+Measurement exited 0 with the updated page source hash and unchanged common-shell
+byte totals. Final asset-typed spike build and format-check results follow below.
+
+Final local revalidation after typography and common-shell changes: chart build
+exit 0 (including Vite client asset declarations), format:check exit 0, web lint
+exit 0, web typecheck exit 0, spike unit suite exit 0 (48 passed, zero skipped),
+common-shell measurement exit 0. Documentation check exit 0 (972 text files,
+109 Markdown files), tree check exit 0 (eight rules), AGENTS/CLAUDE cmp exit 0,
+and git diff --check exit 0. No native evidence or independent build review was
+introduced by these checks. Existing test:checks browser result follows below.
+
+Final existing-suite result: `taskset -c 22,23 npm run test:checks` from web exited
+0 on its first run. Node report: 857 passed, zero failed/cancelled/skipped; browser
+report: 55 passed. Existing full street-load case passed; its original timeout
+and fixture were unchanged. Browser run reported 29.2 minutes; this is a local
+headless test result, never an owner-native chart performance pass. No retry,
+new skip, tolerance change or baseline refresh was used. Final task disposition
+remains C1–C6 BLOCKED and C7 part-one reporting PASS, with the detailed reasons
+in decision 0057 and .overnight/RETURN.md.
