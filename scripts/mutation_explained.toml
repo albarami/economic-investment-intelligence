@@ -4243,3 +4243,188 @@ reason = "A miss returns None instead of the empty text; the empty-text test is 
 module = "custodian/src/eii_custodian/publicdata/investment_contracts.py"
 mutation = "--- src/eii_custodian/publicdata/investment_contracts.py\n+++ src/eii_custodian/publicdata/investment_contracts.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return a reviewed crosswalk hit. A miss stays unmapped.\"\"\"\n     if key is None or key == \"\":\n         return None\n-    found = table.get(key, \"\")\n+    found = table.get(key, )\n     if found == \"\":\n         return None\n     return found"
 reason = "A miss returns None instead of the empty text; the empty-text test is then false and the function returns that None, the same result as the early return of None."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -11,7 +11,7 @@\n         return None\n     spec = load_source_spec(entry.source_id, url=entry.url)\n     if isinstance(spec, InvestmentFailure):\n-        return _refuse(cache, entry.source_id, spec)\n+        return _refuse(None, entry.source_id, spec)\n     if not spec.bounds.confirmed:\n         return _refuse(\n             cache,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -11,7 +11,7 @@\n         return None\n     spec = load_source_spec(entry.source_id, url=entry.url)\n     if isinstance(spec, InvestmentFailure):\n-        return _refuse(cache, entry.source_id, spec)\n+        return _refuse(cache, None, spec)\n     if not spec.bounds.confirmed:\n         return _refuse(\n             cache,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -14,7 +14,7 @@\n         return _refuse(cache, entry.source_id, spec)\n     if not spec.bounds.confirmed:\n         return _refuse(\n-            cache,\n+            None,\n             entry.source_id,\n             InvestmentFailure(\n                 1,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -15,7 +15,7 @@\n     if not spec.bounds.confirmed:\n         return _refuse(\n             cache,\n-            entry.source_id,\n+            None,\n             InvestmentFailure(\n                 1,\n                 entry.source_id,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -27,7 +27,7 @@\n         )\n     try:\n         if entry.source_id == \"fdi_projects\":\n-            failure = _publish_dashboard(entry, spec, cache, digest, clock)\n+            failure = _publish_dashboard(entry, spec, cache, digest, None)\n         else:\n             failure = _publish_agency(\n                 entry, spec, cache, digest, transport, sleep, clock"
+reason = "Equivalent: _publish_dashboard deletes its clock argument without reading or calling it."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -35,7 +35,7 @@\n     except OSError:\n         _clear_partials(cache / entry.source_id)\n         return _refuse(\n-            cache,\n+            None,\n             entry.source_id,\n             InvestmentFailure(\n                 1,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -36,7 +36,7 @@\n         _clear_partials(cache / entry.source_id)\n         return _refuse(\n             cache,\n-            entry.source_id,\n+            None,\n             InvestmentFailure(\n                 1,\n                 entry.source_id,"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -47,5 +47,5 @@\n             ),\n         )\n     if failure is not None:\n-        return _refuse(cache, entry.source_id, failure)\n+        return _refuse(None, entry.source_id, failure)\n     return None"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -47,5 +47,5 @@\n             ),\n         )\n     if failure is not None:\n-        return _refuse(cache, entry.source_id, failure)\n+        return _refuse(cache, None, failure)\n     return None"
+reason = "Equivalent: _refuse deletes cache and source_id without reading them and returns the unchanged failure."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -19,7 +19,7 @@\n         return receipt\n     terms, retrieved = receipt\n     envelope = dashboard_envelope(\n-        _envelope(entry, entry.url, digest, terms, retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, terms, retrieved, method=None)\n     )\n     parsed = parse_fdi(body, spec.dashboard, envelope)\n     if isinstance(parsed, InvestmentFailure):"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -19,7 +19,7 @@\n         return receipt\n     terms, retrieved = receipt\n     envelope = dashboard_envelope(\n-        _envelope(entry, entry.url, digest, terms, retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, terms, retrieved, method=\"XXXX\")\n     )\n     parsed = parse_fdi(body, spec.dashboard, envelope)\n     if isinstance(parsed, InvestmentFailure):"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, None, \"\", \"\", method=\"\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: this temporary envelope reaches only require_page_families and fail_of, which consume source_id and page_url but not the changed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, None, \"\", method=\"\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: this temporary envelope reaches only require_page_families and fail_of, which consume source_id and page_url but not the changed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, \"\", None, method=\"\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: this temporary envelope reaches only require_page_families and fail_of, which consume source_id and page_url but not the changed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, \"\", \"\", method=None),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, \"XXXX\", \"\", method=\"\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: this temporary envelope reaches only require_page_families and fail_of, which consume source_id and page_url but not the changed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, \"\", \"XXXX\", method=\"\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: this temporary envelope reaches only require_page_families and fail_of, which consume source_id and page_url but not the changed field."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n ) -> InvestmentFailure | None:\n     missing_family = require_page_families(\n         tuple(page.kind for page in spec.pages),\n-        _envelope(entry, entry.url, digest, \"\", \"\", method=\"\"),\n+        _envelope(entry, entry.url, digest, \"\", \"\", method=\"XXXX\"),\n     )\n     if missing_family is not None:\n         return missing_family"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -40,7 +40,7 @@\n             }\n         )\n         envelope = agency_envelope(\n-            _envelope(entry, page.url, page_digest, terms, retrieved, method=\"\")\n+            _envelope(entry, page.url, page_digest, terms, retrieved, method=None)\n         )\n         rule = spec.kind_rules.get(page.kind)\n         if rule is None:"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -40,7 +40,7 @@\n             }\n         )\n         envelope = agency_envelope(\n-            _envelope(entry, page.url, page_digest, terms, retrieved, method=\"\")\n+            _envelope(entry, page.url, page_digest, terms, retrieved, method=\"XXXX\")\n         )\n         rule = spec.kind_rules.get(page.kind)\n         if rule is None:"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=None)\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"XXXX\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
+reason = "Equivalent: _envelope deletes method without using it, so agency_envelope or dashboard_envelope receives identical fields."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -25,7 +25,7 @@\n         fetch_host=entry.fetch_host,\n         retrieved_utc=retrieved,\n         publisher=entry.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=None,\n         terms_sha256=terms,\n     )"
+reason = "Equivalent: sidecar_for stores source_modified or None, so the empty string and None produce the same sidecar value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -34,7 +34,7 @@\n         snapshot = read_snapshot(directory, page_digest)\n         archived_retrieved = snapshot.sidecar[\"retrieved_utc\"]\n         if not isinstance(archived_retrieved, str):\n-            raise SnapshotError(\"snapshot_index_invalid\")\n+            raise SnapshotError(None)\n         return page_digest, archived_retrieved, snapshot.body\n     except SnapshotError:\n         return InvestmentFailure("
+reason = "Equivalent: _fetch_page immediately catches its own SnapshotError and returns the same fixed InvestmentFailure without inspecting the exception argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -34,7 +34,7 @@\n         snapshot = read_snapshot(directory, page_digest)\n         archived_retrieved = snapshot.sidecar[\"retrieved_utc\"]\n         if not isinstance(archived_retrieved, str):\n-            raise SnapshotError(\"snapshot_index_invalid\")\n+            raise SnapshotError(\"XXsnapshot_index_invalidXX\")\n         return page_digest, archived_retrieved, snapshot.body\n     except SnapshotError:\n         return InvestmentFailure("
+reason = "Equivalent: _fetch_page immediately catches its own SnapshotError and returns the same fixed InvestmentFailure without inspecting the exception argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -34,7 +34,7 @@\n         snapshot = read_snapshot(directory, page_digest)\n         archived_retrieved = snapshot.sidecar[\"retrieved_utc\"]\n         if not isinstance(archived_retrieved, str):\n-            raise SnapshotError(\"snapshot_index_invalid\")\n+            raise SnapshotError(\"SNAPSHOT_INDEX_INVALID\")\n         return page_digest, archived_retrieved, snapshot.body\n     except SnapshotError:\n         return InvestmentFailure("
+reason = "Equivalent: _fetch_page immediately catches its own SnapshotError and returns the same fixed InvestmentFailure without inspecting the exception argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -9,7 +9,7 @@\n     retrieved: str,\n ) -> InvestmentFailure | None:\n     text = _dump(document)\n-    table_digest = sha256_hex(text.encode(\"utf-8\"))\n+    table_digest = sha256_hex(text.encode(\"UTF-8\"))\n     table_path = cache / entry.source_id / \"staging\" / f\"{table_digest}.json\"\n     _atomic_write(table_path, text)\n     try:"
+reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec independently of the process default encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -48,7 +48,7 @@\n         \"pages\": list(pages),\n     }\n     manifest_text = _dump(manifest)\n-    manifest_digest = sha256_hex(manifest_text.encode(\"utf-8\"))\n+    manifest_digest = sha256_hex(manifest_text.encode(\"UTF-8\"))\n     manifest_path = cache / entry.source_id / \"manifests\" / f\"{manifest_digest}.json\"\n     _atomic_write(manifest_path, manifest_text)\n     audited = _audit_pages(cache, entry.source_id, manifest)"
+reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec independently of the process default encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -16,7 +16,7 @@\n         fetch_host=entry.fetch_host,\n         retrieved_utc=retrieved,\n         publisher=envelope.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=None,\n         terms_sha256=terms,\n     )"
+reason = "Equivalent: sidecar_for stores source_modified or None, so the empty string and None produce the same sidecar value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -2,7 +2,7 @@\n     if not path.is_file():\n         return None\n     try:\n-        loaded: object = json.loads(path.read_text(encoding=\"utf-8\"))\n+        loaded: object = json.loads(path.read_text(encoding=\"UTF-8\"))\n     except (OSError, json.JSONDecodeError):\n         return None\n     return loaded"
+reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec independently of the process default encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -1,2 +1,2 @@\n def _dump(document: Mapping[str, object]) -> str:\n-    return json.dumps(document, sort_keys=True, ensure_ascii=True) + \"\\n\"\n+    return json.dumps(document, sort_keys=True, ) + \"\\n\""
+reason = "Equivalent: json.dumps defaults ensure_ascii to True, so omitting that argument preserves the sorted escaped JSON and its trailing newline."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -1,4 +1,4 @@\n def _atomic_json(path: Path, document: Mapping[str, object]) -> str:\n     text = _dump(document)\n     _atomic_write(path, text)\n-    return sha256_hex(text.encode(\"utf-8\"))\n+    return sha256_hex(text.encode(\"UTF-8\"))"
+reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec independently of the process default encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -1,5 +1,5 @@\n def _atomic_write(path: Path, text: str) -> None:\n     path.parent.mkdir(parents=True, exist_ok=True)\n     partial = path.with_name(\".\" + path.name + \".partial\")\n-    partial.write_text(text, encoding=\"utf-8\")\n+    partial.write_text(text, encoding=\"UTF-8\")\n     _replace(partial, path)"
+reason = "Equivalent: utf-8 and UTF-8 resolve to the same explicit codec independently of the process default encoding."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, None, terms, landing_retrieved, method=\"\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
+reason = "Equivalent under the actual callers: the final agency envelope's page digest is the computed nonempty SHA-256 of the landing page; SourceEnvelope.missing refuses only an empty string, so None passes as the digest does, and validate_investment and _commit_batch read only its source, URL, publisher, licence, terms URL and method fields (lead ruling L-943)."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, None, landing_retrieved, method=\"\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
+reason = "Equivalent under the actual callers: _receipt already requires nonempty terms; SourceEnvelope.missing refuses only an empty string, so None passes as the terms hash does, and the manifest and sidecars take the separate terms argument, never the final envelope's terms hash (lead ruling L-943)."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -57,7 +57,7 @@\n             return parsed\n         rows.extend(parsed)\n     envelope = agency_envelope(\n-        _envelope(entry, entry.url, digest, terms, landing_retrieved, method=\"\")\n+        _envelope(entry, entry.url, digest, terms, None, method=\"\")\n     )\n     validated = validate_investment(\n         tuple(rows), _bounds(entry, spec), spec.confirmation, envelope"
+reason = "Equivalent under the actual callers: _receipt already requires a nonempty landing retrieval time; SourceEnvelope.missing refuses only an empty string, so None passes, and the manifest and receipts take the separate landing_retrieved argument, never the final envelope's retrieval time (lead ruling L-943)."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_build.py"
+mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -30,7 +30,7 @@\n         terms_sha256=terms,\n     )\n     try:\n-        commit_pair(directory, page_digest, entry.extension, response.body, side)\n+        commit_pair(directory, None, entry.extension, response.body, side)\n         snapshot = read_snapshot(directory, page_digest)\n         archived_retrieved = snapshot.sidecar[\"retrieved_utc\"]\n         if not isinstance(archived_retrieved, str):"
+reason = "Equivalent: commit_pair forwards the digest only as publish_snapshot's identity, and _publish_file selects the SHA-256 of the same staged bytes when the identity is None, which equals page_digest, so filenames, index, receipts and lookups are identical (lead ruling L-943)."
