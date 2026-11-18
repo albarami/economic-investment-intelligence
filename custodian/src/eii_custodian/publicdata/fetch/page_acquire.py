@@ -10,7 +10,7 @@ from typing import Any
 from urllib.parse import quote, urlencode, urljoin
 
 from .allowlist import approve, host_of
-from .certificate_pins import Pin, load_pin, page_transport
+from .certificate_pins import Pin, PinError, load_pin, page_transport
 from .kinds import read_bounded
 from .page_archive import staged_source
 from .page_html import Node, ShapeError, Tree
@@ -158,9 +158,12 @@ def fetch(
     if review["max_bytes"] is None:
         raise ShapeError("acquisition_bound_unconfirmed")
     pins: dict[str, Pin] = {}
+    reviewed_hosts = {host_of(url) for url in review["reviewed_urls"]}
     for spec in review["pins"]:
         if not isinstance(spec, dict) or spec.get("host") in pins:
             raise ShapeError("schema_missing")
+        if spec.get("host") not in reviewed_hosts:
+            raise PinError("certificate_host_mismatch")
         pins[spec["host"]] = load_pin(cache, entry.source_id, spec)
     inputs: list[tuple[Response, str, bytes, str]] = []
     shape = review["shape"]

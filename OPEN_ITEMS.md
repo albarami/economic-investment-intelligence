@@ -3525,3 +3525,18 @@ commands, exits and counts are in `.overnight/fix9-checks.jsonl` and
 assignment-alias and generated-source review limits. Production transport and
 runtime refusal remain unchanged. Independent confirmation by another maker and
 live TLS acceptance remain pending; no previous live-source hold is lifted.
+
+
+**Fix pass 10 pin-security notes, 2026-11-18 (L-935):** N1: the retained
+version-1 `PINNED` source-id selection is unused by the eight version-2
+declarations. N2: a legacy tender redirect to another allowed host reuses its
+augmented context. N4: capture `tls_verified` and `access` are lead attestations,
+not independently verified by code. N6: the caller guard scans `custodian/src`,
+not `scripts`, whose build command calls the generic opener without a chain hash.
+N7: `intake_file` does not explicitly reject an empty or parent source name;
+current source callers do not supply one. N8: hard links are not detected; the
+digest binds their content. N9: the top-level `host_pins` list is unused. These
+review limits remain open for lead disposition, with no live approval inferred.
+F1 to F4 are addressed offline in fix pass 10; the Anthropic pin-security review
+and Moonshot lens T confirmation remain PENDING, as do every `security_review`
+value and the retired `icv.qa` record. Existing evidence holds remain unchanged.

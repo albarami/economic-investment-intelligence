@@ -93,7 +93,7 @@ def page_context(host: str, supplied: ssl.SSLContext | None = None) -> ssl.SSLCo
     ):
         raise PinError("tls_verification_disabled")
     pins = _PINS.get() or {}
-    if host in pins:
+    if host in PIN_HOSTS and host in pins:
         pin = pins[host]
         validate_pin(host, pin)
         return verified_context(host, pin)

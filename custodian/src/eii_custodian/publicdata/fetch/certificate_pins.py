@@ -157,6 +157,8 @@ def intake_file(cache: Path, source: str, name: str) -> Path:
 
 def load_pin(cache: Path, source: str, config: object) -> Pin:
     """Load only the lead's hash-reviewed DER file; missing evidence stays closed."""
+    from .page_requests import PIN_HOSTS
+
     if not isinstance(config, dict) or set(config) != {
         "host",
         "sha256",
@@ -175,6 +177,22 @@ def load_pin(cache: Path, source: str, config: object) -> Pin:
         raise PinError("certificate_chain_incomplete") from None
     pin = Pin(config["host"], config["sha256"], der, True)
     validate_pin(pin.host, pin)
+    if pin.host not in PIN_HOSTS:
+        raise PinError("certificate_host_mismatch")
+    # Inspect in an empty store: system roots must not mask extra certificates.
+    inspection = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    try:
+        inspection.load_verify_locations(cadata=ssl.DER_cert_to_PEM_cert(der))
+        authorities = inspection.get_ca_certs()
+        encoded = inspection.get_ca_certs(binary_form=True)
+    except (ValueError, ssl.SSLError):
+        raise PinError("certificate_chain_incomplete") from None
+    if (
+        len(authorities) != 1
+        or encoded != [der]
+        or authorities[0]["issuer"] == authorities[0]["subject"]
+    ):
+        raise PinError("certificate_chain_incomplete")
     return pin
 
 

@@ -1024,19 +1024,29 @@ source tree; acquisition or final validation failure preserves the old tree.
 Actual acquisition maxima and observed row bounds remain lead evidence, never
 helper counts promoted into limits.
 
-A lead-operated school capture requires initial/final URLs and ordered redirect
-URLs, capture tool, UTC capture date, raw SHA-256, verified issuing-intermediate
-DER hash and exact host, TLS verification enabled, and visitor access. Every URL
-must pass the normal allow-list and reviewed URL set. No browser is installed or
-operated by this adapter. Missing evidence records a dated technical failure.
+The retained version-1 school capture seam requires initial/final URLs and
+ordered redirect URLs, capture tool, UTC capture date, raw SHA-256, verified
+issuing-intermediate DER hash and exact host, TLS verification enabled, and
+visitor access. Every URL must pass the normal allow-list and reviewed URL set.
+No browser is installed or operated by this adapter. Missing evidence records
+a dated technical failure. Capture admission is not reachable from the eight
+version-2 declarations: their `page_acquire.fetch@v2` path has no capture intake.
 Only the school directory's normal fetch attempt uses the browser user agent;
-terms reads, other pages and award proofs retain the default agent. The school
-attempt precedes capture intake.
+terms reads, other pages and award proofs retain the default agent.
 The four page pin hosts are `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
 `www.edu.gov.qa` and `myschools.edu.gov.qa`. An initial request or redirect to
 one of these hosts without a page-request scope or valid legacy pin refuses
 with `certificate_chain_incomplete` before constructing an opener or redirected
-request. The existing legacy pin validation remains. A supplied SSL context alone
+request. The stream and attempt openers unconditionally refuse these hosts,
+even inside a page scope, before constructing any opener. Pins loaded for page
+requests must name one of these hosts and belong to the row's reviewed URL hosts.
+The file must decode, by itself in an empty client trust store, to exactly one
+non-self-signed authority certificate; the stored DER must match the file exactly.
+The pin completes the chain; it does not restrict the issuer. System-root chain
+validation and hostname verification remain required, with partial-chain trust
+cleared in both page and tender contexts. A supplied context with partial-chain
+trust enabled is refused. The existing legacy pin validation remains.
+A supplied SSL context alone
 does not constitute a legacy pin. Under lead ruling L-921, the tender adapter
 forwards the registry's `chain_intermediate_sha256`, already checked against the
 chain file by `chain_context`, through `open_https`'s keyword-only
@@ -1055,7 +1065,9 @@ wrapper. Only the `legacy_chain_sha256` argument node of the `open_https` functi
 definition in `fetch/transport.py` remains allowed. Imported names retain all
 possible bindings; any protected binding makes the name or attribute chain a hit.
 Separate planted callers cover literal and variable keyword expansion, aliases,
-external tender scope and wrapper access, wrapper imports and runtime-built keys.
+external tender scope and wrapper access, wrapper imports and string-literal
+keys used in runtime lookups or construction. Computed nonliteral keys are not
+independently recognised; keyword expansion at a recognised opener is refused.
 This is a source boundary; runtime refusal does not inspect callers or signatures.
 Dynamic imports through `importlib.import_module`, `__import__`, or equivalent runtime mechanisms are outside this AST caller boundary and require code review.
 Wrapper lookup through `getattr` or another runtime attribute mechanism that is not a direct AST attribute chain is outside this caller boundary and require code review.

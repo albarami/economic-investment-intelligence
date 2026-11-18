@@ -137,6 +137,9 @@ def open_https(
     from .page_requests import PIN_HOSTS, active, check_target, page_context
 
     check_target(url)
+    supplied_partial_chain = ssl_context is not None and bool(
+        ssl_context.verify_flags & ssl.VERIFY_X509_PARTIAL_CHAIN
+    )
     page_scoped = active()
     pin = current_pin()
     if page_scoped:
@@ -162,6 +165,8 @@ def open_https(
         ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
     ):
         raise TransportFault("unreachable", url)
+    if supplied_partial_chain:
+        raise PinError("certificate_chain_incomplete")
     # L-921: only the tender adapter supplies the chain hash already checked by
     # chain_context. A context alone or an unchecked pin shape cannot bridge the
     # unscoped page-host refusal. Disabled verification keeps its precedence.
@@ -329,6 +334,11 @@ def open_https_stream(
     url: str, *, reviewed_urls: tuple[str, ...] | None = None
 ) -> Iterator[StreamResponse]:
     """Open a bounded-chunk stream; the context always closes the response."""
+    from .certificate_pins import PinError
+    from .page_requests import PIN_HOSTS
+
+    if host_of(url) in PIN_HOSTS:
+        raise PinError("certificate_chain_incomplete")
     if not _stream_allowed(url) or (
         reviewed_urls is not None and url not in reviewed_urls
     ):
@@ -384,6 +394,11 @@ def _stream_allowed(url: str) -> bool:
 
 def open_attempt(request: PreparedRequest) -> AttemptResult:
     """Open one checked HTTPS request. Redirects are not followed."""
+    from .certificate_pins import PinError
+    from .page_requests import PIN_HOSTS
+
+    if host_of(request.url) in PIN_HOSTS:
+        raise PinError("certificate_chain_incomplete")
 
     class _Stop(urllib.request.HTTPRedirectHandler):
         def redirect_request(

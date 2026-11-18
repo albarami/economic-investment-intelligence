@@ -587,9 +587,16 @@ hosts remain active: `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
 `www.edu.gov.qa` and `myschools.edu.gov.qa`. Without a page scope or valid
 legacy pin, an initial request or redirect to these hosts refuses with
 `certificate_chain_incomplete` before constructing an opener or redirected
-request. DER filenames, independent security approval and the Sectigo
-recheck remain pending. Initial, redirected and terms requests each select their
-own verifying context; an unpinned full-chain host receives fresh ordinary trust.
+request. The stream and attempt openers refuse these hosts unconditionally.
+DER filenames and independent security approval for each of the four active
+records remain pending. The fifth, `icv.qa`, record is retired from active pin
+selection and stays PENDING; reviving it needs a new ruling and issuer check.
+Initial, redirected and terms requests each select their own verifying context;
+an unpinned full-chain host receives fresh ordinary trust. A page pin must belong
+to the row's reviewed URL hosts and decode as exactly one non-self-signed
+certificate authority. It completes the chain rather than restricting the issuer.
+The retained version-1 capture seam is unreachable from the eight version-2
+declarations; their normal fetch path has no capture intake.
 There is no AIA fetch, partial-chain trust, verification fallback or cookie jar.
 The existing tender PEM convention is unchanged. The source and redirect hosts
 reviewed by L-892, as narrowed by L-914, join PUB-03; a request still needs its

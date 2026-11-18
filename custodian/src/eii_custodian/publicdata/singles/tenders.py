@@ -502,6 +502,7 @@ def chain_context(path: Path, pin: str) -> ssl.SSLContext:
     if digest != pin.lower():
         raise TenderError("certificate_chain_incomplete")
     context = ssl.create_default_context()
+    context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     if context.verify_mode != ssl.CERT_REQUIRED or not context.check_hostname:
         raise TenderError("certificate_chain_incomplete")
     try:
