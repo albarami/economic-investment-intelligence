@@ -33637,3 +33637,70 @@ Counts:    Eight new planted cases; 73 focused tests; 5,545 final custodian/core
 Seed:      none
 Notes:     Item 1 authenticates manifest bytes against manifest_sha256 as hash_mismatch before parsing and refuses an empty compatibility page list as missing_artifact/pages/empty; document 03, Cache-only announced-project evidence (S2-T30), distinguishes this from a valid empty milestone page. Item 2 derives independent audit state from the archived candidate's independence as well as supplied status, yielding missing_evidence/unvalidated_milestone/milestone_not_independent for the publisher plant. Item 3 refuses duplicate source/key attempts as evidence_audit_incomplete/duplicate fetch attempt before writing. Item 4 compares and reads only plain dictionary copies. The pre-existing malformed-page test kept its assertion; its manifest fixture now has a matching hash so it still reaches the page-type guard. OPEN_ITEMS.md and TASKS.md are unchanged because no open item or round-named status changed. Skills: project-orientation, task-standards, sanad-provenance, test-driven-development, systematic-debugging, verification-before-completion and muhasabah-gate. No commit, network, mutation campaign, database operation or cache read.
 ```
+
+```text
+### S2-T30 — Kill pass 1d: supplied joined-head survivor dispositions
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; pass remains uncommitted)
+Command:   PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/run_proofs.py; each subprocess prefixes taskset -c 4-7 uv run --locked python and runs the exact isolated mutant or original pytest node.
+Exit code: Harness 0; each of eight exact mutant tests 1 and each corresponding original-code test 0; new test file 0 (11 passed).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Reviewer:  Strict mutation and equivalence reviewer from another maker, pending with the lead
+Counts:    Supplied records 73; K 8; E 65 (64 unique exact TOML rows because records 38 and 39 have identical diffs); 49 prior proposals rechecked; withheld 16 resolved as 15 E and 1 K.
+Seed:      No explicit seed supplied; repository conftest selects a clock-based Hypothesis seed; new tests use deterministic invented inputs.
+Environment: Python bytecode disabled, affinity 4-7, UV_OFFLINE=1, uv/ruff/mypy caches and TMPDIR confined to .overnight/tmp; existing locked environment; no network or source-cache read.
+Evidence:  .overnight/tmp/proofs.json records commands, real exits, summaries and wall times; .overnight/tmp/replays/ holds exact mutant copies and red/green logs; .overnight/tmp/prior49-recheck.json maps every earlier proposal to the current hunk; .overnight/tmp/equivalence_recheck.json records the current proofs.
+Notes:     New tests preserve selected crosswalk linkage, supplied audit reasons, independent empty-reason state, duplicate-attempt source diagnostics and verified-registry terms fallback. Record 25 is killed rather than explained: a typed caller value equal to null can survive dictionary equality, while the geography guard still normalizes it to absence. Fifteen withheld default mutations cannot read an absent key after plain row copying and metadata validation. All N1-N5 are individually replayed. No production code, inherited test or existing explanation row changed; no mutation campaign, Git mutation or independent approval claimed. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, github-flow, muhasabah-gate; test-driven-development, systematic-debugging and verification-before-completion unavailable by name, so brief-specified plain-meaning rules applied.
+```
+
+```text
+### S2-T30 — Kill pass 1d correction: retained key objects defeat the proposed default equivalences
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; no commit made)
+Command:   PYTHONDONTWRITEBYTECODE=1 taskset -c 4-7 uv run --locked python .overnight/tmp/key_boundary.py; focused pytest of test_investment_evidence_survivors_8.py; .overnight/tmp/run_extra_proofs.py applies each of the fifteen additional exact mutants in an isolated copy.
+Exit code: Boundary reproducer 0; focused fixture attempts 1 (5 failed, 11 passed) twice, then 0 (16 passed).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Seed:      Repository clock-based seed, no explicit seed argument; deterministic invented inputs
+Counts:    Corrected final partition: K 23, E 50, 49 unique new exact explanation rows; all sixteen previously withheld records are K. All 49 earlier equivalence proposals remain E; the additional equivalent is the default ensure_ascii argument.
+Notes:     Correction to the earlier entry's proposed fifteen E rows: dict copying preserves str-subclass keys, so their stateful equality can hide a key after metadata validation. Removed only this pass's uncommitted proposed explanations, preserving every pre-existing row, and added five negative tests of fabricated identifier text. PO-S2-72 records the unremediated production-boundary issue; no test blesses acceptance of empty identity parts and future metadata refusal is allowed. The first fixture attempt reused identical raw bytes for two revisions and correctly met revision_overwrite; the second used an unsupported float fixture token. Distinct body bytes and the existing fixture's exact numeric-token form corrected both causes. These were deterministic fixture-construction errors, not random suite failures. The earlier whole-suite run began before these additional cases, so a final whole-suite run is required after the added tests.
+```
+
+```text
+### S2-T30 — Kill pass 1d intermediate whole-suite and completed kill proofs
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; uncommitted)
+Command:   .overnight/tmp/run_checks.py and .overnight/tmp/run_extra_proofs.py; commands and environments recorded in their JSON evidence.
+Exit code: Both harnesses 0; 23 individual mutant tests each 1 and 23 corresponding original tests each 0; first whole custodian suite 0 (5,133 passed in 578.67s; measured subprocess wall 579.740s, below 600s).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6)
+Seed:      Initial commands use the repository clock-based seed, not explicitly captured; the final command will supply and record a runtime-generated seed.
+Counts:    Focused initial investment suite 482 passed, 4,651 deselected; 624 formatted files; 374 typed source files; 898 text files and 103 Markdown files; 8 tree rules; 73 of 73 dispositions (23 K, 50 E, 49 unique E rows). All 720 pre-existing TOML rows were checked unchanged as a byte-identical prefix.
+Notes:     ruff check, format check, mypy, documentation check, tree check, AGENTS/CLAUDE comparison, git diff --check, disposition verification and production-source diff each exited 0. The first full run collected the 11-case file before the five key cases were appended; the final required run therefore follows the completed 16-case file. No failure, baseline refresh, skip or retry is concealed. Initial check evidence is .overnight/tmp/checks-initial.json; all 46 individual red/green results are in .overnight/tmp/proofs.json. PO-S2-72 remains open.
+```
+
+```text
+### S2-T30 — Kill pass 1d correction: typed tuple equality and redundant snapshot validation
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; no commit made)
+Command:   .overnight/tmp/run_fallback_proofs.py; .overnight/tmp/run_selection_proof.py; new-file pytest; second whole-suite result retained in .overnight/tmp/checks-second.json.
+Exit code: Both proof harnesses 0; all 22 additional exact mutant tests 1 and original witnesses 0; new-file pytest 0 (18 cases after tuple plants, then 19 after selection plant); second whole custodian suite 0 (5,138 passed in 575.08s; measured wall 576.038s, below 600s).
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6)
+Seed:      Second whole suite 1794987182; new isolated witnesses use deterministic invented inputs and the repository's automatic seed.
+Counts:    Corrected final partition: K 45, E 28, 28 unique exact TOML rows. The 49 earlier proposals resolve as 22 K and 27 E; the additional E is json.dumps default ensure_ascii=True. All sixteen withheld mutants and N1-N5 remain K. There are now nineteen cases across eight test functions, with 45 exact red/green pairs.
+Notes:     Correction to the earlier empty-history proofs: a tuple subclass can override comparison with empty canonical history while retaining iterable revisions or absences, reaching the audit fallback. Twenty-one proposed dead-branch explanations were removed from this pass's uncommitted additions and individually killed by two tests. A stateful selection key also makes the duplicate archive validation detect a conflict, so dropping snapshots changes a refusal; that earlier proposal is now K. Every pre-existing explanation row remains untouched. The original-code tuple fallback is an additional unremediated caller-object boundary under PO-S2-72; the new tests permit a future refusal and only constrain fields if emitted. The second whole run collected before these final three cases, so a final whole run follows the nineteen-case file. Its intermediate disposition check saw 44 K and 29 E before the selection proof completed; the final checker will verify 45 K and 28 E. Earlier rows are preserved as history, not current completion claims.
+```
+
+```text
+### S2-T30 — Kill pass 1d final verification
+Commit:    38da4e31f7a09fdc3823cf6ebb6ece8f7e3a3f24 (base; all pass changes remain uncommitted)
+Command:   PYTHONDONTWRITEBYTECODE=1 python3 .overnight/tmp/run_final_checks.py; every exact subprocess command is recorded in .overnight/tmp/checks-final.json.
+Exit code: All twelve final checks 0; all 45 isolated exact mutant replays 1 and original-code witnesses 0; no mutation campaign run.
+Date:      2026-11-18
+Run by:    OpenAI Codex (GPT-6), senior Python test engineer for mutation testing of provenance code
+Reviewer:  Strict mutation and equivalence reviewer from another maker, pending with the lead
+Seed:      1794987883, explicitly supplied to all three final pytest commands
+Environment: Existing locked environment; PYTHONDONTWRITEBYTECODE=1; taskset -c 4-7; UV_OFFLINE=1; uv, ruff and mypy caches plus TMPDIR confined to .overnight/tmp.
+Counts:    new-tests: 19 passed in 0.32s; investment: 490 passed, 4651 deselected in 19.27s; custodian: 5141 passed in 589.77s (0:09:49); ruff: All checks passed!; format: 624 files already formatted; mypy: Success: no issues found in 374 source files; docs: checked 898 text files, 103 Markdown files: OK; tree: checked 8 rules: OK; agent-parity: (no output); diff: (no output); dispositions: 73 of 73; K=45; E=28; unique E rows=28; exact mutation text verified; production-unchanged: (no output)
+Wall time: Final whole custodian suite 590.824 seconds, below the unchanged 600-second limit.
+Evidence:  .overnight/tmp/checks-final.json, .overnight/tmp/final-check-*.log, .overnight/tmp/proofs.json, .overnight/tmp/dispositions.json, .overnight/tmp/dispositions.md, .overnight/tmp/explanations-preserved.json and .overnight/RETURN.md.
+Notes:     Final partition is 45 K and 28 E, with 28 new exact TOML rows and 73 of 73 records accounted for. Every prior explanation row remains byte-identical. All sixteen withheld mutants and N1-N5 have exact individual red/green proofs. Eight functions add nineteen cases. Production sources and inherited tests are unchanged. PO-S2-72 remains open because this pass may not fix the caller-key boundary. The lead's campaign and independent different-maker review remain pending. Skills: project-orientation, task-standards, mutation-testing, sanad-provenance, github-flow and muhasabah-gate; unavailable test-driven-development, systematic-debugging and verification-before-completion applied through the brief's plain-meaning rules. Muhasabah: PASS for scope and attributed evidence, with no production-fix or approval claim.
+```

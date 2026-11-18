@@ -4428,3 +4428,145 @@ reason = "Equivalent under the actual callers: _receipt already requires a nonem
 module = "custodian/src/eii_custodian/publicdata/investment_build.py"
 mutation = "--- src/eii_custodian/publicdata/investment_build.py\n+++ src/eii_custodian/publicdata/investment_build.py\n@@ -30,7 +30,7 @@\n         terms_sha256=terms,\n     )\n     try:\n-        commit_pair(directory, page_digest, entry.extension, response.body, side)\n+        commit_pair(directory, None, entry.extension, response.body, side)\n         snapshot = read_snapshot(directory, page_digest)\n         archived_retrieved = snapshot.sidecar[\"retrieved_utc\"]\n         if not isinstance(archived_retrieved, str):"
 reason = "Equivalent: commit_pair forwards the digest only as publish_snapshot's identity, and _publish_file selects the SHA-256 of the same staged bytes when the identity is None, which equals page_digest, so filenames, index, receipts and lookups are identical (lead ruling L-943)."
+
+# S2-T30 kill pass 1d: exact supplied joined-head equivalents.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         if isinstance(item, InvestmentFailure):\n             return item\n         snapshots.append(item)\n-        source_id = str(snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(snapshot.sidecar.get(\"source_id\", None))\n         archives.append(\n             VerifiedArchive(\n                 source_id,"
+reason = "The successful _parse_project_snapshot call has already required the authenticated receipt source_id to equal fdi_projects, so this absent-key default is never read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         if isinstance(item, InvestmentFailure):\n             return item\n         snapshots.append(item)\n-        source_id = str(snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(snapshot.sidecar.get(\"source_id\", ))\n         archives.append(\n             VerifiedArchive(\n                 source_id,"
+reason = "The successful _parse_project_snapshot call has already required the authenticated receipt source_id to equal fdi_projects, so this absent-key default is never read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         if isinstance(item, InvestmentFailure):\n             return item\n         snapshots.append(item)\n-        source_id = str(snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(snapshot.sidecar.get(\"source_id\", \"XXXX\"))\n         archives.append(\n             VerifiedArchive(\n                 source_id,"
+reason = "The successful _parse_project_snapshot call has already required the authenticated receipt source_id to equal fdi_projects, so this absent-key default is never read."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -21,7 +21,7 @@\n         return spec\n     if spec.dashboard is None:\n         return _snapshot_failure(snapshot, \"confirmed dashboard shape\", \"missing\")\n-    envelope = _snapshot_envelope(snapshot, FDI_METHOD, PARSER_VERSION)\n+    envelope = _snapshot_envelope(snapshot, FDI_METHOD, None)\n     parsed = parse_fdi(snapshot.body, spec.dashboard, envelope)\n     if isinstance(parsed, InvestmentFailure):\n         return parsed"
+reason = "For FDI_METHOD, _snapshot_envelope always calls dashboard_envelope, which replaces the supplied method_version with PARSER_VERSION before parsing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -26,7 +26,7 @@\n         if isinstance(metadata, InvestmentFailure):\n             return metadata\n         item = replace(item, snapshot=metadata)\n-        source_id = str(item.snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(item.snapshot.sidecar.get(\"source_id\", None))\n         current = {\n             f\"{row.get('source_id', '')}:project:{row.get('project_id', '')}\"\n             for row in item.rows"
+reason = "The preceding _metadata_failure call reparses the authenticated receipt and requires source_id equal to fdi_projects before returning that receipt, so this absent-key default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -26,7 +26,7 @@\n         if isinstance(metadata, InvestmentFailure):\n             return metadata\n         item = replace(item, snapshot=metadata)\n-        source_id = str(item.snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(item.snapshot.sidecar.get(\"source_id\", ))\n         current = {\n             f\"{row.get('source_id', '')}:project:{row.get('project_id', '')}\"\n             for row in item.rows"
+reason = "The preceding _metadata_failure call reparses the authenticated receipt and requires source_id equal to fdi_projects before returning that receipt, so this absent-key default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -26,7 +26,7 @@\n         if isinstance(metadata, InvestmentFailure):\n             return metadata\n         item = replace(item, snapshot=metadata)\n-        source_id = str(item.snapshot.sidecar.get(\"source_id\", \"\"))\n+        source_id = str(item.snapshot.sidecar.get(\"source_id\", \"XXXX\"))\n         current = {\n             f\"{row.get('source_id', '')}:project:{row.get('project_id', '')}\"\n             for row in item.rows"
+reason = "The preceding _metadata_failure call reparses the authenticated receipt and requires source_id equal to fdi_projects before returning that receipt, so this absent-key default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -75,7 +75,7 @@\n                     project_key=project_key,\n                     observation=_row_observation(row),\n                     publication=_UNKNOWN_ASSERTION,\n-                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", \"\")),\n+                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", None)),\n                     checksum=item.snapshot.sha256,\n                     schema=item.schema,\n                     geography=geography,"
+reason = "The preceding authenticated read validates retrieval UTC and _metadata_failure requires matching lineage before returning that verified receipt, so retrieved_utc is present and this default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -75,7 +75,7 @@\n                     project_key=project_key,\n                     observation=_row_observation(row),\n                     publication=_UNKNOWN_ASSERTION,\n-                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", \"\")),\n+                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", )),\n                     checksum=item.snapshot.sha256,\n                     schema=item.schema,\n                     geography=geography,"
+reason = "The preceding authenticated read validates retrieval UTC and _metadata_failure requires matching lineage before returning that verified receipt, so retrieved_utc is present and this default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -75,7 +75,7 @@\n                     project_key=project_key,\n                     observation=_row_observation(row),\n                     publication=_UNKNOWN_ASSERTION,\n-                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", \"\")),\n+                    retrieved_utc=str(item.snapshot.sidecar.get(\"retrieved_utc\", \"XXXX\")),\n                     checksum=item.snapshot.sha256,\n                     schema=item.schema,\n                     geography=geography,"
+reason = "The preceding authenticated read validates retrieval UTC and _metadata_failure requires matching lineage before returning that verified receipt, so retrieved_utc is present and this default is unreachable."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -32,7 +32,7 @@\n         failure = add(\n             VerifiedArchive(\n                 str(selected.sidecar.get(\"source_id\", \"\")),\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", None)),\n                 \"project\",\n                 item.identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -32,7 +32,7 @@\n         failure = add(\n             VerifiedArchive(\n                 str(selected.sidecar.get(\"source_id\", \"\")),\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", )),\n                 \"project\",\n                 item.identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -32,7 +32,7 @@\n         failure = add(\n             VerifiedArchive(\n                 str(selected.sidecar.get(\"source_id\", \"\")),\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", \"XXXX\")),\n                 \"project\",\n                 item.identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -48,7 +48,7 @@\n         failure = add(\n             VerifiedArchive(\n                 candidate.source_id,\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", None)),\n                 \"milestone\",\n                 candidate.snapshot_identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -48,7 +48,7 @@\n         failure = add(\n             VerifiedArchive(\n                 candidate.source_id,\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", )),\n                 \"milestone\",\n                 candidate.snapshot_identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -48,7 +48,7 @@\n         failure = add(\n             VerifiedArchive(\n                 candidate.source_id,\n-                str(selected.sidecar.get(\"key\", \"\")),\n+                str(selected.sidecar.get(\"key\", \"XXXX\")),\n                 \"milestone\",\n                 candidate.snapshot_identity,\n                 selected,"
+reason = "A present receipt key bypasses this default; an absent key makes add compare None with a constructed string and return the same archive metadata differs refusal whose source diagnostic does not depend on that string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -25,7 +25,7 @@\n             for entry in audit.entries\n         ],\n     }\n-    body = (json.dumps(document, sort_keys=True, ensure_ascii=True) + \"\\n\").encode()\n+    body = (json.dumps(document, sort_keys=True, ) + \"\\n\").encode()\n     side = dict(sidecar)\n     for name in (\n         \"sha256\","
+reason = "json.dumps defaults ensure_ascii to True, so omitting its explicit True argument preserves serialization bytes for every document."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -61,7 +61,7 @@\n     matching = [row for row in parsed if row.candidate_id == candidate.candidate_id]\n     if (\n         len(matching) != 1\n-        or replace(candidate, snapshot=None, completion=None, observed_investment=None)\n+        or replace(candidate, snapshot=None, observed_investment=None)\n         != matching[0]\n     ):\n         return _candidate_failure("
+reason = "The earlier unsupported_milestone guard returns unless completion and observed_investment are both None, so removing either redundant None reset preserves the candidate compared with the parsed row."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -61,7 +61,7 @@\n     matching = [row for row in parsed if row.candidate_id == candidate.candidate_id]\n     if (\n         len(matching) != 1\n-        or replace(candidate, snapshot=None, completion=None, observed_investment=None)\n+        or replace(candidate, snapshot=None, completion=None, )\n         != matching[0]\n     ):\n         return _candidate_failure("
+reason = "The earlier unsupported_milestone guard returns unless completion and observed_investment are both None, so removing either redundant None reset preserves the candidate compared with the parsed row."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -71,7 +71,7 @@\n         assertion.value is None\n         or not _valid_assertion(assertion, correction=name == \"correction\")\n         for name, assertion in (\n-            (\"observation\", candidate.observation),\n+            (\"XXobservationXX\", candidate.observation),\n             (\"publication\", candidate.publication),\n             (\"correction\", candidate.correction),\n         )"
+reason = "This loop label is used only for equality with correction and both original and replacement labels are unequal to correction, so the same assertion is checked with correction=False and no label is emitted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -71,7 +71,7 @@\n         assertion.value is None\n         or not _valid_assertion(assertion, correction=name == \"correction\")\n         for name, assertion in (\n-            (\"observation\", candidate.observation),\n+            (\"OBSERVATION\", candidate.observation),\n             (\"publication\", candidate.publication),\n             (\"correction\", candidate.correction),\n         )"
+reason = "This loop label is used only for equality with correction and both original and replacement labels are unequal to correction, so the same assertion is checked with correction=False and no label is emitted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -72,7 +72,7 @@\n         or not _valid_assertion(assertion, correction=name == \"correction\")\n         for name, assertion in (\n             (\"observation\", candidate.observation),\n-            (\"publication\", candidate.publication),\n+            (\"XXpublicationXX\", candidate.publication),\n             (\"correction\", candidate.correction),\n         )\n     ):"
+reason = "This loop label is used only for equality with correction and both original and replacement labels are unequal to correction, so the same assertion is checked with correction=False and no label is emitted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -72,7 +72,7 @@\n         or not _valid_assertion(assertion, correction=name == \"correction\")\n         for name, assertion in (\n             (\"observation\", candidate.observation),\n-            (\"publication\", candidate.publication),\n+            (\"PUBLICATION\", candidate.publication),\n             (\"correction\", candidate.correction),\n         )\n     ):"
+reason = "This loop label is used only for equality with correction and both original and replacement labels are unequal to correction, so the same assertion is checked with correction=False and no label is emitted."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -98,7 +98,7 @@\n         return _candidate_failure(\n             candidate, \"milestone_not_independent\", \"independent reporting\", \"copy\"\n         )\n-    direct = \"\"\n+    direct = None\n     if candidate.project_source_id and candidate.published_project_id:\n         direct = (\n             f\"{candidate.project_source_id}:project:{candidate.published_project_id}\""
+reason = "The initial direct sentinel is used only for truth testing and both empty string and None are false, while the branch with both project identifiers overwrites it with the same string before use."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -16,7 +16,7 @@\n             item, \"invalid_evidence_metadata\", \"selected snapshot identity\", \"mismatch\"\n         )\n     for name, assertion in (\n-        (\"observation\", item.observation),\n+        (\"XXobservationXX\", item.observation),\n         (\"publication\", item.publication),\n         (\"correction\", item.correction),\n     ):"
+reason = "This label is used only to select correction mode and the original and replacement both select correction=False, while every refusal uses fixed text rather than the label."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -16,7 +16,7 @@\n             item, \"invalid_evidence_metadata\", \"selected snapshot identity\", \"mismatch\"\n         )\n     for name, assertion in (\n-        (\"observation\", item.observation),\n+        (\"OBSERVATION\", item.observation),\n         (\"publication\", item.publication),\n         (\"correction\", item.correction),\n     ):"
+reason = "This label is used only to select correction mode and the original and replacement both select correction=False, while every refusal uses fixed text rather than the label."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         )\n     for name, assertion in (\n         (\"observation\", item.observation),\n-        (\"publication\", item.publication),\n+        (\"XXpublicationXX\", item.publication),\n         (\"correction\", item.correction),\n     ):\n         if not _valid_assertion(assertion, correction=name == \"correction\"):"
+reason = "This label is used only to select correction mode and the original and replacement both select correction=False, while every refusal uses fixed text rather than the label."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
+mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         )\n     for name, assertion in (\n         (\"observation\", item.observation),\n-        (\"publication\", item.publication),\n+        (\"PUBLICATION\", item.publication),\n         (\"correction\", item.correction),\n     ):\n         if not _valid_assertion(assertion, correction=name == \"correction\"):"
+reason = "This label is used only to select correction mode and the original and replacement both select correction=False, while every refusal uses fixed text rather than the label."
