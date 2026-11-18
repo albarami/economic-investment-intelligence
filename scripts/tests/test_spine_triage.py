@@ -130,6 +130,11 @@ class SpineTriageTest(unittest.TestCase):
 
         return recorded_answers(self.root, dict(requests(self.context())))
 
+    def test_none_fixture_leaves_suite_stdout_clean(self) -> None:
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.test_none_preserves_queue_without_network_or_key_access()
+        self.assertEqual(output.getvalue(), "")
+
     def test_none_preserves_queue_without_network_or_key_access(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -148,6 +153,7 @@ class SpineTriageTest(unittest.TestCase):
                 return original_getitem(env, key)
 
             with (
+                contextlib.redirect_stdout(io.StringIO()),
                 patch.dict(os.environ, {"EII_DECISION_PROVIDER": "none"}),
                 patch("socket.socket", side_effect=AssertionError("network forbidden")),
                 patch(

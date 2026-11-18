@@ -254,7 +254,9 @@ def verify_child(
     template = (
         policy.template(api_class, "data") if isinstance(api_class, str) else None
     )
-    expected_host = template.host if template is not None else ""
+    if template is None:
+        raise SafeRefusal("lineage_missing", _bare(policy), child_key)
+    expected_host = template.host
     source_id = loaded.get("source_id")
     found_publisher = loaded.get("publisher")
     basis = loaded.get("licence_basis")

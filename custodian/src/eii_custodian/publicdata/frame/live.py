@@ -269,10 +269,11 @@ def district_aliases(review: Path, cache: Path) -> list[dict[str, str]]:
     alias rows live only in `cache/review/district_layer_aliases.csv` of the
     uncommitted cache; the committed file keeps its header and no data row.
     """
-    rows = read_csv(review / "district_layer_aliases.csv")
+    header = ("zone_code", "layer_name", "hdx_name")
+    rows = read_csv(review / "district_layer_aliases.csv", header=header)
     local = cache / "review" / "district_layer_aliases.csv"
     if local.is_file():
-        rows += read_csv(local)
+        rows += read_csv(local, header=header)
     return rows
 
 

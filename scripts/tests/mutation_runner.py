@@ -52,6 +52,81 @@ class MutationRunnerTests(unittest.TestCase):
             self.assertEqual(runner.judge(survivors, ledger), 0)
             self.assertFalse((folder / "mutants").exists())
 
+    def test_timeout_rows_preserve_survivors_and_exit_status(self) -> None:
+        runner = importlib.import_module("scripts.mutation")
+        mutation = "@@ -1 +1 @@\n-return 2\n+return 3"
+        for survivor_codes, expected_exit in (({}, 0), ({"toy.z": 0, "toy.b": 5}, 1)):
+            with self.subTest(survivor_codes=survivor_codes):
+                with TemporaryDirectory(prefix="synthetic-timeouts-") as temporary:
+                    folder = Path(temporary)
+                    (folder / "pyproject.toml").write_text("")
+                    ledger = folder / "ledger.toml"
+                    ledger.write_text("survivors = []\n")
+                    codes = {
+                        "toy.timeout_z": 36,
+                        **survivor_codes,
+                        "toy.timeout_a": -24,
+                    }
+
+                    def fake_command(
+                        work: Path,
+                        *arguments: str,
+                        codes: dict[str, int] = codes,
+                        survivor_codes: dict[str, int] = survivor_codes,
+                        **kwargs: Any,
+                    ) -> subprocess.CompletedProcess[str]:
+                        if arguments[0] == "run":
+                            meta = work / "mutants/src/toy.py.meta"
+                            meta.parent.mkdir(parents=True)
+                            meta.write_text(json.dumps({"exit_code_by_key": codes}))
+                            stdout = ""
+                        else:
+                            self.assertEqual(arguments[0], "show")
+                            self.assertIn(arguments[1], survivor_codes)
+                            stdout = "mutant heading\n" + mutation + arguments[1] + "\n"
+                        return subprocess.CompletedProcess(arguments, 0, stdout, "")
+
+                    output = io.StringIO()
+                    with (
+                        patch.object(runner, "command", side_effect=fake_command),
+                        contextlib.redirect_stdout(output),
+                    ):
+                        code, survivors = runner.run_copy(
+                            folder, ["src/toy.py"], ["tests"], ledger, "product/"
+                        )
+                    rows = [
+                        {"module": "product/src/toy.py", "mutation": mutation + key}
+                        for key in survivor_codes
+                    ]
+                    self.assertEqual(code, expected_exit)
+                    self.assertEqual(survivors, rows)
+                    lines = output.getvalue().splitlines()
+                    self.assertEqual(
+                        lines[1:-1],
+                        [
+                            json.dumps({**row, "line": "1"}, sort_keys=True)
+                            for row in rows
+                        ]
+                        + [
+                            json.dumps(
+                                {
+                                    "module": "product/src/toy.py",
+                                    "status": "timed_out",
+                                    "mutant": key,
+                                    "exit_code": codes[key],
+                                },
+                                sort_keys=True,
+                            )
+                            for key in ("toy.timeout_a", "toy.timeout_z")
+                        ],
+                    )
+                    self.assertEqual(
+                        lines[-1],
+                        f"product/src/toy.py: made={len(codes)} killed=0 "
+                        f"survived={int(bool(survivor_codes))} timed_out=2 "
+                        f"not_covered={int(bool(survivor_codes))} incomplete=0",
+                    )
+
     def test_not_covered_mutant_requires_explanation(self) -> None:
         runner = importlib.import_module("scripts.mutation")
         with TemporaryDirectory(prefix="synthetic-uncovered-") as temporary:

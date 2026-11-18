@@ -518,3 +518,40 @@ def test_worldpop_refuses_a_wrong_band_type(tmp_path):
         target.write(np.array([[1, -99999]], dtype="int32"), 1)
     with pytest.raises(GridError, match="band type"):
         read_population(tmp_path, path, spec())
+
+
+def test_worldpop_selected_older_snapshot(tmp_path):
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex, sidecar_for
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+    from eii_custodian.publicdata.grids.build import cached_bytes
+
+    row = entry("worldpop_qat_agesex", "worldpop_qat_agesex/syn")
+    snapshots = []
+    for body, stamp in [
+        (b"SYN-older", "2024-01-01T00:00:00Z"),
+        (b"SYN-newer", "2024-02-01T00:00:00Z"),
+    ]:
+        side = sidecar_for(
+            row,
+            digest=sha256_hex(body),
+            nbytes=len(body),
+            fetch_url=row.url,
+            fetch_host=row.fetch_host,
+            retrieved_utc=stamp,
+            publisher=row.publisher,
+            source_modified="",
+            row_count=None,
+            terms_sha256="",
+        )
+        snapshots.append(
+            publish_snapshot(tmp_path / row.key, row.extension, body, side)
+        )
+    with pytest.raises(GridError, match="snapshot_selection_invalid"):
+        cached_bytes(tmp_path, row)
+    (tmp_path / "snapshot_pins.json").write_text(
+        json.dumps({row.key: snapshots[0].sha256})
+    )
+    assert cached_bytes(tmp_path, row)[0] == b"SYN-older"
+    snapshots[0].path.write_bytes(b"SYN-tampered")
+    with pytest.raises(GridError, match="snapshot_hash_mismatch"):
+        cached_bytes(tmp_path, row)

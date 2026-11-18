@@ -59,8 +59,9 @@ to the same key. Unmapped spellings fail with source, field and distinct count;
 only `output/build_report.json` receives the spellings, when output is supplied.
 No spelling is printed or added to the committed crosswalk by the builder.
 Unknown indicator tokens remain inventoried and unloaded. The
-`est_census`, `zone_population` and `census_hh_type_2020` rows retain their confirmed
-publisher and licence but remain skipped because their fields are unconfirmed.
+`zone_population` and `census_hh_type_2020` rows retain their confirmed
+publisher and licence but remain skipped with `cache_fields_unconfirmed; adapter_unavailable`.
+`est_census` has no skip reason and is read into `pub_census_national`.
 `bnd_muni_2025` stays skipped. `bnd_geob` is not read by the frame build.
 
 There is one assembler: `build_frame` inspects verified raw source pairs and

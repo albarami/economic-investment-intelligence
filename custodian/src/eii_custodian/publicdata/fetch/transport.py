@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import ssl
 import urllib.error
 import urllib.request
@@ -11,7 +12,7 @@ from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from http.client import HTTPException, HTTPMessage
+from http.client import HTTPException, HTTPMessage, HTTPResponse, HTTPSConnection
 from typing import IO, Protocol
 from urllib.parse import unquote, urlencode, urlsplit, urlunsplit
 
@@ -76,6 +77,7 @@ class Response:
     hops: tuple[str, ...]
     etag: str | None = None
     body_sha256: str = ""
+    headers: Mapping[str, str] = field(default_factory=dict, repr=False)
 
 
 class TransportFault(Exception):
@@ -128,8 +130,31 @@ def open_https(
     ssl_context: ssl.SSLContext | None = None,
     *,
     reviewed_urls: tuple[str, ...] | None = None,
+    legacy_chain_sha256: str | None = None,
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
+    from .certificate_pins import PinError, browser_agent, current_pin, verified_context
+    from .page_requests import PIN_HOSTS, active, check_target, page_context
+
+    check_target(url)
+    supplied_partial_chain = ssl_context is not None and bool(
+        ssl_context.verify_flags & ssl.VERIFY_X509_PARTIAL_CHAIN
+    )
+    page_scoped = active()
+    pin = current_pin()
+    if page_scoped:
+        if token or (
+            headers
+            and any(
+                name.casefold()
+                in {"authorization", "cookie", "__requestverificationtoken"}
+                for name in headers
+            )
+        ):
+            raise TransportFault("blocked_host", "")
+        ssl_context = page_context(host_of(url), ssl_context)
+    elif pin is not None:
+        ssl_context = verified_context(host_of(url), pin, context=ssl_context)
     decision = approve(url)
     if not decision.ok or (
         reviewed_urls is not None
@@ -140,6 +165,17 @@ def open_https(
         ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
     ):
         raise TransportFault("unreachable", url)
+    if supplied_partial_chain:
+        raise PinError("certificate_chain_incomplete")
+    # L-921: only the tender adapter supplies the chain hash already checked by
+    # chain_context. A context alone or an unchecked pin shape cannot bridge the
+    # unscoped page-host refusal. Disabled verification keeps its precedence.
+    if not page_scoped and pin is None and host_of(url) in PIN_HOSTS:
+        if (
+            ssl_context is None
+            or re.fullmatch(r"[0-9a-fA-F]{64}", legacy_chain_sha256 or "") is None
+        ):
+            raise PinError("certificate_chain_incomplete")
     keyed = isinstance(url, KeyedRequest)
     hops: list[str] = []
     guard = _redirect_guard(
@@ -149,13 +185,25 @@ def open_https(
         reviewed_urls=reviewed_urls,
         keyed_url=str(url) if keyed else None,
     )
-    if ssl_context is None:
+    if page_scoped:
+
+        class _PageHTTPS(urllib.request.HTTPSHandler):
+            def https_open(self, req: urllib.request.Request) -> HTTPResponse:
+                check_target(req.full_url)
+                return self.do_open(
+                    HTTPSConnection, req, context=page_context(host_of(req.full_url))
+                )
+
+        opener = urllib.request.build_opener(guard, _PageHTTPS())
+    elif ssl_context is None:
         opener = urllib.request.build_opener(guard)
     else:
         opener = urllib.request.build_opener(
             guard, urllib.request.HTTPSHandler(context=ssl_context)
         )
     request_headers = dict(headers) if headers else {}
+    if browser_agent():
+        request_headers["User-Agent"] = "Mozilla/5.0"
     request_headers.update(authorization_header(url, token))
     address = str(url)
     method = "GET"
@@ -184,6 +232,13 @@ def open_https(
             ):
                 raise TransportFault("blocked_host", "")
             etag = response.headers.get("ETag")
+            public_headers = {
+                name: response.headers[name]
+                for name in ("x-wp-total", "x-wp-totalpages")
+                if response.headers.get(name) is not None
+            }
+    except PinError:
+        raise
     except TransportFault:
         if not keyed:
             raise
@@ -192,7 +247,7 @@ def open_https(
         if not keyed:
             raise TransportFault("http", url) from None
         fault = "http"
-    except (urllib.error.URLError, OSError, ValueError):
+    except (urllib.error.URLError, OSError, ValueError, TransportReadError):
         if not keyed:
             raise TransportFault("unreachable", url) from None
         fault = "unreachable"
@@ -208,7 +263,12 @@ def open_https(
             body = b"null"
         final, hops, etag = str(url), [], None
     return Response(
-        final_url=final, body=body, hops=tuple(hops), etag=etag, body_sha256=digest
+        final_url=final,
+        body=body,
+        hops=tuple(hops),
+        etag=etag,
+        body_sha256=digest,
+        headers=public_headers,
     )
 
 
@@ -234,6 +294,17 @@ def _redirect_guard(
             if keyed_url is not None:
                 # No redirected send can become a second chargeable request.
                 raise TransportFault("blocked_host", keyed_url)
+            from .certificate_pins import PinError, current_pin, validate_pin
+            from .page_requests import PIN_HOSTS, active, check_target, page_context
+
+            check_target(newurl)
+            if active():
+                page_context(host_of(newurl))
+            pin = current_pin()
+            if pin is not None:
+                validate_pin(host_of(newurl), pin)
+            elif not active() and host_of(newurl) in PIN_HOSTS:
+                raise PinError("certificate_chain_incomplete")
             hops.append(newurl)
             if host_of(newurl) == SIGN_IN_HOST:
                 raise TransportFault("credential_missing_or_not_accepted", newurl)
@@ -263,6 +334,11 @@ def open_https_stream(
     url: str, *, reviewed_urls: tuple[str, ...] | None = None
 ) -> Iterator[StreamResponse]:
     """Open a bounded-chunk stream; the context always closes the response."""
+    from .certificate_pins import PinError
+    from .page_requests import PIN_HOSTS
+
+    if host_of(url) in PIN_HOSTS:
+        raise PinError("certificate_chain_incomplete")
     if not _stream_allowed(url) or (
         reviewed_urls is not None and url not in reviewed_urls
     ):
@@ -318,6 +394,11 @@ def _stream_allowed(url: str) -> bool:
 
 def open_attempt(request: PreparedRequest) -> AttemptResult:
     """Open one checked HTTPS request. Redirects are not followed."""
+    from .certificate_pins import PinError
+    from .page_requests import PIN_HOSTS
+
+    if host_of(request.url) in PIN_HOSTS:
+        raise PinError("certificate_chain_incomplete")
 
     class _Stop(urllib.request.HTTPRedirectHandler):
         def redirect_request(

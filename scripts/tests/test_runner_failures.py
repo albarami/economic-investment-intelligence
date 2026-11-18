@@ -196,10 +196,10 @@ class RunnerFailures(unittest.TestCase):
                 )
         finally:
             run_tests_exec.launch = original
-        self.assertEqual(seen, [3000])
+        self.assertEqual(seen, [1800])
         self.assertEqual(status, 1, out)
         self.assertIn(
-            "FAIL timeout: web-checks: no result within 3000 s; "
+            "FAIL timeout: web-checks: no result within 1800 s; "
             "the process group was killed",
             support.visible(out),
         )

@@ -30,6 +30,11 @@ from eii_custodian.publicdata.fetch.kinds import (
     prepare,
     read_terms_page,
 )
+from eii_custodian.publicdata.fetch.partitions import (
+    PartitionError,
+    bounded_partition_reader,
+    load_partition_spans,
+)
 from eii_custodian.publicdata.fetch.receipts import (
     archive_auxiliary,
     cache_directory,
@@ -240,6 +245,10 @@ def _fetch_row(
             else prepare(
                 entry, transport, sleep, cache=cache, registry_entries=registry_entries
             )
+        )
+    except PartitionError as exc:
+        return None, FetchFailure(
+            1, entry.source_id, entry.url, str(exc), "reviewed byte span", "refused"
         )
     except (OSError, ValueError):
         return None, FetchFailure(
@@ -590,11 +599,63 @@ def run_build(
             pending.append(entry)
             continue
         if entry.skip_reason:
-            if entry.terms_url:
+            if entry.source_id == "suppliers_tawteen":
+                from .page_records import load_declaration, record_failure
+
+                refusal = load_declaration(entry.source_id)
+                if refusal.get("kind") != "refusal":
+                    raise ValueError("schema_missing")
+                record_failure(
+                    cache,
+                    entry,
+                    refusal["shape"]["observed_utc"],
+                    refusal["shape"]["reason"],
+                )
+            if entry.terms_url and entry.kind not in {"public_page", "awards_intake"}:
                 _read_terms_apart(
                     entry, transport, sleep, clock, lines, terms, previous, cache
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
+            continue
+        if entry.kind in {"public_page", "awards_intake"}:
+            from .award_checks import AwardError
+            from .awards import fetch_awards
+            from .certificate_pins import PinError
+            from .page_records import PageError, fetch_page
+            from .snapshots import SnapshotError
+
+            try:
+                page = (
+                    fetch_awards(entry, transport, cache, clock, sleep)
+                    if entry.kind == "awards_intake"
+                    else fetch_page(entry, transport, cache, clock, sleep)
+                )
+                manifests[entry.key] = page.sha256
+                lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
+            except (PageError, AwardError, PinError, SnapshotError) as exc:
+                reason = str(exc)
+                failure = FetchFailure(
+                    1, entry.source_id, "", reason, "verified snapshot", "NO_DATA"
+                )
+                lines.append(
+                    fail_line(entry.key, "", reason, "verified snapshot", "NO_DATA")
+                )
+                break
+            except (OSError, ValueError, KeyError, TypeError):
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    "",
+                    "page_validation_failed",
+                    "verified snapshot",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(
+                        entry.key, "", failure.check, "verified snapshot", "NO_DATA"
+                    )
+                )
+                break
             continue
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())
@@ -658,9 +719,28 @@ def run_build(
             assert placed is not None
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
+        row_transport = transport
+        if entry.key == "accident":
+            try:
+                row_transport = bounded_partition_reader(
+                    transport, load_partition_spans(), sleep
+                )
+            except PartitionError as exc:
+                failure = FetchFailure(
+                    1,
+                    entry.source_id,
+                    entry.url,
+                    str(exc),
+                    "reviewed byte span",
+                    "NO_DATA",
+                )
+                lines.append(
+                    fail_line(entry.key, "", str(exc), "reviewed byte span", "NO_DATA")
+                )
+                break
         fetched, result = _fetch_row(
             entry,
-            transport,
+            row_transport,
             cache,
             clock,
             sleep,

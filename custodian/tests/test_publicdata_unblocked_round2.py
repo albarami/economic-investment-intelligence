@@ -408,3 +408,40 @@ def test_accident_awaits_byte_bound_without_fetching(tmp_path):
     assert outcome.failure is None
     assert any("partition_byte_bound_unconfirmed" in line for line in outcome.lines)
     assert not (tmp_path / "accident").exists()
+
+
+@pytest.mark.parametrize(
+    "size,span,reason",
+    [(3, (3, 3), ""), (4, (2, 3), "metadata_bytes"), (1, (2, 3), "metadata_bytes")],
+)
+def test_accident_stream_span(size, span, reason):
+    from eii_custodian.publicdata.fetch.partitions import bounded_partition_reader
+    from eii_custodian.publicdata.fetch.transport import _METADATA_LIMIT
+
+    seen = []
+
+    def transport(url):
+        seen.append(_METADATA_LIMIT.get())
+        return _ok(url, b"x" * size)
+
+    url = PORTAL + "syn/exports/json?where=year%28accident_year%29%3D2001"
+    reader = bounded_partition_reader(transport, {2001: span}, _sleep)
+    if reason:
+        with pytest.raises(Exception, match=reason):
+            reader(url)
+    else:
+        assert reader(url).body == b"xxx"
+    assert seen == [3]
+    assert _METADATA_LIMIT.get() is None
+
+
+def test_accident_missing_span_before_fetch():
+    from eii_custodian.publicdata.fetch.partitions import bounded_partition_reader
+
+    def transport(url):
+        pytest.fail("unreviewed partition requested")
+
+    with pytest.raises(Exception, match="partition_byte_bound_unconfirmed"):
+        bounded_partition_reader(transport, {}, _sleep)(
+            PORTAL + "syn/exports/json?where=year%28accident_year%29%3D2001"
+        )

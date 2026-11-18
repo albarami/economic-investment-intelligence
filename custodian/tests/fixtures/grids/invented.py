@@ -1,5 +1,7 @@
 """Tiny invented binary layouts, generated only in test temporary folders."""
 
+import json
+
 import h5py
 import numpy as np
 import rasterio
@@ -15,6 +17,14 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.grids.night_lights import FIELD, GROUP
 
 FILE_ATTRIBUTES = "/HDFEOS/ADDITIONAL/FILE_ATTRIBUTES"
+
+
+def reseal_receipt(cache, row, digest, meta) -> None:
+    """Rehash an invented receipt so a test reaches its semantic guards."""
+    index = cache / row.key / "index" / f"{digest}.json"
+    value = json.loads(index.read_text(encoding="utf-8"))
+    value["receipt_sha256"] = sha256_hex(meta.read_bytes())
+    index.write_text(json.dumps(value), encoding="utf-8")
 
 
 def write_night_root(source) -> None:
@@ -196,4 +206,10 @@ def store(cache, row, body, publisher="SYN-publisher"):
         terms_sha256="",
     )
     commit_pair(cache_directory(cache, row.key), digest, row.extension, body, sidecar)
+    pins_path = cache / "snapshot_pins.json"
+    pins = (
+        json.loads(pins_path.read_text(encoding="utf-8")) if pins_path.exists() else {}
+    )
+    pins[row.key] = digest
+    pins_path.write_text(json.dumps(pins), encoding="utf-8")
     return digest

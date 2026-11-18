@@ -410,7 +410,7 @@ All numbers below are targets to be measured, not promises.
 
 Under [decision 0055](decisions/0055-mutation-testing-moves-to-after-go-live.md) items 1, 2 and 4, the mutation-pilot procedure below is retained as reference for after go live, if the receiving team approves; it is not an instruction to run a campaign now or a condition of any gate. Completed evidence is preserved, and the six required checks remain unchanged.
 
-Task S1-T20 adds `.github/workflows/mutation-pilot.yml`, a manually dispatched pilot, outside the six required checks. It runs the allow-listed `custodian/src/eii_custodian/publicdata/places_fsq/policy.py` at a full reviewed commit reachable from main. Dispatch the workflow from main. The manifest binds the commit, source, lock, runners, explanation ledger, pinned mutmut version and exact mutant diff hashes. Sorted mutant names are assigned modulo four; each shard regenerates and verifies the complete universe before running its exact names with one child. The existing local command and survivor judging remain unchanged.
+Task S1-T20 adds `.github/workflows/mutation-pilot.yml`, a manually dispatched pilot, outside the six required checks. It runs the allow-listed `custodian/src/eii_custodian/publicdata/places_fsq/policy.py` at a full reviewed commit reachable from main. Dispatch the workflow from main. The manifest binds the commit, source, lock, runners, explanation ledger, pinned mutmut version and exact mutant diff hashes. Sorted mutant names are assigned modulo four; each shard regenerates and verifies the complete universe before running its exact names with one child. The existing local command and survivor judging remain unchanged. The local mutation runner prints one sorted-key JSON line per timed-out mutant, in mutant-key order before the module count line, with `module` (including its package prefix), `status` (`timed_out`), the exact `mutant` key and raw `exit_code`, so each timeout can be replayed alone under decision 0052 item 2.
 
 Four distinct matrix outputs carry compact JSON bounded at 128 KiB per payload. Merge checks the output's shard index, manifest hash and exact assigned names, disjoint complete coverage, raw status and diff hashes. Empty outputs and failed jobs fail as infrastructure incidents; killed, survived, timeout, not-covered and infrastructure failure remain distinct. Artifacts contain the manifest and result JSON, including survivor diffs, retained for seven days. The workflow uses read-only contents permission, the existing action pins, no persisted checkout credentials, two concurrent shards, a fixed concurrency group without cancellation and a ninety-minute ceiling per job. It does not fetch public data or engine extensions.
 
@@ -762,3 +762,60 @@ release tests replay explicit selections, preserve native units and directions,
 reject output/input/binding tampering, enumerate absent pairs, and preserve
 recorded causes and free-plan gaps in the owner report. Fixtures do not verify
 live publisher layouts or Qatar bindings; independent review remains required.
+
+## S2-T29 invented-response checks
+
+`test_s2_t29_pages.py` exercises page evidence holds, registry declarations,
+page schema/types/counts, raw-to-parsed hash lineage, explicit history selection,
+missing receipts, closed claim meanings, Public-split use refusals and the real
+build-public page dispatch. `test_s2_t29_transport.py` plants wrong/missing and
+other-host pins, missing approval, disabled TLS, capture evidence/access failures,
+a dated connection reset and intake escape, and checks browser headers and the
+joined grid/tender and BACI/Gravity/Atlas/Comtrade command boundary, including
+missing configuration/stream/opener, lazy slot reads, query-key refusal and
+sanitized provider failures. School integration plants retain the
+typed capture refusal in the output and dated failure receipt without publishing
+capture bytes. `test_s2_t29_awards.py` exercises
+CSV/OOXML invented intake, ambiguous day-first dates, blanks, invalid-date counts,
+path/hash/profile refusals, exact and short/large distinct proof frames,
+reproducibility, mismatch/failed-fetch denominators, receipt placement,
+registration/name matching and immutable appends. `test_s2_t29_fix.py` adds held
+row continuation, school-only browser scope, proof security/integrity refusals,
+blank and duplicate registrations, stale periods, null numeric cells and the
+missing-coverage zero-claim refusal. It also checks every award row's retrieval
+date, existing-identity conflicts, retained proof snapshots, sanitized page/intake
+errors and interruptions between terms, raw, parsed and proof writes.
+`test_s2_t29_fix2.py` drives the real HTTPS opener and redirect guard with invented
+I/O: other-host pin refusals stop page and awards builds before publication;
+incomplete body reads count as failed award proofs or retry to `unreachable` for
+an existing registry source, with a separate keyed-request check. It also plants
+a nested source symlink and a failure at the final staged replacement rename,
+asserting closed refusals, no outside copy and byte-identical prior trees. Each
+staging plant fails when its specific guard is removed and passes with it restored.
+
+The accident and population-grid test files add bounded acquisition and explicit
+older-snapshot selection plants. Cadence tests extend the closed source assignment
+map. Existing grid fixtures now explicitly select the archived object they create;
+receipt tampering is rejected by the archive hash check before semantic checks.
+Night-light, weather and grid semantic plants use consistently rehashed invented
+receipts to retain their metadata guards. Registry tests account for the eight
+held rows while retaining the closed nightly exclusions and their planted change.
+No existing split, native-cell, schema, TLS, archive or partition guard is relaxed.
+Build pass 5 adds `test_s2_t29_live_shapes.py`, `test_s2_t29_live_acquire.py`,
+`test_s2_t29_live_transport.py` and `test_s2_t29_live_awards.py`. They use invented
+records in the declared live shapes: duplicate JSON attributes with raw >,
+recursive closed schemas, script terminal flags, distinct workbook coordinates,
+cached-formula results, carried years, both tariff layouts, no-tariff coverage,
+modal-number binding, supplier and contractor expiry, all school field refusals,
+count/offset/terminal reconciliation, exact request frames, staged multi-input
+rollback, all five host pin refusals, credential injection and full-chain context
+isolation. Awards tests distinguish the awarded heading from opened bids, retain
+multiple winners, require every intake row's proof match, and preserve malformed
+portal card nesting without crawling. Red/green evidence records tests added
+before each implementation step and already-passing plants separately. The old
+sparse workbook fixture now supplies valid physical coordinates; its assertions
+and the formula refusal are retained. GIS assertion updates retain the original
+historical confirmation and require the new schema hold and zero requests.
+Commands and their actual results belong in PROGRESS.md and the builder return.
+The lead runs mutation campaigns and live evidence checks; invented fixtures do
+not establish page access, reviewed pins or another-maker approval.

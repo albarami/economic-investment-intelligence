@@ -1,8 +1,9 @@
+import { waitForResponse } from './response-deadline.mjs';
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import http from 'node:http';
-import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import {
@@ -488,7 +489,7 @@ function slowTrace() {
 }
 
 function ask(origin, input) {
-  return new Promise((resolve, reject) => {
+  return waitForResponse((resolve, reject) => {
     const url = new URL(input.path, origin);
     const payload =
       input.body === undefined ? null : Buffer.from(input.body, 'utf8');
@@ -521,6 +522,7 @@ function ask(origin, input) {
     request.on('error', reject);
     if (payload) request.write(payload);
     request.end();
+    return () => request.destroy();
   });
 }
 
@@ -532,7 +534,7 @@ test('production mode is refused before the server listens', () => {
 });
 
 test('the trace server records a failed measurement and refuses a bad post', async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-'));
+  const root = temporaryFolder('eii-perf-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);
@@ -636,7 +638,7 @@ function bodyJustAbove(limit) {
 }
 
 test('a post just above the body limit is refused by name and writes nothing', async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-limit-'));
+  const root = temporaryFolder('eii-perf-limit-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);
@@ -671,7 +673,7 @@ const COLLIDING_NAME = 'hexagons-particles.rcollxkept.json';
 const FRESH_NAME = 'hexagons-particles.rfreshxkept.json';
 
 async function withTraceName(traceName, check) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-name-'));
+  const root = temporaryFolder('eii-perf-name-');
   const sink = path.join(root, 'sink');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(sink);
@@ -755,7 +757,7 @@ test('the server and the evidence command refuse a remote display adapter', asyn
     'remote-renderer',
   );
   fs.rmSync(evidence.root, { recursive: true, force: true });
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-remote-'));
+  const root = temporaryFolder('eii-perf-remote-');
   const sink = path.join(root, 'sink');
   const evidenceDir = path.join(root, 'evidence');
   fs.mkdirSync(evidenceDir);
@@ -800,7 +802,7 @@ test('the server and the evidence command refuse a remote display adapter', asyn
 });
 
 test('a test server cannot write the native evidence directory', async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-native-'));
+  const root = temporaryFolder('eii-perf-native-');
   const evidence = path.join(root, 'evidence');
   fs.mkdirSync(evidence);
   const started = await startStaticServer({
@@ -816,7 +818,7 @@ test('a test server cannot write the native evidence directory', async () => {
 });
 
 function plantEvidence(trace, hash) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-evidence-'));
+  const root = temporaryFolder('eii-perf-evidence-');
   const relative =
     'web/spikes/performance/evidence/hexagons-particles.rfix01.json';
   const file = path.join(root, relative);
@@ -841,7 +843,7 @@ function plantEvidence(trace, hash) {
 }
 
 test('the evidence command names a missing native trace and planted faults', () => {
-  const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'eii-perf-empty-'));
+  const empty = temporaryFolder('eii-perf-empty-');
   const evidenceDir = path.join(empty, 'evidence');
   fs.mkdirSync(evidenceDir);
   assert.equal(

@@ -1,7 +1,7 @@
+import { temporaryFolder } from './temporary-folder.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
@@ -127,9 +127,7 @@ test('the exact hold boundary retains the stored endpoint', () => {
   });
 });
 test('payload hours sort numerically despite reversed source rows', async () => {
-  const folder = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'synthetic-hour-order-'),
-  );
+  const folder = temporaryFolder('synthetic-hour-order-');
   try {
     fs.writeFileSync(
       path.join(folder, 'hourly_rows.json'),

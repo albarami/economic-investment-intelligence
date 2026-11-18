@@ -4566,3 +4566,604 @@ reason = "This label is used only to select correction mode and the original and
 module = "custodian/src/eii_custodian/publicdata/investment_evidence.py"
 mutation = "--- src/eii_custodian/publicdata/investment_evidence.py\n+++ src/eii_custodian/publicdata/investment_evidence.py\n@@ -17,7 +17,7 @@\n         )\n     for name, assertion in (\n         (\"observation\", item.observation),\n-        (\"publication\", item.publication),\n+        (\"PUBLICATION\", item.publication),\n         (\"correction\", item.correction),\n     ):\n         if not _valid_assertion(assertion, correction=name == \"correction\"):"
 reason = "This label is used only to select correction mode and the original and replacement both select correction=False, while every refusal uses fixed text rather than the label."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -16,7 +16,7 @@\n         if node.tag == \"root\":\n             return text\n         attrs = \"\".join(\n-            \" \" + k + ('=\"' + html.escape(v, quote=True) + '\"' if v is not None else \"\")\n+            \" \" + k + ('=\"' + html.escape(v, ) + '\"' if v is not None else \"\")\n             for k, v in node.attrs.items()\n         )\n         start = \"<\" + node.tag + attrs + \">\""
+reason = "For every string-valued HTML attribute, html.escape defaults quote to True, so omitting that explicit keyword produces identical bytes and exceptions."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -56,7 +56,7 @@\n                 page_context(host_of(url))\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n-            if failure or response is None:\n+            if failure and response is None:\n                 reason = failure.check if failure else \"access_failed\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if (failure) or True else \"access_failed\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if failure else \"XXaccess_failedXX\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -57,7 +57,7 @@\n             with metadata_limit(review[\"max_bytes\"]):\n                 response, failure = read_bounded(transport, sleep, url)\n             if failure or response is None:\n-                reason = failure.check if failure else \"access_failed\"\n+                reason = failure.check if failure else \"ACCESS_FAILED\"\n                 if entry.source_id == \"schools_private_directory\":\n                     record_failure(cache, entry, stamp, reason)\n                 raise ShapeError(reason)"
+reason = "For every transport result reachable through kinds.read_bounded, _call_url returns either (Response, None) or (None, AttemptFailure), so the refusal branch always has a failure, both Boolean guards agree, and the fallback access_failed arm cannot execute or change any host, pin, redirect, scope or refusal decision."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], None, projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], \"XXjsonXX\", projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -87,7 +87,7 @@\n     kind = review[\"kind\"]\n     if kind in {\"xlsx_sheet\", \"html_blocks\"} and shape[\"discovery\"] is not None:\n         discovery = shape[\"discovery\"]\n-        response = read(discovery[\"url\"], \"json\", projection=True)\n+        response = read(discovery[\"url\"], \"JSON\", projection=True)\n         listing = json_body(response.body)\n         records = path(listing, discovery[\"record_path\"])\n         if not isinstance(records, list):"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, None, extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, \"XXjsonXX\", extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -188,7 +188,7 @@\n             + \"?\"\n             + urlencode({\"where\": \"1=1\", \"returnCountOnly\": \"true\", \"f\": \"json\"})\n         )\n-        response = read(count_url, \"json\", extra=(count_url,), projection=True)\n+        response = read(count_url, \"JSON\", extra=(count_url,), projection=True)\n         count_body = json_body(response.body)\n         # EVIDENCE-shapes.md, O6 schools: count.json has only {\"count\": ...}.\n         if not isinstance(count_body, dict) or set(count_body) - {\"count\"}:"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, None, extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, \"XXjsonXX\", extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -218,7 +218,7 @@\n                 )\n             )\n             # Response attributes are checked before read() adds anything to inputs.\n-            response = read(address, \"json\", extra=(address,), projection=True)\n+            response = read(address, \"JSON\", extra=(address,), projection=True)\n             obj = json_body(response.body)\n             if not isinstance(obj, dict) or set(obj) - SCHOOL_QUERY_KEYS:\n                 raise ShapeError(\"school_field_refused\")"
+reason = "For every discovery, school-count or school-page response, this call fixes projection=True and each replacement extension remains unequal to html, so read neither transforms nor appends that response and the caller independently appends the same explicit json representation with identical frame, host, pin and refusal checks."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -112,7 +112,7 @@\n             link = path(record, discovery[\"link_path\"])\n             if not isinstance(link, str):\n                 raise ShapeError(\"schema_missing\")\n-            link = urljoin(discovery[\"url\"], quote(link, safe=\":/%\"))\n+            link = urljoin(discovery[\"url\"], quote(link, safe=\"XX:/%XX\"))\n             links.append(link)\n             item: dict[str, object] = {\"url\": link}\n             if discovery[\"length_path\"] is not None:"
+reason = "urllib.parse.quote always leaves ASCII letters unescaped, so adding X to safe=:/% cannot change any link for any string input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -311,7 +311,7 @@\n         raise ShapeError(\"row_count\")\n     # Terms must use the same reviewed URL/pin policy. They are optional evidence,\n     # never a reason to turn off a visitor-readable source.\n-    terms_hash: str | None = None\n+    terms_hash: str | None = \"\"\n     terms_unread = \"\"\n     if entry.terms_url:\n         try:"
+reason = "The initial None or empty-string terms_hash is consumed only by terms_hash or empty-string in the sidecars unless overwritten by the same successful terms hash, yielding identical archives for every request outcome."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -338,7 +338,7 @@\n                 fetch_host=host_of(response.final_url),\n                 retrieved_utc=stamp,\n                 publisher=entry.publisher,\n-                source_modified=\"\",\n+                source_modified=None,\n                 row_count=None,\n                 terms_sha256=terms_hash or \"\",\n             )"
+reason = "The raw-input source_modified argument is always empty-string and receipts.sidecar_for normalizes both that value and None to None, yielding identical sidecars for every input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_acquire.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_acquire.py\n+++ src/eii_custodian/publicdata/fetch/page_acquire.py\n@@ -254,7 +254,7 @@\n                         coordinate, \"is_finite\"\n                     ):\n                         raise ShapeError(\"schema_missing\")\n-                    scalar(coordinate, \"number\")\n+                    scalar(None, \"number\")\n                 identifier = attrs[\"objectid\"]\n                 if last_id is not None and identifier <= last_id:\n                     raise ShapeError(\"paging_incomplete\")"
+reason = "Every coordinate reaching scalar came from json_body, which yields only integers or finite Decimal numbers after the preceding type guard and nonfinite-constant refusal, so scalar always succeeds and its discarded result (including the replacement None) cannot change any row, host, pin, scope, redirect or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_html.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_html.py\n+++ src/eii_custodian/publicdata/fetch/page_html.py\n@@ -3,7 +3,7 @@\n     self.root = Node(\"root\")\n     self.current = self.root\n     try:\n-        self.feed(body.decode(\"utf-8\"))\n+        self.feed(body.decode(\"UTF-8\"))\n         self.close()\n     except UnicodeError:\n         raise ShapeError(\"schema_missing\") from None"
+reason = "For all byte strings, Python resolves UTF-8 and utf-8 to the identical UTF-8 codec, with identical decoded output or UnicodeError handling."
+
+# S2-T29 award intake/proof survivor pass: universal equivalences only.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/award_checks.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/award_checks.py\n+++ src/eii_custodian/publicdata/fetch/award_checks.py\n@@ -13,7 +13,7 @@\n     matched = 0\n     for row in rows:\n         registration = row.get(profile[\"registration\"], \"\")\n-        names = by_registration.get(registration, [])\n+        names = by_registration.get(registration, None)\n         name = normalise_name(row.get(profile[\"company\"], \"\"))\n         reason = \"registration_unmatched\"\n         if registration.strip() and names:"
+reason = "For an absent registration the default names value is only tested for truthiness, so both the original empty list and None skip the matching branch and produce the same unmatched report; a present key is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/award_checks.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/award_checks.py\n+++ src/eii_custodian/publicdata/fetch/award_checks.py\n@@ -13,7 +13,7 @@\n     matched = 0\n     for row in rows:\n         registration = row.get(profile[\"registration\"], \"\")\n-        names = by_registration.get(registration, [])\n+        names = by_registration.get(registration, )\n         name = normalise_name(row.get(profile[\"company\"], \"\"))\n         reason = \"registration_unmatched\"\n         if registration.strip() and names:"
+reason = "For an absent registration the default names value is only tested for truthiness, so both the original empty list and None skip the matching branch and produce the same unmatched report; a present key is unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -19,8 +19,7 @@\n         or bool(set(value) - expected - {\"row_count\", \"dated_rows\", \"proof_columns\"})\n         or value[\"format\"] not in {\"csv\", \"xlsx\"}\n         or not isinstance(columns, list)\n-        or not columns\n-        or len(set(columns)) != len(columns)\n+        or not columns and len(set(columns)) != len(columns)\n         or any(not isinstance(c, str) or not c for c in columns)\n         or \"report_url\" not in columns\n         or any("
+reason = "An empty columns list always lacks the mandatory report_url column and is refused by the later unchanged membership guard, so merging its empty-list predicate with the duplicate predicate changes no acceptance or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -19,7 +19,7 @@\n         raise AwardError(\"snapshot_hash_mismatch\")\n     try:\n         raw = (\n-            list(csv.reader(io.StringIO(body.decode(\"utf-8-sig\"))))\n+            list(csv.reader(io.StringIO(body.decode(\"UTF-8-SIG\"))))\n             if schema[\"format\"] == \"csv\"\n             else _xlsx(body, schema[\"sheet\"])\n         )"
+reason = "Python resolves utf-8-sig and UTF-8-SIG to the same registered codec, including BOM consumption and identical decoding errors, for every byte string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -31,7 +31,7 @@\n     dates: list[str] = []\n     unparsed = blank = 0\n     for cells in raw[1:]:\n-        if schema[\"format\"] == \"xlsx\" and len(cells) < len(raw[0]):\n+        if schema[\"format\"] == \"xlsx\" and len(cells) <= len(raw[0]):\n             cells += [\"\"] * (len(raw[0]) - len(cells))\n         if len(cells) != len(raw[0]):\n             raise AwardError(\"schema_missing\")"
+reason = "At the sole newly admitted boundary the cell and header lengths are equal, so padding adds an empty list to a local plain row list and leaves every cell and downstream result unchanged."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=None)\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], )\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n             raise AwardError(\"schema_missing\")\n         values = {\n             column: _value(cell, kind)\n-            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n+            for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=False)\n         }\n         original = dict(zip(raw[0], cells, strict=True))\n         value = original[schema[\"date\"]].strip()"
+reason = "The validated profile has exactly one type per header and the preceding row-width check enforces the same cell count, so these three plain lists always have equal lengths when zip runs and disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, strict=None))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, ))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -39,7 +39,7 @@\n             column: _value(cell, kind)\n             for column, cell, kind in zip(raw[0], cells, schema[\"types\"], strict=True)\n         }\n-        original = dict(zip(raw[0], cells, strict=True))\n+        original = dict(zip(raw[0], cells, strict=False))\n         value = original[schema[\"date\"]].strip()\n         parsed: str | None = None\n         if not value:"
+reason = "The preceding row-width check enforces equal header and cell lengths before the original-cell zip on plain reader lists, so disabling strictness changes no value or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -29,7 +29,7 @@\n         publisher=entry.publisher,\n         source_modified=SCRAPE_DATE,\n         row_count=len(batch.rows),\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     side.update(\n         as_of=utc(stamp).date().isoformat(),"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -104,7 +104,7 @@\n                 raise AwardError(\"metadata_bytes\")\n             if failure is not None and failure.check == \"blocked_host\":\n                 raise AwardError(\"blocked_host\")\n-            if failure or response is None:\n+            if failure and response is None:\n                 raise AwardError(\"proof_fetch_failed\")\n             if any(\n                 address not in declaration[\"reviewed_urls\"]"
+reason = "The unchanged read_bounded implementation returns either a non-null Response with no failure or None with a truthy AttemptFailure, so failure or response-is-None and failure and response-is-None agree for every result this call can return."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -126,7 +126,7 @@\n                 fetch_host=entry.fetch_host,\n                 retrieved_utc=stamp,\n                 publisher=entry.publisher,\n-                source_modified=\"\",\n+                source_modified=None,\n                 row_count=len(rows),\n                 terms_sha256=\"\",\n             )"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -128,7 +128,7 @@\n                 publisher=entry.publisher,\n                 source_modified=\"\",\n                 row_count=len(rows),\n-                terms_sha256=\"\",\n+                terms_sha256=None,\n             )\n             proof_body = response.body\n             if version_two:"
+reason = "The sidecar builder consumes the changed literal only through value or None, and both the original empty string and the replacement None yield the identical recorded None for every entry and response."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -34,7 +34,7 @@\n                 records = json.loads(snapshot.body)\n             elif selection[\"format\"] == \"csv_records\":\n                 records = list(\n-                    csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n+                    csv.DictReader(io.StringIO(snapshot.body.decode(\"UTF-8-SIG\")))\n                 )\n             else:\n                 raise AwardError(\"register_schema_missing\")"
+reason = "Python resolves utf-8-sig and UTF-8-SIG to the same registered codec, including BOM consumption and identical decoding errors, for every byte string."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(None)\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(\"XXregister_schema_missingXX\")\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/awards.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/awards.py\n+++ src/eii_custodian/publicdata/fetch/awards.py\n@@ -37,7 +37,7 @@\n                     csv.DictReader(io.StringIO(snapshot.body.decode(\"utf-8-sig\")))\n                 )\n             else:\n-                raise AwardError(\"register_schema_missing\")\n+                raise AwardError(\"REGISTER_SCHEMA_MISSING\")\n         except (ValueError, UnicodeError, csv.Error):\n             raise AwardError(\"register_schema_missing\") from None\n         if not isinstance(records, list):"
+reason = "The unsupported-format AwardError is unconditionally caught by the immediately enclosing ValueError handler and replaced with the unchanged register_schema_missing AwardError from None, so its discarded message cannot change any returned value or closed refusal for any selection."
+
+# S2-T29 kill pass 3: equivalent mutants of page_records.py, page_requests.py and certificate_pins.py; every other survivor of that campaign is killed by custodian/tests/test_*_survivors_*.py.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/certificate_pins.py\n+++ src/eii_custodian/publicdata/fetch/certificate_pins.py\n@@ -12,7 +12,7 @@\n     path = folder / relative\n     if not path.resolve().is_relative_to(\n         folder.resolve()\n-    ) or not folder.resolve().is_relative_to(cache.resolve()):\n+    ) and not folder.resolve().is_relative_to(cache.resolve()):\n         raise PinError(\"intake_path_refused\")\n     for part in (path, *path.parents):\n         if part == cache:"
+reason = "Input classes: the folder resolves outside the cache while the path stays within the resolved folder, or the folder stays within the cache while a symlink in the name resolves the path outside the folder; only these exclusive escape cases make the mutant skip the first refusal, and the later lexical parent walk encounters the responsible symlink at intake or intake/<source> in the first case and within the name below the folder in the second, before reaching the cache boundary, because absolute names and name parts of '..' are already barred and source is a single name (with '..' collapsing to the cache), so both cases raise the same intake_path_refused with no intervening effect and no reachable input differs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_requests.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_requests.py\n+++ src/eii_custodian/publicdata/fetch/page_requests.py\n@@ -3,7 +3,7 @@\n     if frame is not None and (url not in frame or not approve(url).ok):\n         raise TransportFault(\"blocked_host\", \"\")\n     parts = urlsplit(url)\n-    if (parts.hostname or \"\") == \"myschools.edu.gov.qa\" and parts.path.endswith(\n+    if (parts.hostname or \"XXXX\") == \"myschools.edu.gov.qa\" and parts.path.endswith(\n         \"/PrivateSchoolsView/FeatureServer/0/query\"\n     ):\n         pairs = parse_qsl(parts.query, keep_blank_values=True)"
+reason = "Input class: a URL with no host, where hostname is None and the fallback text is used; neither the empty text nor 'XXXX' equals the lower-case school host myschools.edu.gov.qa, so the school-query rule is skipped in both cases and a URL with a host never reads the fallback, so no reachable input differs."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -1,7 +1,7 @@\n def __init__(self, table_id: str) -> None:\n     super().__init__(convert_charrefs=True)\n     self.table_id = table_id\n-    self.depth = 0\n+    self.depth = None\n     self.matches = 0\n     self.cell: list[str] | None = None\n     self.row: list[str] | None = None"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so None at start acts exactly as 0 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -3,7 +3,7 @@\n         if self.depth:\n             raise PageError(\"schema_missing\")\n         if dict(attrs).get(\"id\") == self.table_id:\n-            self.depth = 1\n+            self.depth = 2\n             self.matches += 1\n     if not self.depth:\n         return"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so 2 on entering the table acts exactly as 1 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -8,4 +8,4 @@\n         self.rows.append(self.row)\n         self.row = None\n     if tag == \"table\":\n-        self.depth = 0\n+        self.depth = None"
+reason = "The depth attribute is only ever read for truthiness (the nested-table refusal, the outside-table returns and the unclosed-table check of parse_body) and is never counted, so None on leaving the table acts exactly as 0 for every page."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -22,7 +22,7 @@\n         raise PageError(\"schema_missing\")\n     parser = _Table(str(declaration.get(\"table_id\", \"\")))\n     try:\n-        parser.feed(body.decode(\"utf-8\"))\n+        parser.feed(body.decode(\"UTF-8\"))\n         parser.close()\n     except UnicodeError:\n         raise PageError(\"schema_missing\") from None"
+reason = "'UTF-8' and 'utf-8' name the same codec (codecs.lookup gives the same codec for both), so the decoded text and any UnicodeDecodeError are identical."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, strict=None)\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, )\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -42,7 +42,7 @@\n         rows.append(\n             {\n                 name: _value(value, kind)\n-                for (name, kind), value in zip(entry.columns, raw, strict=True)\n+                for (name, kind), value in zip(entry.columns, raw, strict=False)\n             }\n         )\n     if (entry.row_count_min is not None and len(rows) < entry.row_count_min) or ("
+reason = "The length check just above refuses every data row whose cell count differs from the declared columns, so zip only ever pairs equal-length sequences and its strict flag cannot change the result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", None)))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'None' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", )))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'None' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -12,7 +12,7 @@\n     if entry.licence_basis == \"owner_decision\" and entry.decision_record != \"0026\":\n         raise PageError(\"receipt_missing\")\n     try:\n-        date.fromisoformat(str(declaration.get(\"as_of\", \"\")))\n+        date.fromisoformat(str(declaration.get(\"as_of\", \"XXXX\")))\n     except ValueError:\n         raise PageError(\"snapshot_date_missing\") from None\n     if not declaration.get(\"period\"):"
+reason = "A declaration without as_of now gives the text 'XXXX' instead of the empty text; neither is an ISO date, so date.fromisoformat raises ValueError and the same snapshot_date_missing refusal follows, while a present as_of ignores the default."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -36,7 +36,7 @@\n     evidence: dict[str, object] = {}\n     with page_transport(pin, browser=entry.source_id == \"schools_private_directory\"):\n         response, failure = read_bounded(transport, sleep, entry.url)\n-    if failure is not None or response is None:\n+    if failure is not None and response is None:\n         if entry.source_id != \"schools_private_directory\":\n             raise PageError(failure.check if failure else \"access_failed\")\n         if capture is None and pin is not None:"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; with 'and' the test is true exactly when failure is set and response is None, which is the same set of calls as with 'or'."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if (failure) or True else \"access_failed\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the condition is already true, so forcing it true still raises failure.check."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if failure else \"XXaccess_failedXX\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the access_failed fallback is never chosen, so its text cannot change."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -38,7 +38,7 @@\n         response, failure = read_bounded(transport, sleep, entry.url)\n     if failure is not None or response is None:\n         if entry.source_id != \"schools_private_directory\":\n-            raise PageError(failure.check if failure else \"access_failed\")\n+            raise PageError(failure.check if failure else \"ACCESS_FAILED\")\n         if capture is None and pin is not None:\n             try:\n                 capture = load_capture(cache, entry.source_id, pin)"
+reason = "read_bounded returns exactly one of a response and a failure (a transport that returns None instead of a Response fails inside the redirect check before returning), so this branch always holds a failure, which is a truthy dataclass; the access_failed fallback is never chosen, so its text cannot change."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -74,7 +74,7 @@\n         fetch_host=host_of(response.final_url),\n         retrieved_utc=stamp,\n         publisher=entry.publisher,\n-        source_modified=\"\",\n+        source_modified=None,\n         row_count=len(rows),\n         terms_sha256=\"\",\n     )"
+reason = "sidecar_for stores source_modified or None, so the empty text and None both record None and no other field reads the argument."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_records.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_records.py\n+++ src/eii_custodian/publicdata/fetch/page_records.py\n@@ -76,7 +76,7 @@\n         publisher=entry.publisher,\n         source_modified=\"\",\n         row_count=len(rows),\n-        terms_sha256=\"\",\n+        terms_sha256=None,\n     )\n     side.update(\n         as_of=review[\"as_of\"],"
+reason = "sidecar_for stores terms_sha256 or None, so the empty text and None both record None, and a read terms page overwrites the field afterwards in both cases."
+
+# S2-T29 pass 4c: exact equivalents; proof context in the return ledger.
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -6,7 +6,7 @@\n             return value\n         if (\n             kind == \"integer\"\n-            and type(value) is not bool\n+            and type(None) is not bool\n             and re.fullmatch(r\"-?[0-9]+\", str(value))\n         ):\n             return int(str(value))"
+reason = "Only exact bool values are newly admitted to the integer branch, but their strings True and False cannot match the signed-digit regular expression, so every input retains the same result or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -10,7 +10,7 @@\n             and re.fullmatch(r\"-?[0-9]+\", str(value))\n         ):\n             return int(str(value))\n-        if kind == \"number\" and type(value) is not bool:\n+        if kind == \"number\" and type(None) is not bool:\n             number = Decimal(str(value))\n             if number.is_finite():\n                 return str(number)"
+reason = "Only exact bool values are newly admitted to the number branch, and Decimal of True or False raises InvalidOperation caught before the same schema_missing refusal, so every input retains the same result or refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -3,7 +3,7 @@\n         result: dict[str, Any] = {}\n         for key, value in pairs:\n             if key in result:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(None)\n             result[key] = value\n         return result"
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -3,7 +3,7 @@\n         result: dict[str, Any] = {}\n         for key, value in pairs:\n             if key in result:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"XXschema_missingXX\")\n             result[key] = value\n         return result"
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -3,7 +3,7 @@\n         result: dict[str, Any] = {}\n         for key, value in pairs:\n             if key in result:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"SCHEMA_MISSING\")\n             result[key] = value\n         return result"
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -8,7 +8,7 @@\n         return result\n \n     def bad(_: str) -> Any:\n-        raise ShapeError(\"schema_missing\")\n+        raise ShapeError(None)\n \n     try:\n         return json.loads("
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -8,7 +8,7 @@\n         return result\n \n     def bad(_: str) -> Any:\n-        raise ShapeError(\"schema_missing\")\n+        raise ShapeError(\"XXschema_missingXX\")\n \n     try:\n         return json.loads("
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -8,7 +8,7 @@\n         return result\n \n     def bad(_: str) -> Any:\n-        raise ShapeError(\"schema_missing\")\n+        raise ShapeError(\"SCHEMA_MISSING\")\n \n     try:\n         return json.loads("
+reason = "This nested callback is called only inside json_body, whose ValueError handler catches ShapeError and replaces every such message with the same schema_missing refusal without returning a parsed value."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_schema.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_schema.py\n+++ src/eii_custodian/publicdata/fetch/page_schema.py\n@@ -9,7 +9,7 @@\n                 raise ShapeError(\"snapshot_date_missing\")\n             try:\n                 if re.fullmatch(r\"[0-9]{4}(?:-Q[1-4])?\", value):\n-                    if not 1 <= int(value[:4]) <= 9999:\n+                    if not 1 <= int(value[:4]) <= 10000:\n                         raise ValueError\n                 else:\n                     datetime.fromisoformat(value.replace(\"Z\", \"+00:00\"))"
+reason = "The preceding full match restricts the sliced year to four ASCII digits, so its integer cannot exceed 9999 and raising that upper bound to 10000 changes no input result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -12,7 +12,7 @@\n         values = [json_body(n.text().encode()) for n in holders]\n     else:\n         values = [\n-            json_body((n.attrs.get(shape[\"attribute\"]) or \"\").encode()) for n in holders\n+            json_body((n.attrs.get(shape[\"attribute\"]) or \"XXXX\").encode()) for n in holders\n         ]\n     if len(values) != shape[\"copies\"] or any(v != values[0] for v in values):\n         raise ShapeError(\"schema_missing\")"
+reason = "The fallback is used only for absent or empty HTML attribute text, and both the empty string and XXXX are invalid JSON that json_body refuses with schema_missing."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -67,7 +67,7 @@\n             for row in range(first, last + 1):\n                 raw_year = cells.get(spec[\"year_column\"] + str(row), \"\")\n                 quarter = cells.get(spec[\"quarter_column\"] + str(row), \"\")\n-                preliminary = False\n+                preliminary = None\n                 if quarterly:\n                     match = re.fullmatch(r\"Q([1-4])(\\*)?\", quarter)\n                     if match is None or not cells.get("
+reason = "The annual preliminary initializer is consumed only for truth testing in the output ternary, where None and False both yield false, while quarterly rows overwrite it before use."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -94,7 +94,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), None)\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
+reason = "read_sheet supplies only strings in cells, and this get default is consumed only for truth testing in the annual-row guard, where missing None and empty text are both false."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -94,7 +94,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), )\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
+reason = "read_sheet supplies only strings in cells, and this get default is consumed only for truth testing in the annual-row guard, where missing None and empty text are both false."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -32,7 +32,7 @@\n         raise ShapeError(\"schema_missing\")\n     if layout == \"double\":\n         containers = parent.find(\"div.row.mb-4 > div.col-md-6 > div.price\")\n-        if len(containers) != 2 or {id(n) for n in containers} != {\n+        if len(containers) != 2 and {id(n) for n in containers} != {\n             id(n) for n in found\n         }:\n             raise ShapeError(\"schema_missing\")"
+reason = "The preceding guard fixes found to two distinct price nodes, and the more restrictive container selector returns a duplicate-free subset, so unequal lengths and unequal identity sets are equivalent here."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -11,7 +11,7 @@\n             raise ShapeError(\"schema_missing\")\n         match = re.fullmatch(\n             r\"javascript:openCompanyDataModel\\(([0-9]+)\\);\",\n-            links[0].attrs.get(\"href\") or \"\",\n+            links[0].attrs.get(\"href\") or \"XXXX\",\n         )\n         if match is None or match[1] in bindings:\n             raise ShapeError(\"schema_missing\")"
+reason = "For absent or empty href the fallback strings empty and XXXX both fail the anchored javascript binding regex and produce the same schema_missing refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -33,7 +33,7 @@\n         if not tables or len(headings) != len(tables):\n             raise ShapeError(\"schema_missing\")\n         for heading in headings:\n-            siblings = heading.parent.nodes() if heading.parent else []\n+            siblings = heading.parent.nodes() if (heading.parent) or True else []\n             index = next(i for i, n in enumerate(siblings) if n is heading)\n             if index + 1 >= len(siblings) or not siblings[index + 1].matches(\n                 \"table.custom--table.mb-5\""
+reason = "The heading is obtained as a descendant of a Tree root, which always assigns a truthy Node parent to every such node, so the forced true condition chooses the same parent nodes for every body."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -52,7 +52,7 @@\n             if len(matches) != 1:\n                 raise ShapeError(\"schema_missing\")\n             section = matches[0]\n-            expiry = None\n+            expiry = \"\"\n             if section[\"date_in_heading\"]:\n                 try:\n                     expiry = ("
+reason = "Before any activity is appended, a dated section replaces expiry with the parsed date and an undated section replaces row_expiry with the row date, so the initializer never reaches output for any body."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -68,7 +68,7 @@\n             for raw in table_rows(sub, section[\"headers\"]):\n                 values = {\n                     h: c.text().strip()\n-                    for h, c in zip(section[\"headers\"], raw, strict=True)\n+                    for h, c in zip(section[\"headers\"], raw, strict=None)\n                 }\n                 row_expiry = expiry\n                 if not section[\"date_in_heading\"]:"
+reason = "table_rows validates each returned row against the same section header list before this zip, so both iterables have equal length for every reachable row and strictness changes no result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -68,7 +68,7 @@\n             for raw in table_rows(sub, section[\"headers\"]):\n                 values = {\n                     h: c.text().strip()\n-                    for h, c in zip(section[\"headers\"], raw, strict=True)\n+                    for h, c in zip(section[\"headers\"], raw, )\n                 }\n                 row_expiry = expiry\n                 if not section[\"date_in_heading\"]:"
+reason = "table_rows validates each returned row against the same section header list before this zip, so both iterables have equal length for every reachable row and strictness changes no result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -68,7 +68,7 @@\n             for raw in table_rows(sub, section[\"headers\"]):\n                 values = {\n                     h: c.text().strip()\n-                    for h, c in zip(section[\"headers\"], raw, strict=True)\n+                    for h, c in zip(section[\"headers\"], raw, strict=False)\n                 }\n                 row_expiry = expiry\n                 if not section[\"date_in_heading\"]:"
+reason = "table_rows validates each returned row against the same section header list before this zip, so both iterables have equal length for every reachable row and strictness changes no result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -92,7 +92,7 @@\n     modals = [\n         n\n         for n in root.find(\"div\")\n-        if (n.attrs.get(\"id\") or \"\").startswith(\"CompanyData-\")\n+        if (n.attrs.get(\"id\") or \"XXXX\").startswith(\"CompanyData-\")\n     ]\n     if len(modals) != len(bindings):\n         raise ShapeError(\"schema_missing\")"
+reason = "For an absent or empty id, neither the empty string nor XXXX starts with CompanyData-, so the same nodes enter the modal count for every HTML body."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -6,7 +6,7 @@\n     if len(headers) != 1:\n         raise ShapeError(\"schema_missing\")\n     heading = headers[0]\n-    siblings = heading.parent.nodes() if heading.parent else []\n+    siblings = heading.parent.nodes() if (heading.parent) or True else []\n     index = next(i for i, n in enumerate(siblings) if n is heading)\n     if index + 1 >= len(siblings):\n         raise ShapeError(\"schema_missing\")"
+reason = "The heading is obtained as a descendant of a Tree root, which always assigns a truthy Node parent to every such node, so the forced true condition chooses the same parent nodes for every body."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -18,7 +18,7 @@\n         titles = [\n             n\n             for n in card.find(\"span.card-title > a\")\n-            if (n.attrs.get(\"href\") or \"\").startswith(\n+            if (n.attrs.get(\"href\") or \"XXXX\").startswith(\n                 \"/TendersOnlineServices/TenderDetails/\"\n             )\n         ]"
+reason = "For an absent or empty href, neither the empty string nor XXXX starts with the required tender-detail prefix, so the same links enter the title list for every body."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -43,7 +43,7 @@\n             card.one(\"div.col-md-2.circle-container > a.btn.btn-primary\").attrs.get(\n                 \"href\"\n             )\n-            or \"\"\n+            or \"XXXX\"\n         )\n         if not proof.startswith(\"/TendersOnlineServices/TenderCompaniesDetails/\"):\n             raise ShapeError(\"schema_missing\")"
+reason = "For an absent or empty report href, neither the empty string nor XXXX starts with the required tender-company prefix, so both paths give the same schema_missing refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -3,7 +3,7 @@\n     try:\n         with ZipFile(io.BytesIO(body)) as archive:\n             if len(set(archive.namelist())) != len(archive.namelist()):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(None)\n             shared: list[str] = []\n             if \"xl/sharedStrings.xml\" in archive.namelist():\n                 shared = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -3,7 +3,7 @@\n     try:\n         with ZipFile(io.BytesIO(body)) as archive:\n             if len(set(archive.namelist())) != len(archive.namelist()):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"XXschema_missingXX\")\n             shared: list[str] = []\n             if \"xl/sharedStrings.xml\" in archive.namelist():\n                 shared = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -3,7 +3,7 @@\n     try:\n         with ZipFile(io.BytesIO(body)) as archive:\n             if len(set(archive.namelist())) != len(archive.namelist()):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"SCHEMA_MISSING\")\n             shared: list[str] = []\n             if \"xl/sharedStrings.xml\" in archive.namelist():\n                 shared = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -15,7 +15,7 @@\n                 s for s in book.findall(\"s:sheets/s:sheet\", NS) if s.get(\"name\") == name\n             ]\n             if len(sheets) != 1:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(None)\n             rid = sheets[0].get(\"{\" + RELNS + \"}id\", \"\")\n             rels = ET.fromstring(archive.read(\"xl/_rels/workbook.xml.rels\"))\n             targets = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -15,7 +15,7 @@\n                 s for s in book.findall(\"s:sheets/s:sheet\", NS) if s.get(\"name\") == name\n             ]\n             if len(sheets) != 1:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"XXschema_missingXX\")\n             rid = sheets[0].get(\"{\" + RELNS + \"}id\", \"\")\n             rels = ET.fromstring(archive.read(\"xl/_rels/workbook.xml.rels\"))\n             targets = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -15,7 +15,7 @@\n                 s for s in book.findall(\"s:sheets/s:sheet\", NS) if s.get(\"name\") == name\n             ]\n             if len(sheets) != 1:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"SCHEMA_MISSING\")\n             rid = sheets[0].get(\"{\" + RELNS + \"}id\", \"\")\n             rels = ET.fromstring(archive.read(\"xl/_rels/workbook.xml.rels\"))\n             targets = ["
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -19,7 +19,7 @@\n             rid = sheets[0].get(\"{\" + RELNS + \"}id\", \"\")\n             rels = ET.fromstring(archive.read(\"xl/_rels/workbook.xml.rels\"))\n             targets = [\n-                r.get(\"Target\", \"\")\n+                r.get(\"Target\", \"XXXX\")\n                 for r in rels\n                 if r.get(\"Id\") == rid and r.get(\"TargetMode\") != \"External\"\n             ]"
+reason = "A missing relationship Target becomes either empty text or XXXX, and both normalized paths fail the mandatory worksheet-prefix and .xml-suffix guard before any member read, giving the same public refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -24,7 +24,7 @@\n                 if r.get(\"Id\") == rid and r.get(\"TargetMode\") != \"External\"\n             ]\n             if len(targets) != 1 or \"..\" in PurePosixPath(targets[0]).parts:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(None)\n             part = targets[0].lstrip(\"/\")\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -24,7 +24,7 @@\n                 if r.get(\"Id\") == rid and r.get(\"TargetMode\") != \"External\"\n             ]\n             if len(targets) != 1 or \"..\" in PurePosixPath(targets[0]).parts:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"XXschema_missingXX\")\n             part = targets[0].lstrip(\"/\")\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -24,7 +24,7 @@\n                 if r.get(\"Id\") == rid and r.get(\"TargetMode\") != \"External\"\n             ]\n             if len(targets) != 1 or \"..\" in PurePosixPath(targets[0]).parts:\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"SCHEMA_MISSING\")\n             part = targets[0].lstrip(\"/\")\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -29,7 +29,7 @@\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part\n             if not part.startswith(\"xl/worksheets/\") or not part.endswith(\".xml\"):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(None)\n             root = ET.fromstring(archive.read(part))\n             cells: dict[str, str] = {}\n             rows: dict[int, list[str]] = {}"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -29,7 +29,7 @@\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part\n             if not part.startswith(\"xl/worksheets/\") or not part.endswith(\".xml\"):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"XXschema_missingXX\")\n             root = ET.fromstring(archive.read(part))\n             cells: dict[str, str] = {}\n             rows: dict[int, list[str]] = {}"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -29,7 +29,7 @@\n             if not part.startswith(\"xl/\"):\n                 part = \"xl/\" + part\n             if not part.startswith(\"xl/worksheets/\") or not part.endswith(\".xml\"):\n-                raise ShapeError(\"schema_missing\")\n+                raise ShapeError(\"SCHEMA_MISSING\")\n             root = ET.fromstring(archive.read(part))\n             cells: dict[str, str] = {}\n             rows: dict[int, list[str]] = {}"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -38,7 +38,7 @@\n                 row: list[str] = []\n                 row_number = int(node.get(\"r\", str(previous + 1)))\n                 if row_number <= previous:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(None)\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n                     raise ShapeError(\"schema_missing\")"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -38,7 +38,7 @@\n                 row: list[str] = []\n                 row_number = int(node.get(\"r\", str(previous + 1)))\n                 if row_number <= previous:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(\"XXschema_missingXX\")\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n                     raise ShapeError(\"schema_missing\")"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -38,7 +38,7 @@\n                 row: list[str] = []\n                 row_number = int(node.get(\"r\", str(previous + 1)))\n                 if row_number <= previous:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(\"SCHEMA_MISSING\")\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n                     raise ShapeError(\"schema_missing\")"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -41,7 +41,7 @@\n                     raise ShapeError(\"schema_missing\")\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(None)\n                 for cell in node.findall(\"s:c\", NS):\n                     reference = cell.get(\"r\", \"\")\n                     match = re.fullmatch(r\"([A-Z]+)([1-9][0-9]*)\", reference)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -41,7 +41,7 @@\n                     raise ShapeError(\"schema_missing\")\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(\"XXschema_missingXX\")\n                 for cell in node.findall(\"s:c\", NS):\n                     reference = cell.get(\"r\", \"\")\n                     match = re.fullmatch(r\"([A-Z]+)([1-9][0-9]*)\", reference)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -41,7 +41,7 @@\n                     raise ShapeError(\"schema_missing\")\n                 previous = row_number\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n-                    raise ShapeError(\"schema_missing\")\n+                    raise ShapeError(\"SCHEMA_MISSING\")\n                 for cell in node.findall(\"s:c\", NS):\n                     reference = cell.get(\"r\", \"\")\n                     match = re.fullmatch(r\"([A-Z]+)([1-9][0-9]*)\", reference)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -43,7 +43,7 @@\n                 if node.get(\"hidden\", \"0\") not in {\"0\", \"false\"}:\n                     raise ShapeError(\"schema_missing\")\n                 for cell in node.findall(\"s:c\", NS):\n-                    reference = cell.get(\"r\", \"\")\n+                    reference = cell.get(\"r\", \"XXXX\")\n                     match = re.fullmatch(r\"([A-Z]+)([1-9][0-9]*)\", reference)\n                     if (\n                         match is None"
+reason = "Only a missing cell reference uses the default, and both empty text and XXXX fail the anchored coordinate regex and give the same normalized schema_missing refusal."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -50,7 +50,7 @@\n                         or int(match[2]) != row_number\n                         or reference in cells\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(None)\n                     formula = cell.find(\"s:f\", NS)\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -50,7 +50,7 @@\n                         or int(match[2]) != row_number\n                         or reference in cells\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"XXschema_missingXX\")\n                     formula = cell.find(\"s:f\", NS)\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -50,7 +50,7 @@\n                         or int(match[2]) != row_number\n                         or reference in cells\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     formula = cell.find(\"s:f\", NS)\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -55,7 +55,7 @@\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(None)\n                     column = 0\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -55,7 +55,7 @@\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"XXschema_missingXX\")\n                     column = 0\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -55,7 +55,7 @@\n                     if formula is not None and (\n                         not cached_formulas or cell.find(\"s:v\", NS) is None\n                     ):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     column = 0\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -59,7 +59,7 @@\n                     column = 0\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1\n-                    if column <= len(row):\n+                    if column < len(row):\n                         raise ShapeError(\"schema_missing\")\n                     row.extend([\"\"] * (column - len(row)))\n                     kind = cell.get(\"t\", \"n\")"
+reason = "Equality with the previous column length implies the same canonical uppercase column and row reference, already refused as a duplicate cell, so changing this later comparison to strict less-than changes no workbook result."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -60,7 +60,7 @@\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1\n                     if column <= len(row):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(None)\n                     row.extend([\"\"] * (column - len(row)))\n                     kind = cell.get(\"t\", \"n\")\n                     value = cell.findtext(\"s:v\", \"\", NS)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -60,7 +60,7 @@\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1\n                     if column <= len(row):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"XXschema_missingXX\")\n                     row.extend([\"\"] * (column - len(row)))\n                     kind = cell.get(\"t\", \"n\")\n                     value = cell.findtext(\"s:v\", \"\", NS)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -60,7 +60,7 @@\n                     for letter in match[1]:\n                         column = column * 26 + ord(letter) - ord(\"A\") + 1\n                     if column <= len(row):\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     row.extend([\"\"] * (column - len(row)))\n                     kind = cell.get(\"t\", \"n\")\n                     value = cell.findtext(\"s:v\", \"\", NS)"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -67,7 +67,7 @@\n                     if kind == \"s\":\n                         index = int(value)\n                         if index < 0:\n-                            raise ShapeError(\"schema_missing\")\n+                            raise ShapeError(None)\n                         value = shared[index]\n                     elif kind == \"inlineStr\":\n                         value = \"\".join("
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -67,7 +67,7 @@\n                     if kind == \"s\":\n                         index = int(value)\n                         if index < 0:\n-                            raise ShapeError(\"schema_missing\")\n+                            raise ShapeError(\"XXschema_missingXX\")\n                         value = shared[index]\n                     elif kind == \"inlineStr\":\n                         value = \"\".join("
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -67,7 +67,7 @@\n                     if kind == \"s\":\n                         index = int(value)\n                         if index < 0:\n-                            raise ShapeError(\"schema_missing\")\n+                            raise ShapeError(\"SCHEMA_MISSING\")\n                         value = shared[index]\n                     elif kind == \"inlineStr\":\n                         value = \"\".join("
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -74,7 +74,7 @@\n                             t.text or \"\" for t in cell.findall(\"s:is//s:t\", NS)\n                         )\n                     elif kind not in {\"n\", \"str\"}:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(None)\n                     if formula is not None and not value:\n                         raise ShapeError(\"schema_missing\")\n                     cells[reference] = value"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -74,7 +74,7 @@\n                             t.text or \"\" for t in cell.findall(\"s:is//s:t\", NS)\n                         )\n                     elif kind not in {\"n\", \"str\"}:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"XXschema_missingXX\")\n                     if formula is not None and not value:\n                         raise ShapeError(\"schema_missing\")\n                     cells[reference] = value"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -74,7 +74,7 @@\n                             t.text or \"\" for t in cell.findall(\"s:is//s:t\", NS)\n                         )\n                     elif kind not in {\"n\", \"str\"}:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     if formula is not None and not value:\n                         raise ShapeError(\"schema_missing\")\n                     cells[reference] = value"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -76,7 +76,7 @@\n                     elif kind not in {\"n\", \"str\"}:\n                         raise ShapeError(\"schema_missing\")\n                     if formula is not None and not value:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(None)\n                     cells[reference] = value\n                     row[column - 1] = value\n                 rows[row_number] = row"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -76,7 +76,7 @@\n                     elif kind not in {\"n\", \"str\"}:\n                         raise ShapeError(\"schema_missing\")\n                     if formula is not None and not value:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"XXschema_missingXX\")\n                     cells[reference] = value\n                     row[column - 1] = value\n                 rows[row_number] = row"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+
+[[survivors]]
+module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -76,7 +76,7 @@\n                     elif kind not in {\"n\", \"str\"}:\n                         raise ShapeError(\"schema_missing\")\n                     if formula is not None and not value:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     cells[reference] = value\n                     row[column - 1] = value\n                 rows[row_number] = row"
+reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
