@@ -2572,6 +2572,15 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - COMPARISON: OI-168 holds the namespace requirement itself and stays as it is; no existing item records that the runner tests run in no required check.
 - NEEDED: Every check of a change to `scripts/mutation.py` or its runner tests runs `uv run --locked python -m unittest scripts.tests.mutation_runner -v` with the group `mutation`; the slice S2 gate decides whether a required hosted check runs them.
 
+## OI-284 — Three wording notes of the mutation handoff's last check
+
+- ID: OI-284
+- TYPE: OPEN
+- RAISED BY: the other-maker check of the mutation handoff at `e8eed7b` (Z.ai GLM-5.3, APPROVED), after five cold reads and four fix passes
+- CONCERNS: [document 18](docs/18_MUTATION_TESTING_HANDOFF.md)
+- EVIDENCE: The check returned three notes, never rejections. N1, record R013 (`weighted_mean`) keeps the earlier phrase "the current `81e62db` version"; it names the revision and asserts no absence, but "current" beside a hash is loose. N2, "the S2-T29 train" uses the repository's train vocabulary; the hash beside it is the anchor. N3, the fixer's first pass briefly regenerated the explanation-data paragraph X001 from the merged tree and then restored it; the checker's byte comparison shows the shipped paragraph unchanged.
+- NEEDED: At the handoff to the receiving team under [decision 0055](docs/decisions/0055-mutation-testing-moves-to-after-go-live.md), replace "the current `81e62db` version" in R013 with "the `81e62db` version" and keep the hash beside every train name; N3 needs no change. No measurement, count or outcome changes.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
