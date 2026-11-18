@@ -1,9 +1,14 @@
 """Fix-six plants: refusal metadata, school envelopes and unscoped pin hosts."""
 
+import ast
+import hashlib
 import json
+import shutil
+import ssl
 from copy import deepcopy
 from dataclasses import replace
 from http.client import HTTPMessage
+from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request
@@ -25,9 +30,11 @@ from eii_custodian.publicdata.fetch.page_requests import PIN_HOSTS, active
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import (
     Response,
+    TransportFault,
     _redirect_guard,
     open_https,
 )
+from eii_custodian.publicdata.singles import tenders
 
 
 def test_only_four_page_pin_hosts_remain():
@@ -207,3 +214,159 @@ def test_unscoped_page_pin_host_refuses_before_send(host, role):
         assert opener.return_value.open.call_count == 0
         assert redirect_base.call_count == 0
         assert hops == []
+
+
+def test_fix7_legacy_tender_checked_chain_reaches_transport(tmp_path):
+    """Invented stand-in proves the adapter seam, not a TLS handshake."""
+    raw = b"SYN-invented-chain-stand-in"
+    chain = tmp_path / "SYN-chain.pem"
+    chain.write_bytes(raw)
+    row = next(r for r in load_registry() if r.key == "tenders_pub")
+    row = replace(row, chain_intermediate_sha256=hashlib.sha256(raw).hexdigest())
+    url = tenders.list_addresses(tenders.TENDER_HOST)[0]
+    with (
+        page_transport(None),
+        patch.object(tenders, "_open_https", wraps=open_https) as seam,
+        patch("urllib.request.build_opener") as opener,
+    ):
+        response = opener.return_value.open.return_value.__enter__.return_value
+        response.read.return_value = b"SYN-page"
+        response.geturl.return_value = url
+        response.headers = {}
+        result = tenders.tender_https(row, chain_file=chain)(
+            tenders.PageCall(url, (), 2, True)
+        )
+        assert result.body == b"SYN-page"
+        assert opener.return_value.open.call_count == 1
+        assert (
+            seam.call_args.kwargs["legacy_chain_sha256"]
+            == row.chain_intermediate_sha256
+        )
+        context = seam.call_args.kwargs["ssl_context"]
+        assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
+        assert not active() and current_pin() is None
+        assert tenders._TENDER_CHAIN.get() is None
+
+
+@pytest.mark.parametrize("host", sorted(PIN_HOSTS))
+@pytest.mark.parametrize("legacy_pin", [None, "a" * 63, "a" * 65, "z" * 64])
+def test_fix7_unscoped_context_needs_well_formed_legacy_pin(host, legacy_pin):
+    with page_transport(None), patch("urllib.request.build_opener") as opener:
+        with pytest.raises(PinError, match=r"^certificate_chain_incomplete$"):
+            open_https(
+                "https://" + host + "/SYN-unscoped",
+                ssl_context=ssl.create_default_context(),
+                legacy_chain_sha256=legacy_pin,
+            )
+        assert opener.call_count == 0
+        assert opener.return_value.open.call_count == 0
+
+
+@pytest.mark.parametrize("mode", ["missing", "no-hostname", "no-verify"])
+def test_fix7_legacy_pin_requires_verifying_context(mode):
+    context = None if mode == "missing" else ssl.create_default_context()
+    if context is not None:
+        context.check_hostname = False
+        if mode == "no-verify":
+            context.verify_mode = ssl.CERT_NONE
+    error = PinError if context is None else TransportFault
+    reason = "certificate_chain_incomplete" if context is None else "unreachable"
+    with page_transport(None), patch("urllib.request.build_opener") as opener:
+        with pytest.raises(error, match=reason) as caught:
+            open_https(
+                tenders.list_addresses(tenders.TENDER_HOST)[0],
+                ssl_context=context,
+                legacy_chain_sha256="a" * 64,
+            )
+        if context is not None:
+            assert caught.value.kind == "unreachable"
+        assert opener.call_count == 0
+        assert opener.return_value.open.call_count == 0
+
+
+@pytest.mark.parametrize("mode", ["no-scope", "other-context", "other-host"])
+def test_fix7_tender_seam_does_not_share_checked_pin(mode):
+    context = ssl.create_default_context()
+    supplied = ssl.create_default_context() if mode == "other-context" else context
+    url = (
+        "https://www.edu.gov.qa/SYN-other-host"
+        if mode == "other-host"
+        else tenders.list_addresses(tenders.TENDER_HOST)[0]
+    )
+    scope = None if mode == "no-scope" else (context, "a" * 64)
+    token = tenders._TENDER_CHAIN.set(scope)
+    try:
+        with page_transport(None), patch("urllib.request.build_opener") as opener:
+            with pytest.raises(PinError, match=r"^certificate_chain_incomplete$"):
+                tenders.open_https(url, ssl_context=supplied)
+            assert opener.call_count == 0
+            assert opener.return_value.open.call_count == 0
+    finally:
+        tenders._TENDER_CHAIN.reset(token)
+    assert tenders._TENDER_CHAIN.get() is None
+
+
+@pytest.mark.parametrize("host", sorted(PIN_HOSTS))
+def test_fix7_tender_legacy_bridge_does_not_authorize_redirect(host, tmp_path):
+    """The actual opener's guard refuses every unscoped page pin redirect."""
+    raw = b"SYN-invented-chain-stand-in"
+    chain = tmp_path / "SYN-chain.pem"
+    chain.write_bytes(raw)
+    row = next(r for r in load_registry() if r.key == "tenders_pub")
+    row = replace(row, chain_intermediate_sha256=hashlib.sha256(raw).hexdigest())
+    url = tenders.list_addresses(tenders.TENDER_HOST)[0]
+    target = "https://" + host + "/SYN-redirect"
+    with (
+        page_transport(None),
+        patch("urllib.request.build_opener") as opener,
+        patch("urllib.request.HTTPRedirectHandler.redirect_request") as redirected,
+    ):
+
+        def send(request, *, timeout):
+            guard = opener.call_args.args[0]
+            guard().redirect_request(request, None, 302, "SYN", HTTPMessage(), target)
+            pytest.fail("redirect must refuse before a response is read")
+
+        opener.return_value.open.side_effect = send
+        with pytest.raises(PinError, match=r"^certificate_chain_incomplete$"):
+            tenders.tender_https(row, chain_file=chain)(
+                tenders.PageCall(url, (), 2, True)
+            )
+        assert opener.call_count == 1
+        assert opener.return_value.open.call_count == 1
+        assert redirected.call_count == 0
+        assert tenders._TENDER_CHAIN.get() is None
+        # The refusal happens before even recording a redirect hop.
+        assert (
+            opener.call_args.args[0].redirect_request.__closure__[0].cell_contents == []
+        )
+
+
+def _fix7_assert_legacy_chain_callers(source):
+    callers = []
+    for path in sorted(source.rglob("*.py")):
+        tree = ast.parse(path.read_text(), filename=path.as_posix())
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and any(
+                keyword.arg == "legacy_chain_sha256" for keyword in node.keywords
+            ):
+                callers.append(path.relative_to(source).as_posix())
+    assert callers == ["eii_custodian/publicdata/singles/tenders.py"], callers
+
+
+def test_fix7_legacy_chain_argument_has_only_tender_source_caller():
+    _fix7_assert_legacy_chain_callers(Path("custodian/src"))
+
+
+def test_fix7_legacy_chain_source_guard_rejects_second_caller(tmp_path):
+    source = tmp_path / "src"
+    shutil.copytree(
+        "custodian/src", source, ignore=shutil.ignore_patterns("__pycache__")
+    )
+    _fix7_assert_legacy_chain_callers(source)
+    (source / "SYN_second_caller.py").write_text(
+        "def syn_call(open_https, url, pin):\n"
+        "    return open_https(url, legacy_chain_sha256=pin)\n"
+    )
+    with pytest.raises(AssertionError, match="SYN_second_caller"):
+        _fix7_assert_legacy_chain_callers(source)

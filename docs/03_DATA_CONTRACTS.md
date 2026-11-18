@@ -1037,9 +1037,22 @@ The four page pin hosts are `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
 one of these hosts without a page-request scope or valid legacy pin refuses
 with `certificate_chain_incomplete` before constructing an opener or redirected
 request. The existing legacy pin validation remains. A supplied SSL context alone
-does not constitute a legacy pin. The unchanged tender adapter currently supplies
-only its PEM-verified context; its pin-scope compatibility follow-up is recorded
-in OPEN_ITEMS.md, **S2-T29 fix pass 6 — legacy tender pin scope**.
+does not constitute a legacy pin. Under lead ruling L-921, the tender adapter
+forwards the registry's `chain_intermediate_sha256`, already checked against the
+chain file by `chain_context`, through `open_https`'s keyword-only
+`legacy_chain_sha256`. This unscoped initial-request bridge requires both a
+verifying SSL context and a complete hexadecimal SHA-256 string; absent or
+malformed pins refuse before opener construction. The existing disabled-context
+`unreachable` refusal keeps its precedence. The injectable tender seam retains
+its original signature: a context-local scope binds the checked hash to that
+exact SSL context and tender host, and resets on success or exception. Only
+`singles/tenders.py` may supply the new argument, enforced by a source AST guard
+with a planted second caller. The legacy hash never authorizes a redirect:
+without page scope or a valid current pin, every redirect to a page pin host,
+including the tender host itself, still refuses before hop recording or
+redirected-request construction. See OPEN_ITEMS.md,
+**S2-T29 fix pass 6 — legacy tender pin scope**, for the offline resolution and
+remaining live-evidence and independent-review limits.
 
 `awards.ingest_awards@v1` reads a hash-pinned file from the uncommitted intake folder
 `data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile

@@ -12,6 +12,7 @@ import json
 import re
 import ssl
 from collections.abc import Callable, Iterable, Mapping, Sequence
+from contextvars import ContextVar
 from dataclasses import dataclass, replace
 from datetime import datetime
 from decimal import Decimal
@@ -24,8 +25,11 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
     BACKOFF_S,
+    Response,
     TransportFault,
-    open_https,
+)
+from eii_custodian.publicdata.fetch.transport import (
+    open_https as _open_https,
 )
 from eii_custodian.publicdata.singles.tenders_html import (
     PageShapeError,
@@ -35,6 +39,9 @@ from eii_custodian.publicdata.singles.tenders_html import (
 )
 
 TENDER_HOST = "monaqasat.mof.gov.qa"
+_TENDER_CHAIN: ContextVar[tuple[ssl.SSLContext, str] | None] = ContextVar(
+    "tender_checked_chain", default=None
+)
 CHAIN_PATH = Path("data/public_chain/tenders_pub.intermediate.pem")
 PAGE_SIZE = 20
 PACE_S = 3
@@ -448,15 +455,40 @@ def list_addresses(host: str) -> tuple[str, ...]:
     return tuple(list_page(host, slug, 1) for _name, slug in LIST_PATHS)
 
 
+def open_https(
+    url: str,
+    headers: Mapping[str, str] | None = None,
+    ssl_context: ssl.SSLContext | None = None,
+) -> Response:
+    """Keep the injectable tender seam; forward only its scoped, checked pin."""
+    checked = _TENDER_CHAIN.get()
+    pin = None
+    if (
+        checked is not None
+        and checked[0] is ssl_context
+        and urlsplit(url).hostname == TENDER_HOST
+    ):
+        pin = checked[1]
+    return _open_https(
+        url, headers=headers, ssl_context=ssl_context, legacy_chain_sha256=pin
+    )
+
+
 def tender_https(
     entry: Entry, *, chain_file: Path | None = None
 ) -> Callable[[PageCall], PageBody]:
-    """Hand the verifying context from ``chain_context`` to ``open_https``."""
+    """Hand the verifying context and its checked chain hash to ``open_https``."""
     path = CHAIN_PATH if chain_file is None else chain_file
     context = chain_context(path, entry.chain_intermediate_sha256)
 
     def transport(call: PageCall) -> PageBody:
-        response = open_https(call.url, headers=dict(call.headers), ssl_context=context)
+        token = _TENDER_CHAIN.set((context, entry.chain_intermediate_sha256))
+        try:
+            response = open_https(
+                call.url, headers=dict(call.headers), ssl_context=context
+            )
+        finally:
+            _TENDER_CHAIN.reset(token)
         return PageBody(status=200, body=response.body, final_url=response.final_url)
 
     return transport

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import ssl
 import urllib.error
 import urllib.request
@@ -129,6 +130,7 @@ def open_https(
     ssl_context: ssl.SSLContext | None = None,
     *,
     reviewed_urls: tuple[str, ...] | None = None,
+    legacy_chain_sha256: str | None = None,
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
     from .certificate_pins import PinError, browser_agent, current_pin, verified_context
@@ -160,10 +162,15 @@ def open_https(
         ssl_context.verify_mode != ssl.CERT_REQUIRED or not ssl_context.check_hostname
     ):
         raise TransportFault("unreachable", url)
-    # Preserve the existing disabled-context refusal above, then fail closed
-    # for missing page pins before constructing any opener.
+    # L-921: only the tender adapter supplies the chain hash already checked by
+    # chain_context. A context alone or an unchecked pin shape cannot bridge the
+    # unscoped page-host refusal. Disabled verification keeps its precedence.
     if not page_scoped and pin is None and host_of(url) in PIN_HOSTS:
-        raise PinError("certificate_chain_incomplete")
+        if (
+            ssl_context is None
+            or re.fullmatch(r"[0-9a-fA-F]{64}", legacy_chain_sha256 or "") is None
+        ):
+            raise PinError("certificate_chain_incomplete")
     keyed = isinstance(url, KeyedRequest)
     hops: list[str] = []
     guard = _redirect_guard(

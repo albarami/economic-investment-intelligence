@@ -3479,3 +3479,22 @@ The lead must resolve the adapter's pin scope before claiming preserved live
 tender acquisition. A compatibility adapter was raised for scope clarification;
 no answer or permission is inferred, no bypass is added and the guard stays
 closed. The PEM convention and all existing tests remain unchanged.
+
+**Fix pass 7 resolution, 2026-11-18 (L-921):** the compatibility scope decision
+is closed by the lead's explicit checked-chain bridge ruling in
+`.overnight/IN/L-921.md`. `open_https` accepts the keyword-only
+`legacy_chain_sha256` only with a verifying context for an otherwise unscoped
+page pin host. The tender adapter forwards its already verified registry hash
+through a context-local, exact-context and exact-host wrapper, retaining its
+existing injectable seam signature and resetting scope on every exit. An AST
+guard confines the argument's source caller to `singles/tenders.py`; a second
+caller in a throwaway source copy fails. Missing/malformed pins and absent or
+disabled verifying contexts refuse before opener construction. The redirect
+guard stays closed for every unscoped page pin host, including the tender host;
+the legacy bridge is never forwarded to it. Offline plants and real check exits
+are in `.overnight/fix7-checks.jsonl` and `.overnight/RETURN.md`.
+The initial direct-keyword adapter attempt failed four unchanged regression
+fixtures because their injected seam retains the original signature; the scoped
+wrapper corrects that interface without editing those files. This is a found
+cause, not a random failure. Independent review by another maker and live TLS
+acceptance remain pending; no invented-chain interface probe claims either.
