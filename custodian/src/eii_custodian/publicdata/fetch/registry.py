@@ -367,12 +367,14 @@ def nightly_blocked(
 
 
 def read_yaml(path: Path) -> object:
-    """Load one YAML document with the safe loader.
+    """Load one YAML document with libyaml's C safe loader; no fallback.
 
     A malformed file raises RegistryError, the package's own error.
     """
     try:
-        loaded: object = yaml.safe_load(path.read_text(encoding="utf-8"))
+        loaded: object = yaml.load(
+            path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader
+        )
     except yaml.YAMLError as exc:
         raise RegistryError("malformed yaml") from exc
     return loaded

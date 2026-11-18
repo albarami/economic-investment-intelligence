@@ -1595,6 +1595,39 @@ In a committed review file an activity code is written in reversible dotted form
 | DAT-106 | Every source in `source_registry` has publisher, dataset or page title, licence, retrieval date and file SHA-256. A Public source also has its URL, which holds no key or token (rule 14). A Synthetic or Simulated source uses the feed producer as publisher, the contract and feed as title, the repository licence, the build date as retrieval date and the feed file hash; its seed remains provenance in the manifest rather than replacing any Source-chain field. | Not-null check for every source-chain field; Public URL check, where a URL that holds a key or token fails; Synthetic and Simulated feed-hash-to-registry check. |
 | DAT-107 | The input class of a `fact_lineage` row follows the source kind: `public_dataset`, `public_document` and `reviewed_config` give `public`; `synthetic_feed` gives `synthetic`; `simulation_output` gives `simulated`. | Mapping check. |
 
+### PUB-67 supporting provenance
+
+The selected-cache series build retains its ordinary licence `source_chain`,
+`release_tables` and `field_mapping`. PUB-67 additionally requires the closed
+`supporting_provenance` object below, validated before writing its regression
+and again at stage admission. It also accompanies the active-licence internal
+and eligible display table. A missing, mistyped, unknown or incomplete field
+refuses admission; portal validation is unchanged (DAT-105, DAT-106).
+
+- `schema`: literal `pub67-support.v1`; `classifier_version`: literal
+  `activity_spine.v1`, the reused structural bucket method.
+- `classification`: a `SupportSource` for the exactly selected `cls_isic4` CSV.
+- `frame`: `output` literal `frame_s2_t02/municipalities.json`, its `sha256`,
+  `method` literal `frame.v1`, `upstream` (ordered `SupportSource` objects for
+  `bnd_hdx` and `bnd_zone_2020`) and `review_sha256` (exactly
+  `municipality_names.csv` and `municipality_aliases.json`, each a SHA-256).
+- Each `SupportSource` has exactly nonempty string fields `key`, `source_id`,
+  `dataset` (the registry/receipt title), `publisher`, `licence_id`,
+  `licence_basis`, `retrieved_utc` (valid UTC timestamp in
+  `YYYY-MM-DDTHH:MM:SSZ` form), `sha256` and `fetch_url`. Hashes are lowercase
+  hexadecimal SHA-256. Keys and source IDs match the named supporting input.
+
+The frame output binds its municipality rows to the two upstream receipts with
+`upstream_sha256`, an object keyed by those registry keys. These hashes must
+match the same build's explicit PASS selections. Body hashes and receipt
+identities are checked through the same helper as primary series sources.
+Supporting selections are separate from the exact primary-series selection map.
+A supporting input alone never triggers PUB-67. The classification has no
+portal slug or release table; neither is invented. Review-file hashes identify
+reviewed configuration, not another public publisher. This is build evidence,
+not an application schema or new public table. The lead's independent provenance
+review and live run remain required under OI-301.
+
 ## 12. The application schema (PostgreSQL only, schema `app`)
 
 This is the one canonical DDL for the application schema. The forward-only migrations under

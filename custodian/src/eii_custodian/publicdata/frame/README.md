@@ -1,6 +1,6 @@
 # Frame build status — S2-T02
 
-`build_frame(cache, registry, review, output=None)` reads verified source pairs
+`build_frame(cache, registry, review, output=None, build_date=None)` reads verified source pairs
 without network access. Its result contains tables, receipts with method
 `frame.v1`, inventories and named limitations. It is a partial frame build, not
 a completed release. Fixtures contain invented values only.
@@ -29,6 +29,10 @@ The Greater Doha set remains the lead's assumption in its CSV; a name that does
 not resolve through the reviewed municipality names refuses. This
 selects the explicit set after the key-based join; it does not join the two
 municipality sources by name.
+
+The same build also writes the joined municipality codes and exact names to
+`cache/frame_s2_t02/municipalities.json`; the public-series stage reads that
+file back, never the review alias map, to code the licence rows of its run.
 
 The district population field `POP2020` maps to the closed residents/persons
 pair in `pub_census_district`, on its joined district, with receipt lineage.
@@ -131,3 +135,11 @@ rows retain previously unlisted source tokens even for an existing zone number.
 Every number outside the frame is marked unmatched in the supplemental rows.
 Only committed review filenames are read, never proposed files. The report
 summarises unlisted zone numbers once per source; the proposal holds the detail.
+
+The public-build integration supplies its one build-start UTC date as
+`build_date`; the live frame forwards it to the places stage before gazetteer
+resolution. Direct callers loading verification files supply a fixed date.
+The frame's municipality handover also records `upstream_sha256` for `bnd_hdx`
+and `bnd_zone_2020` from the frame result's receipts. The PUB-67 series builder
+requires those hashes to agree with the same build's explicit selections;
+see document 03, **PUB-67 supporting provenance**.

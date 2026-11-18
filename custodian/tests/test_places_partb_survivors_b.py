@@ -192,6 +192,8 @@ def _frame_stand_in(calls: list[tuple[Any, ...]]) -> Any:
         registry: tuple[Entry, ...],
         review_given: Path,
         output: Any = None,
+        *,
+        build_date: Any = None,
     ) -> NoReturn:
         calls.append((cache_given, registry, review_given, output))
         raise FrameError("planted")
@@ -256,6 +258,8 @@ def test_a_frame_build_hands_its_log_to_the_places_stage(
         registry: tuple[Entry, ...],
         review_given: Path,
         output: Any = None,
+        *,
+        build_date: Any = None,
     ) -> None:
         run_places_before_gazetteer(cache_given, review_given, (), (), (), {})
 
@@ -282,6 +286,8 @@ def test_a_frame_build_publishes_a_log_even_when_it_has_none(
         registry: tuple[Entry, ...],
         review_given: Path,
         output: Any = None,
+        *,
+        build_date: Any = None,
     ) -> NoReturn:
         published = _BUILD_LINES.get()
         seen.append(None if published is None else list(published))

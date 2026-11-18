@@ -15,12 +15,16 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
 
-def selected_source(
+def selected_body(
     cache: Path, entry: Entry, digest: str
-) -> tuple[list[dict[str, object]], dict[str, object]]:
+) -> tuple[bytes, dict[str, object]]:
     """No latest-file search and no network; bind the body to its exact receipt."""
+    if re.fullmatch(r"[a-f0-9]{64}", digest) is None:
+        raise ValueError("invalid selected hash")
     selected = read_snapshot(cache / entry.key, digest)
     body, receipt = selected.body, selected.sidecar
+    if not isinstance(receipt, dict):
+        raise ValueError("selected receipt mismatch")
     expected = {
         "sha256": digest,
         "key": entry.key,
@@ -37,6 +41,14 @@ def selected_source(
         value = receipt.get(key)
         if not isinstance(value, str) or not value.strip():
             raise ValueError("incomplete receipt")
+    return body, receipt
+
+
+def selected_source(
+    cache: Path, entry: Entry, digest: str
+) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Decode JSON rows after the shared selected body/receipt checks."""
+    body, receipt = selected_body(cache, entry, digest)
     rows = json.loads(body, parse_float=Decimal)
     if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
         raise ValueError("source must contain rows")

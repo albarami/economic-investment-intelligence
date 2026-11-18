@@ -1278,6 +1278,16 @@ fails until a reviewer updates the value with a note naming the new hash (PUB-10
 | PUB-72 | Restaurant licences per 10,000 residents: use the 2025 `pop_muni` values, 111,282 for Al Daayen and 3,219,982 nationally, for the May 2025 snapshot; 361 ÷ 111,282 × 10,000 rounds (0 dp) to 32 and 4,782 ÷ 3,219,982 × 10,000 rounds to 15; the period `2025` is carried on the fact | `lic_active`, `pop_muni` |
 | PUB-73 | Open places extract and establishments: records with country QA in release 2026-10-21.0 number 26,383; the 2020 census establishment total equals 71,203 | `places_ovt`, `est_census` |
 
+PUB-67's four count groups use structural code length and membership in the
+selected `cls_isic4` classes through `class_bucket_counts`, independent of
+mapping approval. All six-digit codes stay legacy; every other digit length
+enters `other_lengths` (five/eight-digit diagnostics remain in the shared
+calculator). Al Daayen is resolved through the reviewed municipality-name group,
+retaining the actual frame key; absent or ambiguous targets, unparsed codes and
+unresolved licence names refuse. The anchors above remain comparison inputs
+only. Supporting lineage follows document 03, **PUB-67 supporting provenance**;
+no separate slug or release table is assigned to the classification.
+
 ## 11. Reconciliation before display (OI-03)
 
 R1 is closed: production value is not a field of the present restaurant datasets. The record is

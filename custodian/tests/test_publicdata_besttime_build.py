@@ -308,7 +308,7 @@ def test_besttime_dispatch_passes_environment(tmp_path, monkeypatch):
         (entry,),
         lambda req: pytest.fail("generic transport"),
         cache,
-        lambda: "unused",
+        lambda: "2026-11-16T00:00:00Z",
         lambda delay: None,
         environ=env,
     )
@@ -436,7 +436,7 @@ def test_besttime_build_failure_names_missing_place(tmp_path, monkeypatch):
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,
-        lambda: "unused",
+        lambda: "2026-11-16T00:00:00Z",
         lambda delay: None,
         environ=env,
     )
@@ -515,7 +515,7 @@ def test_besttime_missing_keys_failure_log_is_key_free(tmp_path, monkeypatch):
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,
-        lambda: "unused",
+        lambda: "2026-11-16T00:00:00Z",
         lambda delay: None,
         environ=env,
     )
@@ -538,7 +538,7 @@ def test_besttime_input_secret_is_not_logged(tmp_path, monkeypatch):
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,
-        lambda: "unused",
+        lambda: "2026-11-16T00:00:00Z",
         lambda delay: None,
         environ=env,
     )

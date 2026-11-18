@@ -1,10 +1,14 @@
 """Publish invented cache inputs and record the fixture's reviewed selection."""
 
+import json
 import os
+from collections.abc import Mapping
 from dataclasses import replace
 from pathlib import Path
 
+from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.review.cache_fixture import write_cached
 
 
@@ -52,3 +56,25 @@ def manifest(folder: Path, body: bytes) -> str:
         },
     )
     return digest
+
+
+def update_receipt(
+    cache: Path, key: str, digest: str, changes: Mapping[str, object]
+) -> None:
+    """Plant semantic receipt fields inside a consistent invented snapshot.
+
+    Snapshot integrity tests must corrupt files directly. This helper keeps the
+    envelope consistent so downstream receipt and lineage guards are reached.
+    """
+    directory = cache / key
+    selected = read_snapshot(directory, digest)
+    receipt = dict(selected.sidecar, **changes)
+    selected.receipt_path.write_text(
+        json.dumps(receipt, ensure_ascii=False), encoding="utf-8"
+    )
+    index = directory / "index" / (digest + ".json")
+    row = json.loads(index.read_text(encoding="utf-8"))
+    row["receipt_sha256"] = sha256_hex(selected.receipt_path.read_bytes())
+    for field in ("source_id", "key", "retrieved_utc", "sha256", "bytes"):
+        row[field] = receipt[field]
+    index.write_text(json.dumps(row), encoding="utf-8")

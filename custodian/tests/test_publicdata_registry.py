@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
 import pytest
+import yaml
 from custodian.tests.repository_root import repository_root
 
 import eii_custodian.publicdata.fetch.registry as registry_module
@@ -22,6 +24,7 @@ from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
     load_registry,
     nightly_blocked,
+    read_yaml,
     registry_path,
 )
 from eii_custodian.publicdata.fetch.seam import SCAN_ROOTS, opener_hits, scan_tree
@@ -417,12 +420,334 @@ def test_loader_refuses_a_bad_terms_forbid(tmp_path: Path) -> None:
         load_registry(_mutated(tmp_path, "forbid.yaml", planted))
 
 
+def _assert_c_safe_loader_only(text: str) -> None:
+    """Allow direct C-safe calls, a plain module import and the error boundary."""
+    assert not re.search(
+        r"\b(?:C?FullLoader|C?UnsafeLoader|CLoader|unsafe_load|full_load|load_all)\b"
+        r"|\byaml\s*\.\s*(?:Loader|unsafe\w*)\b",
+        text,
+    ), "forbidden YAML spelling"
+    tree = ast.parse(text)
+    parents = {
+        child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)
+    }
+    calls = []
+    for node in ast.walk(tree):
+        parent = parents.get(node)
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] == "yaml" or alias.asname == "yaml":
+                    assert alias.name == "yaml" and alias.asname is None, (
+                        "plain import yaml required"
+                    )
+        if isinstance(node, ast.ImportFrom):
+            assert (node.module or "").split(".")[0] != "yaml", (
+                "plain import yaml required"
+            )
+            assert all(
+                alias.asname != "yaml" and alias.name != "yaml" for alias in node.names
+            ), "plain import yaml required"
+        if isinstance(node, ast.Name) and node.id == "yaml":
+            assert (
+                isinstance(node.ctx, ast.Load)
+                and isinstance(parent, ast.Attribute)
+                and parent.value is node
+            ), "yaml module must be used directly"
+        if isinstance(node, ast.arg):
+            assert node.arg != "yaml", "plain import yaml required"
+        if isinstance(
+            node,
+            (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.ExceptHandler),
+        ):
+            assert node.name != "yaml", "plain import yaml required"
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+            if node.value.id == "yaml":
+                assert isinstance(node.ctx, ast.Load), (
+                    "YAML members must be used directly"
+                )
+                assert node.attr in {"load", "CSafeLoader", "YAMLError"}, (
+                    "unsupported YAML member"
+                )
+                if node.attr == "load":
+                    assert isinstance(parent, ast.Call) and parent.func is node, (
+                        "yaml.load must be called directly"
+                    )
+                elif node.attr == "CSafeLoader":
+                    call = parents.get(parent)
+                    assert (
+                        isinstance(parent, ast.keyword)
+                        and parent.arg == "Loader"
+                        and isinstance(call, ast.Call)
+                        and ast.unparse(call.func) == "yaml.load"
+                    ), "YAML members must be used directly"
+                else:
+                    assert (
+                        isinstance(parent, ast.ExceptHandler) and parent.type is node
+                    ), "YAML members must be used directly"
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if isinstance(node.func.value, ast.Name):
+                if node.func.value.id == "yaml" and node.func.attr == "load":
+                    calls.append(node)
+                    loaders = [kw.value for kw in node.keywords if kw.arg == "Loader"]
+                    assert len(loaders) == 1, "explicit C safe loader required"
+                    assert ast.unparse(loaders[0]) == "yaml.CSafeLoader", (
+                        "explicit C safe loader required"
+                    )
+    assert calls, "no approved YAML call"
+
+
 def test_loader_uses_the_safe_loader_only() -> None:
-    """The registry module calls safe_load and does not call yaml.load."""
-    module = Path(registry_module.__file__)
-    text = module.read_text(encoding="utf-8")
-    assert "safe_load" in text
-    assert "yaml.load" not in text
+    """Replace the text guard under decision 0053 with C safe-loader guards."""
+    _assert_c_safe_loader_only(
+        (REPO / "custodian/src/eii_custodian/publicdata/fetch/registry.py").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def test_loader_passes_only_c_safe_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The live loader argument is the C safe loader, even in a mutation copy."""
+    path = tmp_path / "invented.yaml"
+    path.write_text("planted: safe\n", encoding="utf-8")
+    real_load = yaml.load
+    loaders: list[object] = []
+    forwarded: list[object] = []
+
+    def load_spy(text, *, Loader):
+        loaders.append(Loader)
+        result = real_load(text, Loader=Loader)
+        forwarded.append(result)
+        return result
+
+    monkeypatch.setattr(yaml, "load", load_spy)
+
+    def assert_c_loader(reader):
+        loaders.clear()
+        forwarded.clear()
+        result = reader(path)
+        assert result == {"planted": "safe"}
+        assert len(forwarded) == 1
+        assert result is forwarded[0]
+        assert len(loaders) == 1
+        assert loaders[0] is yaml.CSafeLoader
+
+    assert_c_loader(read_yaml)
+
+    def planted_reader(path):
+        return yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+
+    with pytest.raises(AssertionError):
+        assert_c_loader(planted_reader)
+
+
+_APPROVED_YAML_CALL = "yaml.load(text, Loader=yaml.CSafeLoader)"
+
+
+@pytest.mark.parametrize(
+    ("forbidden", "reason"),
+    [
+        ("yaml.load(text, Loader=yaml.Loader)", "forbidden YAML spelling"),
+        ("yaml.full_load(text)", "forbidden YAML spelling"),
+        ("yaml.load_all(text, Loader=yaml.CSafeLoader)", "forbidden YAML spelling"),
+        ("yaml.load(text, Loader=yaml.FullLoader)", "forbidden YAML spelling"),
+        ("yaml.load(text, Loader=yaml.UnsafeLoader)", "forbidden YAML spelling"),
+        ("yaml.unsafe_load(text)", "forbidden YAML spelling"),
+        ("yaml.unsafe(text)", "forbidden YAML spelling"),
+        ("from yaml import FullLoader", "forbidden YAML spelling"),
+        ("f = yaml.load", "yaml.load must be called directly"),
+        ('getattr(yaml, "load")', "yaml module must be used directly"),
+        ("import yaml as y", "plain import yaml required"),
+        ("from yaml import load", "plain import yaml required"),
+        ("from yaml import Loader as L", "plain import yaml required"),
+        ("y = yaml", "yaml module must be used directly"),
+        ("L = yaml.CSafeLoader", "YAML members must be used directly"),
+        ("E = yaml.YAMLError", "YAML members must be used directly"),
+        ("f(Loader=yaml.CSafeLoader)", "YAML members must be used directly"),
+        ("yaml.load = f", "YAML members must be used directly"),
+        ("yaml = other", "yaml module must be used directly"),
+        ("def f(yaml): pass", "plain import yaml required"),
+        ("def yaml(): pass", "plain import yaml required"),
+        ("import other as yaml", "plain import yaml required"),
+        ("from other import module as yaml", "plain import yaml required"),
+        ("yaml.scan(text)", "unsupported YAML member"),
+    ],
+)
+def test_loader_text_guard_refuses_planted_unsafe_calls(
+    forbidden: str, reason: str
+) -> None:
+    """Each forbidden construct fails its own guard beside one approved call."""
+    with pytest.raises(AssertionError, match=re.escape(reason)):
+        _assert_c_safe_loader_only(_APPROVED_YAML_CALL + "\n" + forbidden)
+
+
+def test_loader_text_guard_accepts_approved_call_alone() -> None:
+    """An approved call needs no unrelated construct to satisfy the guard."""
+    _assert_c_safe_loader_only(_APPROVED_YAML_CALL)
+    _assert_c_safe_loader_only("import yaml\n" + _APPROVED_YAML_CALL)
+
+
+@pytest.mark.parametrize("text", ["", "yaml.load(text)"])
+def test_loader_text_guard_refuses_missing_or_loaderless_call(text: str) -> None:
+    """Missing and loader-less calls are separate from independent plants."""
+    with pytest.raises(AssertionError):
+        _assert_c_safe_loader_only(text)
+
+
+_COMMITTED_READER_YAML = (
+    "custodian/publicdata/sources.yaml",  # load_registry in fetch/registry.py
+    "custodian/publicdata/investment_pages.yaml",  # investment_build.load_source_spec
+)
+
+
+def _assert_committed_yaml_forms(text: str) -> None:
+    """Keep the committed inputs out of the differing tab/surrogate forms."""
+    assert "\t" not in text, "tab in committed YAML"
+    assert not re.search(r"\\u[dD][89a-fA-F][0-9a-fA-F]{2}", text), (
+        "surrogate escape in committed YAML"
+    )
+
+
+@pytest.mark.parametrize("relative", _COMMITTED_READER_YAML)
+def test_committed_reader_yaml_has_no_differing_forms(relative: str) -> None:
+    _assert_committed_yaml_forms((REPO / relative).read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("plant", ["\t", r"\ud800"])
+def test_committed_yaml_forms_guard_refuses_planted_copy(
+    tmp_path: Path, plant: str
+) -> None:
+    """A copy with one forbidden form fails the very same text check."""
+    text = (REPO / _COMMITTED_READER_YAML[0]).read_text(encoding="utf-8")
+    path = tmp_path / "planted.yaml"
+    path.write_text(text + "\n# planted: " + plant + "\n", encoding="utf-8")
+    with pytest.raises(AssertionError):
+        _assert_committed_yaml_forms(path.read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("a: [\t1]\n", {"a": [1]}),
+        ("a: [1,\t2]\n", {"a": [1, 2]}),
+        ("a: {\tb: 1}\n", {"a": {"b": 1}}),
+        ("a:\t1\n", {"a": 1}),
+    ],
+    ids=["D1-flow-start", "D1-flow-comma", "D1-flow-map", "D2-block-colon"],
+)
+def test_loader_tab_differences_are_pinned(
+    tmp_path: Path, text: str, expected: object
+) -> None:
+    """SafeLoader refuses tabs that the current libyaml accepts."""
+    path = tmp_path / "tabs.yaml"
+    path.write_text(text, encoding="utf-8")
+    with pytest.raises(yaml.scanner.ScannerError):
+        yaml.load(text, Loader=yaml.SafeLoader)
+    assert read_yaml(path) == expected
+
+
+@pytest.mark.parametrize("depth", [200, 5000], ids=["D3-shallow", "D3-deep"])
+def test_loader_nesting_difference_is_pinned(tmp_path: Path, depth: int) -> None:
+    """At exactly 5000 levels the old reader leaks RecursionError; C loads."""
+    text = "a: " + "[" * depth + "0" + "]" * depth + "\n"
+    path = tmp_path / "nested.yaml"
+    path.write_text(text, encoding="utf-8")
+    if depth == 5000:
+        with pytest.raises(RecursionError) as error:
+            yaml.load(text, Loader=yaml.SafeLoader)
+        assert not isinstance(error.value, yaml.YAMLError)
+    else:
+        expected = yaml.load(text, Loader=yaml.SafeLoader)
+        assert read_yaml(path) == expected
+    loaded = read_yaml(path)
+    assert isinstance(loaded, dict)
+    value = loaded["a"]
+    for _ in range(depth):
+        assert isinstance(value, list) and len(value) == 1
+        value = value[0]
+    assert value == 0
+
+
+def test_loader_surrogate_difference_is_pinned(tmp_path: Path) -> None:
+    """D4: SafeLoader loads a lone surrogate; C wraps ScannerError."""
+    text = 'a: "\\ud800"\n'
+    path = tmp_path / "surrogate.yaml"
+    path.write_text(text, encoding="utf-8")
+    assert yaml.load(text, Loader=yaml.SafeLoader) == {"a": chr(0xD800)}
+    with pytest.raises(RegistryError, match=r"^malformed yaml$") as error:
+        read_yaml(path)
+    assert isinstance(error.value.__cause__, yaml.scanner.ScannerError)
+
+
+@pytest.mark.parametrize("tag", ["python/object/apply", "python/name"])
+def test_loader_refuses_unsafe_tags_without_constructing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, tag: str
+) -> None:
+    """Invented callable and name tags cannot construct or return an object."""
+    constructed = []
+
+    def planted_target() -> object:
+        constructed.append("constructed")
+        return object()
+
+    monkeypatch.setattr(
+        registry_module, "planted_target", planted_target, raising=False
+    )
+    path = tmp_path / "unsafe.yaml"
+    target = f"{registry_module.__name__}.planted_target"
+    suffix = " []" if tag == "python/object/apply" else ""
+    path.write_text(f"!!{tag}:{target}{suffix}\n", encoding="utf-8")
+    try:
+        with pytest.raises(RegistryError, match=r"^malformed yaml$"):
+            read_yaml(path)
+    finally:
+        assert constructed == []
+
+
+def _assert_libyaml_available() -> None:
+    assert yaml.__with_libyaml__ is True
+    assert callable(yaml.CSafeLoader)
+
+
+def test_locked_environment_has_libyaml(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The environment guard refuses a planted missing libyaml or C loader."""
+    _assert_libyaml_available()
+    with monkeypatch.context() as missing_libyaml:
+        missing_libyaml.setattr(yaml, "__with_libyaml__", False)
+        with pytest.raises(AssertionError):
+            _assert_libyaml_available()
+    with monkeypatch.context() as missing_loader:
+        missing_loader.delattr(yaml, "CSafeLoader")
+        with pytest.raises(AttributeError):
+            _assert_libyaml_available()
+
+
+def test_loader_fails_loudly_without_c_safe_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A planted absent C loader cannot fall back to pure Python."""
+    path = tmp_path / "safe.yaml"
+    path.write_text("planted: safe\n", encoding="utf-8")
+    monkeypatch.delattr(yaml, "CSafeLoader")
+    with pytest.raises(AttributeError):
+        read_yaml(path)
+
+
+@pytest.mark.parametrize("relative", _COMMITTED_READER_YAML)
+def test_loader_preserves_committed_registry_values(
+    monkeypatch: pytest.MonkeyPatch,
+    relative: str,
+) -> None:
+    """SafeLoader parity refuses a planted changed registry value."""
+    path = REPO / relative
+    expected = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+    assert read_yaml(path) == expected
+    monkeypatch.setattr(
+        registry_module, "read_yaml", lambda path: {"planted": "changed"}
+    )
+    with pytest.raises(AssertionError):
+        assert registry_module.read_yaml(path) == expected
 
 
 def test_only_the_transport_module_opens_a_connection() -> None:

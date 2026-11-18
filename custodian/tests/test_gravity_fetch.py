@@ -255,13 +255,14 @@ def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
         assert result.failure.check == reason
     clock = build(tmp_path / "clock")
     assert clock.failure is None
+    clock_samples = iter(("2026-11-16T00:00:00Z", "not-a-date"))
     bad_clock_result = __import__(
         "eii_custodian.publicdata.fetch.build", fromlist=["run_build"]
     ).run_build(
         [entry()],
         metadata,
         tmp_path / "bad-clock",
-        lambda: "not-a-date",
+        lambda: next(clock_samples),
         lambda _: None,
         gravity_stream=stream,
         gravity_config=Config.from_mapping(configuration()),

@@ -305,6 +305,8 @@ sources:
     caveat_keys: []
     # PUB-64 source-field -> contract (ruling L-203 R6):
     # sec_hr_goods.estimates_of_intermediate_goods_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_goods
+    # PUB-64 components: case-insensitive Food Stuff and Beverages; group total
+    # sums the selected activity/year rows, as test_pinned_c4 does (L-802 item 1).
     columns:
       - name: "year"
         type: "string"
@@ -349,6 +351,8 @@ sources:
     caveat_keys: []
     # PUB-64 source-field -> contract (ruling L-203 R6):
     # sec_hr_serv.estimates_of_intermediate_services_value_value_in_1_000_qr -> pub_sector_accounts.value:intermediate_services
+    # PUB-64 component: case-insensitive Rents of Buildings; group total sums
+    # the selected activity/year rows, as test_pinned_c4 does (L-802 item 1).
     columns:
       - name: "year"
         type: "string"

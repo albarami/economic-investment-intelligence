@@ -7,6 +7,7 @@ import json
 from collections.abc import Mapping
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -148,6 +149,7 @@ def build_frame(
     output: Path | None = None,
     *,
     selections: Mapping[str, str] | None = None,
+    build_date: date | None = None,
 ) -> FrameResult:
     """Build from confirmed raw shapes, with optional generated review output."""
     from .live import build_live_frame
@@ -164,4 +166,6 @@ def build_frame(
         report = [line for line in result.report if "unlisted zone numbers" not in line]
         propose_reviews(review, output, set(), result.inventory, report)
         return FrameResult(result.tables, report, result.sources, result.inventory)
-    return build_live_frame(cache, registry, review, output, result, selected)
+    return build_live_frame(
+        cache, registry, review, output, result, selected, build_date=build_date
+    )

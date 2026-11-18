@@ -123,6 +123,14 @@ def test_stage_rejects_missing_owned_assertions(tmp_path: Path) -> None:
 
     required_fields = {
         "PUB-63": ("populated_groups",),
+        "PUB-64": (
+            "output_per_employee",
+            "compensation_share_1dp",
+            "operating_surplus_share_1dp",
+            "food_share_1dp",
+            "beverages_share_1dp",
+            "building_rent_share_1dp",
+        ),
         "PUB-65": ("basket_excludes_noodles", "valuation_basis_present"),
         "PUB-68": (
             "combined_share_0dp",
@@ -215,6 +223,12 @@ def test_added_stage_assertions_have_independent_pack_values(tmp_path: Path) -> 
             "compensation": "1308140",
             "operating_surplus": "1247422",
             "average_annual_wage": "31579",
+            "output_per_employee": "152875",
+            "compensation_share_1dp": "20.6",
+            "operating_surplus_share_1dp": "19.7",
+            "food_share_1dp": "29.3",
+            "beverages_share_1dp": "5.6",
+            "building_rent_share_1dp": "11.6",
             "goods_share_1dp": "40.6",
             "services_share_1dp": "16.5",
         },
@@ -438,7 +452,11 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     monkeypatch.setattr(build, "_fetch_row", fetched)
     monkeypatch.setattr("eii_custodian.publicdata.series.figures.finish_build", wrapped)
     result = build.run_build(
-        [entry], lambda url: None, tmp_path, lambda: "", lambda n: None
+        [entry],
+        lambda url: None,
+        tmp_path,
+        lambda: "2026-11-14T00:00:00Z",
+        lambda n: None,
     )
     assert observed == [(entry,)]
     assert result.failure is not None
@@ -574,8 +592,8 @@ def test_independent_checks_and_contract_values() -> None:
         "average_annual_wage": "QAR",
     }
     for source, indicator in [
-        ("sec_hr_goods", "intermediate_goods:invented-kind"),
-        ("sec_hr_serv", "intermediate_services:invented-kind"),
+        ("sec_hr_goods", "intermediate_goods:Food%20Stuff"),
+        ("sec_hr_serv", "intermediate_services:Rents%20of%20Buildings"),
         ("sec_hr_size", "employees:invented-size"),
     ]:
         assert contract_rows(source, fixtures[source])[0] == {
@@ -619,6 +637,10 @@ def test_reconciliations_compute_while_all_display_is_blocked(tmp_path: Path) ->
     fixtures["cus_imp_2019"][0]["hs8"] = fixtures["cus_imp_2019"][0]["hs8"].replace(
         ".", ""
     )
+    from custodian.tests.test_pub67 import FRAME, active_rows, selected_fixture
+
+    support_entries, support_hashes = selected_fixture(tmp_path)
+    fixtures["lic_active"] = active_rows()
     # Decimal JSON fixture numbers are decoded exactly by selected_source.
     entries, selected = [], {}
     for source, rows in fixtures.items():
@@ -635,7 +657,17 @@ def test_reconciliations_compute_while_all_display_is_blocked(tmp_path: Path) ->
             }
         )
     )
-    result = build_series(tmp_path, entries, selected, basket_review=review)
+    entries.extend(support_entries[1:])
+    result = build_series(
+        tmp_path,
+        entries,
+        selected,
+        basket_review=review,
+        municipalities=FRAME,
+        supporting_selected={
+            k: v for k, v in support_hashes.items() if k != "lic_active"
+        },
+    )
     evidence = json.loads(
         (tmp_path / "series/internal/reconciliations.json").read_text()
     )
@@ -991,7 +1023,7 @@ def test_r1_match_records_the_confirmed_field_and_scope(tmp_path: Path) -> None:
 
 
 @pytest.mark.public_data
-def test_missing_contract_mapping_refuses_even_with_matching_numbers(
+def test_missing_frame_output_refuses_even_with_matching_numbers(
     tmp_path: Path, monkeypatch
 ) -> None:
     from eii_custodian.publicdata.series.figures import finish_build
@@ -1017,9 +1049,10 @@ def test_missing_contract_mapping_refuses_even_with_matching_numbers(
     lines = [f"PASS lic_cancelled sha256={digest} host=invented"]
     result = finish_build([entry], tmp_path, lines)
     assert result is not None
-    assert result.source_id == "series_mapping"
+    assert result.source_id == "series"
     assert result.check == "public_data"
-    assert lines[-1] == "FAIL series_mapping public_data selected-cache check"
+    assert result.observed == "municipality_frame_absent"
+    assert lines[-1] == "FAIL series municipality_frame_not_supplied lic_cancelled"
 
 
 @pytest.mark.parametrize(
@@ -1135,15 +1168,22 @@ def test_r3_pub64_published_fields_only():
         (Path(__file__).parent / "fixtures/series/confirmed_shapes.json").read_text(),
         parse_float=Decimal,
     )
-    got = compute_checks(
-        {k: v for k, v in fixtures.items() if k.startswith("sec_hr_")}
-    )["PUB-64"]
+    from .test_series_exact_regressions import pub64_receipts
+
+    data = {k: v for k, v in fixtures.items() if k.startswith("sec_hr_")}
+    got = compute_checks(data, receipts=pub64_receipts(data))["PUB-64"]
     assert got == {
         "establishments": "12",
         "employees": "11",
         "compensation": "12",
         "operating_surplus": "11",
         "average_annual_wage": "17",
+        "output_per_employee": "14",
+        "compensation_share_1dp": "7792.2",
+        "operating_surplus_share_1dp": "7142.9",
+        "food_share_1dp": "1.7",
+        "beverages_share_1dp": "0.5",
+        "building_rent_share_1dp": "0.9",
         "goods_share_1dp": "2.5",
         "services_share_1dp": "1.3",
     }
@@ -1257,7 +1297,10 @@ def test_r3_licence_periods_and_reports(tmp_path):
     assert result["coverage"]["lic_active.municipality_exact_match"] == [
         "بلدية غير مطابقة"
     ]
-    assert result["blocked"] == {}
+    assert result["blocked"] == {
+        "lic_active": ("regression: supporting provenance selections required",)
+    }
+    assert "PUB-67" not in result["checks"]
 
 
 def test_r3_reference_review_remains_explicit():
@@ -1338,6 +1381,9 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
         (Path(__file__).parent / "fixtures/series/confirmed_shapes.json").read_text(),
         parse_float=Decimal,
     )
+    from custodian.tests.test_pub67 import FRAME, classes
+
+    fixtures["lic_active"][0].update(lbldy=FRAME[0].name_ar, rmz_lnsht_ltjry="561010")
     row = fixtures["cus_imp_2025"][0]
     checks = compute_checks(
         {
@@ -1369,7 +1415,10 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
             ],
             "lic_active": fixtures["lic_active"],
             "lic_issued": fixtures["lic_issued"],
-        }
+        },
+        isic_classes=classes(),
+        municipalities=FRAME,
+        activity_entry=next(e for e in load_registry() if e.key == "lic_active"),
     )
     assert checks["PUB-65"] == {
         "italy_2dp": "6.00",
@@ -1381,6 +1430,11 @@ def test_r3_remaining_numeric_checks_do_not_claim_basket_or_spine_review():
         "sum_count": "3",
         "distinct_codes": "1",
         "national_5610101": "0",
+        "isic_prefix": "0",
+        "other_seven": "0",
+        "legacy_six": "3",
+        "other_lengths": "0",
+        "al_daayen_5610101": "0",
     }
     assert checks["PUB-69"] == {
         "sum_count": "3",

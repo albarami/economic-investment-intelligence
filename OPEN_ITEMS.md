@@ -21,7 +21,7 @@
 - OI-35 records which parameter set is exported. A lead ruling of 2026-11-11 sets the default to A; the owner or a data owner may overrule it before the slice S1 gate.
 - OI-39 onwards are raised during the build.
 - OI-96 (closed by the owner's answer of 2026-11-12) and the items after it record the points of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md): the age of the places copy, the Public source for the survival base rate, the Public source of each forecast series without a table, the provider's rule on storing responses, the sources that are off under a public or commercial hosting, the size of the public-total inventory with the two gridded Public tables, the subject of a district series and the build without the night-lights key.
-- OI-132 to OI-148 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are whether road traffic is part of the movement source, the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), who keeps the monthly register snapshots (OI-141), and whether a commute line from a whole home municipality to the site's snapped catchment meets the district-pair case (OI-147, with card C39's form as the default). The owner's attribution note for the imagery provider is received (ruling L-151 records the note and its permitted locations); OI-132 remains for the documentation guard's exception, which task S1-T14 builds. The owner's answer of 2026-11-14 settles the talent ratio (OI-140) and the movement splits (OI-134, item 16). OI-148 confirms the age bands against the operator's format when its data arrives, and is not an owner question. The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
+- OI-132 to OI-148 record the open points of [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md). The owner's pending questions are the gaps N1, N3, N4, N6 and N7 of the decision question bank (hiring and leaving flows, rents, an events calendar, supplier certifications and school capacity), who keeps the monthly register snapshots (OI-141), and whether a commute line from a whole home municipality to the site's snapped catchment meets the district-pair case (OI-147, with card C39's form as the default). The owner's attribution note for the imagery provider is received (ruling L-151 records the note and its permitted locations); OI-132 remains for the documentation guard's exception, which task S1-T14 builds. The owner's answer of 2026-11-14 settles the talent ratio (OI-140) and the movement splits (OI-134, item 16). The owner's answer of 2026-11-17 settles road traffic as part of the movement source (OI-133). OI-148 confirms the age bands against the operator's format when its data arrives, and is not an owner question. The others are the register file's fields still to confirm (OI-142), the look's task S3-T15 (OI-143), the recovery tracker and the Qatarization planner (OI-144), and two assumptions: the age profile of people living here (OI-145) and prices per square foot (OI-146). The decision also updates OI-08 (items 12 and 15), OI-27 (item 15, a product for companies), OI-97 (item 12), OI-98 (items 8 and 12) and OI-102 (items 6 and 8).
 
 ## OI-01 — Main model key (supplied for go-live; not used during the build)
 
@@ -786,6 +786,7 @@
 - DONE SO FAR: The guard judges the five names, four keys and the database URL (for the URL, the password, raw and percent-decoded), from `.env` (read without a byte order mark, with quotes and a trailing comment; a line it cannot read is refused) and the environment, over the content and the path of every staged file, and prints the variable name and, only when it holds no value, the path. A value below 12 characters (for the URL, the password as written or percent-decoded), a database URL that is not a PostgreSQL URL with a host and, when a port is written, a numeric one, and with no at-sign after the host part and no `password` or `passfile` parameter in its query string, or a double-quoted `.env` value that holds a backslash, makes it refuse, because a silent pass would let a one-character value, an unreadable URL or a misread line switch the guard off. A staged submodule entry has no content of its own; its path is judged. The guard reads git's index from the top of the repository. A shorter minimum would refuse ordinary commits, because words such as `postgres` and `secret` occur in many tracked files; 12 is longer than those words and shorter than any real key. The generated database password should be at least 24 characters (set in slice S1, not here). Not covered, by design: the reviewer password (no variable name in the pack), the owner credential (a libpq password file outside the repository), values split over lines, reversed or encoded, `.env.local`. Closed on 2026-11-13 by the owner's decision of that day: approved as proposed.
 - OPTIONS: **Recommendation:** keep. Alternatives: a minimum of 8 (more collisions with words); judging short values by exact line match; also reading `.env.local`; a pre-push repeat of the guard.
 - NEEDED BY: slice S0 gate.
+- UPDATE: 2026-11-17, the owner confirmed the item as built.
 
 ## OI-93 — Which scanner owns which rule, and what none of them judges
 
@@ -956,6 +957,7 @@
 - DONE SO FAR: `scripts/ci_history_scan.py` holds a closed `KNOWN_LINES` table with one entry keyed by file, rule and SHA-256 of the line text; the judge reads a temporary JSON report, leaves out only findings that match that line at the reported commit, prints counts when all findings are known and fails on every other finding; four tests plant the violations named in the task brief; no ignore file and no allow-list in the scanner's configuration; tests that plant a shaped token build the value at run time so a new ledger line would be judged like any other. Closed on 2026-11-13 by the owner's decision of that day: approved as proposed.
 - OPTIONS: **Recommendation:** keep. Alternatives: an ignore file with commit fingerprints (the commit hook would honour it too, and it does not hold in a scratch copy); an allow-list in the scanner's configuration (the hook configuration of S0-T06 keeps none); scanning only the commits of the pull request (weaker than TST-141).
 - NEEDED BY: slice S0 gate.
+- UPDATE: 2026-11-17, the owner confirmed the item as built.
 
 ## OI-110 — Placement, row set and output readings of preflight
 
@@ -1135,12 +1137,14 @@
 ## OI-133 — Whether road traffic is part of the movement source
 
 - ID: OI-133
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN, owner)
 - NEEDED: The owner's confirmation that the road traffic of method card C25 (the hourly link volumes, speed ratios and drive times by hour) is kept as part of the movement source.
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 builds synthetic records only for the confirmed sources; it keeps the road traffic of card C25 as part of the movement source and asks the owner to confirm. The lead's audit gave three options: derive traffic from the movement sources by the same assignment (it needs the open rule that turns trips into vehicle trips, document 05 Q7, and keeps capacities and delay parameters as assumptions); the optional live traffic provider of decision 0019 (it stores nothing and can fill no hourly table, ranking or travel time by hour); or keep the assignment as a method test only and show Public drive times at free flow, leaving out hour-varying drive times, the traffic animation and hourly access scores.
 - DONE SO FAR: The decision keeps the first option until the owner answers. The S1-T11 spike assigns a synthetic flow fixture and is unaffected.
 - OPTIONS: **Recommendation:** keep traffic as part of the movement source, derived from the released hourly flows, with the trips-to-vehicles rule stated as an assumption; if the owner declines, fall back to free-flow drive times and drop the hour-varying parts.
 - NEEDED BY: the slice S4 gate (S4-T08); it bears on S5-T09, S6-T07, S6-T08, S6-T13, S6-T20, S7-T11 and S10-T03.
+- UPDATE: 2026-11-17, by the owner's answer of that day: the default is confirmed. The road traffic of card C25, the traffic assignment of task S1-T11 with its hourly volumes, is part of the movement source and is simulated locally; S1-T11 continues unchanged; the optional live traffic provider of [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) stays off by default and is never needed by a test, a gate, a command or the guided story (AGENTS.md rule 4). The brief records the answer in its open points of decision 0023.
+- CLOSED: 2026-11-17, by the owner's answer. The earlier text is kept.
 
 ## OI-134 — The attributes of the movement records: age, nationality and gender
 
@@ -2440,6 +2444,26 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - CLOSES WHEN: the records change holds the run addresses of both dispatches, the comparison's result and the two timings.
 - CLOSED: 2026-11-16, by the records change of S1-T20: the synthetic dispatch https://github.com/albarami/economic-investment-intelligence/actions/runs/43940084757 succeeded with all four shard outputs intact; the real campaign https://github.com/albarami/economic-investment-intelligence/actions/runs/43940437765 succeeded (killed 304, survived 3) in 21 minutes 31 seconds; the unpartitioned local run at the same commit gave the same counts in 517.41 seconds elapsed and about 523 processor seconds; `scripts/mutation_pilot.py compare` exited 0 with no differing mutant. Evidence rows are in [PROGRESS.md](PROGRESS.md) under S1-T20.
 
+## OI-262 — Live series handoff proof (S2-T03 live fix)
+
+- ID: OI-262
+- TYPE: PENDING
+- NEEDED: The merge of this fix and S2-T06 part B live run 2 on main showing the three licence sources coded from the frame's own municipalities and PUB-67 passing.
+- WHY: The first live run blocked the three licence sources without frame municipalities and reported a misleading PUB-67 failure (lead ruling L-644, which numbered this item OI-255 in the run's own records).
+- DONE SO FAR: The fix writes and reads the same-build frame output; it is approved, mutation tested and checked locally (pull request {PR}).
+- OPTIONS: **Default:** keep the live proof pending; invented fixtures and local suites prove no live success.
+- NEEDED BY: S2-T06 part B live run 2.
+
+## OI-263 — Invented boundary archive followed the clock (random failure, closed)
+
+- ID: OI-263
+- TYPE: RANDOM FAILURE (closed by cause)
+- NEEDED: Nothing more.
+- WHY: The builder of the S2-T03 live fix saw one failure of an invented-archive hash that later runs did not repeat; under rule 39 a green re-run alone does not close it.
+- DONE SO FAR: Cause found: each zip member's time came from the clock, so two builds at different times wrote different bytes. Fixed on main by pull request 74 (fixed member time and permissions, `custodian/tests/test_frame_fixture_archive.py`) and by this fix's mutation pass (fixed member time and stored compression, `custodian/tests/test_frame_fixture_clock.py`); both tests move the clock and assert identical bytes.
+- OPTIONS: **Default:** closed; reopen on any new failure of either test.
+- NEEDED BY: closed.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -3379,10 +3403,204 @@ Each item below was proposed by an independent reviewer outside the verdict ([RE
 - EVIDENCE: The mutation tester's clean run failed once: 1 failed, 1,510 passed; the test compared the receipt's hash of the archive built inside the world with the hash of a second build in its assertion, and the two differed. The same test passed alone (13 passed). Cause: `invented_archive` wrote each member with `ZipFile.writestr(name, ...)`, which stamps the member with the current local time, so two builds on either side of a two-second step of the zip time give different bytes; two builds 2.1 seconds apart were reproduced with different hashes.
 - RESOLUTION: the fixture writes each member with a fixed member time and the same permission bits, and the planted test `custodian/tests/test_frame_fixture_archive.py::test_invented_archive_bytes_do_not_follow_the_clock` builds the archive at two clock readings an hour apart and requires one hash; it failed before the fix and passes after it. This closes the item by a found cause, not by a green re-run (rule 39). The inline archive of `custodian/tests/test_frame_coverage.py` is built and read once per test and is not hashed twice; it is left unchanged.
 
+## OI-300 — PUB-64 anchors and selected-source acceptance
+
+- ID: OI-300
+- TYPE: OPEN
+- RAISED BY: the S2-T08 planner; recorded by the PUB64-fix prerequisite, 2026-11-17.
+- CONCERNS: [04_PUBLIC_DATA_PACK.md](docs/04_PUBLIC_DATA_PACK.md), section 10, PUB-64; `publicdata/stage.py::EXPECTED` and `series/figures.py::compute_checks`.
+- WHY: The stage and series adapter omitted published output per employee and the five C4 computed shares required by PUB-64. Existing core arithmetic tests did not establish that the selected-source build checked those anchors.
+- DONE SO FAR: This prerequisite adds the pack-copied anchors, reuses `sector_norms` and `Component`, and tests the adapter on invented source-shaped rows and receipt chains. Under lead ruling L-802 item 1, component selection follows `custodian/data_tests/test_pinned_methods.py::test_pinned_c4`: case-insensitive Food Stuff, Beverages and Rents of Buildings, with group totals summed over the selected activity/year source rows. No separate total row or category-label confirmation is required.
+- NEEDED: Lead-only live evidence: `test_pinned_c4` against the pinned cache and the `./eii build-public` selected-hash stage check. Missing cache, mismatch or refusal is a failure, never a pass. Both are PENDING until the lead records actual results; this worker does not read the cache or run either live step.
+- CLOSE WHEN: The lead records both live checks and their selected source hashes, commands and real exit codes. Another-maker code review remains required before merge. This item does not close OI-03 or change any display or licence gate.
+- NEEDED BY: S2-T08 part B; this fix remains a separate prerequisite.
+
+### PO-S2-72 — A truncated family row of the pack's sources is skipped by the width test before its typed refusal
+
+- ID: PO-S2-72
+- TYPE: OPEN
+- RAISED BY: the first lens of task S2-T08 part A (Anthropic Claude Fable 5.2 through Claude Code), 2026-11-17, notes N4 and N5 of its confirmation of fix round 4
+- CONCERNS: `custodian/src/eii_custodian/publicdata/completeness.py` (the reading of the family rows of document 04); S2-T08 part B
+- EVIDENCE: Under a header of three or more columns, a truncated family row is skipped by the width test before the typed refusal `pack_family_row_truncated` is reached; it still fails closed later, in the family count, the family total or the pack's names. A three-column family row with a closing pipe splits into five cells and is accepted with no names, and is likewise refused later. The reviewer approved the part with these as notes, not findings: no row passes.
+- NEEDED: before part B reads document 04, the family row tested against the larger of the header width and five before the width skip, with a plant under a five-column header; or one line saying why the item is not valid.
+
+### PO-S2-73 — The pinned development server probes its own port with a socket it closes before binding
+
+- ID: PO-S2-73
+- TYPE: OPEN
+- RAISED BY: the builder of task S2-T10 part b (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, fix round 4, after the reviewer's finding O1 at `cd13d77`
+- CONCERNS: `web/scripts/check-dev-server.mjs`; `web/README.md` (the `check:dev` bullet); the pinned vite 8.3.8
+- EVIDENCE: With no port named, the check binds and releases no port itself and the development server picks its own ephemeral port. In the installed vite 8.3.8, `httpServerStart` with a start port of zero calls `getAvailableEphemeralPort`, whose `tryListen` probe servers close before the port is returned, and only then `tryBindServer` binds the real server. A window of a few consecutive awaits remains in which another process of the same run could take the port. The check's claim was narrowed to what holds; the installed version is pinned by a test, so an upgrade fails loudly and this item is read again. No retry or wider timeout hides it. The reviewer approved `54619be`, no finding.
+- NEEDED: a development server started on a socket the parent holds, or an upstream change that keeps the port held from pick to bind; until then the window stays recorded. Or one line saying why the item is not valid.
+
+### PO-S2-74 — One refusal test of PUB-64 pins three of its ten reason texts
+
+- ID: PO-S2-74
+- TYPE: OPEN
+- RAISED BY: lens B of task PUB64-fix (Z.ai GLM-5.3 through Factory Droid), 2026-11-17, an advisory of its approval at `4fa9c78`
+- CONCERNS: `custodian/tests/test_series_exact_regressions.py` (`test_pub64_requires_receipt_lineage`)
+- EVIDENCE: The test asserts the refusal of PUB-64 without receipt lineage, but compares only three of the ten reason texts the refusal can carry; the reviewer recorded it as not a defect, for the next touch of the test.
+- NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
+
+### PO-S2-75 — The terms fingerprint means different things in the benchmark rows and document 04
+
+- ID: PO-S2-75
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, Qwen 3.8 Max through Droid, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `custodian/publicdata/sources.yaml`; document 04 section 3.1
+- EVIDENCE: The supplied S2-T26 record says the benchmark terms_sha256 kind diverges from the documented meaning. The sources stay pending and the reviewer kept this as a record item, outside its verdict.
+- NEEDED: S2-T10 or the next benchmark task states which meaning binds, aligns both records and plants the other kind, or records why the meanings stand apart.
+
+### PO-S2-76 — Duplicate annual figures have no distinct missing-side cause
+
+- ID: PO-S2-76
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: core and custodian trade_reconciliation.py
+- EVIDENCE: The supplied review record says duplicate annual figures occupying one cell are reported as a plain missing side, without the duplicate cause.
+- NEEDED: Give the duplicate its own closed cause and plant it, or record why the plain missing-side result is intended.
+
+### PO-S2-77 — Monthly native periods are ordered as text
+
+- ID: PO-S2-77
+- TYPE: OPEN
+- RAISED BY: S2-T26 lens B, kept by its confirmation (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `core/src/eii_core/calc/trade_reconciliation.py`; benchmark native period formats
+- EVIDENCE: The supplied review record leaves monthly native period formats open and records lexicographic ordering.
+- NEEDED: Close the accepted formats and order them as periods with a plant that text ordering fails, or record why the text order is intended.
+
+### PO-S2-78 — A standalone selected benchmark read can expose the date-parser diagnostic
+
+- ID: PO-S2-78
+- TYPE: OPEN
+- RAISED BY: S2-T26 builder and both confirming lenses (supplied old-draft/05-OPEN-ITEMS.md)
+- CONCERNS: `custodian/src/eii_custodian/publicdata/benchmarks/contracts.py` read_selected
+- EVIDENCE: The supplied record says build-time parses are under fixed-reason checks, but a standalone read_selected with an invalid stored retrieval date surfaces the parser diagnostic. It names the same pattern in BACI, Atlas and Gravity and records no build-flow caller.
+- NEEDED: Normalize the standalone date parses to a fixed reason with a planted exact-message test, or record why this reader remains unchanged.
+
+### PO-S2-79 — Benchmark activation awaits independent source confirmation
+
+- ID: PO-S2-79
+- TYPE: OPEN
+- RAISED BY: S2-T26 design/build records (supplied old-draft/05-OPEN-ITEMS.md, original draft OI-262; no original draft OI number is reused)
+- CONCERNS: WDI, UNCTADstat, IMF WEO and ILOSTAT registry and policy records
+- EVIDENCE: The supplied task record says all policies are unconfirmed; pending fetches refuse before transport. No source page reading or live Qatar comparison is claimed.
+- NEEDED: The lead verifies each source-native indicator set, history and excluded coverage, Qatar coverage, historical/forecast fields, licence words, access tier, schema and count/byte bounds, records date and hash, and activates only from that evidence.
+
+### PO-S2-80 — The live trade selection awaits the lead and owner
+
+- ID: PO-S2-80
+- TYPE: OPEN
+- RAISED BY: S2-T26 design/build records (supplied old-draft/05-OPEN-ITEMS.md, original draft OI-263; no original draft OI number is reused)
+- CONCERNS: `custodian/publicdata/trade_reconciliation.yaml` and its reviewed input manifests
+- EVIDENCE: The supplied record says the selection is unconfirmed and dispatch performs no live comparison.
+- NEEDED: The lead selects reviewed years, partners, product scopes and manifests through the closed non-ranking mechanism and one BACI-aligned HS revision; the owner confirms; every gap is retained and the live run is recorded.
+
+### PO-S2-81 — The merge-9 hand-plant audit overwrites its detail file
+
+- ID: PO-S2-81
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 1 in T1.open-items-owed.md; LOG-EXTRACT 78 and 86
+- CONCERNS: the lead hand-plant audit tool and evidence filenames
+- EVIDENCE: The audit detail and command-summary writers used one JSON filename. Its own audit exited 1; the individual logs retain all twenty outcomes. This was disposed as an evidence-recording defect, not a code-test failure.
+- NEEDED: Before reuse, assign separate detail and summary paths and plant a collision check. Preserve the earlier failure and individual logs.
+
+### PO-S2-82 — Identity lines need registry-row-key alignment
+
+- ID: PO-S2-82
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 2 in T1.open-items-owed.md; LOG-EXTRACT 86
+- CONCERNS: lead tool train_identity_lines.py; sources.yaml public_splits
+- EVIDENCE: The supplied confirmation says the tool reports registry-row edits as bare line differences.
+- NEEDED: Align by registry row key before interpreting registry changes, retaining exact line text and a planted row-shuffle/change case.
+
+### PO-S2-83 — PUB-04 still describes a flat cache layout
+
+- ID: PO-S2-83
+- TYPE: OPEN
+- RAISED BY: T1b.confirm, Droid GLM 5.3, owed item 3 in T1.open-items-owed.md; LOG-EXTRACT 86
+- CONCERNS: document 04 PUB-04 and S2-T27 dated snapshot archive
+- EVIDENCE: The supplied confirmation records a flat public_cache description while the archive writes dated folders.
+- NEEDED: The lead rules whether PUB-04 adopts the archive form and makes any document amendment through its normal review. Do not silently rewrite the approved requirement.
+
+### PO-S2-84 — Custodian suite duration must be checked against its unchanged bound
+
+- ID: PO-S2-84
+- TYPE: OPEN
+- RAISED BY: T1.open-items-owed.md, the owed item of 17:46; LOG-EXTRACT 89
+- CONCERNS: `scripts/run_tests.py` SUITES python-custodian, 600 s
+- EVIDENCE: The supplied owed record has shared-load S4-T10 checks of 860 s plain and 841 s isolated on four processors near load 30; S2-T30 builder runs of 612 s and 623 s, and its later isolated 606.01 s near load 21–25. Train-1 ck12 at 4d7933a records 686 s plain and 688 s isolated on four processors near load 35. These are not reserved-idle measurements. ADAPT2-RETURN.md additionally records the moved custodian suite: 5620 passed in 946.96 s, exit 0; its load is not supplied as an idle-reservation measurement.
+- NEEDED: Each train whole test records the custodian duration. If the whole test exceeds 600 s on idle processors, open a speed task. Keep the bound, assertions and red evidence unchanged.
+
+### PO-S2-85 — Sleeping mutation children escape a CPU-time-only limit
+
+- ID: PO-S2-85
+- TYPE: OPEN
+- RAISED BY: T1.open-items-owed.md L-866 and L-875; LOG-EXTRACT 91
+- CONCERNS: joined-head registry.py campaign, mutmut fork children and timeout replay
+- EVIDENCE: L-866 records x_require_addition_completion__mutmut_13 sleeping in futex wait for 81 minutes near three percent CPU, manually ended with SIGXCPU and reported as timeout code -24. L-875 records x__refuse_undeclared_period_form__mutmut_2 sleeping with one thread in futex_wait_queue, about 150 s user CPU, RLIMIT_CPU soft 20,846 s, SIGXCPU neither caught, blocked nor pending; the handler-deadlock hypothesis is refuted. A lock inherited across fork is a hypothesis, not a proved cause. Evidence references are the supplied evidence/T1.hang2.proc.txt record and owed note; no process was inspected by this draft.
+- NEEDED: Replay each timeout alone at normal load as a separately recorded step; collect the Python stack if it hangs again, identify the lock or refute the fork-lock hypothesis, and retain the planted read-only detector evidence. No timeout or unexplained survivor closes on a green rerun alone.
+
+
+- UPDATED OWED HANG INVENTORY (source: T1.open-items-owed.md L-866/L-875 and the subsequent entries; all remain replay debt):
+  - `x_require_addition_completion__mutmut_13`: futex sleep; lead SIGXCPU, mutmut timeout code -24 (L-866).
+  - `x__refuse_undeclared_period_form__mutmut_2`: one-thread futex sleep; lead SIGXCPU; the CPU-limit-handler hypothesis was refuted (L-875).
+  - `x__point__mutmut_4`: same signature; lead SIGXCPU at the detector's exit 3.
+  - `x__point__mutmut_8`: 2266 s hang, futex wait; lead SIGXCPU; evidence/T1.hang4.proc.txt.
+  - `x__point__mutmut_9`: 1531 s idle futex wait; lead SIGXCPU; evidence/T1.hang5.proc.txt.
+  - `x__point__mutmut_10`: 1824 s futex wait; lead SIGXCPU; evidence/T1.hang6.proc.txt.
+  - `x__point__mutmut_12`: 918 s futex wait; lead SIGXCPU; evidence/T1.hang7.proc.txt.
+  - `eii_custodian.publicdata.fetch.registry.x__point__mutmut_14`: automated L-889 SIGXCPU at 00:16; evidence/hung/20261118-001652-2785449.txt.
+  - `eii_custodian.publicdata.fetch.registry.x__point__mutmut_15`: automated L-889 SIGXCPU at 00:32; evidence/hung/20261118-003223-729855.txt.
+- REPLAY REQUIREMENT: each identity above is replayed alone at normal load as its own recorded step. Record a Python stack if it hangs again. The fork-lock cause remains a hypothesis, not a diagnosis; no new campaign or replay outcome is supplied here.
+
+### PO-S2-86 — Earlier timeout replays remain outstanding
+
+- ID: PO-S2-86
+- TYPE: OPEN
+- RAISED BY: LOG-EXTRACT 10, 20, 22 and 52; supplied old-draft/04-TASK-S2-T26.md
+- CONCERNS: S2-T11 split-policy timeouts, forecast_series fork hang, and the three core trade-reconciliation timeout replays
+- EVIDENCE: The split-policy run at 072ae84 overlapped another campaign and was explicitly not a normal-load replay. The forecast rerun exited 143, runner 3. S2-T26 approval still awaited three core timeout replays. No closure record for these is supplied.
+- NEEDED: The lead enumerates the exact mutant identities and replays them alone at normal load, retaining failures and cause analysis separately. Later hash-matched campaigns may answer survivors but do not erase these timeout incidents.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
 - Additional open questions and assumptions recorded in documents 01 to 16 and the decision records indexed in [docs/README.md](docs/README.md).
+
+### OI-301 — PUB-67 missing selected-input calculations
+
+- ID: OI-301
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T03/S2-T04 integration, the structural groups and the Al Daayen
+  municipality/code intersection of document 04, section 10, PUB-67.
+- LR3 implements the existing bucket calculator, reviewed municipality-name
+  resolution with the frame's actual key, selected CSV support through the shared
+  receipt helper, and the typed supporting block specified in document 03,
+  **PUB-67 supporting provenance**. PO-LR3-1 is held here: another-maker
+  provenance review of that block is pending with the code review, before merge.
+- Fixture corruption and check evidence are in the appended LR3 PROGRESS.md row.
+  The lead's selected-cache probe and live run 3 have not been run by this worker.
+
+### OI-302 — Places build date missing at the frame seam
+
+- ID: OI-302
+- Status: OPEN; reserved by lead ruling L-806; closure requires the lead's live run 3.
+- Scope: S2-T06 verification date forwarding, under L-808 item 3 and L-810 item 1.
+- LR3 forwards one validated build-start UTC date to the real loader. Header-only
+  verification files stay empty; refusal and showcase/flagship gates remain.
+  PO-LR3-2 is the named adjacent-midnight integration test and planted previous
+  date, with fixture evidence in the appended LR3 PROGRESS.md row.
+- Another-maker code review and the lead's live run 3 are pending. This does not
+  close or change OI-256, the separate places Arabic-name reader gap.
+
+### OI-264 — Registry growth escaped suite-time monitoring
+
+- ID: OI-264
+- Status: OPEN.
+- Scope: S2-T31; decision 0053, Consequences; lead ruling L-902.
+- The lead's measurements of 2026-11-18 found that no check watched the custodian suite's time as the source registry grew from 171,402 to 479,638 bytes; the suite took 834.6 seconds against its 600-second limit, and only the train's ledger run and the hosted tests job found the overrun.
+- Decision 0053 removes the measured parsing waste (the whole custodian suite then took 209.4 seconds) and keeps the 600-second limit. It builds no monitor of suite time; this item stays open for the decision on how to watch suite-time growth before another overrun.
 
 ### S2-T29 build holds — 2026-11-17
 
@@ -3540,3 +3758,21 @@ review limits remain open for lead disposition, with no live approval inferred.
 F1 to F4 are addressed offline in fix pass 10; the Anthropic pin-security review
 and Moonshot lens T confirmation remain PENDING, as do every `security_review`
 value and the retired `icv.qa` record. Existing evidence holds remain unchanged.
+
+
+### S2-T29 main join — remaining check evidence, 2026-11-18
+
+The working-file join of fix-10 HEAD and train-1 main has no remaining conflict
+markers. Its full custodian/core run passes, and all 11 pin-ruling tests pass.
+The scripts suite still has seven clean-environment failures because the pinned
+PyYAML wheel is unavailable to its isolated offline install; both workspace-local
+uv caches lack the wheel. No network, dependency replacement or test weakening
+was used. The lead needs the pinned offline dependency cache and a fresh
+scripts-suite result before claiming all checks green.
+
+The whitespace check also fails on ten inherited PROGRESS.md lines of main
+(29158, 29501, 29565 to 29567, 29620 to 29621 and 29637 to 29639). The brief
+requires every prior ledger row to remain unchanged, so this worker preserved
+them and leaves their disposition to the lead. Full commands, actual exits and
+file-level preservation evidence are in `.overnight/join-checks.jsonl` and
+`.overnight/RETURN.md`. No existing S2-T29 review or live-source hold is closed.

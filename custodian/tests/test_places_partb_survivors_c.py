@@ -12,6 +12,7 @@ import json
 import locale
 from collections.abc import Iterator
 from dataclasses import replace
+from datetime import date
 from pathlib import Path
 from typing import NoReturn
 
@@ -187,11 +188,19 @@ def test_the_stage_receives_the_frame_inputs(
     zones = {"SYN-Z": box(51.0, 25.0, 51.05, 25.05)}
     lines: list[str] = []
     run_places_before_gazetteer(
-        cache, review, (places, building), (_BOUNDARY,), (), zones, lines
+        cache,
+        review,
+        (places, building),
+        (_BOUNDARY,),
+        (),
+        zones,
+        lines,
+        build_date=date(2026, 11, 17),
     )
     assert lines == []
     config = recorder.config
     assert config is not None
+    assert config.build_date == date(2026, 11, 17)
     assert config.zones is zones
     assert config.grid == ()
     assert config.boundary is _BOUNDARY

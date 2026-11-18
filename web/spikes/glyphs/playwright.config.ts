@@ -27,6 +27,11 @@ const capture = process.env.SPIKE_CAPTURE === '1';
 export default defineConfig({
   testDir: './tests',
   testMatch: 'glyphs.spec.ts',
+  // This spike's own artifact folder: Playwright failure artifacts and the
+  // last-run marker stay under it, so this run never writes outside this
+  // spike (apart from the CI-only captures) and cannot collide with another
+  // browser runner's artifacts when the web-checks suite runs one beside it.
+  outputDir: 'test-results',
   fullyParallel: false,
   workers: 1,
   retries: 0,

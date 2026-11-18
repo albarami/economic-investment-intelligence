@@ -80,17 +80,29 @@ The browser suite keeps each named assertion test and each distinct plant. Tests
 with the same initial language, motion setting and road load share a page within
 a default-mode group; a failure does not skip later tests, and selecting one test
 still creates its fixture. Each group closes its page before the next one starts.
-The uninterrupted road scene records the full stored-hour cycle. A fresh English
+The uninterrupted road scene and the English pause scene are separate pages:
+the pause tests toggle playback, so a page shared with them would never
+observe an uninterrupted stored-hour cycle. The uninterrupted road scene
+records the full stored-hour cycle, taking that wait inside the page under the
+same 170 s host bound as readiness. A fresh English
 pause scene first checks the live paused mark and legend, then supplies one real
 pause/resume observation to both the hour-clock and particle
 tests, with a guard that the pause starts before the final hour. The first input
 action is shared; visibility assertions are not cached. Each consumer asserts
-its initial state, and selecting any one test still creates and pauses the scene.
+its initial state. Selecting any one test still creates its fixture, and
+selecting one of the pause tests alone still pauses the scene.
 Initial reduced-motion scenes remain separate in both languages. Distinct plants
 each load their own page. Independent DOM assertions run together. Layer counts, frame waits, viewport, pixel ratios and
 all timeout values remain unchanged. The list reporter gives individual test
 durations; shared scene setup durations are printed separately and included in
 the measured browser wall time.
+
+The web-checks suite runs Node's test runner with at most two test files in
+flight and the browser run as the first file of the list, in the whole test
+command and in `npm run test:checks` both, so the browser renderer keeps the
+processors of a four-processor timing run while the suite's other test files
+drain alongside it. The suite's file list, its limits and its workflow are
+unchanged.
 
 Readiness waits on the same animation-frame condition and captures diagnostics
 in that callback; the host still enforces the same readiness timeout. The
@@ -137,10 +149,20 @@ The small-map road plants that expect reduced-counts rely on the count check
 being decided before the canvas check. A node test pins that order.
 A foreign request rejects the page helper as soon as the request is seen once
 the page URL is http. The rejection text is unchanged.
-The JSON reporter also writes `test-results/performance-timings.json` relative to this spike's
-Playwright configuration directory, allowing the repository test run's individual
+The browser run keeps every artifact inside this spike's own `test-results/`
+folder, relative to this spike's Playwright configuration directory: the
+explicit `outputDir` holds the failure contexts and the last-run marker, and
+the JSON reporter also writes `test-results/performance-timings.json` there,
+allowing the repository test run's individual
 browser durations and overall Playwright duration to be inspected without a
-second full browser run.
+second full browser run. No run of this suite writes the web root's own
+`test-results` folder, so the glyph browser runner running beside this one in
+the web-checks suite cannot collide with these artifacts, and this run cannot
+change the glyph suite's watched listings. The glyph suite's isolation test
+never writes this spike's live folder either: it maps this run's configured
+destinations (the `outputDir` and the reporter file above) into a disposable
+mirrored tree under the system temporary folder and plants its
+performance-style artifacts there.
 
 The mutation runner sets `workers = min(4, processors)` and passes
 `--test-concurrency=max(1, processors // workers)` to Node in every mutant's test

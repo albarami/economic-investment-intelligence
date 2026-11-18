@@ -577,11 +577,21 @@ def _baci_refused_fetch(
     assert {p.name: p.read_bytes() for p in directory.glob("*.manifest.json")} == before
     # A different source id cannot enter BACI dispatch; exercise it directly above.
     if source.source_id == "cepii_baci":
+        retrieval_clock = clock
+        started = False
+
+        def build_clock():
+            nonlocal started
+            if not started:
+                started = True
+                return "2026-11-16T00:00:00Z"
+            return retrieval_clock()
+
         result = run_build(
             [source],
             byte_transport,
             tmp_path,
-            clock,
+            build_clock,
             lambda _: None,
             stream_transport=stream_transport,
             baci_config=config,

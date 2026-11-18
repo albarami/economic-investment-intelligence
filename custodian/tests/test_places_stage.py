@@ -315,10 +315,7 @@ def test_a_decision_file_names_its_candidate_and_a_list_stays_pending(
     assert _decision_against_file(tmp_path, "{}\n") == "decision_fields"
 
 
-def test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution(
-    tmp_path: Path,
-) -> None:
-    """The build writes the stage files after the frame's and the gazetteer reads them."""
+def _frame_stage_fixture(tmp_path: Path):
     from dataclasses import replace
 
     from custodian.tests.fixtures.frame.invented import invented_archive, invented_layer
@@ -326,7 +323,6 @@ def test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution(
     from custodian.tests.test_frame_census import entry
 
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import build_frame
 
     cache, review, output = (tmp_path / name for name in ("cache", "review", "output"))
     review.mkdir()
@@ -397,7 +393,23 @@ def test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution(
     )
     _store(cache, places, place_path.read_bytes())
     entries.append(places)
-    result = build_frame(cache, tuple(entries), review, output)
+    return cache, review, output, entries
+
+
+def test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution(
+    tmp_path: Path,
+) -> None:
+    """The real loader accepts a header-only verification file before gazetteer."""
+    from datetime import date
+
+    from eii_custodian.publicdata.frame.build import build_frame
+    from eii_custodian.publicdata.places.review import VERIFIED_COLUMNS
+
+    cache, review, output, entries = _frame_stage_fixture(tmp_path)
+    (review / "verified_places.csv").write_text(",".join(VERIFIED_COLUMNS) + "\n")
+    result = build_frame(
+        cache, tuple(entries), review, output, build_date=date(2026, 11, 17)
+    )
     points_path = cache / "places_s2_t06" / "place_points.json"
     frame_file = output / "municipality_names.csv"
     assert frame_file.is_file()
