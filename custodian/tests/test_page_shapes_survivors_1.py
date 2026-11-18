@@ -507,7 +507,9 @@ def test_classified_column_count_must_match():
     shorter = declaration("html_table", dec["shape"], dec["columns"][:-1])
     shorter["url"] = dec["url"]
     shorter["reviewed_urls"] = dec["reviewed_urls"]
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match=r"^zip\(\) argument 2 is longer than argument 1$"
+    ):
         classified_rows(body, shorter["shape"], shorter["columns"])
 
 
@@ -725,7 +727,9 @@ def test_awards_date_and_amount_contract():
         dec["shape"],
         dec["columns"],
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match=r"^zip\(\) argument 2 is shorter than argument 1$"
+    ):
         awards(body, dec["shape"], dec["columns"] + [["SYN extra", "string"]])
 
 

@@ -4553,12 +4553,12 @@ reason = "The annual preliminary initializer is consumed only for truth testing 
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
-mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -89,7 +89,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), None)\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -94,7 +94,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), None)\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
 reason = "read_sheet supplies only strings in cells, and this get default is consumed only for truth testing in the annual-row guard, where missing None and empty text are both false."
 
 [[survivors]]
 module = "custodian/src/eii_custodian/publicdata/fetch/page_shapes.py"
-mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -89,7 +89,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), )\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
+mutation = "--- src/eii_custodian/publicdata/fetch/page_shapes.py\n+++ src/eii_custodian/publicdata/fetch/page_shapes.py\n@@ -94,7 +94,7 @@\n                 else:\n                     if (\n                         quarter\n-                        or cells.get(spec[\"quarter_label_column\"] + str(row), \"\")\n+                        or cells.get(spec[\"quarter_label_column\"] + str(row), )\n                         or re.fullmatch(r\"[1-9][0-9]{3}\", raw_year) is None\n                     ):\n                         raise ShapeError(\"schema_missing\")"
 reason = "read_sheet supplies only strings in cells, and this get default is consumed only for truth testing in the annual-row guard, where missing None and empty text are both false."
 
 [[survivors]]
