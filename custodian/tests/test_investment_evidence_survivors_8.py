@@ -173,18 +173,25 @@ def test_non_string_null_equal_location_keeps_absence(tmp_path: Path) -> None:
     assert result.revisions[0].geography_absence_reason == "not_stated_by_source"
 
 
+_ID = "fdi_projects:project:1001"
+
+
 @pytest.mark.parametrize(
-    ("field", "missing_on"),
+    ("field", "missing_on", "expected_first", "absence"),
     [
-        ("source_id", 3),
-        ("project_id", 3),
-        ("source_id", 4),
-        ("project_id", 4),
-        ("project_key", 3),
+        ("source_id", 3, (_ID, "fdi_projects", "1001"), (":project:1001",)),
+        ("project_id", 3, (_ID, "fdi_projects", "1001"), ("fdi_projects:project:",)),
+        ("source_id", 4, (":project:1001", "", "1001"), ()),
+        ("project_id", 4, ("fdi_projects:project:", "fdi_projects", ""), ()),
+        ("project_key", 3, (_ID, "fdi_projects", "1001"), ()),
     ],
 )
 def test_unstable_caller_key_never_invents_identifier_text(
-    tmp_path: Path, field: str, missing_on: int
+    tmp_path: Path,
+    field: str,
+    missing_on: int,
+    expected_first: tuple[str, str, str],
+    absence: tuple[str, ...],
 ) -> None:
     class UnstableKey(str):
         __hash__ = str.__hash__
@@ -209,26 +216,29 @@ def test_unstable_caller_key_never_invents_identifier_text(
         key if name == field else name: value for name, value in first.rows[0].items()
     }
     result = evidence.build_project_evidence((replace(first, rows=(row,)), second))
-    # A future boundary fix may refuse these caller keys. Until then, preserve
-    # the narrower guarantee that missing identity parts never become invented
-    # text. This does not bless the accepted empty parts (see PO-S2-72).
-    if isinstance(result, evidence.InvestmentFailure):
-        assert result.check == "invalid_evidence_metadata"
-        return
-    identifiers = [
-        value
-        for revision in result.revisions
-        for value in (
-            revision.project_identity,
-            revision.source_id,
-            revision.project_id,
-            revision.project_key,
-        )
-    ]
-    identifiers.extend(absence.project_identity for absence in result.absences)
-    for identifier in identifiers:
-        assert "None" not in identifier
-        assert "XXXX" not in identifier
+    control = evidence.build_project_evidence((first, second))
+    # The expectations record today's behaviour for a caller key ruled not
+    # reachable from the archived-bytes callers (PO-S2-87): a missing identity
+    # part stays empty and never becomes invented text such as None or XXXX.
+    # A boundary fix that refuses these keys replaces them with its refusal.
+    assert isinstance(result, ProjectEvidence)
+    assert isinstance(control, ProjectEvidence)
+    assert len(result.revisions) == 2
+    first_rev, second_rev = result.revisions
+    assert (
+        first_rev.project_identity,
+        first_rev.source_id,
+        first_rev.project_id,
+    ) == expected_first
+    expected_key = "" if field == "project_key" else control.revisions[0].project_key
+    assert first_rev.project_key == expected_key
+    assert (
+        second_rev.project_identity,
+        second_rev.source_id,
+        second_rev.project_id,
+        second_rev.project_key,
+    ) == (_ID, "fdi_projects", "1001", control.revisions[1].project_key)
+    assert tuple(item.project_identity for item in result.absences) == absence
 
 
 @pytest.mark.parametrize("kind", ["revision", "absence"])
@@ -273,7 +283,7 @@ def test_audit_fallback_never_rewrites_retained_entry_fields(
             "not_present_in_source_snapshot",
         )
     result = evidence.audit_project_evidence((), supplied, ())
-    # These tuple subclasses expose a separate boundary issue (PO-S2-72).
+    # These tuple subclasses expose a separate boundary issue (PO-S2-87).
     # Preserve fields if returned; a future fix should refuse their projection.
     if isinstance(result, evidence.InvestmentFailure):
         assert result.check == "evidence_audit_incomplete"
