@@ -223,6 +223,7 @@ def run_copy(
                 continue
             codes = json.loads(meta.read_text())["exit_code_by_key"]
             counts: Counter[str] = Counter()
+            timed_out: dict[str, int] = {}
             for key, code in codes.items():
                 status = {
                     0: "survived",
@@ -238,6 +239,8 @@ def run_copy(
                     37: "killed",
                 }.get(code, "incomplete")
                 counts[status] += 1
+                if status == "timed_out":
+                    timed_out[key] = code
                 if status in ("survived", "not_covered"):
                     shown = command(folder, "show", key, environment=environment)
                     if shown.returncode:
@@ -256,6 +259,18 @@ def run_copy(
                             sort_keys=True,
                         )
                     )
+            for key, code in sorted(timed_out.items()):
+                print(
+                    json.dumps(
+                        {
+                            "module": prefix + module,
+                            "status": "timed_out",
+                            "mutant": key,
+                            "exit_code": code,
+                        },
+                        sort_keys=True,
+                    )
+                )
             print(
                 f"{prefix}{module}: made={len(codes)} killed={counts['killed']} survived={counts['survived']} timed_out={counts['timed_out']} not_covered={counts['not_covered']} incomplete={counts['incomplete']}"
             )
