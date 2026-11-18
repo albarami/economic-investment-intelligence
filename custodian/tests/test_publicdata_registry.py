@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
 import pytest
+import yaml
 from custodian.tests.repository_root import repository_root
 
 import eii_custodian.publicdata.fetch.registry as registry_module
@@ -22,6 +24,7 @@ from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
     load_registry,
     nightly_blocked,
+    read_yaml,
     registry_path,
 )
 from eii_custodian.publicdata.fetch.seam import SCAN_ROOTS, opener_hits, scan_tree
@@ -417,12 +420,161 @@ def test_loader_refuses_a_bad_terms_forbid(tmp_path: Path) -> None:
         load_registry(_mutated(tmp_path, "forbid.yaml", planted))
 
 
+def _assert_c_safe_loader_only(text: str) -> None:
+    """Allow only the C safe loader and the common YAML error boundary."""
+    assert not re.search(
+        r"\b(?:C?FullLoader|C?UnsafeLoader|CLoader|unsafe_load|full_load|load_all)\b"
+        r"|\byaml\s*\.\s*(?:Loader|unsafe\w*)\b",
+        text,
+    )
+    tree = ast.parse(text)
+    calls = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+            if node.value.id == "yaml":
+                assert node.attr in {"load", "CSafeLoader", "YAMLError"}
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if isinstance(node.func.value, ast.Name):
+                if node.func.value.id == "yaml" and node.func.attr == "load":
+                    calls.append(node)
+                    loaders = [kw.value for kw in node.keywords if kw.arg == "Loader"]
+                    assert len(loaders) == 1
+                    assert ast.unparse(loaders[0]) == "yaml.CSafeLoader"
+    assert calls
+
+
 def test_loader_uses_the_safe_loader_only() -> None:
-    """The registry module calls safe_load and does not call yaml.load."""
-    module = Path(registry_module.__file__)
-    text = module.read_text(encoding="utf-8")
-    assert "safe_load" in text
-    assert "yaml.load" not in text
+    """Replace the text guard under decision 0053 with C safe-loader guards."""
+    _assert_c_safe_loader_only(
+        (REPO / "custodian/src/eii_custodian/publicdata/fetch/registry.py").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def test_loader_passes_only_c_safe_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The live loader argument is the C safe loader, even in a mutation copy."""
+    path = tmp_path / "invented.yaml"
+    path.write_text("planted: safe\n", encoding="utf-8")
+    real_load = yaml.load
+    loaders: list[object] = []
+    forwarded: list[object] = []
+
+    def load_spy(text, *, Loader):
+        loaders.append(Loader)
+        result = real_load(text, Loader=Loader)
+        forwarded.append(result)
+        return result
+
+    monkeypatch.setattr(yaml, "load", load_spy)
+
+    def assert_c_loader(reader):
+        loaders.clear()
+        forwarded.clear()
+        result = reader(path)
+        assert result == {"planted": "safe"}
+        assert len(forwarded) == 1
+        assert result is forwarded[0]
+        assert len(loaders) == 1
+        assert loaders[0] is yaml.CSafeLoader
+
+    assert_c_loader(read_yaml)
+
+    def planted_reader(path):
+        return yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+
+    with pytest.raises(AssertionError):
+        assert_c_loader(planted_reader)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "yaml.load(text, Loader=yaml.Loader)",
+        "yaml.full_load(text)",
+        "yaml.load(text)",
+        "yaml.load_all(text, Loader=yaml.CSafeLoader)",
+        "yaml.load(text, Loader=yaml.FullLoader)",
+        "yaml.load(text, Loader=yaml.UnsafeLoader)",
+        "yaml.unsafe_load(text)",
+        "yaml.unsafe(text)",
+        "from yaml import FullLoader\nyaml.load(text, Loader=yaml.CSafeLoader)",
+    ],
+)
+def test_loader_text_guard_refuses_planted_unsafe_calls(text: str) -> None:
+    """Every planted unsafe call or omitted loader fails the source guard."""
+    with pytest.raises(AssertionError):
+        _assert_c_safe_loader_only(text)
+
+
+@pytest.mark.parametrize("tag", ["python/object/apply", "python/name"])
+def test_loader_refuses_unsafe_tags_without_constructing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, tag: str
+) -> None:
+    """Invented callable and name tags cannot construct or return an object."""
+    constructed = []
+
+    def planted_target() -> object:
+        constructed.append("constructed")
+        return object()
+
+    monkeypatch.setattr(
+        registry_module, "planted_target", planted_target, raising=False
+    )
+    path = tmp_path / "unsafe.yaml"
+    target = f"{registry_module.__name__}.planted_target"
+    suffix = " []" if tag == "python/object/apply" else ""
+    path.write_text(f"!!{tag}:{target}{suffix}\n", encoding="utf-8")
+    try:
+        with pytest.raises(RegistryError, match=r"^malformed yaml$"):
+            read_yaml(path)
+    finally:
+        assert constructed == []
+
+
+def _assert_libyaml_available() -> None:
+    assert yaml.__with_libyaml__ is True
+    assert callable(yaml.CSafeLoader)
+
+
+def test_locked_environment_has_libyaml(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The environment guard refuses a planted missing libyaml or C loader."""
+    _assert_libyaml_available()
+    with monkeypatch.context() as missing_libyaml:
+        missing_libyaml.setattr(yaml, "__with_libyaml__", False)
+        with pytest.raises(AssertionError):
+            _assert_libyaml_available()
+    with monkeypatch.context() as missing_loader:
+        missing_loader.delattr(yaml, "CSafeLoader")
+        with pytest.raises(AttributeError):
+            _assert_libyaml_available()
+
+
+def test_loader_fails_loudly_without_c_safe_loader(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A planted absent C loader cannot fall back to pure Python."""
+    path = tmp_path / "safe.yaml"
+    path.write_text("planted: safe\n", encoding="utf-8")
+    monkeypatch.delattr(yaml, "CSafeLoader")
+    with pytest.raises(AttributeError):
+        read_yaml(path)
+
+
+def test_loader_preserves_committed_registry_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """SafeLoader parity refuses a planted changed registry value."""
+    path = registry_path()
+    expected = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+    assert read_yaml(path) == expected
+    monkeypatch.setattr(
+        registry_module, "read_yaml", lambda path: {"planted": "changed"}
+    )
+    with pytest.raises(AssertionError):
+        assert registry_module.read_yaml(path) == expected
 
 
 def test_only_the_transport_module_opens_a_connection() -> None:
