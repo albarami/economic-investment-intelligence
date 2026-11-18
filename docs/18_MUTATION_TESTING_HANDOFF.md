@@ -27,7 +27,7 @@ The meanings of the outcome columns are:
 - **Considered:** changes generated for a complete campaign, or enumerated in a partial record. An unsuccessful start with no result says unknown; it is not evidence that no changes were possible.
 - **Killed:** a test noticed the change. The original code must pass that test, and the failure must concern the intended behavior.
 - **Survived:** tests returned without noticing the change.
-- **Explained:** the module path and complete change text both match one entry in the tracked data file `scripts/mutation_explained.toml`. It holds one entry per explained change: `module` holds the module path, `mutation` holds the exact complete change as a difference block, and `reason` states why the change preserves behaviour. It is repository data, not an executable procedure. A historical statement that everything was explained does not establish such a match.
+- **Explained:** an exact match in the tracked data file `scripts/mutation_explained.toml` means exact equality of `module` plus the value of `mutation`. The `mutation` value is either the complete difference block or the recorded web change object, copied exactly. A `reason` is labelled as an equivalence argument, a coverage limit, or a record that a later test killed the change; a later kill is not preserved behaviour. These labels describe what the entry records, not an independent proof of equivalence. It is repository data, not an executable procedure. A historical statement that everything was explained does not establish such a match.
 - **Open:** a recorded change has no exact matching explanation in this snapshot. A later repair may already address it; reconcile versions before writing another test.
 - **Not compared:** original and changed text are absent. Even an earlier claim of equivalence remains unverified here.
 - **Timed out:** the changed test run did not finish within its fixed allowance. This is an inconclusive result, counted separately from a kill or survival.
@@ -37,7 +37,9 @@ Some older records include changes that survived and changes not covered in the 
 
 “Latest measured” marks the last recorded measurement for that task and file. “On latest identified task head” additionally requires a recorded commit identity matching the latest identified task version. Unknown identities remain unproved. These marks describe the measurement history; they do not certify a later merged version. Earlier rows remain visible as superseded measurements. Where a row names a group rather than individual files, the original summary did not provide the split.
 
-Sources: the R-numbered records in section 9 and the data file `scripts/mutation_explained.toml` at the commits named in each status row. Explained requires an exact match of both file and complete change text at the measured commit, latest identified task commit or recorded base commit; unresolved revisions remain unknown. Missing values remain unknown. Proposed investigations in the detailed tables are explicitly hypotheses, not confirmed defects or claims about tests added later.
+Sources: the R-numbered records in section 9 and the data file `scripts/mutation_explained.toml` at the commits named in each status row. An explanation match is checked at the measured commit, at the latest identified task commit, and at `origin/main` (`81e62db`), as the explanation-comparison column lists; unresolved revisions remain unknown. Missing values remain unknown. Proposed investigations in the detailed tables are explicitly hypotheses, not confirmed defects or claims about tests added later.
+
+Explanation-data record X001 is `scripts/mutation_explained.toml`, SHA-256 `26f30dd7c3795bba80aee317d7a0ee4d89098a82a276d617b9956dd4abdc12b9`. It contains 663 complete difference-block entries and 242 recorded web change-object entries. Its written reasons are labelled here as 702 equivalence arguments, 154 coverage limits and 49 records of later kills. A matched coverage limit remains a coverage limit, and a matched later kill is not an equivalence argument; neither changes the historical outcome counts.
 
 ## 2. A worked example
 
@@ -73,9 +75,7 @@ Sources: R008 for the performance example and R006 for the `situation_mean` chan
 
 ## 3. Method and rules to retain
 
-The repository’s own rules file lists the commands that the project used, and the team may use those or its own tools.
-
-A campaign starts from a fixed source version and a passing unmodified test suite. Make a small deliberate change, run the relevant tests, record the result, then restore the source. Repeat over the complete intended set of changes. Keep the original and changed text, function, outcome, source fingerprint, test identity and source version together. A failed start before any change runs is a test-environment problem to investigate, not a mutation result.
+A campaign starts from a fixed source version and a passing unmodified test suite. Make a small deliberate change, run the relevant tests, record the result, then restore the source. Repeat over the complete intended set of changes. Keep the original and changed text, function, outcome, source fingerprint, test identity and source version together. The source fingerprint is the SHA-256 of the examined source file’s bytes. It is distinct from the record fingerprint, which is the SHA-256 of the historical input file’s bytes. A failed start before any change runs is a test-environment problem to investigate, not a mutation result.
 
 A behavior-changing alteration that no test notices exposes a hole in the evidence established by the tests. Close it with a test that distinguishes the altered behavior from a valid control. If the change cannot alter behavior for any admitted input, write down why. Trace every reachable branch and every caller restriction on which that reason relies. Passing selected examples is insufficient proof of equivalence. An explanation belongs to the exact file and change text; moving text or changing a caller can invalidate it.
 
@@ -96,6 +96,8 @@ Sources: [decision 0052](decisions/0052-mutation-campaigns-run-in-a-background-l
 ## 4. Defects and test defects found
 
 These are recorded findings and repairs. Their presence on the eventual merged source must be checked before the deferred work resumes. The campaign tables are measurement history, not evidence that each repair has already received a complete campaign on its final version.
+
+The [open-item register](../OPEN_ITEMS.md) on this branch has no row for the quarterly-workbook, certificate-trust, investment-archive, fetch-host lineage or archive-member repairs below. This section is their record; it gives the recorded repairs and their known status without assigning an open-item identifier.
 
 ### Quarterly workbook continuity
 
@@ -218,11 +220,11 @@ These are completion criteria for deferred mutation work. They do not reinstate 
 
 The elapsed cost table below is a measured subtotal of the records in section 9, not the complete cost of the project or an estimate for the remaining work. Parallel campaign durations overlap. Summing elapsed campaign hours measures accumulated run durations, not elapsed calendar time. Allocated core-hours multiply a reserved processor count by elapsed hours; they do not measure actual processor use. Missing processor counts or durations stay unknown, and recorded rounded zero durations do not establish that a campaign cost nothing. Test-writing costs are listed separately to avoid charging a campaign again for each module or mixing investigation time into execution time.
 
-Both final partial records have a written timestamp inconsistent with the campaign history. No elapsed duration is inferred from that timestamp. R041 retains only the opening header of the superseded page-source run, without per-module outcomes. These are evidence gaps, not completed work.
+R044 states “Written 2026-11-18 11:18 (Asia/Qatar)”, and R108 states “Written 2026-11-18 11:18 (Asia/Qatar)”. These written timestamps are inconsistent with the campaign history; no duration is inferred from them. R041 retains only the opening header of the superseded page-source run, without per-module outcomes. These are evidence gaps, not completed work.
 
 Snapshot mismatch is the main interpretation risk. A successful historical result may have been followed by source changes; a historical unmatched change may already have a new test or written reason at a later commit. Neither direction can be resolved by optimistic labelling. Short recorded commits are preserved as short identities, without invented missing digits.
 
-R040 records no changes for `custodian/src/eii_custodian/publicdata/fetch/page_archive.py`: its only function, `staged_source`, is wrapped by a context-manager decorator (`@contextmanager`), so the measurement did not alter the function’s body and produced no changes for it. This is a limitation of the measurement, and explicit behavior tests and a fresh coverage assessment are still needed. The source was read at `59d5211`; this path is absent at current `origin/main` (`81e62db`). Other source groups have only combined counts in the older summaries, so their per-file outcomes remain unknown.
+R040 records no changes for `custodian/src/eii_custodian/publicdata/fetch/page_archive.py`: its only function, `staged_source`, is wrapped by a context-manager decorator (`@contextmanager`), so the measurement did not alter the function’s body and produced no changes for it. This is a limitation of the measurement, and explicit behavior tests and a fresh coverage assessment are still needed. The source was read at `59d5211`; this path is absent at current `origin/main` (`81e62db`). For the same archive module, R044 records no generated changes but does not state whether the same context-manager limitation applies or whether it was a failed start. The records do not settle that distinction for R044. Other source groups have only combined counts in the older summaries, so their per-file outcomes remain unknown.
 
 A high count of kills does not prove correct calculations, adequate privacy protection or complete security coverage. Equivalent changes can inflate survivor counts, weak tests can inflate apparent kills, and unmodified-suite failures can prevent any measurement. Certificate trust, source-copy selection and caller restrictions all affect whether a test provides the evidence it claims. Applying C1 through C7 matters as much as adding assertions.
 
@@ -462,7 +464,7 @@ Unknown is missing evidence. Not compared means survivor text is absent. Explain
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/awards.py | 59d5211 | 965 | 636 | 329 | 17 | 312 | 0 | 0 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 17 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py | 59d5211 | 356 | 293 | 63 | 1 | 62 | 0 | 0 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 1 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | 59d5211 | 1366 | 958 | 406 | 18 | 388 | 2 | 0 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 18 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
-| R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_archive.py | 59d5211 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | attempt without a result |  | 177a85b | 59d5211 | no exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
+| R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_archive.py | 59d5211 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | measured; no changes generated | only function is a context-manager wrapper; body not altered | 177a85b | 59d5211 | no exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | 59d5211 | 197 | 132 | 58 | 1 combined | 64 combined | 0 | 7 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 1 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | 59d5211 | 991 | 692 | 299 | 16 | 283 | 0 | 0 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 16 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
 | R040 | S2-T29 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | 59d5211 | 188 | 44 | 144 | 1 | 143 | 0 | 0 | 0 | superseded measurement |  | 177a85b | 59d5211 | 177a85b: 1 exact matches; checked 59d5211: read; 177a85b: read; origin/main (81e62db): read |
@@ -1121,7 +1123,7 @@ Each row identifies a historical gap and its feasible next procedure; a new camp
 
 ### Partial survivor register
 
-For R044, the recorded suffixes identify variants within each function but do not encode the alteration; the missing exact changed text cannot be recovered from this repository. Every listed variant remains not compared. Run fresh campaigns of the listed modules on the current merged source after the deferral and keep their results as new evidence without claiming to reproduce those R044 changes. Exercise each function with its valid control and its refusal or boundary case using the test-quality rules above.
+For R044, the recorded suffixes identify variants within each function but do not encode the alteration; the missing exact changed text cannot be recovered from this repository. Every listed variant remains not compared. Run fresh campaigns of the listed modules on the current merged source after the deferral and keep their results as new evidence without claiming to reproduce those R044 changes. Exercise each function with its valid control and its refusal or boundary case using the test-quality rules above. The separator `ǁ` stands in for the qualifier dot; the source spelling is written beside each affected displayed name.
 
 | Record | Source file | Function | Variants | Recorded variant suffixes | Disposition |
 |---|---|---|---|---|---|
@@ -1131,13 +1133,13 @@ For R044, the recorded suffixes identify variants within each function but do no
 | R044 | custodian/src/eii_custodian/publicdata/fetch/awards.py | read_registers | 4 | 101, 102, 103, 104 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | _html_without_form_secrets | 1 | 47 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_acquire.py | fetch | 17 | 126, 130, 131, 132, 203, 210, 211, 287, 541, 548, 549, 627, 634, 635, 758, 954, 993 | not compared; original and changed lines absent |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | Treeǁ__init__ | 1 | 11 | not compared; original and changed lines absent |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_html.py | Treeǁ__init__ (source: Tree.__init__) | 1 | 11 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _validate | 3 | 34, 36, 39 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | fetch_page | 6 | 205, 207, 86, 94, 95, 96 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | parse_body | 4 | 60, 92, 95, 96 | not compared; original and changed lines absent |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁ__init__ | 1 | 4 | not compared; original and changed lines absent |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁhandle_endtag | 1 | 25 | not compared; original and changed lines absent |
-| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁhandle_starttag | 1 | 13 | not compared; original and changed lines absent |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁ__init__ (source: _Table.__init__) | 1 | 4 | not compared; original and changed lines absent |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁhandle_endtag (source: _Table.handle_endtag) | 1 | 25 | not compared; original and changed lines absent |
+| R044 | custodian/src/eii_custodian/publicdata/fetch/page_records.py | _Tableǁhandle_starttag (source: _Table.handle_starttag) | 1 | 13 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_requests.py | check_target | 1 | 19 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_schema.py | json_body | 6 | 3, 4, 5, 7, 8, 9 | not compared; original and changed lines absent |
 | R044 | custodian/src/eii_custodian/publicdata/fetch/page_schema.py | period | 1 | 22 | not compared; original and changed lines absent |
