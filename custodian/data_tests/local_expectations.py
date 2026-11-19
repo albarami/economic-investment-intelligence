@@ -396,11 +396,14 @@ def summary_reasons(text, exit_code):
     ]
     reasons = set()
     for line in failures:
-        found = re.fullmatch(r"FAILED .+ - ([A-Za-z0-9_-]+):([a-z_]+)", line)
+        found = re.fullmatch(r"FAILED .+ - Failed: ([A-Za-z0-9_-]+):([a-z_]+)", line)
         if found is None:
             raise ValueError("summary_unparsed") from None
         case_id, reason = found.groups()
-        case_by_id(case_id)
+        try:
+            case_by_id(case_id)
+        except ValueError:
+            raise ValueError("summary_unparsed") from None
         if reason not in {
             "awaiting_routine",
             "awaiting_expectation",

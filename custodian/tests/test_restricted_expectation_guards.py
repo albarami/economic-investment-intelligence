@@ -607,7 +607,7 @@ def child_run(tmp_path, text):
             "-m",
             "pytest",
             str(child),
-            "-q",
+            "-vv",
             "-p",
             "no:cacheprovider",
             "-c",
@@ -717,7 +717,7 @@ def test_restricted_outstanding_subprocess(tmp_path):
 )
 def test_restricted_summary_accounting(plant):
     local, _ = modules()
-    text = "FAILED invented.py::test_one - C12-MTH-46:awaiting_routine\n1 failed, 2 passed in 0.01s\n"
+    text = "FAILED invented.py::test_one - Failed: C12-MTH-46:awaiting_routine\n1 failed, 2 passed in 0.01s\n"
     code = 1
     if plant == "correct":
         assert local.summary_reasons(text, code) == {"C12-MTH-46:awaiting_routine"}
@@ -738,3 +738,19 @@ def test_restricted_summary_accounting(plant):
         code = 0
     with pytest.raises(ValueError):
         local.summary_reasons(text, code)
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "FAILED invented.py::test_one",
+        "FAILED invented.py::test_one - C12-MTH-46:awaiting_routine",
+        "FAILED invented.py::test_one - Failed: unknown:awaiting_routine",
+        "ERROR invented.py::test_one - Failed: C12-MTH-46:awaiting_routine",
+    ],
+    ids=["truncated", "missing_prefix", "unknown_case", "error"],
+)
+def test_restricted_summary_unparsed(line):
+    local, _ = modules()
+    with pytest.raises(ValueError, match=r"^summary_unparsed$"):
+        local.summary_reasons(line + "\n1 failed, 2 passed in 0.01s\n", 1)

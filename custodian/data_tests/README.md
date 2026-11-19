@@ -3,7 +3,7 @@
 Only the lead's own shell runs the real-cache command from the repository root:
 
 ```sh
-uv run --locked python -m pytest custodian/data_tests -q -p no:cacheprovider
+uv run --locked python -m pytest custodian/data_tests -vv -p no:cacheprovider
 ```
 
 Neither the whole test command, a gate nor CI selects this folder. Ordinary
@@ -81,15 +81,13 @@ a fabricated release fact. Release chain validation is unchanged.
 
 ## Outstanding set B and lead's wrong-value proof
 
-**Reporting blocker found during the build:** in the pinned pytest, the required
-`pytest.fail(..., pytrace=False)` prints the case/reason in the failure body but
-omits it from the default `FAILED` short-summary line. The two actual-child
-summary assertions in `test_restricted_wrong_value_and_safe_output` and
-`test_restricted_outstanding_subprocess` reproduce this and currently fail.
-`summary_reasons` correctly refuses the unparsed line. A lead ruling must settle
-how the default summary carries the fixed label before the proof below can be
-completed. No runner, marker, traceback rule or proof accounting was changed
-to conceal this conflict; the synthetic summary fixtures alone do not prove it.
+Pin verbosity at `-vv` in the command above and the invented child runs. At
+lower verbosity, pytest can truncate a long node's short-summary line to the
+terminal width, dropping its reason (lead ruling L-1056 item 2). Never rely on
+`COLUMNS` or a terminal. Keep `pytest.fail(..., pytrace=False)`; the accepted
+summary form is exactly `FAILED <node> - Failed: <CASE>:<reason>`. Every other
+`FAILED` or `ERROR` line, including a truncated line, fails with
+`summary_unparsed` (L-1056 items 1 and 3).
 
 Before running, derive B with `restricted_cases.outstanding()` from the
 reviewer-checked inventory and record it in the ledger. The current full set is:
