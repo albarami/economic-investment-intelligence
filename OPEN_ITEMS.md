@@ -2777,6 +2777,28 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The lead confirms what the F5 calibration values are, where they are owed and the task that closes them before its gate.
 - NEEDED BY: the slice S4 gate.
 
+## OI-316 — S2-T41 command-help boundary duplicates a literal
+
+- ID: OI-316
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T41 lens A confirmation N1 at 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60; nonblocking proposed follow-up, not fixed.
+- CONCERNS: `scripts/tests/commands_support.py`, expected_usage; `scripts/commands/table.py`, CDSE_BOUNDARY; document 02 command table; S2-T41, ARC-96, REV-41 and REV-42.
+- EVIDENCE: `.overnight/IN/ledger/verdicts/S2-T41.confA1.return.md`, Findings N1: expected_usage formerly came wholly from the architecture table; one line now duplicates CDSE_BOUNDARY as a literal, and that boundary line is absent from document 02's command table.
+- DONE SO FAR: The equality test pins the literal and lens A APPROVED the head with this nit. No fix is claimed by this ledger preparation.
+- NEEDED: S2-T10 disposes the proposal under REV-42: derive the line from a documented source, or explicitly retain the pinned literal with the reason. Another maker checks that disposition; no merge-blocking defect is inferred.
+- NEEDED BY: slice S2 review follow-up S2-T10, before the slice S2 gate.
+
+## OI-317 — S2-T41 child recorder has limited leak diagnostics
+
+- ID: OI-317
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T41 lens A confirmation N2 at 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60; nonblocking proposed follow-up, not fixed.
+- CONCERNS: `scripts/tests/test_commands.py`, record_child in test_build_public_usage_and_unreachable; proposed decision 0066 item 6; S2-T41, REV-41 and REV-42.
+- EVIDENCE: `.overnight/IN/ledger/verdicts/S2-T41.confA1.return.md`, Findings N2 and F2 plants: the bare MagicMock makes subprocess.run/check_output leak plants fail through ValueError rather than a value-specific assertNotIn. The test still goes red. Launches outside the subprocess.Popen seam, including os.posix_spawn and os.system, are not recorded.
+- DONE SO FAR: Both invented CDSE values are asserted across the recorded channels; reviewer Popen plants were value-specific red. Lens A APPROVED with the diagnostic nit. No broader interception or fix is claimed here.
+- NEEDED: S2-T10 disposes the proposal under REV-42. The review suggests a mock whose communicate returns an empty stdout/stderr pair and whose __enter__ returns itself; if implemented, demonstrate value-specific failures for both invented values through subprocess.run/check_output. Record the limits of other child seams, or justify and independently verify any extension; do not silently claim them covered.
+- NEEDED BY: slice S2 review follow-up S2-T10, before the slice S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.

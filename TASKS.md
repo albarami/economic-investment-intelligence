@@ -778,7 +778,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: registry/source metadata, narrow transport and tooling environment reader, receipt/snapshot integration, credential inventories and tests, product-isolation tests and the pack passages named in D0066. The lead's wrapper and proof call are separate lead operations outside the task.
 - Depends: S2-T01, S2-T02, S2-T27. Reuse S2-T19's dated-imagery conventions where applicable without adding a dependency to that task. Display ownership is unresolved; no assignment to S3-T16 or S3-T23.
 - Requirements: document 04 PUB-01, PUB-03, PUB-04, PUB-10, PUB-11, PUB-12, PUB-19 and PUB-110; document 02 ARC-13, ARC-96 and ARC-98; document 13 OPS-07, OPS-08, OPS-65 and OPS-71; AGENTS.md rules 5, 11, 14, 16–23 and 33–39.
-- Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status queued.
+- Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/97).
 
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.

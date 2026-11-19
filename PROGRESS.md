@@ -35303,6 +35303,207 @@ Seed:      none
 Notes:     All five work commits must have Conventional Commit subjects. make_spec.py proves the exact replay order, unchanged original messages with no cherry-pick trailers, five equal range-diff rows and all six approved task files byte-identical.
 ```
 
+### S2-T41 — Optional offline satellite backup cache from CDSE: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/97)
+
+Maker and model: OpenAI GPT-6 through Codex (supplied session role; no more precise model identifier exposed). Persona: senior release engineer. Strict self-review persona: release-evidence reviewer refusing a row without its source. Skills applied: project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate. This preparation transcribes the supplied evidence; it grants no independent approval. Every evidence path below is relative to `.overnight/IN/ledger/`. `form/spec.json`, `form/log.md` and `form/items.md` supply form only, never S2-T41 evidence.
+
+#### Plan rounds and design reviews
+
+- Plan round 1 is evidenced by the launch in `log-lines.md` at 07:03 (OpenAI through Codex) and the subsequent review; no plan-1 return is supplied. No exact plan-1 session model or plan commit is inferred. The 07:20 design-review launch identifies Anthropic Claude Opus 5.5 through login C (`log-lines.md`).
+- Design review 1: Anthropic Claude Opus 5.5, REJECTED, F1–F7, against plan 1 and draft 0066 at tree `6e473d38025d736d85525286403bb95770964e76`. F1 objects to a tracked wrapper folder; F2 requires the separate lead proof and useful redacted refusal; F3 corrects the stale credential action; F4 removes display/release scope; F5 completes the amendment inventory; F6 corrects record status/citations; F7 requires provider wording, URL, date and hash. Tests were judged sound on reading, not executed. security-review loading was refused and its checks applied by hand. The lead says a longer return was deleted unread after screening; only the supplied screened return is used (`verdicts/S2-T41.planrev1.return.md`; `log-lines.md`, 07:39).
+- L-1078: F1 NOT ACCEPTED because the wrapper is ignored lead-run tooling, never tracked; F2–F7 ACCEPTED. Display becomes a lead-owned open point. The wrapper and proof remain separate lead work, not task code. Hardening notes are recorded rather than silently added to scope (`rulings.md`, L-1078; `verdicts/S2-T41.plan2.return.md`).
+- Plan round 2: return self-identifies OpenAI GPT-6 through Codex; launch records GPT-6.1 Sol, while the result line says GPT-6 Sol. These labels are retained without inventing a precise planner session identity. It delivered plan r2 (17,806 bytes) and draft r2 (34,618 bytes), applied F2–F7 and the F1 ruling, and retained display/provider/confirmation open points (`verdicts/S2-T41.plan2.return.md`; `log-lines.md`, 07:39 and 07:47).
+- Plan confirmation: Anthropic Claude Opus 5.5, APPROVED plan r2 and draft r2, F2–F7 MET, F1 withdrawn under L-1078, no new finding. Tree `b1e8653ccfd15e242308a147a5cafb34799d9a54`; file-only review, no network. It records wrapper path wording relative to the lead-run folder, removal of draft review notes on filing, ruling-time record, unavailable security-review loading and lead-shell rule-44 wording. This is plan approval, not implementation approval (`verdicts/S2-T41.planconf1.return.md`; `log-lines.md`, 07:51).
+
+#### Build and separate lead proof
+
+- Build 1 was launched as OpenAI GPT-6.1 Sol through Codex codex-b at base `b1e8653ccfd15e242308a147a5cafb34799d9a54`; its return self-identifies GPT-6 through Codex with no exact session identifier exposed. Personas: senior security engineer/Python test engineer and strict security reviewer tracing secret paths. Loaded skills were project-orientation, task-standards, sanad-provenance, domain-modeling, github-flow and muhasabah-gate; unavailable test/security/verification skills were applied by their plain meanings (`log-lines.md`, 07:51 and 08:30; `verdicts/S2-T41.build1.return.md`).
+- Delivered: optional closed flag, tooling credential inventories and presence-only rows, transport/redaction/request bounds, fixture metric/cost/metadata contracts, receipted immutable unread-cache promotion and product/release isolation plants, proposed decision 0066 and coordinated pack amendments. No live provider contract, bulk acquisition, wrapper, display or product asset was built. The reviewed-endpoint set remains empty; pending envelopes and the linear cost fixture are internal contracts. Provider wording, complete page evidence, actual quota/schema/date mapping, reviewed boundary/projection and later display ownership remain lead work (`verdicts/S2-T41.build1.return.md`, Delivered scope and Intentional pending provider work).
+- Builder red/green history preserves inventory, presence, secret/import, command, transport, cache and isolation plants. Additional registry, host-admission, request-hash and refresh-token plants failed before correction. Initial import/fixture, registry-order/count, lint, type, document and format failures are recorded with deterministic causes; no green rerun erases them. Final focused public run: exit 0, 141 passed. Broad custodian: exit 0, 7,369 passed, one existing duplicate-ZIP warning, 425.10 s; refresh test added during that run is covered afterward by the focused run. Broad scripts: 904 tests, exit 1 solely on the unchanged shared index. Final static checks: ruff 0, format 0 (742 files), mypy 0 (414 files), docs 0 (1,032 text/116 Markdown), parity 0, whitespace 0; tree 1 solely on the index inventory. Environment: UV_OFFLINE=1, workspace temporary paths, focused unittest helper path, no seed override (`verdicts/S2-T41.build1.return.md`, Plan items and final evidence).
+- The builder could not commit: staging returned 128 because the shared worktree index was outside its writable sandbox. The lead reports committing the worker tree unchanged as `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`; lead docs/tree checks passed and rules files matched. The 08:30 log says 47 paths while the builder return enumerates its own changed paths; neither is used as the authoritative BASE-to-WORK scope count. The generated spec uses Git's exact requested diff (`verdicts/S2-T41.build1.return.md`, Commits and Files changed; `log-lines.md`, 08:30).
+- Separate lead proof, outside the task: token status 200, 2,048 bytes, SHA-256 `f71b3201426f1b9b4543416c1ff930e9da1d4e7ef7a818892c198ec0e682227b`; Process status 200, 10,993 bytes, SHA-256 `3dbdc0bccd33d48634fa9fb7dc2c0258bfe9ee72f51f694675738162d2c5e6b0`, with `png=False` in the supplied record. The lead attributes that flag to its double-escaped literal, corrected to a signature check without rerunning. This ledger does not independently validate the picture or infer bulk readiness. The log reports the lead's official-page reads and wrapper worktree-refusal plant; complete page hashes/contents are not supplied here (`verdicts/S2-T41.leadproof1.txt`; `log-lines.md`, 07:53).
+
+#### Two initial implementation lenses and L-1092
+
+- Lens A: Moonshot AI Kimi K3.1 Pro via relay (return self-label: Factory Droid, OR Kimi K3.1 Pro), REJECTED at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`. F1 asks for code-level lead-shell admission; F2 finds the ordinary-build leak plant checks only the older token and omits both CDSE values and argv/environment/receipt comparison. Reading only; no tests, exits or executed counts claimed (`verdicts/S2-T41.revA1.return.md`; `log-lines.md`, 09:36).
+- Lens B: xAI Grok 4.7 High via Cursor (return self-label: SpaceXAI, Grok 4.7), APPROVED the same commit with four nonblocking notes: SYN-88 text in the wrong cell; unpinned ceiling/exact allowance boundaries; missing document-02 sentence break; stale no-commit/index-failure records. Review was reading only; builder counts were not independently reproduced. Initial launches were held by the governor and relaunched with different-maker justification; the held launches supplied no verdict (`verdicts/S2-T41.revB1.return.md`; `log-lines.md`, 08:33 and 09:36).
+- Lead ruling L-1092: F1 NOT ACCEPTED as written. Possession of both values held only by the lead wrapper is the boundary; no caller-settable admission flag or new wrapper is required. Replacement obligation O1 requires absent/empty-pair omission before request/write, planted neither/one/empty cases, and help/decision wording. F2 ACCEPTED. Lens-B notes 1–3 become obligations B1–B3; note 4 requires append-only record correction. Builder's maker fixes, both lenses confirm (`rulings.md`, L-1092).
+- Initial fix1 was stopped after 20 s because the lead's clone recipe failed before checkout; nothing was written. The corrected recipe checked the hash before launching fix1b. This is a lead setup failure with an identified cause, not a random test failure or an implementation attempt that supplied evidence (`log-lines.md`, 09:38).
+
+#### Fix round 1b and confirmations
+
+- Fix1b: OpenAI, launched as GPT-6.1 Sol through Codex; return self-identifies GPT-6 with exact session identifier unavailable. Commits: `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` (credential leak verification gaps), `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` (fixture environment isolation), `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60` (fix evidence and commit correction). No push/merge claimed. Same senior security/Python-test and strict credential-path personas; project-orientation, task-standards, github-flow, strict-reviewer, sanad-provenance and muhasabah-gate loaded, unavailable methods applied plainly (`verdicts/S2-T41.fix1b.return.md`; `log-lines.md`, 10:05).
+- O1 expands absent/partial/empty/whitespace cases and complete pending-contract control with socket/child/build/file/directory tripwires. A file-write plant fails the same focused test (exit 1, eight failing subcases), then four wiring tests pass (exit 0). Help first fails (eight tests, four failures, exit 1), then command tests pass. F2 checks both invented values across stdout/stderr/files/paths/receipts/argv/effective child environments; a real build-seam receipt prevents an empty receipt loop. Fourteen leak-channel runs fail with value-specific assertions, then eight command tests pass. B2's six rounding/unit/request boundary defects each fail the focused quota test; restored CDSE files pass 14 tests. B1/B3 are prose corrections verified by reading/docs, with no artificial red test claimed. Records append corrections without rewriting previous bytes (`verdicts/S2-T41.fix1b.return.md`, Obligations and plant evidence).
+- Final fix evidence: CDSE 14 passed; scripts 904 tests OK in 312.927 s; custodian 7,370 passed, one existing warning, 309.76 s; all exit 0. Ruff/format/mypy/docs/tree/parity/whitespace exit 0 (742 formatted files; 414 typed files; 1,032 text/116 Markdown; eight tree rules). Python 3.14.6, UV_OFFLINE=1, PYTHONDONTWRITEBYTECODE=1, workspace TMPDIR; direct test commands supplied no seed. Broad runs began after code/test commit `2d1ccf4`, with only records appended afterward; document/tree/parity/whitespace checks repeated at final `3fa8d4c`. Earlier deterministic typing/lint corrections remain recorded (`verdicts/S2-T41.fix1b.return.md`, Final checks).
+- Final lens A: Anthropic Claude Opus 5.5 through login C/Claude Code, APPROVED `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, replacing Moonshot because the relay lacked credit. O1, F2, B1–B3 and records closed under the ruling; no blocking findings or weakening. It independently ran CDSE (14 passed, exit 0), command discovery (eight tests, exit 0), wiring discovery (four tests, exit 0), docs/parity and throwaway O1/F2 plants. Nine Popen-channel leak plants were value-specific red; three O1 plants each failed with eight subcases. The bare `scripts.tests.test_commands` invocation failed import (exit 1, one error); discovery succeeded. The base and final narrowed ordinary-build tests both missed a separate radiance-path leak, so no pre-existing coverage was lost. Broad suites were not rerun. Wrapper/real confinement were not inspected (`verdicts/S2-T41.confA1.return.md`; `log-lines.md`, 10:17 launch attribution).
+- Lens A's N1 and N2 are recorded, NOT fixed: N1 duplicates the help boundary literal outside the architecture table; N2's bare MagicMock causes subprocess.run/check_output leaks to fail through ValueError rather than value-specific assertions, and other child-launch seams are not recorded. Both are nonblocking proposed follow-ups (OI-316 and OI-317 in items.md). Its CONSULT interprets ruling refusal as decision-0066 successful omission, exit 0; it does not request an exit-code change (`verdicts/S2-T41.confA1.return.md`, Findings and CONSULT).
+- Final lens B: xAI Grok 4.7 High through Cursor (self-label SpaceXAI Grok 4.7), APPROVED `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, no findings. It confirms the ruling's accepted obligations, both-value channel assertions, limited scope and preservation of existing controls on reading. No tests run, no independent test exits/counts claimed (`verdicts/S2-T41.confB1.return.md`; `log-lines.md`, 10:17).
+
+#### Lead whole tests and records notes
+
+- lv1 at original commit `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`, seed 2327118317: exit 0, RESULT PASSED. Suite passes: guards 910; core 739; custodian-1 4,163; custodian-2 3,207; product 786; web-checks 861; web-unit 1. Supplied total 10,667 passed, zero failed/skipped, seven suites, zero with problems (`lead-test-lv1.txt`; `log-lines.md`, 08:32 and 09:36).
+- lv2 at final commit `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, seed 1164900349: exit 0, RESULT PASSED. Suite passes: guards 910; core 739; custodian-1 4,163; custodian-2 3,207; product 786; web-checks 861; web-unit 1. Supplied total 10,667 passed, zero failed/skipped, seven suites, zero with problems. The files provide no wall duration or per-suite timing, so none is inferred. Neither head test proves a future exact merge result (`lead-test-lv2.txt`; `log-lines.md`, 10:05 launch).
+- Commit-subject records: the three fix subjects are `fix: close S2-T41 credential leak verification gaps`, `test: isolate the CDSE leak fixture environment`, and `docs: record S2-T41 fix evidence and commit correction`; none carries literal `(S2-T41)` scope. Preserve them exactly; do not imply all four subjects have that suffix. The first subject is `feat(custodian): optional free CDSE backup cache behind its own flag, with decision record 0066 (S2-T41)` (fix subjects: `verdicts/S2-T41.fix1b.return.md`, Commits; complete subjects independently read from Git at WORK).
+
+#### CONSULT and uncertainty for the lead
+
+- Required spec inputs PRNUM and SEEDNUM remain placeholders. No supplied evidence establishes a PR number or fresh ledger/exact-merge seed. Plan-1 return, exact planner/build session model identifiers, complete provider page evidence, timing of whole suites and future hosted/exact-merge approval remain unavailable; historical labels/results above are qualified accordingly (`log-lines.md`; `lead-test-lv1.txt`; `lead-test-lv2.txt`; supplied verdicts).
+- Read-only Git scope audit at the brief's exact BASE and WORK: merge-base is `b1e8653ccfd15e242308a147a5cafb34799d9a54`, not BASE `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02`. The four work commits descend from that older base. The exact requested scope therefore includes pre-task branch divergence, including decision-0062 deletions and other pack changes; these are not claimed as approved S2-T41 implementation. spec.json deliberately preserves the exact requested diff, rather than silently narrowing it. Lead disposition/rebase and corresponding review/check requirements remain unresolved. Source: brief BASE/WORK plus this preparation's read-only `git merge-base`, `git diff --name-status BASE WORK`, and `git log BASE..WORK`; the supplied ledger evidence does not authorize or explain those extra changes.
+- OI-316/OI-317 are the next unused sequential OI numbers at WORK (read-only scan of OPEN_ITEMS.md ID fields: maximum 313). `log-lines.md` mentions next OI-316 in another lead context, so the lead must check reservations on the eventual joined tree before appending. Existing S2-T41 provider/display/hardening open points are retained, not duplicated or closed (`verdicts/S2-T41.build1.return.md`, pending work; `verdicts/S2-T41.fix1b.return.md`, Reading-only limits; `log-lines.md`, 07:58).
+
+Muhasabah gate: PASS for evidence preparation with the stated uncertainties. No independent approval, provider readiness, merge or successful future ledger replay is inferred from these records.
+
+#### Carry onto main
+
+- The four approved commits sat on `b1e8653ccfd15e242308a147a5cafb34799d9a54`, a main before pull requests 95 and 96, and `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02` is not their ancestor (found by the ledger preparation). The lead cherry-picked them onto `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02` in order: `68c26fdf`, `92d29d83`, `bac208e2` and `8cdff52631cbc8098781490ef61c07de4176cc93`.
+- One conflict, in `docs/README.md`: main's index line of decision records (which accepts 0029 and 0062) is kept and the carried change adds only "[0066](decisions/0066-an-optional-free-cdse-backup-cache.md)" to the proposed decisions. The lead's file-by-file proof (join_proof over approved `b1e8653..3fa8d4c` and carried `4679f3c..8cdff52631cbc8098781490ef61c07de4176cc93`): 51 of 52 files byte-identical; `docs/README.md` differs by that one line (+2 -2 lines); no file changed only in the carried diff. No code or test differs from the approved commits.
+
+#### Evidence for the work commit `8cdff52631cbc8098781490ef61c07de4176cc93`
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_cache.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 4–6; PUB-01, PUB-04, PUB-10, PUB-11, PUB-19. Invented metric tiling, raster/date/mask validation, fixture ceiling and exact quota boundaries, response/request hashes, receipt and immutable snapshot chains, cache containment and malformed/partial promotion plants. Internal fixture arithmetic is not a verified provider tariff or live contract. No network or real cache.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 2, 3 and 6; PUB-03, PUB-12, ARC-13, ARC-98, OPS-07, OPS-08. Closed invented OAuth/Process envelopes, exact endpoint plus allow-listed host, pending-contract refusal, redirect/body/header/request-budget plants, all-issued-token redaction and registry isolation. No live provider or credential proof.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   PYTHONPATH=scripts:scripts/tests uv run --locked python -m unittest scripts.tests.test_commands -v
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 3 and 6; ARC-96, ARC-98, OPS-65, OPS-71, AGENTS.md rule 14; L-1092 F2. Closed command/help contract and absence of both invented CDSE values from stdout, stderr, files, paths, nonempty produced receipts, recorded argv and effective Popen child environments. Helper-path setup is required: confirmation A recorded ModuleNotFoundError for the bare module invocation. Popen recorder diagnostic and other child seams remain N2, proposed OI-315; this command does not claim broader child interception.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   PYTHONPATH=scripts:scripts/tests uv run --locked python -m unittest scripts.tests.test_cdse_key -v
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 1, 3 and 6; OPS-07, OPS-08, OPS-65, OPS-71, ARC-98; L-1092 O1. Neither/partial/empty/whitespace pairs omit before acquisition or file writes; complete invented control still omits pending provider verification. Default mode excludes backup, unknown flags refuse and credential repr is redacted. Omission is exit 0, not an independent caller-identity check.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint WORK; use replay result, not historical builder output.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "745 files already formatted"
+Seed:      none
+Notes:     Read-only format check at WORK; historical corrections remain in log.md.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 414 source files"
+Seed:      none
+Notes:     Type-check WORK with the locked repository environment; counts come from the lead replay.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1036 text files, 117 Markdown files: OK"
+Seed:      none
+Notes:     Document checks at WORK; decision 0066 remains Proposed and no provider readiness is inferred.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Layout and empty example-name inventory at committed WORK; earlier builder index failure is corrected append-only, not suppressed.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02...8cdff52631cbc8098781490ef61c07de4176cc93'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/publicdata/cdse/README.md A:custodian/src/eii_custodian/publicdata/cdse/__init__.py A:custodian/src/eii_custodian/publicdata/cdse/cache.py A:custodian/src/eii_custodian/publicdata/cdse/contracts.py A:custodian/src/eii_custodian/publicdata/cdse/transport.py A:custodian/tests/test_cdse_cache.py A:custodian/tests/test_cdse_transport.py A:docs/decisions/0066-an-optional-free-cdse-backup-cache.md A:scripts/cdse_key.py A:scripts/tests/test_cdse_isolation.py A:scripts/tests/test_cdse_key.py M:.env.example M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/fetch/registry.py M:custodian/tests/test_publicdata_behaviour.py M:custodian/tests/test_publicdata_licence.py M:custodian/tests/test_publicdata_registry.py M:docs/01_PROJECT_BRIEF.md M:docs/02_ARCHITECTURE.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:docs/08_BACKEND.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/13_DEPLOYMENT_AND_OPERATIONS.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/15_REVIEWER_CHECKLIST.md M:docs/16_DEMO_RUNBOOK.md M:docs/GLOSSARY.md M:docs/README.md M:eii M:scripts/check_tree.py M:scripts/commands/build_public.py M:scripts/commands/table.py M:scripts/commit_guard.py M:scripts/preflight.py M:scripts/preflight_rows.py M:scripts/tests/commands_support.py M:scripts/tests/import_boundary_guard.py M:scripts/tests/test_check_tree.py M:scripts/tests/test_commands.py M:scripts/tests/test_hooks_guard.py M:scripts/tests/test_import_boundary_files.py M:scripts/tests/test_operations_parity.py M:scripts/tests/test_preflight_rows.py M:scripts/tests/test_preflight_run.py M:scripts/tests/test_s1_followup.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "52 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact git diff --name-status BASE WORK, including inherited base divergence. BASE is not an ancestor of WORK: merge-base is b1e8653ccfd15e242308a147a5cafb34799d9a54. Do not describe this list as S2-T41-only scope. The lead must disposition the divergence before ledger replay/join; see log.md CONSULT.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   ./eii test --seed 2801618360
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    10667 passed, 0 failed, 0 skipped
+Seed:      2801618360
+Notes:     Lead only: fresh supplied seed, provider none, offline, no real cache, unchanged gates and limits. SEEDNUM is unresolved input, not execution evidence. Historical lv1/lv2 tests are recorded separately and do not prove an exact future merge result.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02..8cdff52631cbc8098781490ef61c07de4176cc93'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Four S2-T41 commits: 7ce5fc6537ac541f9af6cc60991edf65e4b9f591, 4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a, 2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c, 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60. All subjects are Conventional Commits; the three fixes have no literal (S2-T41) scope suffix. BASE divergence is unresolved; do not assume ancestor-chain replay from BASE.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
