@@ -237,6 +237,7 @@ The slice numbers of the earlier plan are kept, so that slice references across 
 | Public context and scenario backlog amendments (items 4 to 7, 9, 10, 12, 17, 22, 24 to 26, 28 and 29) | slices S3, S6 and S7 | S3-T12, S6-T03, S6-T12, S7-T01, S7-T02, S7-T08, S7-T09, S7-T10 and S7-T11 |
 | Health, school and age-specific service catchments (items 11, 21 and 27) | slice S7 | S7-T24, using S2-T29, S3-T12, S3-T14 and S6-T13 |
 | EII's acceptance targets and demonstration order | slices S2, S5, S6, S7, S8, S9 and S10 | TST-268 to TST-276, PRV-137 and PRV-138; the gate sentences of decision 0047 items B and D |
+| The eight everyday capabilities of the map screen ([decision 0065](decisions/0065-eight-everyday-capabilities-of-the-map-screen.md)) | slices S7 and S10 | S7-T28 to S7-T34, S10-T08 |
 
 ## 7. Estimated effort
 
