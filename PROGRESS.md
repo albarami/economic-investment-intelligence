@@ -38793,3 +38793,115 @@ environment) exited 0; last line:
 It verified the exact two production replacements against the full base commit,
 both scratch guard removals, the six changed tracked files, unchanged index and
 HEAD, the original ledger prefix, and the report marker/content constraints.
+
+## S7-CONTRACT — proposed coordinate contract for S7-T29 and S7-T33
+
+Date: 2026-11-19. Maker: OpenAI. Model: GPT-6 (Codex; exact runtime
+identifier not exposed). Senior persona: data-contract and geospatial
+architect for typed, source-linked map evidence. Strict self-review persona:
+principal contract reviewer refusing unsupported units, identities, geography,
+source chains and model/browser calculation. This is not an independent maker
+review; that verdict and decision acceptance remain SC-C04 in OPEN_ITEMS.md.
+
+Base read with `git rev-parse HEAD` (exit 0):
+`b4ca3324b5c089f3ddef36bd0086d7fc465b921d`; branch from
+`git status --short --branch` (exit 0): `local/S7-contract`, initially clean.
+The complete `.overnight/BRIEF.md` was read through the file-reading shell
+tool before work. Evidence inputs were both S7 build returns and both approved
+plans in `.overnight/IN/`; their test results are historical supplied evidence,
+not tests rerun by this task. No outside worker's worktree was inspected.
+
+Skills applied: project-orientation, task-standards, sanad-provenance,
+al-muhasibi, github-flow, strict-reviewer and muhasabah-gate. The requested
+writing-plans skill is unavailable in the installed catalogue; plain-meaning
+equivalent: read stops and pack first, identify existing frame/source objects,
+separate evidence from proposals, reserve uniquely defined draft rows, record
+unsettled points, then run the two specified checks and package the result.
+No library/API integration, runtime guard, artificial red plant, new source,
+privacy change, code/test edit or network call is part of this docs-only task.
+
+Reading findings and scope are attributed in decision 0067 **Context** and
+**Sources and uncertainty**. Its numbered items propose decimal-degree metrics,
+core-owned precision, transient input-sensitive point identity, existing
+municipality/gazetteer lineage, mapped-land coverage and precise refusal keys.
+New conditional requirement definitions are DAT-172 to DAT-176, BE-141 to
+BE-144 and FE-155 to FE-157; docs/README.md indexes the Proposed record.
+OPEN_ITEMS.md's **S7-CONTRACT — decision 0067 consultations** retains method,
+seat, Polygon orchestration, review/acceptance, stack/version, actual release
+metadata and later wording/library/frozen-bundle evidence as CONSULT. Neither
+S7 task is declared complete or activated. All earlier ledger bytes remain.
+
+Verification and delivery evidence will be appended after the actual commands;
+no passing result or implementation commit is asserted in this planning row.
+
+### S7-CONTRACT — check evidence and strict self-review
+
+Environment probes: `python3 --version`, exit 0, Python 3.14.4;
+`uname -sm`, exit 0, Linux x86_64. No seed applies: only deterministic
+documentation/tree checks run, not a world build or randomised test suite.
+No provider, database service or network was used. Task input and output paths
+remain workspace-relative; installed skills were read at their declared locations.
+
+| Command | Real exit | Observed result and scope |
+|---|---:|---|
+| `python3 scripts/check_docs.py` | 0 | 1037 text files, 118 Markdown files; includes the new non-ignored decision file. Checks links, requirement definitions/references, prohibited patterns and AGENTS.md/CLAUDE.md byte parity. |
+| `python3 scripts/check_tree.py` | 0 | Eight rules checked. This checker reads the existing index; it does not prove uncommitted additions have been staged. |
+| `git diff --check` | 0 | No tracked-diff whitespace errors. New-decision content is additionally checked by the document checker. |
+
+Strict self-review found an important remaining metadata boundary: the
+existing frame/gazetteer/source/manifest source rows do not declare the
+reference-period/edition field a navigation Fact would need. The decision and
+document 03 now explicitly require SC-C06's reviewed immutable-hash-to-period
+binding or an amendment, and refuse missing lineage instead of inventing a
+field or using retrieval time. This reading correction is not a failed or
+retried check. Final checks after it and the delivery record remain to run.
+
+Self-review verdict: APPROVE as a Proposed, docs-only contract for independent
+review, with SC-C01 to SC-C07 explicit and unresolved. REJECT as an activation
+or completed S7 implementation: absent method/context/source evidence cannot
+be approved by documentation checks. No different-maker verdict is claimed.
+Muhasabah: PASS for attributed reading, labelled proposals, explicit limits and
+authorised scope; runtime correctness and contract acceptance are unproved.
+
+### S7-CONTRACT — staging and delivery fallback
+
+After the metadata/period clarification, `python3 scripts/check_docs.py` again
+returned exit 0 (1037 text files, 118 Markdown files),
+`python3 scripts/check_tree.py` returned exit 0 (eight rules), and
+`git diff --cached --check` returned exit 0. `git diff --cached --stat`
+reported seven documentation files, 486 insertions; the later evidence append
+is additional to that measured staged state. `git diff --cached --name-only`
+(exit 0) contained only OPEN_ITEMS.md, PROGRESS.md, documents 03/08/10,
+docs/README.md and decision 0067. No code, test or environment file was staged.
+
+The explicit `git add` of those seven paths returned exit 0. The normal commit
+attempt with subject `docs(docs): propose S7-T29 and S7-T33 coordinate contract`
+and the brief's exact co-author trailer returned **exit 128**: Git could not
+create its index lock on the read-only metadata filesystem. Its raw diagnostic
+path is deliberately not copied into this ledger. The command used
+`UV_OFFLINE=1` and `EII_DECISION_PROVIDER=none`. No commit hash exists for this
+task; base remains `b4ca3324b5c089f3ddef36bd0086d7fc465b921d`. No retry,
+alternate index, alternate clone, permission change, hook bypass, push or merge
+was attempted. The requested fallback is `.overnight/OUT/contract.patch`,
+exported from the complete seven-path diff against HEAD, including staged and
+unstaged documentation edits. `.overnight/RETURN.md` records the disposition.
+
+SANDBOX ROUTES NOTICED: broad filesystem and network-capable tools are exposed;
+only task/repository reading and the declared installed skill files were used.
+The Git metadata boundary refused the commit after successful staging. An
+alternate index/clone or permission change could route around it; none was
+used. No private input, vault, data cache, secret file or outside job was read,
+and no network request was made. The staged state is preserved for the lead.
+
+Final delivery checks after recording the commit failure:
+`python3 scripts/check_docs.py`, exit 0, 1037 text files and 118 Markdown
+files; `python3 scripts/check_tree.py`, exit 0, eight rules;
+`git diff HEAD --check`, exit 0. `git rev-parse HEAD`, exit 0, confirms
+unchanged base `b4ca3324b5c089f3ddef36bd0086d7fc465b921d`.
+`git status --short --branch`, exit 0, confirms `local/S7-contract` with the
+seven scoped documentation paths, including the newly staged decision;
+PROGRESS.md also has the later unstaged evidence append. No random failure,
+test retry, skipped assertion, changed baseline or tolerance was involved.
+The patch is validated read-only against these working files with
+`git apply --check --reverse .overnight/OUT/contract.patch`; its actual exit
+and the final artifact paths are in the return report.
