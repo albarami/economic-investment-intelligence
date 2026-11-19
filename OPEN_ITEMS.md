@@ -313,6 +313,7 @@
 - NEEDED BY: slice S3 company interface; backlog review after slice S11.
 - CLOSED: 2026-11-12, by the owner's decisions of that day, recorded in [decision 0016](docs/decisions/0016-version-1-covers-the-whole-initiative.md): serving the region (journey D7) is in version 1; a cross-country entry comparison stays out of version 1. The company-seat recording notice keeps its draft wording, the documented default.
 - UPDATE: 2026-11-13, by [decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 15: the oversight seat and its roll-up leave version 1, so the notice no longer discloses oversight recording. The company seat states that its questions are recorded in the internal question log, which no screen shows ([01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), section "Open questions and assumptions", ASSUMPTION 4).
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 21: the owner reopens the cross-country comparison of starting a business as a later card, built once the benchmark sources of S2-T26 are read (S7-T25). This amends decision 0016 item 21 in that point only; serving the region is unchanged.
 
 ## OI-28 — Pilot request and lawful real-data path
 
@@ -830,6 +831,7 @@
 - OPTIONS: **Recommendation:** use the release dated 2025-01-10 and show its date; a newer release is the owner's choice. Alternative: leave the source out and keep the other registered places data.
 - NEEDED BY: slice S2 gate (S2-T15, PLN-25); not a blocker.
 - CLOSED: 2026-11-12, by the owner's answer of that day, recorded in [decision 0019](docs/decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 21: the copy dated 2025-01-10 is used for version 1 as it is and is shown with its date; where a place of the copy disagrees with OpenStreetMap or Overture, which are current, the newer source wins; no account is opened and no newer release is fetched for now.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 14: from the first refresh on, the newest dated release of the copy is read at each refresh on the S2-T15 path, with its date recorded in the registry and shown beside the places, and earlier releases kept as dated snapshots (S2-T37). This amends decision 0019 item 21's fixed release in that point only.
 
 ## OI-97 — Public source for the survival base rate
 
@@ -1103,6 +1105,7 @@
 - DONE SO FAR: Task S1-T11 fixed the values in the parameter file of the assignment spike, each with its source, the date it was read (2026-11-13) and its status. α 0.15 and β 4: the standard values of the volume-delay form of the Bureau of Public Roads (1964), as an open textbook of network analysis states them (Boyles, Lownes and Unnikrishnan, Transportation Network Analysis, Volume I, section 1.5.1). Free-flow speed by road class, in kilometres per hour: motorway 105, trunk 90, primary 75, secondary 60, tertiary 50, residential 35: the routing engine's own default for a road without a posted speed (the table `default_speed` of the file `lua/graph.lua` in the engine's source repository, and measured on the installed engine), so that free-flow drive times and the assignment agree. Capacity by road class, in vehicle trips per hour for one direction: motorway 4000, trunk 2000, primary 1500, secondary 1000, tertiary 600, residential 600: the default lanes in each direction times the default capacity per lane of the OpenStreetMap network reader of the open-source transport simulation MATSim (ASSUMPTION: a published default table, not measured for Qatar; one capacity for each class, because a road link of the data contract has no lane count). Volume bands: four, with the edges 0.85, 0.95 and 1.00, from Table 3-2 of chapter 3 of the Traffic Signal Timing Manual of the Federal Highway Administration (ASSUMPTION: thresholds published for signalised intersections, applied to road links as display bands). The speed floor is 10 kilometres per hour, by the owner's decision of 2026-11-13. The method makes one whole speed for a link and an hour, the larger of the floor and the rule's speed rounded half-up, times each link by its length over that speed, and releases the ratio of that speed to the free-flow speed rounded half-up to three decimals; the product reads the whole speed back exactly from the released ratio (tested for every whole speed from the floor to each class speed) and refuses a file of rows whose ratio gives back less than the floor or is not the rounded ratio of a whole speed. On the spike's fixture day two link-hours are at the floor by the rule, and four released rows give a whole speed of 10. A dial situation's link takes the speed of its length over the mean of its hourly times, rounded half-up to a whole km/h, so MTH-90's situation fixture becomes 53 km/h and 600/53 minutes. The spike routed between nodes only: how the end links of a route from a point inside a link are timed (an area's pin, a gateway) is left to the slice S3 task that shows such routes, in writing. The engine's turn costs at junctions are kept: a route shows its link times and one line for the turns, and a drive-time area's legend says once that it includes them; the differences between the engine and the method that the spike measured are pinned in tests and stated on card C25 as limits (decision 0021 item 9). Four rules of the spike's own, for task S5-T09 to keep or to change in writing: β is a positive whole number, because the assignment is computed in exact arithmetic; an hour is a whole number from 0 to 23, and text, decimal and boolean values are refused; identifiers are ordered as text by code point, so `SYN-N-0-10` comes before `SYN-N-0-9`, and the real graph needs its own fixed identifier order; trips between two different units that load at the same node stay off the network, like trips within one unit. The spike finds the links of an engine route from the vertices of the route's shape, which holds on its straight synthetic links only; the real graph needs the engine's edge identifiers. By the owner's decision of 2026-11-13, a link's capacity will be the capacity of one lane of its class times the link's lanes in one direction, read from the road extract (a link without a lanes tag taking its class's median); the amendment of decision 0021, card C25 and the road_link contract enters with task S5-T09, before any traffic is built; the values above stand until then.
 - OPTIONS: **Recommendation:** confirm the values and the rules as fixed; decision 0021 records them. Alternatives: the owner or a transport authority supplies free-flow speeds and capacities for Qatar's road classes, with their source, before slice S5; for a situation, the exact mean time instead of the whole speed, with a mark on the screen wherever the engine's time is shown beside it.
 - NEEDED BY: the slice S1 gate; task S5-T09.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 53: the owner wants fractional speeds kept once the method rule is confirmed. Until this item and OI-120 confirm it, the whole speed of decision 0021 stands; the change then takes a new method version (MTH-04, MTH-89) in S5-T09, and no release control of document 06 changes.
 
 ## OI-125 — One random failure of the performance page's smoke orbit
 
@@ -1173,42 +1176,46 @@
 ## OI-136 — Rents (the decision question bank's gap N3)
 
 - ID: OI-136
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN (owner))
 - NEEDED: The owner's word on a source of rents, or a confirmation that rents stay the user's own input.
 - WHY: No open rent source exists (document 04 section 12). [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic rents or tenancies; the 2026 guide land prices and the recorded sale prices are prices and are never relabelled as rents.
 - DONE SO FAR: Break-even and the "how sure" runs of S6-T21 take only the user's own rent, or the guide and recorded prices labelled as prices.
 - OPTIONS: **Recommendation:** keep the user's rent as the only rent in version 1.
 - NEEDED BY: before any rent figure is offered.
+- CLOSED: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 12: the owner's yes to the question groups N2 to N7 is given. N3 (rents): S6-T04 builds its playbook; a rent comes only from a registered Public source or the user's own input, a price is never relabelled as a rent, and no synthetic rent stands in (decision 0023 item 12).
 
 ## OI-137 — An events calendar (the decision question bank's gap N4)
 
 - ID: OI-137
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN (owner))
 - NEEDED: The owner's word on a public source of an events calendar.
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now.
 - DONE SO FAR: The simulation keeps its three event days of document 05; no calendar of named events is shown.
 - OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
 - NEEDED BY: before any question of the bank that needs it is answered.
+- CLOSED: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 12: the owner's yes to the question groups N2 to N7 is given. N4 (an events calendar): S6-T04 builds its playbook, which answers only from the dated event snapshots of S2-T29 with no complete-calendar claim; the same snapshots feed the event model of S4-T08 (item 36).
 
 ## OI-138 — Supplier certifications (the decision question bank's gap N6)
 
 - ID: OI-138
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN (owner))
 - NEEDED: The owner's word on a public source of supplier certifications.
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item A9 records it as a gap that waits for the owner's word and is not built now; no synthetic data stands in for it (item 12).
 - DONE SO FAR: The partner and supplier finder shows no certification; the structured qualification route stays as document 09 states it.
 - OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
 - NEEDED BY: before any question of the bank that needs it is answered.
+- CLOSED: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 12: the owner's yes to the question groups N2 to N7 is given. N6 (supplier certifications): S6-T04 builds its playbook, which answers only from a registered Public source; S2-T29's browser-capture route is tried on the supplier page before any dated skip stands (item 28), and without a source the question stays a gap with its reason (AI-129).
 
 ## OI-139 — School capacity (the decision question bank's gap N7)
 
 - ID: OI-139
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN (owner))
 - NEEDED: The owner's word on a public source of school capacity.
 - WHY: [Decision 0023](docs/decisions/0023-ten-additions-and-the-data-rule.md) item 12 forbids synthetic school capacity, and item A9 records it as a gap that waits for the owner's word.
 - DONE SO FAR: Only the published students by municipality (`students_muni`) are shown, as Public facts with source and year.
 - OPTIONS: **Recommendation:** leave it out until a public source is named and registered in document 04.
 - NEEDED BY: before any question of the bank that needs it is answered.
+- CLOSED: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 12: the owner's yes to the question groups N2 to N7 is given. N7 (school capacity): S6-T04 builds its playbook; the private-school directory's school-level count fields are taken as published by S2-T29 (item 46), no capacity is estimated (decision 0023 item 12), and without a source the question stays a gap with its reason (AI-129).
 
 ## OI-140 — Whether the competition-adjusted ratio of talent available near this site may be computed
 
@@ -1261,6 +1268,7 @@
 - DONE SO FAR: Documents 01, 09, 10 and 14 record the gap in their open questions. The cases of item 1 already bind the planner's figures: group statistics only, through the release rules, with Qatari and non-Qatari splits only where the cell passes (BRF-96, AI-133, FE-150).
 - OPTIONS: **Recommendation:** build neither until its passage and task are recorded. The planner then follows the cases of item 1 and the release rules of document 06. The recovery tracker's passage is written from the owner's description, through a decision record if it adds scope to version 1 (AGENTS.md rule 46).
 - NEEDED BY: for the planner, before the journey D5 tasks of slice S7 (S7-T03, S7-T08) are planned; for the recovery tracker, before any work on it.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 44: both tools get their tasks. S7-T26 builds the Qatarization planner in journey D5 under decision 0023 items 1 and 15. S7-T27 first writes the recovery tracker's passage from the owner's description, through a decision record if it adds scope (AGENTS.md rule 46), then builds it. The item stays open for that description.
 
 ## OI-145 — The age profile of people living here as its own Public component
 
@@ -1491,12 +1499,13 @@
 ## OI-130 — Showing the live traffic layer outside internal evaluation
 
 - ID: OI-130
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - NEEDED: The owner's decision whether the optional live traffic layer (decision 0019, task S6-T19) is shown to anyone outside his own evaluation and testing.
 - WHY: The provider's terms, read by the lead in full on 2026-11-13 (`https://docs.tomtom.com/legal/terms-and-conditions`; no date or version on the page), license the free plan "for Evaluation Use only", defined as "internal evaluation and testing by you of the Licensed Products"; a demonstration to a ministry is not clearly internal evaluation.
 - DONE SO FAR: Document 04 records the terms on the two provider rows: Evaluation Use only; caching or storing results prohibited except in a client under the result's cache-control headers and never to serve several users (nothing is stored, as decision 0019 already says); the logos and copyright notices the provider's interfaces generate are kept, and other attribution comes from the provider's copyright interface; the page says nothing on showing the layer beside other map data. The layer stays off by default.
 - OPTIONS: **Recommendation:** keep the live layer for the owner's own evaluation and show the simulated traffic in every demonstration; if the owner wants the live layer in a demonstration, take a plan whose terms allow that use first.
 - NEEDED BY: task S6-T19.
+- CLOSED: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 2: the owner restores the live layer for showings to others under the provider's paid plan, a spend choice the lead lists for the owner on the subscriptions file (OI-304); until the owner holds it, the layer stays the owner's own evaluation on the free plan. It stays off by default, stores nothing of a response, shows its attribution and is never needed by a test, gate, command or the guided story (rules 4 and 27); simulated traffic stays the default of every showing. Carried by S6-T19.
 
 ## OI-131 — Public split declarations of the registry rows
 
@@ -1548,6 +1557,7 @@
 - DONE SO FAR: `custodian/publicdata/review/population_indicators.csv` lists `Employed` with a blank token; the live build reports the unmapped indicators' rows as not loaded (192 rows on the real run, `Employed` among them), refuses an indicator the file does not list with the source and the indicator named, and a test pins the committed file with two planted edits of a copy.
 - OPTIONS: **Recommendation:** decide at the slice S5 privacy design, before any task loads or uses the count; loading it earlier needs that decision first.
 - NEEDED BY: the design of slice S5.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 15: the owner restores the indicator. S2-T38 loads it as a Public fact on the source's own geography, with source and year, never joined to a synthetic record, used to segment one, apportioned to a drawn area or combined with a protected figure (rule 10). The item stays open only for how the attack model of slice S5 counts the published figure, a point of S5's privacy design in which no privacy rule, attack size or tolerance is relaxed (rule 12).
 
 ## OI-171 — Three bed-linen lines whose two descriptions disagree
 
@@ -1558,6 +1568,7 @@
 - DONE SO FAR: The three lines stay excluded with the corrected reason; the input 'bed linen' is narrower than its name and says so.
 - OPTIONS: **Recommendation:** keep the lines out until the OI-03 sign-off decides; including them needs the nomenclature as a cited source.
 - NEEDED BY: the OI-03 sign-off; the hotel basket.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 35: the three lines enter the import baskets only if the basket allows them and the condition above holds (the nomenclature cited as a source). Whether the basket limit of eight lines (MTH-33) is the cause of their exclusion is to confirm here. Carried by S6-T15.
 
 ## OI-172 — Owner's confirmation of the reviewed customs baskets
 
@@ -1998,6 +2009,7 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: The four recommendations stand word for word in the record's table. R6 would reopen a narrow part of decision 0023 item 15.
 - OPTIONS: **Default until the owner decides:** nothing changes. The owner's 30-minute drive ceiling stays (R3). There is no custodian-facing view in version 1 (R6). The wage trend stays national by sector in version 1 (R7). The tool server stays outside the plan (R14). A yes on any block needs its own decision record and task.
 - NEEDED BY: before slice S11 ends, or earlier if the owner wants a block in version 1.
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 50: the owner's choice on R7 is yes: sector pay gains the area figure from released synthetic wage tables under document 06 beside the national Public mean, its origin carried as decision 0035 requires. No area-sector dimension is released until document 06's rules pass it in the custodian plane; the carrying task is to confirm (OI-312). R3, R6 and R14 are unchanged; item 19 keeps the 30-minute drive ceiling.
 
 ## OI-215 — DES-175 "its label" names no origin marker
 
@@ -2427,6 +2439,7 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - DONE SO FAR: Recruitment and testing are not performed by this documents-only change. Proposed gates are SUS at least 80 (a score, not a percentage) and at least 90 per cent correct reading of the source chain and of withheld results; no audience origin classification is tested (decision 0035 items 1 and 4).
 - OPTIONS: **Recommendation:** The owner recruits from his own network, balanced by working language; record the protocol before the test and report measured results against the proposed gates.
 - NEEDED BY: After the S6 flagship journey runs; the build never waits for recruitment or these tests (L-674 item 6).
+- UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 52: the first audience showing, not the build, waits until one bilingual usability session has run. The build still never waits for recruitment or these tests.
 
 ## OI-258 — Request limits on free exploration
 
@@ -2662,6 +2675,106 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - CONCERNS: `custodian/tests/fixtures/heights/invented.py` (`zip_members`, `zip_members_duplicated`); `custodian/tests/test_publicdata_heights.py::test_two_runs_give_identical_file_hashes`
 - EVIDENCE: The test failed once at its byte-equality assertion (the output files differed at byte index 1002). Cause: the fixtures wrote zip members by name, so each member took the wall-clock time of its writing; the heights manifest records each input's hash, and two builds of one fixture on either side of a two-second step of the zip time field gave different input hashes. Shown by building the 3D-GloBFP fixture twice 2.1 seconds apart (bodies differ) and by the new `custodian/tests/test_heights_fixture_clock.py`, red at `b380109` (5 failed, 1 passed) and green with the fix (6 passed). No product code is involved.
 - NEEDED: The fix of task S2-T34 writes every member with the zip format's first date and the compression its writer names; the byte-equality assertion stays unchanged. The item closes when that fix is merged and the hosted run of the merge passes.
+
+## OI-304 — The live traffic provider's plan for showings to others
+
+- ID: OI-304
+- TYPE: OPEN (owner)
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 2
+- CONCERNS: S6-T19; the subscriptions file kept for the owner outside the repository
+- WHY: The owner restores the live layer for showings to others under the provider's paid plan; the table records its price as to confirm.
+- NEEDED: The lead confirms the plan's name and price from the provider's current page and lists it on the subscriptions file, outside the repository; the owner takes it or not. Until the owner holds it, the layer stays the owner's own evaluation on the free plan, off by default and never needed by a test, gate, command or the guided story.
+- NEEDED BY: before the live layer is shown to anyone other than the owner.
+
+## OI-305 — The imagery provider's plan with offline tiles
+
+- ID: OI-305
+- TYPE: OPEN (owner)
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 6
+- CONCERNS: S3-T23; OPS-73, TST-248; the subscriptions file kept for the owner outside the repository
+- WHY: Offline satellite imagery needs an imagery-provider plan that includes offline tiles; the table records its price as to confirm.
+- NEEDED: The lead confirms the plan's name and price and lists it on the subscriptions file, outside the repository; the owner takes it or not. Until the owner holds it, S3-T23 does not start, and OPS-73, TST-248 and every statement that no tile is stored stand unchanged.
+- NEEDED BY: S3-T23.
+
+## OI-306 — The ceiling of the photorealistic 3D mode
+
+- ID: OI-306
+- TYPE: OPEN (owner)
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 7
+- CONCERNS: S3-T16; TST-255, BE-139, OPS-74
+- WHY: The spend meter replaces the per-view budget; the owner names the ceiling after one showing is measured.
+- NEEDED: The micro-pass of S3-T16 measures the billable requests and the spend of a full showing of Doha and of all Qatar; the owner then names the ceiling. Until then the owner's ceiling of USD 20 in total holds, with its project-wide hard stop (3,333 billable requests at USD 6.00 per 1,000, lowered if the price read is higher).
+- NEEDED BY: before any ceiling other than USD 20 is configured.
+
+## OI-307 — Decision 0062 and the tolerances of S4-T12
+
+- ID: OI-307
+- TYPE: OPEN (owner)
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 9
+- CONCERNS: S4-T12; SYN-91; the draft decision 0062
+- WHY: Row 9 of the narrowing table is not yet decided: the owner approves decision 0062 once, after its redraft has passed its review.
+- NEEDED: The redraft of decision 0062 passes its review, and the owner approves or amends it. No tolerance of S4-T12 is fixed, tuned or run before then, and the values are fixed before the fit check runs (rule 12).
+- NEEDED BY: S4-T12.
+
+## OI-308 — The list of files that the per-file ceiling refuses
+
+- ID: OI-308
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 11
+- CONCERNS: S2-T08 part B; L-975
+- WHY: Every refused file that feeds a figure or a card gets a named per-source ceiling or a bounded read; the table names the WSF 3D height file and two import exports, and records as to confirm whether the list of refused files is made.
+- NEEDED: The lead records whether the list is made and, if it is, the dated list of every file the ceiling of 300 MiB refuses, each with the figure or card it feeds, so that none is missed.
+- NEEDED BY: the next pass of S2-T08 part B.
+
+## OI-309 — The other six registry rows not read by the live build
+
+- ID: OI-309
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 22
+- CONCERNS: S2-T24, S2-T25, S2-T26, S2-T28; OI-210, OI-275
+- WHY: The table counts 15 registry rows not read by the live build and names nine (the accident table, BACI, Gravity, the Atlas of complexity, Comtrade, World Development Indicators, UNCTAD FDI, IMF WEO, ILOSTAT); the other six and the live build record are to confirm.
+- NEEDED: The live build record that lists the 15 rows, the names of the other six, and for each the task that reads it; each URL and byte bound is confirmed from the publisher's metadata, and no bound is invented.
+- NEEDED BY: the slice S2 gate.
+
+## OI-310 — Where GlobalBuildingAtlas stands in the height order
+
+- ID: OI-310
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 25
+- CONCERNS: S2-T20, S3-T16; decision 0023 item A2
+- WHY: GlobalBuildingAtlas is measured against the recorded heights, but the height order of decision 0023 item A2 does not hold it.
+- NEEDED: S2-T20 records its measured error beside those of the other height sources; its place in the order is then put to the owner, and a change of the order takes its own decision record (AGENTS.md rule 46).
+- NEEDED BY: before S3-T16 draws a height from it.
+
+## OI-311 — Free imagery dates and the GIS locator within OPS-65 and ARC-35
+
+- ID: OI-311
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) items 24 and 30
+- CONCERNS: S2-T19, S2-T27, S3-T03, S3-T16; OPS-65, ARC-35
+- WHY: A free choice of imagery dates for any area and address search through the national GIS locator both reach the GIS centre's services, while OPS-65 and ARC-35 let only `./eii build-public` contact a public source host, apart from the named run-time providers.
+- NEEDED: The lead records how each is served: from dated snapshots fetched by `./eii build-public`, or as a named run-time exception that a decision record adds to OPS-65 and ARC-35 with its own planted checks. No host is contacted at run time before then, and S2-T19's committed list of fixed views and its planted refusal stand meanwhile.
+- NEEDED BY: S2-T19's amendment of item 30 and S3-T03's amendment of item 24.
+
+## OI-312 — Carrying tasks still to confirm
+
+- ID: OI-312
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) items 31, 43 and 50
+- CONCERNS: TASKS.md slices S3, S6 and S7
+- WHY: The table marks as to confirm the tasks of: the four playback behaviours, pages PAGE-2 and PAGE-6, the satellite opening shot and the what-changed card (item 31; hot and cold spots stay with S7-T23); the period and bound checks on 14 rows (item 43); and sector pay by area from released synthetic wage tables (item 50).
+- NEEDED: The lead names the carrying task of each by a reviewed change of TASKS.md, adding an amendment line that cites its item; no criterion is ticked by naming it.
+- NEEDED BY: before the gate of the slice that holds each task.
+
+## OI-313 — The F5 calibration values
+
+- ID: OI-313
+- TYPE: OPEN
+- RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 45
+- CONCERNS: TASKS.md queue rules; S4-T02
+- WHY: The table lists the F5 calibration values among the plan items left as open items, and marks them as to confirm.
+- NEEDED: The lead confirms what the F5 calibration values are, where they are owed and the task that closes them before its gate.
+- NEEDED BY: the slice S4 gate.
 
 ## Change control
 
