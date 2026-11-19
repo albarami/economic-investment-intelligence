@@ -1,0 +1,109 @@
+[
+  {
+    "id": "paired_valid",
+    "raw": "{\"catalogue_version\":\"354e3cfa2236a86df76c5e244793e3ba0850b999002f38c0229110cf1e166c33\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\",\"light\":\"f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false,
+      "catalogue_variant": "paired_slots"
+    },
+    "expected": null
+  },
+  {
+    "id": "paired_swap",
+    "raw": "{\"catalogue_version\":\"354e3cfa2236a86df76c5e244793e3ba0850b999002f38c0229110cf1e166c33\",\"headline_key\":\"foundation_headline\",\"decision_template_key\":\"foundation_decision\",\"observed\":[{\"claim_key\":\"area_note\",\"slots\":{\"reading\":\"f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5\",\"light\":\"f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4\"}}],\"inferred\":[],\"still_to_test\":[],\"not_measured\":[],\"next_questions\":[{\"question_key\":\"foundation_ask_shape\",\"slots\":{}},{\"question_key\":\"foundation_ask_walk\",\"slots\":{}},{\"question_key\":\"foundation_ask_context\",\"slots\":{}}],\"layout\":[{\"component\":\"foundation_note\",\"props\":{}}],\"stage\":[{\"component\":\"hour\",\"props\":{\"hour_key\":\"hour_am\"}}]}",
+    "context": {
+      "facts": {
+        "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4": {
+          "fact_id": "f_a1b2c3d4a1b2c3d4a1b2c3d4a1b2c3d4",
+          "metric_key": "population_grid_people",
+          "unit": "count",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        },
+        "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5": {
+          "fact_id": "f_b2c3d4e5b2c3d4e5b2c3d4e5b2c3d4e5",
+          "metric_key": "night_lights_radiance",
+          "unit": "radiance_nw_cm2_sr",
+          "period": "2024",
+          "geography_kind": "area_shape",
+          "provenance": "public",
+          "evidence_status": "observed",
+          "lineage_ref": "lin_grid_people",
+          "breakdown": "none"
+        }
+      },
+      "lineage": {
+        "lin_grid_people": {
+          "release_table": "invented_grid",
+          "method": "invented_fixture",
+          "version": "fixture",
+          "source": "invented source, no public assertion",
+          "licence": "test fixture only",
+          "retrieved": "2026-11-18",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "assumptions": [],
+      "scope": "area",
+      "limits": [
+        "fixture_only"
+      ],
+      "companions": [
+        "source_context"
+      ],
+      "withheld": false,
+      "catalogue_variant": "paired_slots"
+    },
+    "expected": {
+      "rule_code": "SLOT_METRIC",
+      "item_path": "observed[0].slots.reading"
+    }
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "task": "S6-T33 part 1",
+  "authority": ["TASKS.md S6-T33", "decision 0042 items 4, 5, 6, 8, 9, 13", "L-974"],
+  "candidates": ["native", "a2ui", "json-render"],
+  "transports": ["plain-events", "ag-ui"],
+  "unauthorizedOutput": 0,
+  "prematureCommits": 0,
+  "staleCommits": 0,
+  "repairLimit": 1,
+  "severity": ["blocking", "warning"],
+  "activation": "application-established, single-use, same event turn",
+  "version": "exact S3-T07 catalogue_version equality against supported set",
+  "streams": "every byte cut, explicit completion and validation, cancellation before and after validation, late chunks",
+  "lineCounting": "nonblank, noncomment lines; frozen categorized file list in count-lines.mjs",
+  "selection": "retain adapter only if every criterion passes and it removes code; otherwise native",
+  "browser": "BLOCKED: browser provisioning requires lead; existing data cache is off limits",
+  "factDisplay": "BLOCKED: application Fact chip family absent; do not create a second family",
+  "randomness": "none",
+  "network": "none"
+}

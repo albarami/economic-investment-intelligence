@@ -1,0 +1,73 @@
+{
+  "kind": "offline-bundle-only",
+  "sources": {
+    "measure-build.mjs": "89a17c2bb0727f5d6af20837c82cd9c26cf21d03d7c40d51e5198a105ee935fa",
+    "contract.json": "647679a6a7fb3e71d85f9940accb0e82ada4f9d6b9238b0ea245c1eed393539d",
+    "fixtures/profiles.json": "f01ded8414f0cfd0e4c4553378b6625b84ec3d41edf3fa10da55035f4b3e2b4d",
+    "main.tsx": "fcf9fa87b004e45fcf08bbe33ec2137bd95b46c0c8696231ba66650911ba39ae",
+    "benchmark.tsx": "8547196d677d8c5d0ef7f630730dc2657d746681cfe853f616b1ad9fb097b5d4",
+    "workload.ts": "cea85d04c8885a385defe072d528322ef1a490742650214a7ddc0e3e75ff4536",
+    "guards.mjs": "b4c613497f7ff1279f4ba43c14ae5935aeb9c28c847199ccc6d273670b4287ae",
+    "adapters/echarts.tsx": "83b22e67054bf34f15d66f1362827d9c6437a94c8118fdcaa23a1512d4408b71",
+    "adapters/plot.tsx": "ace6e3d2af39b0ef06802a0c64dd37ac374b819080b62877a78731d753093f5a",
+    "adapters/visx.tsx": "7aa2ec4d2f7435e93e23e1d6c8414e87884e84154c781346c4494edd613273a6"
+  },
+  "environment": {
+    "node": "v22.22.3",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "settings": {
+    "mode": "production",
+    "format": "es",
+    "minify": true,
+    "gzipLevel": 9,
+    "brotliQuality": 11
+  },
+  "identity": {
+    "lock": "32a58aae97d4eea1a20b256691474c4d720a7dcc46f1d9bc27f4ad12df7a63e1",
+    "contract": "647679a6a7fb3e71d85f9940accb0e82ada4f9d6b9238b0ea245c1eed393539d",
+    "fixture": "f01ded8414f0cfd0e4c4553378b6625b84ec3d41edf3fa10da55035f4b3e2b4d"
+  },
+  "totals": {
+    "empty": {
+      "raw": 858767,
+      "gzip": 214630,
+      "brotli": 144374
+    },
+    "echarts": {
+      "raw": 1505270,
+      "gzip": 398446,
+      "brotli": 296259
+    },
+    "plot": {
+      "raw": 1228733,
+      "gzip": 317433,
+      "brotli": 228355
+    },
+    "visx": {
+      "raw": 909238,
+      "gzip": 229992,
+      "brotli": 158178
+    }
+  },
+  "deltas": {
+    "echarts": {
+      "raw": 646503,
+      "gzip": 183816,
+      "brotli": 151885
+    },
+    "plot": {
+      "raw": 369966,
+      "gzip": 102803,
+      "brotli": 83981
+    },
+    "visx": {
+      "raw": 50471,
+      "gzip": 15362,
+      "brotli": 13804
+    }
+  },
+  "parse": "BLOCKED: native parse/compile attribution unavailable",
+  "memory": "BLOCKED: full-story instrumentation unavailable"
+}

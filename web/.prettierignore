@@ -3,3 +3,9 @@ package-lock.json
 *.md
 playwright-report/
 test-results/
+
+# Frozen machine inputs: byte hashes were declared before guard execution.
+spikes/catalogue/fixtures/
+spikes/catalogue/contract.json
+# Recorder serializes hashed machine evidence with JSON.stringify.
+spikes/catalogue/evidence/

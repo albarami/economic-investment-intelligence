@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@observablehq/plot": [
+        "../../node_modules/@observablehq/plot/src/index.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "main.tsx",
+    "benchmark.tsx",
+    "recorder.ts",
+    "adapters/*.tsx",
+    "workload.ts",
+    "guards.mjs"
+  ]
+}
