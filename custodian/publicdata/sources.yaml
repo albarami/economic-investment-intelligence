@@ -18,9 +18,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-active-certificates-by-municipality-and-business-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-active-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -54,9 +54,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-canceled-certificates-by-municipality-and-business-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-canceled-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -94,9 +94,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/moci-issued-certificates-by-municipality-and-business-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/moci-issued-certificates-by-municipality-and-business-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -134,9 +134,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2025-2026/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2025-2026/"
     nightly_live_fetch: true
     public_splits: []
@@ -186,9 +186,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/qatar-imports-2019-2024-copy/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/qatar-imports-2019-2024-copy/"
     nightly_live_fetch: true
     public_splits: []
@@ -236,9 +236,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-economic-indicators-in-hotels-and-restaurants-by-activity1/"
     nightly_live_fetch: true
     public_splits: []
@@ -294,9 +294,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-goods-value-in-hotels-and-restaurants-by0/"
     nightly_live_fetch: true
     public_splits: []
@@ -340,9 +340,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-intermediate-services-value-in-hotels-and-restaurants0/"
     nightly_live_fetch: true
     public_splits: []
@@ -386,9 +386,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-number-establishments-employees-by-size-of-establishment-economic-activity/"
     nightly_live_fetch: true
     public_splits: []
@@ -433,9 +433,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-restaurants-statistics-estimates-of-compensation-in-hotels-and-restaurants-by-occupation1/"
     nightly_live_fetch: true
     public_splits: []
@@ -461,9 +461,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q1/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -503,9 +503,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-15-years-and-above-and-monthly-average-wage-q/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -545,9 +545,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/workers-in-paid-employment-and-average-monthly-wage-by-gender-and-sector/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -581,9 +581,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/average-monthly-wage-q-r-for-workers-in-private-sector-in-qatar-2021-2025/"
     nightly_live_fetch: true
     public_splits: []
@@ -615,9 +615,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-and-average-work-hours-by-gender-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -651,9 +651,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/electricity-total-consumption-by-zone-number/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/electricity-total-consumption-by-zone-number/"
     nightly_live_fetch: true
     public_splits: []
@@ -685,9 +685,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/water-total-consumption-by-zone-number/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/water-total-consumption-by-zone-number/"
     nightly_live_fetch: true
     public_splits: []
@@ -713,9 +713,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/public-transport-users/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/public-transport-users/"
     nightly_live_fetch: true
     public_splits: []
@@ -753,9 +753,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/accommodation-data-by-segment-date-and-key-metrics-supply-demand-occupancy-adr-revpar/"
     nightly_live_fetch: true
     public_splits: []
@@ -781,9 +781,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/consumer-price-index-cpi-by-expenditure-group-monthly/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/consumer-price-index-cpi-by-expenditure-group-monthly/"
     nightly_live_fetch: true
     public_splits: []
@@ -817,9 +817,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-real-estates-sales-bulletin/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/weekly-real-estates-sales-bulletin/"
     nightly_live_fetch: true
     public_splits: []
@@ -882,9 +882,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-and-labour-force-by-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -910,9 +910,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-area-and-population-density-per-square-kilometers-by-zone/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-area-and-population-density-per-square-kilometers-by-zone/"
     nightly_live_fetch: true
     public_splits: []
@@ -946,9 +946,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-business-establishments-by-economic-activity-in-census-2010-2020/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-business-establishments-by-economic-activity-in-census-2010-2020/"
     nightly_live_fetch: true
     public_splits: []
@@ -981,9 +981,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-by-type-of-household-gender-and-place-of-residence-on-the-census-night-december-2020/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -1018,9 +1018,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/accident/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/accident/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -1093,9 +1093,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/qat_pop_2020_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2025A/2020/QAT/v1/100m/constrained/"
     nightly_live_fetch: true
     public_splits: []
@@ -1324,9 +1324,9 @@ sources:
     decision_record: ""
     fetch_host: "data.humdata.org"
     url: "https://data.humdata.org/dataset/6a84f3b8-41cd-4769-a61f-6dbd5f61bd05/resource/1955adf8-4e4a-4a87-b3f0-0fbe6e761ca9/download/qat_admin_boundaries.geojson.zip"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/3.0/igo/legalcode"
+    terms_words: "\"Attribution 3.0 IGO\" [...] \"You must include a copy of, or the Uniform Resource Identifier (URI) for, this License with every copy of the Work You Distribute or Publicly Perform.\" [...] \"any attributions that the Licensor indicates be associated with the Work as indicated in a copyright notice\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://data.humdata.org/dataset/cod-ab-qat"
     nightly_live_fetch: true
     public_splits: []
@@ -1352,9 +1352,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/municipalities-in-qatar-2025/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.data.gov.qa/pages/license/annexes"
+    terms_words: "\"Creative Commons Attribution 4.0 International (CC BY 4.0)\" [...] \"provided that proper attribution to the data source is maintained.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/municipalities-in-qatar-2025/"
     nightly_live_fetch: true
     public_splits: []
@@ -1385,9 +1385,9 @@ sources:
     decision_record: ""
     fetch_host: "www.geoboundaries.org"
     url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
+    terms_words: "ADM0: \"Open Data Commons Open Database License 1.0\"; ADM1: \"Creative Commons Attribution 4.0 International (CC BY 4.0)\"; ADM2: \"Creative Commons Attribution 4.0 International (CC BY 4.0)\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.geoboundaries.org/api/current/gbOpen/QAT/ALL/"
     nightly_live_fetch: true
     public_splits: []
@@ -1413,9 +1413,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/?list-type=2&prefix=release/2026-10-21.0/theme=places/type=place/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://docs.overturemaps.org/attribution/"
+    terms_words: "\"other\" [...] \"Data from Meta. Available under CDLA Permissive 2.0.\" [...] \"Available under Apache 2.0.\" [...] \"Data from AllThePlaces. Available under CC0 1.0.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/catalog.json"
     nightly_live_fetch: true
     public_splits: []
@@ -1441,9 +1441,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/?list-type=2&prefix=release/2026-10-21.0/theme=buildings/type=building/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
     landing_url: "s3://overturemaps-us-west-2/release/2026-10-21.0/theme=buildings/"
     nightly_live_fetch: true
     public_splits: []
@@ -1469,9 +1469,9 @@ sources:
     decision_record: ""
     fetch_host: "download.openstreetmap.fr"
     url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.openstreetmap.org/copyright"
+    terms_words: "\"Open Data Commons Open Database License (ODbL)\" [...] \"You are free to copy, distribute, transmit and adapt our data, as long as you credit OpenStreetMap and its contributors. If you alter or build upon our data, you may distribute the result only under the same license.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf"
     nightly_live_fetch: true
     public_splits: []
@@ -1497,9 +1497,9 @@ sources:
     decision_record: "0026"
     fetch_host: "unstats.un.org"
     url: "https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_4_english_structure.Txt"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.un.org/en/about-us/terms-of-use"
+    terms_words: "\"for the User’s personal, non-commercial use, without any right to resell or redistribute them or to compile or create derivative works therefrom\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://unstats.un.org/unsd/classifications/Econ"
     nightly_live_fetch: true
     public_splits: []
@@ -1753,9 +1753,9 @@ sources:
     decision_record: "0026"
     fetch_host: ""
     url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://qna.org.qa/en/pages/terms-of-use"
+    terms_words: "\"All contents of the Qatar News Agency Web Site are: All rights reserved for Qatar News Agency © 2021 and/or its suppliers. All rights reserved.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://qna.org.qa/en/News-Area/News/2026-2/16/qatar-sets-reduced-working-hours-for-public-sector-during-ramadan"
     nightly_live_fetch: false
     public_splits: []
@@ -1865,9 +1865,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/weekly-residential-units-sales-bulletin/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/weekly-residential-units-sales-bulletin/"
     nightly_live_fetch: true
     public_splits: []
@@ -1920,9 +1920,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitors-of-museums-and-exhibition-by-month-and-museum/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitors-of-museums-and-exhibition-by-month-and-museum/"
     nightly_live_fetch: true
     public_splits: []
@@ -1963,9 +1963,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/phcc-patient-visits-by-health-center-and-region/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/phcc-patient-visits-by-health-center-and-region/"
     nightly_live_fetch: true
     public_splits: []
@@ -2008,9 +2008,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/total-building-permits-issued-by-municipality-and-type-of-building-type-of-permit/"
     nightly_live_fetch: true
     public_splits: []
@@ -2055,9 +2055,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/total-building-completion-certificates-issued-by-municipality-and-type-of-building-type-of/"
     nightly_live_fetch: true
     public_splits: []
@@ -2102,9 +2102,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-daayen-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2145,9 +2145,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-khor-and-al-thakhira-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2188,9 +2188,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-rayyan-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2231,9 +2231,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shahhaniya-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2274,9 +2274,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-shamal-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2317,9 +2317,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2360,9 +2360,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-doha-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-doha-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2403,9 +2403,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/building-permits-issued-by-type-of-permit-and-month-umm-slal-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -2446,9 +2446,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-two/"
     nightly_live_fetch: true
     public_splits: []
@@ -2491,9 +2491,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits/"
     nightly_live_fetch: true
     public_splits: []
@@ -2536,9 +2536,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport/"
     nightly_live_fetch: true
     public_splits: []
@@ -2581,9 +2581,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits/"
     nightly_live_fetch: true
     public_splits: []
@@ -2626,9 +2626,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy/"
     nightly_live_fetch: true
     public_splits: []
@@ -2671,9 +2671,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one/"
     nightly_live_fetch: true
     public_splits: []
@@ -2716,9 +2716,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/establishments-employees-and-compensation-of-employees-by-economic-activity-business-services/"
     nightly_live_fetch: true
     public_splits: []
@@ -2761,9 +2761,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-metals/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-metals/"
     nightly_live_fetch: true
     public_splits: []
@@ -2804,9 +2804,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-basic-pharmaceutical-products-and-pharmaceutical-preparations/"
     nightly_live_fetch: true
     public_splits: []
@@ -2845,9 +2845,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-beverages/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-beverages/"
     nightly_live_fetch: true
     public_splits: []
@@ -2888,9 +2888,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-chemicals-and-chemical-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-chemicals-and-chemical-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2929,9 +2929,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-coke-and-refined-petroleum-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-coke-and-refined-petroleum-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -2970,9 +2970,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-computer-electronic-and-optical-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-computer-electronic-and-optical-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3013,9 +3013,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-electrical-equipment/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-electrical-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -3054,9 +3054,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-fabricated-metal-products-except-machinery-and-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -3095,9 +3095,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-food-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-food-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3138,9 +3138,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-furniture/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-furniture/"
     nightly_live_fetch: true
     public_splits: []
@@ -3181,9 +3181,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-leather-and-related-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-leather-and-related-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3222,9 +3222,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-machinery-and-equipment-nec/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-machinery-and-equipment-nec/"
     nightly_live_fetch: true
     public_splits: []
@@ -3263,9 +3263,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-manufacture-of-wood-and-of-products-of-wood-and-cork-except-furniture-manufacture/"
     nightly_live_fetch: true
     public_splits: []
@@ -3304,9 +3304,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-motor-vehicles-trailers-and-semi-trailers/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-motor-vehicles-trailers-and-semi-trailers/"
     nightly_live_fetch: true
     public_splits: []
@@ -3347,9 +3347,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-non-metallic-mineral-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-non-metallic-mineral-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3388,9 +3388,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-other-transport-equipment/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-other-transport-equipment/"
     nightly_live_fetch: true
     public_splits: []
@@ -3429,9 +3429,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-paper-and-paper-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-paper-and-paper-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3470,9 +3470,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-rubber-and-plastics-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-rubber-and-plastics-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3513,9 +3513,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-textiles/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-textiles/"
     nightly_live_fetch: true
     public_splits: []
@@ -3556,9 +3556,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/manufacture-of-wearing-apparel/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/manufacture-of-wearing-apparel/"
     nightly_live_fetch: true
     public_splits: []
@@ -3597,9 +3597,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/main-manufacturing-products/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/main-manufacturing-products/"
     nightly_live_fetch: true
     public_splits: []
@@ -3644,9 +3644,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/purchases-sales-and-stocks-during-the-year-by-type-of-trade-wholesale-and-retail-trade-all/"
     nightly_live_fetch: true
     public_splits: []
@@ -3691,9 +3691,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/population-by-municipality-and-age-groups/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/population-by-municipality-and-age-groups/"
     nightly_live_fetch: true
     public_splits: []
@@ -3732,9 +3732,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotels-and-hotel-apartments-by-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotels-and-hotel-apartments-by-municipality/"
     nightly_live_fetch: true
     public_splits: []
@@ -3775,9 +3775,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/annual-certificates-of-origin-by-type-and-importing-country/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/annual-certificates-of-origin-by-type-and-importing-country/"
     nightly_live_fetch: true
     public_splits: []
@@ -3818,9 +3818,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-previous-port/"
     nightly_live_fetch: true
     public_splits: []
@@ -3865,9 +3865,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/arriving-vessels-gross-and-net-tonnage-by-type-of-vessel-and-country-of-registration-hamad-port0/"
     nightly_live_fetch: true
     public_splits: []
@@ -3924,9 +3924,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/distribution-of-business-establishments-and-employees-by-municipalities-according-to-census-2015/"
     nightly_live_fetch: true
     public_splits: []
@@ -3973,9 +3973,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/female-population-and-labour-force-by-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/female-population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4016,9 +4016,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/male-population-and-labour-force-by-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/male-population-and-labour-force-by-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4059,9 +4059,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/employed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/employed-persons-15-years-and-above-by-gender-and-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4102,9 +4102,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/unemployed-persons-15-years-and-above-by-gender-and-municipality/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/unemployed-persons-15-years-and-above-by-gender-and-municipality/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4145,9 +4145,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/females-population-by-municipality-and-age-groups-december-2020/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/females-population-by-municipality-and-age-groups-december-2020/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4192,9 +4192,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/males-population-by-municipality-and-age-groups-december-2020/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/males-population-by-municipality-and-age-groups-december-2020/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4235,9 +4235,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-females-15-years-and-above-by-age-group-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4276,9 +4276,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-males-15-years-and-above-by-age-group-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -4317,9 +4317,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4360,9 +4360,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4403,9 +4403,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-non-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4446,9 +4446,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-females-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4489,9 +4489,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-males-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4532,9 +4532,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/economically-active-qatari-population-15-years-and-above-by-occupation-and-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality", "sex"]
@@ -4575,9 +4575,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4628,9 +4628,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-building/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4677,9 +4677,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-business/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4726,9 +4726,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4775,9 +4775,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy0/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4824,9 +4824,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-energy1/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4873,9 +4873,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-one/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4922,9 +4922,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -4971,9 +4971,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social0/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5020,9 +5020,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/number-of-employees-and-compensation-of-employees-by-nationality-and-main-economic-activity-social1/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5069,9 +5069,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/students-by-level-of-education-municipality-gender-type-of-education-and-nationality-2025-2026/"
     nightly_live_fetch: true
     public_splits: ["sex", "nationality"]
@@ -5124,9 +5124,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/hotel-guests-by-nationality-hotel-rating-and-hotel-stays/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5171,9 +5171,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-mode-of-entry/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-mode-of-entry/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5218,9 +5218,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-by-region/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-by-region/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5265,9 +5265,9 @@ sources:
     decision_record: ""
     fetch_host: "www.data.gov.qa"
     url: "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/exports/json"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://creativecommons.org/licenses/by/4.0/"
+    terms_words: "\"CC BY\" [...] \"You must give appropriate credit, provide a link to the license, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://www.data.gov.qa/explore/dataset/visitor-arrivals-trends-by-mode-of-transport-air-land-sea/"
     nightly_live_fetch: true
     public_splits: ["nationality"]
@@ -5375,8 +5375,8 @@ sources:
     fetch_host: "www.invest.qa"
     url: "https://www.invest.qa/"
     terms_url: "https://www.invest.qa/en/terms-and-conditions?tab=terms-of-use"
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_words: "\"the material should not be copied or modified or re-produced in whole or in part without:\" [...] \"The prior written permission of\" [...] \"acknowledging the source, by using appropriate words or by copyright notice (© Investment Promotion Agency LLC).\""
+    terms_read_on: "2026-11-19"
     terms_watch: true
     landing_url: "https://www.invest.qa/"
     nightly_live_fetch: true
@@ -5456,9 +5456,9 @@ sources:
     decision_record: ""
     fetch_host: ""
     url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5484,9 +5484,9 @@ sources:
     decision_record: ""
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/fused/fsq-os-places/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://data.source.coop/fused/fsq-os-places/README.md"
+    terms_words: "Licensed under the Apache License, Version 2.0 (the \"License\"); you may not use this file except in compliance with the License."
+    terms_read_on: "2026-11-19"
     landing_url: "https://data.source.coop/fused/fsq-os-places/"
     nightly_live_fetch: true
     public_splits: []
@@ -5512,9 +5512,9 @@ sources:
     decision_record: ""
     fetch_host: ""
     url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: true
     public_splits: ["sex"]
@@ -5540,9 +5540,9 @@ sources:
     decision_record: ""
     fetch_host: ""
     url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://open-meteo.com/en/terms"
+    terms_words: "\"You may only use the free API services for non-commercial purposes.\" [...] \"API data are offered under Attribution 4.0 International (CC BY 4.0)\" [...] \"You must give appropriate credit, provide a link to the licence, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://open-meteo.com/en/docs/historical-weather-api"
     nightly_live_fetch: true
     public_splits: []
@@ -5570,8 +5570,8 @@ sources:
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/fused/fsq-os-places/"
     terms_url: "https://data.source.coop/fused/fsq-os-places/README.md"
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_words: "Licensed under the Apache License, Version 2.0 (the \"License\"); you may not use this file except in compliance with the License."
+    terms_read_on: "2026-11-19"
     landing_url: "https://data.source.coop/fused/fsq-os-places/"
     nightly_live_fetch: true
     public_splits: []
@@ -5602,9 +5602,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=places/type=place/part-00014-dcceff87-235e-5a0e-a4b4-5f25ccb873e7-c000.zstd.parquet"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-15"
+    terms_url: "https://docs.overturemaps.org/attribution/"
+    terms_words: "\"other\" [...] \"Data from Meta. Available under CDLA Permissive 2.0.\" [...] \"Available under Apache 2.0.\" [...] \"Data from AllThePlaces. Available under CC0 1.0.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/places/place/collection.json"
     nightly_live_fetch: true
     public_splits: []
@@ -5646,9 +5646,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00288-28a3d046-de24-53bb-bd50-0444cb513967-c000.zstd.parquet"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-15"
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
     nightly_live_fetch: true
     public_splits: []
@@ -5684,9 +5684,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00384-3eb496b1-cc75-5748-a633-0449cf44f528-c000.zstd.parquet"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-15"
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
     nightly_live_fetch: true
     public_splits: []
@@ -5722,9 +5722,9 @@ sources:
     decision_record: ""
     fetch_host: "overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
     url: "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-10-21.0/theme=buildings/type=building/part-00385-82be6408-14fb-51c1-89b0-93ae23c9516a-c000.zstd.parquet"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-15"
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
     nightly_live_fetch: true
     public_splits: []
@@ -5762,9 +5762,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5797,9 +5797,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5832,9 +5832,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5867,9 +5867,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5902,9 +5902,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5937,9 +5937,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -5972,9 +5972,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6007,9 +6007,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6042,9 +6042,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6077,9 +6077,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6112,9 +6112,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6147,9 +6147,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2024/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6182,9 +6182,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6217,9 +6217,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6252,9 +6252,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6287,9 +6287,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6322,9 +6322,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6357,9 +6357,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6392,9 +6392,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6427,9 +6427,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6462,9 +6462,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6497,9 +6497,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6532,9 +6532,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6567,9 +6567,9 @@ sources:
     decision_record: ""
     fetch_host: "ladsweb.modaps.eosdis.nasa.gov"
     url: "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A3/2025/"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-use-guidance"
+    terms_words: "\"Unless the content is marked with a use restriction or license, data provided from a NASA-led mission are licensed as Creative Commons Zero (CC0).\" [...] \"NASA should be acknowledged as the source of the material.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/"
     nightly_live_fetch: false
     public_splits: []
@@ -6602,9 +6602,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_00_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6639,9 +6639,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_01_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6676,9 +6676,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_05_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6713,9 +6713,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_10_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6750,9 +6750,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_15_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6787,9 +6787,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_20_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6824,9 +6824,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_25_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6861,9 +6861,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_30_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6898,9 +6898,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_35_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6935,9 +6935,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_40_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -6972,9 +6972,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_45_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7009,9 +7009,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_50_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7046,9 +7046,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_55_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7083,9 +7083,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_60_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7120,9 +7120,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_65_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7157,9 +7157,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_70_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7194,9 +7194,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_75_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7231,9 +7231,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_80_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7268,9 +7268,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_85_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7305,9 +7305,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_f_90_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7342,9 +7342,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_00_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7379,9 +7379,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_01_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7416,9 +7416,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_05_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7453,9 +7453,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_10_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7490,9 +7490,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_15_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7527,9 +7527,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_20_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7564,9 +7564,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_25_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7601,9 +7601,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_30_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7638,9 +7638,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_35_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7675,9 +7675,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_40_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7712,9 +7712,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_45_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7749,9 +7749,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_50_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7786,9 +7786,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_55_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7823,9 +7823,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_60_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7860,9 +7860,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_65_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7897,9 +7897,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_70_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7934,9 +7934,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_75_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -7971,9 +7971,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_80_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -8008,9 +8008,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_85_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -8045,9 +8045,9 @@ sources:
     decision_record: ""
     fetch_host: "data.worldpop.org"
     url: "https://data.worldpop.org/GIS/AgeSex_structures/Global_2015_2030/R2025A/2025/QAT/v1/100m/constrained/qat_m_90_2025_CN_100m_R2025A_v1.tif"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://www.worldpop.org/faq/"
+    terms_words: "\"Creative Commons Attribution 4.0 International License\" [...] \"Users are free to use, copy, distribute, transmit, and adapt the work for commercial and non-commercial purposes, without restriction, as long as clear attribution of the source is provided.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://hub.worldpop.org/geodata/listing?id=138"
     nightly_live_fetch: false
     public_splits: ["sex"]
@@ -8082,9 +8082,9 @@ sources:
     decision_record: ""
     fetch_host: "archive-api.open-meteo.com"
     url: "https://archive-api.open-meteo.com/v1/archive?latitude=25.2854&longitude=51.5310&start_date=2024-01-01&end_date=2025-12-31&hourly=temperature_2m&timezone=Asia%2FQatar"
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-14"
+    terms_url: "https://open-meteo.com/en/terms"
+    terms_words: "\"You may only use the free API services for non-commercial purposes.\" [...] \"API data are offered under Attribution 4.0 International (CC BY 4.0)\" [...] \"You must give appropriate credit, provide a link to the licence, and indicate if changes were made.\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://open-meteo.com/en/docs/historical-weather-api"
     nightly_live_fetch: true
     public_splits: []
@@ -11415,7 +11415,7 @@ sources:
     decision_record: '0026'
     fetch_host: monaqasat.mof.gov.qa
     url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AvailableMinistriesTenders/1
-    terms_url: ''
+    terms_url: "https://monaqasat.mof.gov.qa/TermsOfUse"
     terms_words: If not stated otherwise, it must not reproduce, republish, upload, send, distribute or publicly display
       or edit the contents of this website without the prior written consent of through the Ministry of Finance
     terms_read_on: '2026-11-14'
@@ -11874,7 +11874,7 @@ sources:
     decision_record: ""
     fetch_host: "ndownloader.figshare.com"
     url: "https://ndownloader.figshare.com/files/54052157"
-    terms_url: ""
+    terms_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
     terms_words: "\"CC BY 4.0\" on the figshare item; \"Rights License Creative Commons Attribution 4.0 International\" on the Zenodo record"
     terms_read_on: "2026-11-15"
     landing_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
@@ -11901,7 +11901,7 @@ sources:
     decision_record: ""
     fetch_host: "ndownloader.figshare.com"
     url: "https://ndownloader.figshare.com/files/54051971"
-    terms_url: ""
+    terms_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
     terms_words: "\"CC BY 4.0\" on the figshare item; \"Rights License Creative Commons Attribution 4.0 International\" on the Zenodo record"
     terms_read_on: "2026-11-15"
     landing_url: "https://figshare.com/articles/dataset/3D-GloBFP_the_first_global_three-dimensional_building_footprint_dataset_PART_grid_ID_1300-1699_/28890593"
@@ -12064,9 +12064,9 @@ sources:
     decision_record: ""
     fetch_host: ""
     url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-15"
+    terms_url: "https://comtradeplus.un.org/en/license-agreement"
+    terms_words: "\"any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation\" [...] \"is strictly prohibited without the prior written permission of the United Nations.\" [...] \"Internal use, including the use of UN Comtrade data for the AI model\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://uncomtrade.org/docs/un-comtrade-tools/"
     nightly_live_fetch: false
     public_splits: []
@@ -12117,13 +12117,13 @@ sources:
     landing_url: "https://data.worldbank.org/"
     url: ""
     fetch_host: ""
-    terms_url: ""
+    terms_url: "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
     licence_url: ""
     licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-16"
+    licence_basis: "portal_terms"
+    decision_record: ""
+    terms_words: "\"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below.\""
+    terms_read_on: "2026-11-19"
     terms_watch: false
     nightly_live_fetch: true
     public_splits: []
@@ -12151,13 +12151,13 @@ sources:
     landing_url: "https://unctadstat.unctad.org/"
     url: ""
     fetch_host: ""
-    terms_url: ""
+    terms_url: "https://unctadstat.unctad.org/EN/About.html#TERMS_OF_USE"
     licence_url: ""
     licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    decision_record: "0026"
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-16"
+    licence_basis: "portal_terms"
+    decision_record: ""
+    terms_words: "\"Creative Commons Attribution 3.0 IGO license\" [...] \"All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source.\""
+    terms_read_on: "2026-11-19"
     terms_watch: false
     nightly_live_fetch: true
     public_splits: []
