@@ -307,7 +307,7 @@ class Commands(unittest.TestCase):
                 build_public, "load_registry", return_value=(entry, failed_entry)
             ),
             patch("socket.socket", side_effect=AssertionError("network")),
-            patch.dict(os.environ, cdse_env),
+            patch.dict(os.environ, cdse_env, clear=True),
             patch("subprocess.Popen", side_effect=record_child) as children,
         ):
             code = build_public.run(
