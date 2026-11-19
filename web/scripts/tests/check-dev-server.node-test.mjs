@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import childProcess from 'node:child_process';
 import { spawn } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
+import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
+import http from 'node:http';
+import { syncBuiltinESMExports } from 'node:module';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { after, test as declareTest } from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveViteBin } from '../check-dev-server.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -115,6 +119,265 @@ function assertUsage(result) {
   assert.equal(result.status, 2, result.stdout + result.stderr);
   assert.ok(result.stdout.startsWith('USAGE: '), result.stdout);
 }
+
+// Drive the unmodified CLI with a fake dev server and a virtual clock. The
+// transport models a first transform that continues after a client disconnects;
+// no wall-clock sleep decides whether a request or its timeout wins. Keep the
+// real httpGet, main error formatting, shared startup clock and cleanup in play.
+async function timedServer(
+  t,
+  {
+    entryDelay = 1200,
+    pageDelay = 0,
+    timeoutMs = 5000,
+    entryStatus = 200,
+    entryType = 'text/javascript',
+    entryErrors = [],
+  } = {},
+) {
+  const root = tempRoot();
+  fs.writeFileSync(path.join(root, 'index.html'), PAGE);
+  const bin = writer(root);
+  const child = new EventEmitter();
+  child.stdout = new EventEmitter();
+  child.stderr = new EventEmitter();
+  child.exitCode = null;
+  child.signalCode = null;
+  child.kill = (signal) => {
+    child.signalCode = signal;
+    child.emit('exit');
+  };
+  const requests = [];
+  let entryReadyAt;
+  let stdout = '';
+  let status;
+  const previousArgv = process.argv;
+  const previousExit = process.exitCode;
+  const write = process.stdout.write.bind(process.stdout);
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 0 });
+  t.mock.method(childProcess, 'spawn', () => {
+    queueMicrotask(() =>
+      child.stdout.emit('data', '  Local:   http://127.0.0.1:43210/\n'),
+    );
+    return child;
+  });
+  syncBuiltinESMExports();
+  t.mock.method(http, 'get', (url, respond) => {
+    const entry = new URL(url).pathname !== '/';
+    if (entry) entryReadyAt ??= Date.now() + entryDelay;
+    requests.push({ entry, at: Date.now() });
+    const req = new EventEmitter();
+    const errorCode = entry ? entryErrors.shift() : undefined;
+    const answer = () => {
+      if (errorCode !== undefined) {
+        req.emit(
+          'error',
+          Object.assign(new Error('planted'), { code: errorCode }),
+        );
+        return;
+      }
+      const res = new EventEmitter();
+      res.statusCode = entry ? entryStatus : 200;
+      res.headers = {
+        'content-type': entry ? entryType : 'text/html',
+      };
+      respond(res);
+      res.emit('data', Buffer.from(entry ? 'export {};' : PAGE));
+      res.emit('end');
+    };
+    const delay = entry ? Math.max(0, entryReadyAt - Date.now()) : pageDelay;
+    const timer = Number.isFinite(delay)
+      ? setTimeout(answer, errorCode ? 0 : delay)
+      : null;
+    req.destroy = () => clearTimeout(timer);
+    return req;
+  });
+  t.mock.method(process.stdout, 'write', (chunk, ...args) => {
+    if (/^(PASS|FAIL) /.test(String(chunk))) {
+      stdout += chunk;
+      return true;
+    }
+    return write(chunk, ...args);
+  });
+  t.mock.method(process, 'exit', (code) => {
+    status = code;
+  });
+  process.argv = [
+    process.execPath,
+    SCRIPT,
+    '--root',
+    root,
+    '--vite-bin',
+    bin,
+    '--timeout-ms',
+    String(timeoutMs),
+  ];
+  try {
+    await import(`${pathToFileURL(SCRIPT).href}?timed=${t.name}`);
+    // setImmediate flushes I/O and promise continuations between clock ticks;
+    // it is not a delay and makes no assertion about machine speed.
+    for (
+      let elapsed = 0;
+      status === undefined && elapsed <= 70000;
+      elapsed += 100
+    ) {
+      t.mock.timers.tick(100);
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+    assert.notEqual(
+      status,
+      undefined,
+      'the CLI did not finish within the virtual bound',
+    );
+    return {
+      status,
+      stdout,
+      requests,
+      elapsed: Date.now(),
+      signal: child.signalCode,
+    };
+  } finally {
+    process.argv = previousArgv;
+    process.exitCode = previousExit;
+    t.mock.restoreAll();
+    syncBuiltinESMExports();
+    t.mock.timers.reset();
+  }
+}
+
+test('entry transform beyond one request timeout uses the startup deadline', async (t) => {
+  const result = await timedServer(t);
+  assert.equal(result.status, 0, result.stdout);
+  assert.match(
+    result.stdout,
+    /^PASS dev-server http:\/\/127\.0\.0\.1:43210\/\n$/,
+  );
+  assert.ok(result.elapsed < 5000);
+  assert.equal(result.requests.filter((request) => request.entry).length, 2);
+  assert.equal(result.signal, 'SIGTERM');
+});
+
+test('an entry that never answers times out naming its URL at the startup deadline', async (t) => {
+  const result = await timedServer(t, { entryDelay: Infinity });
+  assert.equal(result.status, 1, result.stdout);
+  assert.equal(
+    result.stdout,
+    'FAIL timeout: no accepted answer from http://127.0.0.1:43210/main.js within 5000 ms\n',
+  );
+  assert.equal(result.elapsed, 5000);
+  assert.equal(result.signal, 'SIGTERM');
+});
+
+test('entry 404 fails at once without retrying', async (t) => {
+  const result = await timedServer(t, { entryDelay: 0, entryStatus: 404 });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, 'FAIL bad-status: /main.js: 404\n');
+  assert.equal(result.requests.filter((request) => request.entry).length, 1);
+  assert.ok(result.elapsed < 1000);
+});
+
+test('entry wrong content type keeps its failure without retrying', async (t) => {
+  const result = await timedServer(t, {
+    entryDelay: 0,
+    entryType: 'text/plain',
+  });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, 'FAIL bad-content-type: /main.js: text/plain\n');
+  assert.equal(result.requests.filter((request) => request.entry).length, 1);
+});
+
+test('entry not-yet errors use the same retry classification as the page', async (t) => {
+  for (const code of [
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'EPIPE',
+    'TIMEOUT',
+    'ECONNABORTED',
+  ]) {
+    await t.test(code, async (sub) => {
+      const result = await timedServer(sub, {
+        entryDelay: 0,
+        entryErrors: [code],
+      });
+      assert.equal(result.status, 0, result.stdout);
+      assert.equal(
+        result.requests.filter((request) => request.entry).length,
+        2,
+      );
+    });
+  }
+});
+
+test('entry other errors retain the internal-error line without retrying', async (t) => {
+  const result = await timedServer(t, {
+    entryDelay: 0,
+    entryErrors: ['EACCES'],
+  });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, 'FAIL internal-error: EACCES: planted\n');
+  assert.equal(result.requests.filter((request) => request.entry).length, 1);
+});
+
+test('page polling spends the same startup budget as the entry', async (t) => {
+  const result = await timedServer(t, {
+    pageDelay: 700,
+    entryDelay: 800,
+    timeoutMs: 1500,
+  });
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stdout,
+    'FAIL timeout: no accepted answer from http://127.0.0.1:43210/main.js within 1500 ms\n',
+  );
+  assert.equal(result.elapsed, 1500);
+});
+
+test('entry requests and pauses cannot overrun a short remaining deadline', async (t) => {
+  const result = await timedServer(t, {
+    entryDelay: Infinity,
+    timeoutMs: 1700,
+  });
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stdout,
+    'FAIL timeout: no accepted answer from http://127.0.0.1:43210/main.js within 1700 ms\n',
+  );
+  assert.equal(result.elapsed, 1700);
+});
+
+test('entry poll pauses stop at the remaining deadline', async (t) => {
+  const result = await timedServer(t, {
+    entryDelay: Infinity,
+    timeoutMs: 1400,
+  });
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stdout,
+    'FAIL timeout: no accepted answer from http://127.0.0.1:43210/main.js within 1400 ms\n',
+  );
+  assert.equal(result.elapsed, 1400);
+});
+
+test('an entry response at the deadline cannot turn expiration into success', async (t) => {
+  const result = await timedServer(t, { entryDelay: 700, timeoutMs: 1000 });
+  assert.equal(result.status, 1);
+  assert.equal(
+    result.stdout,
+    'FAIL timeout: no accepted answer from http://127.0.0.1:43210/main.js within 1000 ms\n',
+  );
+  assert.equal(result.elapsed, 1000);
+});
+
+test('entry polling retains the outer bound even with a longer startup timeout', async (t) => {
+  const result = await timedServer(t, {
+    entryDelay: Infinity,
+    timeoutMs: 90000,
+  });
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, 'FAIL timeout: outer bound\n');
+  assert.equal(result.elapsed, 60000);
+  assert.equal(result.signal, 'SIGTERM');
+});
 
 test('real shell starts', { timeout: 60000 }, () => {
   const result = run(['--root', WEB]);

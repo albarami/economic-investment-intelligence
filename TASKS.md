@@ -787,6 +787,15 @@ Open question to settle in your plan with options: where the archive persists so
 - Requirements: document 04 PUB-01, PUB-03, PUB-04, PUB-10, PUB-11, PUB-12, PUB-19 and PUB-110; document 02 ARC-13, ARC-96 and ARC-98; document 13 OPS-07, OPS-08, OPS-65 and OPS-71; AGENTS.md rules 5, 11, 14, 16–23 and 33–39.
 - Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/97).
 
+### S2-T42 — The dev-server check waits for the entry module under the startup deadline
+
+- Goal: Fix the load-sensitive entry-module timeout in the dev-server check by sharing the page poll's startup deadline and not-yet handling.
+- Acceptance criteria: [ ] a fake-server test with injected timing fails on the base when the first entry transform exceeds one request timeout, then passes with the fix; [ ] page and entry polling share the startup deadline and outer bound, with requests and pauses limited to remaining time; [ ] an entry that never answers fails within the deadline with a timeout line naming the entry; [ ] an entry returning 404 fails at once with its existing bad-status line; [ ] other errors, content-type failures and all existing FAIL lines retain their behaviour and text; [ ] every existing test passes unchanged, with no raised constant, test timeout, retry or skip; [ ] the required web, documentation, tree and guidance-parity checks pass with real exits recorded.
+- Scope: `web/scripts/check-dev-server.mjs`, its existing test harness, `TASKS.md`, `OPEN_ITEMS.md` and `PROGRESS.md`; `web/README.md` only if it describes entry timing.
+- Depends: none.
+- Requirements: AGENTS.md rules 36, 37 and 39.
+- Delivery: Standard; builder persona senior Node.js tooling engineer for child processes, loopback HTTP and deterministic timing tests; strict reviewer persona reviewer who rejects hidden failures and guards without planted violations; status in progress.
+
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open; [x] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice (moved here word for word from task S1-T15 by a re-plan of 2026-11-14, with open item OI-158: no test, assertion, planted case or bound is removed or weakened for it); [x] the hosted value of 3,000 s is removed from the whole test command, so that the limit of the suite `web-checks` is 1,800 s on every runner again, with the planted cases of task S1-T16 brought to that state (decision 0027 item 4; open item OI-158, whose three-run condition is met; added by the gate-fix task S1-T17).
