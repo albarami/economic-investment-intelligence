@@ -13,9 +13,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
-from eii_custodian.publicdata.places_fsq.constants import PINNED_RELEASE
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.footer import read_summary
+from eii_custodian.publicdata.places_fsq.releases import validate_release
 from eii_custodian.publicdata.places_fsq.select import (
     FRAME_BOX,
     coordinate_bounds,
@@ -38,14 +38,15 @@ class ExclusionCheck:
     summary_footer_sha256: str
     selected: tuple[str, ...]
     checked: tuple[CheckedFooter, ...]
+    release: str
     method: str = "fsq_exclusions.v1"
-    release: str = PINNED_RELEASE
 
 
 def check_exclusions(
     summary: Path,
     excluded_files: Mapping[str, Path],
     *,
+    release: str,
     max_files: int,
     max_footer_bytes: int,
 ) -> ExclusionCheck:
@@ -63,8 +64,9 @@ def check_exclusions(
         or max_footer_bytes < 12
     ):
         raise PlacesFsqError("exclusion_budget_invalid")
+    release = validate_release(release)
     body = _read_footer(summary, max_footer_bytes)
-    selected = select_partitions(body, PINNED_RELEASE, FRAME_BOX)
+    selected = select_partitions(body, release, FRAME_BOX)
     all_names = {
         chunk.file_path
         for chunks in read_summary(body).row_groups
@@ -83,7 +85,7 @@ def check_exclusions(
             raise PlacesFsqError("summary_stale")
         checked.append(CheckedFooter(name, hashlib.sha256(footer).hexdigest()))
     return ExclusionCheck(
-        hashlib.sha256(body).hexdigest(), selected.files, tuple(checked)
+        hashlib.sha256(body).hexdigest(), selected.files, tuple(checked), release
     )
 
 

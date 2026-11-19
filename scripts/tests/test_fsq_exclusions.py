@@ -18,6 +18,8 @@ from eii_custodian.publicdata.places_fsq.footer import metadata_bytes
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partitions
 from fsq_exclusions import CheckedFooter, _read_footer, check_exclusions
 
+_RELEASE = "2025-01-10"
+
 
 def group(name: str, *, near: bool) -> dict[str, object]:
     return {
@@ -65,6 +67,7 @@ class ExclusionTests(unittest.TestCase):
                 check_exclusions(
                     summary,
                     {"far.parquet": far},
+                    release=_RELEASE,
                     max_files=1,
                     max_footer_bytes=4096,
                 )
@@ -74,9 +77,11 @@ class ExclusionTests(unittest.TestCase):
             summary, far, summary_body, far_body = self.fixture(Path(folder))
             # Data pages are deliberately much larger than the footer budget.
             far.write_bytes(far_body[:4] + b"invented-page" * 10000 + far_body[4:])
+            release = "2032-04-05"
             result = check_exclusions(
                 summary,
                 {"far.parquet": far},
+                release=release,
                 max_files=1,
                 max_footer_bytes=len(summary_body),
             )
@@ -89,7 +94,7 @@ class ExclusionTests(unittest.TestCase):
                 (CheckedFooter("far.parquet", hashlib.sha256(far_body).hexdigest()),),
             )
             self.assertEqual(result.method, "fsq_exclusions.v1")
-            self.assertEqual(result.release, "2025-01-10")
+            self.assertEqual(result.release, release)
 
     def test_missing_extra_or_wrong_key_is_refused_before_file_access(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
@@ -105,7 +110,11 @@ class ExclusionTests(unittest.TestCase):
                 ):
                     with self.assertRaisesRegex(PlacesFsqError, "^exclusion_file_set$"):
                         check_exclusions(
-                            summary, mapping, max_files=1, max_footer_bytes=4096
+                            summary,
+                            mapping,
+                            release=_RELEASE,
+                            max_files=1,
+                            max_footer_bytes=4096,
                         )
                     self.assertEqual(reader.call_count, 1)
 
@@ -124,7 +133,13 @@ class ExclusionTests(unittest.TestCase):
             )
             with patch("fsq_exclusions._read_footer", wraps=_read_footer) as reader:
                 with self.assertRaisesRegex(PlacesFsqError, "^exclusion_file_limit$"):
-                    check_exclusions(summary, {}, max_files=1, max_footer_bytes=4096)
+                    check_exclusions(
+                        summary,
+                        {},
+                        release=_RELEASE,
+                        max_files=1,
+                        max_footer_bytes=4096,
+                    )
                 self.assertEqual(reader.call_count, 1)
 
     def test_invalid_budgets_refuse_before_any_file_access(self) -> None:
@@ -137,7 +152,11 @@ class ExclusionTests(unittest.TestCase):
                     PlacesFsqError, "^exclusion_budget_invalid$"
                 ):
                     check_exclusions(
-                        Path("absent"), {}, max_files=files, max_footer_bytes=size
+                        Path("absent"),
+                        {},
+                        release=_RELEASE,
+                        max_files=files,
+                        max_footer_bytes=size,
                     )
                 reader.assert_not_called()
 
@@ -148,6 +167,7 @@ class ExclusionTests(unittest.TestCase):
                 check_exclusions(
                     summary,
                     {"far.parquet": far},
+                    release=_RELEASE,
                     max_files=1,
                     max_footer_bytes=len(body) - 1,
                 )
@@ -158,6 +178,7 @@ class ExclusionTests(unittest.TestCase):
                 check_exclusions(
                     summary,
                     {"far.parquet": far},
+                    release=_RELEASE,
                     max_files=1,
                     max_footer_bytes=len(body),
                 )
@@ -210,13 +231,18 @@ class ExclusionTests(unittest.TestCase):
                         check_exclusions(
                             summary,
                             {"far.parquet": far},
+                            release=_RELEASE,
                             max_files=1,
                             max_footer_bytes=4096,
                         )
             far.unlink()
             with self.assertRaisesRegex(PlacesFsqError, "^exclusion_file_unreadable$"):
                 check_exclusions(
-                    summary, {"far.parquet": far}, max_files=1, max_footer_bytes=4096
+                    summary,
+                    {"far.parquet": far},
+                    release=_RELEASE,
+                    max_files=1,
+                    max_footer_bytes=4096,
                 )
 
     def test_missing_coordinate_statistics_cannot_certify_exclusion(self) -> None:
@@ -226,7 +252,11 @@ class ExclusionTests(unittest.TestCase):
             far.write_bytes(metadata_bytes([missing], dataset_geo_bbox=None))
             with self.assertRaisesRegex(PlacesFsqError, "^statistics_missing$"):
                 check_exclusions(
-                    summary, {"far.parquet": far}, max_files=1, max_footer_bytes=4096
+                    summary,
+                    {"far.parquet": far},
+                    release=_RELEASE,
+                    max_files=1,
+                    max_footer_bytes=4096,
                 )
 
     def test_checks_all_exclusions_in_key_order_without_a_partial_result(self) -> None:
@@ -249,7 +279,7 @@ class ExclusionTests(unittest.TestCase):
             z.write_bytes(far_body)
             files = {"z/far.parquet": z, "a/far.parquet": a}
             result = check_exclusions(
-                summary, files, max_files=2, max_footer_bytes=4096
+                summary, files, release=_RELEASE, max_files=2, max_footer_bytes=4096
             )
             self.assertEqual(
                 tuple(row.name for row in result.checked),
@@ -257,7 +287,9 @@ class ExclusionTests(unittest.TestCase):
             )
             z.write_bytes(metadata_bytes([group("", near=True)], dataset_geo_bbox=None))
             with self.assertRaisesRegex(PlacesFsqError, "^summary_stale$"):
-                check_exclusions(summary, files, max_files=2, max_footer_bytes=4096)
+                check_exclusions(
+                    summary, files, release=_RELEASE, max_files=2, max_footer_bytes=4096
+                )
 
     def test_short_trailer_and_metadata_reads_cannot_certify_exclusion(self) -> None:
         body = metadata_bytes([group("", near=False)], dataset_geo_bbox=None)

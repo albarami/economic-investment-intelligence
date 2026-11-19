@@ -226,6 +226,8 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
 
     def transport(url: str) -> Response:
         if url == entry.url:
+            return Response(final_url=url, body=listing(f"{_RELEASE}/"), hops=())
+        if url.endswith("_metadata"):
             return Response(final_url=url, body=body, hops=())
         if url == entry.terms_url:
             return Response(final_url=url, body=b"Proprietary terms only.", hops=())
@@ -238,7 +240,7 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
         del os.environ["PLACES_FSQ_TOKEN"]
     assert outcome.failure is None
     manifest = json.loads(
-        (tmp_path / "licence" / RELEASE_KEY / "manifest.json").read_text(
+        (tmp_path / "licence" / RELEASE_KEY / _RELEASE / "manifest.json").read_text(
             encoding="utf-8"
         )
     )

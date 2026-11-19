@@ -348,7 +348,7 @@ SOURCE_COMPONENTS: dict[str, frozenset[str]] = {
             "ntl_blackmarble/2025-12",
         )
     ),
-    "places_fsq": frozenset(("places_fsq/copy-2025-01-10",)),
+    "places_fsq": frozenset(("places_fsq/copy",)),
     "places_ovt": frozenset(("places_ovt/part-00014",)),
     "price_ext": frozenset(
         (

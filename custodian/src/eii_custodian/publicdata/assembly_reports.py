@@ -411,15 +411,20 @@ def gather_audit(build: Production) -> dict[str, Any]:
             "s2_t13_confirmation.yaml",
         )
     )
-    fsq = next(
-        (e for e in build.entries if e.key == "places_fsq/copy-2025-01-10"), None
-    )
+    fsq = next((e for e in build.entries if e.key == "places_fsq/copy"), None)
     policy = read_yaml(build.review / "places_fsq_policy.yaml")
     if fsq and isinstance(policy, dict):
+        releases = {
+            str(row.get("source_release") or "")
+            for row in build.tables.get("pub_place_fsq", [])
+        }
+        registry_release = releases.pop() if len(releases) == 1 else ""
+        receipt = build.receipts.get(fsq.key, {})
         item = fsq_evidence(
-            "2025-01-10" if fsq.key in build.receipts else "",
+            registry_release,
             policy,
             "places_fsq_policy.yaml",
+            str(receipt.get("source_modified") or ""),
         )
         evidence.append(
             replace(
