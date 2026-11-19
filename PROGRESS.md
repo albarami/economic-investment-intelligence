@@ -40413,3 +40413,15 @@ no private path or contact token in the return, and its required last-line marke
 Diagnostic log locations were replaced by neutral placeholders within the
 workspace; test identities, recorded exits and counts remain unchanged.
 No implementation file changed after the passing final-code guard run.
+
+## S2-T21 — Fix: the class source's pack-cell test follows the recorded terms (lead, 2026-11-19)
+
+The lead's whole test of the approved S2-T21 part B head `86f7ed1db4edb1b6c95a52ef2bdccebca1602fc8` (`./eii test --seed 2099362825`, cores 8 to 11) exited 1: 11676 passed, 1 failed, `custodian/tests/test_activity_real_shape.py::test_pack_cell_names_the_confirmed_isic_address`. That older guard of the confirmed ISIC address also asserted that the terms cell of the `cls_isic4` row in document 04 section 2 still held the placeholder "UN terms of use; exact publisher wording and date read to be recorded"; S2-T21 part B replaced that placeholder with the publisher's recorded wording, as its criteria require. The failure is deterministic (the same file alone: 1 failed, 21 passed) and is carried by the train head of S2-7, which joins that commit.
+
+Fix: the test keeps both address assertions and now asserts that the placeholder is gone and that the cell holds the recorded reading (the quoted "personal, non-commercial use" wording, the read date and the basis `owner_decision`). No document, registry or production line changes.
+
+- red first: the unchanged test on the joined S2-7 head, whose `cls_isic4` structure cell is byte-identical to the approved S2-T21 part B head's: 1 failed, 21 passed.
+- green: `uv run --locked python -m pytest custodian/tests/test_activity_real_shape.py -q -p no:cacheprovider`: exit 0, 22 passed.
+- planted violation: with the placeholder written back into that cell, the fixed test fails (1 failed, 21 passed); the document restored, 22 passed and the tree shows only the test change.
+- `uv run --locked ruff check` and `ruff format --check` on the file: exit 0.
+- Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, named in the ledger of the pull request of train S2-7.
