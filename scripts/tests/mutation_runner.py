@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 import unittest
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -528,6 +529,42 @@ class EvalMutationRunnerTest(unittest.TestCase):
 
 
 class SourceGuardSelectionTests(unittest.TestCase):
+    # The options that can deselect, filter or ignore collected tests; the part
+    # split's -p and --custodian-part options are not among them.
+    SELECTION_OPTIONS = ("--deselect", "-k", "-m", "--ignore", "--ignore-glob")
+
+    def _assert_no_selection_options(self, name: str, options: Iterable[str]) -> None:
+        """Refuse every option that can deselect, filter or ignore tests."""
+        offenders = [
+            option
+            for option in options
+            if option.split("=", 1)[0] in self.SELECTION_OPTIONS
+        ]
+        self.assertFalse(offenders, f"the suite {name} selects tests: {offenders}")
+
+    def _assert_parts_collect_guards(
+        self,
+        suites: Iterable[Any],
+        guards: Iterable[str],
+        module_part: Callable[[str], int],
+    ) -> None:
+        """Refuse a part split that leaves a guard module outside every part."""
+        parts: set[int] = set()
+        prefixes: set[str] = set()
+        for suite in suites:
+            if suite.kind != "pytest" or "--custodian-part" not in suite.args:
+                continue
+            parts.add(int(suite.args[suite.args.index("--custodian-part") + 1]))
+            prefixes.add(suite.args[0])
+        for node in guards:
+            if not any(node.startswith(prefix + "/") for prefix in prefixes):
+                continue
+            self.assertIn(
+                module_part(node.split("::", 1)[0]),
+                parts,
+                f"the part split collects the guard {node} in no named part",
+            )
+
     def test_unlisted_deselection_refused_by_name(self) -> None:
         runner = importlib.import_module("scripts.mutation")
         with TemporaryDirectory(prefix="synthetic-selection-") as temporary:
@@ -560,35 +597,100 @@ class SourceGuardSelectionTests(unittest.TestCase):
     def test_closed_guards_collected_by_ordinary_suite(self) -> None:
         runner = importlib.import_module("scripts.mutation")
         suite_runner = importlib.import_module("scripts.run_tests")
+        part = importlib.import_module("scripts.pytest_custodian_part")
         suites = suite_runner.SUITES
         root = Path(__file__).resolve().parents[2]
+        guards = set(runner.SOURCE_TEXT_GUARDS)
         collected: set[str] = set()
         for suite in suites:
             if suite.kind != "pytest" or not any(
-                node.startswith(suite.args[0] + "/")
-                for node in runner.SOURCE_TEXT_GUARDS
+                node.startswith(suite.args[0] + "/") for node in guards
             ):
                 continue
-            self.assertFalse(any(arg.startswith("-") for arg in suite.args))
+            self._assert_no_selection_options(suite.name, suite.args)
             with TemporaryDirectory(prefix="synthetic-collection-") as temporary:
                 command = suite_runner.runner_exec.build_command(
                     suite, root, {}, Path(temporary), 1
                 )
-                self.assertFalse(any(arg.startswith("--deselect") for arg in command))
+                # Everything after the interpreter's own -m flag belongs to
+                # pytest: the runner's fixed flags and the suite's added options.
+                # The config file's addopts (the nightly marker gate among them)
+                # apply during the collection run itself, so an addopts entry
+                # that removes a guard fails the membership check below.
+                self._assert_no_selection_options(
+                    suite.name, command[command.index("-m") + 2 :]
+                )
+                env = suite_runner.runner_exec.child_env(
+                    suite.kind,
+                    {
+                        name: value
+                        for name, value in os.environ.items()
+                        if name in ("PATH", "HOME")
+                    }
+                    | {"TMPDIR": temporary},
+                    1,
+                    Path(temporary),
+                )
                 result = subprocess.run(
                     [*command, "--collect-only", "-q"],
                     cwd=root / suite.cwd,
+                    env=env,
                     text=True,
                     capture_output=True,
                     check=False,
                 )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             collected.update(line.strip() for line in result.stdout.splitlines())
-        self.assertTrue(set(runner.SOURCE_TEXT_GUARDS) <= collected)
-        # An invented listed node outside the ordinary suite must fail membership.
+        # The union of the named custodian parts counts as the ordinary suite.
+        self.assertTrue(guards <= collected)
+        self._assert_parts_collect_guards(suites, guards, part.module_part)
+        # An invented listed node outside the ordinary suites must fail membership.
         with self.assertRaises(AssertionError):
             self.assertTrue(
-                set(runner.SOURCE_TEXT_GUARDS)
-                | {"core/data_tests/test_invented.py::test_guard"}
-                <= collected
+                (guards | {"core/data_tests/test_invented.py::test_guard"}) <= collected
+            )
+        # A suite argument that deselects a guard must fail the option scan.
+        holder = next(
+            suite
+            for suite in suites
+            if suite.kind == "pytest"
+            and any(node.startswith(suite.args[0] + "/") for node in guards)
+        )
+        guard = sorted(
+            node for node in guards if node.startswith(holder.args[0] + "/")
+        )[0]
+        with self.assertRaises(AssertionError):
+            self._assert_no_selection_options(
+                holder.name, (*holder.args, "--deselect=" + guard)
+            )
+        # Dropping the part that holds a guard leaves it collected by no named
+        # part and must fail the split check.
+        split_guards = sorted(
+            node
+            for node in guards
+            if any(
+                suite.kind == "pytest"
+                and "--custodian-part" in suite.args
+                and node.startswith(suite.args[0] + "/")
+                for suite in suites
+            )
+        )
+        self.assertTrue(
+            split_guards,
+            "no source-text guard lives under a part-split suite; the planted "
+            "neither-part case needs one",
+        )
+        dropped = part.module_part(split_guards[0].split("::", 1)[0])
+        without_the_part = tuple(
+            suite
+            for suite in suites
+            if not (
+                suite.kind == "pytest"
+                and "--custodian-part" in suite.args
+                and int(suite.args[suite.args.index("--custodian-part") + 1]) == dropped
+            )
+        )
+        with self.assertRaises(AssertionError):
+            self._assert_parts_collect_guards(
+                without_the_part, guards, part.module_part
             )
