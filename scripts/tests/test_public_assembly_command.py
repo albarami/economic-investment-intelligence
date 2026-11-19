@@ -20,6 +20,9 @@ from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
         ["--seed", "1", "--seed", "2"],
         ["--seed", "\u0661"],
         ["--other"],
+        ["--seed", "1", "--cdse-backup"],
+        ["--cdse-backup", "--seed", "1"],
+        ["--cdse-backup", "x"],
     ],
 )
 def test_invalid_seed_has_no_reads_or_connections(
@@ -30,6 +33,7 @@ def test_invalid_seed_has_no_reads_or_connections(
 
     monkeypatch.setattr(build_public, "load_registry", forbidden)
     monkeypatch.setattr(build_public, "earthdata_token", forbidden)
+    monkeypatch.setattr(build_public, "cdse_credentials", forbidden)
     assert build_public.run(tmp_path, {}, args, transport=forbidden) == 2
     assert list(tmp_path.iterdir()) == []
 
