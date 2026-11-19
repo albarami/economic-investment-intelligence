@@ -2850,6 +2850,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - COMPARISON: OI-160 covers an older occurrence and is CLOSED at HEAD under its specific hosted-run default. It is historical context, not evidence that this later failure is closed. OI-227 concerns a different interrupt-test failure. No new causal diagnosis is asserted here.
 - NEEDED BY: honest S2-T35 handoff and the owning investigation's closure review.
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4379,6 +4381,17 @@ Revision-2 record points without extra numbers:
 - EVIDENCE: removing the exact-URL block for the register host, or only its frame condition, leaves `test_frame_and_path_refusals` green (exit 0, 3 passed), because the host block and the approval cover those strings; the fetcher builds only the constant register URL.
 - NEEDED: a planted test that fails when that block is removed, or a recorded reason it is redundant.
 - COMPARISON: none.
+
+### PO-S2-119 — Pre-existing museum missing-value and field-binding notes
+
+- ID: PO-S2-119
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-LR3F.rev1 notes N3 and N4; retained by the lead in LOG-LR3F.md 2026-11-19 16:39.
+- CONCERNS: `custodian/src/eii_custodian/publicdata/additions/common.py` `read_measure` whitespace-only handling, and `custodian/src/eii_custodian/publicdata/additions/property_venues.py` `_museum_rows` field binding.
+- EVIDENCE: `.overnight/IN/S2-LR3F.rev1.return.md` notes N3/N4 identify pre-existing whitespace-only values treated as missing and `_museum_rows` reading the literal `number` field while fetch uses the YAML field. A future non-number field could diverge; no such production change or runtime failure is asserted here. `.overnight/IN/LOG-LR3F.md` 16:39 explicitly records both notes as PO-S2-119 for a later task. The item is absent from main55 and lr3f OPEN_ITEMS.md at preparation.
+- NEEDED: A lead disposition and later scoped task for N3/N4, or a recorded reason to retain their current behavior, with suitable planted violations for any guard changed. Keep L-1141's exact key/field admission and unknown-text refusals unchanged; no fix is made by this ledger input.
+- NEEDED BY: The lead's later S2-T11 parser task and truthful review-note handoff; no new current-PR acceptance or mutation gate is invented.
+- COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
 
 ## Sources
 
