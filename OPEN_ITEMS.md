@@ -2850,6 +2850,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - COMPARISON: OI-160 covers an older occurrence and is CLOSED at HEAD under its specific hosted-run default. It is historical context, not evidence that this later failure is closed. OI-227 concerns a different interrupt-test failure. No new causal diagnosis is asserted here.
 - NEEDED BY: honest S2-T35 handoff and the owning investigation's closure review.
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4380,6 +4382,17 @@ Revision-2 record points without extra numbers:
 - NEEDED: a planted test that fails when that block is removed, or a recorded reason it is redundant.
 - COMPARISON: none.
 
+### PO-S2-119 — Pre-existing museum missing-value and field-binding notes
+
+- ID: PO-S2-119
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-LR3F.rev1 notes N3 and N4; retained by the lead in LOG-LR3F.md 2026-11-19 16:39.
+- CONCERNS: `custodian/src/eii_custodian/publicdata/additions/common.py` `read_measure` whitespace-only handling, and `custodian/src/eii_custodian/publicdata/additions/property_venues.py` `_museum_rows` field binding.
+- EVIDENCE: `.overnight/IN/S2-LR3F.rev1.return.md` notes N3/N4 identify pre-existing whitespace-only values treated as missing and `_museum_rows` reading the literal `number` field while fetch uses the YAML field. A future non-number field could diverge; no such production change or runtime failure is asserted here. `.overnight/IN/LOG-LR3F.md` 16:39 explicitly records both notes as PO-S2-119 for a later task. The item is absent from main55 and lr3f OPEN_ITEMS.md at preparation.
+- NEEDED: A lead disposition and later scoped task for N3/N4, or a recorded reason to retain their current behavior, with suitable planted violations for any guard changed. Keep L-1141's exact key/field admission and unknown-text refusals unchanged; no fix is made by this ledger input.
+- NEEDED BY: The lead's later S2-T11 parser task and truthful review-note handoff; no new current-PR acceptance or mutation gate is invented.
+- COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
@@ -4646,3 +4659,13 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - EVIDENCE: Read-only tip-T22 commit `46387fe393952a52be79a2091c5020abf4be5df6`, decision 0061 **Open matters and change control**, explicitly leaves live route parity pending and distinguishes its second-engine stand-in from real PostgreSQL. Planning inputs do not supply final live receipts or another maker's approval on the joined head. No database or live runner is used by this documents-only change.
 - NEEDED: The lead records actual two-store command exits, exact commit, release identity and every query's execution, including S3-T25 and S3-T26 cases; the divergence proof exits 3 with no new tolerance. Missing live evidence stays pending. Reconcile the S3-T16/S3-T22 reviews and forced differences under rule 33, obtain S3-T09's own fix review and the joined design audit, and retain OI-09 native approval. Local tips certify none of these. Mutation-only debts remain deferred under decision 0055 items 1 to 4 and do not become slice-gate holds.
 - NEEDED BY: S3-T10 end-to-end step and S3-T11 ordinary evidence closure before slice S3 gate; no approval or completion is inferred.
+
+
+### PO-S2-116 — Closure status for published venue visits
+
+- ID: PO-S2-116
+- TYPE: OPEN
+- RAISED BY: OpenAI Codex (GPT-6), S2-LR3F under lead ruling L-1141
+- CONCERNS: `pub_venue_visits` closure or restricted-opening status
+- EVIDENCE: Document 03, `pub_venue_visits` contract, has `value int` and no status column. The S2-LR3F brief binds four exact note forms to the National Planning Council museum-visits JSON export retrieved 2026-11-19, SHA-256 `8a89835ea0587994cdaff627395e66935ae1dabf8caceae8e20640be77d8a040`. Under L-1141 these cells are reviewed missing values, counted in coverage and never zero; this change does not store closure as a separate fact.
+- NEEDED: A decision record on a closure status of `pub_venue_visits`, or one line saying why not.

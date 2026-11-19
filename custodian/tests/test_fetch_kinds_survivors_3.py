@@ -52,6 +52,29 @@ def test_measure_accepts_reviewed_forms(rows, monkeypatch):
 
 
 @pytest.mark.parametrize(
+    "text",
+    [
+        "-",
+        "--",
+        "مغلق",
+        "مغلق للتجديد Closed of Renovation",
+        "مغلق للتجديد Closed For Renovation",
+        "يفتح للزوار الرسميين Only Open ToOfficial Visitors",
+    ],
+)
+def test_museum_source_reviewed_forms_pass_the_fetch_precheck(text):
+    entry = portal(
+        key="visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum"
+    )
+    result = kinds.prepare(
+        entry,
+        transport(_portal_meta("Planted publisher"), [{"number": text}]),
+        _sleep,
+    )
+    assert result.failure is None
+
+
+@pytest.mark.parametrize(
     "source,rule,rows,expected",
     [
         ("trade_ext", "", [{}], ("", "", True, "")),

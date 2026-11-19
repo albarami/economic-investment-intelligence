@@ -37257,6 +37257,187 @@ Seed:      2421425381
 Notes:     Lead's fresh whole test at WORK using the supplied seed, provider none, no network and unchanged limits. This row is required; r4 quick checks are not whole-test evidence. Exact merge-result and hosted/head checks remain separate lead gates.
 ```
 
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/101)
+
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant not exposed).
+Persona: careful senior release coordinator tracing every ledger claim to a Git object, log entry or file. Strict self-review persona: records reviewer rejecting claims without a source; this self-audit is not another-maker approval. Skills: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer and muhasabah-gate. The named verification-before-completion skill is unavailable in the session catalogue; its plain requirement is applied by checking the generated inputs and recording actual draft exits. No tests or ledger are run by this drafter.
+
+Sources named below are files under `.overnight/IN/`, unless a tracked path or Git object is explicit. Log times are on 2026-11-19 unless otherwise stated. Git parents, subjects, inventories and tracked text are read from the named objects; Git author/coauthor identity is not used as builder-maker evidence. Historical test counts belong to their named build or lead record, not this session. Planned PR numbers come from `.overnight/BRIEF.md`; neither PR is claimed to exist. Draft PR and seed remain `https://github.com/albarami/economic-investment-intelligence/pull/101` and `2307420339`. The lead must regenerate the frozen inventories after PR99 merges and the work is rebased. No network, public data cache, private source or tracked-file edit is used here. The only Git write requested by this brief is local checkout to run each generator at its WORK.
+
+#### Ownership and frozen Git inventory
+
+Owning task: **S2-T11 — Portal additions of decision 0017**, for the bounded S2-LR3F live-run fix of ruling L-1141. Source: `TASKS.md` at `da1541a22ec114d8c4ca036b7442a19fc325238f`, S2-T11 Goal/Scope and its museum parsing-trap acceptance criterion; `docs/14_IMPLEMENTATION_PLAN.md`, slice S2, Decision 0017 scope and task S2-T11. The task heading already exists. No S2-LR3F task heading is invented.
+
+The brief's `custodian/publicdata/additions/property_venues.py` is a shorthand that has no tracked path or history. The actual path in the diff is `custodian/src/eii_custodian/publicdata/additions/property_venues.py`. The requested `git log --format='%h %s' -- custodian/publicdata/additions/property_venues.py custodian/publicdata/review/additions_property_venues.yaml` gives da1541a2 and d66d742c, via the YAML. Repeating on the actual parser path gives the same two commits in lr3f history. `git log --all --format='%h %s' --` on the actual parser and YAML recovers the original S2-T11 additions and fixes: `bb1c1824227cc5040cb29482ea19053f2d9ca52f` adds both files with subject "feat(publicdata): the 77 addition rows declare columns and periods; property and venue tables from invented fixtures (S2-T11, pass A)". The later squash is `d66d742c3736168560278d717da257fdaa34aac5` (train 1 of slice S2, PR82); its subject alone is not single-task ownership evidence.
+
+S2-T19 is a plausible neighbouring task because it also owns property readers and open-data families. Its TASKS Scope instead names the GIS layers, sales bulletins, bank credit, tenders, district cooling and those families; it depends on S2-T11. The museum-specific S2-T11 criterion and the original file-add commit favour S2-T11 for these files. S2-T06 part B owns the stalled live-run consequence, not this parser. Sources: the three TASKS sections at WORK; LOG-LR3F.md 15:58 and 16:39. No ownership ambiguity is hidden.
+
+| Task / bounded work | Commit | Parent / base | Local review evidence |
+|---|---|---|---|
+| S2-T11 / S2-LR3F | `da1541a22ec114d8c4ca036b7442a19fc325238f` | `55657e59d80098d9860d3a8463431cd33bdf45a7` | Cognition Devin SWE-2 High, APPROVED; LOG-LR3F.md 16:39 and S2-LR3F.rev1.return.md |
+
+`git log --reverse --format=%H BASE..WORK` and `git diff --name-status --no-renames BASE WORK` give one linear commit, seven paths and two changed test files; make_spec.py freezes these inventories and generates `merges: []`. BASE is main55; WORK is lr3f. TASKS dependencies remain S2-T01 and S2-T02; no dependency or slice acceptance is inferred from status text.
+
+#### Build, ruling and review
+
+- LOG-LR3F.md 15:58 records the lead's live run 3 at BASE: build-public exit 1, `visits_museum` / `measure_unparsed`; the run stopped before later sources. This is a historical failure and the reason for this correction, not a passing full build.
+- L-1141: LOG-LR3F.md 16:07 and RULINGS-LR3F.md L-1141 (dated 16:07, written there 16:29) admit the four confirmed note texts as reviewed missing forms of the museum number field, alongside the two dash forms. No number or zero, unknown/changed-space text still refuses; no closure-status field is built. PO-S2-116 holds the separate status decision.
+- Builder maker: **OpenAI GPT-6.1 Sol through Codex**, explicitly attributed by LOG-LR3F.md 16:07 launch and 16:31 build result. The committed PROGRESS.md section "S2-LR3F — Exact reviewed museum missing forms (L-1141), 2026-11-19" self-reports GPT-6 without a narrower serving identity. Builder persona: senior public-data engineer; strict self-review persona: data-quality reviewer. These maker attributions do not come from the lead's commit identity.
+- Build result at 16:31: the lead verified the patch tree equal and committed `da1541a22ec114d8c4ca036b7442a19fc325238f` on BASE. The log reports corrected red 10 failed, then focused green 92; six planted faults each red then green; custodian 8054 passed; scripts 920; lint, format, mypy, docs, tree and parity exit 0. PROGRESS retains the initial 12-failure red with two test-authoring errors, corrected red 10 failed/4 passed, seed 71141, and the read-only staging failure, exit 128. Those errors are not reclassified as semantic red proofs. They precede the lead's commit of the returned tree.
+- Reviewer maker: **Cognition Devin SWE-2 High**, different from OpenAI. LOG-LR3F.md 16:31 launches rev1 on `da1541a22ec114d8c4ca036b7442a19fc325238f`; 16:39 records **APPROVED** that commit, no blocking findings. S2-LR3F.rev1.return.md begins VERDICT: APPROVED and verifies exact key/field admission, byte-exact forms, no missing-as-zero row and retained coverage. Its final limitations say it ran no tests/checks and could not independently inspect builder scratch logs, live export equality or patch hash. No independent execution is attributed to it.
+- Review notes: N1 is cosmetic PROGRESS layout; N2 is the PO numbering gap; N3 and N4 concern pre-existing whitespace-only handling and parser/fetch field binding. LOG-LR3F.md 16:39 explicitly assigns N3/N4 to **PO-S2-119**. That item is absent from both main55 and lr3f, so po_items.md supplies this named residual item, without silently fixing code. PO-S2-116 is already in WORK: it is not duplicated. No new ordinary OI is named, so items.md is empty.
+
+#### Proposed status and command inventory
+
+`tasks_md.json` copies the complete existing S2-T11 Delivery line verbatim from WORK and supplies one bounded correction status: in review in PR https://github.com/albarami/economic-investment-intelligence/pull/101, locally approved at da1541a2. Existing live completeness and unticked criteria remain open. No other task is edited.
+
+The command inventory has one pytest row per changed test file with verified function anchors, then the template's lint, format, mypy, docs, tree, byte parity, exact scope, Conventional Commits and required `./eii test --seed 2307420339` row. There are eleven executable ledger rows. No real-cache test changed; lead_only_commands.json is `[]`. A command being listed is not evidence it has been executed.
+
+#### Evidence the draft listed as missing, and how the lead resolved it
+
+- M100-01: the per-file rows, the shared rows and the fresh-seed whole test are the ledger rows of this pull request. Their exits, counts and seed are recorded by the ledger run itself.
+- M100-02: the rebase onto the merge of pull request 99 is recorded below. The prepush checks, the head checks, the six hosted checks and the whole test on the exact merge result follow this ledger, and are recorded in the next pull request's records.
+- M100-03: live run 4 of `./eii build-public` follows this merge. PO-S2-116 and PO-S2-119 stay open. The remaining acceptance of S2-T11 and of S2-T06 part B is unticked.
+- M100-04: the builder's raw command logs stay in its build workspace, outside the repository. The reviewer read the full diff. This ledger's own runs are the execution evidence.
+
+Ledger inputs drafted by OpenAI GPT-6.1 Sol (Codex); the lead resolved the four items above from the run log and the rebase proof.
+
+Rebase onto the merge of pull request 99 (lead, 2026-11-19 17:12): the approved commit `da1541a22ec114d8c4ca036b7442a19fc325238f` was rebased from `55657e59d80098d9860d3a8463431cd33bdf45a7` onto `98384ae5933dff2efb81721d087e74e6ce600011` (train S2-5, pull request 99, merged 2026-11-19 17:09 with all six hosted checks green, squash pinned to `3bc7a02fa9c9fc2b4140eb5559ccb0c3ad6f3c2e`) as `3dfb72e5bde913e7c93eddea8ef1d44d795efad9`. One textual conflict, in `PROGRESS.md`, where both sides appended at the end. It was resolved by keeping the base file whole and appending this commit's own 55 lines unchanged. For each of the seven changed files, the added and removed lines of `git diff 55657e59 da1541a2` equal those of `git diff 98384ae5 3dfb72e5` (lead's script, md5 of the change lines, all seven SAME). The approval therefore stands on a base-only move.
+
+#### Evidence for the work commit `3dfb72e5bde913e7c93eddea8ef1d44d795efad9`
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_museum_source_reviewed_forms_pass_the_fetch_precheck. Source: custodian/tests/test_fetch_kinds_survivors_3.py at 3dfb72e5bde913e7c93eddea8ef1d44d795efad9. No per-file result at this head is asserted.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    41 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_source_reviewed_forms_preserve_counts_and_period_coverage; test_source_reviewed_cell_has_no_number_or_value_row; test_source_note_unknown_text_and_space_changes_are_refused; test_source_note_does_not_apply_to_another_registry_key_or_field. Source: custodian/tests/test_museum_missing_forms.py at 3dfb72e5bde913e7c93eddea8ef1d44d795efad9. No per-file result at this head is asserted.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Static lint at WORK; record the actual exit, not an earlier result.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "822 files already formatted"
+Seed:      none
+Notes:     Formatter check only; actual final summary at WORK, with no formatting mutation.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 443 source files"
+Seed:      none
+Notes:     Locked type check at WORK; no inferred source-file count.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1118 text files, 119 Markdown files: OK"
+Seed:      none
+Notes:     Document validation at WORK; the command supplies its actual counts.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repository tree guard at WORK; preserve its closed rules.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte comparison of the two agent instruction files at WORK.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','98384ae5933dff2efb81721d087e74e6ce600011...3dfb72e5bde913e7c93eddea8ef1d44d795efad9'],check=True,capture_output=True,text=True).stdout.splitlines()); w='M:OPEN_ITEMS.md M:PROGRESS.md M:custodian/publicdata/review/additions_property_venues.yaml M:custodian/src/eii_custodian/publicdata/additions/property_venues.py M:custodian/tests/test_fetch_kinds_survivors_3.py M:custodian/tests/test_museum_missing_forms.py M:docs/04_PUBLIC_DATA_PACK.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "7 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact name-status scope from BASE..WORK, frozen from read-only Git; no records have been written by this draft.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','98384ae5933dff2efb81721d087e74e6ce600011..3dfb72e5bde913e7c93eddea8ef1d44d795efad9'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Conventional Commit subjects for every BASE..WORK commit; merges is generated explicitly in the spec.
+```
+
+```text
+### S2-T11 — Venue-visits reviewed missing forms (S2-LR3F): task log
+Commit:    3dfb72e5bde913e7c93eddea8ef1d44d795efad9
+Command:   ./eii test --seed 2307420339
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    11692 passed, 0 failed, 0 skipped
+Seed:      2307420339
+Notes:     Lead's fresh whole test at WORK using the supplied seed, provider none, no network and unchanged limits. This row is required; historical quick checks are not whole-test evidence. Exact merge-result and hosted/head checks remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -38811,3 +38992,60 @@ HEAD, the original ledger prefix, and the report marker/content constraints.
 - After the merge of pull request 99 (98384ae5), which holds OI-318 and OI-319, this change's open items OI-318, OI-319 and OI-320 are renumbered OI-320, OI-321 and OI-322. The renumbering is applied in OPEN_ITEMS.md and decision record 0068; the row above keeps its original numbers.
 - The draft OI-321 (the worker's scripts check lacked the pinned pyyaml wheel offline: 920 tests, exit 1, seven clean-environment failures) is environment evidence, not a project open item. It is removed from OPEN_ITEMS.md and kept here.
 - The lead's own run of the scripts discovery in the equipped shell is recorded with this pull request.
+
+
+## S2-LR3F — Exact reviewed museum missing forms (L-1141), 2026-11-19
+
+Maker: OpenAI. Model: Codex, GPT-6 as supplied by the session role; no finer runtime identifier exposed. Builder persona: senior public-data engineer for a provenance-first statistics build. Strict self-review persona: data-quality reviewer rejecting guessed text, missing-as-zero values and weakened refusals. Skills: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer and muhasabah-gate. The named test-driven-development and verification-before-completion skills were not installed at the searched skill roots; their plain-meaning rules were applied: failing fixture first, same assertions green, planted faults detected, real exits and completed checks before any completion claim.
+
+Base and unchanged HEAD: `55657e59d80098d9860d3a8463431cd33bdf45a7`; branch `local/S2-LR3F`. Environment: Linux, locked Python 3.14.6, uv 0.11.31, `UV_OFFLINE=1`, `PYTHONDONTWRITEBYTECODE=1`, decision provider `none`. `TMPDIR` is the absolute workspace-local `.overnight/tmp`; mypy cache and pytest basetemp directories are inside it. Each pytest command explicitly uses seed `71141`; unittest has no seed option. No network, secret file, real public cache or vault was read by this worker. Full command output with runtime local paths redacted is in `.overnight/tmp/`; `.overnight/tmp/checks.jsonl` records each actual subprocess exit.
+
+Authority and source: the supplied S2-LR3F brief and ruling L-1141 bind the National Planning Council museum-visits export, retrieved 2026-11-19, 1,372 rows, SHA-256 `8a89835ea0587994cdaff627395e66935ae1dabf8caceae8e20640be77d8a040`. Publisher and CC-BY-4.0 designation were checked in `custodian/publicdata/sources.yaml` at the exact museum registry key. No live retrieval is claimed here. The YAML admits only its four exact note texts alongside the two dashes for `number` at that key; unknown and whitespace-altered forms still refuse. The docstring and document 04's paragraph now describe that list. PO-S2-116 asks for a decision record on a separate closure status, or one line saying why not; no status column is added.
+
+Test-first evidence: the first new-test run had 12 failures, including two `NameError` failures because an existing fetch-test assertion was accidentally placed in the new function. The assertion was restored to its original function before implementation. The corrected red has 10 failures and four passes: the exact-list pin plus closure-note fetch/parser refusals, all meaningful rather than setup errors. Both runs remain recorded below. Existing description-refusal tests retain all three old description strings as explicit parameters after removal of the `unconfirmed` YAML block. No refusal assertion was deleted.
+
+Guard plants: six temporary faults were applied one at a time and restored byte for byte, with no test edits: admit unknown Arabic text; normalize spaces; leak reviewed forms to other registry keys; copy the museum forms into health-centre year fields; convert missing cells to numeric zero; and emit museum rows for missing cells. Each produced assertion failures (exit 1), then the unchanged tests passed against restored source. `plant-unknown` and `plant-spaces` map to `green-refusals`; both scope plants map to `green-scope`; both zero/value plants map to `green-no-value`. The combined fixture keeps genuine zero, omits and counts all missing cells, and retains the final missing month in period coverage. `.overnight/tmp/plants.py` records the exact temporary faults; `.overnight/tmp/self-review.log` records AST preservation checks: parser implementation unchanged and old tests preserved except the explicitly superseded list pin and removed-block fixture.
+
+Commands and actual evidence (each log has the matching name):
+
+- `red-reviewed`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py custodian/tests/test_fetch_kinds_survivors_3.py -k 'source_reviewed or reviewed_forms_are_exact' -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/red-reviewed`; exit `1`; 12 failed, 2 passed, 63 deselected in 0.91s; evidence `.overnight/tmp/red-reviewed.log`.
+- `red-reviewed-corrected`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py custodian/tests/test_fetch_kinds_survivors_3.py -k 'source_reviewed or reviewed_forms_are_exact' -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/red-reviewed-corrected`; exit `1`; 10 failed, 4 passed, 63 deselected in 0.96s; evidence `.overnight/tmp/red-reviewed-corrected.log`.
+- `green-focused`: `uv run --locked python -m pytest custodian/tests/test_additions_property_venues.py custodian/tests/test_museum_missing_forms.py custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/green-focused`; exit `0`; 92 passed in 5.03s; evidence `.overnight/tmp/green-focused.log`.
+- `plant-unknown`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_unknown -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-unknown`; exit `1`; 1 failed, 11 passed, 29 deselected in 1.34s; evidence `.overnight/tmp/plant-unknown.log`.
+- `plant-spaces`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_unknown -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-spaces`; exit `1`; 10 failed, 2 passed, 29 deselected in 1.03s; evidence `.overnight/tmp/plant-spaces.log`.
+- `plant-key-scope`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_does_not_apply -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-key-scope`; exit `1`; 4 failed, 37 deselected in 0.29s; evidence `.overnight/tmp/plant-key-scope.log`.
+- `plant-field-scope`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_does_not_apply -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-field-scope`; exit `1`; 4 failed, 37 deselected in 0.48s; evidence `.overnight/tmp/plant-field-scope.log`.
+- `plant-missing-zero`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_reviewed_cell -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-missing-zero`; exit `1`; 6 failed, 35 deselected in 0.29s; evidence `.overnight/tmp/plant-missing-zero.log`.
+- `plant-value-row`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_reviewed_cell -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/plant-value-row`; exit `1`; 6 failed, 35 deselected in 0.57s; evidence `.overnight/tmp/plant-value-row.log`.
+- `format-apply`: `uv run --locked ruff format custodian/tests/test_museum_missing_forms.py custodian/tests/test_fetch_kinds_survivors_3.py`; exit `0`; 1 file reformatted, 1 file left unchanged; evidence `.overnight/tmp/format-apply.log`.
+- `green-scope`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_does_not_apply -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/green-scope`; exit `0`; 4 passed, 37 deselected in 0.48s; evidence `.overnight/tmp/green-scope.log`.
+- `green-no-value`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_reviewed_cell -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/green-no-value`; exit `0`; 6 passed, 35 deselected in 0.58s; evidence `.overnight/tmp/green-no-value.log`.
+- `green-refusals`: `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -k source_note_unknown -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/green-refusals`; exit `0`; 12 passed, 29 deselected in 1.40s; evidence `.overnight/tmp/green-refusals.log`.
+- `agents-parity`: `cmp AGENTS.md CLAUDE.md`; exit `0`; silent success; no test count; evidence `.overnight/tmp/agents-parity.log`.
+- `tree`: `python3 scripts/check_tree.py`; exit `0`; checked 8 rules: OK; evidence `.overnight/tmp/tree.log`.
+- `ruff-format-check`: `uv run --locked ruff format --check .`; exit `0`; 799 files already formatted; evidence `.overnight/tmp/ruff-format-check.log`.
+- `ruff-check`: `uv run --locked ruff check .`; exit `0`; All checks passed!; evidence `.overnight/tmp/ruff-check.log`.
+- `docs`: `python3 scripts/check_docs.py`; exit `0`; checked 1091 text files, 117 Markdown files: OK; evidence `.overnight/tmp/docs.log`.
+- `mypy`: `uv run --locked mypy`; exit `0`; Success: no issues found in 431 source files; evidence `.overnight/tmp/mypy.log`.
+- `environment`: `uv run --locked python -c 'import platform, sys; print("Python", platform.python_version()); print("Platform", sys.platform)'`; exit `0`; no test count; see log; evidence `.overnight/tmp/environment.log`.
+- `diff-check`: `git diff --check`; exit `0`; silent success; no test count; evidence `.overnight/tmp/diff-check.log`.
+- `git-add`: `git add custodian/publicdata/review/additions_property_venues.yaml custodian/src/eii_custodian/publicdata/additions/property_venues.py custodian/tests/test_museum_missing_forms.py custodian/tests/test_fetch_kinds_survivors_3.py docs/04_PUBLIC_DATA_PACK.md OPEN_ITEMS.md PROGRESS.md`; exit `128`; no test count; see log; evidence `.overnight/tmp/git-add.log`.
+- `diff-after-ledger`: `git diff --check`; exit `0`; silent success; no test count; evidence `.overnight/tmp/diff-after-ledger.log`.
+- `docs-after-ledger`: `python3 scripts/check_docs.py`; exit `0`; checked 1091 text files, 117 Markdown files: OK; evidence `.overnight/tmp/docs-after-ledger.log`.
+- `scripts`: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'`; exit `0`; Ran 920 tests in 365.882s; evidence `.overnight/tmp/scripts.log`.
+- `custodian`: `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider --hypothesis-seed=71141 --basetemp=.overnight/tmp/custodian`; exit `0`; 8054 passed, 1 warning in 455.83s (0:07:35); evidence `.overnight/tmp/custodian.log`.
+
+Final scoped outcome: full custodian suite `8054 passed, 1 warning` (the existing duplicate-ZIP fixture), exit 0; scripts suite `920 tests`, exit 0. Ruff lint, formatting (799 files), mypy (431 source files), documentation (1,091 text and 117 Markdown files), tree (eight rules), byte parity and whitespace checks all exited 0. No skipped-test summary or unexplained random failure was reported. No retries or weakened assertions concealed a failure.
+
+Delivery boundary: `git add` exited 128 because the workspace index is read-only. No commit or push was attempted after that failure, and no permissions were changed. The required fallback is `.overnight/OUT/changes.patch`; its final byte count, SHA-256 and reverse-apply check are in `.overnight/RETURN.md`. Requested commit title: `fix(publicdata): the venue-visits closure notes are reviewed missing forms (S2-LR3F)`. Strict self-review found no scoped defect; independent review by another maker and the next live public build remain with the lead. Muhasabah PASS: source attribution, assumptions, actual checks, unchanged parser logic, preserved refusals and the delivery limits are explicit. PO-S2-116 remains OPEN.
+- `diff-final`: `git diff --check`; exit `0`; silent success; no test count; evidence `.overnight/tmp/diff-final.log`.
+- `docs-final`: `python3 scripts/check_docs.py`; exit `0`; checked 1091 text files, 117 Markdown files: OK; evidence `.overnight/tmp/docs-final.log`.
+- `patch-generate`: `bash -c 'git diff --binary > .overnight/OUT/changes.patch'`; exit `0`; silent success; no test count; evidence `.overnight/tmp/patch-generate.log`.
+- `patch-reverse-check`: `git apply --check --reverse .overnight/OUT/changes.patch`; exit `0`; silent success; no test count; evidence `.overnight/tmp/patch-reverse-check.log`.
+
+Final artifact-scan correction: an inline report/path audit exited 1 because its substring pattern for an absolute temporary path also matched the relative `.overnight/tmp/` evidence references. Inspection confirmed those relative tokens caused the assertion; no absolute path was found. A boundary-aware pattern fixes the audit helper, not product code. The corrected artifact audit passes eight assertions, exit 0, checking exact patch bytes, append-only records, byte parity, report marker/counts and absence of absolute local paths in added lines and the report. Evidence: `.overnight/tmp/final_audit.py` and `.overnight/tmp/final-audit-corrected.log`. The failed audit is recorded here rather than treated as a passing rerun without cause.
+- `patch-generate-final`: `bash -c 'git diff --binary > .overnight/OUT/changes.patch'`; exit `0`; silent success; no test count; evidence `.overnight/tmp/patch-generate-final.log`.
+- `patch-reverse-final`: `git apply --check --reverse .overnight/OUT/changes.patch`; exit `0`; silent success; no test count; evidence `.overnight/tmp/patch-reverse-final.log`.
+- `final-audit-corrected`: `python3 .overnight/tmp/final_audit.py`; exit `0`; checked 8 final artifact assertions: OK; evidence `.overnight/tmp/final-audit-corrected.log`.
+
+Records correction (lead, 2026-11-19 17:55): the pull request of this ledger is number 101; number 100 went to the documents pull request of decision 0068 before this one opened. The four references above that the ledger wrote as `pull/100` before the pull request existed are corrected to `pull/101` in this same records commit; no evidence row changed.
