@@ -93,6 +93,21 @@ def _plant_env_name_in_package_pyc(root: Path) -> None:
 class ImportBoundaryFilesTest(unittest.TestCase):
     """File-tree and byte-level rules for ``check_imports``."""
 
+    def test_cdse_names_text_and_binary(self) -> None:
+        for name in ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET"):
+            for package in ("eii_core", "eii_product", "eii_custodian"):
+                for extension in ("txt", "bin"):
+                    with (
+                        self.subTest(name=name, package=package, extension=extension),
+                        tempfile.TemporaryDirectory() as folder,
+                    ):
+                        root = Path(folder)
+                        cases.make_tree(root)
+                        path = cases.package_dir(root, package) / f"probe.{extension}"
+                        path.write_bytes(b"\xff" + name.encode())
+                        failures, _notes = guard.check_imports(root)
+                        self.assertEqual(bool(failures), package != "eii_custodian")
+
     def test_missing_source_tree(self) -> None:
         """Missing or empty package trees fail the src-tree rule."""
         count = 0

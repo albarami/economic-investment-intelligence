@@ -12,6 +12,8 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response, Transport
 
 KEY_NAMES = (
+    "CDSE_CLIENT_ID",
+    "CDSE_CLIENT_SECRET",
     "EARTHDATA_API_KEY",
     "TOMTOM_API_KEY",
     "COMTRADE_PRIMARY_API_KEY",

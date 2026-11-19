@@ -4272,3 +4272,16 @@ requires every prior ledger row to remain unchanged, so this worker preserved
 them and leaves their disposition to the lead. Full commands, actual exits and
 file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 `.overnight/RETURN.md`. No existing S2-T29 review or live-source hold is closed.
+
+
+## S2-T41 — Optional unread CDSE backup, build open points
+
+- **Provider contract and evidence pending (lead):** verify current official Authentication, Process API, Sentinel-2 L2A, acquisition-date metadata, quota/rate/processing-unit and legal pages. Record exact publisher wording, public URL, read date and page SHA-256. No page was fetched by this offline build. Registry publisher, endpoints, schema and costs are pending; the command deliberately omits bulk acquisition successfully. Internal `pending.v1` Process/metadata envelopes and the linear cost fixture are not provider contracts. Replace them only through reviewed official evidence, including any minima and unit rounding; no remembered host or free allowance is activated.
+- **Terms and attribution pending (lead):** record imagery notice, interface terms and complete attribution separately, in the provider’s words or with each missing field/reason/check date under decision 0059. Pending terms remain usable; they waive no publisher, schema, integrity or quota guard. No quotation or hash of an unread page is invented.
+- **Acquisition mapping pending (lead):** bind the verified contributing dates, cloud/no-data masks and raster response contract to the actual picture. The offline metadata/raster tests establish only internal validation. Confirm the reviewed Qatar boundary and metric projection before bulk use; no real boundary or cache was read here.
+- **Display ownership pending (lead):** assign a later task and any amendments to S3-T16’s offline criterion, imagery delivery and attribution. S2-T41 adds no display, asset/release export or map adapter; S3-T23/OI-305 are unchanged.
+- **Recorded hardening only (L-1078 item 6):** README Commit hooks name parity, the lead-run wrapper’s worktree refusal, and recorded retry-reserve choice. No wrapper is added or run; the owner’s already-placed values need no further action. The command form is explicitly lead-shell-only in rule 44.
+- **Review pending:** the plan’s Anthropic confirmation does not review this implementation. Two independent maker lenses, hosted checks and the lead’s exact-merge whole test remain separate.
+- **ASSUMPTIONS:** the worker uses only invented response/credential fixtures; the actual provider schema may differ from internal placeholders. No exact session model identifier is exposed to the worker. The supplied role identifies OpenAI GPT-6 through Codex; no more precise model identity is asserted.
+
+- **Build environment blocker:** `git add .env.example` returned exit 128: the shared worktree index is read-only outside the permitted workspace. No commit or push was made. `check_tree` reads that unchanged index, so it refuses the new example-name inventory until the lead stages the changes in a writable checkout. No guard or sandbox permission was changed.

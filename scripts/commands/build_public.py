@@ -7,6 +7,7 @@ from collections.abc import Callable, Mapping, Sequence
 from functools import partial
 from pathlib import Path
 
+from cdse_key import cdse_credentials
 from earthdata_key import VARIABLE, earthdata_token
 from eii_custodian.publicdata.atlas.config import AtlasError
 from eii_custodian.publicdata.atlas.config import Config as AtlasConfig
@@ -85,6 +86,13 @@ def run(
     benchmark_stream: StreamTransport | None = None,
 ) -> int:
     """Fetch the registry. Extra arguments are a usage error and open nothing."""
+    if tuple(args) == ("--cdse-backup",):
+        credentials = cdse_credentials(environ)
+        reason = (
+            "credentials_absent" if credentials is None else "provider_contract_pending"
+        )
+        print(f"satellite_cdse_backup omitted: {reason}")
+        return 0
     if len(args) != 0:
         table.write_usage()
         return 2
@@ -96,7 +104,9 @@ def run(
     bound = None if transport is not None else open_attempt
     slots = slot_secrets(environ, injected=transport is not None)
     try:
-        entries = load_registry()
+        entries = tuple(
+            entry for entry in load_registry() if entry.kind != "cdse_backup"
+        )
     except RegistryError as exc:
         return exits.finish(1, "build-public", exc.detail)
     baci_config: Config | None = None

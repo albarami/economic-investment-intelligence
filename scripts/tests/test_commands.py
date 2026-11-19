@@ -27,7 +27,7 @@ class Commands(unittest.TestCase):
     def test_usage_lists_every_command(self) -> None:
         expected = support.expected_usage(ROOT)
         rows = support.architecture_table(ROOT)
-        self.assertEqual(len(rows), 12)
+        self.assertEqual(len(rows), 13)
         for args in ((), ("bogus",)):
             with self.subTest(args=args):
                 proc = support.run_launcher(args, {"PATH": ""}, ROOT)
@@ -42,7 +42,7 @@ class Commands(unittest.TestCase):
 
         self.assertEqual(table.usage_text(), expected)
         specs = table.COMMANDS
-        self.assertEqual(len(specs), 12)
+        self.assertEqual(len(specs), 13)
         for spec, (command, plane) in zip(specs, rows, strict=True):
             self.assertEqual(spec.form, support.usage_form(command))
             self.assertEqual(spec.plane, plane)
@@ -270,7 +270,13 @@ class Commands(unittest.TestCase):
         ):
             code = build_public.run(
                 root,
-                {"PATH": "", "EARTHDATA_API_KEY": secret, "TOMTOM_API_KEY": secret},
+                {
+                    "PATH": "",
+                    "EARTHDATA_API_KEY": secret,
+                    "TOMTOM_API_KEY": secret,
+                    "CDSE_CLIENT_ID": "FAKE-CDSE-COMMAND-ID",
+                    "CDSE_CLIENT_SECRET": "FAKE-CDSE-COMMAND-SECRET",
+                },
                 (),
                 transport=unreachable,
                 sleep=lambda _seconds: None,

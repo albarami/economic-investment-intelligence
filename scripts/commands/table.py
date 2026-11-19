@@ -32,6 +32,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("down", "down", "Product", "placeholder", NOT_YET),
     Command(TEST_FORM, "test", "All", "real", ""),
     Command("build-public", "build-public", "Custodian", "real", ""),
+    Command("build-public --cdse-backup", "build-public", "Custodian", "real", ""),
     Command("build-world", "build-world", "Custodian", "placeholder", NOT_YET),
     Command("build-release", "build-release", "Custodian", "placeholder", NOT_YET),
     Command(

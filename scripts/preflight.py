@@ -30,6 +30,8 @@ CHECKS = (
     "model-key",
     "traffic-provider-key",
     "night-lights-key",
+    "cdse-client-id",
+    "cdse-client-secret",
     "imagery-provider-key",
     "photorealistic-3d-key",
     "env-not-tracked",
@@ -108,6 +110,8 @@ def run_preflight(
         out_lines.append(rows.model_key_row(environ))
         out_lines.append(rows.traffic_provider_key_row(environ))
         out_lines.append(rows.night_lights_key_row(environ))
+        out_lines.append(rows.cdse_client_id_row(environ))
+        out_lines.append(rows.cdse_client_secret_row(environ))
         out_lines.append(rows.imagery_provider_key_row(environ))
         out_lines.append(rows.photorealistic_3d_key_row(environ))
         out_lines.append(rows.env_tracked_row(root, environ, limit))

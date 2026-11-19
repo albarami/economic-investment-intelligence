@@ -309,6 +309,24 @@ def night_lights_key_row(environ: Mapping[str, str]) -> store.Line:
     return store.Line("PASS", "night-lights-key", "absent")
 
 
+def cdse_client_id_row(environ: Mapping[str, str]) -> store.Line:
+    """Optional tooling credential presence only; no auth or probe child."""
+    return store.Line(
+        "PASS",
+        "cdse-client-id",
+        "present" if environ.get("CDSE_CLIENT_ID", "").strip() else "absent",
+    )
+
+
+def cdse_client_secret_row(environ: Mapping[str, str]) -> store.Line:
+    """Optional tooling credential presence only; never render the value."""
+    return store.Line(
+        "PASS",
+        "cdse-client-secret",
+        "present" if environ.get("CDSE_CLIENT_SECRET", "").strip() else "absent",
+    )
+
+
 def imagery_provider_key_row(environ: Mapping[str, str]) -> store.Line:
     """OPS-73: ESRI_API_KEY presence only; never print the value or connect."""
     if environ.get("ESRI_API_KEY", ""):

@@ -15,6 +15,7 @@ usage() {
     'down' \
     'test [--seed N]' \
     'build-public' \
+    'build-public --cdse-backup' \
     'build-world' \
     'build-release' \
     'load-release' \

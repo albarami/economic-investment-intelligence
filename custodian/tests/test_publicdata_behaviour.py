@@ -48,6 +48,8 @@ _SCRIPTS = REPO / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 KEY_NAMES = (
+    "CDSE_CLIENT_ID",
+    "CDSE_CLIENT_SECRET",
     "EARTHDATA_API_KEY",
     "TOMTOM_API_KEY",
     "COMTRADE_PRIMARY_API_KEY",
@@ -1393,3 +1395,16 @@ def test_key_scan_refuses_a_folder_without_python_files(tmp_path: Path) -> None:
     (tmp_path / "scripts/commands/notes.txt").write_text("x\n", encoding="utf-8")
     with pytest.raises(ValueError, match="scripts/commands"):
         key_offenders(tmp_path)
+
+
+def test_cdse_name_in_unrelated_fetcher_refused(tmp_path: Path) -> None:
+    for name in ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET"):
+        module = tmp_path / "custodian/src/eii_custodian/publicdata/unrelated.py"
+        module.parent.mkdir(parents=True, exist_ok=True)
+        module.write_text(f"# {name}\n")
+        command = tmp_path / "scripts/commands/plain.py"
+        command.parent.mkdir(parents=True, exist_ok=True)
+        command.write_text("value = 1\n")
+        assert key_offenders(tmp_path) == (
+            f"custodian/src/eii_custodian/publicdata/unrelated.py:{name}",
+        )
