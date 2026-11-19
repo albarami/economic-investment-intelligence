@@ -312,6 +312,7 @@ def test_series_indexes_existing_internal_rows_before_named_regression_refusal(
     result = json.loads((tmp_path / "assembly/series_stage.json").read_text())
     assert result["mismatch"] == "PUB-62"
     assert result["tables"]["pub_zone_utility"][1]["value"] == 24
+    assert result["row_sources"]["pub_zone_utility"] == ["util_elec", "util_elec"]
 
 
 def test_failed_new_run_clears_prior_report_before_source_read(tmp_path: Path) -> None:

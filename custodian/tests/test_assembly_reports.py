@@ -184,15 +184,99 @@ def test_each_missing_or_pending_gate_is_refused() -> None:
             require_complete(changed)
 
 
-def test_multisource_draw_names_each_input_hash_and_url(tmp_path: Path) -> None:
+def _multisource_build(tmp_path: Path, *, series: bool = False):
     state = build(tmp_path)
-    second = entry(source="second", url="https://example.org/other")
-    state.receipts[second.key] = receipt(second)
+    second = entry(
+        source="second",
+        key="second/key" if series else "second",
+        url="https://example.org/other",
+    )
+    state.receipts[second.key] = {**receipt(second), "sha256": "c" * 64}
     state.table_sources["pub_invented"].add(second.key)
+    keys = ["invented"] * 24 + [second.source_id if series else second.key]
+    payload = {"tables": state.tables}
+    if series:
+        (tmp_path / "assembly/gis_property_singles.json").unlink()
+        payload["row_sources"] = {"pub_invented": keys}
+        state.record("series_stage", payload)
+    else:
+        for row, key in zip(state.tables["pub_invented"], keys, strict=True):
+            row["source_key"] = key
+        state.record("gis_property_singles", payload)
+    return state
+
+
+def test_multisource_draw_names_each_input_hash_and_url(tmp_path: Path) -> None:
+    state = _multisource_build(tmp_path)
     figures = draw_tables(state)["pub_invented"]()
-    assert "https://example.org/other" in figures[0].filter
-    assert "https://example.org/source" in figures[0].filter
-    assert "a" * 64 in figures[0].filter
+    links = [
+        {
+            key: state.receipts[source][key]
+            for key in ("source_id", "fetch_url", "sha256")
+        }
+        for source in ("invented", "second")
+    ]
+    for index, figure in enumerate(figures):
+        source = "second" if index == 24 else "invented"
+        own = state.receipts[source]
+        assert figure.source_id == own["source_id"]
+        assert figure.url == own["fetch_url"]
+        assert figure.filter == (
+            "snapshot="
+            + own["sha256"]
+            + ";table=pub_invented;row="
+            + str(index)
+            + ";field=value;inputs="
+            + json.dumps(links, sort_keys=True)
+        )
+
+
+@pytest.mark.parametrize("series", [False, True])
+def test_multisource_draw_names_the_row_source(tmp_path: Path, series: bool) -> None:
+    state = _multisource_build(tmp_path, series=series)
+    figure = draw_tables(state)["pub_invented"]()[-1]
+    assert figure.source_id == "second"
+    assert figure.url == "https://example.org/other"
+    assert figure.filter.split(";", 1)[0] == "snapshot=" + "c" * 64
+
+
+def test_untagged_multisource_table_is_excluded_and_recorded(tmp_path: Path) -> None:
+    state = _multisource_build(tmp_path)
+    for row in state.tables["pub_invented"]:
+        row.pop("source_key")
+    state.table("pub_checkable", [{"value": i} for i in range(25)], ("invented",))
+    state.record("gis_property_singles", {"tables": state.tables})
+    assert set(draw_tables(state)) == {"pub_checkable"}
+    write_record(tmp_path, "assembly/build.json", {})
+    state.draw()
+    record = json.loads((tmp_path / "assembly/draw.json").read_text())
+    assert record["excluded_tables"] == [
+        {
+            "table": "pub_invented",
+            "sources": ["invented", "second"],
+            "reason": "assembly_draw_lineage_ambiguous",
+        }
+    ]
+    assert all(key.startswith("pub_checkable:") for key in record["figure_ids"])
+
+
+@pytest.mark.parametrize("series", [False, True])
+def test_partly_tagged_multisource_table_refuses(tmp_path: Path, series: bool) -> None:
+    state = _multisource_build(tmp_path, series=series)
+    if series:
+        state.record(
+            "series_stage",
+            {
+                "tables": state.tables,
+                "row_sources": {"pub_invented": ["invented"] * 24},
+            },
+        )
+    else:
+        state.tables["pub_invented"][-1].pop("source_key")
+        state.record("gis_property_singles", {"tables": state.tables})
+    with pytest.raises(AssemblyError, match="assembly_draw_lineage_ambiguous"):
+        readers = draw_tables(state)
+        readers["pub_invented"]()
 
 
 @pytest.mark.parametrize("value", ["NaN", "Infinity", "-Infinity"])

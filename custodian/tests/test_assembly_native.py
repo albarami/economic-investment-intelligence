@@ -199,3 +199,56 @@ def test_comtrade_adapter_uses_reviewed_parent_manifest_and_real_assembler(
     assert figures
     assert all(figure.figure_id.endswith(":value") for figure in figures)
     assert state.tables["pub_comtrade_trade"]
+
+
+def test_draw_over_investment_tables(tmp_path: Path, monkeypatch) -> None:
+    from custodian.tests import test_investment_build as fixture
+
+    from eii_custodian.publicdata.assembly_io import write_record
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+    from eii_custodian.publicdata.draw import draw
+
+    entries = (fixture._fdi_entry(), fixture._agency_entry())
+    pins = {}
+    for row in entries:
+        bodies = (
+            {
+                row.url: fixture.dashboard_page(
+                    tuple(
+                        fixture.invented_record(project_id=1001 + i) for i in range(12)
+                    )
+                )
+            }
+            if row.source_id == "fdi_projects"
+            else fixture._agency_transport_bodies()
+        )
+        assert fixture._run(tmp_path, monkeypatch, row, bodies) == 0
+        pointer, manifest, _table = fixture._batch(tmp_path, row.source_id)
+        pins[row.key] = next(
+            page["sha256"] for page in manifest["pages"] if page["url"] == row.url
+        )
+        pins[row.key + "/evidence"] = pointer["manifest_sha256"]
+    cache = tmp_path / "data/public_cache"
+    (cache / "snapshot_pins.json").write_text(json.dumps(pins))
+    state = context(cache, entries)
+    state.reviewed_selections()
+    readers = draw_tables(state)
+    assert set(readers) == {"fdi_projects", "pub_investqa_record"}
+    fdi = readers["fdi_projects"]()
+    assert {figure.figure_id for figure in fdi} == {
+        "fdi_projects:" + str(index) + ":" + field
+        for index in range(12)
+        for field in ("capex_value", "jobs")
+    }
+    assert {
+        figure.kind for figure in fdi if figure.figure_id.endswith(":capex_value")
+    } == {"money"}
+    assert {figure.kind for figure in fdi if figure.figure_id.endswith(":jobs")} == {
+        "count"
+    }
+    # This agency contract stores heading blocks and links, with no numeric measures.
+    assert readers["pub_investqa_record"]() == []
+    write_record(cache, "assembly/build.json", {})
+    selected = draw(readers, 17, cache / "assembly/build.json")
+    assert len(selected) == 20
+    assert all(figure in fdi for figure in selected)
