@@ -177,11 +177,19 @@ def test_fetch_tenders_scopes_the_chain_to_its_host(tmp_path: Path) -> None:
     assert calls == []
 
 
-def test_without_a_reviewed_chain_the_refusal_is_truthful(tmp_path: Path) -> None:
-    # The registry holds no reviewed pin: even a valid invented intermediate
-    # is refused before any request, with the truthful reason.
+def test_the_registry_holds_the_reviewed_pin() -> None:
+    # The live run of 2026-11-19 placed the intermediate and its SHA-256 was
+    # reviewed into the registry; the pin is one lowercase SHA-256, never empty.
     row = next(r for r in load_registry() if r.key == "tenders_pub")
-    assert row.chain_intermediate_sha256 == ""
+    pin = row.chain_intermediate_sha256
+    assert len(pin) == 64 and set(pin) <= set("0123456789abcdef")
+
+
+def test_without_a_reviewed_chain_the_refusal_is_truthful(tmp_path: Path) -> None:
+    # A row without a reviewed pin: even a valid invented intermediate is
+    # refused before any request, with the truthful reason.
+    committed = next(r for r in load_registry() if r.key == "tenders_pub")
+    row = replace(committed, chain_intermediate_sha256="")
     path, _pin = _file(tmp_path, intermediate_pem())
     with pytest.raises(TenderError) as refused:
         tenders.tender_https(row, chain_file=path)

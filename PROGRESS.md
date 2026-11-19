@@ -40710,3 +40710,14 @@ Fix: the test keeps both address assertions and now asserts that the placeholder
 - planted violation: with the placeholder written back into that cell, the fixed test fails (1 failed, 21 passed); the document restored, 22 passed and the tree shows only the test change.
 - `uv run --locked ruff check` and `ruff format --check` on the file: exit 0.
 - Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, named in the ledger of the pull request of train S2-7.
+
+## S2-T19 — The tender host's intermediate pin from the live run (lead, 2026-11-19)
+
+Live run 4 of `./eii build-public` on main `260ae461f221c7ac8fd100fa8e0a044f5ed4a1eb` (cores 10 and 11, 19:48 to 20:14) exited 1 with 241 PASS lines and one failing source, `tenders_pub`, refused with `certificate_chain_incomplete`: the registry pin was still empty, as document 04 section 2 recorded ("pending the lead's real run"). From the lead's shell only, the lead read the server certificate's CA Issuers address, fetched the issuing intermediate once, converted it to one PEM certificate, verified it against the system roots (`openssl verify` exit 0, and the server certificate verified with it as the only untrusted certificate, exit 0; validity ends 2031-03-29), and placed it at the uncommitted path `data/public_chain/tenders_pub.intermediate.pem` of the live-run clone (ignored by git). The project's own `chain_context` accepted that file with its SHA-256 `6601f41fceefbe7523a6a2e746938de57fc24e99426b7bea58d1867dbee1be5e`.
+
+Changes: the registry row `tenders_pub` now holds that pin and its basis note says where it came from; document 04 section 2 states the pin is set; `custodian/tests/test_tender_chain.py` adds `test_the_registry_holds_the_reviewed_pin` and keeps the claim of `test_without_a_reviewed_chain_the_refusal_is_truthful` on an explicitly unpinned copy of the committed row. No certificate file is committed; verification and hostname checking stay on.
+
+- red first: with the pin set and the tests unchanged, `uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider` exit 1, 1 failed (`test_without_a_reviewed_chain_the_refusal_is_truthful`), 29 passed.
+- planted violation: with the registry pin blanked, the new test fails (exit 1, 1 failed); restored, 31 passed.
+- `uv run --locked python -m pytest custodian/tests/test_tender_chain.py custodian/tests/test_tenders.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_publicdata_registry.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider`: exit 0, 343 passed.
+- Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, recorded in the ledger of the pull request that carries this change.

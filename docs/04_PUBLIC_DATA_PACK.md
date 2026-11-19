@@ -859,8 +859,8 @@ No certificate file is committed. The runner places `tenders_pub.intermediate.pe
 uncommitted `data/public_chain/`: read the CA Issuers address from the server certificate,
 fetch the intermediate, verify it against system roots, then compare the file's SHA-256 with
 the reviewed `chain_intermediate_sha256` registry pin. The build never fetches that file;
-the issuing host is not allowed by PUB-03. The pin is still empty pending the lead's real run,
-not an invented digest. The default verifying SSL context loads only that intermediate in
+the issuing host is not allowed by PUB-03. The pin holds the SHA-256 of the intermediate the lead
+placed in the live run of 2026-11-19, not an invented digest. The default verifying SSL context loads only that intermediate in
 addition to system roots. Missing file, mismatched hash or changed chain leaves this source
 absent with `certificate_chain_incomplete`; the remedy is a reviewed registry change, never
 relaxed verification. The lead read the intermediate's validity ending in March 2031.
