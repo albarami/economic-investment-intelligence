@@ -119,6 +119,7 @@
 | [0065](decisions/0065-eight-everyday-capabilities-of-the-map-screen.md) | Eight everyday capabilities of the map screen, one new task each: a route between two points, a measuring tool, print and export of the view and the case file, a Public-data download, an imagery swipe, a share link, coordinates and go-to, and a phone layout | Accepted, 2026-11-19 |
 
 | [0066](decisions/0066-an-optional-free-cdse-backup-cache.md) | Optional free CDSE backup, credential inventories and unread cache; display assigned separately | Proposed, 2026-11-19 |
+| [0067](decisions/0067-session-coordinates-and-the-released-map-frame.md) | Session coordinate units/identity, released map-frame lineage, mapped-land refusals and draft S7-T29/S7-T33 contracts; unresolved activation points remain CONSULT | Proposed, 2026-11-19 |
 
 ## Identifiers and change control
 
