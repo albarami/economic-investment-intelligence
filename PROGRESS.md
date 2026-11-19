@@ -38046,3 +38046,201 @@ exit 0 (1024 text files, 112 Markdown files); `python3 scripts/check_tree.py` ex
 three investment test files and document 03. Muhasabah PASS for L-1052 items 1–4: named
 red/green evidence and exact contract replacement verified; independent re-review and the
 lead's whole test remain owed. No other finding, live acceptance or part-B work is claimed.
+
+## S2-T36 offline build — 2026-11-19
+
+Builder: OpenAI / GPT-6 (Codex), senior data-platform engineer for public-data
+acquisition, provenance and request-chain integrity. Later reviewer persona:
+strict reviewer of public-data fetchers, transport guards, predecessor binding,
+projection-before-write and planted violations; another-maker review is pending.
+Skills applied: project-orientation, task-standards, github-flow,
+sanad-provenance and muhasabah-gate. The named test-driven-development and
+verification-before-completion skills are unavailable; their plain requirements
+were applied directly. Git remained read-only as the task brief requires.
+
+Binding build base: `67311c879b0fd8c68216d53abd33d61282a7b3d5` on
+`local/S2-T36`. The task entry and decision 0064 are supplied in the brief's
+input artifacts, not added to this older tree. No task criterion/status or open
+item was changed. This records an offline implementation, not live activation,
+a completed source fetch or reviewer approval. The lead retains the reviewed
+pin, byte bound, hidden-state/selector confirmation, producer session, real-cache
+run and commit. `EII_FC_REGISTER_FILE` and release tables are unchanged.
+
+All recorded pytest runs used seed `1938475621`, the locked workspace environment,
+`UV_OFFLINE=1` in the invoking shell and `TMPDIR` set to this workspace's
+`.overnight/tmp` by its absolute resolved path. The whole-test runner builds its
+own child allow-list environment and selects decision provider `none`. No public
+source, live capture, private input, vault or real data cache was read by the
+builder. Commands below run from the repository root. Detailed local transcripts
+are under `.overnight/`; local paths in completed transcripts were redacted.
+
+| Evidence | Command | Exit and observed result |
+|---|---|---|
+| Initial shape interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register.py -q --hypothesis-seed=1938475621` | 2; one collection error: FC package absent. This is interface absence, not a semantic guard proof. |
+| Initial capture interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q --hypothesis-seed=1938475621` | 2; one collection error: producer module absent. |
+| Initial inventory interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py -q --hypothesis-seed=1938475621` | 2; one collection error: build adapter absent. |
+| Schools recovery red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k v2_school --hypothesis-seed=1938475621` | 1; five failed: connection/403/429/503/refusal-body cases did not recover. |
+| TLS classification red | `uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -k tls_errors --hypothesis-seed=1938475621` | 1; two failed: direct/wrapped TLS failures were classified as recoverable connections. |
+| Independent missing-basis red | `uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 1; 89 passed, one failed: removing the basis alone left decision 0026 and was refused by registry typing. Corrected under decision 0059; unknown citations still refuse. |
+| Terminal-without-anchor red | `uv run --locked python -m pytest custodian/tests/test_fc_register.py -q -k terminal_pager_without --hypothesis-seed=1938475621` | 1; one failed: a pager without a next control was incorrectly refused. |
+| Invalid capture time red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k 'plants and time' --hypothesis-seed=1938475621` | 1; one failed: invalid UTC evidence escaped the dated failure path. |
+| FC suite green | `uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 0; 94 passed, no skips. Exact capture refusal reasons are asserted; both required capture-chain fixtures succeed without persisted state. |
+| Initial broader regression | `uv run --locked python -m pytest custodian/tests/test_s2_t29* custodian/tests/test_source_completeness* custodian/tests/test_publicdata_registry.py -q --hypothesis-seed=1938475621` | 1; 727 passed, seven failed. The failures identified a local import defect, declaration placement, source counts/nightly inventory and exact terms quotation. All were corrected; no test was removed. |
+| Corrected affected regressions | `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_publicdata_registry.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 0; 333 passed at that revision. Later FC additions have their own 94-pass run above. |
+| Lint | `uv run --locked ruff check .` | 0; all checks passed after correcting unused imports, import order and regex literals. Earlier runs exited 1 (23, then three, then two findings); all are retained in the local transcripts. |
+| Format | `uv run --locked ruff format --check .` | 0; 801 files already formatted. Formatter applications exited 0; the final application reformatted one task test file. |
+| Types | `uv run --locked mypy` | 0; 434 source files. Initial exit 1 had three nullable HTML-attribute errors, corrected before the passing check. |
+| Lock | `uv lock --check` | 0; 69 packages resolved. No dependency or lock change. |
+| Version pins | `uv run --locked python scripts/check_versions.py` | 0; 70 components. |
+| Reference notes | `uv run --locked python scripts/check_reference_notes.py` | 0; two files, six libraries, 359 rows. No new external library used. |
+| Docs, preliminary | `python3 scripts/check_docs.py` | 0; 1089 text files, 112 Markdown files before this evidence append. |
+| Tree, preliminary | `python3 scripts/check_tree.py` | 0; eight rules. |
+| Instructions | `cmp AGENTS.md CLAUDE.md` | 0; byte-identical, unchanged. |
+| Whitespace | `git diff --check` | 0; no output. |
+
+Correction record: intermediate FC runs also exposed a test certificate's missing
+PEM decode (48 failed, nine passed), an overly generic expected TLS diagnostic
+(one failed, 56 passed), an incorrectly nested registry row (one failed, 64 passed),
+and a missing invented pin in a fixture (one failed, 20 passed). These were fixture,
+assertion or implementation defects, corrected without skips, raised timeouts,
+refreshed baselines or weakened guards. Subsequent FC milestones passed 65, 82,
+90, 92 and 93 tests before the final 94-test set. Not every guard has an isolated
+semantic-red test run before implementation: the first three reds above are
+collection errors. This limitation is carried to the return report, not represented
+as complete per-guard failing-first evidence.
+
+The tests retain separate inside-card and outside-pane personal-name sentinels;
+projection strips both before any successful write, on live and producer/replay
+paths. Failed chains leave only dated closed failures and preserve any earlier
+complete snapshot. Capture replay/duplicate/missing/reordered/wrong-page/repeated-
+response/predecessor/false-terminal plants refuse; unknown fields, company-detail
+requests, undelivered state, credential headers, TLS/pins, off-frame paths and
+oversize responses remain terminal. The composed name inventory keeps both names
+on duplicate QFC numbers and the caller refuses its source-only collision plant.
+
+No mutation campaign was run (decision 0055). Proposed open items, assumptions,
+whole-test results and the shared-file hunk inventory are reported in
+`.overnight/RETURN.md`; final validation is appended after the whole run completes.
+
+### S2-T36 correction and closing targeted evidence
+
+The first whole run additionally exposed the exact weekly-family expectation and
+an existing keyed-transport exception-context regression introduced by the TLS
+classification change. The transport again raises its keyed closed fault outside
+the upstream exception handler. The affected command
+`uv run --locked python -m pytest custodian/tests/test_fc_register*.py custodian/tests/test_public_cadence.py custodian/tests/test_publicdata_besttime_transport.py -q --hypothesis-seed=1938475621`
+exited 0, 152 passed (`transport-regression-final.log`).
+
+The same whole run exposed a duplicate redirect/pin recheck in the new pre-recovery
+logic and the exact host inventory requiring the two reviewed hosts. The duplicate
+check was removed: original responses are checked before recovery; admitted
+captures are checked after admission. The existing exact-count survivor assertion
+was not changed. The command
+`uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, 151 passed (`redirect-regression-final.log`).
+
+The expanded broad command
+`uv run --locked python -m pytest custodian/tests/test_s2_t29* custodian/tests/test_source_completeness* custodian/tests/test_publicdata_registry.py custodian/tests/test_public_cadence.py custodian/tests/test_publicdata_besttime_transport.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, 886 passed (`regression-final.log`). The existing style/config guard
+command `uv run --locked python -m pytest scripts/tests/test_pychecks_config.py scripts/tests/test_pychecks_ruff.py -q --hypothesis-seed=1938475621`
+exited 0, 14 passed (`guard-style-final.log`).
+
+A further direct-entry boundary plant was written and run:
+`uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k direct_fc_admission --hypothesis-seed=1938475621`
+exited 1, one failed, because the shared admission function accepted an FC raw
+legacy capture when called without its projected identity. FC acquisition already
+required projected evidence, but the direct admission API did not. Admission now
+requires the closed projected contract for the exact FC URL regardless of supplied
+optional metadata; intake checks the current projection and upstream digest too.
+The command `uv run --locked python -m pytest custodian/tests/test_fc_register*.py custodian/tests/test_s2_t29_transport.py -q --hypothesis-seed=1938475621`
+then exited 0, 146 passed (`admission-green.log`). The final FC-only command
+`uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, **95 passed**, no skips (`fc-final95.log`). This supersedes the earlier
+94-test count for the completed focused suite; the earlier result is retained.
+
+Post-patch-validation was applied for coverage reasoning. Its isolated Git-worktree
+runner cannot run under this brief's read-only Git rule, so no formal runner or
+independent review is claimed. A local source-comparison harness under the
+documented `.overnight/tmp/ppv/` loads the binding-base transport or the patched
+transport with final sibling modules and intercepts all network sends. Commands:
+
+- `T36_TRANSPORT_SOURCE=.overnight/tmp/ppv/base_transport.py uv run --locked python -m pytest .overnight/tmp/ppv/test_tls_validation.py -q -s --hypothesis-seed=1938475621`: exit 1, two failed and three passed. The direct and URLError-wrapped certificate cases each print `PPV_REACHED`, then fail the TLS-not-connection-recovery safety assertion.
+- `T36_TRANSPORT_SOURCE=custodian/src/eii_custodian/publicdata/fetch/transport.py uv run --locked python -m pytest .overnight/tmp/ppv/test_tls_validation.py -q -s --hypothesis-seed=1938475621`: exit 0, five passed. Benign selected output is byte-identical; the keyed error-context and adjacent off-host checks pass on both sources.
+
+The final tracked implementation patch (excluding this append-only ledger) is
+`.overnight/T36.final.patch`, SHA-256
+`835f981cccf855c4fc7036808b1a88038726ab205ce8ac4ce65a179be8d2d891`.
+The final input manifest `.overnight/validation-inputs.final.json` hashes 37
+changed/new implementation, test, fixture and documentation files, SHA-256
+`7db1a635a4e4a5d75db31e2a8e2f6dc0eca0cd88696d9070e399468951d807eb`.
+A read-back hash check exited 0 and confirmed every implementation input unchanged.
+The earlier patch/manifest remain preserved as earlier evidence, not overwritten.
+
+Closing checks after the last source change: `uv run --locked ruff check .` exit 0;
+`uv run --locked ruff format --check .` exit 0, 801 files; `uv run --locked mypy`
+exit 0, 434 source files; `python3 scripts/check_docs.py` exit 0, 1089 text files
+and 112 Markdown files; `python3 scripts/check_tree.py` exit 0, eight rules;
+`cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Evidence files are
+`closing-ruff.log`, `closing-format.log`, `closing-mypy.log`, `closing-docs.log`
+and `closing-tree.log`. The return-marker/absolute-path/email check first exited 1
+because its broad path predicate also matched the documented relative temporary
+folder; the corrected absolute-path predicate exited 0. No source check was
+suppressed or changed by this report-only correction.
+
+The whole-project run is still running its existing web checks at this append.
+Its final exit and counts follow in a later row; its initial failures are not
+represented as a passing whole-project result. Only the lead may resolve the
+reported evidence gaps and acceptance status.
+
+### S2-T36 final complete custodian suite
+
+With the final 37 implementation inputs unchanged, the command
+`uv run --locked python -m pytest custodian/tests -q --hypothesis-seed=1938475621`
+ran with `PYTHONHASHSEED=1938475621`, the same workspace-local `TMPDIR` and
+`UV_OFFLINE=1`. It exited **0: 8111 passed, one warning, no skips**, in 323.96 s
+(`custodian-final.log`). The warning is the existing invented duplicate ZIP member
+fixture `test_read_sheet_duplicate_zip_entries_refused`. This run occurred while
+the earlier whole command was in its unchanged web suites; no timeout or test
+setting was changed. It verifies the completed custodian code, including every
+custodian regression found by the earlier whole run.
+
+### S2-T36 whole command result and final disposition
+
+`./eii test --seed 1938475621`, invoked with workspace-local `TMPDIR` and
+`UV_OFFLINE=1`, completed with exit **1**. Its own summary was **11413 passed,
+18 failed, zero skipped**, seven suites, three with problems (`eii-test.log`).
+The run began before the final corrections and is retained as that revision's
+evidence, not represented as a passing run of the final input manifest.
+
+| Suite | Runner counts |
+|---|---|
+| python-guards | 917 passed, 13 failed, zero skipped |
+| python-core | 745 passed, zero failed, zero skipped |
+| python-custodian-1 | 4413 passed, three failed, zero skipped |
+| python-custodian-2 | 3690 passed, two failed, zero skipped |
+| python-product | 786 passed, zero failed, zero skipped |
+| web-checks | 861 passed, zero failed, zero skipped |
+| web-unit | one passed, zero failed, zero skipped |
+
+The guard failures include the brief's known unavailable UV-cache environment
+errors and in-progress style/config failures. The final style/config rerun passed
+14 tests. The five custodian failures named earlier in this ledger are corrected
+and covered by the subsequent final complete package run: 8111 passed. No failing
+whole command was hidden, no baseline was refreshed, no timeout was raised and no
+random failure was closed on a green rerun. The brief's hash-dependent S2-T40
+failure did not appear in this run. The unchanged web suites both passed.
+
+Muhasabah: PASS for factual reporting, sources, explicit assumptions and scope;
+full task acceptance is not claimed. The per-guard semantic-red chronology gap,
+lead-owned live activation/evidence, different-maker implementation review and
+future S4-T05 caller are explicit in `.overnight/RETURN.md`. Proposed open items
+remain in that return only. The final report lists every changed/new file and all
+54 shared-file hunks. No task status, open-item number or accepted decision was
+silently changed. Final file/report checks follow this append.
+
+Final post-append verification: `python3 scripts/check_docs.py` exited 0
+(1089 text files, 112 Markdown files); `python3 scripts/check_tree.py` exited 0
+(eight rules); `cmp AGENTS.md CLAUDE.md` exited 0; `git diff --check` exited 0.
+The final implementation-hash/unchanged-task-files/report-marker/hunk-inventory/
+absolute-path/email check exited 0. Return evidence is complete as a report;
+acceptance limitations remain explicit, including the failing whole run.

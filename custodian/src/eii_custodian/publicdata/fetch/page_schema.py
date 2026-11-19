@@ -61,6 +61,16 @@ SHAPES = {
         "where",
         "record_schema",
     },
+    "fc_company_cards": {
+        "pane",
+        "card",
+        "fields",
+        "pager_targets",
+        "form_fields",
+        "progress_fields",
+        "projection",
+        "producer",
+    },
     "refusal": {"reason", "observed_utc", "decision"},
 }
 COMMON = {
@@ -240,6 +250,15 @@ def validate(review: Mapping[str, Any]) -> None:
                 raise ValueError
         except ValueError:
             raise ShapeError("snapshot_date_missing") from None
+    if review["kind"] == "fc_company_cards":
+        from ..fc_register.constants import COLUMNS, SHAPE, URL
+
+        if (
+            shape != SHAPE
+            or columns != [list(c) for c in COLUMNS]
+            or review["url"] != URL
+        ):
+            raise ShapeError("schema_missing")
     if review["kind"] == "arcgis_query":
         if (
             not isinstance(shape["layer"], str)

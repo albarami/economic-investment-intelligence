@@ -33,6 +33,7 @@ FAMILIES = {
     "statistical_series": "as_published",
 }
 RECORDED_FAMILIES = {
+    "fc_register": "registers",
     "events_visit_qatar": "event_pages",
     "events_qncc": "event_pages",
     "suppliers_tawteen": "supplier_credentials",

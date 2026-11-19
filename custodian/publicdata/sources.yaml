@@ -12618,6 +12618,41 @@ sources:
     skip_reason: "provider_contract_pending"
     extension: "tif"
 
+  - key: "fc_register"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; S2-T36"}
+    source_id: "fc_register"
+    slug: ""
+    kind: "public_page"
+    title_en: "Public Register | Qatar Financial Centre"
+    publisher: "Qatar Financial Centre Authority (QFCA)"
+    licence_id: "none-stated"
+    licence_basis: "owner_decision"
+    licence_url: "https://www.qfc.qa/en/terms-of-use/"
+    decision_record: "0026"
+    fetch_host: "eservices.qfc.qa"
+    url: "https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx"
+    terms_url: "https://www.qfc.qa/en/terms-of-use/"
+    terms_words: 'may only be used for personal viewing purposes'
+    terms_read_on: "2026-11-19"
+    basis_note: "READ-T36 R4/R5: main-site terms define the Site as www.qfc.qa and www.start.qfc.qa, not the register host. Robots read 2026-11-19: eservices.qfc.qa Disallow: /View; www.qfc.qa User-agent: *, Disallow: /umbraco/. No /View path is requested. Terms are records under decision 0059. Pin, form fields and byte bound await lead activation review."
+    landing_url: "https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns:
+      - {name: qfc_number, type: string}
+      - {name: company_name, type: string}
+      - {name: company_name_ar, type: string}
+      - {name: metadata, type: string}
+      - {name: licence_status, type: string}
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "fc_activation_review_pending"
+    extension: "json"
+
 forecast_series:
   - key: licence_issues
     state: held

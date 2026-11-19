@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .allowlist import approve, host_of
+from .page_html import ShapeError
+from .page_identity import RequestIdentity, digest
 from .snapshots import utc
 from .transport import Response
 
@@ -95,12 +97,35 @@ class Capture:
     pin: Pin
     tls_verified: bool
     access: str
+    identity: RequestIdentity | None = None
+    projection: str = ""
+    upstream_sha256: str = ""
 
 
 def admit_capture(
-    capture: Capture, expected_url: str
+    capture: Capture, expected_url: str, *, identity: RequestIdentity | None = None
 ) -> tuple[Response, dict[str, object]]:
     """Validate lead capture evidence before returning bytes to the receipt seam."""
+    if identity is not None and capture.identity != identity:
+        raise PinError("capture_identity_mismatch")
+    from ..fc_register.constants import PROJECTION, URL
+
+    if expected_url == URL or capture.projection or capture.identity is not None:
+        from ..fc_register.parse import fragment
+
+        if (
+            expected_url != URL
+            or identity is None
+            or capture.projection != PROJECTION
+            or not digest(capture.upstream_sha256)
+        ):
+            raise PinError("capture_evidence_missing")
+        try:
+            value = fragment(capture.body)
+        except ShapeError:
+            raise PinError("capture_progress_invalid") from None
+        if value["progress"]["shown_page"] != identity.ordinal:
+            raise PinError("capture_progress_invalid")
     if not capture.tool.strip() or capture.initial_url != expected_url:
         raise PinError("capture_evidence_missing")
     utc(capture.captured_utc)
@@ -128,6 +153,13 @@ def admit_capture(
         "tls_verified": True,
         "access": "visitor",
     }
+    if capture.projection:
+        evidence.update(
+            projection=capture.projection,
+            upstream_sha256=capture.upstream_sha256,
+            upstream_evidence="producer-attested",
+            request_identity=identity.data() if identity else None,
+        )
     return Response(capture.final_url, capture.body, capture.hops), evidence
 
 
@@ -204,13 +236,30 @@ def inspect_intermediate(der: bytes) -> None:
         raise PinError("certificate_chain_incomplete")
 
 
-def load_capture(cache: Path, source: str, pin: Pin) -> Capture | None:
+def load_capture(
+    cache: Path,
+    source: str,
+    pin: Pin,
+    *,
+    identity: RequestIdentity | None = None,
+    max_bytes: int = 300 * 1024 * 1024,
+) -> Capture | None:
     """Optional lead-operated browser capture; no browser package or automatic run."""
-    path = intake_file(cache, source, "capture.json")
+    paged = source == "fc_register"
+    if paged and identity is None:
+        raise PinError("capture_identity_mismatch")
+    path = intake_file(
+        cache,
+        source,
+        f"capture-{identity.ordinal}.json" if paged and identity else "capture.json",
+    )
     if not path.exists():
         return None
     try:
-        receipt = json.loads(path.read_bytes())
+        receipt_body = _bounded_intake(path, min(max_bytes, 65536))
+        from .page_schema import json_body
+
+        receipt = json_body(receipt_body)
         expected = {
             "file",
             "initial_url",
@@ -224,9 +273,11 @@ def load_capture(cache: Path, source: str, pin: Pin) -> Capture | None:
             "tls_verified",
             "access",
         }
+        if paged:
+            expected |= {"request_identity", "projection", "upstream_sha256"}
         if not isinstance(receipt, dict) or set(receipt) != expected:
             raise PinError("capture_evidence_missing")
-        text_keys = expected - {"hops", "tls_verified"}
+        text_keys = expected - {"hops", "tls_verified", "request_identity"}
         if any(not isinstance(receipt[key], str) for key in text_keys):
             raise PinError("capture_evidence_missing")
         if (
@@ -236,7 +287,19 @@ def load_capture(cache: Path, source: str, pin: Pin) -> Capture | None:
             or receipt["intermediate_sha256"] != pin.sha256
         ):
             raise PinError("capture_evidence_missing")
-        body = intake_file(cache, source, receipt["file"]).read_bytes()
+        body = _bounded_intake(intake_file(cache, source, receipt["file"]), max_bytes)
+        request_identity = (
+            RequestIdentity.load(receipt["request_identity"]) if paged else None
+        )
+        if paged:
+            from ..fc_register.constants import PROJECTION
+            from ..fc_register.parse import fragment
+
+            if receipt["projection"] != PROJECTION or not digest(
+                receipt["upstream_sha256"]
+            ):
+                raise PinError("capture_evidence_missing")
+            fragment(body)
         return Capture(
             body,
             receipt["initial_url"],
@@ -248,6 +311,34 @@ def load_capture(cache: Path, source: str, pin: Pin) -> Capture | None:
             pin,
             receipt["tls_verified"],
             receipt["access"],
+            request_identity,
+            receipt.get("projection", ""),
+            receipt.get("upstream_sha256", ""),
         )
-    except (OSError, KeyError, json.JSONDecodeError):
+    except (OSError, KeyError, json.JSONDecodeError, ShapeError):
         raise PinError("capture_evidence_missing") from None
+
+
+def _bounded_intake(path: Path, maximum: int) -> bytes:
+    from .transport import INTAKE_CEILING_BYTES
+
+    with path.open("rb") as stream:
+        body = stream.read(min(maximum, INTAKE_CEILING_BYTES) + 1)
+    if len(body) > min(maximum, INTAKE_CEILING_BYTES):
+        raise PinError("metadata_bytes")
+    return body
+
+
+def capture_files(cache: Path, source: str) -> set[int]:
+    """Closed ordinal names locate receipts; contents, never names, bind requests."""
+    import re
+
+    folder = intake_file(cache, source, "capture-1.json").parent
+    ordinals = set()
+    for path in folder.glob("capture*.json"):
+        match = re.fullmatch(r"capture-([1-9][0-9]*)\.json", path.name)
+        if match is None:
+            raise PinError("capture_identity_mismatch")
+        intake_file(cache, source, path.name)
+        ordinals.add(int(match[1]))
+    return ordinals

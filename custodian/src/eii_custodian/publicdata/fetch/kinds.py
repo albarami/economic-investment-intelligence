@@ -212,7 +212,13 @@ def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure |
                 1, exc.url, "blocked_host", "allow-listed host", exc.url
             )
         return None, AttemptFailure(
-            1, exc.url, "http_status", "http success", "http status"
+            1,
+            exc.url,
+            "http_status",
+            "http success",
+            str(exc.status)
+            if exc.kind == "http" and exc.status is not None
+            else "http status",
         )
 
 

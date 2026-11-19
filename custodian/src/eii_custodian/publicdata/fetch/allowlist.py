@@ -8,6 +8,8 @@ from urllib.parse import SplitResult, parse_qsl, urlencode, urlsplit
 # Hosts named by PUB-03. Hosts still to be fixed by a later fetcher are absent.
 ALLOWED_HOSTS = frozenset(
     {
+        "eservices.qfc.qa",
+        "www.qfc.qa",
         "www.data.gov.qa",
         "www.data.qa",
         "services7.arcgis.com",

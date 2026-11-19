@@ -635,7 +635,7 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_census_district` | Public | district × period × indicator | `district_key`, `period`, `indicator` | `publicdata` | `area_evidence` |
 | `pub_place` | Public | place | `place_id` | `publicdata` | `scan_places`, `resolve` |
 | `pub_place_verification` | Public | place × check date | `place_id`, `check_date` | `publicdata` | `scan_places`, `resolve` |
-| `pub_register_company` | Public | register company | `registration_number` | `publicdata` (from the register file read through `EII_REGISTER_FILE` and the financial centre's file read through `EII_FC_REGISTER_FILE`; no fetcher for the register's site is in the repository, decision 0022 item 1) | company card; the map's establishment points; firm counts and density; prospect, partner and supplier lists (D3, D4, S3); name-collision test (DAT-14) |
+| `pub_register_company` | Public | register company | `registration_number` | `publicdata` (from the register file read through `EII_REGISTER_FILE` and the financial centre's file read through `EII_FC_REGISTER_FILE`; no fetcher for the business register's site is in the repository; S2-T36 separately fetches financial-centre company-only snapshots for the name inventory, without changing these table inputs, decision 0022 item 1) | company card; the map's establishment points; firm counts and density; prospect, partner and supplier lists (D3, D4, S3); name-collision test (DAT-14) |
 | `pub_register_snapshot` | Public | register company × snapshot month | `registration_number`, `period` | `publicdata` (from the monthly snapshots of the register files, kept each month from 2026-11 beside each register file, outside the repository, and read through the same settings as `pub_register_company`; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) items 12 and 13) | openings and closures of register companies (DAT-164, card C22); the "what changed this month" card |
 | `pub_hotel_monthly` | Public | month × star class × indicator | `period`, `star_class`, `indicator` | `publicdata` | `sector_facts` |
 | `pub_price_index` | Public | month × group | `period`, `group_code` | `publicdata` | `sector_facts` |
@@ -962,7 +962,8 @@ host values remain pending the lead.
 These are custodian cache contracts under section 7.3, not new release-manifest
 entries. The retained v1 table contract supports existing archived inputs.
 `page_acquire.fetch@v2` binds a closed reviewed parser kind:
-`xlsx_sheet`, `embedded_json`, `html_blocks`, `html_table` or `arcgis_query`.
+`xlsx_sheet`, `embedded_json`, `html_blocks`, `html_table`, `arcgis_query` or
+`fc_company_cards` (S2-T36).
 A source cannot be redeclared under another parser kind to bypass its guards.
 The supplier row is `refusal` only under decision 0026 item 2 and lead ruling
 L-899: it records the dated access refusal without opening any request.
@@ -2310,3 +2311,33 @@ reader reopens selected native readers and recomputes both collections. An absen
 side never creates an input value; unknown compatibility prevents a gap. Owner
 reports preserve recorded access/free-plan obstacles, their evidence and nullable
 price fields. No live selection is activated by these fixture contracts.
+
+
+### S2-T36 company-only register cache contract
+
+`fc_register` adds no release table and does not change `EII_FC_REGISTER_FILE`.
+The `fc_company_cards` declaration positively reconstructs only QFC number,
+company-name positions, unlabelled metadata and licence-status text, plus the
+closed progress record `{shown_page, continuation}`. No other markup, person-name
+column, delivered form state or cookie is persisted. Live and capture paths share
+`fc_company_pane@v1`. The fragment has its own digest and the discarded full
+response has `upstream_sha256`, marked computed or producer-attested explicitly.
+
+Every request identity binds method, exact reviewed URL, Company pager target,
+argument, ordinal and preceding full-response hash. Shown page must equal ordinal.
+Capture receipts add that identity, projection version and attested upstream hash
+to the existing visitor/TLS/pin/tool/time evidence. Canonical fragments are checked
+at intake and admission. Only the producer pages with delivered state; replay runs
+to terminal without live POSTs. Missing, replayed, reordered, non-progressing or
+extra pages refuse before publication and leave a dated failure. The closed
+failure-to-capture table is documented in the FC adapter README; no security
+refusal is eligible. The schools v2 path shares that transition without changing
+its single `capture.json` shape.
+
+The inventory contribution verifies the selected v2 envelope, every input receipt,
+fragment and predecessor binding, and includes all company names before display
+filtering or deduplication. The composition entry point is
+`name_inventory.check_inventory`; `fc_register.build.build_inventory` refuses a
+collision. Source, selected snapshot, method, licence and retrieval lineage travel
+with the contribution. S4-T05 supplies other contributions and its configured edit
+distance; this task introduces no new collision threshold or normaliser.

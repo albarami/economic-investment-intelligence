@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 from collections.abc import Callable, Mapping
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urlencode, urljoin
@@ -19,7 +20,7 @@ from .page_schema import SCHOOL_FIELDS, json_body, path, period, scalar, typed, 
 from .page_shapes import page_end, parse
 from .receipts import sha256_hex, sidecar_for
 from .registry import LICENCE_BASES, Entry
-from .snapshots import Snapshot, publish_snapshot, read_snapshot, utc
+from .snapshots import Snapshot, SnapshotError, publish_snapshot, read_snapshot, utc
 from .terms_text import terms_text_sha256
 from .transport import Response, Transport, metadata_limit
 
@@ -87,6 +88,7 @@ def _html_without_form_secrets(body: bytes) -> bytes:
 def validate_entry(entry: Entry, review: Mapping[str, Any]) -> None:
     validate(review)
     expected_kind = {
+        "fc_register": "fc_company_cards",
         "insurance_tables": "xlsx_sheet",
         "events_visit_qatar": "embedded_json",
         "events_qncc": "embedded_json",
@@ -169,7 +171,7 @@ def fetch(
     shape = review["shape"]
     base_frame = tuple(review["reviewed_urls"])
 
-    def read(
+    def _read(
         url: str,
         extension: str,
         *,
@@ -179,6 +181,7 @@ def fetch(
         frame = base_frame + extra
         if url not in frame or not approve(url).ok:
             raise ShapeError("blocked_host")
+        captured = False
         with (
             page_requests(frame, pins),
             page_transport(
@@ -192,15 +195,56 @@ def fetch(
                 page_context(host_of(url))
             with metadata_limit(review["max_bytes"]):
                 response, failure = read_bounded(transport, sleep, url)
-            if failure or response is None:
-                reason = failure.check if failure else "access_failed"
-                if entry.source_id == "schools_private_directory":
-                    record_failure(cache, entry, stamp, reason)
-                raise ShapeError(reason)
-            for target in (*response.hops, response.final_url):
-                check_target(target)
-                if host_of(target) in PIN_HOSTS:
-                    page_context(host_of(target))
+            from ..fc_register.acquire import eligible, obstacle
+            from . import certificate_pins
+
+            # Security checks precede obstacle classification, so a valid
+            # capture cannot rescue a refused redirect, pin or oversized body.
+            if response is not None:
+                for target in (*response.hops, response.final_url):
+                    check_target(target)
+                    if host_of(target) in PIN_HOSTS:
+                        page_context(host_of(target))
+                if len(response.body) > review["max_bytes"]:
+                    raise ShapeError("metadata_bytes")
+            enabled = (
+                entry.source_id == "schools_private_directory"
+                and url != entry.terms_url
+            )
+            obstacle_reason = obstacle(response.body) if response is not None else None
+            reason = failure.check if failure else obstacle_reason
+            if reason or response is None:
+                status = (
+                    int(failure.observed)
+                    if failure and failure.observed in {"403", "429", "503"}
+                    else None
+                )
+                can_capture = eligible(
+                    "http" if reason == "http_status" else reason or "access_failed",
+                    status,
+                )
+                if not enabled or not can_capture:
+                    raise ShapeError(
+                        "unavailable" if obstacle_reason else reason or "access_failed"
+                    )
+                pin = pins.get(host_of(url))
+                capture = (
+                    certificate_pins.load_capture(
+                        cache, entry.source_id, pin, max_bytes=review["max_bytes"]
+                    )
+                    if pin
+                    else None
+                )
+                if capture is None:
+                    raise ShapeError(reason or "access_failed")
+                response, evidence = certificate_pins.admit_capture(capture, url)
+                response = replace(response, evidence={"capture": evidence})
+                captured = True
+            if captured:
+                for target in (*response.hops, response.final_url):
+                    check_target(target)
+                    if host_of(target) in PIN_HOSTS:
+                        page_context(host_of(target))
         if len(response.body) > review["max_bytes"]:
             raise ShapeError("metadata_bytes")
         if any(
@@ -218,10 +262,43 @@ def fetch(
             inputs.append((response, extension, body, representation))
         return response
 
+    def read(
+        url: str,
+        extension: str,
+        *,
+        extra: tuple[str, ...] = (),
+        projection: bool = False,
+    ) -> Response:
+        try:
+            return _read(url, extension, extra=extra, projection=projection)
+        except (ShapeError, PinError, SnapshotError) as exc:
+            if (
+                entry.source_id == "schools_private_directory"
+                and url != entry.terms_url
+            ):
+                record_failure(cache, entry, stamp, str(exc))
+            raise
+
     rows: list[dict[str, object]] = []
     coverage: list[dict[str, str]] = []
     kind = review["kind"]
-    if kind in {"xlsx_sheet", "html_blocks"} and shape["discovery"] is not None:
+    if kind == "fc_company_cards":
+        from ..fc_register.acquire import pages as acquire_pages
+        from ..fc_register.parse import fragment
+
+        try:
+            acquired = acquire_pages(
+                transport, cache, pins, shape, review["max_bytes"], sleep
+            )
+            for response in acquired:
+                inputs.append((response, "json", response.body, "fc_company_pane@v1"))
+                rows.extend(fragment(response.body)["rows"])
+        except (ShapeError, PinError, SnapshotError) as exc:
+            record_failure(cache, entry, stamp, str(exc))
+            if isinstance(exc, SnapshotError):
+                raise ShapeError(str(exc)) from None
+            raise
+    elif kind in {"xlsx_sheet", "html_blocks"} and shape["discovery"] is not None:
         discovery = shape["discovery"]
         response = read(discovery["url"], "json", projection=True)
         listing = json_body(response.body)
@@ -479,7 +556,10 @@ def fetch(
                 terms_sha256=terms_hash or "",
             )
             side.update(
-                upstream_sha256=sha256_hex(response.body),
+                upstream_sha256=response.body_sha256
+                if representation == "fc_company_pane@v1"
+                else sha256_hex(response.body),
+                **dict(response.evidence),
                 representation=representation,
                 as_of=stamp[:10],
             )
@@ -490,7 +570,10 @@ def fetch(
                     "key": key,
                     "identity": snapshot.sha256,
                     "sha256": snapshot.sha256,
-                    "upstream_sha256": sha256_hex(response.body),
+                    "upstream_sha256": response.body_sha256
+                    if representation == "fc_company_pane@v1"
+                    else sha256_hex(response.body),
+                    **dict(response.evidence),
                     "extension": extension,
                     "representation": representation,
                     "url": response.final_url,

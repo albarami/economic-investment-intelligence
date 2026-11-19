@@ -239,7 +239,15 @@ def test_f3_load_pin_valid_intermediate(tmp_path, invented_certs):
 @pytest.mark.parametrize("reverse", [False, True])
 def test_f4_handler_selects_context_each_redirect(host, reverse, invented_certs):
     pin = make_pin(invented_certs["intermediate"], host)
-    pinned_url = "https://" + host + "/SYN-pin"
+    pinned_url = (
+        "https://"
+        + host
+        + (
+            "/qfcpublicregister/publicregister.aspx"
+            if host == "eservices.qfc.qa"
+            else "/SYN-pin"
+        )
+    )
     initial, target = (OTHER, pinned_url) if reverse else (pinned_url, OTHER)
     sent = []
 
