@@ -9,7 +9,7 @@ import os
 import subprocess
 import sys
 import unittest
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -529,17 +529,15 @@ class EvalMutationRunnerTest(unittest.TestCase):
 
 
 class SourceGuardSelectionTests(unittest.TestCase):
-    # The options that can deselect, filter or ignore collected tests; the part
-    # split's -p and --custodian-part options are not among them.
-    SELECTION_OPTIONS = ("--deselect", "-k", "-m", "--ignore", "--ignore-glob")
-
     def _assert_no_selection_options(self, name: str, options: Iterable[str]) -> None:
-        """Refuse every option that can deselect, filter or ignore tests."""
-        offenders = [
-            option
-            for option in options
-            if option.split("=", 1)[0] in self.SELECTION_OPTIONS
-        ]
+        """Refuse all suite options except the exact custodian part sequences."""
+        args = tuple(options)
+        if args in (
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "2"),
+        ):
+            return
+        offenders = [option for option in args if option.startswith("-")]
         self.assertFalse(offenders, f"the suite {name} selects tests: {offenders}")
 
     def _assert_parts_collect_guards(
@@ -564,6 +562,132 @@ class SourceGuardSelectionTests(unittest.TestCase):
                 parts,
                 f"the part split collects the guard {node} in no named part",
             )
+
+    def _collect_suite(
+        self, suite: Any, root: Path, parent: Mapping[str, str], tmp: Path
+    ) -> subprocess.CompletedProcess[str]:
+        """Probe ordinary collection with the runner's command and environment."""
+        suite_runner = importlib.import_module("scripts.run_tests")
+        self._assert_no_selection_options(suite.name, suite.args)
+        env = suite_runner.runner_exec.child_env(
+            suite.kind,
+            dict(parent) | {"TMPDIR": str(tmp)},
+            1,
+            tmp,
+        )
+        command = suite_runner.runner_exec.build_command(suite, root, env, tmp, 1)
+        # Pin the runner-owned prefix separately so its config and reporting
+        # options cannot become exceptions for arbitrary suite arguments.
+        fixed = [
+            sys.executable,
+            "-P",
+            "-s",
+            "-m",
+            "pytest",
+            "-c",
+            "pyproject.toml",
+            "--rootdir",
+            ".",
+            "--junit-xml",
+            str(tmp / "result.xml"),
+            "--hypothesis-seed",
+            "1",
+        ]
+        self.assertEqual(command, [*fixed, *suite.args])
+        self._assert_no_selection_options(suite.name, command[len(fixed) :])
+        # Config addopts still apply in the real collection; a config entry
+        # that removes a guard fails the ordinary-suite membership assertion.
+        return subprocess.run(
+            [*command, "--collect-only", "-q"],
+            cwd=root / suite.cwd,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    def test_only_exact_custodian_partition_options_accepted(self) -> None:
+        for value in ("1", "2"):
+            self._assert_no_selection_options(
+                "python-custodian-" + value,
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    value,
+                ),
+            )
+        self._assert_no_selection_options("python-core", ("core/tests",))
+        for args in (
+            ("core/tests", "--co"),
+            ("core/tests", "-p", "some_plugin"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "3"),
+            ("core/tests", "-x"),
+            ("core/tests", "--maxfail=1"),
+            ("core/tests", "-c", "alternate.toml"),
+            ("core/tests", "-o", "addopts=--co"),
+            ("core/tests", "-kguard"),
+            ("core/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
+            ("custodian/tests", "--custodian-part", "1", "-p", "pytest_custodian_part"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part=1"),
+            (
+                "custodian/tests",
+                "-p",
+                "pytest_custodian_part",
+                "--custodian-part",
+                "1",
+                "--co",
+            ),
+        ):
+            with self.subTest(args=args), self.assertRaises(AssertionError):
+                self._assert_no_selection_options("synthetic-suite", args)
+
+    def test_collection_environment_matches_ordinary_runner(self) -> None:
+        suite_runner = importlib.import_module("scripts.run_tests")
+        parent = dict(os.environ) | {
+            "LANG": "C",
+            "LC_ALL": "C",
+            "XDG_DATA_HOME": "synthetic-runner-xdg",
+            "UV_PYTHON_INSTALL_DIR": "synthetic-python-install",
+        }
+        with TemporaryDirectory(prefix="synthetic-environment-parity-") as temporary:
+            root = Path(temporary)
+            (root / "pyproject.toml").write_text("")
+            (root / "conftest.py").write_text(
+                "import os\n"
+                "def pytest_collection_modifyitems(items):\n"
+                "    if os.environ.get('LANG') != 'C':\n"
+                "        items.clear()\n"
+            )
+            (root / "test_guard.py").write_text("def test_guard():\n    assert True\n")
+            suite = suite_runner.Suite(
+                "synthetic-environment-parity", "pytest", ".", ("test_guard.py",), 60
+            )
+            ordinary = suite_runner.run_suite(suite, 1, root, parent, {})
+            self.assertEqual(ordinary.fail_lines, ())
+            self.assertIsNotNone(ordinary.counts)
+            assert ordinary.counts is not None
+            self.assertEqual(ordinary.counts.passed, 1)
+            with patch.object(
+                suite_runner.runner_exec,
+                "build_command",
+                wraps=suite_runner.runner_exec.build_command,
+            ) as build:
+                result = self._collect_suite(suite, root, parent, root)
+            self.assertEqual(
+                build.call_args.args[2].get("LANG"),
+                parent["LANG"],
+                "the runner and collection probe must preserve the same LANG",
+            )
+            self.assertEqual(
+                build.call_args.args[2],
+                suite_runner.runner_exec.child_env(
+                    suite.kind, parent | {"TMPDIR": str(root)}, 1, root
+                ),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("test_guard.py::test_guard", result.stdout.splitlines())
 
     def test_unlisted_deselection_refused_by_name(self) -> None:
         runner = importlib.import_module("scripts.mutation")
@@ -601,44 +725,15 @@ class SourceGuardSelectionTests(unittest.TestCase):
         suites = suite_runner.SUITES
         root = Path(__file__).resolve().parents[2]
         guards = set(runner.SOURCE_TEXT_GUARDS)
+        parent = dict(os.environ)
         collected: set[str] = set()
         for suite in suites:
             if suite.kind != "pytest" or not any(
                 node.startswith(suite.args[0] + "/") for node in guards
             ):
                 continue
-            self._assert_no_selection_options(suite.name, suite.args)
             with TemporaryDirectory(prefix="synthetic-collection-") as temporary:
-                command = suite_runner.runner_exec.build_command(
-                    suite, root, {}, Path(temporary), 1
-                )
-                # Everything after the interpreter's own -m flag belongs to
-                # pytest: the runner's fixed flags and the suite's added options.
-                # The config file's addopts (the nightly marker gate among them)
-                # apply during the collection run itself, so an addopts entry
-                # that removes a guard fails the membership check below.
-                self._assert_no_selection_options(
-                    suite.name, command[command.index("-m") + 2 :]
-                )
-                env = suite_runner.runner_exec.child_env(
-                    suite.kind,
-                    {
-                        name: value
-                        for name, value in os.environ.items()
-                        if name in ("PATH", "HOME")
-                    }
-                    | {"TMPDIR": temporary},
-                    1,
-                    Path(temporary),
-                )
-                result = subprocess.run(
-                    [*command, "--collect-only", "-q"],
-                    cwd=root / suite.cwd,
-                    env=env,
-                    text=True,
-                    capture_output=True,
-                    check=False,
-                )
+                result = self._collect_suite(suite, root, parent, Path(temporary))
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             collected.update(line.strip() for line in result.stdout.splitlines())
         # The union of the named custodian parts counts as the ordinary suite.
