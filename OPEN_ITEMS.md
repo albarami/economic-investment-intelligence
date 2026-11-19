@@ -2852,6 +2852,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 
 
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4392,6 +4394,46 @@ Revision-2 record points without extra numbers:
 - NEEDED: A lead disposition and later scoped task for N3/N4, or a recorded reason to retain their current behavior, with suitable planted violations for any guard changed. Keep L-1141's exact key/field admission and unknown-text refusals unchanged; no fix is made by this ledger input.
 - NEEDED BY: The lead's later S2-T11 parser task and truthful review-note handoff; no new current-PR acceptance or mutation gate is invented.
 - COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
+
+### PO-S2-121 — Two plant tests of the mutation-ledger guard accept any parse failure
+
+- ID: PO-S2-121
+- TYPE: OPEN
+- RAISED BY: Anthropic Sonnet 5.5, S2-T43.rev3 nit 1, as recorded in the lead log at 2026-11-19 17:37 (label assigned there).
+- CONCERNS: the planted malformed-copy tests of the mutation-ledger parse guard (S2-T43).
+- EVIDENCE: the TOML decode error subclasses ValueError, so two plant tests could pass on any parse failure rather than on the planted defect.
+- NEEDED: tighten those two plants with assertRaisesRegex on the expected message, in a small follow-up; no check is relaxed.
+- COMPARISON: PO-S2-122 to PO-S2-124 concern S2-T37; this is the only S2-T43 residual.
+
+### PO-S2-122 — The README still names a fixed places-copy release
+
+- ID: PO-S2-122
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rev1 N1, as recorded in LOG-S2-6-verdicts.md at 2026-11-19 04:00.
+- CONCERNS: README.md's S2-T15 paragraph naming release 2025-01-10 as the pinned copy.
+- EVIDENCE: The lead explicitly sends this note to the S2-T10 sweep. The paragraph is still present at WORK. S2-T37 changes selection to the newest dated release at each refresh; its task-specific document changes are separately approved.
+- NEEDED: In the owning documentation sweep, make the README describe the approved newest-release rule while preserving truthful pipeline limits. This draft changes no tracked wording and claims no completed correction.
+- COMPARISON: OI-96 is the historical owner decision; this item concerns the current README summary rather than reopening that decision. No matching proposed-item entry was found at WORK.
+
+### PO-S2-123 — Release-path validation reads only the first date substring
+
+- ID: PO-S2-123
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rev1 N2, as recorded in LOG-S2-6-verdicts.md at 2026-11-19 04:00.
+- CONCERNS: validate_release_path in the places-copy release validator.
+- EVIDENCE: The lead's note for the ledger says that validation reads the first date substring only. The detailed original rev1 return is not supplied; no additional exploit, failing test, severity or affected path shape is inferred from that summary.
+- NEEDED: Attach the detailed review note and determine whether a later date substring requires a bounded follow-up and planted case. Keep the approved release/date binding and fail-closed behavior; no permissive fallback is authorized.
+- COMPARISON: The carry-back approval of dbf94f0c and the train's forced-document confirmation are separate evidence and do not dispose of this residual. No matching proposed-item entry was found at WORK.
+
+### PO-S2-124 — The exclusion-audit docstring still calls the copy pinned
+
+- ID: PO-S2-124
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rbconf1 F2; retained as cosmetic by RULING-L1095.md at 2026-11-19 09:57.
+- CONCERNS: scripts/fsq_exclusions.py module docstring.
+- EVIDENCE: The supplied carry-back return notes that the docstring still says the pinned copy's excluded file footers although the fixed-release constant is retired. The same wording remains at WORK. L-1095 sends the note to the next fix touching that file.
+- NEEDED: Correct the description in that scoped follow-up, preserving the explicit release argument and every existing validation. This is a wording note, not a rejected code or test change.
+- COMPARISON: PO-S2-122 concerns README.md; this item is the helper's own description. No matching proposed-item entry was found at WORK.
 
 ## Sources
 

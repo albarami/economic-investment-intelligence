@@ -756,7 +756,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: the release selection of the places fetcher, its registry row, PUB-102 and the source row of document 04, and tests.
 - Depends: S2-T15, S2-T27.
 - Requirements: PUB-01, PUB-03, PUB-102; decision 0019 item 21 as amended by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 14.
-- Delivery: routine; personas Data; status queued.
+- Delivery: routine; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved on the carry-back through dbf94f0 by Cognition Devin SWE-2 High under L-1095 and joined through e1a931ac; hosted and exact merge-result checks remain the lead's gates.
 ### S2-T38 — Employed people by municipality, a Public fact
 - Goal: Load the `Employed` indicator of the municipal population source as a Public fact on the source's own geography ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 15).
 - Acceptance criteria: [ ] `pub_population_municipality` carries the indicator `Employed` by municipality with its source and year, in the source's own categories; [ ] it is never joined to a synthetic record, used to segment one, apportioned to a drawn area or combined with a protected figure, with one planted case of each refused (rule 10); [ ] the contract of `pub_population_municipality` in document 03 lists the indicator; [ ] how the attack model of slice S5 counts the published figure is recorded on OI-170 for S5's privacy design, and no privacy rule, attack size or tolerance changes for it (rule 12).
@@ -777,7 +777,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: `custodian/tests/test_investment_evidence_survivors_8.py`, its seed guard, and the records; the investment-evidence production module only if the cause is there.
 - Depends: S2-T30.
 - Requirements: AGENTS.md rules 36, 37 and 39.
-- Delivery: Standard; builder persona: senior test-reliability engineer for Python data pipelines; strict reviewer persona: strict test-reliability reviewer from another maker; status in progress.
+- Delivery: Standard; builder persona: senior test-reliability engineer for Python data pipelines; strict reviewer persona: strict test-reliability reviewer from another maker; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), carry-back ec1829a approved by xAI Grok 4.7 under L-1095 and joined as b8be5843; OI-314 stays open until merge; hosted and exact merge-result checks remain the lead's gates.
 ### S2-T41 — Optional offline satellite backup cache from CDSE
 
 - Goal: collect the owner's optional free backup as a receipted, unread cache, off by default, with no effect on any other task or numerical output (L-1069 and L-1078 item 4).
@@ -794,7 +794,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: `web/scripts/check-dev-server.mjs`, its existing test harness, `TASKS.md`, `OPEN_ITEMS.md` and `PROGRESS.md`; `web/README.md` only if it describes entry timing.
 - Depends: none.
 - Requirements: AGENTS.md rules 36, 37 and 39.
-- Delivery: Standard; builder persona senior Node.js tooling engineer for child processes, loopback HTTP and deterministic timing tests; strict reviewer persona reviewer who rejects hidden failures and guards without planted violations; status in progress.
+- Delivery: Standard; builder persona senior Node.js tooling engineer for child processes, loopback HTTP and deterministic timing tests; strict reviewer persona reviewer who rejects hidden failures and guards without planted violations; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved locally at c13fa0f6 by Cognition Devin SWE-2 High and joined as 11352f10; OI-318 became OI-323 under L-1146 and remains open for hosted and exact merge-result evidence.
 
 ### S2-T43 — The mutation ledger file always parses
 - Goal: Catch a broken mutation ledger during ordinary scripts unittest discovery, even while mutation campaigns are stopped.
@@ -802,7 +802,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: `scripts/tests/test_mutation_explained_parses.py`, this task entry and append-only evidence in `PROGRESS.md`; no mutation runner, ledger or other test changes.
 - Depends: none.
 - Requirements: AGENTS.md rules 36, 37 and 38.
-- Delivery: Mechanical; builder persona senior Python test-tooling engineer for repository guards; strict self-review persona reviewer rejecting a guard that never fails, tests a copy instead of the real file or weakens or skips a check; status in progress.
+- Delivery: Mechanical; builder persona senior Python test-tooling engineer for repository guards; strict self-review persona reviewer rejecting a guard that never fails, tests a copy instead of the real file or weakens or skips a check; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved locally at 66b0308f by Anthropic Sonnet 5.5 at 17:37 on 2026-11-19 and joined as 58e739ea; the test-precision note is recorded by the lead as PO-S2-121; hosted and exact merge-result checks remain the lead's gates.
 
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
