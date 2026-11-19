@@ -282,9 +282,17 @@ class Production:
                     raise AssemblyError("assembly_investment_review_missing")
                 read_investment(self, entry, selected[entry.key], evidence_identity)
         self.selected = selected
+        from .investment_build import page_public_totals
+
         return self.record(
             "reviewed_selections",
-            {"selected": self.selected, "tables": self.tables.copy()},
+            {
+                "selected": self.selected,
+                "tables": self.tables.copy(),
+                "page_public_totals": page_public_totals(
+                    self.tables.get("pub_investqa_page", [])
+                ),
+            },
         )
 
     def frame(self) -> dict[str, str]:

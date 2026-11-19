@@ -399,3 +399,255 @@ def _lineage(row: dict[str, object], envelope: SourceEnvelope) -> dict[str, obje
         }
     )
     return row
+
+
+# Decision 0029 item 2: the version fixes these structural lists. No CSS or
+# script is evaluated. The reviewed record reader supplies its furniture classes.
+_PAGE_EXCLUDED = frozenset(
+    {
+        "header",
+        "nav",
+        "footer",
+        "aside",
+        "script",
+        "style",
+        "svg",
+        "form",
+        "input",
+        "select",
+        "option",
+        "textarea",
+        "button",
+        "label",
+        "noscript",
+        "template",
+    }
+)
+_PAGE_FURNITURE = frozenset(
+    {"cookie", "cookies", "consent", "cookie-banner", "side-menu"}
+)
+_PAGE_BLOCKS = frozenset(
+    {
+        "main",
+        "article",
+        "section",
+        "div",
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "ul",
+        "ol",
+        "li",
+        "dl",
+        "dt",
+        "dd",
+        "blockquote",
+        "pre",
+        "table",
+        "thead",
+        "tbody",
+        "tfoot",
+        "tr",
+        "td",
+        "th",
+        "figure",
+        "figcaption",
+        "br",
+        "hr",
+    }
+)
+
+
+class _PageText(HTMLParser):
+    """Visible text nodes in source order; block edges separate nonempty lines."""
+
+    def __init__(self, furniture: frozenset[str]) -> None:
+        super().__init__(convert_charrefs=True)
+        self.furniture = furniture | _PAGE_FURNITURE
+        self.stack: list[tuple[str, bool, bool]] = []
+        self.languages: list[str] = []
+        self.english: list[str] = []
+        self.lines: list[list[str]] = [[]]
+        self.titles: list[str] = []
+        self.title_parts: list[str] | None = None
+        self.main_count = 0
+        self.closed_main = False
+        self.closed_html = False
+
+    def visible(self) -> bool:
+        return any(main for _, main, _ in self.stack) and not any(
+            skip for _, _, skip in self.stack
+        )
+
+    def boundary(self) -> None:
+        if self.lines[-1]:
+            self.lines.append([])
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attr = dict(attrs)
+        if tag == "html":
+            self.languages.append((attr.get("lang") or "").split("-")[0].casefold())
+        if (
+            tag == "link"
+            and "alternate" in (attr.get("rel") or "").split()
+            and attr.get("hreflang") == "en"
+            and attr.get("href")
+        ):
+            self.english.append(str(attr["href"]))
+        skip = (
+            tag in _PAGE_EXCLUDED
+            or "hidden" in attr
+            or (attr.get("aria-hidden") or "").casefold() == "true"
+            or bool(set((attr.get("class") or "").split()) & self.furniture)
+        )
+        if tag not in _VOID:
+            self.stack.append((tag, tag == "main", skip))
+        if tag == "main":
+            self.main_count += 1
+        if self.visible() and not skip:
+            if tag in _PAGE_BLOCKS:
+                self.boundary()
+            if tag == "h1":
+                self.title_parts = []
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.handle_starttag(tag, attrs)
+        if tag not in _VOID:
+            self.handle_endtag(tag)
+
+    def handle_endtag(self, tag: str) -> None:
+        if self.visible():
+            if tag == "h1" and self.title_parts is not None:
+                self.titles.append(" ".join(self.title_parts))
+                self.title_parts = None
+            if tag in _PAGE_BLOCKS:
+                self.boundary()
+        if tag == "main":
+            self.closed_main = True
+        if tag == "html":
+            self.closed_html = True
+        for index in range(len(self.stack) - 1, -1, -1):
+            if self.stack[index][0] == tag:
+                del self.stack[index:]
+                break
+
+    def handle_data(self, data: str) -> None:
+        import unicodedata
+
+        if self.visible():
+            text = _SPACE.sub(" ", unicodedata.normalize("NFC", data)).strip()
+            if text:
+                self.lines[-1].append(text)
+                if self.title_parts is not None:
+                    self.title_parts.append(text)
+
+
+def _page_decode(body: bytes, charset: str) -> str:
+    """BOM, receipt charset, then page meta charset; never guess an encoding."""
+    import codecs
+
+    for marker, encoding in (
+        (codecs.BOM_UTF32_LE, "utf-32"),
+        (codecs.BOM_UTF32_BE, "utf-32"),
+        (codecs.BOM_UTF8, "utf-8-sig"),
+        (codecs.BOM_UTF16_LE, "utf-16"),
+        (codecs.BOM_UTF16_BE, "utf-16"),
+    ):
+        if body.startswith(marker):
+            return body.decode(encoding)
+    if not charset:
+        meta = re.search(
+            rb"<meta\b[^>]*\bcharset\s*=\s*['\"]?([A-Za-z0-9_-]+)",
+            body,
+            re.IGNORECASE,
+        )
+        if meta is None:
+            raise ValueError("encoding absent")
+        charset = meta[1].decode("ascii")
+    return body.decode(charset)
+
+
+def page_refusal(check: str, url: str = "") -> InvestmentFailure:
+    """Release reports identify the check without copying a rejected token."""
+    return InvestmentFailure(
+        1, "investqa_pages", url, check, "verified page", "refused"
+    )
+
+
+def extract_page(
+    body: bytes,
+    *,
+    page_url: str,
+    page_language: str,
+    sequence: int | None,
+    retrieved_on: str,
+    page_sha256: str,
+    manifest_sha256: str,
+    charset: str = "",
+    furniture: frozenset[str] = frozenset(),
+    extractor: str = "investqa_page_text@1",
+) -> dict[str, object] | InvestmentFailure:
+    """Decision 0029: extract one exact page row, or refuse the whole quotation."""
+    import hashlib
+    import unicodedata
+    from datetime import date
+
+    from .investment_contracts import PAGE_EXTRACTOR
+
+    if extractor != PAGE_EXTRACTOR:
+        return page_refusal("page_extractor_version", page_url)
+    digest = hashlib.sha256(body).hexdigest()
+    if digest != page_sha256 or digest != manifest_sha256:
+        return page_refusal("page_hash_mismatch", page_url)
+    try:
+        text = _page_decode(body, charset)
+        date.fromisoformat(retrieved_on)
+    except (UnicodeError, LookupError, ValueError):
+        return page_refusal("page_decode", page_url)
+    collector = _PageText(furniture)
+    collector.feed(text)
+    collector.close()
+    if page_language not in {"en", "ar"} or collector.languages != [page_language]:
+        return page_refusal("page_language", page_url)
+    if (
+        collector.main_count != 1
+        or not collector.closed_main
+        or not collector.closed_html
+        or collector.stack
+    ):
+        return page_refusal("page_truncated", page_url)
+    page_text = "\n".join(" ".join(line) for line in collector.lines if line)
+    runs = re.findall(r"\d+", page_text)
+    if any(len(run) in {8, 11} for run in runs):
+        return page_refusal("page_identifier_shape", page_url)
+    if re.search(r"[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}", page_text) or any(
+        7 <= sum(unicodedata.category(char) == "Nd" for char in match) <= 15
+        for match in re.findall(r"\+?\d+(?:[ ()-]\d+)*", page_text)
+    ):
+        return page_refusal("page_contact_shape", page_url)
+    if re.search(r"SYN-[A-Z]-|CANARY", page_text, re.IGNORECASE):
+        return page_refusal("page_release_token", page_url)
+    if len(set(collector.english)) > 1:
+        return page_refusal("page_key", page_url)
+    key_url = urljoin(page_url, collector.english[0]) if collector.english else page_url
+    key = re.sub(r"[^a-z0-9]+", "_", urlsplit(key_url).path.casefold()).strip("_")
+    if not key or not key[0].isalpha():
+        return page_refusal("page_key", page_url)
+    if sequence is not None and (type(sequence) is not int or sequence < 1):
+        return page_refusal("page_sequence", page_url)
+    return {
+        "page_key": key,
+        "page_language": page_language,
+        "sequence": sequence,
+        "page_title": collector.titles[-1] if collector.titles else None,
+        "page_url": page_url,
+        "retrieved_on": retrieved_on,
+        "page_sha256": digest,
+        "extractor": PAGE_EXTRACTOR,
+        "page_text": page_text,
+        "source_id": "investqa_pages",
+    }

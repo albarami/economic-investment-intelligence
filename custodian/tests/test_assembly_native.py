@@ -233,7 +233,8 @@ def test_draw_over_investment_tables(tmp_path: Path, monkeypatch) -> None:
     state = context(cache, entries)
     state.reviewed_selections()
     readers = draw_tables(state)
-    assert set(readers) == {"fdi_projects", "pub_investqa_record"}
+    assert set(readers) == {"fdi_projects", "pub_investqa_record", "pub_investqa_page"}
+    assert readers["pub_investqa_page"]() == []
     fdi = readers["fdi_projects"]()
     assert {figure.figure_id for figure in fdi} == {
         "fdi_projects:" + str(index) + ":" + field
@@ -252,3 +253,145 @@ def test_draw_over_investment_tables(tmp_path: Path, monkeypatch) -> None:
     selected = draw(readers, 17, cache / "assembly/build.json")
     assert len(selected) == 20
     assert all(figure in fdi for figure in selected)
+
+
+def _agency_selected(tmp_path, monkeypatch, bodies=None):
+    from custodian.tests import test_investment_build as fixture
+    from custodian.tests.test_investment_bilingual import bilingual
+
+    pages, originals = bilingual()
+    originals = {
+        url: body.replace(b"<body>", b'<head><meta charset="utf-8"></head><body>')
+        for url, body in originals.items()
+    }
+    if bodies:
+        originals.update(bodies)
+    row = fixture._agency_entry()
+    assert fixture._run(tmp_path, monkeypatch, row, originals, pages=pages) == 0
+    pointer, manifest, table = fixture._batch(tmp_path, row.source_id)
+    cache = tmp_path / "data/public_cache"
+    pins = {
+        row.key: manifest["pages"][0]["sha256"],
+        row.key + "/evidence": pointer["manifest_sha256"],
+    }
+    (cache / "snapshot_pins.json").write_text(json.dumps(pins))
+    return row, cache, pointer, manifest, table
+
+
+def test_agency_selected_release_writes_both_languages_and_inventory(
+    tmp_path, monkeypatch
+):
+    row, cache, _pointer, _manifest, table = _agency_selected(tmp_path, monkeypatch)
+    from eii_custodian.publicdata.investment_build import read_page_table
+
+    page_table = read_page_table(cache / row.key / "evidence", _manifest)
+    expected = page_table["page_rows"]
+    assert len(expected) == 10
+    assert {item["page_language"] for item in expected} == {"en", "ar"}
+    assert table["schema_version"] == "pub_investqa_record.v1"
+    assert all(item["extractor"] == "investqa_page_text@1" for item in expected)
+    # Publish changed bytes but keep the earlier explicit reviewed selection.
+    from custodian.tests import test_investment_build as fixture
+    from custodian.tests.test_investment_bilingual import bilingual
+
+    pages, bodies = bilingual()
+    bodies = {
+        url: body.replace(b"Invented", b"Changed") for url, body in bodies.items()
+    }
+    assert fixture._run(tmp_path, monkeypatch, row, bodies, pages=pages) == 0
+    (cache / row.key / "loadable.json").unlink()
+    state = context(cache, (row,))
+    state.reviewed_selections()
+    assert state.tables["pub_investqa_page"] == expected
+    assert state.tables["pub_investqa_record"] == table["rows"]
+    record = json.loads((cache / "assembly/reviewed_selections.json").read_bytes())
+    entries = record["page_public_totals"]
+    assert len(entries) == 10
+    assert all(item["status"] == "not_applicable" for item in entries)
+    assert all(item["reason"] == "source_only" for item in entries)
+
+
+@pytest.mark.parametrize(
+    "plant,check",
+    [
+        ("missing", "page_rows_missing"),
+        ("version", "page_extractor_version"),
+        ("text", "page_text_mismatch"),
+        ("duplicate", "page_duplicate_key"),
+        ("language", "page_language"),
+    ],
+)
+def test_agency_assembly_rejects_tampered_page_rows(
+    tmp_path, monkeypatch, plant, check
+):
+    from eii_custodian.publicdata.assembly import AssemblyError
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot, read_snapshot
+
+    row, cache, pointer, manifest, table = _agency_selected(tmp_path, monkeypatch)
+    from eii_custodian.publicdata.investment_build import read_page_table
+
+    table = read_page_table(cache / row.key / "evidence", manifest)
+    if plant == "missing":
+        table.pop("page_rows", None)
+    else:
+        rows = table.setdefault("page_rows", [{}])
+        if plant == "version":
+            rows[0]["extractor"] = "investqa_page_text@old"
+        elif plant == "text":
+            rows[0]["page_text"] += " edited"
+        elif plant == "duplicate":
+            rows.append(dict(rows[0]))
+        else:
+            rows[0]["page_language"] = "ar"
+    directory = cache / row.key / "evidence"
+    body = json.dumps(table).encode()
+    receipt = dict(
+        read_snapshot(directory, manifest["page_table_snapshot_identity"]).sidecar
+    )
+    receipt.update(sha256=sha256_hex(body), bytes=len(body))
+    snapshot = publish_snapshot(directory, "json", body, receipt)
+    manifest.update(
+        page_table_sha256=snapshot.sha256, page_table_snapshot_identity=snapshot.sha256
+    )
+    body = json.dumps(manifest).encode()
+    receipt = dict(read_snapshot(directory, pointer["manifest_sha256"]).sidecar)
+    receipt.update(sha256=sha256_hex(body), bytes=len(body))
+    snapshot = publish_snapshot(directory, "json", body, receipt)
+    (cache / "snapshot_pins.json").write_text(
+        json.dumps(
+            {
+                row.key: manifest["pages"][0]["sha256"],
+                row.key + "/evidence": snapshot.sha256,
+            }
+        )
+    )
+    with pytest.raises(AssemblyError, match=check):
+        context(cache, (row,)).reviewed_selections()
+
+
+def test_agency_release_contact_refusal_keeps_typed_records(tmp_path, monkeypatch):
+    from custodian.tests import test_investment_build as fixture
+
+    url = fixture.SECTOR_URL.replace("agency.invalid/", "agency.invalid/en/")
+    body = (
+        fixture.agency_bodies()[fixture.SECTOR_URL]
+        .replace(
+            b"</main>",
+            ("<div>" + "invented" + "@" + "example.invalid</div></main>").encode(),
+        )
+        .replace(b"<body>", b'<head><meta charset="utf-8"></head><body>')
+    )
+    row, cache, _, manifest, records = _agency_selected(
+        tmp_path, monkeypatch, {url: body}
+    )
+    from eii_custodian.publicdata.investment_build import read_page_table
+
+    table = read_page_table(cache / row.key / "evidence", manifest)
+    assert len(table["page_rows"]) == 9
+    assert table["page_refusals"][0]["check"] == "page_contact_shape"
+    assert any(item["page_url"] == url for item in records["rows"])
+    state = context(cache, (row,))
+    state.reviewed_selections()
+    assert len(state.tables["pub_investqa_page"]) == 9
+    assert any("page_contact_shape" in line for line in state.lines)

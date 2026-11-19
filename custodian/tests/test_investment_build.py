@@ -1192,7 +1192,7 @@ def _agency_entry() -> Entry:
         "investqa_pages",
         LANDING_URL,
         "agency.invalid",
-        ("pub_investqa_record",),
+        ("pub_investqa_record", "pub_investqa_page"),
         (),
         6,
         500,
@@ -1261,3 +1261,221 @@ def _envelope() -> SourceEnvelope:
         method="eii_custodian.publicdata.investment_parse.parse_fdi",
         method_version="1",
     )
+
+
+def _quotation_row(body=None, language="en", **changes):
+    from eii_custodian.publicdata.investment_agency import extract_page
+
+    if body is None:
+        body = _fixtures.quotation_page(language)
+    values = dict(
+        page_url=f"https://agency.invalid/{language}/invented-page",
+        page_language=language,
+        sequence=1,
+        retrieved_on="2026-11-14",
+        page_sha256=hashlib.sha256(body).hexdigest(),
+        manifest_sha256=hashlib.sha256(body).hexdigest(),
+        charset="",
+        furniture=frozenset({"cookie"}),
+    )
+    values.update(changes)
+    return extract_page(body, **values)
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+def test_page_text_determinism_and_bilingual_roundtrip(language):
+    body = _fixtures.quotation_page(language)
+    first = _quotation_row(body, language)
+    assert not isinstance(first, InvestmentFailure), first
+    second = _quotation_row(body, language)
+    assert first == second
+    assert json.loads(json.dumps(first, ensure_ascii=True)) == first
+    assert first["page_text"].encode() == second["page_text"].encode()
+    assert first["extractor"] == "investqa_page_text@1"
+    assert first["page_key"] == "en_invented_page"
+    assert set(first) == {
+        "page_key",
+        "page_language",
+        "sequence",
+        "page_title",
+        "page_url",
+        "retrieved_on",
+        "page_sha256",
+        "extractor",
+        "page_text",
+        "source_id",
+    }
+    lead = "Invented café" if language == "en" else "نص مخترع ١٢"
+    assert first["page_text"] == (
+        f"Invented title\n{lead} link tail.\nFirst inline last.\nSecond."
+    )
+    reordered = body.replace(
+        b"<div>First <span>inline</span> last.</div><p>Second.</p>",
+        b"<p>Second.</p><div>First <span>inline</span> last.</div>",
+    )
+    changed = _quotation_row(reordered, language)
+    assert not isinstance(changed, InvestmentFailure)
+    assert changed["page_text"] != first["page_text"]
+
+
+@pytest.mark.parametrize(
+    "plant,check",
+    [
+        ("eight", "page_identifier_shape"),
+        ("eleven", "page_identifier_shape"),
+        ("arabic_eight", "page_identifier_shape"),
+        ("mixed_eight", "page_identifier_shape"),
+        ("contact", "page_contact_shape"),
+        ("telephone", "page_contact_shape"),
+        ("telephone_plain", "page_contact_shape"),
+        ("synthetic", "page_release_token"),
+        ("canary", "page_release_token"),
+    ],
+)
+def test_page_text_refusals_are_named(plant, check):
+    tokens = {
+        "eight": "7" * 8,
+        "eleven": "7" * 11,
+        "arabic_eight": chr(0x661) * 8,
+        "mixed_eight": "7" * 4 + chr(0x6F1) * 4,
+        "contact": "invented" + "@" + "example.invalid",
+        "telephone": "+" + "7" * 3 + " " + "7" * 3 + " " + "7" * 4,
+        "telephone_plain": "7" * 10,
+        "synthetic": "SYN-" + "P-invented",
+        "canary": "CANARY" + "_invented",
+    }
+    result = _quotation_row(
+        _fixtures.quotation_page(extra=f"<div>{tokens[plant]}</div>")
+    )
+    assert isinstance(result, InvestmentFailure)
+    assert result.check == check
+    assert result.observed == "refused"  # Never echo the offending token.
+
+
+@pytest.mark.parametrize(
+    "changes,check",
+    [
+        ({"page_sha256": "ab" * 32}, "page_hash_mismatch"),
+        ({"manifest_sha256": "ab" * 32}, "page_hash_mismatch"),
+        ({"page_language": "ar"}, "page_language"),
+        ({"extractor": "investqa_page_text@old"}, "page_extractor_version"),
+    ],
+)
+def test_page_text_hash_language_and_version_refusals(changes, check):
+    result = _quotation_row(**changes)
+    assert isinstance(result, InvestmentFailure)
+    assert result.check == check
+
+
+@pytest.mark.parametrize(
+    "plant,check",
+    [
+        ("text", "page_text_mismatch"),
+        ("duplicate", "page_duplicate_key"),
+        ("missing", "page_rows_missing"),
+        ("version", "page_extractor_version"),
+        ("language", "page_language"),
+        ("extra_column", "page_columns"),
+    ],
+)
+def test_page_release_reextracts_and_refuses_candidate(plant, check):
+    from eii_custodian.publicdata.investment_build import validate_page_rows
+
+    body = _fixtures.quotation_page()
+    row = _quotation_row(body)
+    assert not isinstance(row, InvestmentFailure)
+    candidates = [dict(row)]
+    if plant == "text":
+        candidates[0]["page_text"] += " edited"
+    elif plant == "duplicate":
+        candidates.append(dict(row))
+    elif plant == "missing":
+        candidates.clear()
+    elif plant == "version":
+        candidates[0]["extractor"] = "investqa_page_text@old"
+    elif plant == "language":
+        candidates[0]["page_language"] = "ar"
+    else:
+        candidates[0]["invented"] = "extra"
+    failure = validate_page_rows(candidates, [row])
+    assert isinstance(failure, InvestmentFailure)
+    assert failure.check == check
+
+
+def test_page_rows_contribute_source_only_public_totals():
+    from eii_custodian.publicdata.investment_build import page_public_totals
+
+    rows = [_quotation_row(language=language) for language in ("en", "ar")]
+    entries = page_public_totals(rows)
+    assert len(entries) == len(rows)
+    for row, entry in zip(rows, entries, strict=True):
+        key = json.dumps(
+            {name: row[name] for name in ("page_key", "page_language")},
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        assert entry["public_total_id"] == "row:pub_investqa_page:" + key
+        assert entry["status"] == "not_applicable"
+        assert entry["reason"] == "source_only"
+        assert entry["source_id"] == row["source_id"]
+        assert entry["selectors"] == {
+            "page_key": row["page_key"],
+            "page_language": row["page_language"],
+        }
+
+
+@pytest.mark.parametrize(
+    "plant,check",
+    [
+        ("encoding", "page_decode"),
+        ("bad_encoding", "page_decode"),
+        ("language", "page_language"),
+        ("truncated", "page_truncated"),
+        ("region", "page_truncated"),
+        ("sequence", "page_sequence"),
+    ],
+)
+def test_page_extractor_refuses_incomplete_source(plant, check):
+    body = _fixtures.quotation_page()
+    changes = {}
+    if plant == "encoding":
+        body = body.replace(b'<meta charset="utf-8">', b"")
+    elif plant == "bad_encoding":
+        body = body.replace(b"utf-8", b"invented-encoding")
+    elif plant == "language":
+        body = body.replace(b'lang="en"', b"")
+    elif plant == "truncated":
+        body = body.replace(b"</main>", b"")
+    elif plant == "region":
+        body = body.replace(b"<main>", b"<article>").replace(b"</main>", b"</article>")
+    else:
+        changes["sequence"] = True
+    result = _quotation_row(body, **changes)
+    assert isinstance(result, InvestmentFailure)
+    assert result.check == check
+
+
+@pytest.mark.parametrize("encoding", ["utf-8-sig", "utf-16", "utf-32"])
+def test_page_encoding_bom_precedes_receipt_and_meta(encoding):
+    body = _fixtures.quotation_page().decode().encode(encoding)
+    result = _quotation_row(body, charset="invented-encoding")
+    expected = _quotation_row()
+    assert not isinstance(result, InvestmentFailure)
+    assert result["page_text"] == expected["page_text"]
+
+
+def test_page_receipt_charset_precedes_meta():
+    body = _fixtures.quotation_page().replace(b"utf-8", b"invented-encoding")
+    result = _quotation_row(body, charset="utf-8")
+    assert not isinstance(result, InvestmentFailure)
+    assert result["page_text"] == _quotation_row()["page_text"]
+
+
+def test_agency_registry_declares_page_release_beside_unchanged_records():
+    from eii_custodian.publicdata.investment_contracts import SCHEMA_AGENCY
+
+    entry = next(row for row in load_registry() if row.source_id == "investqa_pages")
+    assert entry.release_tables == ("pub_investqa_record", "pub_investqa_page")
+    assert SCHEMA_AGENCY == "pub_investqa_record.v1"
+    assert entry.commit_allowed is False
+    assert entry.refetch.value == "daily"

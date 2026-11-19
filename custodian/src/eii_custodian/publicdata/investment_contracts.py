@@ -679,3 +679,22 @@ def period_is_future(period: str, retrieved_utc: str) -> bool:
     if year is None or len(period) < 4 or not period[:4].isdigit():
         return False
     return int(period[:4]) > year
+
+
+# Decision 0029 appendix item 2, plus the common Public source-registry key.
+# L-1157: the record schema remains v1; this is the extraction's version.
+PAGE_EXTRACTOR = "investqa_page_text@1"
+PAGE_COLUMNS = frozenset(
+    {
+        "page_key",
+        "page_language",
+        "sequence",
+        "page_title",
+        "page_url",
+        "retrieved_on",
+        "page_sha256",
+        "extractor",
+        "page_text",
+        "source_id",
+    }
+)

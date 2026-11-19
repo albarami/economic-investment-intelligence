@@ -123,8 +123,11 @@ def read_investment(
     from .investment_build import (
         _bounds,
         load_source_spec,
+        read_page_table,
         select_release,
+        selected_page_rows,
         validate_investment,
+        validate_page_rows,
     )
     from .investment_contracts import (
         SCHEMA_AGENCY,
@@ -204,6 +207,30 @@ def read_investment(
     name = (
         "fdi_projects" if entry.source_id == "fdi_projects" else "pub_investqa_record"
     )
+    if entry.source_id == "investqa_pages":
+        page_rows, page_refusals = selected_page_rows(
+            local(build.cache, entry.key), manifest["pages"], spec.furniture
+        )
+        page_table = read_page_table(
+            local(build.cache, entry.key + "/evidence"), manifest
+        )
+        if isinstance(page_table, InvestmentFailure):
+            raise AssemblyError(page_table.check)
+        checked_pages = validate_page_rows(page_table.get("page_rows"), page_rows)
+        if isinstance(checked_pages, InvestmentFailure):
+            raise AssemblyError(checked_pages.check)
+        if page_table.get("page_refusals") != page_refusals:
+            raise AssemblyError("page_refusals_mismatch")
+        build.table("pub_investqa_page", checked_pages, (entry.key,))
+        for refusal in page_refusals:
+            build.lines.append(
+                "REFUSED pub_investqa_page "
+                + str(refusal["page_key"])
+                + " check="
+                + str(refusal["check"])
+                + " reason="
+                + str(refusal["observed"])
+            )
     build.table(name, checked, (entry.key,))
     for item in (snapshot, table_snapshot):
         relative = item.path.relative_to(build.cache).as_posix()

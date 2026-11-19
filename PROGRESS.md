@@ -40092,3 +40092,324 @@ S2-T44 final record/report audit:
   approval, native result, four-processor gate or merge is fabricated. The
   return proposes PO-S2-118 closure for review and notes the absent task/item
   records; neither OPEN_ITEMS.md nor an earlier evidence row is changed.
+
+## S2-T39B-BUILD1 — exact contract appendix; runtime stopped on open contract/scope points
+
+Date: 2026-11-19. Base commit: `98384ae5933dff2efb81721d087e74e6ce600011`.
+Builder persona: senior data engineer for public-source ingestion and release contracts.
+Strict self-review persona: provenance and data-contract reviewer; no independent-maker approval claimed.
+Skills applied: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. Test-driven development and verification-before-completion
+were followed in their plain meaning where unavailable: no runtime change was made without
+its required contract, and passing old tests are not claimed as new implementation proof.
+
+Authority: `.overnight/BRIEF.md`, reviewed plan r2 AC2 and build order, L-1043/L-1044,
+accepted decision 0029 Decision items 1–7 and appendix items 1–5, document 03 DAT-143,
+DAT-120/DAT-121 and section 7.3, S2-T39 and OI-178. Applied appendix items 1–5 exactly:
+section 7.2 gains the page-table catalogue row, section 7.3 gains the page-table columns
+and the exact record row, and DAT-143 gains the exact requirement/check replacements.
+The typed record column list remains unchanged. S2-T39's delivery line distinguishes
+this documentation under review from a runtime build that has not been completed;
+all four acceptance criteria remain unchecked. OPEN_ITEMS.md and the agent rule files
+were not changed. No commit, push, live input, fetch or mutation campaign was made.
+
+Stopped under the brief's explicit no-guess instruction. Decision 0029 names
+`investqa_page_text@1` and the separate page table but no replacement agency artifact/schema
+identifier for the brief's required schema bump. The current artifact is
+`pub_investqa_record.v1`; its cached page/block rows are not the typed release columns.
+Also, `assembly_native.py::read_investment`, called by
+`assembly_adapters.py::Production.reviewed_selections`, writes only the record table;
+both adapter files are outside the allowed change list. The return asks for the exact
+schema/artifact identity and the owning task or expanded scope for selected-release
+integration. Adding a cache field or registry declaration alone is not AC2 delivery.
+The extractor's exact element list is delegated by 0029 to part B's reviewed parser
+change, not treated as a new owner-level decision. No runtime implementation was begun.
+
+Environment: supplied `.venv`, Python 3.14.6, Linux x86_64; nothing sourced.
+For the uv commands below: `UV_OFFLINE=1`,
+`UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`, `TMPDIR="$PWD/.overnight/tmp"`.
+The full test command additionally sets `EII_DECISION_PROVIDER=none`.
+Seed: `3729156408`. No secret value or environment inventory was read or recorded.
+
+Commands and actual results before the integrated result:
+
+- Initial inline appendix-copy script, `python3 -`: exit 1, a pre-write assertion
+  detected code-block indentation; no file was written. Corrected dedenting version:
+  exit 0; appendix applied. This is not a runtime test red/green cycle.
+- `uv run --locked python -m pytest custodian/tests/test_investment_build.py custodian/tests/test_investment_agency.py custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider`:
+  exit 0; 80 passed in 3.15s. Existing parser/publication/bilingual acquisition regression
+  evidence only; no new quotation-release test or guard was added.
+- `uv run --locked ruff check .`: exit 0; all checks passed.
+- `uv run --locked ruff format --check .`: exit 0; 822 files already formatted.
+- `uv run --locked mypy`: exit 0; no issues in 443 source files.
+- `python3 scripts/check_docs.py`: exit 0; 1118 text files, 119 Markdown files checked.
+- `python3 scripts/check_tree.py`: exit 0; 8 rules checked.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; no output.
+- `git diff --check`: exit 0; no output.
+- Read-only exact-copy/scope audit, `uv run --locked python -`: exit 0. Three exact
+  appendix rows occur once, three DAT-143 replacements and two check clauses match,
+  four task boxes remain unchecked, the then-current tracked diff has exactly the
+  two documentation files, and AGENTS.md/CLAUDE.md bytes match. Reported interpreter
+  and platform are the values above.
+- `./eii test --seed 3729156408`: started; outcome pending in this append. Its actual
+  exit and counts will be appended without rewriting this row.
+
+There is no new runtime red/green evidence: no release schema, selected page-table output,
+round-trip test, new tamper plant, per-page scan contribution or older-selection proof
+was implemented. The return proposes retaining OI-178 open until that work and independent
+review pass; its proposed eventual closing line is conditional. No screen code changed.
+Strict self-review: REJECT for full AC2 completion. Muhasabah: PASS for the bounded evidence
+and explicit missing work. `.overnight/RETURN.md` carries the contract-to-decision mapping,
+questions, check record and proposed open-item text.
+
+
+S2-T39B-BUILD1 integrated run, interim evidence (same seed `3729156408`):
+`python-guards` reports 938 passed, 8 failed, 0 skipped; its pytest tail separately
+reports 1 failed, 939 passed, 7 errors in 316.26s. Both counts are retained; the
+count discrepancy is unresolved and no rerun was made. The failed test is
+`scripts/tests/test_commands.py::Commands::test_exit_codes_are_in_the_table`,
+subtest `command='test'`: a nested uv launcher cannot initialize the default
+cache because that location is read-only, so the expected usage-error prefix
+is absent. Seven class-setup errors in
+`scripts/tests/test_clean_environment.py::CleanEnvironment` all follow the missing
+default uv cache: `test_bare_environment_cannot_import`,
+`test_each_package_imports_from_clean_environment`,
+`test_hostile_surroundings_do_not_change_the_result`,
+`test_installed_names_equal_the_workspace_and_the_locked_declared_packages`,
+`test_lock_is_current`, `test_stale_lock_is_detected`, and
+`test_sync_all_packages_locked_keeps_lock`. The runner's Python-child allow-list
+omits the outer `UV_CACHE_DIR`; no outside cache was created or rule changed.
+The passing suites report: `python-core` 749, `python-custodian-1` 4587,
+`python-custodian-2` 3733, `python-product` 786; each reports 0 failed and 0 skipped.
+The web checks are still running; the command's exit and aggregate remain pending.
+
+Post-evidence checks already completed: `python3 scripts/check_docs.py` exit 0,
+1118 text files and 119 Markdown files; `python3 scripts/check_tree.py` exit 0,
+8 rules; `git diff --check` exit 0. A read-only scope audit,
+`uv run --locked python -`, exited 0 and confirmed the original PROGRESS.md
+bytes remain its prefix, only the three allowed tracked documentation files
+are changed, the return ends in the required marker, authored records hold no
+absolute private paths, HEAD is unchanged and the staging index is empty.
+
+
+S2-T39B-BUILD1 integrated run completion (same command and seed, no retry):
+`./eii test --seed 3729156408` exited 1. Runner total: 10794 passed, 8 failed,
+0 skipped in 7 suites, 2 with problems; RESULT: FAILED. The suite rows are
+`python-guards` 938 passed / 8 failed / 0 skipped; `python-core` 749 / 0 / 0;
+`python-custodian-1` 4587 / 0 / 0; `python-custodian-2` 3733 / 0 / 0;
+`python-product` 786 / 0 / 0; `web-checks` counts unavailable; `web-unit` 1 / 0 / 0.
+The guard failures and its separate pytest-tail count are retained in the preceding
+append. `web-checks` exceeded the unchanged 1800-second limit and the runner killed
+its process group. Its last visible browser result was
+`tests/performance.spec.ts:612:3`, `Arabic reduced-motion scene`,
+`roads mark and legend are visible ar reduced`; this identifies output context,
+not a failing test or root cause. No complete web-check count is claimed.
+The return proposes retaining the environment failures, guard count discrepancy
+and this timeout as unresolved follow-up, without a rule change or a green-rerun closure.
+
+The full check is not green and AC2 is not complete. `.overnight/RETURN.md` now
+contains the actual final exit, all reported suite counts, seed, named guard
+failures, timeout, exact document-contract mapping and the schema/scope questions.
+No runtime red/green or new release-table proof is claimed. No code, fixture,
+source registration, agent-rule file or earlier open-item/evidence row was changed.
+
+
+S2-T39B-BUILD1 final verification:
+Final post-completion verification: `python3 scripts/check_docs.py` exited 0
+(1118 text files, 119 Markdown files); `python3 scripts/check_tree.py` exited 0
+(8 rules); `cmp AGENTS.md CLAUDE.md` and `git diff --check` exited 0 with no output.
+The final read-only audit, `uv run --locked python -`, exited 0 and confirmed
+exact appendix application, all four unchecked task criteria, append-only ledger,
+a seed absent from the original ledger, the three-file tracked scope, unchanged
+HEAD/index, agent-rule byte parity, the actual full-run failure counts and the
+return marker. These checks do not turn the failed integrated run into a pass.
+
+
+S2-T39B-BUILD2 — bounded custodian implementation under L-1157, 2026-11-19.
+Maker/model: OpenAI / GPT-6 (Codex). Builder persona: senior data-contract
+engineer for deterministic extraction and public-source release provenance.
+Strict self-review persona: provenance reviewer rejecting any column or value
+not supported by decision 0029. Skills applied: project-orientation,
+task-standards, sanad-provenance, github-flow, strict-reviewer, muhasabah-gate;
+test-driven-development and verification-before-completion followed by their
+plain meaning where not installed. Self-review is not another maker's approval.
+HEAD remains `98384ae5933dff2efb81721d087e74e6ce600011`; no commit, staging,
+network call or real public-data-cache reading was performed by this build.
+The round-1 `.overnight/RETURN.md` was absent: its read exited 1. The supplied
+round-1 brief, r2 plan, L-1043/L-1044, L-1157 and existing round-1 ledger evidence
+were read; the three inherited documentation changes were retained.
+
+Source environment: clone `.venv`, activated only through its `bin/activate`;
+`UV_OFFLINE=1`, `TMPDIR=.overnight/tmp`, `UV_CACHE_DIR=.overnight/tmp/uv-cache`
+(the latter paths are resolved inside the workspace by the command shell).
+All focused pytest commands use `uv run --locked python -m pytest`, the
+repository's configuration, invented pages and repository temporary paths.
+The full command uses fresh seed `2948716035`, absent from earlier ledger rows.
+
+Red/green evidence (logs under `.overnight/tmp/`, not committed):
+- `custodian/tests/test_investment_build.py -k 'page_text or page_release or
+  page_rows_contribute' -q`: red exit 1, 21 failed / 31 deselected (missing new
+  interfaces); same command green exit 0, 21 passed / 31 deselected. These cover
+  bilingual text and deterministic byte equality, reordered elements, ASCII
+  eight/eleven-digit runs, Arabic-Indic and mixed-script runs built at runtime,
+  contact and synthetic/canary shapes, both hash comparisons, language/version,
+  altered text, duplicate/missing/extra-column rows and PRV-115 contributions.
+- `custodian/tests/test_assembly_native.py -k agency -q`: red exit 1,
+  7 failed / 11 deselected; first post-implementation run exit 1,
+  2 passed / 5 failed / 11 deselected because the tamper fixture updated
+  `nbytes` instead of the snapshot receipt's `bytes`. The receipt-fixture
+  correction retains the snapshot hash guard. Next run exit 0,
+  7 passed / 11 deselected. Cases bind the explicitly selected older bilingual
+  manifest, reject missing/version/text/duplicate/language plants and preserve
+  typed records when the quotation's contact scan refuses a page.
+- `custodian/tests/test_investment_build.py -k registry_declares_page -q`:
+  red exit 1, 1 failed / 62 deselected; green exit 0,
+  1 passed / 62 deselected after declaring the companion release table.
+- `custodian/tests/test_investment_build.py -k telephone_plain -q`:
+  red exit 1, 1 failed / 63 deselected; green exit 0,
+  1 passed / 63 deselected after retaining the contact scan for an unseparated
+  telephone-shaped token. No token value is copied into a refusal record.
+- Additional encoding, BOM/receipt/meta precedence, no-language, no-region,
+  truncation and invalid-sequence coverage was added after the extractor:
+  `custodian/tests/test_investment_build.py -k
+  'page_extractor_refuses_incomplete_source or page_encoding_bom or
+  page_receipt_charset' -q` exited 0, 10 passed / 52 deselected.
+  These ten cases have pass evidence only; no failing-first result is claimed.
+
+Broader regression evidence:
+- The four-file focused command (`test_investment_build.py`,
+  `test_assembly_native.py`, `test_investment_bilingual.py`,
+  `test_investment_agency.py`, all under `custodian/tests`, `-q`) first exited 1,
+  118 passed / 1 failed: `test_draw_over_investment_tables` still expected only
+  the old tables. After asserting the companion table and its empty numerical
+  draw, the command exited 0, 119 passed.
+- The expanded command (`custodian/tests/test_investment*.py`,
+  `test_assembly_native.py`, `test_production_adapters.py`,
+  `test_publicdata_registry.py`, `-q`) first exited 1, 697 passed / 1 failed:
+  `test_investment_build_survivors_2.py::test_agency_publishes_exact_counts_and_each_kind`
+  caught new keys in the old record document. The implementation was corrected
+  to keep that document unchanged and archive page rows/refusals separately,
+  referenced by the explicit manifest. No survivor test was edited. The same
+  expanded command then exited 0, 698 passed. A subsequent run includes the
+  new telephone plant; its final evidence follows below.
+
+Static checks so far: `uv run --locked ruff check .` first exited 1 with two
+unused fixture bindings, then exited 0 after correction; `ruff format .`
+exited 0 (8 reformatted / 814 unchanged), then exited 0 again (formatting the
+separate-page archive correction; see its log). `ruff format --check .`
+exited 0, 822 files formatted. `uv run --locked mypy` initially exited 0,
+443 source files; after the separate archive change it exited 1 with two
+new type errors (Mapping-to-dict list conversion and reuse of a snapshot-typed
+local). Explicit dictionary conversion and a separate checked-pages variable
+fixed both; the next run exited 0, 443 source files. No type suppression was added.
+`python3 scripts/check_docs.py` exited 0, 1118 text / 119 Markdown files;
+`python3 scripts/check_tree.py` exited 0, 8 rules; `cmp AGENTS.md CLAUDE.md`
+and `git diff --check` exited 0. Final post-record checks follow separately.
+
+Contract and limits: decision 0029 appendix items 1–5 remain applied to document
+03; item 2's extractor element lists and whitespace rule are recorded there.
+The exact column is `extractor`, holding `investqa_page_text@1`; L-1157 and the
+round-2 brief call its version `extractor_version`, but no extra column or
+record-schema bump was invented. `sequence` is null because snapshot inventory
+order is not evidence of the site's own page-list order. Declared alternate
+English links establish a paired key; no language counterpart is guessed.
+PRV-115 row contributions are emitted with canonical key selectors,
+`not_applicable` and `source_only`; this is not the complete signed release
+inventory. Loading, complete release signing/scans and all screen-side item 6
+checks remain with their owning tasks. AC2 is unchecked and no independent
+review approval is claimed. The whole test is running once with its recorded
+seed; no limit, assertion, baseline or failure has been suppressed.
+
+
+S2-T39B-BUILD2 final-code checks and integrated-run qualification:
+The expanded focused command completed with exit 0, 699 passed in 33.90s,
+including the unseparated-telephone plant. The final-code `ruff check .` and
+`ruff format --check .` each exited 0 (822 formatted files); `mypy` exited 0,
+443 source files. Post-record docs/tree checks exited 0 (1118 text files,
+119 Markdown files; 8 tree rules), as did agent byte parity and diff whitespace.
+The separate archive formatter run reported 3 files reformatted, 819 unchanged.
+The read-only scope/HEAD/index/task-box/return-marker audit exited 0.
+Arabic-RTL was also read for source-script preservation; decision 0029's
+verbatim requirement takes precedence over locale digit conversion.
+
+The whole run was started before the archive correction was fully finalized.
+Its guard suite copied intermediate files and reported four additional failures
+from the two type errors later fixed; the running suite is not evidence of an
+unchanged final tree. This sequencing mistake is retained explicitly. Reported
+`python-guards` row: 934 passed, 12 failed, 0 skipped; its pytest tail instead
+reports 935 passed, 5 failed and 7 errors in 311.64s. The runner/pytest count
+difference remains unresolved. Four code-check failures are
+`scripts/tests/test_pychecks_config.py::PychecksConfig::test_clean_copy_passes`,
+`test_real_repository_passes`, and
+`scripts/tests/test_pychecks_mypy.py::PychecksMypy::test_evals_copy_and_planted_type_error`,
+`test_mypy_python_version_is_read`; all identify the same two intermediate
+type errors. The command-table subtest `command='test'` and seven
+`CleanEnvironment` setup errors again identify the unavailable default uv cache:
+the child environment excludes the outer `UV_CACHE_DIR`. No cache outside the
+workspace, rule change, retry of the whole command or limit change was made.
+`python-core` reports 749 passed, 0 failed, 0 skipped. Other suite results remain
+pending. A targeted final-code run of the two pychecks guard files was started
+because the implementation changed; it does not erase the whole-run failures.
+
+
+S2-T39B-BUILD2 targeted final-code guard result:
+`uv run --locked python -m pytest scripts/tests/test_pychecks_config.py
+scripts/tests/test_pychecks_mypy.py -q` exited 0, 11 passed in 43.03s.
+This run follows the two recorded type fixes, uses the prescribed local offline
+environment, and does not replace the failed whole-run guard row.
+
+
+S2-T39B-BUILD2 integrated run, continued (seed `2948716035`):
+`python-custodian-1` reports 4594 passed / 0 failed / 0 skipped;
+`python-custodian-2` reports 3766 / 0 / 0; `python-product` reports 786 / 0 / 0.
+The web counting reporter is incomplete (no end marker) and currently contains
+820 pass records and 1 fail record, `real shell starts` in
+`web/scripts/tests/check-dev-server.node-test.mjs`. These are partial counts,
+not a completed suite verdict. No web code or timeout was changed, no cause is
+asserted and no rerun was used to close this failure. Whole-command completion
+and web-unit results remain pending.
+
+
+S2-T39B-BUILD2 whole-run completion (same command, no whole-run retry):
+`./eii test --seed 2948716035` exited 1; RESULT: FAILED.
+Runner total: 11690 passed, 13 failed, 0 skipped in 7 suites, 2 with problems.
+Suite rows (passed / failed / skipped): python-guards 934 / 12 / 0;
+python-core 749 / 0 / 0; python-custodian-1 4594 / 0 / 0;
+python-custodian-2 3766 / 0 / 0; python-product 786 / 0 / 0;
+web-checks 860 / 1 / 0; web-unit 1 / 0 / 0. The guard suite's separate pytest
+tail (935 passed, 5 failed, 7 errors in 311.64s), its count discrepancy, the
+intermediate-code type failures and nested default-cache failures remain as
+recorded above. The passing final-code guard run does not erase them.
+
+Separate web record: the suite completed 861 tests, 860 passed and 1 failed,
+0 cancelled/skipped/todo, in 650451.387202 ms. `real shell starts` in
+`web/scripts/tests/check-dev-server.node-test.mjs` reports
+`FAIL internal-error: TIMEOUT: timed out`, actual exit 1 versus expected 0,
+and duration 1820.88734 ms. This is an internal test timeout, not a suite timeout:
+web-checks completed within the unchanged 1800-second suite limit. The partial
+820-pass/one-fail reporter observation above was incomplete; the complete
+860/1/0 result supersedes it. No web edit, limit change or cause beyond the
+reported failure is claimed. Keep it unresolved for the lead; no green rerun
+alone closes it.
+
+No exact-final-tree whole-run proof is claimed: the run began before the two
+recorded type fixes. Final-code evidence is the 699 focused tests, 11 pychecks
+guard tests, mypy and static/docs/tree checks. TASKS.md retains unchecked AC2
+and names the failed run. `.overnight/RETURN.md` records the complete contract
+mapping, column-name discrepancy, all red/green and pass-only cases, failures,
+proposed OI-178 wording and owning-task handoffs. Strict self-review: REJECT
+for full AC2/merge-ready completion; independent review is not impersonated.
+Muhasabah: PASS for the bounded, explicit and sourced handoff.
+
+
+S2-T39B-BUILD2 final handoff verification:
+`python3 scripts/check_docs.py` exited 0 (1118 text / 119 Markdown files);
+`python3 scripts/check_tree.py` exited 0 (8 rules); `cmp AGENTS.md CLAUDE.md`
+and `git diff --check` exited 0. The read-only `python3 -` audit exited 0,
+proving append-only ledger bytes against HEAD, exact decision-0029 appendix
+rows retained, seed absent before this round, allowed tracked scope, unchanged
+HEAD and empty staging index, agent parity, final full-run failure/exit evidence,
+no private path or contact token in the return, and its required last-line marker.
+Diagnostic log locations were replaced by neutral placeholders within the
+workspace; test identities, recorded exits and counts remain unchanged.
+No implementation file changed after the passing final-code guard run.

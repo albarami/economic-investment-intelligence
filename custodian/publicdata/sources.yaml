@@ -5382,7 +5382,7 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["pub_investqa_record"]
+    release_tables: ["pub_investqa_record", "pub_investqa_page"]
     caveat_keys: []
     columns:
       - name: "record_type"
