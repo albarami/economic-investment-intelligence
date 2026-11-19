@@ -498,7 +498,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Scope: `scripts/run_tests.py`, a pytest plugin and the manifest guard under `scripts/`, the runner's tests, README.md's sentence on the suites, the height fixtures' zip writer and its clock test, decision 0060, open items OI-285 and OI-286 and task evidence.
 - Depends: none.
 - Requirements: decision 0060; TST-15; AGENTS.md rules 12, 36, 37 and 39; ruling L-902 2(b).
-- Delivery: Standard; builder persona senior test-infrastructure engineer; strict reviewer persona strict test-infrastructure reviewer from another maker; status approved (review by Google Gemini 3.1 Pro on dbaebe0); merge waits for the hosted checks of its pull request.
+- Delivery: Standard; builder persona senior test-infrastructure engineer; strict reviewer persona strict test-infrastructure reviewer from another maker; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/89).
 
 ### S2-T24 — BACI registry and free download
 - Goal: Register CEPII BACI as a separate bilateral trade source and free bulk-file alternative.
@@ -536,7 +536,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Scope: The existing source registry, archive and parser contracts; project revisions, independent milestone rows, the announcement/observation boundary, receipts and tests. No new synthetic record, product computation or privacy control.
 - Depends: S2-T12 and S2-T27.
 - Requirements: C28, C30; PUB-01, PUB-04, PUB-07, PUB-10, PUB-16, PUB-86, PUB-87, PUB-88; DAT-142, DAT-143; TST-210, TST-211.
-- Delivery: Standard; reason: the task extends S2-T12's parser and S2-T27's hash archive without a new trust boundary or privacy control. Builder persona: senior public-data engineer; strict reviewer persona: principal data-quality and provenance reviewer from another maker; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/85).
+- Delivery: Standard; reason: the task extends S2-T12's parser and S2-T27's hash archive without a new trust boundary or privacy control. Builder persona: senior public-data engineer; strict reviewer persona: principal data-quality and provenance reviewer from another maker; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/85).
 ### S2-T31 — The source registry is read with the C safe loader (decision 0053)
 - Goal: Remove repeated pure-Python source-registry parsing overhead while preserving safe loading and the suite's regression alarm, under lead ruling L-902.
 - Acceptance criteria: [x] B1: only `read_yaml` changes to `yaml.load(..., Loader=yaml.CSafeLoader)`, with no pure-Python fallback and unchanged `RegistryError("malformed yaml")` for every `yaml.YAMLError`; [x] B2: replace the old text guard with unsafe-tag behaviour, safe-loader-only source scanning (direct calls, plain imports and no module/member aliases), independent planted source fixtures with an approved-call control, locked libyaml availability, committed-input tab/surrogate guards, pinned SafeLoader/read_yaml differences and value parity for both committed reader inputs, each with planted violations and red-first evidence where practical, with no other test changes; [x] B3: record [decision 0053](docs/decisions/0053-the-source-registry-is-read-with-the-c-safe-loader.md), index it and update any document sentence naming the registry's old loader; [x] the custodian suite completes under its 600 s limit with margin.
@@ -572,7 +572,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Scope: method cards in `docs/07_ECONOMIC_METHODS.md` and the recorded source-check evidence.
 - Depends: S2-T08.
 - Requirements: MTH-03.
-- Delivery: hard; personas Methods; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/87).
+- Delivery: hard; personas Methods; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/87).
 ### S2-T27 — The public snapshot archive and the re-fetch schedule.
 - Goal: every public fetch keeps a dated, hash-pinned snapshot that is never overwritten, and each source carries a recorded re-fetch schedule, because publishers overwrite their tables and a series' history cannot be rebuilt later.
 - Scope: the fetch layer of `./eii build-public` (custodian/src/eii_custodian/publicdata/fetch/ and the shared helpers of S2-T25), the source registry rows, the receipts, the release build's reading of a pinned snapshot, documents 03, 04 and 12. Extend what exists (receipts, registry, the monthly register snapshots of document 04's register rows); never a parallel store.
@@ -742,14 +742,14 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: `custodian/data_tests/` and its notes; no committed value.
 - Depends: S2-T22.
 - Requirements: PUB-71; decision 0026 item 5; decision 0034; AGENTS.md rules 13, 14, 36, 37 and 44.
-- Delivery: routine; personas Data; status queued.
+- Delivery: routine; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), offline mechanisms approved at c288163 and joined through 23ca06f; the lead's real-cache proof done at c288163 (baseline, wrong-value and restoration steps); the five findings of set B stay outstanding as recorded in custodian/data_tests/README.md; no full-task or slice-gate completion is claimed.
 ### S2-T36 — The financial centre's company register
 - Goal: Register and read the financial centre's public company register through the normal seam of `./eii build-public`, and give its company names to the collision check ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 5).
 - Acceptance criteria: [ ] the register has a registry row with its publisher, page, retrieval date and hash, and the publisher's terms in its own words with the date read and the basis of use, kept as a record and never a gate (decision 0059); [ ] `./eii build-public` fetches it with its receipt, its host added to the allow-list by a reviewed registry change, and no host outside the allow-list is contacted; where it refuses automated reading, S2-T29's route is tried and the failure recorded with its date; [ ] its company names enter the complete inventory of real names that S2-T15 built and S4-T05 calls, hidden duplicates included, with a planted label that collides only with one of them; [ ] the parser is tested only on small hand-made files of the source's shape, and nothing fetched is committed.
 - Scope: the register's fetcher and parser under `custodian/publicdata/`, its registry row, its entry in the inventory of real names, fixtures and tests.
 - Depends: S2-T01, S2-T15, S2-T27.
 - Requirements: PUB-01, PUB-03, PUB-04, DAT-14, SYN-20; AGENTS.md rules 5, 8, 9 and 19.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), offline mechanisms joined through 9ec9f4a from local 6197c61; both review lenses approved at 6197c61; live activation and source confirmation remain open.
 ### S2-T37 — The newest dated release of the places copy at each refresh
 - Goal: Read the newest dated release of the public copy of `places_fsq` at each refresh, on the S2-T15 path, with the release date recorded and shown ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 14, amending decision 0019 item 21's fixed release).
 - Acceptance criteria: [ ] at each refresh the newest dated release of the copy is found through the dataset's own metadata and fetched without an account from the host already on the allow-list; [ ] the release date used is recorded in the registry and carried on every eligible place, so that S3-T12 shows it beside the places; [ ] each earlier release stays as its own dated snapshot (S2-T27), and a planted overwrite is refused; [ ] the de-duplication against `pub_place`, the reviewed category mapping and the inventory of real names of S2-T15 run on each new release, with a planted unmapped category refused; [ ] PUB-102 and the source row of `places_fsq` in document 04 state the newest-release rule; [ ] tests use only small hand-made files, and nothing fetched is committed.
@@ -763,14 +763,14 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: the `pop_muni` reader, document 03's contract of the table, fixtures and tests.
 - Depends: S2-T02.
 - Requirements: PUB-12, PUB-83; AGENTS.md rules 7, 10, 12 and 19.
-- Delivery: hard; personas Data and Privacy; status queued.
+- Delivery: hard; personas Data and Privacy; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), approved locally at 68ab302 and joined as 7b865bc; OI-170 retains the S5 attack-model decision; joined-head, hosted and exact merge-result evidence remain the lead's gates.
 ### S2-T39 — The investment sources in full
 - Goal: Read the agency's Arabic pages, add the full-page column once decision record 0029 settles it, and fill the FDI project-to-area crosswalk by lead review ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 32).
 - Acceptance criteria: [ ] the agency's Arabic pages are listed and read through the normal seam, each quoted in full and unchanged with the date read, so that each language shows the agency's own text (rule 21; OI-181); [ ] the full-page column enters the release only once decision record 0029 is accepted, and document 03 section 7.3's column list is written once from it (OI-178); [ ] the crosswalks that fill `source_country_iso3`, `municipality_code` and `place_key` of `fdi_projects` are committed after the lead's review, with no name matching and no value edited by hand, a planted key derived by name matching refused (OI-182); [ ] the parsers are tested only on synthetic pages of the same shape, and nothing fetched is committed.
 - Scope: the investment-source parsers under `custodian/publicdata/`, the reviewed crosswalk files, document 03 section 7.3 for the investment tables, and tests.
 - Depends: S2-T12, S2-T27.
 - Requirements: PUB-86, PUB-87, PUB-88, PLN-25, DAT-142, DAT-143.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status in review for part A (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), approved locally at 8da4e4e and joined through 55889ab; live Arabic inventory, reviewed real crosswalk entries and part B release/quotation delivery remain open; decision 0029 is accepted but is not implemented by this part.
 ### S2-T41 — Optional offline satellite backup cache from CDSE
 
 - Goal: collect the owner's optional free backup as a receipted, unread cache, off by default, with no effect on any other task or numerical output (L-1069 and L-1078 item 4).
@@ -778,7 +778,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: registry/source metadata, narrow transport and tooling environment reader, receipt/snapshot integration, credential inventories and tests, product-isolation tests and the pack passages named in D0066. The lead's wrapper and proof call are separate lead operations outside the task.
 - Depends: S2-T01, S2-T02, S2-T27. Reuse S2-T19's dated-imagery conventions where applicable without adding a dependency to that task. Display ownership is unresolved; no assignment to S3-T16 or S3-T23.
 - Requirements: document 04 PUB-01, PUB-03, PUB-04, PUB-10, PUB-11, PUB-12, PUB-19 and PUB-110; document 02 ARC-13, ARC-96 and ARC-98; document 13 OPS-07, OPS-08, OPS-65 and OPS-71; AGENTS.md rules 5, 11, 14, 16–23 and 33–39.
-- Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/97).
+- Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/97).
 
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
