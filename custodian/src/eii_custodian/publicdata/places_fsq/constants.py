@@ -1,9 +1,9 @@
-"""Pinned copy, attribution and the distances the pack states."""
+"""Anonymous copy, attribution and the distances the pack states."""
 
 from __future__ import annotations
 
-PINNED_RELEASE = "2025-01-10"
-RELEASE_KEY = "places_fsq/copy-2025-01-10"
+RELEASE_POLICY = "newest_dated_at_each_refresh"
+RELEASE_KEY = "places_fsq/copy"
 PLACEHOLDER_KEY = "places_fsq"
 COPY_ROOT = "https://data.source.coop/fused/fsq-os-places/"
 METHOD = "places_fsq.v1"

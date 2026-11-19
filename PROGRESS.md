@@ -39049,3 +39049,35 @@ Final artifact-scan correction: an inline report/path audit exited 1 because its
 - `final-audit-corrected`: `python3 .overnight/tmp/final_audit.py`; exit `0`; checked 8 final artifact assertions: OK; evidence `.overnight/tmp/final-audit-corrected.log`.
 
 Records correction (lead, 2026-11-19 17:55): the pull request of this ledger is number 101; number 100 went to the documents pull request of decision 0068 before this one opened. The four references above that the ledger wrote as `pull/100` before the pull request existed are corrected to `pull/101` in this same records commit; no evidence row changed.
+
+## S2-T37 — Newest dated places release at each refresh
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-18 | S2-T37 working tree over `84080e265926b3367a864d239e6d9bc60f654884`; newest anonymous release discovery, release-scoped receipts and manifests, retained dated snapshots, actual-date propagation, complete category mapping and all decision-0064-item-14 document passages. Git read-only; lead commits. | Builder evidence below and `.overnight/RETURN.md`. No TASKS.md criterion or status changed; decisions 0019, 0040 and 0064 unchanged. No network, live fetch, dependency installation or whole-module mutation campaign. Supplied locked environment on Linux/WSL; all test `TMPDIR` values were the workspace `.overnight/tmp`. | Moonshot AI Kimi K3.1 Pro, senior data-platform engineer. Strict reviewer persona: independent provenance and data-quality reviewer from another maker; no verdict claimed. Skills: project-orientation, task-standards, test-driven-development, verification-before-completion, sanad-provenance and muhasabah-gate. |
+
+### Builder red/green and break evidence
+
+- Initial `test_places_fsq_releases.py`: exit 2 because `releases.py` was absent; a later implementation run had 11 failures from incorrect `Tree.find` use. After correction the same suite passed 18 tests; its final expanded form passed 22. The existing FSQ migration selection first had 30 failures, then 1 failed and 129 passed on an outdated request-count assertion. The final broad FSQ/gate/snapshot selection exited 0 with 301 passed, zero failed and zero skipped.
+- Forced gate change: `custodian/tests/test_gate_records.py custodian/tests/test_gate_records_survivors.py` first exited 1 with 5 failed and 43 passed because the old `fsq_evidence` accepted three arguments; after the authorised four-argument actual-release evidence change, exit 0 with 48 passed.
+- Second display release: `test_further_source_duplicate_is_not_shown_and_the_release_is_carried` exited 1 while the fixture still carried the former fixed date, then exited 0 with 1 passed using invented `2032-04-05`. The original two-refresh integration passed after release-scoped storage already existed, so no separate production red-first claim is made for it. Its expanded final form exited 0 with 1 passed and builds both pinned releases with mapped categories, hidden duplicate exclusion and hidden-name refusal.
+- Planted discovery, sign-in, foreign/off-root, wrong-release, malformed-date, unmapped/partial-category, hidden-duplicate/name, occupied/tampered-snapshot and former-document-wording guards all have safe controls in the final focused selection. `test_snapshot_refuses_existing_occupant` and `test_snapshot_path_and_no_clobber` exited 0 together, 2 passed. The document regression ran red on the former fixed wording and is green in the final release suite.
+- PLN-27: a temporary one-change runner restored original bytes after each break. 41 breaks covering release selection, fetch propagation, assembly, mapping/policy, gate evidence and document text were run only against their covering files/tests; all 41 were killed with the expected test exit 1, runner exit 0, zero survivors and zero unapplied mutations. The temporary runner and result file were removed after the evidence was recorded. Details are in `.overnight/RETURN.md`.
+
+### Builder static and focused checks
+
+| Command | Exit | Result |
+|---|---:|---|
+| `uv run --locked ruff check .` | 0 | All checks passed. |
+| `uv run --locked ruff format --check .` | 0 | 735 files already formatted. |
+| `uv run --locked mypy` | 0 | No issues in 408 source files. |
+| `python3 scripts/check_docs.py` | 0 | 1021 text files, 112 Markdown files: OK. |
+| `python3 scripts/check_tree.py` | 0 | 8 rules: OK. |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical. |
+| `git diff --check` | 0 | No whitespace errors. |
+
+### Full seeded repository run
+
+- 2026-11-19: `./eii test --seed 3764211809` exited 1. Final runner total: **10656 passed, 8 failed, 0 skipped in 7 suites, 2 with problems**. Per suite: `python-guards` 890 passed, 7 failed; `python-core` 739 passed; `python-custodian-1` 4155 passed, 1 failed; `python-custodian-2` 3224 passed; `python-product` 786 passed; `web-checks` 861 passed; `web-unit` 1 passed. No suite reported a skip and no FSQ test failed.
+- The seven guard failures were setup errors in the shared `CleanEnvironment` class before test assertions: `seed_cache` could not copy the absent pre-existing `uv` cache. No cache was installed or read to clear them and no retry was made. The other failure was `custodian/tests/test_investment_evidence_survivors_8.py::test_unstable_caller_key_never_invents_identifier_text[project_key-3-expected_first4-absence4]`, outside this task's changed files. It was not retried, suppressed or cleared. Both remain proposed lead-owned open items in `.overnight/RETURN.md`.
+- The final focused FSQ/gate/snapshot selection was rerun after these unrelated failures and again exited 0 with 301 passed, zero failed and zero skipped. Ruff check, Ruff format check, mypy, documentation, tree, agent-file parity and diff checks remained exit 0. The repository-wide run is therefore recorded as failed, not green.

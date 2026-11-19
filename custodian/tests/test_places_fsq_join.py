@@ -47,7 +47,7 @@ def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
         (skipped, _entry()), transport, tmp_path / "joined", _clock, _sleep
     )
     assert joined.failure is None
-    assert joined.lines[0] == "SKIP places_fsq/copy-2025-01-10 SYN-disabled"
+    assert joined.lines[0] == "SKIP places_fsq/copy SYN-disabled"
     assert joined.lines[1:] == baseline.lines
     assert events == ["investment", "series", "regression"]
 

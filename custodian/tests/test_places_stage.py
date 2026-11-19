@@ -47,9 +47,9 @@ from eii_custodian.publicdata.places.stage import (
     run_places_stage,
     validate_recorded_decision,
 )
-from eii_custodian.publicdata.places_fsq.constants import PINNED_RELEASE
 from eii_custodian.publicdata.places_fsq.parse import ParsedRow
 
+_RELEASE = "2025-01-10"
 _FRAME = (50.7, 24.4, 51.7, 26.2)
 _BUILD = date(2026, 11, 15)
 _LINK = "https://example.invalid/syn"
@@ -447,7 +447,7 @@ def _config(
         places_receipt=receipt_for(places, "places_ovt"),
         build_date=_BUILD,
         fsq_rows=rows,
-        fsq_release=PINNED_RELEASE if fsq else "",
+        fsq_release=_RELEASE if fsq else "",
         fsq_licence="SYN-FSQ-LICENCE" if fsq else "",
         buildings_paths=paths,
         buildings_receipts=receipts,

@@ -622,7 +622,7 @@ Open points from [decision 0019](decisions/0019-forecasts-estimates-scenarios-an
 
 - OPEN: the Public source of each series of the owner's list (decision 0019 item 2) for which the public data pack holds no table yet; such a series is not on the list of method card C30 until a table exists, and a question about it is answered as a series not on the list.
 - ASSUMPTION (S2-T17, OI-102): the subject of Public property prices by district, including C41, and the district count of AI-137 is `district`, with the Public-only rule above, pending owner confirmation.
-- OI-96, closed: the newest release of the public copy of the third places source (`places_fsq`) is dated 2025-01-10, and the owner decided on 2026-11-12 that it is used for version 1 as it is: no account is opened and no newer release is fetched for now. Where a place of the copy disagrees with OpenStreetMap or Overture, which are current, the newer source wins. The places are shown with the release date (decision 0019 item 21).
+- OI-96, settled by decision 0064 item 14: each refresh selects the newest dated release of the public copy of the third places source (`places_fsq`) without an account, records its actual date in runtime registry evidence and shows it beside the places, and retains every earlier dated snapshot. Where a place of the copy disagrees with OpenStreetMap or Overture, which are current, the newer source wins.
 - The tools and arguments of the new families are fixed in [08 Backend](08_BACKEND.md); this document names the families, their subjects, classes and caveat keys, whose fixed sentences are in [11 Design direction](11_DESIGN_DIRECTION.md).
 
 Open points from [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md):

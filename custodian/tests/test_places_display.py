@@ -40,11 +40,11 @@ from eii_custodian.publicdata.places.display import (
 from eii_custodian.publicdata.places.review import Verification
 from eii_custodian.publicdata.places_fsq.constants import (
     DUPLICATE_WITHIN_M,
-    PINNED_RELEASE,
 )
 from eii_custodian.publicdata.places_fsq.parse import ParsedRow
 from eii_custodian.publicdata.places_fsq.policy import distance_m, duplicate_links
 
+_RELEASE = "2032-04-05"
 _LICENCE = "SYN-LICENCE"
 _ATTR = (("syn-source", _LICENCE),)
 _BOX = box(51.4, 25.2, 51.6, 25.4)
@@ -224,11 +224,12 @@ def test_further_source_duplicate_is_not_shown_and_the_release_is_carried(
         attribution=_ATTR,
         places_receipt=receipt_for(path),
         fsq_rows=rows,
-        fsq_release=PINNED_RELEASE,
+        fsq_release=_RELEASE,
         fsq_licence=_LICENCE,
     )
     assert [point.fsq_place_id for point in result.fsq_shown] == ["SYN-FSQ-NEW"]
-    assert result.fsq_shown[0].source_release == PINNED_RELEASE
+    assert result.fsq_shown[0].source_release == "2032-04-05"
+    assert result.fsq_shown[0].source_release == _RELEASE
     assert result.fsq_shown[0].licence == _LICENCE
     assert result.fsq_shown[0].caveat_key == result.caveat.key
     assert "fsq_duplicate_not_shown: 1" in result.report
@@ -252,7 +253,7 @@ def test_further_source_without_a_licence_is_refused(tmp_path: Path) -> None:
             attribution=_ATTR,
             places_receipt=receipt_for(path),
             fsq_rows=rows,
-            fsq_release=PINNED_RELEASE,
+            fsq_release=_RELEASE,
         )
     with pytest.raises(PlacesError, match="fsq_licence_missing"):
         build_places(
@@ -263,7 +264,7 @@ def test_further_source_without_a_licence_is_refused(tmp_path: Path) -> None:
             attribution=_ATTR,
             places_receipt=receipt_for(path),
             fsq_rows=rows,
-            fsq_release=PINNED_RELEASE,
+            fsq_release=_RELEASE,
             fsq_licence="   ",
         )
 
@@ -297,7 +298,7 @@ def test_complete_needs_a_real_area_and_the_further_release(tmp_path: Path) -> N
                 "SYN-FSQ-NEW", "SYN Other", Decimal("51.510000"), Decimal("25.310000")
             ),
         ),
-        fsq_release=PINNED_RELEASE,
+        fsq_release=_RELEASE,
         fsq_licence=_LICENCE,
     )
     assert result.complete is True
@@ -529,7 +530,7 @@ def test_further_source_outside_a_bent_boundary_is_absent(tmp_path: Path) -> Non
                 "SYN-FSQ-OUT", "SYN Other", Decimal("51.550000"), Decimal("25.350000")
             ),
         ),
-        fsq_release=PINNED_RELEASE,
+        fsq_release=_RELEASE,
         fsq_licence=_LICENCE,
     )
     assert result.fsq_shown == ()

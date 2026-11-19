@@ -1,7 +1,7 @@
-"""Fetch the pinned release through the existing transport seam.
+"""Discover and fetch the newest dated release through the transport seam.
 
-One receipt is written for each file that the metadata selects. A summary
-that names no file for the frame writes nothing and asks for no data file.
+The listing, metadata and every selected file receive their own receipts. A
+summary that names no file for the frame writes nothing and asks for no data.
 """
 
 from __future__ import annotations
@@ -29,10 +29,10 @@ from eii_custodian.publicdata.places_fsq.constants import (
     COPYRIGHT_LINE,
     LICENCE_NAME,
     METHOD,
-    PINNED_RELEASE,
     RELEASE_KEY,
 )
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
+from eii_custodian.publicdata.places_fsq.releases import select_release
 from eii_custodian.publicdata.places_fsq.select import (
     FRAME_BOX,
     coordinate_bounds,
@@ -75,19 +75,32 @@ def fetch_release(
     clock: Clock,
     sleep: Sleeper,
 ) -> tuple[ReleaseFetch | None, ReleaseFailure | None]:
-    """Fetch the metadata, the selected files and the licence text."""
+    """Discover the newest release, then fetch its metadata, data and licence."""
     del sleep
     blocked = _blocked(entry)
     if blocked is not None:
         return None, blocked
-    metadata, failure = _get(entry, transport, entry.url)
+    listing, failure = _get(entry, transport, entry.url)
+    if failure is not None or listing is None:
+        return None, failure
+    refusal = _body_refusal(listing.body, listing.final_url, metadata=True)
+    if refusal is not None and refusal.check == "sign_in_demand":
+        return None, refusal
+    try:
+        release = select_release(listing.body)
+    except PlacesFsqError as exc:
+        return None, ReleaseFailure(
+            1, listing.final_url, exc.reason, "newest dated release", "none"
+        )
+    metadata_url = f"{COPY_ROOT}{release}/places/_metadata"
+    metadata, failure = _get(entry, transport, metadata_url)
     if failure is not None or metadata is None:
         return None, failure
     refusal = _body_refusal(metadata.body, metadata.final_url, metadata=True)
     if refusal is not None:
         return None, refusal
     try:
-        selected = select_partitions(metadata.body, PINNED_RELEASE, FRAME_BOX)
+        selected = select_partitions(metadata.body, release, FRAME_BOX)
     except PlacesFsqError as exc:
         return None, ReleaseFailure(
             1, metadata.final_url, exc.reason, "files for the frame", "none"
@@ -107,7 +120,7 @@ def fetch_release(
         terms_url = terms.final_url
     stored: list[tuple[str, bytes, str]] = []
     for name in selected.files:
-        url = _data_url(name)
+        url = _data_url(name, release)
         decision = approve(url)
         if not decision.ok:
             return None, ReleaseFailure(
@@ -144,6 +157,9 @@ def fetch_release(
         retrieved,
         host_of(metadata.final_url),
         licence_pending,
+        release=release,
+        listing=(listing.body, listing.final_url),
+        metadata_url=metadata.final_url,
     )
     return ReleaseFetch(digest, host_of(metadata.final_url)), None
 
@@ -210,9 +226,9 @@ def _licence_pending(body: bytes) -> bool:
     return LICENCE_NAME not in text or COPYRIGHT_LINE not in text
 
 
-def _data_url(file_path: str) -> str:
+def _data_url(file_path: str, release: str) -> str:
     name = file_path.rsplit("/", 1)[-1]
-    return f"{COPY_ROOT}{PINNED_RELEASE}/places/{name}"
+    return f"{COPY_ROOT}{release}/places/{name}"
 
 
 def _store(
@@ -225,8 +241,30 @@ def _store(
     retrieved: str,
     host: str,
     licence_pending: bool = False,
+    *,
+    release: str,
+    listing: tuple[bytes, str],
+    metadata_url: str,
 ) -> str:
-    directory = cache_directory(cache, entry.key)
+    directory = cache_directory(cache, entry.key) / release
+    listing_body, listing_url = listing
+    listing_digest = sha256_hex(listing_body)
+    commit_pair(
+        directory / "listings",
+        listing_digest,
+        "html",
+        listing_body,
+        _sidecar(
+            entry,
+            listing_digest,
+            listing_body,
+            listing_url,
+            host_of(listing_url),
+            retrieved,
+            terms,
+            release=release,
+        ),
+    )
     meta_digest = sha256_hex(metadata)
     file_rows: list[dict[str, object]] = []
     commit_pair(
@@ -234,7 +272,16 @@ def _store(
         meta_digest,
         "parquet",
         metadata,
-        _sidecar(entry, meta_digest, metadata, entry.url, host, retrieved, terms),
+        _sidecar(
+            entry,
+            meta_digest,
+            metadata,
+            metadata_url,
+            host,
+            retrieved,
+            terms,
+            release=release,
+        ),
     )
     for name, body, url in files:
         digest = sha256_hex(body)
@@ -243,16 +290,26 @@ def _store(
             digest,
             "parquet",
             body,
-            _sidecar(entry, digest, body, url, host_of(url), retrieved, terms),
+            _sidecar(
+                entry,
+                digest,
+                body,
+                url,
+                host_of(url),
+                retrieved,
+                terms,
+                release=release,
+            ),
         )
         file_rows.append({"name": name, "sha256": digest, "bytes": len(body)})
     terms_digest = terms_text_sha256(terms) if terms else ""
     manifest = {
         "attribution": ATTRIBUTION,
         "files": file_rows,
+        "listing_sha256": listing_digest,
         "metadata_sha256": meta_digest,
         "method": METHOD,
-        "release": PINNED_RELEASE,
+        "release": release,
         "retrieved_utc": retrieved,
         "terms_sha256": terms_digest or None,
         "terms_url": terms_url or None,
@@ -270,7 +327,16 @@ def _store(
         digest,
         "json",
         payload,
-        _sidecar(entry, digest, payload, entry.url, host, retrieved, terms),
+        _sidecar(
+            entry,
+            digest,
+            payload,
+            metadata_url,
+            host,
+            retrieved,
+            terms,
+            release=release,
+        ),
     )
     final = directory / "manifest.json"
     partial = directory / ".manifest.json.partial"
@@ -291,6 +357,8 @@ def _sidecar(
     host: str,
     retrieved: str,
     terms: bytes,
+    *,
+    release: str,
 ) -> dict[str, object]:
     return sidecar_for(
         entry,
@@ -300,7 +368,8 @@ def _sidecar(
         fetch_host=host,
         retrieved_utc=retrieved,
         publisher=entry.publisher,
-        source_modified=PINNED_RELEASE,
+        source_modified=release,
         row_count=None,
         terms_sha256=terms_text_sha256(terms) if terms else "",
+        observed_periods=(release, release),
     )
