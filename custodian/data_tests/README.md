@@ -1,0 +1,135 @@
+# Lead-only restricted findings (S2-T35)
+
+Only the lead's own shell runs the real-cache command from the repository root:
+
+```sh
+uv run --locked python -m pytest custodian/data_tests -q -p no:cacheprovider
+```
+
+Neither the whole test command, a gate nor CI selects this folder. Ordinary
+tests in `custodian/tests/test_restricted_expectation_guards.py` use invented
+temporary caches only. There is no environment, CLI or configuration redirect
+of `cache.CACHE`. The lead uses `data/public_cache/`; no agent reads that cache.
+No fetching takes place here. Keep pytest's default traceback and short summary;
+never enable locals. Safe failures contain a fixed case ID and reason only.
+
+## Inventory and preparation
+
+`restricted_cases.CASES` is the metadata-only inventory, version `S2-T35-v1`.
+Its anchors reconcile S2-T22's task log, OI-195, OI-276, PUB-71 and document 04
+section 2.2's locally retained counts. Decision 0034 item 3's standing places
+are excluded. The removed district alias is a name rather than a numeric
+finding; the existing alias guard remains responsible for it. No source record,
+source name, expected value or expected-record digest belongs in this folder.
+Another maker must check completeness before the lead supplies expectations.
+
+PUB-71 replays both sector and occupation snapshots with `read_cached`,
+`layer_rows` and `check_employment`, then `coverage_share` and `rounded`.
+It checks raw national inputs and national/zone results using the existing
+precisions and exact equality of the stage record. Source-count cases replay
+`layer_rows` and count validated rows. Census counts use the source's own
+geography. No tabulated count is apportioned to a drawn area.
+
+The committed GIS pointer identifies services, but not the removed numeric
+finding kinds. The evidence file it cites is not supplied in this workspace.
+H2's exact period, hour predicate, denominator, weighting and selected partition
+binding are likewise not recoverable from the supplied committed records.
+Those cases stay outstanding. `read_gis` already reads verified snapshot bytes,
+checks the same receipt identities as `read_cached`, then calls `_parse_body`.
+`boundary_finding_counts` and `h2_hour_counts` have invented-input tests; they do
+not assert a recovered real recipe. H2 cannot become ready until its recipe
+and partition-to-assembled-snapshot binding are confirmed and implemented.
+The municipality polygon count also awaits a confirmed replay recipe; its
+file is not silently treated as a census-map envelope.
+
+The lead prepares these **uncommitted** files by independent inspection of
+the selected source snapshots, never from output of the replay code under test:
+
+- `data/public_cache/method_pins.json`: existing source-key to SHA-256 map.
+- `data/public_cache/local_expectations/PUB-71.json`: the existing object with
+  exactly the five keys in `stage._LOCAL_FIELDS['PUB-71']`, each decimal text.
+  Its shape is unchanged.
+- `data/public_cache/local_expectations/restricted_cases.json`: an object with
+  exactly `version` (`restricted.v1`) and `cases` (case ID to record).
+
+Every ready case needs a record. Each record has exactly `method`, `version`,
+`period`, `geography`, `units`, `expectation_origin`, `source_shas`,
+`record_sha256`, `precision` and `tolerance`. All except the origin, hashes and
+expected values are fixed by the committed inventory and `precision(case)`.
+The origin must be nonempty and name an independent worksheet or reading.
+`source_shas` holds exactly the case's sources and agrees with `method_pins.json`
+and the selected receipts. `record_sha256` is SHA-256 of `canonical(expected)`:
+UTF-8 JSON with sorted keys, no separator whitespace and `ensure_ascii=False`.
+Keep every such digest local, including evidence of the lead's plant.
+
+For PUB-71, `expected` is the object in its separate existing file. For other
+ready cases, add exactly one further record key, `expected`, holding only
+`rows` as decimal text. `precision` has the same field set, using integer zero
+for raw counts and zone results, integer one for `national_1dp`. `tolerance`
+has the same fields, all decimal text zero: nothing loosens stage equality.
+Unknown IDs/fields, malformed or nonfinite decimal text, duplicate JSON keys,
+wrong versions/pins/checksums, and symlink/path escapes are refused by name.
+Missing files or case records fail as `<case_id>:missing_record`.
+
+`CaseLineage` validates lead-test evidence only. Publisher, dataset title, URL
+and retrieval date come from the receipt; method/version come from the case;
+the digest equals the selected receipt and pin. Licence ID/basis agree literally
+with the registry, including a genuinely empty ID. A release table is present
+only if listed by the registry. PUB-71 also builds a strict `SourceChain` for
+`pub_census_zone`. A GIS lineage with no table/licence is never converted into
+a fabricated release fact. Release chain validation is unchanged.
+
+## Outstanding set B and lead's wrong-value proof
+
+**Reporting blocker found during the build:** in the pinned pytest, the required
+`pytest.fail(..., pytrace=False)` prints the case/reason in the failure body but
+omits it from the default `FAILED` short-summary line. The two actual-child
+summary assertions in `test_restricted_wrong_value_and_safe_output` and
+`test_restricted_outstanding_subprocess` reproduce this and currently fail.
+`summary_reasons` correctly refuses the unparsed line. A lead ruling must settle
+how the default summary carries the fixed label before the proof below can be
+completed. No runner, marker, traceback rule or proof accounting was changed
+to conceal this conflict; the synthetic summary fixtures alone do not prove it.
+
+Before running, derive B with `restricted_cases.outstanding()` from the
+reviewer-checked inventory and record it in the ledger. The current full set is:
+
+- `C12-MTH-46:awaiting_routine` (S6-T13).
+- `H2:awaiting_expectation` (S2-T35 recipe/partition confirmation).
+- `GIS-ZONES:awaiting_expectation` (S2-T35 finding confirmation).
+- `GIS-MUNICIPALITIES:awaiting_expectation` (S2-T35 finding confirmation).
+- `GIS-DISTRICTS:awaiting_expectation` (S2-T35 finding confirmation).
+- `COUNT-bnd_muni_2025:awaiting_expectation` (S2-T35 replay confirmation).
+
+Each is a failing parametrized test, never a pass, skip or xfail. C12's acceptance
+remains unticked until S6-T13 supplies the routine. The command intentionally
+exits one while B is nonempty. An exit code alone proves no plant.
+
+1. Supply all ready records independently. Run the exact command above and
+   capture its exit and default short summary. Require exit one and reasons
+   exactly B. Any extra reason, including `missing_record`, is a failed proof.
+2. Save the original local companion and selected ready expectation bytes.
+   Record their file SHA-256s and the selected record's canonical checksum
+   locally. Change one expected field **in place**, recompute the record
+   checksum, and rerun the same command. Require exactly B plus
+   `<planted case>:expectation_mismatch` and exit one.
+3. Restore original bytes in a `finally` block even if a check fails. Prove both
+   file hashes and the case-record checksum restored. Run once more; require
+   exactly B and exit one. No redirect, refreshed baseline or retry.
+
+Count **every** `FAILED` and `ERROR` short-summary line. An unparsed line is an
+unexpected reason and fails the proof. The final failed count must match the
+number of parsed lines; no skipped, xfailed or error count is allowed.
+`local_expectations.summary_reasons(text, exit_code)` validates this accounting
+without launching a run; separately compare its returned set with B or the
+planted union. Record every exit, count and reason set in the lead's ledger.
+Use only IDs/reasons in committed evidence; local values and their digests stay
+local. The builder's invented subprocess proof does not replace this lead run.
+
+## Coverage limit
+
+Comparators, parsers and counters here are outside the mutation runner's module
+roots. Mutation coverage is **not measured**, not a pass; the task ledger and
+proposed open item carry that limitation. No campaign or new mutation gate is
+introduced (decision 0055). Existing regression assertions, cache helpers,
+commit/alias guards, runner selections and privacy/security controls stay intact.
