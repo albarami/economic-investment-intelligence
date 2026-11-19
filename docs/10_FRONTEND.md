@@ -34,7 +34,7 @@ Method honesty stays: intervals and backtests, measured errors, rank stability a
 - Brief sentences are application-owned bilingual claim templates filled with Fact chips. The assistant selects structured claim and component keys; no model-written prose reaches the screen.
 - Forecasts of listed series (Public series, and the released monthly statistics of the custodian-type feeds, which carry the Synthetic class), base rates, the site estimate and the user's scenarios are outputs of tested code ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md)). A forecast shows its interval and its measured backtest error, a base rate its counts and period, an estimate its low, middle and high cases and its main drivers, with no visible origin label (decision 0035 items 1 and 6), and a scenario every assumption, editable and never called a forecast. The browser draws what it receives. Nothing forecasts the success of a venture.
 - Decision 0035 keeps provenance in the backend and removes origin words and textures from every audience surface. Estimate ranges, reliability, suppression, source access and Public reference years remain.
-- Arabic mirrors the chrome and reading order, not the map, charts, numerals or the dial. Digits are Western in both languages.
+- Arabic mirrors the chrome and reading order, not the map, charts, numerals or the dial. Digits are Western in both languages, except inside a verbatim quotation of decision 0029, which keeps the publisher's own digits.
 - Visual tokens, motion, typography sizes and the storyboard are owned by [11 Design direction](11_DESIGN_DIRECTION.md). This document links to them and does not restate them.
 
 ## 1. Scope and boundaries
@@ -512,7 +512,7 @@ Each view is a layout of a brief from the closed component catalogue of [09](09_
 
 ## 5. The Fact chip rule
 
-**Rule.** No numeral may be rendered anywhere in the interface except by the Fact chip family in `web/src/facts/`. A "numeral" is any character of Unicode category Nd: Western digits, Arabic-Indic digits and Extended Arabic-Indic digits all count.
+**Rule.** No numeral may be rendered anywhere in the interface except by the Fact chip family in `web/src/facts/`. A "numeral" is any character of Unicode category Nd: Western digits, Arabic-Indic digits and Extended Arabic-Indic digits all count. The one exception is `verbatim-quotation` of decision 0029: a character of the stored `pub_investqa_page.page_text`, rendered as one opaque run inside the body element of the `source_quotation` component.
 
 The family has four variants, all one component:
 
@@ -684,7 +684,7 @@ Keys are physical: the clicker's next key and the Right arrow key always mean "n
 | ID | Requirement | Slice |
 |---|---|---|
 | FE-61 | Switching language changes `lang` and `dir`, mirrors the items in the left column of section 8 and none in the right column; visual tests in both languages confirm it. | slice S3 |
-| FE-62 | Every number in both languages uses Western digits; a test scans the rendered Arabic page for Arabic-Indic and Extended Arabic-Indic digits and finds none. | slice S3 |
+| FE-62 | Every number in both languages uses Western digits, except a character of a verbatim quotation of decision 0029; a test scans the rendered Arabic page, outside the body element of every `source_quotation` component, for Arabic-Indic and Extended Arabic-Indic digits and finds none. | slice S3 |
 | FE-63 | For one brief, the set of `fact_id` values and their displayed digit strings are identical in English and Arabic. | slice S6 |
 | FE-64 | Every Fact chip and every API-supplied name is bidirectionally isolated; the five mixed-direction cases of section 8 match reviewed screenshots. | slice S3 |
 | FE-65 | Component styles use logical properties only; the style check passes. | slice S3 |
@@ -806,7 +806,7 @@ Every interface task uses `frontend-design-pro`; every chart task uses `dataviz`
 
 **Automated provenance audit** (`tests/audit/`, Playwright). On every route, every story step and every case-story step, in both languages and at the wall and tablet viewports, the audit:
 
-1. walks all visible text nodes and fails on any numeral not inside a Fact chip element;
+1. walks all visible text nodes and fails on any numeral not inside a Fact chip element, except inside the body element of a `source_quotation` component whose text equals, character for character, the stored `page_text` of the row it names (decision 0029);
 2. for `value` and `compact` chips, verifies backend provenance and absence of visible origin labels (decision 0035), resolves `fact_id` to a fact in the registry with `provenance`, `input_classes`, `lineage_ref` and `release_id` present, and refuses any incomplete source chain; for raw `input` chips, checks the "Your inputs" treatment and the typed control value or selected preset without requiring a registry `fact_id` or provenance class; for `reference` chips, checks each against the originating API identifier, code, time-control key or retrieval date and its allowed variant schema without requiring a `fact_id` or provenance mark (TST-101, FE-41, FE-122);
 3. for `value` and `compact` chips, recomputes the least-real class independently and compares it with the fact's backend provenance field; asserts no rendered origin mark (decision 0035 items 1 and 3);
 4. for `value` and `compact` chips, opens the chip's drawer, checks the "Source chain" label and follows fact → release table → method and version → publisher, dataset, licence, retrieval date and file hash;
