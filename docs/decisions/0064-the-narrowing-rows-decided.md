@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted, decided by the owner on 2026-11-19 (relayed 00:59); recorded by the lead |
+| Status | Accepted, decided by the owner on 2026-11-19 (relayed 00:59); recorded by the lead; row 9 decided by [decision 0062](0062-the-tolerances-of-the-calibration-fit.md), accepted on 2026-11-19 |
 | Date | 2026-11-19 |
 | Owner | The owner |
 | Decided by | The owner's note of 2026-11-19, relayed by the owner's advisor at 00:59, agreeing to the advisor's recommendation for each of rows 1 to 21 of the narrowing table, with rows 22 to 58 proceeding as suggested; recorded by the lead's ruling L-1029, under AGENTS.md rule 46; read with the owner's note relayed at 00:35 and the lead's ruling L-1026 (no terms, licence or permission question is put to the owner; [decision 0059](0059-publisher-terms-are-a-record-not-a-gate.md)) |

@@ -2709,12 +2709,13 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 ## OI-307 — Decision 0062 and the tolerances of S4-T12
 
 - ID: OI-307
-- TYPE: OPEN (owner)
+- TYPE: CLOSED (was OPEN (owner))
 - RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 9
 - CONCERNS: S4-T12; SYN-91; the draft decision 0062
 - WHY: Row 9 of the narrowing table is not yet decided: the owner approves decision 0062 once, after its redraft has passed its review.
 - NEEDED: The redraft of decision 0062 passes its review, and the owner approves or amends it. No tolerance of S4-T12 is fixed, tuned or run before then, and the values are fixed before the fit check runs (rule 12).
 - NEEDED BY: S4-T12.
+- CLOSED: 2026-11-19, by [decision 0062](docs/decisions/0062-the-tolerances-of-the-calibration-fit.md): revision 3 (revision 2 approved by a reviewer of another maker; revision 3 confirmed by a different maker) is accepted by the owner's single approval relayed at 05:49 ("all yes and the rotation i will tell you when"), with every default of its open points; X1 stays a named gap (option C not chosen), and no extra allowance is given beyond the record. The values the record leaves open (the numbers of F19 and F21, X1's minimum number of zones, `international_visitors`, the additional correlations) stay named gaps in the record and in S4-T12, which carries them; the S4-T12 fit check may run.
 
 ## OI-308 — The list of files that the per-file ceiling refuses
 
