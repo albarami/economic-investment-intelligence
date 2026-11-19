@@ -432,18 +432,27 @@ def _admitted(series: ForecastSeries, spec: Definition) -> bool:
             or (
                 series.geography == series.source_geography
                 and series.breakdown == series.source_breakdown
-                and (
-                    (series.level == "national" and series.geography_kind == "national")
-                    or (
-                        series.level in ("municipality", "district", "zone")
-                        and series.geography_kind == "public"
-                        and series.geography.startswith(series.level + ":")
-                    )
-                    or (
-                        series.level == "area"
-                        and series.geography_kind in ("area_shape", "release_units")
-                    )
-                )
+            )
+        )
+        and (
+            (series.level == "national" and series.geography_kind == "national")
+            or (
+                series.level in ("municipality", "district", "zone")
+                and series.geography_kind == "public"
+                and series.geography.startswith(series.level + ":")
+            )
+            or (
+                series.level == "area"
+                and series.geography_kind in ("area_shape", "release_units")
+            )
+        )
+        # Released geography vocabulary; DAT-137 / PRV-55 further limit stayers
+        # through spec.levels to municipality or national, never caller labels alone.
+        and (
+            series.input_class != "synthetic"
+            or series.geography == "national"
+            or series.geography.startswith(
+                ("municipality:", "area_shape:", "release_units:")
             )
         )
         and (

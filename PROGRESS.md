@@ -43209,3 +43209,108 @@ conditional reader/emitter/Fact-family boundaries above remain open. Final
 record/patch checks and the complete per-file return are delivered in
 `.overnight/RETURN.md`; the binary-capable fallback patch is refreshed after the
 records, without a push or further Git mutation attempt.
+
+### S6-T14 step one — fix pass one after independent rejection
+
+Maker OpenAI; model GPT-6 (Codex; exact serving variant not exposed). Builder
+persona: senior statistical-methods and calculation engineer. Strict self-review
+persona: reviewer rejecting caller-label admission bypasses and unplanted guards.
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer (self-review), muhasabah-gate; test-driven-development,
+systematic-debugging and verification-before-completion in their plain meanings
+because their named skill files are not installed.
+
+Authority: `.overnight/BRIEF.md`, independent review
+`.overnight/IN/REV1-RETURN.md` Findings 1 and 2, approved plan section 4.1 items
+1–3 and section 4.2, and ruling L-1137. Correction to the prior step-one evidence:
+the lead committed that patch at full base
+`464393bf7679be3567ac2ff69acfcd8d52d640df`. This fix starts from that clean commit
+on `local/S6-T14-b1`; this is the tested base hash, not a new fix commit.
+
+Finding 1: `_admitted` now binds level, geography kind and prefix for every
+input class. Only Public inputs require equality to source geography and source
+breakdown. Released inputs additionally accept only `national`, `municipality:*`,
+`area_shape:*` and `release_units:*`; the unchanged stayer definition permits
+municipality or national only. Authorities read: document 03 DAT-137 and document
+06 PRV-55, both limiting the stayer index to municipality or coarser. Calculation
+formulas, release treatment and existing tests are unchanged.
+
+Red first, before editing forecast.py: command
+`uv run --locked python -m pytest core/tests/test_forecast_admission.py -q -p no:cacheprovider --hypothesis-seed=614 -k 'released_municipal_label or released_series_cannot_use_user_scenario'`
+exited 1: seven failed, 39 deselected. Every failure was the intended assertion:
+base code returned ForecastResult where ForecastNotOffered was required. Plants:
+municipality-labelled `district:x` for stayer_index and pay_level; and
+`user_scenario:z` for all five released families. Exact red output is retained in
+`.overnight/OUT/fix1/red.log`, including each actual ForecastResult. Seven added
+positive controls preserve valid municipality/area routes and the Public-only
+source-equality rule. The unchanged existing tests retain national routes and
+stayer finer-level refusal.
+
+Finding 2: OI-318 through OI-325 each gain NEEDED and NEEDED BY lines specifying
+the concrete requirement and consuming task or step. Numbers, boundaries and
+closure conditions stay unchanged; no item closes. TASKS.md is untouched.
+
+The optional ForecastLineage direct-construction note is left unchanged: fully
+revalidating subject, window digest and generator name/version is not a two-line
+change using existing validators. The brief permits it only within that limit.
+Every other review note remains outside this fix scope.
+
+Environment: Linux x86_64, locked Python 3.14.6, uv 0.11.31; pins remain pytest
+9.2.0, Ruff 0.17.4 and mypy 2.4.1 (pyproject.toml). Check processes use
+UV_OFFLINE=1, PYTHONDONTWRITEBYTECODE=1, workspace `.overnight/tmp` as TMPDIR and
+`.overnight/tmp/uv-cache` as UV_CACHE_DIR. Hypothesis seed 614 is explicitly
+supplied and printed in both pytest logs. Invented histories only; no network,
+real data cache, mutation campaign, database lifecycle action, push or merge.
+
+Real child exits and exact argument lists are recorded in
+`.overnight/OUT/fix1/exits.jsonl`; corresponding logs are beside it.
+
+| Check | Exit | Observed counts/result | Log |
+|---|---:|---|---|
+| Focused pytest: forecast, forecast_admission, forecast_backtest, forecast_models, forecast_mutation and calculation_purity test modules; `-q -p no:cacheprovider --hypothesis-seed=614` | 0 | 273 passed; no failures or skips | `focused.log` |
+| `uv run --locked python -m pytest core/tests -q -p no:cacheprovider --hypothesis-seed=614` | 0 | 1015 passed; no failures or skips | `core.log` |
+| `uv run --locked ruff check .` | 0 | All checks passed | `ruff.log` |
+| `uv run --locked ruff format --check .` | 0 | 812 files already formatted | `format.log` |
+| `uv run --locked mypy` | 0 | No issues in 436 source files | `mypy.log` |
+
+Git staging of the four task paths exited 128: the workspace index lock cannot
+be created on the read-only filesystem (`git-add.log`). No commit or push was
+made. All changed files already exist in Git, so no new-file intent-to-add is
+needed. The authorized fallback `.overnight/OUT/changes.patch` will contain the
+four-path working-tree diff. Documentation/tree/parity and patch validation are
+recorded in the follow-up append below after their actual runs.
+
+#### S6-T14 fix pass one — records and fallback verification
+
+After the evidence append, `python3 scripts/check_docs.py` exited 0 (1105 text
+files, 118 Markdown files), `python3 scripts/check_tree.py` exited 0 (eight rules),
+`cmp AGENTS.md CLAUDE.md` exited 0 (identical bytes), and `git diff --check`
+exited 0. Logs: `.overnight/OUT/fix1/{docs,tree,parity,diff}.log`; real exits are
+in the same directory's `exits.jsonl`. A separate preservation command exited 0:
+AGENTS.md, CLAUDE.md and TASKS.md match the base bytes; PROGRESS.md retains its
+base bytes as a prefix; each of the eight open items has exactly one NEEDED and
+one NEEDED BY field. No unexplained random failure occurred.
+
+The initial four-path patch passed
+`git apply --reverse --check .overnight/OUT/changes.patch`, exit 0. The patch is
+refreshed after this final append, with its final reverse check, SHA-256, byte
+count and exact path inventory recorded in
+`.overnight/OUT/fix1/patch-verification.json` and `.overnight/RETURN.md`.
+Documentation checking is repeated after this records-only addition; that
+outcome is retained in `docs-final.log` and `exits.jsonl`.
+
+Strict self-review: APPROVE for the bounded fix-pass changes only. Muhasabah
+self-audit: PASS for provenance, scope, honest exits and explicit limits.
+Neither is the independent different-maker review required by rule 35; that
+re-review remains pending. Optional lineage hardening and all other review
+notes remain unchanged under the brief. OI-318 through OI-325 stay open, mounted
+reader/emitter and step-two interfaces stay outstanding, and no task status or
+acceptance checkbox changes. No mutation testing was started.
+
+Evidence correction: the first additional return/manifest self-check exited 1
+because its local-path regex matched the relative `.overnight/tmp/uv-cache`
+string as though it were absolute. This was a deterministic check-authoring
+error, not a source/test failure. Adding a path-start boundary to that ad hoc
+check produced exit 0 with the same report, checksum and exit records. Both
+outcomes are retained here; no baseline or test assertion changed. The patch
+and documentation check are refreshed once more after this evidence-only append.

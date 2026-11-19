@@ -267,6 +267,54 @@ def test_municipal_series_cannot_be_relabelled_as_another_geography(geography, k
     assert isinstance(module.forecast_series(series), module.ForecastNotOffered)
 
 
+@pytest.mark.parametrize("key", ["stayer_index", "pay_level"])
+def test_released_municipal_label_cannot_admit_district_geography(key):
+    series = replace(
+        released(key),
+        level="municipality",
+        geography="district:x",
+        geography_kind="public",
+    )
+    assert isinstance(module.forecast_series(series), module.ForecastNotOffered)
+
+
+@pytest.mark.parametrize(
+    "key",
+    ["pay_level", "earner_count", "wage_bill", "stayer_index", "employment_by_area"],
+)
+def test_released_series_cannot_use_user_scenario_geography(key):
+    series = replace(
+        released(key),
+        geography="user_scenario:z",
+        geography_kind="user_scenario",
+    )
+    assert isinstance(module.forecast_series(series), module.ForecastNotOffered)
+
+
+@pytest.mark.parametrize(
+    "key,level,geography,kind",
+    [
+        ("stayer_index", "municipality", "municipality:x", "public"),
+        ("pay_level", "municipality", "municipality:x", "public"),
+        ("pay_level", "area", "area_shape:x", "area_shape"),
+        ("pay_level", "area", "release_units:x", "release_units"),
+        ("earner_count", "area", "release_units:x", "release_units"),
+        ("wage_bill", "area", "area_shape:x", "area_shape"),
+        ("employment_by_area", "area", "release_units:x", "release_units"),
+    ],
+)
+def test_released_geography_binding_keeps_valid_routes(key, level, geography, kind):
+    series = replace(
+        released(key),
+        level=level,
+        geography=geography,
+        geography_kind=kind,
+        # Source-geography and source-breakdown equality apply only to Public input.
+        source_breakdown=(("fixture", "source_only"),),
+    )
+    assert isinstance(module.forecast_series(series), module.ForecastResult)
+
+
 def test_source_less_request_needs_no_invented_series_chain_or_history():
     check = getattr(module, "forecast_source_refusal", None)
     assert check is not None, "source-only refusal boundary missing"
