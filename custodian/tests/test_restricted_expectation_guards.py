@@ -117,6 +117,7 @@ def test_restricted_replay_and_lineage(tmp_path):
         ("source", "source_pin_mismatch"),
         ("version", "record_invalid"),
         ("precision", "record_invalid"),
+        ("precision_text", "record_invalid"),
         ("tolerance", "record_invalid"),
         ("precision_bool", "record_invalid"),
         ("expected_extra", "record_invalid"),
@@ -164,6 +165,11 @@ def test_restricted_record_plants(tmp_path, plant, reason):
         record["version"] = "invented-wrong-version"
     elif plant == "precision":
         record["precision"]["national_1dp"] = 0
+    elif plant == "precision_text":
+        expected = json.loads(path.read_text())
+        expected["national_1dp"] = "40"
+        path.write_text(json.dumps(expected))
+        record["record_sha256"] = hashlib.sha256(local.canonical(expected)).hexdigest()
     elif plant == "precision_bool":
         record["precision"]["national_1dp"] = True
     elif plant in {"expected_extra", "expected_missing", "nontext", "duplicate"}:
@@ -427,6 +433,10 @@ def test_restricted_comparator():
         local.ExpectationError, match=rf"^{case.case_id}:expectation_mismatch$"
     ):
         local.compare(case, {"rows": "3"}, {"rows": "2"})
+    with pytest.raises(
+        local.ExpectationError, match=rf"^{case.case_id}:expectation_mismatch$"
+    ):
+        local.compare(case, {"rows": "2.0"}, {"rows": "2"})
 
 
 def test_restricted_inventory_and_outstanding():
@@ -444,21 +454,21 @@ def test_restricted_inventory_and_outstanding():
 
 
 @pytest.mark.parametrize(
-    "plant",
+    "plant,reason",
     [
-        "extra",
-        "decimal",
-        "place",
-        "status",
-        "owner",
-        "missing",
-        "dataset",
-        "historical_missing",
-        "duplicate",
-        "version",
+        ("extra", "inventory_shape"),
+        ("decimal", "inventory_recipe"),
+        ("place", "inventory_identifier"),
+        ("status", "inventory_status"),
+        ("owner", "inventory_owner"),
+        ("missing", "inventory_source"),
+        ("dataset", "inventory_basis"),
+        ("historical_missing", "inventory_source"),
+        ("duplicate", "inventory_identity"),
+        ("version", "inventory_metadata"),
     ],
 )
-def test_restricted_inventory_plants(plant):
+def test_restricted_inventory_plants(plant, reason):
     _, inventory = modules()
     rows = [asdict(c) for c in inventory.CASES]
     registry = load_registry()
@@ -478,14 +488,14 @@ def test_restricted_inventory_plants(plant):
         rows[0]["source_key"] = "util_elec"
     elif plant == "historical_missing":
         rows = [asdict(inventory.case_by_id("H2"))]
-        registry = tuple(e for e in registry if e.key != "accident")
+        rows[0]["source_ids"] = ("accident", "invented_missing")
     elif plant == "duplicate":
         rows.append(dict(rows[0]))
     elif plant == "version":
         rows[0]["version"] = "invented_version"
     else:
-        rows[0]["source_ids"] = ("invented_missing",)
-    with pytest.raises(ValueError):
+        rows[0]["source_ids"] = (rows[0]["source_key"], "invented_missing")
+    with pytest.raises(ValueError, match=f"^{reason}$"):
         inventory.validate_inventory(rows, registry)
 
 
@@ -640,7 +650,7 @@ def test_restricted_wrong_value_and_safe_output(tmp_path):
     expected_path = cache / "local_expectations/PUB-71.json"
     original = expected_path.read_bytes()
     expected = json.loads(original)
-    expected["national_private"] = "987654321.123456789"
+    expected["national_private"] = "987654321"
     expected_path.write_text(json.dumps(expected))
     companion["cases"][case.case_id]["record_sha256"] = hashlib.sha256(
         local.canonical(expected)
@@ -650,7 +660,7 @@ def test_restricted_wrong_value_and_safe_output(tmp_path):
     assert wrong.returncode == 1
     output = wrong.stdout + wrong.stderr
     assert "PUB-71:expectation_mismatch" in output
-    assert "987654321.123456789" not in output
+    assert "987654321" not in output
     assert local.summary_reasons(output, wrong.returncode) == {
         "PUB-71:expectation_mismatch"
     }

@@ -157,9 +157,14 @@ def load_expectation(cache, case):
         for value in expected.values()
     ):
         refuse(case, "record_invalid")
-    if record["tolerance"] != dict.fromkeys(expected, "0"):
-        refuse(case, "record_invalid")
     if any(type(value) is not int for value in record["precision"].values()):
+        refuse(case, "record_invalid")
+    if any(
+        len(expected[key].partition(".")[2]) != record["precision"][key]
+        for key in expected
+    ):
+        refuse(case, "record_invalid")
+    if record["tolerance"] != dict.fromkeys(expected, "0"):
         refuse(case, "record_invalid")
     if record["source_shas"] != pins(cache, case):
         refuse(case, "source_pin_mismatch")
@@ -384,7 +389,7 @@ def h2_hour_counts(rows, *, period, hours, weight):
 
 def compare(case, actual, expected):
     if set(actual) != set(expected) or any(
-        Decimal(actual[key]) != Decimal(expected[key]) for key in expected
+        actual[key] != expected[key] for key in expected
     ):
         refuse(case, "expectation_mismatch")
 

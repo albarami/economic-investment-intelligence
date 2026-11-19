@@ -1,7 +1,8 @@
 """PYTEST_DONT_REWRITE — metadata only; never source names, rows or values.
 
 Inventory anchors: S2-T22 task log, OI-195, OI-276 and document 04 section
-2.2/PUB-71. Decision 0034 item 3's standing places are excluded.
+2.2/PUB-71. C12's population source follows document 07, C12 "Research note".
+Decision 0034 item 3's standing places are excluded.
 """
 
 import re
@@ -10,6 +11,7 @@ from dataclasses import asdict, dataclass, fields
 import yaml
 
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.frame.layers import COUNTS
 from eii_custodian.publicdata.stage import _LOCAL_FIELDS
 
 from .cache import ROOT
@@ -54,11 +56,11 @@ CASES = (
     Case(
         "C12-MTH-46",
         "docs/07_ECONOMIC_METHODS.md:MTH-46",
-        "census_zone_sector",
-        ("census_zone_sector", "census_zone_occ"),
-        ("census_zone_sector",),
+        "census_district_pop",
+        ("census_district_pop",),
+        ("POP2020",),
         "2020",
-        ("census_zone_sector",),
+        ("census_district_pop",),
         "access_score",
         "reachable_access",
         VERSION,
@@ -138,21 +140,6 @@ CASES = (
             "bnd_district_2020",
         )
     ),
-    Case(
-        "COUNT-bnd_muni_2025",
-        "docs/04_PUBLIC_DATA_PACK.md:2.2",
-        "bnd_muni_2025",
-        ("bnd_muni_2025",),
-        ("bnd_muni_2025",),
-        "2025",
-        ("bnd_muni_2025",),
-        "count",
-        "boundary_finding_counts",
-        VERSION,
-        ("boundary_finding_counts",),
-        "awaiting_expectation",
-        "S2-T35",
-    ),
 )
 
 
@@ -173,6 +160,7 @@ def validate_inventory(cases, registry=None):
     by_id = {entry.source_id: entry for entry in entries}
     identifiers = {entry.key for entry in entries}
     identifiers.update(name for entry in entries for name, _ in entry.columns)
+    identifiers.update(COUNTS["census_district_pop"])
     identifiers.update(name for names in _LOCAL_FIELDS.values() for name in names)
     pointer = yaml.safe_load(
         (ROOT / "custodian/publicdata/review/s2_t29_sources.yaml").read_text()

@@ -39,8 +39,7 @@ checks the same receipt identities as `read_cached`, then calls `_parse_body`.
 `boundary_finding_counts` and `h2_hour_counts` have invented-input tests; they do
 not assert a recovered real recipe. H2 cannot become ready until its recipe
 and partition-to-assembled-snapshot binding are confirmed and implemented.
-The municipality polygon count also awaits a confirmed replay recipe; its
-file is not silently treated as a census-map envelope.
+`bnd_muni_2025`'s row count is pinned by its registry `row_count_min`/`row_count_max`, checked by `fetch/checks.py` at fetch; it is not an inventory case.
 
 The lead prepares these **uncommitted** files by independent inspection of
 the selected source snapshots, never from output of the replay code under test:
@@ -97,7 +96,6 @@ reviewer-checked inventory and record it in the ledger. The current full set is:
 - `GIS-ZONES:awaiting_expectation` (S2-T35 finding confirmation).
 - `GIS-MUNICIPALITIES:awaiting_expectation` (S2-T35 finding confirmation).
 - `GIS-DISTRICTS:awaiting_expectation` (S2-T35 finding confirmation).
-- `COUNT-bnd_muni_2025:awaiting_expectation` (S2-T35 replay confirmation).
 
 Each is a failing parametrized test, never a pass, skip or xfail. C12's acceptance
 remains unticked until S6-T13 supplies the routine. The command intentionally
