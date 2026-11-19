@@ -249,13 +249,16 @@ def test_terminal_failure_never_loads_capture(tmp_path, kind, status):
 
 def test_sign_in_pin_and_size_are_terminal(tmp_path):
     p, _ = prepared(tmp_path)
-    for send in [
-        lambda r: Response(str(r), b"sign in SYN-PRIVATE", ()),
-        lambda r: Response(str(r), b"x" * 70000, ()),
+    for body, reason in [
+        (
+            page(1, True).replace(b"SYN-OUTSIDE-PERSON", b"sign in SYN-OUTSIDE-PERSON"),
+            "credentials",
+        ),
+        (page(1, True) + b"<!--" + (b"X" * 70000) + b"-->", "metadata_bytes"),
     ]:
         with patch("eii_custodian.publicdata.fc_register.acquire.load_capture") as load:
-            with pytest.raises(PageError):
-                replay(tmp_path, p, send)
+            with pytest.raises(PageError, match=reason):
+                replay(tmp_path, p, lambda r, body=body: Response(str(r), body, ()))
             load.assert_not_called()
     with (
         patch(

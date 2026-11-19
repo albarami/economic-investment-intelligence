@@ -35,9 +35,7 @@ def eligible(reason: str, status: int | None = None) -> bool:
 def obstacle(body: bytes) -> str | None:
     lower = body.lower()
     # Credentials never become an eligible obstacle response.
-    if any(
-        word in lower for word in (b"sign in", b"sign-in", b"registration required")
-    ):
+    if any(word in lower for word in (b"sign in", b"sign-in")):
         return "credentials"
     if any(word in lower for word in (b"robot check", b"paywall")):
         return "refusal_body"

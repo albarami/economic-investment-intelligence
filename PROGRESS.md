@@ -38244,3 +38244,105 @@ Final post-append verification: `python3 scripts/check_docs.py` exited 0
 The final implementation-hash/unchanged-task-files/report-marker/hunk-inventory/
 absolute-path/email check exited 0. Return evidence is complete as a report;
 acceptance limitations remain explicit, including the failing whole run.
+
+### S2-T36 fix pass 1 — ruling L-1062 — 2026-11-19
+
+Builder: OpenAI / GPT-6 Codex, senior data-platform engineer. Strict reviewer
+personas: other-maker public-acquisition and security reviewers, the two lenses
+named in `.overnight/IN/REVIEW-A.md` and `.overnight/IN/REVIEW-B.md`; their fix
+confirmation remains with the lead. Skills loaded: project-orientation,
+task-standards, sanad-provenance, muhasabah-gate and github-flow.
+test-driven-development and verification-before-completion are not installed;
+their plain requirements were applied: tests before fixes, isolated semantic red
+proofs, then actual green commands before reporting. Git remained read-only.
+
+Base commit: `785f6b2485e753e83b04af9cda2910fc6f467bb9`.
+Authority and scope: `.overnight/IN/RULING-L1062.md` item 1 only; no proposed open
+item was built. Commands ran from the repository root with `UV_OFFLINE=1` and
+`TMPDIR` set to the absolute resolution of this workspace's `.overnight/tmp`.
+The locked environment was used; no seed override was supplied, and all new or
+changed plants use deterministic invented fixtures. No live fetch was performed.
+
+- A-F1: chose the smaller acquisition change at
+  `custodian/src/eii_custodian/publicdata/fetch/page_acquire.py:531`:
+  `projection=kind == "fc_company_cards"` on the terms read. Terms still get a
+  visible-text hash; they no longer append a non-company input to this source's
+  company-page chain. The inventory reader was untouched. The new test at
+  `custodian/tests/test_fc_register_inventory.py:32` uses two live company pages
+  and a nonempty reviewed terms URL, then verifies the returned names, exact
+  request sequence, company-only input chain and retained terms hash.
+- A-F2: dropped only `registration required` from the obstacle credential tuple
+  at `custodian/src/eii_custodian/publicdata/fc_register/acquire.py:38`.
+  Both sign-in spellings remain. The new non-capture v2 regression at
+  `custodian/tests/test_s2_t29_live_acquire.py:85` accepts a valid invented event
+  title carrying that phrase through normal acquisition.
+- B-F1: `custodian/tests/test_fc_register_capture.py:254` now puts `sign in` in
+  the outside-person cell of a valid terminal company page and matches
+  `credentials`; `load_capture.assert_not_called()` remains at line 262.
+- B-F2: the same test at line 257 now pads a valid terminal company page with an
+  HTML comment beyond the declared byte bound and matches `metadata_bytes`;
+  capture is still forbidden. The size guard itself was untouched.
+- Forced changes in passed parts: only the A-F1 terms-call hunk in shared
+  acquisition and the A-F2 regression added to the existing shared acquisition
+  test file. The B findings share one loop, which now pairs bodies with exact
+  refusal reasons and binds each body in its response lambda. Formatting changes
+  stay inside these test edits. No additional production code was changed.
+
+Red evidence, with tests edited before either production fix:
+
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py::test_inventory_with_terms_keeps_only_company_page_inputs -q -p no:cacheprovider`
+  — exit 1; last line `1 failed in 0.42s`. Original source at the base commit
+  refused `contribution()` with `PageError receipt_missing` after its terminal
+  company fragment, reproducing A-F1.
+- `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py::test_non_capture_source_accepts_registration_required_text -q -p no:cacheprovider`
+  — exit 1; last line `1 failed in 5.54s`. Original source refused the valid
+  non-capture v2 response as `PageError unavailable`, reproducing A-F2.
+- `uv run --locked python .overnight/tmp/fix-p1/prove.py sign-in` — exit 1;
+  pytest last line `1 failed in 0.31s`, wrapper last line `Exit: 1`.
+  In a scratch package copy only the credential word tuple was emptied; the
+  changed B-F1 plant failed with `DID NOT RAISE PageError`.
+- `uv run --locked python .overnight/tmp/fix-p1/prove.py size` — exit 1;
+  pytest last line `1 failed in 0.32s`, wrapper last line `Exit: 1`.
+  In a separate scratch copy only the response-size guard was removed; the
+  changed B-F2 plant failed with `DID NOT RAISE PageError`.
+  Both copies and sanitized logs are under `.overnight/tmp/fix-p1/`; neither
+  guard was removed from the workspace source.
+
+Green evidence and required checks:
+
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py::test_inventory_with_terms_keeps_only_company_page_inputs custodian/tests/test_s2_t29_live_acquire.py::test_non_capture_source_accepts_registration_required_text custodian/tests/test_fc_register_capture.py::test_sign_in_pin_and_size_are_terminal -q -p no:cacheprovider`
+  — exit 0; last line `3 passed in 5.51s`. Covers all four findings.
+- `uv run --locked python -m pytest custodian/tests/test_fc_register.py custodian/tests/test_fc_register_capture.py custodian/tests/test_fc_register_inventory.py custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider`
+  — exit 0; last line `96 passed in 3.14s`.
+- `uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_s2_t29_live_acquire.py custodian/tests/test_s2_t29_live_shapes.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider`
+  — exit 0; last line `527 passed in 55.64s`. These are the affected shared
+  acquisition, school-query/capture-support and transport regression files;
+  the FC suite also ran the five school v2 eligible-capture cases.
+- `uv run --locked ruff check .` — exit 0; last line `All checks passed!`.
+- First `uv run --locked ruff format --check .` — exit 1; last line
+  `2 files would be reformatted, 799 files already formatted`. Corrected only
+  the two reported layouts in the changed tests. Subsequent identical command
+  — exit 0; last line `801 files already formatted`.
+- `uv run --locked mypy` — exit 0; last line
+  `Success: no issues found in 434 source files`.
+- `python3 scripts/check_docs.py` — exit 0; last line
+  `checked 1089 text files, 112 Markdown files: OK`.
+- `python3 scripts/check_tree.py` — exit 0; last line `checked 8 rules: OK`.
+- `cmp AGENTS.md CLAUDE.md` — exit 0; no output.
+- `git diff --check` — exit 0; no output.
+
+Muhasabah: PASS for this bounded fix report. Claims follow the inspected ruling,
+diff and actual command outputs. This is offline fix evidence; live activation,
+the lead's commit and both other-maker confirmations remain outside this pass.
+Earlier evidence rows, task statuses and open-item dispositions were not rewritten.
+
+Post-report verification for fix pass 1: `python3 scripts/check_docs.py` exited 0
+with `checked 1089 text files, 112 Markdown files: OK`;
+`python3 scripts/check_tree.py` exited 0 with `checked 8 rules: OK`;
+`cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0 with no output.
+The read-only inline scope/report audit (`uv run --locked python -`, same
+environment) exited 0; last line:
+`PASS: six-file scope, unchanged HEAD/index, append-only ledger, exact production fixes, isolated guard proofs, report marker and content checks`.
+It verified the exact two production replacements against the full base commit,
+both scratch guard removals, the six changed tracked files, unchanged index and
+HEAD, the original ledger prefix, and the report marker/content constraints.

@@ -1,6 +1,7 @@
 """Complete-name composition, pinned lineage and source-only collision plant."""
 
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -8,12 +9,13 @@ import pytest
 from custodian.tests.test_fc_register import (
     invented_pin_context as invented_pin_context,
 )
-from custodian.tests.test_fc_register import live, page, row
+from custodian.tests.test_fc_register import live, page, review, row
 
 from eii_custodian.publicdata.fc_register.build import build_inventory
 from eii_custodian.publicdata.fc_register.names import contribution
 from eii_custodian.publicdata.fetch.page_records import PageError
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError
+from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.name_inventory import Contribution, check_inventory
 
 
@@ -25,6 +27,34 @@ def selected(tmp_path):
         json.dumps({"fc_register": result.sha256})
     )
     return result
+
+
+def test_inventory_with_terms_keeps_only_company_page_inputs(
+    tmp_path, invented_pin_context
+):
+    terms_url = "https://www.qfc.qa/SYN-terms"
+    terms = b"<p>SYN terms record</p>"
+    ent = replace(row(), terms_url=terms_url)
+    dec = review()
+    dec["reviewed_urls"].append(terms_url)
+    result, sent = live(tmp_path, [page(1), page(2, True), terms], ent, dec)
+    (tmp_path / "snapshot_pins.json").write_text(
+        json.dumps({"fc_register": result.sha256})
+    )
+
+    fc = contribution(tmp_path, ent)
+    assert fc.names == (
+        "SYN Glass Orchard 1",
+        "SYN بستان زجاج 1",
+        "SYN Glass Orchard 2",
+        "SYN بستان زجاج 2",
+    )
+    assert [str(request) for request in sent] == [ent.url, ent.url, terms_url]
+    assert len(fc.lineage["inputs"]) == 2
+    assert all(
+        item["representation"] == "fc_company_pane@v1" for item in fc.lineage["inputs"]
+    )
+    assert result.sidecar["terms_sha256"] == terms_text_sha256(terms)
 
 
 def test_complete_inventory_retains_hidden_duplicate_names_and_caller_refuses(

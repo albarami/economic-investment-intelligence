@@ -82,6 +82,27 @@ def school():
     return dec, attrs
 
 
+def test_non_capture_source_accepts_registration_required_text(tmp_path):
+    dec, body, _ = embedded()
+    body = body.replace(b"SYN &gt; event", b"SYN registration required")
+    calls = []
+
+    def read(url):
+        calls.append(url)
+        return Response(url, body, ())
+
+    result = fetch_page(
+        entry(dec),
+        read,
+        tmp_path,
+        lambda: STAMP,
+        lambda _: None,
+        declaration=dec,
+    )
+    assert json.loads(result.body)["rows"][0]["title"] == "SYN registration required"
+    assert calls == [dec["url"]]
+
+
 def school_transport(attrs, calls, plant=""):
     def read(url):
         calls.append(url)

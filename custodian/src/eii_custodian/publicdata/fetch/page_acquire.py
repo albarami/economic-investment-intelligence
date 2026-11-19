@@ -528,7 +528,7 @@ def fetch(
     terms_unread = ""
     if entry.terms_url:
         try:
-            terms = read(entry.terms_url, "html")
+            terms = read(entry.terms_url, "html", projection=kind == "fc_company_cards")
             terms_hash = terms_text_sha256(terms.body)
         except ShapeError as exc:
             if str(exc) not in {
