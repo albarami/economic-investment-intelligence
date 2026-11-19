@@ -119,6 +119,7 @@
 | [0065](decisions/0065-eight-everyday-capabilities-of-the-map-screen.md) | Eight everyday capabilities of the map screen, one new task each: a route between two points, a measuring tool, print and export of the view and the case file, a Public-data download, an imagery swipe, a share link, coordinates and go-to, and a phone layout | Accepted, 2026-11-19 |
 
 | [0066](decisions/0066-an-optional-free-cdse-backup-cache.md) | Optional free CDSE backup, credential inventories and unread cache; display assigned separately | Proposed, 2026-11-19 |
+| [0068](decisions/0068-public-map-integration-follow-ons.md) | Four Public map integration tasks S3-T24 to S3-T27 before S3-T10's end-to-end step; C3 default retained and C6 phone-sheet fix returned to S3-T09; no value cut | Lead ruling L-1136 recorded, 2026-11-19; independent review pending |
 
 ## Identifiers and change control
 
