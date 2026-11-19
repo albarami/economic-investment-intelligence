@@ -95,7 +95,7 @@ The S4-T12 plan revision 2 builds the calibration fit so that every missing tole
 
 The lead's ruling L-1011 binds the same points. Each value gives the method that produced it or says "stays open", and nothing is active before the owner's single yes.
 
-This record is documents-only. Its accepting change amends only the pack documents named under Amends; it changes no code, configuration, manifest or test (Consequences).
+This record is documents-only. Its accepting change amends only the pack documents named under Amends and adds the derivation module and its tests under docs/decisions/0062/; it changes no product, custodian or core code, configuration, manifest or test (Consequences).
 
 ## Binding conditions of this record (r2)
 
