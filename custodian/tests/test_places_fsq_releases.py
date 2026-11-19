@@ -27,12 +27,55 @@ from eii_custodian.publicdata.places_fsq.policy import (
 from eii_custodian.publicdata.places_fsq.releases import (
     select_release,
     validate_release,
+    validate_release_path,
 )
-from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
+from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partitions
 
 _OLD = "2031-02-03"
 _NEW = "2032-04-05"
 _STABLE_KEY = "places_fsq/copy"
+
+
+@pytest.mark.parametrize("validator", ["receipt", "selection"])
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        f"{_NEW}/places/part-{_OLD}.parquet",
+        f"{_OLD}/places/part-{_NEW}.parquet",
+        f"{_NEW}/places/part-2033-06-07.parquet",
+        f"part-{_NEW}-copied-{_OLD}.parquet",
+        f"{_NEW}/{_OLD}/places/part.parquet",
+    ],
+)
+def test_every_date_in_receipt_and_selection_paths_must_match(
+    file_path: str, validator: str
+) -> None:
+    body = metadata_bytes(
+        [dict(file_path=file_path, longitude=(51.0, 51.5), latitude=(25.0, 25.5))],
+        dataset_geo_bbox=None,
+    )
+    with pytest.raises(PlacesFsqError, match=r"^release_mismatch$"):
+        if validator == "receipt":
+            validate_release_path(file_path, _NEW)
+        else:
+            select_partitions(body, _NEW, FRAME_BOX)
+
+
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        f"{_NEW}/places/part-{_NEW}.parquet",
+        f"{_NEW}/{_NEW}/part.parquet",
+        "part.parquet",
+    ],
+)
+def test_equal_release_dates_and_undated_paths_remain_valid(file_path: str) -> None:
+    validate_release_path(file_path, _NEW)
+    body = metadata_bytes(
+        [dict(file_path=file_path, longitude=(51.0, 51.5), latitude=(25.0, 25.5))],
+        dataset_geo_bbox=None,
+    )
+    assert select_partitions(body, _NEW, FRAME_BOX).files == (file_path,)
 
 
 def test_unordered_listing_selects_greatest_valid_calendar_date() -> None:

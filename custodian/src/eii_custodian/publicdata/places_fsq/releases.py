@@ -28,9 +28,9 @@ def validate_release(release: str) -> str:
 
 def validate_release_path(file_path: str, release: str) -> None:
     """Refuse a dated receipt path that belongs to another release."""
-    match = _DATE.search(file_path)
-    if match is not None and match.group(0) != release:
-        raise PlacesFsqError("release_mismatch")
+    for match in _DATE.finditer(file_path):
+        if match.group(0) != release:
+            raise PlacesFsqError("release_mismatch")
 
 
 def select_release(body: bytes, root: str = COPY_ROOT) -> str:

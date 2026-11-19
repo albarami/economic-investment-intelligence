@@ -5,15 +5,49 @@ Selection uses coordinate statistics against the frame, never the geographic bbo
 The parser preserves source fields; display eligibility, duplicates and category
 mapping follow the reviewed policy. Fetch checks every selected file against the
 summary before storing any receipt or manifest.
+Receipt validation and summary selection share the same release-path check:
+every complete ISO date appearing anywhere in the path must equal the approved
+release. Repeated equal dates and undated names remain valid; a different date
+refuses with `release_mismatch` (PO-S2-123, ruling L-1178).
 
 ## Format facts this reader relies on
 
 The following statements are transcribed from the lead’s format check, section 1,
 read 2026-11-14. Row numbers identify that check, not pack requirements.
-The reader supports only type-defined column order; IEEE total order is unknown.
+The column-order implementation below supersedes the original type-order-only
+reader (decision 0064 item 43, PO-S2-36).
 Container sizes are bounded by remaining bytes, and nesting is limited to
 64 structs and containers including FileMetaData. These are reader limits,
 not requirements claimed for the format.
+
+### Column-order reading (PO-S2-36)
+
+Source: The Apache Software Foundation, `apache/parquet-format`,
+[`src/main/thrift/parquet.thrift`, `ColumnOrder` and `Statistics`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift),
+branch master, Apache-2.0, retrieved 2026-11-19. The lead supplied a verbatim
+extract of that file to the builder, with source-file SHA-256
+`8173ad1168162021798d28128b5676b8e9ad64c0bb63c4f8cbf1eecf836d75a3`.
+This task reads that retained extract offline; it does not fetch the source anew.
+
+The reader resolves member 1 (`TYPE_ORDER`), member 2
+(`IEEE_754_TOTAL_ORDER`, physical FLOAT or DOUBLE only), and member 3
+(`INT96_TIMESTAMP_ORDER`, physical INT96 only). A known order on a disallowed
+physical type refuses with `statistics_missing`. INT96 order is recognized,
+but timestamps are never converted to geographic degrees: such columns have no
+coordinate bounds. TYPE_ORDER on INT96 ignores all statistics, as the extract
+requires. Logical FLOAT16 is outside this coordinate reader's supported types.
+Unknown members above 3, missing orders and malformed unions retain the existing
+signed deprecated-bound fallback; modern bounds cannot authorize selection.
+
+FLOAT and DOUBLE bounds are decoded from their physical encodings. Under
+IEEE total order the bounds describe non-NaN values; any NaN bound removes both
+usable coordinate bounds. Under TYPE_ORDER each NaN bound is ignored separately.
+For either floating order, when all three counts are present and
+`nan_count + null_count == num_values`, neither bound is usable. Missing counts
+are never assumed to be zero; finite non-NaN bounds do not prove NaNs absent.
+For TYPE_ORDER, a zero minimum is normalized to negative zero and a zero maximum
+to positive zero. The inclusive frame comparisons thus admit either sign of
+zero; IEEE total order keeps the encoded signs. No NaN search is performed.
 
 - Row 12: [TC "Boolean encoding"](https://raw.githubusercontent.com/apache/thrift/master/doc/specs/thrift-compact-protocol.md), read 2026-11-14: "Field values are encoded directly in the field header.".
 - Row 13: [TC "Boolean encoding"](https://raw.githubusercontent.com/apache/thrift/master/doc/specs/thrift-compact-protocol.md), read 2026-11-14: "Element values of type `bool` are sent as an `i8`; true as `1` and false as `2`.".
@@ -86,7 +120,7 @@ and the file set is refused by name.
 - N1-31: [PQ-T `struct Statistics`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15: "1: optional binary max;" / "2: optional binary min;".
 - N1-32: [PQ-T `struct Statistics`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15: "Values are encoded using PLAIN encoding, except that variable-length byte arrays do not include a length prefix.".
 - N1-33: [PQ-T `struct KeyValue`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15: "1: required string key" / "2: optional string value".
-- N1-34: [PQ-T `union ColumnOrder`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15: "struct TypeDefinedOrder {}" / "1: TypeDefinedOrder TYPE_ORDER;"; the members this reader does not support are "2: IEEE754TotalOrder IEEE_754_TOTAL_ORDER;" and "3: Int96TimestampOrder INT96_TIMESTAMP_ORDER;".
+- N1-34: [PQ-T `union ColumnOrder`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15: "struct TypeDefinedOrder {}" / "1: TypeDefinedOrder TYPE_ORDER;"; later members are "2: IEEE754TotalOrder IEEE_754_TOTAL_ORDER;" and "3: Int96TimestampOrder INT96_TIMESTAMP_ORDER;". The PO-S2-36 implementation above now resolves these members.
 - N1-35: [PQ-T `struct FileMetaData`, `struct SchemaElement`, `struct RowGroup`, `struct ColumnMetaData`, `enum FieldRepetitionType`, `enum Encoding`, `enum CompressionCodec`](https://raw.githubusercontent.com/apache/parquet-format/master/src/main/thrift/parquet.thrift), read 2026-11-15, for the fields that only the fixture writer `metadata_bytes` writes: "1: required i32 version" / "2: required list<SchemaElement> schema;" / "3: required i64 num_rows" / "6: optional string created_by" / "1: optional Type type;" / "3: optional FieldRepetitionType repetition_type;" / "4: required string name;" / "5: optional i32 num_children;" / "2: required i64 total_byte_size" / "2: required list<Encoding> encodings" / "4: required CompressionCodec codec" / "5: required i64 num_values" / "9: required i64 data_page_offset" / "REQUIRED = 0;" / "OPTIONAL = 1;" / "PLAIN = 0;" / "UNCOMPRESSED = 0;".
 - N1-36: [GPQ v2.0.0 "Version and schema"](https://geoparquet.org/releases/v2.0.0/), read 2026-11-15: "This is version 2.0.0 of the GeoParquet specification."; [GPQ v1.1.0 "Version and schema"](https://geoparquet.org/releases/v1.1.0/), read 2026-11-15: "This is version 1.1.0 of the GeoParquet specification.".
 - N1-37: [GPQ v2.0.0 "Metadata"](https://geoparquet.org/releases/v2.0.0/) and [GPQ v1.1.0 "Metadata"](https://geoparquet.org/releases/v1.1.0/), read 2026-11-15: "A GeoParquet file MUST include a `geo` key in the Parquet metadata" (the page names `FileMetaData::key_value_metadata`) / "The value of this key MUST be a JSON-encoded UTF-8 string representing the file and column metadata that validates against the GeoParquet metadata schema.".
