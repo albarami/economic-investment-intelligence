@@ -112,11 +112,16 @@ class CommitGuard(unittest.TestCase):
         self._free(stdout + stderr, gateway)
 
     def test_new_key_staged_value_refused(self) -> None:
-        for name in ("TOMTOM_API_KEY", "EARTHDATA_API_KEY"):
+        for name in (
+            "TOMTOM_API_KEY",
+            "EARTHDATA_API_KEY",
+            "CDSE_CLIENT_ID",
+            "CDSE_CLIENT_SECRET",
+        ):
             for source in ("environment", "file"):
                 with self.subTest(name=name, source=source):
                     _home, env, repo, rng = self._start()
-                    key = support.random_value(rng, 12)
+                    key = "FAKE-" + support.random_value(rng, 7)
                     if source == "environment":
                         env[name] = key
                     else:
@@ -132,11 +137,16 @@ class CommitGuard(unittest.TestCase):
                     self.assertEqual(stderr, _content("new.txt", name))
 
     def test_new_key_clean_file_passes(self) -> None:
-        for name in ("TOMTOM_API_KEY", "EARTHDATA_API_KEY"):
+        for name in (
+            "TOMTOM_API_KEY",
+            "EARTHDATA_API_KEY",
+            "CDSE_CLIENT_ID",
+            "CDSE_CLIENT_SECRET",
+        ):
             for source in ("environment", "file"):
                 with self.subTest(name=name, source=source):
                     _home, env, repo, rng = self._start()
-                    key = support.random_value(rng, 12)
+                    key = "FAKE-" + support.random_value(rng, 7)
                     if source == "environment":
                         env[name] = key
                     else:
@@ -154,11 +164,16 @@ class CommitGuard(unittest.TestCase):
                     self.assertEqual(stderr, "")
 
     def test_new_key_short_value_fails_closed(self) -> None:
-        for name in ("TOMTOM_API_KEY", "EARTHDATA_API_KEY"):
+        for name in (
+            "TOMTOM_API_KEY",
+            "EARTHDATA_API_KEY",
+            "CDSE_CLIENT_ID",
+            "CDSE_CLIENT_SECRET",
+        ):
             for source in ("environment", "file"):
                 with self.subTest(name=name, source=source):
                     _home, env, repo, rng = self._start()
-                    key = support.random_value(rng, 11)
+                    key = "FAKE-" + support.random_value(rng, 6)
                     if source == "environment":
                         env[name] = key
                     else:
@@ -173,10 +188,15 @@ class CommitGuard(unittest.TestCase):
                     self.assertEqual(stderr, _weak(name))
 
     def test_unlisted_env_file_names_are_ignored(self) -> None:
-        for name in ("TOMTOM_API_KEY_EXTRA", "EARTHDATA_API_KEY_EXTRA"):
+        for name in (
+            "TOMTOM_API_KEY_EXTRA",
+            "EARTHDATA_API_KEY_EXTRA",
+            "CDSE_CLIENT_ID_EXTRA",
+            "CDSE_CLIENT_SECRET_EXTRA",
+        ):
             with self.subTest(name=name):
                 _home, env, repo, rng = self._start()
-                key = support.random_value(rng, 12)
+                key = "FAKE-" + support.random_value(rng, 7)
                 (repo / ".env").write_text(name + '="' + key + "\n", encoding="utf-8")
                 self._stage(repo, env, "clean.txt", b"clean\n")
                 status, stdout, stderr = self._guard(env, repo)

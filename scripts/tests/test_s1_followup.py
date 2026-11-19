@@ -48,6 +48,28 @@ class Followup(unittest.TestCase):
             )
             self.assertEqual(boundary.check_imports(root), ([], []))
 
+    def test_cdse_plane_names(self) -> None:
+        for name in ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET"):
+            for package in ("eii_product", "eii_core", "eii_custodian"):
+                with (
+                    self.subTest(name=name, package=package),
+                    tempfile.TemporaryDirectory() as folder,
+                ):
+                    root = Path(folder)
+                    cases.make_tree(root)
+                    cases.write_planted(root, package, f"# {name}\n")
+                    failures, notes = boundary.check_imports(root)
+                    expected = (
+                        []
+                        if package == "eii_custodian"
+                        else [
+                            cases.expected_env_name_line(
+                                cases.planted_rel_path(package), 1, name
+                            )
+                        ]
+                    )
+                    self.assertEqual((failures, notes), (expected, []))
+
     def test_hardening_file_required(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

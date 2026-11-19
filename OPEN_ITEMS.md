@@ -2777,6 +2777,28 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The lead confirms what the F5 calibration values are, where they are owed and the task that closes them before its gate.
 - NEEDED BY: the slice S4 gate.
 
+## OI-316 — S2-T41 command-help boundary duplicates a literal
+
+- ID: OI-316
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T41 lens A confirmation N1 at 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60; nonblocking proposed follow-up, not fixed.
+- CONCERNS: `scripts/tests/commands_support.py`, expected_usage; `scripts/commands/table.py`, CDSE_BOUNDARY; document 02 command table; S2-T41, ARC-96, REV-41 and REV-42.
+- EVIDENCE: `.overnight/IN/ledger/verdicts/S2-T41.confA1.return.md`, Findings N1: expected_usage formerly came wholly from the architecture table; one line now duplicates CDSE_BOUNDARY as a literal, and that boundary line is absent from document 02's command table.
+- DONE SO FAR: The equality test pins the literal and lens A APPROVED the head with this nit. No fix is claimed by this ledger preparation.
+- NEEDED: S2-T10 disposes the proposal under REV-42: derive the line from a documented source, or explicitly retain the pinned literal with the reason. Another maker checks that disposition; no merge-blocking defect is inferred.
+- NEEDED BY: slice S2 review follow-up S2-T10, before the slice S2 gate.
+
+## OI-317 — S2-T41 child recorder has limited leak diagnostics
+
+- ID: OI-317
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T41 lens A confirmation N2 at 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60; nonblocking proposed follow-up, not fixed.
+- CONCERNS: `scripts/tests/test_commands.py`, record_child in test_build_public_usage_and_unreachable; proposed decision 0066 item 6; S2-T41, REV-41 and REV-42.
+- EVIDENCE: `.overnight/IN/ledger/verdicts/S2-T41.confA1.return.md`, Findings N2 and F2 plants: the bare MagicMock makes subprocess.run/check_output leak plants fail through ValueError rather than a value-specific assertNotIn. The test still goes red. Launches outside the subprocess.Popen seam, including os.posix_spawn and os.system, are not recorded.
+- DONE SO FAR: Both invented CDSE values are asserted across the recorded channels; reviewer Popen plants were value-specific red. Lens A APPROVED with the diagnostic nit. No broader interception or fix is claimed here.
+- NEEDED: S2-T10 disposes the proposal under REV-42. The review suggests a mock whose communicate returns an empty stdout/stderr pair and whose __enter__ returns itself; if implemented, demonstrate value-specific failures for both invented values through subprocess.run/check_output. Record the limits of other child seams, or justify and independently verify any extension; do not silently claim them covered.
+- NEEDED BY: slice S2 review follow-up S2-T10, before the slice S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4272,3 +4294,20 @@ requires every prior ledger row to remain unchanged, so this worker preserved
 them and leaves their disposition to the lead. Full commands, actual exits and
 file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 `.overnight/RETURN.md`. No existing S2-T29 review or live-source hold is closed.
+
+
+## S2-T41 — Optional unread CDSE backup, build open points
+
+- **Provider contract and evidence pending (lead):** verify current official Authentication, Process API, Sentinel-2 L2A, acquisition-date metadata, quota/rate/processing-unit and legal pages. Record exact publisher wording, public URL, read date and page SHA-256. No page was fetched by this offline build. Registry publisher, endpoints, schema and costs are pending; the command deliberately omits bulk acquisition successfully. Internal `pending.v1` Process/metadata envelopes and the linear cost fixture are not provider contracts. Replace them only through reviewed official evidence, including any minima and unit rounding; no remembered host or free allowance is activated.
+- **Terms and attribution pending (lead):** record imagery notice, interface terms and complete attribution separately, in the provider’s words or with each missing field/reason/check date under decision 0059. Pending terms remain usable; they waive no publisher, schema, integrity or quota guard. No quotation or hash of an unread page is invented.
+- **Acquisition mapping pending (lead):** bind the verified contributing dates, cloud/no-data masks and raster response contract to the actual picture. The offline metadata/raster tests establish only internal validation. Confirm the reviewed Qatar boundary and metric projection before bulk use; no real boundary or cache was read here.
+- **Display ownership pending (lead):** assign a later task and any amendments to S3-T16’s offline criterion, imagery delivery and attribution. S2-T41 adds no display, asset/release export or map adapter; S3-T23/OI-305 are unchanged.
+- **Recorded hardening only (L-1078 item 6):** README Commit hooks name parity, the lead-run wrapper’s worktree refusal, and recorded retry-reserve choice. No wrapper is added or run; the owner’s already-placed values need no further action. The command form is explicitly lead-shell-only in rule 44.
+- **Review pending:** the plan’s Anthropic confirmation does not review this implementation. Two independent maker lenses, hosted checks and the lead’s exact-merge whole test remain separate.
+- **ASSUMPTIONS:** the worker uses only invented response/credential fixtures; the actual provider schema may differ from internal placeholders. No exact session model identifier is exposed to the worker. The supplied role identifies OpenAI GPT-6 through Codex; no more precise model identity is asserted.
+
+- **Build environment blocker:** `git add .env.example` returned exit 128: the shared worktree index is read-only outside the permitted workspace. No commit or push was made. `check_tree` reads that unchanged index, so it refuses the new example-name inventory until the lead stages the changes in a writable checkout. No guard or sandbox permission was changed.
+
+- **Correction, 2026-11-19, S2-T41 fix round 1 (L-1092):** the implementation is committed unchanged by the lead at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` (`7ce5fc6`), and `python3 scripts/check_tree.py` passes on it (exit 0, eight rules; `.overnight/tmp/base-tree.log`). This supersedes the earlier uncommitted/index-blocker statement without rewriting it. Fix commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` addresses O1, F2 and B1–B3. Per L-1092, possession of both values held only by the lead's wrapper is the boundary; no caller-admission flag or wrapper is added. Review A's rejected F2 and review B's adopted notes await both lenses' confirmation of this fix; provider evidence, later display ownership, hosted checks and the exact-merge whole test remain with the lead.
+
+- **Fix-round verification, 2026-11-19:** final code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` additionally closes the fake fixture's inherited environment. Final full custodian and scripts suites pass (7370 passed and 904 tests, each exit 0), with zero skips and no unexplained random failure. Evidence is appended under PROGRESS.md's S2-T41 fix-round headings. This closes no provider-evidence or later-display item and supplies no independent review verdict.

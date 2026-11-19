@@ -153,6 +153,32 @@ class CheckTreeCase(unittest.TestCase):
 
 
 class CheckTreeTests(CheckTreeCase):
+    def test_cdse_inventory_and_plants(self) -> None:
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        import check_tree
+
+        for name in ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET"):
+            self.assertIn(name, check_tree.ENV_EXAMPLE_NAMES)
+            for edit in ("remove", "reorder", "populate"):
+                with (
+                    self.subTest(name=name, edit=edit),
+                    tempfile.TemporaryDirectory() as folder,
+                ):
+                    root = make_fixture(folder)
+                    path = root / ".env.example"
+                    text = path.read_text()
+                    self.assertIn(name + "=\n", text)
+                    text = text.replace(name + "=\n", "")
+                    if edit == "reorder":
+                        text = name + "=\n" + text
+                    if edit == "populate":
+                        text += name + "=FAKE-CDSE-EXAMPLE-VALUE\n"
+                    path.write_text(text)
+                    git(root, "add", ".env.example")
+                    done = run_check(root)
+                    self.assertEqual(done.returncode, 1)
+                    self.assert_line_starting(done, "FAIL env-example:")
+
     def test_real_repository_passes(self) -> None:
         self.assert_clean(run_check(REPO_ROOT))
 

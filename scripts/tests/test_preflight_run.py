@@ -133,6 +133,8 @@ class Preflight(unittest.TestCase):
             "PASS model-key: absent",
             "PASS traffic-provider-key: absent; EII_TRAFFIC_PROVIDER simulated",
             "PASS night-lights-key: absent",
+            "PASS cdse-client-id: absent",
+            "PASS cdse-client-secret: absent",
             "PASS imagery-provider-key: absent",
             "PASS photorealistic-3d-key: absent",
             "PASS env-not-tracked: .env is not tracked by git",
@@ -241,14 +243,14 @@ class Preflight(unittest.TestCase):
                     elif label == "port_held":
                         want[11] = f"FAIL api-port: 127.0.0.1:{api_port} is in use"
                     elif label == "env_staged":
-                        want[17] = "FAIL env-not-tracked: .env is tracked by git"
+                        want[19] = "FAIL env-not-tracked: .env is tracked by git"
                     elif label == "pg_no_answer":
                         want[4] = (
                             f"WARN postgresql: no answer on 127.0.0.1:{db_port} "
                             "(pg_isready exit status 2); store embedded; Docker not reachable"
                         )
                     elif label == "cmd_missing":
-                        want[18] = "WARN wsl-interop: cmd.exe not found on PATH"
+                        want[20] = "WARN wsl-interop: cmd.exe not found on PATH"
                     self.assertEqual(report.text_lines(), want)
                     if label in (
                         "python",
@@ -599,7 +601,17 @@ class Preflight(unittest.TestCase):
         night_key = stubs.dummy("night")
         imagery_key = stubs.dummy("imagery")
         maptile_key = stubs.dummy("maptile")
-        keys = (key, traffic_key, night_key, imagery_key, maptile_key)
+        cdse_id = "FAKE-CDSE-PREFLIGHT-ID"
+        cdse_secret = "FAKE-CDSE-PREFLIGHT-SECRET"
+        keys = (
+            key,
+            traffic_key,
+            night_key,
+            imagery_key,
+            maptile_key,
+            cdse_id,
+            cdse_secret,
+        )
         password = stubs.dummy("pw")
         ran: list[str] = []
         with tempfile.TemporaryDirectory() as tmp:
@@ -612,6 +624,8 @@ class Preflight(unittest.TestCase):
                     env["ANTHROPIC_API_KEY"] = key
                     env["TOMTOM_API_KEY"] = traffic_key
                     env["EARTHDATA_API_KEY"] = night_key
+                    env["CDSE_CLIENT_ID"] = cdse_id
+                    env["CDSE_CLIENT_SECRET"] = cdse_secret
                     env["ESRI_API_KEY"] = imagery_key
                     env["MAPTILE_API_KEY"] = maptile_key
                     stub_dir = case / "stubs"
@@ -769,6 +783,8 @@ class Preflight(unittest.TestCase):
             "model-key",
             "traffic-provider-key",
             "night-lights-key",
+            "cdse-client-id",
+            "cdse-client-secret",
             "imagery-provider-key",
             "photorealistic-3d-key",
             "env-not-tracked",

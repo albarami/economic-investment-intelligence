@@ -15,10 +15,12 @@ usage() {
     'down' \
     'test [--seed N]' \
     'build-public' \
+    'build-public --cdse-backup' \
     'build-world' \
     'build-release' \
     'load-release' \
-    'freeze' >&2
+    'freeze' \
+    "CDSE backup boundary: possession of both CDSE values, held only by the lead's wrapper." >&2
   exit 2
 }
 

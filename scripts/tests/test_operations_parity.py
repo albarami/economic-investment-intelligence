@@ -30,6 +30,8 @@ PREFLIGHT_NAMES = {
     "Model key": "model-key",
     "Traffic provider key": "traffic-provider-key",
     "Night-lights key": "night-lights-key",
+    "CDSE client ID": "cdse-client-id",
+    "CDSE client secret": "cdse-client-secret",
     "Imagery provider key": "imagery-provider-key",
     "Photorealistic 3D key": "photorealistic-3d-key",
     "`.env` not tracked": "env-not-tracked",
@@ -112,6 +114,19 @@ class OperationsParity(unittest.TestCase):
             list(preflight.CHECKS),
             [PREFLIGHT_NAMES[row["Prerequisite"]] for row in preflight_rows],
         )
+
+    def test_cdse_missing_member_is_refused(self) -> None:
+        text = DOCUMENT.read_text()
+        for kind in ("preflight", "example", "tree", "secrets"):
+            for name in (
+                ("cdse-client-id", "cdse-client-secret")
+                if kind == "preflight"
+                else ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET")
+            ):
+                actual = documented(text, kind)
+                self.assertIn(name, actual)
+                with self.assertRaises(AssertionError):
+                    assert_parity(text, kind, actual - {name})
 
     def test_added_table_row_is_refused(self) -> None:
         text = DOCUMENT.read_text(encoding="utf-8")

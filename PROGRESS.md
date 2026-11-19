@@ -35303,6 +35303,207 @@ Seed:      none
 Notes:     All five work commits must have Conventional Commit subjects. make_spec.py proves the exact replay order, unchanged original messages with no cherry-pick trailers, five equal range-diff rows and all six approved task files byte-identical.
 ```
 
+### S2-T41 — Optional offline satellite backup cache from CDSE: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/97)
+
+Maker and model: OpenAI GPT-6 through Codex (supplied session role; no more precise model identifier exposed). Persona: senior release engineer. Strict self-review persona: release-evidence reviewer refusing a row without its source. Skills applied: project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate. This preparation transcribes the supplied evidence; it grants no independent approval. Every evidence path below is relative to `.overnight/IN/ledger/`. `form/spec.json`, `form/log.md` and `form/items.md` supply form only, never S2-T41 evidence.
+
+#### Plan rounds and design reviews
+
+- Plan round 1 is evidenced by the launch in `log-lines.md` at 07:03 (OpenAI through Codex) and the subsequent review; no plan-1 return is supplied. No exact plan-1 session model or plan commit is inferred. The 07:20 design-review launch identifies Anthropic Claude Opus 5.5 through login C (`log-lines.md`).
+- Design review 1: Anthropic Claude Opus 5.5, REJECTED, F1–F7, against plan 1 and draft 0066 at tree `6e473d38025d736d85525286403bb95770964e76`. F1 objects to a tracked wrapper folder; F2 requires the separate lead proof and useful redacted refusal; F3 corrects the stale credential action; F4 removes display/release scope; F5 completes the amendment inventory; F6 corrects record status/citations; F7 requires provider wording, URL, date and hash. Tests were judged sound on reading, not executed. security-review loading was refused and its checks applied by hand. The lead says a longer return was deleted unread after screening; only the supplied screened return is used (`verdicts/S2-T41.planrev1.return.md`; `log-lines.md`, 07:39).
+- L-1078: F1 NOT ACCEPTED because the wrapper is ignored lead-run tooling, never tracked; F2–F7 ACCEPTED. Display becomes a lead-owned open point. The wrapper and proof remain separate lead work, not task code. Hardening notes are recorded rather than silently added to scope (`rulings.md`, L-1078; `verdicts/S2-T41.plan2.return.md`).
+- Plan round 2: return self-identifies OpenAI GPT-6 through Codex; launch records GPT-6.1 Sol, while the result line says GPT-6 Sol. These labels are retained without inventing a precise planner session identity. It delivered plan r2 (17,806 bytes) and draft r2 (34,618 bytes), applied F2–F7 and the F1 ruling, and retained display/provider/confirmation open points (`verdicts/S2-T41.plan2.return.md`; `log-lines.md`, 07:39 and 07:47).
+- Plan confirmation: Anthropic Claude Opus 5.5, APPROVED plan r2 and draft r2, F2–F7 MET, F1 withdrawn under L-1078, no new finding. Tree `b1e8653ccfd15e242308a147a5cafb34799d9a54`; file-only review, no network. It records wrapper path wording relative to the lead-run folder, removal of draft review notes on filing, ruling-time record, unavailable security-review loading and lead-shell rule-44 wording. This is plan approval, not implementation approval (`verdicts/S2-T41.planconf1.return.md`; `log-lines.md`, 07:51).
+
+#### Build and separate lead proof
+
+- Build 1 was launched as OpenAI GPT-6.1 Sol through Codex codex-b at base `b1e8653ccfd15e242308a147a5cafb34799d9a54`; its return self-identifies GPT-6 through Codex with no exact session identifier exposed. Personas: senior security engineer/Python test engineer and strict security reviewer tracing secret paths. Loaded skills were project-orientation, task-standards, sanad-provenance, domain-modeling, github-flow and muhasabah-gate; unavailable test/security/verification skills were applied by their plain meanings (`log-lines.md`, 07:51 and 08:30; `verdicts/S2-T41.build1.return.md`).
+- Delivered: optional closed flag, tooling credential inventories and presence-only rows, transport/redaction/request bounds, fixture metric/cost/metadata contracts, receipted immutable unread-cache promotion and product/release isolation plants, proposed decision 0066 and coordinated pack amendments. No live provider contract, bulk acquisition, wrapper, display or product asset was built. The reviewed-endpoint set remains empty; pending envelopes and the linear cost fixture are internal contracts. Provider wording, complete page evidence, actual quota/schema/date mapping, reviewed boundary/projection and later display ownership remain lead work (`verdicts/S2-T41.build1.return.md`, Delivered scope and Intentional pending provider work).
+- Builder red/green history preserves inventory, presence, secret/import, command, transport, cache and isolation plants. Additional registry, host-admission, request-hash and refresh-token plants failed before correction. Initial import/fixture, registry-order/count, lint, type, document and format failures are recorded with deterministic causes; no green rerun erases them. Final focused public run: exit 0, 141 passed. Broad custodian: exit 0, 7,369 passed, one existing duplicate-ZIP warning, 425.10 s; refresh test added during that run is covered afterward by the focused run. Broad scripts: 904 tests, exit 1 solely on the unchanged shared index. Final static checks: ruff 0, format 0 (742 files), mypy 0 (414 files), docs 0 (1,032 text/116 Markdown), parity 0, whitespace 0; tree 1 solely on the index inventory. Environment: UV_OFFLINE=1, workspace temporary paths, focused unittest helper path, no seed override (`verdicts/S2-T41.build1.return.md`, Plan items and final evidence).
+- The builder could not commit: staging returned 128 because the shared worktree index was outside its writable sandbox. The lead reports committing the worker tree unchanged as `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`; lead docs/tree checks passed and rules files matched. The 08:30 log says 47 paths while the builder return enumerates its own changed paths; neither is used as the authoritative BASE-to-WORK scope count. The generated spec uses Git's exact requested diff (`verdicts/S2-T41.build1.return.md`, Commits and Files changed; `log-lines.md`, 08:30).
+- Separate lead proof, outside the task: token status 200, 2,048 bytes, SHA-256 `f71b3201426f1b9b4543416c1ff930e9da1d4e7ef7a818892c198ec0e682227b`; Process status 200, 10,993 bytes, SHA-256 `3dbdc0bccd33d48634fa9fb7dc2c0258bfe9ee72f51f694675738162d2c5e6b0`, with `png=False` in the supplied record. The lead attributes that flag to its double-escaped literal, corrected to a signature check without rerunning. This ledger does not independently validate the picture or infer bulk readiness. The log reports the lead's official-page reads and wrapper worktree-refusal plant; complete page hashes/contents are not supplied here (`verdicts/S2-T41.leadproof1.txt`; `log-lines.md`, 07:53).
+
+#### Two initial implementation lenses and L-1092
+
+- Lens A: Moonshot AI Kimi K3.1 Pro via relay (return self-label: Factory Droid, OR Kimi K3.1 Pro), REJECTED at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`. F1 asks for code-level lead-shell admission; F2 finds the ordinary-build leak plant checks only the older token and omits both CDSE values and argv/environment/receipt comparison. Reading only; no tests, exits or executed counts claimed (`verdicts/S2-T41.revA1.return.md`; `log-lines.md`, 09:36).
+- Lens B: xAI Grok 4.7 High via Cursor (return self-label: SpaceXAI, Grok 4.7), APPROVED the same commit with four nonblocking notes: SYN-88 text in the wrong cell; unpinned ceiling/exact allowance boundaries; missing document-02 sentence break; stale no-commit/index-failure records. Review was reading only; builder counts were not independently reproduced. Initial launches were held by the governor and relaunched with different-maker justification; the held launches supplied no verdict (`verdicts/S2-T41.revB1.return.md`; `log-lines.md`, 08:33 and 09:36).
+- Lead ruling L-1092: F1 NOT ACCEPTED as written. Possession of both values held only by the lead wrapper is the boundary; no caller-settable admission flag or new wrapper is required. Replacement obligation O1 requires absent/empty-pair omission before request/write, planted neither/one/empty cases, and help/decision wording. F2 ACCEPTED. Lens-B notes 1–3 become obligations B1–B3; note 4 requires append-only record correction. Builder's maker fixes, both lenses confirm (`rulings.md`, L-1092).
+- Initial fix1 was stopped after 20 s because the lead's clone recipe failed before checkout; nothing was written. The corrected recipe checked the hash before launching fix1b. This is a lead setup failure with an identified cause, not a random test failure or an implementation attempt that supplied evidence (`log-lines.md`, 09:38).
+
+#### Fix round 1b and confirmations
+
+- Fix1b: OpenAI, launched as GPT-6.1 Sol through Codex; return self-identifies GPT-6 with exact session identifier unavailable. Commits: `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` (credential leak verification gaps), `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` (fixture environment isolation), `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60` (fix evidence and commit correction). No push/merge claimed. Same senior security/Python-test and strict credential-path personas; project-orientation, task-standards, github-flow, strict-reviewer, sanad-provenance and muhasabah-gate loaded, unavailable methods applied plainly (`verdicts/S2-T41.fix1b.return.md`; `log-lines.md`, 10:05).
+- O1 expands absent/partial/empty/whitespace cases and complete pending-contract control with socket/child/build/file/directory tripwires. A file-write plant fails the same focused test (exit 1, eight failing subcases), then four wiring tests pass (exit 0). Help first fails (eight tests, four failures, exit 1), then command tests pass. F2 checks both invented values across stdout/stderr/files/paths/receipts/argv/effective child environments; a real build-seam receipt prevents an empty receipt loop. Fourteen leak-channel runs fail with value-specific assertions, then eight command tests pass. B2's six rounding/unit/request boundary defects each fail the focused quota test; restored CDSE files pass 14 tests. B1/B3 are prose corrections verified by reading/docs, with no artificial red test claimed. Records append corrections without rewriting previous bytes (`verdicts/S2-T41.fix1b.return.md`, Obligations and plant evidence).
+- Final fix evidence: CDSE 14 passed; scripts 904 tests OK in 312.927 s; custodian 7,370 passed, one existing warning, 309.76 s; all exit 0. Ruff/format/mypy/docs/tree/parity/whitespace exit 0 (742 formatted files; 414 typed files; 1,032 text/116 Markdown; eight tree rules). Python 3.14.6, UV_OFFLINE=1, PYTHONDONTWRITEBYTECODE=1, workspace TMPDIR; direct test commands supplied no seed. Broad runs began after code/test commit `2d1ccf4`, with only records appended afterward; document/tree/parity/whitespace checks repeated at final `3fa8d4c`. Earlier deterministic typing/lint corrections remain recorded (`verdicts/S2-T41.fix1b.return.md`, Final checks).
+- Final lens A: Anthropic Claude Opus 5.5 through login C/Claude Code, APPROVED `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, replacing Moonshot because the relay lacked credit. O1, F2, B1–B3 and records closed under the ruling; no blocking findings or weakening. It independently ran CDSE (14 passed, exit 0), command discovery (eight tests, exit 0), wiring discovery (four tests, exit 0), docs/parity and throwaway O1/F2 plants. Nine Popen-channel leak plants were value-specific red; three O1 plants each failed with eight subcases. The bare `scripts.tests.test_commands` invocation failed import (exit 1, one error); discovery succeeded. The base and final narrowed ordinary-build tests both missed a separate radiance-path leak, so no pre-existing coverage was lost. Broad suites were not rerun. Wrapper/real confinement were not inspected (`verdicts/S2-T41.confA1.return.md`; `log-lines.md`, 10:17 launch attribution).
+- Lens A's N1 and N2 are recorded, NOT fixed: N1 duplicates the help boundary literal outside the architecture table; N2's bare MagicMock causes subprocess.run/check_output leaks to fail through ValueError rather than value-specific assertions, and other child-launch seams are not recorded. Both are nonblocking proposed follow-ups (OI-316 and OI-317 in items.md). Its CONSULT interprets ruling refusal as decision-0066 successful omission, exit 0; it does not request an exit-code change (`verdicts/S2-T41.confA1.return.md`, Findings and CONSULT).
+- Final lens B: xAI Grok 4.7 High through Cursor (self-label SpaceXAI Grok 4.7), APPROVED `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, no findings. It confirms the ruling's accepted obligations, both-value channel assertions, limited scope and preservation of existing controls on reading. No tests run, no independent test exits/counts claimed (`verdicts/S2-T41.confB1.return.md`; `log-lines.md`, 10:17).
+
+#### Lead whole tests and records notes
+
+- lv1 at original commit `7ce5fc6537ac541f9af6cc60991edf65e4b9f591`, seed 2327118317: exit 0, RESULT PASSED. Suite passes: guards 910; core 739; custodian-1 4,163; custodian-2 3,207; product 786; web-checks 861; web-unit 1. Supplied total 10,667 passed, zero failed/skipped, seven suites, zero with problems (`lead-test-lv1.txt`; `log-lines.md`, 08:32 and 09:36).
+- lv2 at final commit `3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60`, seed 1164900349: exit 0, RESULT PASSED. Suite passes: guards 910; core 739; custodian-1 4,163; custodian-2 3,207; product 786; web-checks 861; web-unit 1. Supplied total 10,667 passed, zero failed/skipped, seven suites, zero with problems. The files provide no wall duration or per-suite timing, so none is inferred. Neither head test proves a future exact merge result (`lead-test-lv2.txt`; `log-lines.md`, 10:05 launch).
+- Commit-subject records: the three fix subjects are `fix: close S2-T41 credential leak verification gaps`, `test: isolate the CDSE leak fixture environment`, and `docs: record S2-T41 fix evidence and commit correction`; none carries literal `(S2-T41)` scope. Preserve them exactly; do not imply all four subjects have that suffix. The first subject is `feat(custodian): optional free CDSE backup cache behind its own flag, with decision record 0066 (S2-T41)` (fix subjects: `verdicts/S2-T41.fix1b.return.md`, Commits; complete subjects independently read from Git at WORK).
+
+#### CONSULT and uncertainty for the lead
+
+- Required spec inputs PRNUM and SEEDNUM remain placeholders. No supplied evidence establishes a PR number or fresh ledger/exact-merge seed. Plan-1 return, exact planner/build session model identifiers, complete provider page evidence, timing of whole suites and future hosted/exact-merge approval remain unavailable; historical labels/results above are qualified accordingly (`log-lines.md`; `lead-test-lv1.txt`; `lead-test-lv2.txt`; supplied verdicts).
+- Read-only Git scope audit at the brief's exact BASE and WORK: merge-base is `b1e8653ccfd15e242308a147a5cafb34799d9a54`, not BASE `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02`. The four work commits descend from that older base. The exact requested scope therefore includes pre-task branch divergence, including decision-0062 deletions and other pack changes; these are not claimed as approved S2-T41 implementation. spec.json deliberately preserves the exact requested diff, rather than silently narrowing it. Lead disposition/rebase and corresponding review/check requirements remain unresolved. Source: brief BASE/WORK plus this preparation's read-only `git merge-base`, `git diff --name-status BASE WORK`, and `git log BASE..WORK`; the supplied ledger evidence does not authorize or explain those extra changes.
+- OI-316/OI-317 are the next unused sequential OI numbers at WORK (read-only scan of OPEN_ITEMS.md ID fields: maximum 313). `log-lines.md` mentions next OI-316 in another lead context, so the lead must check reservations on the eventual joined tree before appending. Existing S2-T41 provider/display/hardening open points are retained, not duplicated or closed (`verdicts/S2-T41.build1.return.md`, pending work; `verdicts/S2-T41.fix1b.return.md`, Reading-only limits; `log-lines.md`, 07:58).
+
+Muhasabah gate: PASS for evidence preparation with the stated uncertainties. No independent approval, provider readiness, merge or successful future ledger replay is inferred from these records.
+
+#### Carry onto main
+
+- The four approved commits sat on `b1e8653ccfd15e242308a147a5cafb34799d9a54`, a main before pull requests 95 and 96, and `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02` is not their ancestor (found by the ledger preparation). The lead cherry-picked them onto `4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02` in order: `68c26fdf`, `92d29d83`, `bac208e2` and `8cdff52631cbc8098781490ef61c07de4176cc93`.
+- One conflict, in `docs/README.md`: main's index line of decision records (which accepts 0029 and 0062) is kept and the carried change adds only "[0066](decisions/0066-an-optional-free-cdse-backup-cache.md)" to the proposed decisions. The lead's file-by-file proof (join_proof over approved `b1e8653..3fa8d4c` and carried `4679f3c..8cdff52631cbc8098781490ef61c07de4176cc93`): 51 of 52 files byte-identical; `docs/README.md` differs by that one line (+2 -2 lines); no file changed only in the carried diff. No code or test differs from the approved commits.
+
+#### Evidence for the work commit `8cdff52631cbc8098781490ef61c07de4176cc93`
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_cache.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 4–6; PUB-01, PUB-04, PUB-10, PUB-11, PUB-19. Invented metric tiling, raster/date/mask validation, fixture ceiling and exact quota boundaries, response/request hashes, receipt and immutable snapshot chains, cache containment and malformed/partial promotion plants. Internal fixture arithmetic is not a verified provider tariff or live contract. No network or real cache.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 2, 3 and 6; PUB-03, PUB-12, ARC-13, ARC-98, OPS-07, OPS-08. Closed invented OAuth/Process envelopes, exact endpoint plus allow-listed host, pending-contract refusal, redirect/body/header/request-budget plants, all-issued-token redaction and registry isolation. No live provider or credential proof.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   PYTHONPATH=scripts:scripts/tests uv run --locked python -m unittest scripts.tests.test_commands -v
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 3 and 6; ARC-96, ARC-98, OPS-65, OPS-71, AGENTS.md rule 14; L-1092 F2. Closed command/help contract and absence of both invented CDSE values from stdout, stderr, files, paths, nonempty produced receipts, recorded argv and effective Popen child environments. Helper-path setup is required: confirmation A recorded ModuleNotFoundError for the bare module invocation. Popen recorder diagnostic and other child seams remain N2, proposed OI-315; this command does not claim broader child interception.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   PYTHONPATH=scripts:scripts/tests uv run --locked python -m unittest scripts.tests.test_cdse_key -v
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T41; proposed decision 0066 items 1, 3 and 6; OPS-07, OPS-08, OPS-65, OPS-71, ARC-98; L-1092 O1. Neither/partial/empty/whitespace pairs omit before acquisition or file writes; complete invented control still omits pending provider verification. Default mode excludes backup, unknown flags refuse and credential repr is redacted. Omission is exit 0, not an independent caller-identity check.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "All checks passed!"
+Seed:      none
+Notes:     Lint WORK; use replay result, not historical builder output.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "745 files already formatted"
+Seed:      none
+Notes:     Read-only format check at WORK; historical corrections remain in log.md.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 414 source files"
+Seed:      none
+Notes:     Type-check WORK with the locked repository environment; counts come from the lead replay.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1036 text files, 117 Markdown files: OK"
+Seed:      none
+Notes:     Document checks at WORK; decision 0066 remains Proposed and no provider readiness is inferred.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Layout and empty example-name inventory at committed WORK; earlier builder index failure is corrected append-only, not suppressed.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02...8cdff52631cbc8098781490ef61c07de4176cc93'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/src/eii_custodian/publicdata/cdse/README.md A:custodian/src/eii_custodian/publicdata/cdse/__init__.py A:custodian/src/eii_custodian/publicdata/cdse/cache.py A:custodian/src/eii_custodian/publicdata/cdse/contracts.py A:custodian/src/eii_custodian/publicdata/cdse/transport.py A:custodian/tests/test_cdse_cache.py A:custodian/tests/test_cdse_transport.py A:docs/decisions/0066-an-optional-free-cdse-backup-cache.md A:scripts/cdse_key.py A:scripts/tests/test_cdse_isolation.py A:scripts/tests/test_cdse_key.py M:.env.example M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/fetch/registry.py M:custodian/tests/test_publicdata_behaviour.py M:custodian/tests/test_publicdata_licence.py M:custodian/tests/test_publicdata_registry.py M:docs/01_PROJECT_BRIEF.md M:docs/02_ARCHITECTURE.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/05_SYNTHETIC_WORLD_AND_SIMULATION.md M:docs/08_BACKEND.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/13_DEPLOYMENT_AND_OPERATIONS.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/15_REVIEWER_CHECKLIST.md M:docs/16_DEMO_RUNBOOK.md M:docs/GLOSSARY.md M:docs/README.md M:eii M:scripts/check_tree.py M:scripts/commands/build_public.py M:scripts/commands/table.py M:scripts/commit_guard.py M:scripts/preflight.py M:scripts/preflight_rows.py M:scripts/tests/commands_support.py M:scripts/tests/import_boundary_guard.py M:scripts/tests/test_check_tree.py M:scripts/tests/test_commands.py M:scripts/tests/test_hooks_guard.py M:scripts/tests/test_import_boundary_files.py M:scripts/tests/test_operations_parity.py M:scripts/tests/test_preflight_rows.py M:scripts/tests/test_preflight_run.py M:scripts/tests/test_s1_followup.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "52 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact git diff --name-status BASE WORK, including inherited base divergence. BASE is not an ancestor of WORK: merge-base is b1e8653ccfd15e242308a147a5cafb34799d9a54. Do not describe this list as S2-T41-only scope. The lead must disposition the divergence before ledger replay/join; see log.md CONSULT.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   ./eii test --seed 2801618360
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    10667 passed, 0 failed, 0 skipped
+Seed:      2801618360
+Notes:     Lead only: fresh supplied seed, provider none, offline, no real cache, unchanged gates and limits. SEEDNUM is unresolved input, not execution evidence. Historical lv1/lv2 tests are recorded separately and do not prove an exact future merge result.
+```
+
+```text
+### S2-T41 — Optional offline satellite backup cache from CDSE
+Commit:    8cdff52631cbc8098781490ef61c07de4176cc93
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','4679f3cc60d7a4c1e0ad7e91ab0ae1cd4f8c9e02..8cdff52631cbc8098781490ef61c07de4176cc93'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Four S2-T41 commits: 7ce5fc6537ac541f9af6cc60991edf65e4b9f591, 4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a, 2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c, 3fa8d4cdc46bc4aed2ae63ff489b9ebf06c4be60. All subjects are Conventional Commits; the three fixes have no literal (S2-T41) scope suffix. BASE divergence is unresolved; do not assume ancestor-chain replay from BASE.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -36001,3 +36202,95 @@ Senior expert persona: senior test-infrastructure engineer (builder: OpenAI GPT-
 | 2026-11-18 | Lead check lv1, split as built | `./eii test --seed 3740962858`, cores 4 to 7: exit 0, 10473 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3178, python-product 786, web-checks 861, web-unit 1). | lead |
 | 2026-11-18 | Lead check lv2 on head `dbaebe0ca1344612584ad74341fa7ecc74508340` | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0; `ruff check` 0; `ruff format --check` 0; `mypy` 0; `check_docs.py` 0; `check_tree.py` 0; `cmp AGENTS.md CLAUDE.md` 0; `git diff --check b380109 HEAD` 0; heights tests 82 passed, exit 0. Then `./eii test --seed 2082766191` (tmp/eiitest_bg.sh): exit 0, 10479 passed in seven suites (python-guards 897, python-core 739, python-custodian-1 4011, python-custodian-2 3184, python-product 786, web-checks 861, web-unit 1). | lead |
 | 2026-11-18 | Review | APPROVED `dbaebe0ca1344612584ad74341fa7ecc74508340`, R1 to R5 PASS; whole collection 7195 = part 1 4011 + part 2 3184 (base 7189 plus the 6 clock tests); 96 focused tests passed; ruff and mypy exit 0. | Google Gemini 3.1 Pro |
+
+
+## S2-T41 — Optional unread CDSE cache, offline build evidence
+
+Builder: OpenAI, GPT-6 through Codex, senior security engineer and Python test engineer. Strict self-review persona: security reviewer tracing every secret path. Supplied session role says "GPT-6"; the tool exposes no more precise session model identifier, so none is invented. The plan confirmation is Anthropic’s separate plan verdict, not an implementation approval. Independent maker implementation reviews remain the lead’s next step.
+
+Skills loaded: project-orientation, task-standards, sanad-provenance, domain-modeling, github-flow and muhasabah-gate. Installed catalogs and skill-file search provided no test-driven-development, verification-before-completion or security-review file; equivalent rules applied: ordered red-first tests, planted violations, exact exit/count recording, verification before claims and secret-flow/host/boundary review. No unavailable skill is claimed loaded. No sub-agent or external service was called.
+
+Base/unchanged HEAD: `b1e8653ccfd15e242308a147a5cafb34799d9a54`; branch `local/S2-T41`. Implementation is an uncommitted worktree change: `git add .env.example` returned 128 because the shared worktree index is read-only outside the writable workspace. No commit hash for the implementation exists; no push, permissions change or alternate-index workaround was attempted.
+
+Environment for tests: repository root; `TMPDIR` is the absolute path of `.overnight/tmp` within the workspace; `UV_OFFLINE=1`. Focused unittest module invocations also use `PYTHONPATH=scripts:scripts/tests`; discovery itself needs no path override. Python is the locked managed interpreter. No seed override was supplied; the repository’s existing `eii` Hypothesis profile and each fixture’s own seed are retained. No live credentials, setup file, real public cache or provider page was read by the builder. Existing loopback probe fixtures remain local; the new transport/cache cases deny sockets and use invented values/responses only.
+
+Commands below abbreviate `uv run --locked python` as `PY`; this is notation only, not a changed command. `--basetemp` values are the absolute workspace-local temporary folders named in each row, never a path outside the workspace.
+
+- Item 0 documents: inserted queued S2-T41 with criteria unticked, filed decision 0066 as Proposed, indexed it in the proposed list and extended the named live policy passages. Preserved accepted decision history and product configuration lists. No red test is applicable to this filing step.
+- Item 1 inventory red: `PY -m unittest scripts.tests.test_check_tree.CheckTreeTests.test_cdse_inventory_and_plants`, exit 1, one failing test (missing CDSE inventory). An earlier invocation exited 1 with one import error; the harness import path was fixed before the meaningful red run. Same command green: exit 0, one test, six remove/reorder/populate plants caught. PINNED_FOLDERS unchanged.
+- Item 2 presence red: with the path override, `PY -m unittest scripts.tests.test_preflight_rows scripts.tests.test_preflight_run scripts.tests.test_operations_parity`, exit 1, 30 tests, 20 failing subcases and one missing-row error. The earlier invocation without the path override exited 1, six tests, six failing subcases and two import errors; recorded as harness failure, not guard evidence. First implementation run of rows/run exited 1, 26 tests, two baseline-index failures; corrected the exact row positions for the two added names. Final combined item 2/3 green below catches blank/partial/full pair, output echo, network/child call and document/code parity plants, without a severity relaxation.
+- Item 3 commit/boundary red: `PY -m unittest scripts.tests.test_hooks_guard scripts.tests.test_s1_followup scripts.tests.test_import_boundary_files`, exit 1, 40 tests, 24 failing subcases. Plants include both new names, environment/setup fixture sources, staged values, short fail-closed values, unlisted suffixes, and Python/text/binary product/core violations; custodian name references remain allowed. Item 2/3 combined green: same three files plus rows/run/parity, exit 0, 70 tests. MIN_LENGTH, KEY_ALLOWANCE and the closed probe-child environment are unchanged.
+- Item 4 wiring red: `PY -m unittest scripts.tests.test_cdse_key`, exit 1, one collection/import error before reader implementation. Green with command/launcher files: `PY -m unittest scripts.tests.test_cdse_key scripts.tests.test_commands scripts.tests.test_launcher`, exit 0, 18 tests. Explicit optional mode omits missing/partial/pending setup; default mode excludes the source; extra/unknown flags refuse before credential reading. Both new names were added to the two custodian KEY_NAMES inventories, with unrelated-fetcher plants and no KEY_ALLOWANCE change.
+- Item 4 transport red: `PY -m pytest custodian/tests/test_cdse_transport.py -q -p no:cacheprovider --basetemp=<temporary red-transport>`, exit 2, one collection error before the transport existed. Same file after implementation with `<temporary green-transport>`: exit 0, five tests. Plants: HTTP/off-host/off-path/query/user-info URL, arbitrary body/script fields, malformed auth, redirect, secret/token echo, extra header, and unbudgeted third/metadata attempts. Sanitized refusal retains the provider text. No live host, wire schema or sender is invented.
+- Item 5 cache red: `PY -m pytest custodian/tests/test_cdse_cache.py -q -p no:cacheprovider --basetemp=<temporary red-cache>`, exit 2, one collection error before contracts/cache existed. Green with `<temporary green-cache>`: exit 0, five tests. Plants: invalid metric CRS/footprint/dimensions, over-cap edge, missing/out-of-window date, unsupported cloud-free claim, collection/band/transform changes, unknown/insufficient quota, absent reserve choice, malformed raster/evidence/hash, partial write, symlink/cache escape, release output, changed receipt and bad parent/member references. Pending terms remain usable and snapshots use existing sidecar_for/commit_pair.
+- Item 6 isolation red: `PY -m unittest scripts.tests.test_cdse_isolation`, exit 1, four tests with nine failing subcases. Same command green: exit 0, four tests. Plants cover product cache reads, serving/config/facts, bundled cache assets, and custodian release/freeze/world/assignment inclusion; the empty product stays independent. No display or placeholder-command integration is claimed.
+- Additional registry plant: initial test erroneously passed because the asdict fixture was invalid; adding a valid-row assertion exposed two fixture errors (exit 1 each), then switching to the real registry-row shape produced the meaningful red: `PY -m pytest custodian/tests/test_cdse_transport.py -q -p no:cacheprovider --basetemp=<temporary red-registry-correct>`, exit 1, one failed/five passed. The source/kind/release/nightly schema is now closed; later focused green below covers it.
+- Additional host-admission plant: `PY -m pytest custodian/tests/test_cdse_transport.py::test_endpoint_record_does_not_bypass_host_allowlist -q -p no:cacheprovider --basetemp=<temporary red-host>`, exit 1, one failed. Fix requires both the reviewed exact endpoint and existing PUB-03 host admission; no CDSE host is admitted by this build. Transport/cache green with `<temporary green-host>`: exit 0, 12 tests.
+- Additional request-hash plant: `PY -m pytest custodian/tests/test_cdse_cache.py::test_request_hash_excludes_response_metadata -q -p no:cacheprovider --basetemp=<temporary red-request-hash>`, exit 1, one failed. Request hash now excludes response dates/coverage; separate metadata/boundary hashes bind them in the immutable receipt. Transport/cache green with `<temporary green-request-hash>`: exit 0, 13 tests.
+- Focused public suites: `PY -m pytest custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_licence.py -x -q -p no:cacheprovider --basetemp=<temporary diagnose-public>`, exit 0, 49 passed.
+- First broad scripts run: `PY -m unittest discover -s scripts/tests -p 'test_*.py'`, exit 1, 904 tests, one failure: real-repository tree scan reads the unchanged index. ResourceWarnings arose in existing temporary-directory fixtures; no failure was hidden or skipped.
+- First broad custodian run: `PY -m pytest custodian/tests -q -p no:cacheprovider --basetemp=<temporary bt>`, exit 1, 103 failed, 7263 passed, one warning. Inserting the new row first changed the base row used by BACI fixtures; moved the row to the end without changing any existing row. The explicit count and no-nightly inventories were extended by one source. No numeric baseline or privacy rule changed. Follow-up `test_baci_complete_archive` with `<temporary diagnose-baci>`: exit 0, one passed. This is a diagnosed deterministic defect, not an unexplained random failure.
+- Registry follow-up runs: `PY -m pytest custodian/tests/test_publicdata_registry.py -x -q -p no:cacheprovider --basetemp=<temporary registry-check>`, exit 1, one failed/68 passed (new source count). `PY -m pytest custodian/tests/test_cdse_transport.py custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider --basetemp=<temporary green-registry>`, exit 1, one failed/83 passed (new no-nightly member). Both inventories were corrected explicitly for S2-T41.
+- Focused final public suites: `PY -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_licence.py custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider --basetemp=<temporary final-focused>`, exit 0, 140 passed.
+
+Open provider facts, internal placeholder limits, display ownership, independent review and the read-only-index blocker are appended under OPEN_ITEMS.md’s S2-T41 heading. No acceptance, real imagery, live fetch, source completeness, independent implementation approval, merge or freeze is claimed. Final checks and whole-suite correction evidence follow in append-only rows.
+
+- Final changed scripts: `PY -m unittest scripts.tests.test_check_tree scripts.tests.test_preflight_rows scripts.tests.test_preflight_run scripts.tests.test_operations_parity scripts.tests.test_hooks_guard scripts.tests.test_s1_followup scripts.tests.test_import_boundary_files scripts.tests.test_commands scripts.tests.test_cdse_key scripts.tests.test_cdse_isolation`, exit 1, 118 tests, one failure only (unchanged read-only index). New-key hook values were subsequently made visibly fake with a FAKE prefix while retaining the exact existing short-value lengths; targeted verification follows.
+- Static-check correction history: first `uv run --locked ruff check .` exited 1 with three import/unused-name findings; first mypy exited 1 with six typing findings. Fixed imports, tuple annotation and fixture callable type without changing any checker configuration; mypy’s second pass exposed one invalid geometry import, then exited 0 for 414 files after reusing the existing frame shape API. First docs scan exited 1 for an invented user-info URL matching the email guard; constructed the user-info plant without a literal email, preserving the URL refusal. Docs scan then exited 0 for 1031 text/115 Markdown files. A later ruff pass exited 1 for two import-order findings and then exited 0 after fixing those imports. Formatter was explicitly applied (20 files, then one, then five); no baseline was regenerated.
+- Final checks to date: `uv run --locked ruff check .` exit 0; `uv run --locked ruff format --check .` exit 0, 742 files; `uv run --locked mypy` exit 0, 414 files; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. `python3 scripts/check_tree.py` exit 1, exactly the expected env-example/index mismatch, eight rules checked; the index was not changed or bypassed.
+
+- Final self-review found a token-refresh leak: after refresh, refusal redaction forgot the previously issued token. Red `PY -m pytest custodian/tests/test_cdse_transport.py::test_refusal_redacts_every_issued_token_after_refresh -q -p no:cacheprovider --basetemp=<temporary red-refresh>` exited 1, one failed. Keep all issued tokens only in memory for redaction; green transport/cache with `<temporary green-refresh>` exited 0, 14 passed. This change occurred during the second broad custodian run and is covered afterward by the focused final files; that broad run’s count therefore precedes this added test. No old assertion was removed.
+- Visibly fake hook fixture follow-up: `PY -m unittest scripts.tests.test_hooks_guard`, exit 0, 23 tests. Final docs scan at that point: `python3 scripts/check_docs.py`, exit 0, 1032 text/116 Markdown files. Refreshed mypy: exit 0, 414 files; ruff check exit 0. Format check then caught one line after the refresh fix (exit 1); applied the formatter explicitly to that one file before final validation.
+
+- Final focused public verification after the refresh fix and formatting: `PY -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_licence.py custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider --basetemp=<temporary final-focused-after-refresh>`, exit 0, 141 passed. Final static checks: ruff check 0; ruff format --check 0 (742 files); mypy 0 (414 files); check_docs 0 (1032 text/116 Markdown); cmp 0; git diff --check 0. check_tree remains exit 1 with only the unchanged-index name mismatch (no bypass).
+
+- Corrected full custodian run: `PY -m pytest custodian/tests -q -p no:cacheprovider --basetemp=<temporary bt>`, exit 0, 7369 passed, one warning in the existing duplicate-ZIP refusal fixture, 425.10 seconds. Output captured in the task’s ignored evidence after local-path redaction; the child exit was propagated, not hidden. The refresh case added during this run is separately covered in the 141-pass final focused run above. No flaky failure remains unexplained and no retry, skip, tolerance, privacy rule or baseline refresh concealed a failure.
+- Handoff self-audit: PASS for a truthful offline-build handoff; completion/merge gate remains NOT MET because staging/committing and the index-based check are blocked, independent implementation reviews are not yet supplied, and provider facts intentionally remain pending. Proposed decision 0066 is not represented as accepted. No live request, real imagery, wrapper, display or product-readable asset was built or claimed.
+
+
+### S2-T41 fix round 1 — L-1092 correction
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-19 | Correction to S2-T41's uncommitted/index-blocker evidence | The implementation is committed at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` (`7ce5fc6`), committed unchanged by the lead. Before any fix edit in this private clone, `python3 scripts/check_tree.py` exited 0, eight rules checked (`.overnight/tmp/base-tree.log`). The earlier no-commit and unchanged-index refusal statements remain historical observations, superseded by this correction. Fix commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` implements only L-1092 O1, F2 and B1–B3. | OpenAI GPT-6 through Codex; senior security engineer and Python test engineer; strict self-review persona: security reviewer tracing every credential path and rejecting leak tests that do not assert the leaked value. |
+
+Skills read and applied: project-orientation, task-standards, github-flow, strict-reviewer, sanad-provenance and muhasabah-gate. Requested test-driven-development, systematic-debugging, security-review and verification-before-completion are unavailable by those names; their plain meanings are applied as the brief directs. The builder's self-review is not an independent maker verdict; both lens confirmations remain with the lead.
+
+Environment: Python 3.14.6, Linux, `UV_OFFLINE=1`, `PYTHONDONTWRITEBYTECODE=1`; `TMPDIR` resolves to this workspace's `.overnight/tmp`. No seed supplied or printed by these direct pytest/unittest commands. Commands run from the repository root; full output, with local paths redacted, and actual child exits are under `.overnight/tmp/` and `.overnight/tmp/checks.jsonl`.
+
+
+#### S2-T41 fix round 1 — plants and focused evidence
+
+Additional code commit: `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c`, `test: isolate the CDSE leak fixture environment`. The fixture clears the surrounding environment before adding the invented pair, so inherited-child leak diagnostics cannot print unrelated environment values. This follows self-review of commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a`.
+
+| Obligation | Evidence and real exits |
+|---|---|
+| O1 | Existing command refusal required no production change. Before edits, `uv run --locked python -m unittest discover -s scripts/tests -p test_cdse_key.py -q` exited 0, four tests (`base-o1.log`). The expanded optional-mode test covers neither value, each value alone, both empty, each empty with the other present, each whitespace-only with the other present, and a complete invented control. It denies sockets, children, the build seam, file opening and directory creation; stderr and the temporary root stay empty. Deliberately writing when the reader returns no pair makes `uv run --locked python -m unittest discover -s scripts/tests -p test_cdse_key.py -k test_optional_mode_never_opens_before_verification -q` exit 1, one test with eight failing subcases (`o1-file-write-final-red.log`). Remove plant: the four-test module exits 0 (`o1-committed.log`). Help and decision 0066 item 3 state the possession boundary. Expected-help update before implementation: eight command tests, four failures, exit 1 (`help-red.log`); implemented help: eight pass, exit 0. |
+| F2 | `scripts/tests/test_commands.py::Commands.test_build_public_usage_and_unreachable` binds both fake CDSE values, produces a real fixture receipt before a controlled unreachable source, and checks stdout, stderr, every file/path, explicit receipts, recorded argv and each child environment, including inheritance. For each value, temporary leaks into stdout, stderr, a file, a receipt, argv, an explicit child environment and an inherited environment made `uv run --locked python -m unittest discover -s scripts/tests -p test_commands.py -k test_build_public_usage_and_unreachable -q` exit 1: fourteen final plant invocations, each running one test and failing a value-specific assertion. Logs: `cdse_client_id-*-final-red.log` and `cdse_client_secret-*-final-red.log`; the two inherited-environment invocations each expose both fake values. All plants removed: eight command tests pass, exit 0 (`commands-committed.log`). Earlier twelve-channel plant invocations also exited 1 and remain in `checks.jsonl`. |
+| B1 | SYN-88's requirement now excepts only the unread `satellite_cdse_backup` public cache. The optional-backup policy is in that cell; its verification cell retains the sandbox/import-boundary/reviewer checks. Prose change, so no new executable guard or red plant is claimed; verified by reading and `check_docs.py`. |
+| B2 | The invented 1001-pixel cost pins a non-integral unit/quantum ratio above the minimum. The budget pins equality, one quantum below and above the unit allowance, and equality, one request below and above the request allowance. Six temporary source defects (floor, nearest, unit equality refusal, accepting a unit excess, request equality refusal, accepting a request excess) each make `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py -k test_quota_unknown_insufficient_rounding_and_enumeration -q -p no:cacheprovider` exit 1, one failed and five deselected (`b2-*-final-red.log`). Original source bytes restored. `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py -q -p no:cacheprovider`: exit 0, fourteen passed (`cdse-committed.log`). |
+| B3 | Document 02 section 2 Public fetchers ends the vault prohibition with a period before the decision 0066 sentence. Prose-only; source inspection and `check_docs.py`, no new guard or artificial red plant. |
+
+Initial development checks are retained: ruff exited 1 for two B023 test-closure diagnostics; mypy exited 1 for one optional-bytes test diagnostic. Passing explicit arguments to the test helper and narrowing the receipt-file values fixed them without changing assertions or checker settings. First broad runs, started before the final fixture cleanup, both passed: custodian 7370 passed with one existing duplicate-ZIP warning (exit 0, 322.38 s pytest time); scripts 904 tests (exit 0, 332.234 s unittest time). They are not represented as checks started on the final code commit. The repeated broad runs below validate committed code after that cleanup, rather than retrying a failure.
+
+
+#### S2-T41 fix round 1 — committed-code verification
+
+The final broad suites started after code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c`; no code or test changed during those runs. Only these append-only records were completed during verification. Final document/tree/parity/diff checks also cover the records commit. All task-owned plants are removed; `scripts/commands/build_public.py` and `custodian/src/eii_custodian/publicdata/cdse/contracts.py` match base `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` byte for byte.
+
+| Command | Exit | Observed result | Log under `.overnight/tmp/` |
+|---|---:|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py -q -p no:cacheprovider` | 0 | 14 passed, zero failed/skipped | `cdse-committed.log` |
+| `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -q` | 0 | 904 tests, OK, zero failed/skipped; 312.927 s unittest time | `scripts-committed.log` |
+| `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -x` | 0 | 7370 passed, zero failed/skipped, one existing duplicate-ZIP warning; 309.76 s pytest time | `custodian-committed.log` |
+| `uv run --locked ruff check .` | 0 | All checks passed | `ruff-committed.log` |
+| `uv run --locked ruff format --check .` | 0 | 742 files already formatted | `format-committed.log` |
+| `uv run --locked mypy` | 0 | 414 source files, no issues | `types-committed.log` |
+| `python3 scripts/check_docs.py` | 0 | 1032 text files, 116 Markdown files | `final-records-docs.log`; repeated after final append |
+| `python3 scripts/check_tree.py` | 0 | Eight rules checked | `final-records-tree.log`; repeated after final append |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Bytes identical | `final-records-parity.log`; repeated after final append |
+| `git diff --check 7ce5fc6 HEAD` | 0 | No whitespace errors | `committed-diff.log`; repeated on final records commit |
+
+Additional focused final commands: `uv run --locked python -m unittest discover -s scripts/tests -p test_commands.py -q`, exit 0, eight tests (`commands-committed.log`); same discovery with `-p test_cdse_key.py`, exit 0, four tests (`o1-committed.log`). Both records files retain the complete earlier bytes as prefixes. There were no unexplained random failures, retries, skipped tests, weakened guards, changed pins or refreshed baselines. The existing warning is from the deliberate duplicate-ZIP refusal fixture, not a failed test.
+
+Self-review and muhasabah: PASS for this offline fix's evidence and scope. Wrapper confinement is the lead's ruling, not independently exercised here; provider contracts and live behavior remain unverified. No real setup, private input, vault or real public cache was inspected, and no provider request, wrapper, display, mutation campaign, push or merge was performed. Both independent lens confirmations and the normal hosted/exact-merge gates remain with the lead.
