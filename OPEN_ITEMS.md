@@ -2852,6 +2852,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 
 
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4393,6 +4395,46 @@ Revision-2 record points without extra numbers:
 - NEEDED BY: The lead's later S2-T11 parser task and truthful review-note handoff; no new current-PR acceptance or mutation gate is invented.
 - COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
 
+### PO-S2-121 — Two plant tests of the mutation-ledger guard accept any parse failure
+
+- ID: PO-S2-121
+- TYPE: OPEN
+- RAISED BY: Anthropic Sonnet 5.5, S2-T43.rev3 nit 1, as recorded in the lead log at 2026-11-19 17:37 (label assigned there).
+- CONCERNS: the planted malformed-copy tests of the mutation-ledger parse guard (S2-T43).
+- EVIDENCE: the TOML decode error subclasses ValueError, so two plant tests could pass on any parse failure rather than on the planted defect.
+- NEEDED: tighten those two plants with assertRaisesRegex on the expected message, in a small follow-up; no check is relaxed.
+- COMPARISON: PO-S2-122 to PO-S2-124 concern S2-T37; this is the only S2-T43 residual.
+
+### PO-S2-122 — The README still names a fixed places-copy release
+
+- ID: PO-S2-122
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rev1 N1, as recorded in LOG-S2-6-verdicts.md at 2026-11-19 04:00.
+- CONCERNS: README.md's S2-T15 paragraph naming release 2025-01-10 as the pinned copy.
+- EVIDENCE: The lead explicitly sends this note to the S2-T10 sweep. The paragraph is still present at WORK. S2-T37 changes selection to the newest dated release at each refresh; its task-specific document changes are separately approved.
+- NEEDED: In the owning documentation sweep, make the README describe the approved newest-release rule while preserving truthful pipeline limits. This draft changes no tracked wording and claims no completed correction.
+- COMPARISON: OI-96 is the historical owner decision; this item concerns the current README summary rather than reopening that decision. No matching proposed-item entry was found at WORK.
+
+### PO-S2-123 — Release-path validation reads only the first date substring
+
+- ID: PO-S2-123
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rev1 N2, as recorded in LOG-S2-6-verdicts.md at 2026-11-19 04:00.
+- CONCERNS: validate_release_path in the places-copy release validator.
+- EVIDENCE: The lead's note for the ledger says that validation reads the first date substring only. The detailed original rev1 return is not supplied; no additional exploit, failing test, severity or affected path shape is inferred from that summary.
+- NEEDED: Attach the detailed review note and determine whether a later date substring requires a bounded follow-up and planted case. Keep the approved release/date binding and fail-closed behavior; no permissive fallback is authorized.
+- COMPARISON: The carry-back approval of dbf94f0c and the train's forced-document confirmation are separate evidence and do not dispose of this residual. No matching proposed-item entry was found at WORK.
+
+### PO-S2-124 — The exclusion-audit docstring still calls the copy pinned
+
+- ID: PO-S2-124
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T37.rbconf1 F2; retained as cosmetic by RULING-L1095.md at 2026-11-19 09:57.
+- CONCERNS: scripts/fsq_exclusions.py module docstring.
+- EVIDENCE: The supplied carry-back return notes that the docstring still says the pinned copy's excluded file footers although the fixed-release constant is retired. The same wording remains at WORK. L-1095 sends the note to the next fix touching that file.
+- NEEDED: Correct the description in that scoped follow-up, preserving the explicit release argument and every existing validation. This is a wording note, not a rejected code or test change.
+- COMPARISON: PO-S2-122 concerns README.md; this item is the helper's own description. No matching proposed-item entry was found at WORK.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
@@ -4669,3 +4711,25 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - CONCERNS: `pub_venue_visits` closure or restricted-opening status
 - EVIDENCE: Document 03, `pub_venue_visits` contract, has `value int` and no status column. The S2-LR3F brief binds four exact note forms to the National Planning Council museum-visits JSON export retrieved 2026-11-19, SHA-256 `8a89835ea0587994cdaff627395e66935ae1dabf8caceae8e20640be77d8a040`. Under L-1141 these cells are reviewed missing values, counted in coverage and never zero; this change does not store closure as a separate fact.
 - NEEDED: A decision record on a closure status of `pub_venue_visits`, or one line saying why not.
+## OI-314 — The unstable-key evidence test fails for some string hash seeds
+
+- ID: OI-314
+- TYPE: OPEN
+- RAISED BY: the lead's ruling L-1050 of 2026-11-19, from the random failure of the S2-T37 whole run (seed 3764211809)
+- CONCERNS: `custodian/tests/test_investment_evidence_survivors_8.py::test_unstable_caller_key_never_invents_identifier_text`; AGENTS.md rules 36, 37 and 39; task S2-T40
+- EVIDENCE: The test failed alone under `PYTHONHASHSEED=3764211809` (its `project_key` case) and under `PYTHONHASHSEED=1` (two `project_id` cases), and passed under 0; the whole-test runner passes the run seed as `PYTHONHASHSEED`, so the failure was deterministic per seed. Cause: the test's `missing_on` pins one global index into the equality calls on the caller-supplied unstable key, but the count and order of those calls follow the row dict's slot layout, which the string hash seed sets. A field lookup crosses the unstable key's slot for some layouts only, and one lookup can compare the stored key more than once after a not-equal result, so the failing comparison lands on a different field lookup per seed (under seed 0 the `project_id` order is `receipt-metadata check`, `archived-parser comparison`, `current-set lookup`, `revision-loop lookup`; under seed 1 the same fixed lookups consume five comparisons, the `current-set lookup` comparing the key twice). Production code performs its lookups in a fixed order and iterates no set or dict of string keys in a seed-dependent order that reaches an equality call; the test assumed one order.
+- NEEDED: Task S2-T40 fixes the test at that cause, so it states its property for every order of the unstable key's comparisons (a missing identity part stays empty and never becomes invented text; the control and the second revision keep their exact equalities; the only other outcome is the receipt-metadata refusal) and a guard runs it under a fixed list of hash seeds in subprocesses. The item closes when S2-T40 merges; a green re-run under one seed alone never closes it (rule 39).
+
+
+
+## OI-323 — The dev-server entry transform exceeded a single request timeout
+
+- ID: OI-323
+- TYPE: OPEN, cause fixed locally; independent confirmation and merged-result evidence pending.
+- RAISED BY: S2-T42, from the lead's TRAIN-S2-5.head1 failure record of 2026-11-19 (also identified there as proposed item PO-S2-115).
+- CONCERNS: `web/scripts/check-dev-server.mjs`, `web/scripts/tests/check-dev-server.node-test.mjs`; AGENTS.md rules 36, 37 and 39.
+- EVIDENCE: `.overnight/IN/HEAD1-FAILURE.md` records whole-test exit 1, 11662 passed and one failed, with `real shell starts` reporting an internal TIMEOUT under load. At base `55657e59d80098d9860d3a8463431cd33bdf45a7`, `run` fetches the entry once through `httpGet` with `REQUEST_TIMEOUT_MS` and no `isNotYet` catch; `poll` handles those transient errors for the page only. The injected-clock regression leaves that production code unchanged and reproduces `FAIL internal-error: TIMEOUT: timed out` (one failed test, exit 1, `.overnight/tmp/red.log`).
+- CAUSE: The single entry request's one-second limit becomes an internal error if the first transform outlasts it. The recorded machine-load explanation is consistent with this code path; this worker did not independently measure the historical transform duration.
+- FIX: S2-T42 runs both requests through the same polling function and startup deadline, bounds requests and pauses by the remaining startup and outer budgets, retries only the existing not-yet errors, and names the entry URL on startup expiry. Virtual-clock plants cover delayed success, a never-answering entry, immediate 404 and wrong-content-type failures, other errors, shared-budget expiry and the outer bound. Four temporary source violations each produce exit 1 and are removed; commands and final checks are appended in PROGRESS.md under S2-T42.
+- NEEDED: Another maker confirms the task's local result; the lead supplies the hosted and exact-merge whole-test evidence before recording closure. A green rerun alone does not close this random failure. OI-323 follows the highest ID on the brief's supplied base; local main/origin tracking refs are older, and the lead may renumber at the join if needed.
+- NEEDED BY: S2-T42 review and the slice S2 gate.

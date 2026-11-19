@@ -12,7 +12,7 @@ from eii_custodian.publicdata.places_fsq.constants import (
     ATTRIBUTION,
     DUPLICATE_WITHIN_M,
     EARTH_RADIUS_M,
-    PINNED_RELEASE,
+    RELEASE_POLICY,
     TERMS_CHECKED,
 )
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
@@ -141,14 +141,14 @@ def load_mapping(path: Path, known_keys: frozenset[str]) -> tuple[CategoryMappin
 def product_categories(
     category_ids: str, mapping: Sequence[CategoryMapping]
 ) -> str | None:
-    """Return reviewed keys in source order, or none when no identifier is mapped."""
+    """Return reviewed keys only when every source identifier has a mapping."""
     if category_ids == "":
         return None
     by_id = {row.source_category_id: row.place_category_key for row in mapping}
-    found = [by_id[item] for item in category_ids.split(";") if item in by_id]
-    if not found:
-        return None
-    return ";".join(found)
+    identifiers = category_ids.split(";")
+    if any(item not in by_id for item in identifiers):
+        raise PlacesFsqError("category_unmapped")
+    return ";".join(by_id[item] for item in identifiers)
 
 
 def _first_link(row: ParsedRow, places: Sequence[PlaceStandIn]) -> DuplicateLink | None:
@@ -176,9 +176,9 @@ def assert_policy(path: Path) -> None:
     if not isinstance(loaded, dict):
         raise PlacesFsqError("policy_disagrees")
     expected: dict[str, object] = {
-        "release": PINNED_RELEASE,
+        "release": RELEASE_POLICY,
         "release_field": "folder_name",
-        "metadata_file": f"{PINNED_RELEASE}/places/_metadata",
+        "metadata_file": "<release>/places/_metadata",
         "selection": "row_group_coordinate_statistics",
         "ignored_bounds": "file_geographic_metadata",
         "country": "QA",
@@ -190,6 +190,8 @@ def assert_policy(path: Path) -> None:
         "host_terms": f"terms to be read; checked {TERMS_CHECKED}",
         "name_ar": "always_null",
         "categories": "category_ids_and_category_labels",
+        "category_mapping": "every_nonempty_identifier_reviewed",
+        "snapshots": "every_dated_release_retained",
     }
     for key, value in expected.items():
         if loaded.get(key) != value:

@@ -18,6 +18,9 @@ from pathlib import PurePosixPath
 from eii_custodian.publicdata.completeness import in_use
 from eii_custodian.publicdata.confirm_s2_t13 import Confirmation, completion_evidence
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.places_fsq.constants import RELEASE_KEY, RELEASE_POLICY
+from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
+from eii_custodian.publicdata.places_fsq.releases import validate_release
 
 CONFIRMATION_TASKS = ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
 INVESTMENT_FLAGS = (
@@ -344,17 +347,27 @@ def _arabic_evidence(agency: object) -> bool:
 
 
 def fsq_evidence(
-    registry_release: str, policy: Mapping[str, object], reference: str
+    registry_release: str,
+    policy: Mapping[str, object],
+    reference: str,
+    receipt_release: str,
 ) -> ConfirmationEvidence:
-    """Compare the caller's registered release with places_fsq_policy.yaml."""
+    """Require one actual dated release in runtime evidence and its receipt."""
+    try:
+        validate_release(registry_release)
+        validate_release(receipt_release)
+    except PlacesFsqError:
+        matches = False
+    else:
+        matches = (
+            registry_release == receipt_release
+            and policy.get("release") == RELEASE_POLICY
+        )
     return ConfirmationEvidence(
         "S2-T15",
-        ("places_fsq",),
+        (RELEASE_KEY,),
         (reference,),
-        {
-            "release_matches": bool(registry_release)
-            and policy.get("release") == registry_release
-        },
+        {"release_matches": matches},
     )
 
 

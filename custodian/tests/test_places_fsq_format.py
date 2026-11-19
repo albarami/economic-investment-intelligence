@@ -4,6 +4,7 @@ import struct
 import time
 
 import pytest
+from custodian.tests.fixtures.places_fsq.invented import listing
 
 from eii_custodian.publicdata.places_fsq import footer as f
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
@@ -116,7 +117,12 @@ def test_fsq_nan_maximum_is_missing(tmp_path):
 
     def transport(url):
         seen.append(url)
-        body = summary(high=float("nan")) if url == entry.url else path.read_bytes()
+        if url == entry.url:
+            body = listing("2025-01-10/")
+        elif url.endswith("_metadata"):
+            body = summary(high=float("nan"))
+        else:
+            body = path.read_bytes()
         return Response(url, body, ())
 
     result, failure = fetch_release(
@@ -124,7 +130,10 @@ def test_fsq_nan_maximum_is_missing(tmp_path):
     )
     assert result is None
     assert failure.check == "statistics_missing"
-    assert seen == [entry.url]
+    assert seen == [
+        entry.url,
+        "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/_metadata",
+    ]
     assert not (tmp_path / "cache").exists()
 
 
@@ -207,7 +216,11 @@ def test_fsq_fetch_refuses_stale_summary_before_storage(tmp_path):
     entry = _replace(_release_entry(), terms_url="")
 
     def transport(url):
-        return Response(url, summary() if url == entry.url else path.read_bytes(), ())
+        if url == entry.url:
+            body = listing("2025-01-10/")
+        else:
+            body = summary() if url.endswith("_metadata") else path.read_bytes()
+        return Response(url, body, ())
 
     result, failure = fetch_release(
         entry, transport, tmp_path / "cache", _clock, _sleep
@@ -248,7 +261,11 @@ def test_fsq_fetch_refuses_stale_latitude_only(tmp_path):
     released = summary(low=51.5, high=51.5, south=25.3, north=25.4)
 
     def transport(url):
-        return Response(url, released if url == entry.url else path.read_bytes(), ())
+        if url == entry.url:
+            body = listing("2025-01-10/")
+        else:
+            body = released if url.endswith("_metadata") else path.read_bytes()
+        return Response(url, body, ())
 
     result, failure = fetch_release(
         entry, transport, tmp_path / "cache", _clock, _sleep

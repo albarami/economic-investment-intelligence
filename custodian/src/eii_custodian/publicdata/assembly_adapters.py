@@ -19,10 +19,27 @@ from .assembly_inventory import INVENTORY, validate_inventory
 from .assembly_io import bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry, read_yaml
-from .fetch.snapshots import read_snapshot, reviewed_selections
+from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
 from .fetch.transport import Transport
 from .frame.build import FrameResult, build_frame, read_cached
 from .trade_reconciliation import Selection
+
+
+def _fsq_manifest(cache: Path, key: str, identity: str) -> tuple[Snapshot, str]:
+    """Resolve one reviewed digest inside exactly one dated release namespace."""
+    from .places_fsq.errors import PlacesFsqError
+    from .places_fsq.releases import validate_release
+
+    matches = sorted(local(cache, key).glob(f"*/manifests/index/{identity}.json"))
+    if len(matches) != 1:
+        raise AssemblyError("assembly_lineage_missing")
+    directory = matches[0].parent.parent
+    release = directory.parent.name
+    try:
+        validate_release(release)
+    except PlacesFsqError:
+        raise AssemblyError("assembly_lineage_missing") from None
+    return read_snapshot(directory, identity), release
 
 
 @dataclass
@@ -247,9 +264,10 @@ class Production:
             if entry.key in {"places_ovt", "bldg_ovt"}:
                 stored_key = entry.key + "/listing"
                 directory = local(self.cache, stored_key)
-            if entry.key == "places_fsq/copy-2025-01-10":
-                directory = local(self.cache, entry.key + "/manifests")
-            snapshot = read_snapshot(directory, selected[entry.key])
+            if entry.key == "places_fsq/copy":
+                snapshot, _ = _fsq_manifest(self.cache, entry.key, selected[entry.key])
+            else:
+                snapshot = read_snapshot(directory, selected[entry.key])
             if (
                 snapshot.sidecar.get("key") != stored_key
                 or snapshot.sidecar.get("source_id") != entry.source_id
@@ -506,17 +524,17 @@ class Production:
 
     def fsq(self) -> dict[str, str]:
         from .places_fsq.assemble import build_places
-        from .places_fsq.constants import ATTRIBUTION, PINNED_RELEASE, RELEASE_KEY
+        from .places_fsq.constants import ATTRIBUTION, RELEASE_KEY
         from .places_fsq.policy import PlaceStandIn, assert_policy, load_mapping
         from .places_fsq.select import FRAME_BOX
 
         row = next((e for e in self.entries if e.key == RELEASE_KEY), None)
         if row is None or row.key not in self.selected:
             raise AssemblyError("assembly_fsq_missing")
-        snapshot = read_snapshot(
-            local(self.cache, row.key + "/manifests"), self.selected[row.key]
-        )
+        snapshot, release = _fsq_manifest(self.cache, row.key, self.selected[row.key])
         manifest = json.loads(snapshot.body)
+        if manifest.get("release") != release:
+            raise AssemblyError("assembly_fsq_missing")
         assert_policy(self.review / "places_fsq_policy.yaml")
         paths = {}
         hashes = {}
@@ -525,7 +543,7 @@ class Production:
             if name in paths:
                 raise AssemblyError("assembly_output_invalid")
             paths[name] = read_snapshot(
-                local(self.cache, row.key + "/files"), digest
+                local(self.cache, f"{row.key}/{release}/files"), digest
             ).path
             hashes[name] = digest
         places = self.read_places()
@@ -550,12 +568,12 @@ class Production:
             mapping=load_mapping(self.review / "places_fsq_categories.csv", categories),
             labels=(),
             min_edit_distance=1,
-            release=manifest["release"],
+            release=release,
             attribution=manifest["attribution"],
             receipt_sha256=snapshot.sha256,
         )
         self.table("pub_place_fsq", [asdict(r) for r in result.rows], (row.key,))
-        if result.release != PINNED_RELEASE or manifest["attribution"] != ATTRIBUTION:
+        if result.release != release or manifest["attribution"] != ATTRIBUTION:
             raise AssemblyError("assembly_fsq_missing")
         return self.record(
             "fsq",

@@ -2,7 +2,6 @@
 
 import json
 import shutil
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -120,26 +119,32 @@ def test_fsq_reads_real_manifest_and_file_archive(tmp_path: Path) -> None:
     from custodian.tests.test_places_fsq import _grid
 
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.places_fsq.constants import ATTRIBUTION, RELEASE_KEY
+    from eii_custodian.publicdata.places_fsq.constants import COPY_ROOT, RELEASE_KEY
+    from eii_custodian.publicdata.places_fsq.fetch import _store
 
     row = next(e for e in load_registry() if e.key == RELEASE_KEY)
     path = tmp_path / "invented.parquet"
     write_places(path, [place()])
-    digest = write_cached(
+    release = "2032-04-05"
+    identity = _store(
+        row,
         tmp_path,
-        replace(row, key=row.key + "/files", extension="parquet"),
-        path.read_bytes(),
-    ).stem
-    manifest = {
-        "files": [{"name": "invented.parquet", "sha256": digest}],
-        "release": "2025-01-10",
-        "attribution": ATTRIBUTION,
-    }
-    identity = write_cached(
-        tmp_path,
-        replace(row, key=row.key + "/manifests", extension="json"),
-        json.dumps(manifest).encode(),
-    ).stem
+        b"metadata",
+        [
+            (
+                "invented.parquet",
+                path.read_bytes(),
+                f"{COPY_ROOT}{release}/places/invented.parquet",
+            )
+        ],
+        "",
+        "",
+        "2026-11-18T00:00:00Z",
+        "data.source.coop",
+        release=release,
+        listing=(b"<html><body>invented</body></html>", COPY_ROOT),
+        metadata_url=f"{COPY_ROOT}{release}/places/_metadata",
+    )
     points = tmp_path / "places_s2_t06/pub_place.jsonl"
     points.parent.mkdir()
     points.write_text("")
@@ -154,18 +159,59 @@ def test_fsq_reads_real_manifest_and_file_archive(tmp_path: Path) -> None:
     (review / "places_fsq_categories.csv").write_text(",".join(MAPPING_COLUMNS) + "\n")
     build = context(tmp_path, (row,))
     build.review = review
-    build.selected = {row.key: identity}
-    build.receipts[row.key] = {"sha256": identity}
+    (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: identity}))
+    build.reviewed_selections()
     build.files[points.relative_to(tmp_path).as_posix()] = file_hash(points)
     build.frame_result = FrameResult({"grid_cell": _grid((51.5, 25.3))}, [], {})
     build.fsq()
     assert build.tables["pub_place_fsq"][0]["name_ar"] is None
+    assert build.tables["pub_place_fsq"][0]["source_release"] == release
     assert (
         json.loads((tmp_path / "assembly/fsq.json").read_text())["coverage"][
             "name_ar_null"
         ]
         == 1
     )
+
+
+def test_fsq_gate_evidence_compares_table_and_receipt_release(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.assembly_reports import gather_audit
+    from eii_custodian.publicdata.assembly_sources import SOURCE_COMPONENTS
+    from eii_custodian.publicdata.fetch.receipts import sidecar_for
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.places_fsq.constants import RELEASE_KEY
+
+    assert SOURCE_COMPONENTS["places_fsq"] == frozenset((RELEASE_KEY,))
+    entries = load_registry()
+    row = next(e for e in entries if e.key == RELEASE_KEY)
+    build = context(tmp_path, entries)
+    release = "2032-04-05"
+    build.tables["pub_place_fsq"] = [{"source_release": release}]
+    build.receipts[row.key] = sidecar_for(
+        row,
+        digest="a" * 64,
+        nbytes=0,
+        fetch_url=row.url,
+        fetch_host=row.fetch_host,
+        retrieved_utc="2026-11-18T00:00:00Z",
+        publisher=row.publisher,
+        source_modified=release,
+        row_count=None,
+        terms_sha256="",
+    )
+    evidence = next(
+        item
+        for item in gather_audit(build)["confirmations"]
+        if item["task"] == "S2-T15"
+    )
+    assert evidence["state"] == "recorded"
+    build.receipts[row.key]["source_modified"] = "2031-02-03"
+    evidence = next(
+        item
+        for item in gather_audit(build)["confirmations"]
+        if item["task"] == "S2-T15"
+    )
+    assert evidence["state"] == "pending"
 
 
 def test_investment_capture_calls_real_empty_registration_audit(tmp_path: Path) -> None:

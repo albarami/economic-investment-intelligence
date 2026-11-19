@@ -202,11 +202,10 @@ def test_arbitrary_checks_do_not_complete_a_confirmation():
     )
 
 
-def test_fsq_release_must_match_policy_and_fetched_evidence():
-    item = g.fsq_evidence(
-        "invented-release", {"release": "invented-release"}, "invented policy"
-    )
-    row = entry("places_fsq")
+def test_fsq_release_must_match_newest_policy_and_fetched_evidence():
+    policy = {"release": "newest_dated_at_each_refresh"}
+    item = g.fsq_evidence("2032-04-05", policy, "invented policy", "2032-04-05")
+    row = entry("places_fsq/copy")
     item = replace(item, receipt_sha256={row.key: "a" * 64})
     assert (
         next(
@@ -216,13 +215,20 @@ def test_fsq_release_must_match_policy_and_fetched_evidence():
         )["state"]
         == "recorded"
     )
-    bad = g.fsq_evidence(
-        "invented-release", {"release": "other-release"}, "invented policy"
-    )
-    assert all(
-        r["state"] == "pending"
-        for r in g.confirmations([bad], [row], {row.key: receipt(row)})
-    )
+    for bad in (
+        g.fsq_evidence("", policy, "invented policy", ""),
+        g.fsq_evidence("2032-04-05", policy, "invented policy", "2031-02-03"),
+        g.fsq_evidence(
+            "2032-04-05",
+            {"release": "2025-01-10"},
+            "invented policy",
+            "2032-04-05",
+        ),
+    ):
+        assert all(
+            r["state"] == "pending"
+            for r in g.confirmations([bad], [row], {row.key: receipt(row)})
+        )
 
 
 def test_confirmed_absence_is_evidence_without_claiming_a_fetch():

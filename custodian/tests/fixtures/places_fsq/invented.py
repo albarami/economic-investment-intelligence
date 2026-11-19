@@ -27,6 +27,12 @@ def point_wkb(longitude: float, latitude: float) -> bytes:
     return struct.pack("<BIdd", 1, 1, longitude, latitude)
 
 
+def listing(*hrefs: str) -> bytes:
+    """A tiny invented HTML listing; each href is supplied by the test."""
+    links = "".join(f'<a href="{href}">{href}</a>' for href in hrefs)
+    return f"<html><body>{links}</body></html>".encode()
+
+
 def write_places(
     path: Path,
     rows: Sequence[Mapping[str, object]],

@@ -18,7 +18,6 @@ from eii_custodian.publicdata.places_fsq.assemble import build_places
 from eii_custodian.publicdata.places_fsq.constants import (
     ATTRIBUTION,
     LICENCE_NAME,
-    PINNED_RELEASE,
 )
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.footer import metadata_bytes
@@ -36,6 +35,7 @@ from eii_custodian.publicdata.places_fsq.policy import (
 )
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partitions
 
+_RELEASE = "2025-01-10"
 _WEST = 50.7
 _SOUTH = 24.4
 _EAST = 51.7
@@ -227,7 +227,7 @@ def test_one_kept_place_carries_the_hand_written_table_fields(tmp_path: Path) ->
                 mapping=(),
                 labels=(),
                 min_edit_distance=2,
-                release=PINNED_RELEASE,
+                release=_RELEASE,
                 attribution=ATTRIBUTION,
                 receipt_sha256="",
             )
@@ -380,7 +380,8 @@ def test_mapping_row_keeps_every_reviewed_field(tmp_path: Path) -> None:
         ),
     )
     assert product_categories("cccccccccccccccceeee0001", loaded) == "food"
-    assert product_categories("cccccccccccccccceeee0001;dddd", loaded) == "food"
+    with pytest.raises(PlacesFsqError, match=r"^category_unmapped$"):
+        product_categories("cccccccccccccccceeee0001;dddd", loaded)
     assert product_categories("", loaded) is None
     blank = tmp_path / "blank.csv"
     blank.write_text(

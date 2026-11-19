@@ -756,7 +756,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: the release selection of the places fetcher, its registry row, PUB-102 and the source row of document 04, and tests.
 - Depends: S2-T15, S2-T27.
 - Requirements: PUB-01, PUB-03, PUB-102; decision 0019 item 21 as amended by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 14.
-- Delivery: routine; personas Data; status queued.
+- Delivery: routine; personas Data; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved on the carry-back through dbf94f0 by Cognition Devin SWE-2 High under L-1095 and joined through e1a931ac; hosted and exact merge-result checks remain the lead's gates.
 ### S2-T38 — Employed people by municipality, a Public fact
 - Goal: Load the `Employed` indicator of the municipal population source as a Public fact on the source's own geography ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 15).
 - Acceptance criteria: [ ] `pub_population_municipality` carries the indicator `Employed` by municipality with its source and year, in the source's own categories; [ ] it is never joined to a synthetic record, used to segment one, apportioned to a drawn area or combined with a protected figure, with one planted case of each refused (rule 10); [ ] the contract of `pub_population_municipality` in document 03 lists the indicator; [ ] how the attack model of slice S5 counts the published figure is recorded on OI-170 for S5's privacy design, and no privacy rule, attack size or tolerance changes for it (rule 12).
@@ -771,6 +771,13 @@ Open question to settle in your plan with options: where the archive persists so
 - Depends: S2-T12, S2-T27.
 - Requirements: PUB-86, PUB-87, PUB-88, PLN-25, DAT-142, DAT-143.
 - Delivery: hard; personas Data; status in review for part A (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), approved locally at 8da4e4e and joined through 55889ab; live Arabic inventory, reviewed real crosswalk entries and part B release/quotation delivery remain open; decision 0029 is accepted but is not implemented by this part.
+### S2-T40 — The unstable-key evidence test holds under every hash seed (ruling L-1050)
+- Goal: Make the unstable-key evidence test hold under every string hash seed, fixed at its cause and never by a skip, retry, pinned seed or weakened assertion, with a guard that runs it under fixed hash seeds (ruling L-1050; OI-314).
+- Acceptance criteria: [ ] the cause is recorded with the equality-call order under two hash seeds, naming which code makes that order depend on the seed; [ ] the test states its property for every order of the unstable key's comparisons (a missing identity part stays empty and never becomes invented text; the control and the second revision keep their exact equalities; the only other outcome is the receipt-metadata refusal), with no case removed and no equality loosened; [ ] a guard runs the test in a subprocess under a fixed list of hash seeds including 0, 1, 2 and 3764211809 and was shown red on the unfixed test; [ ] OI-314 closes when this task merges.
+- Scope: `custodian/tests/test_investment_evidence_survivors_8.py`, its seed guard, and the records; the investment-evidence production module only if the cause is there.
+- Depends: S2-T30.
+- Requirements: AGENTS.md rules 36, 37 and 39.
+- Delivery: Standard; builder persona: senior test-reliability engineer for Python data pipelines; strict reviewer persona: strict test-reliability reviewer from another maker; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), carry-back ec1829a approved by xAI Grok 4.7 under L-1095 and joined as b8be5843; OI-314 stays open until merge; hosted and exact merge-result checks remain the lead's gates.
 ### S2-T41 — Optional offline satellite backup cache from CDSE
 
 - Goal: collect the owner's optional free backup as a receipted, unread cache, off by default, with no effect on any other task or numerical output (L-1069 and L-1078 item 4).
@@ -779,6 +786,23 @@ Open question to settle in your plan with options: where the archive persists so
 - Depends: S2-T01, S2-T02, S2-T27. Reuse S2-T19's dated-imagery conventions where applicable without adding a dependency to that task. Display ownership is unresolved; no assignment to S3-T16 or S3-T23.
 - Requirements: document 04 PUB-01, PUB-03, PUB-04, PUB-10, PUB-11, PUB-12, PUB-19 and PUB-110; document 02 ARC-13, ARC-96 and ARC-98; document 13 OPS-07, OPS-08, OPS-65 and OPS-71; AGENTS.md rules 5, 11, 14, 16–23 and 33–39.
 - Delivery: hard; builder persona senior data-engineering and security engineer; strict reviewer persona independent security/provenance reviewer of another maker; status done (pull request https://github.com/albarami/economic-investment-intelligence/pull/97).
+
+### S2-T42 — The dev-server check waits for the entry module under the startup deadline
+
+- Goal: Fix the load-sensitive entry-module timeout in the dev-server check by sharing the page poll's startup deadline and not-yet handling.
+- Acceptance criteria: [ ] a fake-server test with injected timing fails on the base when the first entry transform exceeds one request timeout, then passes with the fix; [ ] page and entry polling share the startup deadline and outer bound, with requests and pauses limited to remaining time; [ ] an entry that never answers fails within the deadline with a timeout line naming the entry; [ ] an entry returning 404 fails at once with its existing bad-status line; [ ] other errors, content-type failures and all existing FAIL lines retain their behaviour and text; [ ] every existing test passes unchanged, with no raised constant, test timeout, retry or skip; [ ] the required web, documentation, tree and guidance-parity checks pass with real exits recorded.
+- Scope: `web/scripts/check-dev-server.mjs`, its existing test harness, `TASKS.md`, `OPEN_ITEMS.md` and `PROGRESS.md`; `web/README.md` only if it describes entry timing.
+- Depends: none.
+- Requirements: AGENTS.md rules 36, 37 and 39.
+- Delivery: Standard; builder persona senior Node.js tooling engineer for child processes, loopback HTTP and deterministic timing tests; strict reviewer persona reviewer who rejects hidden failures and guards without planted violations; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved locally at c13fa0f6 by Cognition Devin SWE-2 High and joined as 11352f10; OI-318 became OI-323 under L-1146 and remains open for hosted and exact merge-result evidence.
+
+### S2-T43 — The mutation ledger file always parses
+- Goal: Catch a broken mutation ledger during ordinary scripts unittest discovery, even while mutation campaigns are stopped.
+- Acceptance criteria: [ ] the real `scripts/mutation_explained.toml` parses with standard-library `tomllib` and contains at least one row in the shape consumed by `scripts/mutation.py`; [ ] temporary copies with a duplicate key, a removed row header and a stray key without a header are refused by the same check as the real file; [ ] a deliberately broken temporary copy produces recorded red output and the committed guard passes against the unchanged repository ledger; [ ] the ordinary scripts discovery and required static, documentation, tree and byte-parity checks run with recorded exits and counts.
+- Scope: `scripts/tests/test_mutation_explained_parses.py`, this task entry and append-only evidence in `PROGRESS.md`; no mutation runner, ledger or other test changes.
+- Depends: none.
+- Requirements: AGENTS.md rules 36, 37 and 38.
+- Delivery: Mechanical; builder persona senior Python test-tooling engineer for repository guards; strict self-review persona reviewer rejecting a guard that never fails, tests a copy instead of the real file or weakens or skips a check; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved locally at 66b0308f by Anthropic Sonnet 5.5 at 17:37 on 2026-11-19 and joined as 58e739ea; the test-precision note is recorded by the lead as PO-S2-121; hosted and exact merge-result checks remain the lead's gates.
 
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.

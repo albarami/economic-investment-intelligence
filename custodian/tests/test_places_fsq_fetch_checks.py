@@ -4,16 +4,23 @@ import json
 from dataclasses import astuple, replace
 
 import pytest
-from custodian.tests.test_places_fsq import _release_entry
+from custodian.tests.fixtures.places_fsq.invented import listing, place, write_places
+from custodian.tests.test_places_fsq import _grid, _release_entry
 
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError, read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.places_fsq import fetch as f
-from eii_custodian.publicdata.places_fsq.constants import ATTRIBUTION
+from eii_custodian.publicdata.places_fsq.assemble import build_places
+from eii_custodian.publicdata.places_fsq.constants import ATTRIBUTION, COPY_ROOT
+from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.footer import metadata_bytes
+from eii_custodian.publicdata.places_fsq.policy import CategoryMapping, PlaceStandIn
+from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
 
 URL = "https://data.source.coop/invented"
 FOREIGN = "https://invented.invalid/file"
 TERMS = b"Copyright 2024 Foursquare Labs, Inc. All rights reserved. Apache License, Version 2.0"
+RELEASE = "2025-01-10"
 
 
 @pytest.mark.parametrize("metadata", [False, True])
@@ -110,7 +117,7 @@ def test_fsq_blocked_before_request_and_redirect_fields(tmp_path):
     assert f.is_release_entry(replace(entry, skip_reason="invented")) is False
     assert f.is_release_entry(replace(entry, key="places_fsq")) is False
     assert (
-        f._data_url("a/b/invented.parquet")
+        f._data_url("a/b/invented.parquet", RELEASE)
         == "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/invented.parquet"
     )
 
@@ -129,7 +136,8 @@ def test_fsq_summary_refusal_fields(tmp_path):
     )
 
     def transport(url):
-        return Response(URL, body, ())
+        response = listing(f"{RELEASE}/") if url == entry.url else body
+        return Response(url, response, ())
 
     result, failure = f.fetch_release(
         entry, transport, tmp_path, lambda: "clock", lambda _: None
@@ -137,7 +145,7 @@ def test_fsq_summary_refusal_fields(tmp_path):
     assert result is None
     assert astuple(failure) == (
         1,
-        URL,
+        f"{COPY_ROOT}{RELEASE}/places/_metadata",
         "release_mismatch",
         "files for the frame",
         "none",
@@ -153,6 +161,7 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
     terms = b"abc"
     meta_hash = hashlib.sha256(metadata).hexdigest()
     data_hash = hashlib.sha256(data).hexdigest()
+    listing_hash = hashlib.sha256(b"listing").hexdigest()
     # SHA-256 test vector for ASCII abc.
     terms_hash = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
     for term_body, term_hash, term_url, folder in [
@@ -169,11 +178,15 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
             term_url,
             "2091-01-01T00:00:00Z",
             "data.source.coop",
+            release=RELEASE,
+            listing=(b"listing", COPY_ROOT),
+            metadata_url=entry.url,
         )
-        directory = cache / "places_fsq" / "copy-2025-01-10"
+        directory = cache / "places_fsq" / "copy" / RELEASE
         expected = {
             "attribution": ATTRIBUTION,
             "files": [{"name": "a.parquet", "sha256": data_hash, "bytes": 4}],
+            "listing_sha256": listing_hash,
             "metadata_sha256": meta_hash,
             "method": "places_fsq.v1",
             "release": "2025-01-10",
@@ -202,7 +215,7 @@ def test_fsq_store_manifest_and_sidecars(tmp_path):
                 "row_count": None,
                 "terms_sha256": term_hash,
                 "switched_off": False,
-                "key": "places_fsq/copy-2025-01-10",
+                "key": "places_fsq/copy",
             }.items():
                 assert receipt[key] == value
 
@@ -239,7 +252,8 @@ def test_fsq_fetch_failure_at_each_stage_stores_nothing(tmp_path, stage, mode):
     data_url = (
         "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/a.parquet"
     )
-    urls = {"metadata": entry.url, "terms": entry.terms_url, "data": data_url}
+    metadata_url = f"{COPY_ROOT}{RELEASE}/places/_metadata"
+    urls = {"metadata": metadata_url, "terms": entry.terms_url, "data": data_url}
     summary = metadata_bytes(
         [
             dict(
@@ -258,7 +272,9 @@ def test_fsq_fetch_failure_at_each_stage_stores_nothing(tmp_path, stage, mode):
             if mode == "transport":
                 raise TransportFault("unreachable", url)
             return Response(url, b"SIGN IN" if mode == "signin" else b"other", ())
-        return Response(url, summary if url == entry.url else TERMS, ())
+        if url == entry.url:
+            return Response(url, listing(f"{RELEASE}/"), ())
+        return Response(url, summary if url == metadata_url else TERMS, ())
 
     result, failure = f.fetch_release(
         entry, transport, tmp_path / "cache", lambda: "clock", lambda _: None
@@ -277,11 +293,11 @@ def test_fsq_fetch_failure_at_each_stage_stores_nothing(tmp_path, stage, mode):
         expected = (1, data_url, "not_parquet", "parquet", "other")
     assert astuple(failure) == expected
     stop = {
-        "metadata": 1,
-        "terms": 3 if mode == "malformed" else 2,
-        "data": 3,
+        "metadata": 2,
+        "terms": 4 if mode == "malformed" else 3,
+        "data": 4,
     }[stage]
-    assert seen == [entry.url, entry.terms_url, data_url][:stop]
+    assert seen == [entry.url, metadata_url, entry.terms_url, data_url][:stop]
     assert not (tmp_path / "cache").exists()
 
 
@@ -324,9 +340,12 @@ def test_fsq_fetch_success_manifest_tracks_actual_responses(tmp_path, with_terms
 
     def transport(url):
         seen.append(url)
-        body = (
-            summary if url == entry.url else TERMS if url == entry.terms_url else data
-        )
+        if url == entry.url:
+            body = listing(f"{RELEASE}/")
+        elif url.endswith("_metadata"):
+            body = summary
+        else:
+            body = TERMS if url == entry.terms_url else data
         return Response(url + "/served", body, ())
 
     def clock():
@@ -342,9 +361,15 @@ def test_fsq_fetch_success_manifest_tracks_actual_responses(tmp_path, with_terms
     assert failure is None
     assert result is not None
     assert result.host == "data.source.coop"
-    assert seen == [entry.url, *([entry.terms_url] if with_terms else []), file_url]
+    metadata_url = f"{COPY_ROOT}{RELEASE}/places/_metadata"
+    assert seen == [
+        entry.url,
+        metadata_url,
+        *([entry.terms_url] if with_terms else []),
+        file_url,
+    ]
     assert clocks == ["clock"]
-    directory = tmp_path / "cache" / "places_fsq" / "copy-2025-01-10"
+    directory = tmp_path / "cache" / "places_fsq" / "copy" / RELEASE
     manifest = (directory / "manifest.json").read_bytes()
     assert result.digest == hashlib.sha256(manifest).hexdigest()
     record = json.loads(manifest)
@@ -388,7 +413,9 @@ def test_fsq_data_footer_failure_named_at_file_address(tmp_path, malformed, reas
     )
 
     def transport(url):
-        return Response(url, summary if url == entry.url else data, ())
+        if url == entry.url:
+            return Response(url, listing(f"{RELEASE}/"), ())
+        return Response(url, summary if url.endswith("_metadata") else data, ())
 
     result, failure = f.fetch_release(
         entry, transport, tmp_path / "cache", lambda: "clock", lambda _: None
@@ -416,16 +443,17 @@ def test_fsq_generated_address_guard_refuses_planted_foreign_host(
 
     def transport(url):
         seen.append(url)
-        return Response(url, body, ())
+        response = listing(f"{RELEASE}/") if url == entry.url else body
+        return Response(url, response, ())
 
-    monkeypatch.setattr(f, "_data_url", lambda _: FOREIGN)
+    monkeypatch.setattr(f, "_data_url", lambda _name, _release: FOREIGN)
     assert f.fetch_release(
         entry, transport, tmp_path / "cache", lambda: "clock", lambda _: None
     ) == (
         None,
         f.ReleaseFailure(1, FOREIGN, "blocked_host", "allow-listed host", FOREIGN),
     )
-    assert seen == [entry.url]
+    assert seen == [entry.url, f"{COPY_ROOT}{RELEASE}/places/_metadata"]
     assert not (tmp_path / "cache").exists()
 
 
@@ -448,8 +476,11 @@ def test_fsq_manifest_replace_failure_removes_named_partial(tmp_path, monkeypatc
             "",
             "2091-01-01T00:00:00Z",
             "data.source.coop",
+            release=RELEASE,
+            listing=(b"listing", COPY_ROOT),
+            metadata_url=COPY_ROOT,
         )
-    directory = tmp_path / "places_fsq" / "copy-2025-01-10"
+    directory = tmp_path / "places_fsq" / "copy" / RELEASE
     assert not (directory / ".manifest.json.partial").exists()
     assert not (directory / "manifest.json").exists()
 
@@ -467,7 +498,8 @@ def test_fsq_duplicate_names_fetch_only_summary(tmp_path):
 
     def transport(url):
         seen.append(url)
-        return Response(url, summary, ())
+        response = listing(f"{RELEASE}/") if url == entry.url else summary
+        return Response(url, response, ())
 
     result, failure = f.fetch_release(
         entry, transport, tmp_path / "cache", lambda: "clock", lambda _: None
@@ -475,10 +507,157 @@ def test_fsq_duplicate_names_fetch_only_summary(tmp_path):
     assert result is None
     assert astuple(failure) == (
         1,
-        entry.url,
+        f"{COPY_ROOT}{RELEASE}/places/_metadata",
         "file_name_duplicate",
         "files for the frame",
         "none",
     )
-    assert seen == [entry.url]
+    assert seen == [entry.url, f"{COPY_ROOT}{RELEASE}/places/_metadata"]
     assert not (tmp_path / "cache").exists()
+
+
+def test_two_refreshes_retain_both_releases_and_build_from_new_digest(tmp_path):
+    old = "2031-02-03"
+    new = "2032-04-05"
+    entry = replace(_release_entry(), terms_url="")
+    data = tmp_path / "same.parquet"
+    write_places(
+        data,
+        [
+            place(
+                fsq_place_id="aaaaaaaaaaaaaaaaaaaaaaaa",
+                fsq_category_ids=["SYN-food"],
+                fsq_category_labels=["Invented food"],
+            ),
+            place(
+                fsq_place_id="bbbbbbbbbbbbbbbbbbbbbbbb",
+                name="Invented Hidden",
+                longitude=51.500001,
+                fsq_category_ids=["SYN-food"],
+                fsq_category_labels=["Invented food"],
+            ),
+        ],
+    )
+    available = [old]
+    cache = tmp_path / "cache"
+
+    def fetch(release, retrieved):
+        summary = metadata_bytes(
+            [
+                dict(
+                    file_path=f"{release}/places/same.parquet",
+                    longitude=(51.5, 51.500001),
+                    latitude=(25.3, 25.3),
+                )
+            ],
+            dataset_geo_bbox=None,
+        )
+        bodies = {
+            COPY_ROOT: listing(*(f"{item}/" for item in reversed(available))),
+            f"{COPY_ROOT}{release}/places/_metadata": summary,
+            f"{COPY_ROOT}{release}/places/same.parquet": data.read_bytes(),
+        }
+
+        def transport(url):
+            return Response(url, bodies[url], ())
+
+        result, failure = f.fetch_release(
+            entry, transport, cache, lambda: retrieved, lambda _: None
+        )
+        assert failure is None
+        assert result is not None
+        return result
+
+    first = fetch(old, "2091-01-01T00:00:00Z")
+    available.append(new)
+    second = fetch(new, "2091-01-02T00:00:00Z")
+    old_dir = cache / "places_fsq" / "copy" / old
+    new_dir = cache / "places_fsq" / "copy" / new
+    old_manifest = read_snapshot(old_dir / "manifests", first.digest)
+    new_manifest = read_snapshot(new_dir / "manifests", second.digest)
+    assert json.loads(old_manifest.body)["release"] == old
+    record = json.loads(new_manifest.body)
+    assert record["release"] == new
+    assert first.digest != second.digest
+    for directory, release in ((old_dir, old), (new_dir, new)):
+        for role in ("listings", "metadata", "files", "manifests"):
+            identities = [
+                path.stem for path in (directory / role / "index").glob("*.json")
+            ]
+            assert identities
+            for identity in identities:
+                snapshot = read_snapshot(directory / role, identity)
+                assert snapshot.sidecar["source_modified"] == release
+                assert snapshot.body
+    row = record["files"][0]
+    old_file = read_snapshot(old_dir / "files", row["sha256"])
+    new_file = read_snapshot(new_dir / "files", row["sha256"])
+    assert old_file.body == new_file.body == data.read_bytes()
+    assert old_file.sidecar["source_modified"] == old
+    assert new_file.sidecar["source_modified"] == new
+
+    # Both builds read their pinned manifest digest, never a compatibility pointer.
+    (old_dir / "manifest.json").write_bytes(b"{}")
+    (new_dir / "manifest.json").write_bytes(b"{}")
+    mapping = (
+        CategoryMapping(
+            "SYN-food",
+            "food",
+            "map-1",
+            "approved",
+            "reviewer",
+            "2030-01-01",
+            "invented",
+        ),
+    )
+    places = (
+        PlaceStandIn("SYN-P-HIDDEN", "Invented Hidden", None, 51.500001, 25.3, False),
+    )
+
+    def build(directory, manifest_digest, file_snapshot, labels=("Zedqun Label",)):
+        manifest = json.loads(
+            read_snapshot(directory / "manifests", manifest_digest).body
+        )
+        file_row = manifest["files"][0]
+        return build_places(
+            files={file_row["name"]: file_snapshot.path},
+            expected_sha256={file_row["name"]: file_row["sha256"]},
+            frame=FRAME_BOX,
+            grid=_grid((51.5, 25.3)),
+            places=places,
+            mapping=mapping,
+            labels=labels,
+            min_edit_distance=2,
+            release=manifest["release"],
+            attribution=ATTRIBUTION,
+            receipt_sha256=manifest_digest,
+        )
+
+    for directory, release, digest, file_snapshot in (
+        (old_dir, old, first.digest, old_file),
+        (new_dir, new, second.digest, new_file),
+    ):
+        built = build(directory, digest, file_snapshot)
+        assert built.release == release
+        assert {row.source_release for row in built.rows} == {release}
+        assert [item.row.fsq_place_id for item in built.eligible] == [
+            "aaaaaaaaaaaaaaaaaaaaaaaa"
+        ]
+        assert built.eligible[0].product_categories == "food"
+        assert [link.fsq_place_id for link in built.duplicates] == [
+            "bbbbbbbbbbbbbbbbbbbbbbbb"
+        ]
+        assert built.coverage.duplicate_not_shown == 1
+        assert built.names.ok
+        with pytest.raises(PlacesFsqError, match=r"^name_collision$"):
+            build(directory, digest, file_snapshot, labels=("Invented Hidden",))
+
+    # Tampering with the old body cannot change its index or affect the new build.
+    index = old_dir / "files" / "index" / f"{row['sha256']}.json"
+    index_before = index.read_bytes()
+    old_file.path.write_bytes(b"planted tamper")
+    with pytest.raises(SnapshotError, match=r"^snapshot_hash_mismatch$"):
+        read_snapshot(old_dir / "files", row["sha256"])
+    assert index.read_bytes() == index_before
+    old_file.path.write_bytes(data.read_bytes())
+    assert read_snapshot(old_dir / "files", row["sha256"]).body == data.read_bytes()

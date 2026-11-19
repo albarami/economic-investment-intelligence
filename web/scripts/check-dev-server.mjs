@@ -212,15 +212,15 @@ function isFile(target) {
   return isFileStat;
 }
 
-async function poll(child, output, port, timeoutMs, outer) {
-  const deadline = Date.now() + timeoutMs;
+async function poll(child, output, port, timeoutMs, outer, deadline, entry) {
   // A null port means the check named no port: the child picked and bound
   // its own ephemeral port, and the port it bound appears in its Local
   // line. The check itself held and released no port; the child's own
   // startup still probes before it binds (see the chosen-port comment in
   // run()).
   let actual = port;
-  while (Date.now() < deadline) {
+  const end = Math.min(deadline, outer.deadline);
+  while (Date.now() < end) {
     if (outer.fired) return { fail: 'FAIL timeout: outer bound' };
     const gone = childGone(child);
     if (gone) return { fail: gone };
@@ -229,33 +229,42 @@ async function poll(child, output, port, timeoutMs, outer) {
       const goneAnnouncing = childGone(child);
       if (goneAnnouncing) return { fail: goneAnnouncing };
       await new Promise((resolve) => {
-        setTimeout(resolve, POLL_INTERVAL_MS);
+        setTimeout(resolve, Math.min(POLL_INTERVAL_MS, end - Date.now()));
       });
       continue;
     }
-    const pageUrl = `http://127.0.0.1:${actual}/`;
+    const requestUrl = entry ?? `http://127.0.0.1:${actual}/`;
     try {
-      const response = await httpGet(pageUrl, REQUEST_TIMEOUT_MS);
+      const response = await httpGet(
+        requestUrl,
+        Math.min(REQUEST_TIMEOUT_MS, end - Date.now()),
+      );
+      if (outer.fired || Date.now() >= outer.deadline)
+        return { fail: 'FAIL timeout: outer bound' };
+      if (Date.now() >= deadline) break;
       const goneAfter = childGone(child);
       if (goneAfter) return { fail: goneAfter };
-      if (hasLocalLine(output.text(), actual))
+      if (entry !== undefined || hasLocalLine(output.text(), actual))
         return { response, port: actual };
     } catch (error) {
       if (!isNotYet(error)) throw error;
     }
+    if (Date.now() >= end) break;
     const goneLater = childGone(child);
     if (goneLater) return { fail: goneLater };
     await new Promise((resolve) => {
-      setTimeout(resolve, POLL_INTERVAL_MS);
+      setTimeout(resolve, Math.min(POLL_INTERVAL_MS, end - Date.now()));
     });
   }
+  if (outer.fired || Date.now() >= outer.deadline)
+    return { fail: 'FAIL timeout: outer bound' };
   if (actual === null) {
     return {
       fail: `FAIL timeout: no accepted answer from the announced dev server within ${timeoutMs} ms`,
     };
   }
   return {
-    fail: `FAIL timeout: no accepted answer from http://127.0.0.1:${actual}/ within ${timeoutMs} ms`,
+    fail: `FAIL timeout: no accepted answer from ${entry ?? `http://127.0.0.1:${actual}/`} within ${timeoutMs} ms`,
   };
 }
 
@@ -337,7 +346,11 @@ async function run() {
     cwd: root,
     env: childEnvironment(home),
   });
-  const outer = { fired: false };
+  // Page readiness and the first entry transform share one startup budget.
+  // Each request and poll pause is capped by the remaining startup/outer time.
+  const startedAt = Date.now();
+  const deadline = startedAt + args.timeoutMs;
+  const outer = { fired: false, deadline: startedAt + OUTER_BOUND_MS };
   const outerTimer = setTimeout(() => {
     outer.fired = true;
   }, OUTER_BOUND_MS);
@@ -348,6 +361,7 @@ async function run() {
       namedPort,
       args.timeoutMs,
       outer,
+      deadline,
     );
     if (polled.fail) {
       process.stdout.write(`${polled.fail}\n`);
@@ -374,7 +388,21 @@ async function run() {
       return;
     }
     const entryUrl = new URL(entry.entry, `http://127.0.0.1:${port}/`).href;
-    const script = await httpGet(entryUrl, REQUEST_TIMEOUT_MS);
+    const fetched = await poll(
+      started.child,
+      started,
+      port,
+      args.timeoutMs,
+      outer,
+      deadline,
+      entryUrl,
+    );
+    if (fetched.fail) {
+      process.stdout.write(`${fetched.fail}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    const script = fetched.response;
     if (script.status !== 200) {
       process.stdout.write(
         `FAIL bad-status: ${entry.entry}: ${script.status}\n`,

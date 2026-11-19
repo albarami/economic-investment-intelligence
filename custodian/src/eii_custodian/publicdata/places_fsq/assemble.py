@@ -13,7 +13,6 @@ from eii_custodian.publicdata.places_fsq.constants import (
     ATTRIBUTION,
     LICENCE_NAME,
     METHOD,
-    PINNED_RELEASE,
 )
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.names import NameCheck, check_labels
@@ -29,6 +28,10 @@ from eii_custodian.publicdata.places_fsq.policy import (
     duplicate_links,
     is_eligible,
     product_categories,
+)
+from eii_custodian.publicdata.places_fsq.releases import (
+    validate_release,
+    validate_release_path,
 )
 from eii_custodian.publicdata.places_fsq.select import FrameBox
 
@@ -107,8 +110,12 @@ def build_places(
     receipt_sha256: str,
 ) -> BuiltPlaces:
     """Return the table. A missing hash, release or attribution refuses it."""
-    if release != PINNED_RELEASE:
-        raise PlacesFsqError("source_release")
+    try:
+        validate_release(release)
+        for name in files:
+            validate_release_path(name, release)
+    except PlacesFsqError:
+        raise PlacesFsqError("source_release") from None
     if attribution != ATTRIBUTION or receipt_sha256 == "":
         raise PlacesFsqError("attribution")
     parsed = _parsed(files, expected_sha256)

@@ -14,7 +14,12 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from custodian.tests.fixtures.places_fsq.invented import place, point_wkb, write_places
+from custodian.tests.fixtures.places_fsq.invented import (
+    listing,
+    place,
+    point_wkb,
+    write_places,
+)
 from custodian.tests.repository_root import repository_root
 
 import h3
@@ -26,10 +31,10 @@ from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.places_fsq.assemble import EligiblePlace, build_places
 from eii_custodian.publicdata.places_fsq.constants import (
     ATTRIBUTION,
+    COPY_ROOT,
     COPYRIGHT_LINE,
     HOST_TERMS_NOTE,
     LICENCE_NAME,
-    PINNED_RELEASE,
     RELEASE_KEY,
 )
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
@@ -56,6 +61,7 @@ from eii_custodian.publicdata.places_fsq.policy import (
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partitions
 
 _PACKAGE = repository_root(Path(__file__)) / "custodian"
+_RELEASE = "2025-01-10"
 _MAPPING = _PACKAGE / "publicdata" / "review" / "places_fsq_categories.csv"
 _POLICY = _PACKAGE / "publicdata" / "review" / "places_fsq_policy.yaml"
 _README = (
@@ -84,7 +90,7 @@ _EDGE = {
 def test_selects_only_files_whose_row_groups_meet_the_frame() -> None:
     """Row-group coordinate statistics select the files; a file's own geo bbox does not."""
     body = metadata_bytes((_NEAR, _FAR, _EDGE), dataset_geo_bbox=(0.0, 0.0, 1.0, 1.0))
-    selected = select_partitions(body, release=PINNED_RELEASE, frame=FRAME_BOX)
+    selected = select_partitions(body, release=_RELEASE, frame=FRAME_BOX)
     assert selected.files == ("edge.parquet", "near.parquet")
     ignored = {item.file_path: item.bbox for item in selected.ignored_geo}
     assert ignored[""] == (0.0, 0.0, 1.0, 1.0)
@@ -96,18 +102,19 @@ def test_metadata_with_no_file_for_the_frame_fetches_nothing(tmp_path: Path) -> 
     """A summary that misses the frame refuses before any data file is requested."""
     body = metadata_bytes((_FAR,), dataset_geo_bbox=(50.7, 24.4, 51.7, 26.2))
     with pytest.raises(PlacesFsqError, match=r"^no_file_for_frame$"):
-        select_partitions(body, release=PINNED_RELEASE, frame=FRAME_BOX)
+        select_partitions(body, release=_RELEASE, frame=FRAME_BOX)
     entry = _release_entry()
     seen: list[str] = []
 
     def transport(url: str) -> Response:
         seen.append(url)
-        return Response(final_url=url, body=body, hops=())
+        response = listing(f"{_RELEASE}/") if url == entry.url else body
+        return Response(final_url=url, body=response, hops=())
 
     outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "no_file_for_frame"
-    assert seen == [entry.url]
+    assert seen == [entry.url, f"{COPY_ROOT}{_RELEASE}/places/_metadata"]
     assert not (tmp_path / RELEASE_KEY / "manifest.json").exists()
 
 
@@ -121,11 +128,11 @@ def test_a_different_release_in_the_summary_is_refused() -> None:
     }
     body = metadata_bytes((group,), dataset_geo_bbox=None)
     with pytest.raises(PlacesFsqError, match=r"^release_mismatch$"):
-        select_partitions(body, release=PINNED_RELEASE, frame=FRAME_BOX)
+        select_partitions(body, release=_RELEASE, frame=FRAME_BOX)
 
 
 def test_registry_row_records_publisher_licence_terms_and_release() -> None:
-    """The placeholder stays skipped. The appended row records the pinned release."""
+    """The stable row selects a release at refresh and records it at runtime."""
     rows = [entry for entry in load_registry() if entry.source_id == "places_fsq"]
     placeholder = next(entry for entry in rows if entry.key == "places_fsq")
     release = next(entry for entry in rows if entry.key == RELEASE_KEY)
@@ -134,7 +141,9 @@ def test_registry_row_records_publisher_licence_terms_and_release() -> None:
     assert release.publisher == "Foursquare"
     assert release.licence_basis == "dataset"
     assert release.licence_id == "Apache-2.0"
-    assert release.period_first == PINNED_RELEASE
+    assert release.period_first == ""
+    assert release.period_last == ""
+    assert release.title_en.endswith("newest dated release at each refresh")
     assert HOST_TERMS_NOTE in release.basis_note
     assert COPYRIGHT_LINE in release.basis_note
     assert release.terms_url.endswith("/README.md")
@@ -155,6 +164,8 @@ def test_build_fetches_only_the_qatar_file_and_no_foreign_host(tmp_path: Path) -
     def transport(url: str) -> Response:
         seen.append(url)
         if url == entry.url:
+            return Response(final_url=url, body=listing(f"{_RELEASE}/"), hops=())
+        if url.endswith("_metadata"):
             return Response(final_url=url, body=body, hops=())
         if url == entry.terms_url:
             return Response(final_url=url, body=_README, hops=())
@@ -174,11 +185,12 @@ def test_build_fetches_only_the_qatar_file_and_no_foreign_host(tmp_path: Path) -
     assert outcome.failure is None
     assert seen == [
         entry.url,
+        f"{COPY_ROOT}{_RELEASE}/places/_metadata",
         entry.terms_url,
         "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/near.parquet",
     ]
     assert all(approve(url).ok for url in seen)
-    assert (tmp_path / "cache" / RELEASE_KEY / "manifest.json").is_file()
+    assert (tmp_path / "cache" / RELEASE_KEY / _RELEASE / "manifest.json").is_file()
     assert "planted-token-value" not in stored
 
 
@@ -214,6 +226,8 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
 
     def transport(url: str) -> Response:
         if url == entry.url:
+            return Response(final_url=url, body=listing(f"{_RELEASE}/"), hops=())
+        if url.endswith("_metadata"):
             return Response(final_url=url, body=body, hops=())
         if url == entry.terms_url:
             return Response(final_url=url, body=b"Proprietary terms only.", hops=())
@@ -226,7 +240,7 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
         del os.environ["PLACES_FSQ_TOKEN"]
     assert outcome.failure is None
     manifest = json.loads(
-        (tmp_path / "licence" / RELEASE_KEY / "manifest.json").read_text(
+        (tmp_path / "licence" / RELEASE_KEY / _RELEASE / "manifest.json").read_text(
             encoding="utf-8"
         )
     )
@@ -250,6 +264,8 @@ def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_is_pending(
 
     def transport(url: str) -> Response:
         seen.append(url)
+        if url == bare.url:
+            return Response(final_url=url, body=listing(f"{_RELEASE}/"), hops=())
         if url.endswith("_metadata"):
             return Response(final_url=url, body=body, hops=())
         return Response(final_url=url, body=data.read_bytes(), hops=())
@@ -406,7 +422,7 @@ def test_duplicate_keeps_the_main_place_and_hides_the_copy(tmp_path: Path) -> No
     assert "eeeeeeeeeeeeeeeeeeee000c" in shown
     assert built.duplicates[2].in_showcase is True
     assert built.places == (same, other_language, showcase)
-    assert all(item.source_release == PINNED_RELEASE for item in built.eligible)
+    assert all(item.source_release == _RELEASE for item in built.eligible)
     assert all(item.attribution == ATTRIBUTION for item in built.eligible)
     assert built.rows[0].name_ar is None
     assert built.coverage.name_ar_null == len(built.rows)
@@ -420,10 +436,10 @@ def test_duplicate_keeps_the_main_place_and_hides_the_copy(tmp_path: Path) -> No
     assert hidden.coverage.closed_not_shown == 1
 
 
-def test_category_mapping_is_reviewed_and_unmapped_stays_unmapped(
+def test_category_mapping_is_reviewed_and_unmapped_is_refused(
     tmp_path: Path,
 ) -> None:
-    """The committed file is a header. A bad mapping is not used."""
+    """The committed file is a header. An unmapped identifier refuses assembly."""
     assert load_mapping(_MAPPING, frozenset()) == ()
     header = _MAPPING.read_text(encoding="utf-8").strip()
     assert header == ",".join(MAPPING_COLUMNS)
@@ -442,19 +458,24 @@ def test_category_mapping_is_reviewed_and_unmapped_stays_unmapped(
                 fsq_category_ids=["cccccccccccccccceeee0001"],
                 fsq_category_labels=["Invented leaf"],
             ),
-            place(
-                fsq_place_id="ffffffffffffeeeeeeee000b",
-                fsq_category_ids=["dddddddddddddddddddd0009"],
-                fsq_category_labels=["Unmapped leaf"],
-            ),
         ],
     )
     built = _build(path, (), mapping=mapping)
     by_id = {item.row.fsq_place_id: item for item in built.eligible}
     assert by_id["abcdabcdabcdabcdabcdabcd"].product_categories == "food"
     assert by_id["abcdabcdabcdabcdabcdabcd"].row.category_labels == "Invented leaf"
-    assert by_id["ffffffffffffeeeeeeee000b"].product_categories is None
-    assert built.coverage.unmapped_places == 1
+    assert built.coverage.unmapped_places == 0
+    write_places(
+        path,
+        [
+            place(
+                fsq_category_ids=["dddddddddddddddddddd0009"],
+                fsq_category_labels=["Unmapped leaf"],
+            ),
+        ],
+    )
+    with pytest.raises(PlacesFsqError, match=r"^category_unmapped$"):
+        _build(path, (), mapping=mapping)
     unsigned = _mapping(
         tmp_path / "unsigned.csv",
         [
@@ -513,6 +534,20 @@ def test_reviewed_policy_file_matches_the_enforced_rules(tmp_path: Path) -> None
     )
     with pytest.raises(PlacesFsqError, match=r"^policy_disagrees$"):
         assert_policy(planted)
+    for old, new in (
+        ('release: "newest_dated_at_each_refresh"', 'release: "2025-01-10"'),
+        ('metadata_file: "<release>/places/_metadata"', 'metadata_file: "fixed"'),
+        (
+            "category_mapping: every_nonempty_identifier_reviewed",
+            "category_mapping: partial_allowed",
+        ),
+        ("snapshots: every_dated_release_retained", "snapshots: latest_only"),
+    ):
+        planted.write_text(
+            _POLICY.read_text(encoding="utf-8").replace(old, new), encoding="utf-8"
+        )
+        with pytest.raises(PlacesFsqError, match=r"^policy_disagrees$"):
+            assert_policy(planted)
 
 
 def test_a_bad_receipt_refuses_the_table(tmp_path: Path) -> None:
@@ -529,7 +564,7 @@ def test_a_bad_receipt_refuses_the_table(tmp_path: Path) -> None:
             mapping=(),
             labels=(),
             min_edit_distance=3,
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             attribution=ATTRIBUTION,
             receipt_sha256="abc",
         )
@@ -540,18 +575,18 @@ def test_selection_refuses_a_bad_summary_and_keeps_a_file_without_geo() -> None:
     plain = dict(_NEAR)
     plain["geo_bbox"] = None
     bare = metadata_bytes((plain,), dataset_geo_bbox=None)
-    selected = select_partitions(bare, release=PINNED_RELEASE, frame=FRAME_BOX)
+    selected = select_partitions(bare, release=_RELEASE, frame=FRAME_BOX)
     assert selected.files == ("near.parquet",)
     assert selected.ignored_geo == ()
     empty = metadata_bytes((), dataset_geo_bbox=None)
     with pytest.raises(PlacesFsqError, match=r"^no_file_for_frame$"):
-        select_partitions(empty, release=PINNED_RELEASE, frame=FRAME_BOX)
+        select_partitions(empty, release=_RELEASE, frame=FRAME_BOX)
     nameless = dict(_NEAR)
     nameless["file_path"] = ""
     with pytest.raises(PlacesFsqError, match=r"^file_path_missing$"):
         select_partitions(
             metadata_bytes((nameless,), dataset_geo_bbox=None),
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             frame=FRAME_BOX,
         )
     unstated = dict(_NEAR)
@@ -559,7 +594,7 @@ def test_selection_refuses_a_bad_summary_and_keeps_a_file_without_geo() -> None:
     with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
         select_partitions(
             metadata_bytes((unstated,), dataset_geo_bbox=None),
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             frame=FRAME_BOX,
         )
 
@@ -711,7 +746,7 @@ def test_table_mapping_and_names_cover_the_remaining_plants(tmp_path: Path) -> N
             mapping=(),
             labels=(),
             min_edit_distance=3,
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             attribution="wrong",
             receipt_sha256="a" * 64,
         )
@@ -725,7 +760,7 @@ def test_table_mapping_and_names_cover_the_remaining_plants(tmp_path: Path) -> N
             mapping=(),
             labels=(),
             min_edit_distance=3,
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             attribution=ATTRIBUTION,
             receipt_sha256="a" * 64,
         )
@@ -774,8 +809,8 @@ def test_table_mapping_and_names_cover_the_remaining_plants(tmp_path: Path) -> N
     )
 
 
-def test_a_place_without_the_copy_release_date_is_refused(tmp_path: Path) -> None:
-    """An eligible place carries 2025-01-10. A place without that date is refused."""
+def test_a_place_without_a_real_copy_release_date_is_refused(tmp_path: Path) -> None:
+    """An eligible place carries the actual folder date; malformed dates refuse."""
     path = tmp_path / "places.parquet"
     write_places(path, [place()])
     digest = sha256_hex(path.read_bytes())
@@ -803,7 +838,7 @@ def test_a_place_without_the_copy_release_date_is_refused(tmp_path: Path) -> Non
             mapping=(),
             labels=(),
             min_edit_distance=3,
-            release="2024-12-03",
+            release="2024-13-03",
             attribution=ATTRIBUTION,
             receipt_sha256="a" * 64,
         )
@@ -964,7 +999,7 @@ def test_a_grid_without_the_kept_cells_refuses(tmp_path: Path) -> None:
             mapping=(),
             labels=(),
             min_edit_distance=3,
-            release=PINNED_RELEASE,
+            release=_RELEASE,
             attribution=ATTRIBUTION,
             receipt_sha256="a" * 64,
         )
@@ -986,7 +1021,7 @@ def _build(
         mapping=mapping,
         labels=(),
         min_edit_distance=3,
-        release=PINNED_RELEASE,
+        release=_RELEASE,
         attribution=ATTRIBUTION,
         receipt_sha256="a" * 64,
     )
@@ -1039,7 +1074,9 @@ def _run(
     def transport(url: str) -> Response:
         seen.append(url)
         if url == entry.url:
-            return Response(final_url=url, body=body, hops=hops)
+            return Response(final_url=url, body=listing(f"{_RELEASE}/"), hops=hops)
+        if url.endswith("_metadata"):
+            return Response(final_url=url, body=body, hops=())
         if url == entry.terms_url:
             return Response(final_url=url, body=terms, hops=())
         return Response(final_url=url, body=b"PAR1-not-used", hops=())

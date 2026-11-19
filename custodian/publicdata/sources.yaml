@@ -5555,20 +5555,20 @@ sources:
     reconciliation: "none"
     skip_reason: "fetcher_owned_by_S2-T14"
     extension: "json"
-  # S2-T15
-  - key: "places_fsq/copy-2025-01-10"
+  # S2-T15 and S2-T37
+  - key: "places_fsq/copy"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "places_fsq"
     slug: ""
     kind: "https_file"
-    title_en: "Foursquare Open Source Places, public copy, release 2025-01-10"
+    title_en: "Foursquare Open Source Places, public copy, newest dated release at each refresh"
     publisher: "Foursquare"
     licence_id: "Apache-2.0"
     licence_basis: "dataset"
     licence_url: "https://www.apache.org/licenses/LICENSE-2.0"
     decision_record: ""
     fetch_host: "data.source.coop"
-    url: "https://data.source.coop/fused/fsq-os-places/2025-01-10/places/_metadata"
+    url: "https://data.source.coop/fused/fsq-os-places/"
     terms_url: "https://data.source.coop/fused/fsq-os-places/README.md"
     terms_words: "terms to be read"
     terms_read_on: "2026-11-14"
@@ -5581,8 +5581,8 @@ sources:
     columns: []
     row_count_min: null
     row_count_max: null
-    period_first: "2025-01-10"
-    period_last: "2025-01-10"
+    period_first: ""
+    period_last: ""
     period_field: "source_release"
     reconciliation: "none"
     skip_reason: ""

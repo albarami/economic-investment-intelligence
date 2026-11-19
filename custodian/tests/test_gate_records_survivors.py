@@ -261,14 +261,38 @@ def test_investment_missing_blocks_have_exact_false_checks(document):
 
 
 @pytest.mark.parametrize(
-    "release,policy,matched",
+    "release,receipt_release,policy,matched",
     [
-        ("", {"release": ""}, False),
-        ("invented", {"release": "other"}, False),
-        ("invented", {"release": "invented"}, True),
+        ("", "", {"release": "newest_dated_at_each_refresh"}, False),
+        (
+            "2032-02-30",
+            "2032-02-30",
+            {"release": "newest_dated_at_each_refresh"},
+            False,
+        ),
+        (
+            "2032-04-05",
+            "2031-02-03",
+            {"release": "newest_dated_at_each_refresh"},
+            False,
+        ),
+        ("2032-04-05", "2032-04-05", {"release": "2025-01-10"}, False),
+        (
+            "2032-04-05",
+            "2032-04-05",
+            {"release": "newest_dated_at_each_refresh"},
+            True,
+        ),
     ],
 )
-def test_fsq_exact_match_and_nonempty_release(release, policy, matched):
-    assert g.fsq_evidence(release, policy, "invented policy") == g.ConfirmationEvidence(
-        "S2-T15", ("places_fsq",), ("invented policy",), {"release_matches": matched}
+def test_fsq_actual_release_matches_policy_and_receipt(
+    release, receipt_release, policy, matched
+):
+    assert g.fsq_evidence(
+        release, policy, "invented policy", receipt_release
+    ) == g.ConfirmationEvidence(
+        "S2-T15",
+        ("places_fsq/copy",),
+        ("invented policy",),
+        {"release_matches": matched},
     )
