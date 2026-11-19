@@ -4615,3 +4615,34 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - **Correction, 2026-11-19, S2-T41 fix round 1 (L-1092):** the implementation is committed unchanged by the lead at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` (`7ce5fc6`), and `python3 scripts/check_tree.py` passes on it (exit 0, eight rules; `.overnight/tmp/base-tree.log`). This supersedes the earlier uncommitted/index-blocker statement without rewriting it. Fix commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` addresses O1, F2 and B1–B3. Per L-1092, possession of both values held only by the lead's wrapper is the boundary; no caller-admission flag or wrapper is added. Review A's rejected F2 and review B's adopted notes await both lenses' confirmation of this fix; provider evidence, later display ownership, hosted checks and the exact-merge whole test remain with the lead.
 
 - **Fix-round verification, 2026-11-19:** final code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` additionally closes the fake fixture's inherited environment. Final full custodian and scripts suites pass (7370 passed and 904 tests, each exit 0), with zero skips and no unexplained random failure. Evidence is appended under PROGRESS.md's S2-T41 fix-round headings. This closes no provider-evidence or later-display item and supplies no independent review verdict.
+
+
+## OI-320 — S3 opening electricity fact still needs its release binding
+
+- ID: OI-320
+- TYPE: OPEN
+- RAISED BY: S3-T10 plan r3 CONSULT C3 and follow-on dispositions, **What the inputs cannot settle**; decision 0068 item 6 records L-1136's retained default.
+- CONCERNS: S3-T10 opening-chip criterion; document 16 **Scene 0**; document 07 **C9 Zone momentum from utility series**; S3-T24 transport.
+- EVIDENCE: The planning inputs do not establish the mounted release's required electricity growth/benchmark slot, period or wording. A layer field named ranked_ratio alone establishes none of those bindings; no release data was inspected for this documents-only task.
+- NEEDED: The lead and S3-T10 verify the actual fact identity, period, wording and complete chain through S3-T24's transport before binding the dated opening chip. No literal, proxy or substitute hero is allowed. If unavailable, show only the catalogue unavailable sentence and keep the opening-chip criterion unmet.
+- NEEDED BY: S3-T10 end-to-end evidence and slice S3 gate; no criterion or status is changed here.
+
+## OI-321 — Local basemap and glyph artefacts need a verified serving binding
+
+- ID: OI-321
+- TYPE: OPEN
+- RAISED BY: S3-T10 plan r3 CONSULT C5 and follow-on dispositions, **What the inputs cannot settle**; decision 0068 item 4.
+- CONCERNS: S3-T27; document 08 **8.1 Endpoints**; FE-56, FE-58, FE-68 and DES-56.
+- EVIDENCE: The supplied planning inputs leave usable local map/font artefacts unverified. This documents-only change neither reads a data cache nor asserts that a usable extract is present.
+- NEEDED: S3-T27 records the verified mounted PMTiles and glyph names, hashes, types and release binding, reuses the released artefacts and font pins, and proves actual map geometry and EN/AR labels through production same-origin routes. Null-extract, missing-glyph and route-bypass plants must fail; a plain land/sea fallback cannot close the label proof. The lead supplies any required artefact preparation through its authorized path, never a provider call in a test.
+- NEEDED BY: S3-T27 acceptance, S3-T10 end-to-end evidence and slice S3 gate.
+
+## OI-322 — Live Public-query coverage and joined-head approvals remain evidence holds
+
+- ID: OI-322
+- TYPE: OPEN
+- RAISED BY: S3-T10 plan r3 CONSULT C1, C2, C4 and C6; follow-on dispositions, **Existing-owner fix and evidence checklist** and **What the inputs cannot settle**; decision 0068 items 1 to 3, 5 and 7.
+- CONCERNS: S3-T24 live parity, S3-T25 resolver queries, S3-T26 selected-area cases, S3-T09 phone-sheet fix, S3-T10 integration and S3-T11 closure; OI-09 remains the separate native-review hold.
+- EVIDENCE: Read-only tip-T22 commit `46387fe393952a52be79a2091c5020abf4be5df6`, decision 0061 **Open matters and change control**, explicitly leaves live route parity pending and distinguishes its second-engine stand-in from real PostgreSQL. Planning inputs do not supply final live receipts or another maker's approval on the joined head. No database or live runner is used by this documents-only change.
+- NEEDED: The lead records actual two-store command exits, exact commit, release identity and every query's execution, including S3-T25 and S3-T26 cases; the divergence proof exits 3 with no new tolerance. Missing live evidence stays pending. Reconcile the S3-T16/S3-T22 reviews and forced differences under rule 33, obtain S3-T09's own fix review and the joined design audit, and retain OI-09 native approval. Local tips certify none of these. Mutation-only debts remain deferred under decision 0055 items 1 to 4 and do not become slice-gate holds.
+- NEEDED BY: S3-T10 end-to-end step and S3-T11 ordinary evidence closure before slice S3 gate; no approval or completion is inferred.
