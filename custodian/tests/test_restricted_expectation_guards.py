@@ -103,6 +103,75 @@ def test_restricted_replay_and_lineage(tmp_path):
         assert source_chain.retrieved == "2026-11-14"
 
 
+def coverage_fixture(cache, *zones, private=None, total=None):
+    from custodian.tests.test_method_cache import _write_cached_source
+
+    case, companion = fixture(cache)
+    pins = json.loads((cache / "method_pins.json").read_text())
+    for source in case.source_ids:
+        payload = json.loads((cache / source / (pins[source] + ".json")).read_text())
+        features = payload["features"]
+        for zone in zones:
+            feature = next(
+                (row for row in features if row["attributes"]["ZONE_NO"] == zone),
+                None,
+            )
+            if feature is None:
+                feature = {
+                    "attributes": dict(features[0]["attributes"]),
+                    "geometry": {"rings": []},
+                }
+                features.append(feature)
+            attrs = feature["attributes"]
+            attrs["ZONE_NO"] = zone
+            if source == "census_zone_sector":
+                attrs.update(Private=private, Total_Economic_active___15=total)
+            elif total is None:
+                attrs.update(dict.fromkeys(COUNTS[source][1:-1]))
+        payload["count"] = len(features)
+        pins[source] = _write_cached_source(cache, source, payload)
+    (cache / "method_pins.json").write_text(json.dumps(pins))
+    companion["cases"][case.case_id]["source_shas"] = pins
+    save(cache, companion)
+    return case
+
+
+def test_restricted_null_coverage_zone(tmp_path):
+    local, _ = modules()
+    case = coverage_fixture(tmp_path, 71)
+    expected = local.load_expectation(tmp_path, case)
+    local.compare(case, local.replay(tmp_path, case).values, expected)
+    local.check_case(tmp_path, case)
+
+
+def test_restricted_half_null_row(tmp_path):
+    local, _ = modules()
+    # Paired control: both null is coverage, exactly one null is invalid.
+    case = coverage_fixture(tmp_path, 71)
+    local.check_case(tmp_path, case)
+    for private, total in ((None, 100), (40, None)):
+        case = coverage_fixture(tmp_path, 71, private=private, total=total)
+        with pytest.raises(local.ExpectationError, match=r"^PUB-71:source_invalid$"):
+            local.replay(tmp_path, case)
+        with pytest.raises(pytest.fail.Exception, match=r"^PUB-71:source_invalid$"):
+            local.check_case(tmp_path, case)
+
+
+def test_restricted_target_zone_null_coverage(tmp_path):
+    local, _ = modules()
+    for zones in ((69,), (70,), (69, 70)):
+        case = coverage_fixture(tmp_path, *zones)
+        with pytest.raises(local.ExpectationError, match=r"^PUB-71:zone_missing$"):
+            local.replay(tmp_path, case)
+        with pytest.raises(pytest.fail.Exception, match=r"^PUB-71:zone_missing$"):
+            local.check_case(tmp_path, case)
+        assert local.summary_reasons(
+            "FAILED invented.py::test_one - Failed: PUB-71:zone_missing\n"
+            "1 failed in 0.10s",
+            1,
+        ) == {"PUB-71:zone_missing"}
+
+
 @pytest.mark.parametrize(
     "plant,reason",
     [

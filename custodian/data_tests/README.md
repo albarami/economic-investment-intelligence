@@ -26,7 +26,10 @@ Another maker must check completeness before the lead supplies expectations.
 PUB-71 replays both sector and occupation snapshots with `read_cached`,
 `layer_rows` and `check_employment`, then `coverage_share` and `rounded`.
 It checks raw national inputs and national/zone results using the existing
-precisions and exact equality of the stage record. Source-count cases replay
+precisions and exact equality of the stage record. National figures sum only
+zones that carry counts, leaving zones with both counts null out of both sums,
+as the source publishes them and the original public-data stage computed PUB-71.
+Source-count cases replay
 `layer_rows` and count validated rows. Census counts use the source's own
 geography. No tabulated count is apportioned to a drawn area.
 

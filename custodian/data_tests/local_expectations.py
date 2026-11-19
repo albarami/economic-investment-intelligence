@@ -307,6 +307,14 @@ def replay(cache, case):
         rows = layers[case.source_key]
         if len({row["ZONE_NO"] for row in rows}) != len(rows):
             raise ValueError("duplicate_zone") from None
+        if any(
+            (row["Private"] is None) != (row["Total_Economic_active___15"] is None)
+            for row in rows
+        ):
+            refuse(case, "source_invalid")
+        rows = [row for row in rows if row["Private"] is not None]
+        if not {69, 70}.issubset({row["ZONE_NO"] for row in rows}):
+            refuse(case, "zone_missing")
         chain = chains[0].source_chain()
 
         def share(group, geography):
@@ -335,8 +343,6 @@ def replay(cache, case):
         }
         for zone in (69, 70):
             group = [row for row in rows if row["ZONE_NO"] == zone]
-            if len(group) != 1:
-                raise ValueError("zone_missing") from None
             _, _, result = share(group, f"zone:{zone}")
             if result.geography != f"zone:{zone}":
                 raise ValueError("geography_invalid") from None
@@ -419,6 +425,7 @@ def summary_reasons(text, exit_code):
             "source_pin_mismatch",
             "path_refused",
             "source_invalid",
+            "zone_missing",
         }:
             raise ValueError("summary_unparsed") from None
         reasons.add(case_id + ":" + reason)
@@ -454,6 +461,7 @@ def check_case(cache, case):
             "source_pin_mismatch",
             "path_refused",
             "source_invalid",
+            "zone_missing",
             "expectation_mismatch",
         }:
             reason = "source_invalid"
