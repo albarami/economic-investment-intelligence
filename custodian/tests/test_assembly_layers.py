@@ -44,7 +44,14 @@ def test_landmarks_extend_the_catalogued_gazetteer_with_bound_sources(
     assert state.tables["gazetteer"][1]["name_en"] == "SYN MARK"
     assert state.table_sources["gazetteer"] == {row.key, base.key}
     assert state.source_tables[row.key] == ["gazetteer"]
-    assert draw_tables(state)["gazetteer"]() == []
+    assert draw_tables(state) == {}
+    assert state.draw_exclusions == [
+        {
+            "table": "gazetteer",
+            "sources": [base.key, row.key],
+            "reason": "assembly_draw_lineage_ambiguous",
+        }
+    ]
 
 
 def test_changed_frame_gazetteer_cannot_be_hidden_by_later_phase(

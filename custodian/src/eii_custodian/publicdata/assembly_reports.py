@@ -118,6 +118,17 @@ RATIO_FIELDS = RATIO_FIELDS | frozenset({"busyness_index"})
 ADMIN_FIELDS = ADMIN_FIELDS | frozenset(
     {
         "aggregation_level",
+        "decision_record",
+        "city_id",
+        "lng",
+        "tech_level_id",
+        "world_region_id",
+        "src_country_id",
+        "src_state_id",
+        "src_world_region_id",
+        "level",
+        "ordinal",
+        "parent_ordinal",
         "project_id",
         "project_month",
         "project_year",
@@ -574,6 +585,43 @@ def gather_audit(build: Production) -> dict[str, Any]:
     }
 
 
+def _draw_row_sources(
+    build: Production, table: str, data: dict[str, Any]
+) -> list[str] | None:
+    """Resolve stored row tags; only wholly untagged multi-source tables are excluded."""
+    sources = build.table_sources.get(table, set())
+    if not sources or any(source not in build.receipts for source in sources):
+        raise AssemblyError("assembly_lineage_missing")
+    rows = data["tables"][table]
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise AssemblyError("assembly_output_invalid")
+    if len(sources) == 1:
+        return [next(iter(sources))] * len(rows)
+    stored = data.get("row_sources", {}).get(table, [])
+    if not isinstance(stored, list) or (stored and len(stored) != len(rows)):
+        raise AssemblyError("assembly_draw_lineage_ambiguous")
+    tags = [
+        row.get("source_key") or (stored[index] if stored else None)
+        for index, row in enumerate(rows)
+    ]
+    if not any(tags):
+        return None
+    if not all(isinstance(tag, str) and tag for tag in tags):
+        raise AssemblyError("assembly_draw_lineage_ambiguous")
+    resolved = []
+    for tag in tags:
+        # Additions carry registry keys; series envelopes carry publisher source IDs.
+        matches = (
+            [tag]
+            if tag in sources
+            else [key for key in sources if build.receipts[key]["source_id"] == tag]
+        )
+        if len(matches) != 1:
+            raise AssemblyError("assembly_draw_lineage_ambiguous")
+        resolved.append(matches[0])
+    return resolved
+
+
 def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
     """Bind every registered table to its stored phase envelope and exact hash."""
     files: dict[str, tuple[str, str]] = {}
@@ -616,16 +664,33 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
     if set(build.tables) - set(files):
         raise AssemblyError("figure_table_unreachable")
 
+    build.draw_exclusions.clear()
+    for table, (name, digest) in sorted(files.items()):
+        if len(build.table_sources.get(table, set())) <= 1:
+            continue
+        bound_files(build.cache, {name: digest})
+        if _draw_row_sources(build, table, read_object(build.cache, name)) is None:
+            build.draw_exclusions.append(
+                {
+                    "table": table,
+                    "sources": sorted(build.table_sources[table]),
+                    "reason": "assembly_draw_lineage_ambiguous",
+                }
+            )
+    excluded = {item["table"] for item in build.draw_exclusions}
+
     def reader(table: str) -> Sequence[Figure]:
         name, digest = files[table]
         bound_files(build.cache, {name: digest})
-        rows = read_object(build.cache, name)["tables"][table]
+        data = read_object(build.cache, name)
+        rows = data["tables"][table]
+        row_sources = _draw_row_sources(build, table, data)
+        if row_sources is None:
+            raise AssemblyError("assembly_draw_lineage_ambiguous")
         sources = build.table_sources.get(table, set())
         if not sources or any(source not in build.receipts for source in sources):
             raise AssemblyError("assembly_lineage_missing")
         keys = sorted(sources)
-        source = keys[0]
-        receipt = build.receipts[source]
         links = [
             {
                 key: build.receipts[source][key]
@@ -635,6 +700,7 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
         ]
         output = []
         for index, row in enumerate(rows):
+            receipt = build.receipts[row_sources[index]]
             if not isinstance(row, dict):
                 raise AssemblyError("assembly_output_invalid")
             for field, value in row.items():
@@ -701,7 +767,11 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
                 )
         return output
 
-    return {table: partial(reader, table) for table in sorted(files)}
+    return {
+        table: partial(reader, table)
+        for table in sorted(files)
+        if table not in excluded
+    }
 
 
 def write_reports(build: Production) -> dict[str, str]:

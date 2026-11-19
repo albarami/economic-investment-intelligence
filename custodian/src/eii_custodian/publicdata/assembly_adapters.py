@@ -50,6 +50,7 @@ class Production:
     data_files: dict[str, str] = field(default_factory=dict)
     audit: dict[str, Any] = field(default_factory=dict)
     stamp: str = ""
+    draw_exclusions: list[dict[str, Any]] = field(default_factory=list)
 
     def adapters(self) -> dict[str, Callable[[], Mapping[str, str]]]:
         return {
@@ -594,6 +595,7 @@ class Production:
             {table for source in selected for table, _ in FIELD_MAP[source].values()}
         )
         produced = {}
+        row_sources = {}
         by_source = {entry.source_id: entry for entry in self.entries}
         for name in names:
             relative = "series/internal/" + name + ".json"
@@ -615,7 +617,10 @@ class Production:
             self.table(name, envelope["rows"], tuple(keys))
             self.files[relative] = file_hash(path)
             produced[name] = self.tables[name]
-        output = self.record("series_stage", {**result, "tables": produced})
+            row_sources[name] = envelope["row_sources"]
+        output = self.record(
+            "series_stage", {**result, "tables": produced, "row_sources": row_sources}
+        )
         if result["mismatch"] or result["missing"]:
             raise AssemblyError("assembly_regression_refused")
         return output
@@ -742,7 +747,11 @@ class Production:
         )
         output = self.record(
             "draw",
-            {"figure_ids": [f.figure_id for f in figures], "figure_seed": self.seed},
+            {
+                "figure_ids": [f.figure_id for f in figures],
+                "figure_seed": self.seed,
+                "excluded_tables": self.draw_exclusions,
+            },
         )
         output.update(
             self.record(
