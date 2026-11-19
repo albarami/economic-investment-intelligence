@@ -97,7 +97,7 @@ addition. If the expanded live proof needs additional command authorization, its
 CLAUDE.md byte-identically; no new command is authorized here.
 
 OPEN_ITEMS.md records unresolved opening-fact availability, usable local assets and final live/joined-head evidence
-as OI-318 to OI-320; OI-09 remains the native-approval owner. No release data or cache was inspected to settle them.
+as OI-320 to OI-322; OI-09 remains the native-approval owner. No release data or cache was inspected to settle them.
 Material scope changes need a new decision record under AGENTS.md rule 46. An implementation result, review or
 gate is never inferred from a planning document or a local branch tip (rule 47).
 

@@ -38806,3 +38806,8 @@ HEAD, the original ledger prefix, and the report marker/content constraints.
 
 
 **S3-ADD patch packaging correction:** the artifact safety audit exited 1 on an automatically abbreviated blob hash made of eight digits in patch metadata, not on document content. The patch is therefore regenerated with `git diff --binary --full-index HEAD`, preserving the exact same document changes while spelling full blob hashes. This supersedes the shorter patch command above; the worker return records the final patch size, digest and successful artifact audit. No guard, test or source document was changed to accept the abbreviation.
+
+**S3-ADD records correction (lead, 2026-11-19 17:20, ruling L-1146; review S3-ADD.rev1 by Z.ai GLM-5.3, records findings only, which never reject):**
+- After the merge of pull request 99 (98384ae5), which holds OI-318 and OI-319, this change's open items OI-318, OI-319 and OI-320 are renumbered OI-320, OI-321 and OI-322. The renumbering is applied in OPEN_ITEMS.md and decision record 0068; the row above keeps its original numbers.
+- The draft OI-321 (the worker's scripts check lacked the pinned pyyaml wheel offline: 920 tests, exit 1, seven clean-environment failures) is environment evidence, not a project open item. It is removed from OPEN_ITEMS.md and kept here.
+- The lead's own run of the scripts discovery in the equipped shell is recorded with this pull request.

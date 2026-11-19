@@ -4617,9 +4617,9 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - **Fix-round verification, 2026-11-19:** final code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` additionally closes the fake fixture's inherited environment. Final full custodian and scripts suites pass (7370 passed and 904 tests, each exit 0), with zero skips and no unexplained random failure. Evidence is appended under PROGRESS.md's S2-T41 fix-round headings. This closes no provider-evidence or later-display item and supplies no independent review verdict.
 
 
-## OI-318 — S3 opening electricity fact still needs its release binding
+## OI-320 — S3 opening electricity fact still needs its release binding
 
-- ID: OI-318
+- ID: OI-320
 - TYPE: OPEN
 - RAISED BY: S3-T10 plan r3 CONSULT C3 and follow-on dispositions, **What the inputs cannot settle**; decision 0068 item 6 records L-1136's retained default.
 - CONCERNS: S3-T10 opening-chip criterion; document 16 **Scene 0**; document 07 **C9 Zone momentum from utility series**; S3-T24 transport.
@@ -4627,9 +4627,9 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - NEEDED: The lead and S3-T10 verify the actual fact identity, period, wording and complete chain through S3-T24's transport before binding the dated opening chip. No literal, proxy or substitute hero is allowed. If unavailable, show only the catalogue unavailable sentence and keep the opening-chip criterion unmet.
 - NEEDED BY: S3-T10 end-to-end evidence and slice S3 gate; no criterion or status is changed here.
 
-## OI-319 — Local basemap and glyph artefacts need a verified serving binding
+## OI-321 — Local basemap and glyph artefacts need a verified serving binding
 
-- ID: OI-319
+- ID: OI-321
 - TYPE: OPEN
 - RAISED BY: S3-T10 plan r3 CONSULT C5 and follow-on dispositions, **What the inputs cannot settle**; decision 0068 item 4.
 - CONCERNS: S3-T27; document 08 **8.1 Endpoints**; FE-56, FE-58, FE-68 and DES-56.
@@ -4637,23 +4637,12 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - NEEDED: S3-T27 records the verified mounted PMTiles and glyph names, hashes, types and release binding, reuses the released artefacts and font pins, and proves actual map geometry and EN/AR labels through production same-origin routes. Null-extract, missing-glyph and route-bypass plants must fail; a plain land/sea fallback cannot close the label proof. The lead supplies any required artefact preparation through its authorized path, never a provider call in a test.
 - NEEDED BY: S3-T27 acceptance, S3-T10 end-to-end evidence and slice S3 gate.
 
-## OI-320 — Live Public-query coverage and joined-head approvals remain evidence holds
+## OI-322 — Live Public-query coverage and joined-head approvals remain evidence holds
 
-- ID: OI-320
+- ID: OI-322
 - TYPE: OPEN
 - RAISED BY: S3-T10 plan r3 CONSULT C1, C2, C4 and C6; follow-on dispositions, **Existing-owner fix and evidence checklist** and **What the inputs cannot settle**; decision 0068 items 1 to 3, 5 and 7.
 - CONCERNS: S3-T24 live parity, S3-T25 resolver queries, S3-T26 selected-area cases, S3-T09 phone-sheet fix, S3-T10 integration and S3-T11 closure; OI-09 remains the separate native-review hold.
 - EVIDENCE: Read-only tip-T22 commit `46387fe393952a52be79a2091c5020abf4be5df6`, decision 0061 **Open matters and change control**, explicitly leaves live route parity pending and distinguishes its second-engine stand-in from real PostgreSQL. Planning inputs do not supply final live receipts or another maker's approval on the joined head. No database or live runner is used by this documents-only change.
 - NEEDED: The lead records actual two-store command exits, exact commit, release identity and every query's execution, including S3-T25 and S3-T26 cases; the divergence proof exits 3 with no new tolerance. Missing live evidence stays pending. Reconcile the S3-T16/S3-T22 reviews and forced differences under rule 33, obtain S3-T09's own fix review and the joined design audit, and retain OI-09 native approval. Local tips certify none of these. Mutation-only debts remain deferred under decision 0055 items 1 to 4 and do not become slice-gate holds.
 - NEEDED BY: S3-T10 end-to-end step and S3-T11 ordinary evidence closure before slice S3 gate; no approval or completion is inferred.
-
-
-## OI-321 — S3-ADD scripts check lacks the pinned offline dependency
-
-- ID: OI-321
-- TYPE: OPEN (environment evidence)
-- RAISED BY: S3-ADD documents-only verification, 2026-11-19; base commit `55657e59d80098d9860d3a8463431cd33bdf45a7`.
-- CONCERNS: The required scripts unittest discovery command; clean-environment install evidence, not the scope of S3-T24 to S3-T27.
-- EVIDENCE: One offline run reports 920 tests in 290.392 seconds, exit 1, seven failures including four package-import subtests; zero errors or skips. The isolated sync reports `pyyaml==6.0.3` unavailable in the offline cache; imports of all four workspace packages and installed-name equality then fail. This is the observed install diagnosis, not evidence of a documentation regression or a passing suite.
-- NEEDED: The lead supplies the already pinned dependency through its authorized tooling-cache preparation and obtains a new complete scripts result, retaining this failed run. No network fetch, test change, retry, skip, pin change or baseline refresh was made by this worker. Existing clean-environment holds are not closed.
-- NEEDED BY: The lead's check evidence before claiming all required checks green for S3-ADD; independent review and hosted checks remain pending.
