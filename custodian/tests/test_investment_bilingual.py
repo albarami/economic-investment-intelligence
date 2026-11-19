@@ -262,13 +262,21 @@ def test_arabic_shape_and_truncation_keep_previous_batch(
         assert after[name] == before[name]
 
 
-def test_network_attempt_is_an_explicit_failure(monkeypatch):
+def test_network_attempt_is_an_explicit_failure(tmp_path: Path, monkeypatch):
+    pages, bodies = bilingual()
+
     def refuse(*args, **kwargs):
         raise AssertionError("network_attempt")
 
+    def transport(url):
+        socket.create_connection(("invented.invalid", 443))
+        body = b.TERMS_BODY if url == b.TERMS_URL else bodies[url]
+        return b.Response(final_url=url, body=body, hops=())
+
     monkeypatch.setattr(socket, "create_connection", refuse)
     with pytest.raises(AssertionError, match="network_attempt"):
-        socket.create_connection(("invented.invalid", 443))
+        b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages)
+    assert not b._batch_names(b._published(tmp_path, "investqa_pages"))
 
 
 def test_fetched_content_commit_is_refused(tmp_path: Path):

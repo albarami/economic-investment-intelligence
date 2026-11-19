@@ -44,6 +44,31 @@ def specimen(tmp_path: Path):
     return c, page, row, document, path, crosswalk
 
 
+@pytest.mark.parametrize("missing_key_field", [False, True])
+def test_csv_country_target(tmp_path: Path, missing_key_field: bool):
+    c, page, row, document, path, _good = specimen(tmp_path)
+    target = b"unrelated\nINV\n" if missing_key_field else b"iso3\nINV\n"
+    (tmp_path / "invented-countries.csv").write_bytes(target)
+    row.update(
+        target_resource="invented-countries.csv", target_sha256=sha256_hex(target)
+    )
+    path.write_text(json.dumps(document), encoding="utf-8")
+    crosswalk = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    if missing_key_field:
+        assert isinstance(crosswalk, InvestmentFailure)
+        assert crosswalk.check == "crosswalk_target"
+    else:
+        assert not isinstance(crosswalk, InvestmentFailure), crosswalk
+        spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
+        result = parse_fdi(
+            page.body,
+            replace(spec.dashboard, crosswalk=crosswalk),
+            replace(b._envelope(), page_sha256=sha256_hex(page.body)),
+        )
+        assert not isinstance(result, InvestmentFailure), result
+        assert result[0][0]["source_country_iso3"] == "INV"
+
+
 def test_review_covers_both_sides_and_identifier_lookup(tmp_path: Path):
     _c, page, row, _document, path, crosswalk = specimen(tmp_path)
     assert not isinstance(crosswalk, InvestmentFailure)

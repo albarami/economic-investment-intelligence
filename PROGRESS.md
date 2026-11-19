@@ -37949,3 +37949,100 @@ all plants, assumptions, forced hunks, unresolved lead inputs and changed files 
 `.overnight/RETURN.md`, ending `MARKER-S2-T39-BUILD-A`. No commit, task criterion or status
 was changed. Muhasabah PASS: offline mechanics and full-run failure are distinguished from
 live acceptance; no independent build approval or complete part-A delivery is claimed.
+
+
+### S2-T39 part A — fix pass 1 under L-1052
+
+Base commit: `cb7fbfe790d4583f839b1f4dda57daffa95130d2`; branch `local/S2-T39`.
+Maker/model: OpenAI GPT-6 (Codex). Builder persona: senior public-data engineer for
+bilingual acquisition, versioned parsers and reviewed identifier crosswalks. Self-audit
+persona: strict senior public-data contract and test reviewer; this is not another maker's
+implementation approval. Independent re-review remains with the two supplied review lenses.
+Skills loaded: project-orientation, task-standards, github-flow, sanad-provenance and
+muhasabah-gate. Requested test-driven-development and verification-before-completion files
+were not found in the installed skill roots; applied their plain meaning: tests first,
+removed-guard failures confined to scratch, passing workspace checks and honest evidence.
+Git remains read-only as the brief requires. No network or real public cache was used.
+
+Scope: L-1052 items 1–4 only. Lens A F-1 adds exactly the stale-v1 and absent-schema cases
+to `test_spec_file_refusal_paths`. Lens A F-2 adds `test_csv_country_target[False]` (invented
+CSV with `iso3`, accepted through `read_crosswalk` and `parse_fdi`) and `[True]` (CSV with
+an unrelated column, refused as `crosswalk_target`). Lens B F1 replaces the direct socket
+call with an injected transport's socket attempt through the publisher, asserts the
+`network_attempt` sentinel and absence of a published batch. Lens B F2 moves only the
+review sentence into the municipality/place entry's closing parenthesis in document 03
+section 7.3, using the reviewer's exact wording. No production module changes. A byte
+comparison against the base proves the entire contract equals that one replacement, so
+`pub_investqa_record` and DAT-143 are unchanged. L-1052 item 5 remains the lead's ledger work.
+
+Correction required by L-1052 item 3: the earlier S2-T39 evidence and BUILD-RETURN described
+`test_network_attempt_is_an_explicit_failure` as a planted network-access violation. At the
+base commit that test invoked the patched socket directly and exercised no production code;
+that earlier description was incorrect. It is now a publisher-path plant. Earlier evidence
+rows are retained unchanged.
+
+Environment: Linux; Python 3.14.6; pytest 9.2.0; Hypothesis 6.170.15; existing locked
+environment, no install. Every uv command uses `TMPDIR="$PWD/.overnight/tmp"`,
+`UV_OFFLINE=1`, `UV_NO_SYNC=1`, `UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`.
+All pytest invocations use `--hypothesis-seed=3192026119`. No test was skipped, retried,
+suppressed or given a relaxed assertion. The whole test remains the lead's.
+
+Removed-guard evidence: `uv run --locked python .overnight/tmp/fix1_plants.py` exited 0.
+The driver copies allow-listed tracked source/configuration files into
+`.overnight/tmp/fix1-scratch`, verifies that production imports resolve there, and runs each
+pytest command with the same locked interpreter. It restores each edited scratch file and
+checks byte equality after the run; production guards in the workspace are never removed.
+Each inner invocation is `python -m pytest FILE -q -p no:cacheprovider -k EXPRESSION
+--hypothesis-seed=3192026119 --tb=short`, in that scratch root:
+
+- FILE `custodian/tests/test_investment_build_survivors.py`, EXPRESSION
+  `test_spec_file_refusal_paths and inventory_schema`: removing the schema-version guard
+  gives exit 1, 2 failed/27 deselected. Both stale and absent schema produce the wrong
+  `confirmation_inventory` refusal rather than the required `inventory_schema` refusal.
+  Output: `.overnight/tmp/fix1-red-inventory_schema.log`.
+- FILE `custodian/tests/test_investment_crosswalk.py`, EXPRESSION
+  `test_csv_country_target and False`: disabling the CSV-reader branch gives exit 1,
+  1 failed/26 deselected; the valid CSV is incorrectly refused. Output:
+  `.overnight/tmp/fix1-red-csv_reader.log`.
+- Same FILE, EXPRESSION `test_csv_country_target and True`: removing target membership
+  validation gives exit 1, 1 failed/26 deselected; the CSV without its key field is
+  incorrectly accepted. Output: `.overnight/tmp/fix1-red-csv_membership.log`.
+- FILE `custodian/tests/test_investment_bilingual.py`, EXPRESSION
+  `test_network_attempt_is_an_explicit_failure`: replacing the socket sentinel with a
+  no-op gives exit 1, 1 failed/28 deselected (`DID NOT RAISE AssertionError`). The publisher
+  completes using invented responses, proving the real publisher path is exercised;
+  the fake socket never opens a connection. Output:
+  `.overnight/tmp/fix1-red-network_sentinel.log`.
+
+Green command on the workspace: `uv run --locked python -m pytest
+custodian/tests/test_investment_build_survivors.py custodian/tests/test_investment_crosswalk.py
+custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider
+-k 'inventory_schema or test_csv_country_target or test_network_attempt_is_an_explicit_failure'
+--hypothesis-seed=3192026119 --tb=short`: exit 0, 5 passed/80 deselected. Both inventory
+plants, both CSV cases and the publisher socket plant pass with their guards present.
+
+Required source checks (all from the repository root):
+
+- `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k investment
+  --hypothesis-seed=3192026119`: exit 0, 566 passed/6847 deselected in 7.30 seconds.
+- `uv run --locked python -m pytest custodian/tests/test_investment_bilingual.py
+  custodian/tests/test_investment_crosswalk.py custodian/tests/test_gate_records.py
+  custodian/tests/test_gate_records_survivors.py -q -p no:cacheprovider
+  --hypothesis-seed=3192026119`: exit 0, 103 passed in 1.24 seconds.
+- `uv run --locked ruff check .`: exit 0, all checks passed (zero diagnostics).
+- `uv run --locked ruff format --check .`: exit 0, 737 files already formatted.
+- `uv run --locked mypy`: exit 0, 409 source files, no issues.
+
+The scope/contract invariant script exited 0: exactly four changed tracked files before this
+ledger append, exact document replacement, protected contract rows unchanged. Final document,
+tree, instruction-parity and whitespace checks follow after the evidence append. Handoff
+records go in `.overnight/RETURN.md`; independent re-review and the whole test are not claimed.
+
+
+S2-T39 fix-pass final record checks after the evidence append: `python3 scripts/check_docs.py`
+exit 0 (1024 text files, 112 Markdown files); `python3 scripts/check_tree.py` exit 0
+(8 rules); `cmp AGENTS.md CLAUDE.md` exit 0 (one byte-identical pair);
+`git diff --check` exit 0 (zero whitespace defects). Five tracked files changed: this ledger,
+three investment test files and document 03. Muhasabah PASS for L-1052 items 1–4: named
+red/green evidence and exact contract replacement verified; independent re-review and the
+lead's whole test remain owed. No other finding, live acceptance or part-B work is claimed.
