@@ -690,11 +690,10 @@ def assert_population_indicators_pinned(review_dir):
 
     rows = read_csv(review_dir / "population_indicators.csv")
     indicators = load_indicators(review_dir)
-    tokens = [row["mapped_indicator"] for row in rows if row["mapped_indicator"]]
-    assert len(tokens) == 1, f"expected one mapped indicator, got {len(tokens)}"
-    assert tokens == ["residents"]
-    assert "Employed" in indicators
-    assert indicators["Employed"] == ""
+    mapped = {row["indicator"]: row["mapped_indicator"] for row in rows}
+    mapped = {name: token for name, token in mapped.items() if token}
+    assert mapped == {"Employed": "employed", "Population": "residents"}
+    assert indicators["Employed"] == "employed"
 
 
 def committed_review_dir():
@@ -707,17 +706,30 @@ def test_k2_committed_population_indicators_pinned():
     assert_population_indicators_pinned(committed_review_dir())
 
 
-@pytest.mark.parametrize("mode", ["add_employed_token", "move_residents_to_employed"])
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "add_employed_token",
+        "move_residents_to_employed",
+        "employed_residents",
+        "employed_blank",
+    ],
+)
 def test_k2_population_indicators_pin_refuses_employed_token(tmp_path, mode):
     committed = (committed_review_dir() / "population_indicators.csv").read_text(
         encoding="utf-8"
     )
+    assert "\nEmployed,employed\n" in committed
     if mode == "add_employed_token":
-        tampered = committed.replace("\nEmployed,\n", "\nEmployed,employees\n")
-    else:
+        tampered = committed.replace("\nEmployed,employed\n", "\nEmployed,employees\n")
+    elif mode == "move_residents_to_employed":
         tampered = committed.replace(
             "\nPopulation,residents\n", "\nPopulation,\n"
-        ).replace("\nEmployed,\n", "\nEmployed,residents\n")
+        ).replace("\nEmployed,employed\n", "\nEmployed,residents\n")
+    elif mode == "employed_residents":
+        tampered = committed.replace("\nEmployed,employed\n", "\nEmployed,residents\n")
+    else:
+        tampered = committed.replace("\nEmployed,employed\n", "\nEmployed,\n")
     (tmp_path / "population_indicators.csv").write_text(tampered, encoding="utf-8")
     with pytest.raises(AssertionError):
         assert_population_indicators_pinned(tmp_path)

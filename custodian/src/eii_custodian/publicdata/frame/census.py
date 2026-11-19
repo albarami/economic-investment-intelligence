@@ -13,6 +13,10 @@ UNITS = {
     "establishments": "establishments",
     "employees": "persons",
 }
+# UNITS is the closed audit-count list of PUB-84 and DAT-128. A table-specific
+# Public count below is loaded on its source's own geography but is no audit
+# selector until a contract revision adds it (decision 0064 item 15, OI-170).
+TABLE_UNITS = {("pub_population_municipality", "employed"): "persons"}
 GEOGRAPHY = {
     "pub_population_municipality": "municipality_code",
     "pub_census_national": None,
@@ -29,6 +33,13 @@ SOURCES = {
     "census_district_pop": "pub_census_district",
 }
 BASE_FIELDS = {"period", "indicator", "value", "unit"}
+
+
+def unit_for(table: str, indicator: str) -> str | None:
+    """The closed unit of an indicator in a table, or None when it is not admitted."""
+    if indicator in UNITS:
+        return UNITS[indicator]
+    return TABLE_UNITS.get((table, indicator))
 
 
 def census_rows(
@@ -58,10 +69,8 @@ def census_rows(
             }:
                 raise FrameError(f"{entry.source_id}: unexpected census column {field}")
             ignored.add(f"{entry.source_id}: not loaded: {field}")
-        if (
-            record["indicator"] not in UNITS
-            or UNITS[record["indicator"]] != record["unit"]
-        ):
+        unit = unit_for(table, record["indicator"])
+        if unit is None or unit != record["unit"]:
             raise FrameError(f"{entry.source_id}: invalid indicator/unit")
         if table == "pub_census_zone" and record["period"] != "2020":
             raise FrameError(f"{entry.source_id}: zone census period")

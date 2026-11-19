@@ -7,6 +7,7 @@ from decimal import Inexact, Rounded, localcontext
 import pytest
 
 from eii_core.calc.apportion import (
+    COUNT_TABLES,
     Lineage,
     Row,
     Weight,
@@ -639,6 +640,29 @@ def test_labour_count_cannot_bypass_split_table(metric):
         None,
         (),
     )
+
+
+def assert_population_table_counts_residents_only(count_tables):
+    """S2-T38: the municipal table's `employed` rows are never a C18 count."""
+    holders = {
+        metric
+        for metric, tables in count_tables.items()
+        if "pub_population_municipality" in tables
+    }
+    assert holders == {"population"}
+    assert count_tables["employed"] == frozenset({"pub_labour_sex_municipality"})
+
+
+def test_population_table_counts_residents_only():
+    assert_population_table_counts_residents_only(COUNT_TABLES)
+
+
+@pytest.mark.parametrize("metric", ["employed", "labour_force", "licences"])
+def test_plant_population_table_under_another_count_fails(metric):
+    planted = {**COUNT_TABLES}
+    planted[metric] = planted[metric] | {"pub_population_municipality"}
+    with pytest.raises(AssertionError):
+        assert_population_table_counts_residents_only(planted)
 
 
 @pytest.mark.parametrize("reverse", [False, True])
