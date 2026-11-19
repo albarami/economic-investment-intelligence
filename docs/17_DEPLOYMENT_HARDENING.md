@@ -116,6 +116,24 @@ Document 04 supplies the terms records; the relative-busyness quotations come fr
 
 The two public registers (`biz_register`, `fc_register`) join this list if their terms, once read and recorded in document 04, need a permission or a licence for real use.
 
+### Further-places excluded-file coverage (PO-S2-35)
+
+The pinned places fetch compares selected files with its summary and does not
+verify excluded files. A stale summary can therefore hide an intersecting file;
+selected-file consistency alone is not evidence of correct exclusion. The
+package README's **Limits** retains the format warning about summary files.
+
+S2-T10 supplies the bounded offline callable `scripts.fsq_exclusions.check_exclusions`
+with an invented stale-summary plant. It checks all excluded keys named by one
+summary against explicitly supplied local file footers, with explicit byte and
+file budgets and footer digests. It neither fetches those files nor establishes
+that the summary lists the entire release. No real-release result is recorded
+by that fixture test. Before deployment reliance, the public-pack owner records
+independent release-file-list completeness, acquisition evidence and a completed
+audit bound to the exact release and summary used. Until then the normal fetch's
+excluded-file coverage remains unverified; no complete-coverage claim follows
+from a successful selected-file fetch.
+
 ## 7. Governance of real custodian data
 
 Document 13 already covers the deployment platform, the place of the build engine, the network binding and the identity and audit services. This section points to it and adds what a real-data deployment needs.

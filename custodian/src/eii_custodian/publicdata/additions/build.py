@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import importlib
 import json
 import re
@@ -27,8 +26,8 @@ from eii_custodian.publicdata.additions.property_venues import (
     load_venue_crosswalk,
 )
 from eii_custodian.publicdata.additions.storage import publish
-from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError, read_snapshot
 
 Parser = Callable[
     [
@@ -427,17 +426,27 @@ def _report(parsed: Sequence[FamilyParse], pending: list[str]) -> dict[str, obje
 def _cached_export(
     cache: Path, entry: Entry, digest: str
 ) -> tuple[list[dict[str, object]], dict[str, object]]:
-    directory = cache / entry.key
-    body_path = directory / f"{digest}.{entry.extension}"
-    side_path = directory / f"{digest}.meta.json"
-    if not body_path.is_file() or not side_path.is_file():
-        raise AdditionError("hash_absent")
-    body = body_path.read_bytes()
-    if sha256_hex(body) != digest or hashlib.sha256(body).hexdigest() != digest:
-        raise AdditionError("hash_mismatch")
+    """Read the explicitly selected archive, never its compatibility copy."""
+    try:
+        selected = read_snapshot(cache / entry.key, digest)
+        body, receipt = selected.body, selected.sidecar
+    except (SnapshotError, OSError):
+        raise AdditionError("selected_input_refused") from None
+    if selected.path.suffix != "." + entry.extension:
+        raise AdditionError("export_unreadable")
+    if any(
+        receipt.get(field) != expected
+        for field, expected in (
+            ("source_id", entry.source_id),
+            ("key", entry.key),
+            ("licence_id", entry.licence_id),
+            ("licence_basis", entry.licence_basis),
+            ("switched_off", False),
+        )
+    ):
+        raise AdditionError("selected_input_refused")
     try:
         loaded = json.loads(body.decode("utf-8"))
-        receipt = json.loads(side_path.read_text(encoding="utf-8"))
     except (UnicodeError, json.JSONDecodeError) as error:
         raise AdditionError("export_unreadable") from error
     if isinstance(loaded, dict):
@@ -445,10 +454,6 @@ def _cached_export(
         loaded = results if isinstance(results, list) else None
     if not isinstance(loaded, list) or not all(isinstance(row, dict) for row in loaded):
         raise AdditionError("export_unreadable")
-    if not isinstance(receipt, dict):
-        raise AdditionError("export_unreadable")
-    if receipt.get("sha256") != digest:
-        raise AdditionError("hash_mismatch")
     rows: list[dict[str, object]] = []
     for row in loaded:
         if isinstance(row, dict):

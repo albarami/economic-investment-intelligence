@@ -20,6 +20,7 @@ from eii_custodian.publicdata.investment_contracts import (
     PARSER_VERSION,
     PROVENANCE_PUBLIC,
     SCHEMA_FDI,
+    TERMS_READING_FIELDS,
     EvidenceAudit,
     EvidenceAuditEntry,
     EvidenceProjection,
@@ -273,10 +274,16 @@ def build_project_evidence(
             )
         seen_snapshots.add(item.identity)
         item = replace(item, rows=tuple(dict(row) for row in item.rows))
-        metadata = _metadata_failure(item)
-        if isinstance(metadata, InvestmentFailure):
-            return metadata
-        item = replace(item, snapshot=metadata)
+        # A Snapshot keeps the caller rows. Parser rows replace them.
+        authenticated: ProjectSnapshot | Snapshot | InvestmentFailure = (
+            _metadata_failure(item)
+        )
+        if isinstance(authenticated, InvestmentFailure):
+            return authenticated
+        if isinstance(authenticated, Snapshot):
+            item = replace(item, snapshot=authenticated)
+        else:
+            item = authenticated
         source_id = str(item.snapshot.sidecar.get("source_id", ""))
         current = {
             f"{row.get('source_id', '')}:project:{row.get('project_id', '')}"
@@ -411,6 +418,9 @@ def audit_project_evidence(
     canonical_projects = build_project_evidence(canonical_snapshots)
     if isinstance(canonical_projects, InvestmentFailure):
         return canonical_projects
+    unauthenticated = _refuse_unauthenticated_audit(evidence, expected, attempts)
+    if unauthenticated is not None:
+        return unauthenticated
     if (
         evidence.revisions != canonical_projects.revisions
         or evidence.absences != canonical_projects.absences
@@ -441,10 +451,10 @@ def audit_project_evidence(
     entries: list[EvidenceAuditEntry] = []
     ordered_snapshots = canonical_snapshots
     for item in ordered_snapshots:
-        for revision in evidence.revisions:
+        for revision in canonical_projects.revisions:
             if revision.snapshot_identity == item.identity:
                 entries.append(_revision_entry(revision))
-        for absence in evidence.absences:
+        for absence in canonical_projects.absences:
             if absence.snapshot_identity == item.identity:
                 entries.append(
                     EvidenceAuditEntry(
@@ -819,6 +829,34 @@ def _attempt_entry(
     )
 
 
+def _plain_text(value: object) -> bool:
+    return type(value) is str
+
+
+def _refuse_unauthenticated_audit(
+    evidence: ProjectEvidence,
+    expected: tuple[ExpectedInput, ...],
+    attempts: tuple[FetchAttempt, ...],
+) -> InvestmentFailure | None:
+    """Refuse non-plain caller identity objects before audit projection."""
+    if type(evidence.revisions) is not tuple or type(evidence.absences) is not tuple:
+        return _audit_failure("", "plain sequence")
+    for attempt in attempts:
+        if not _plain_text(attempt.source_id) or not _plain_text(attempt.key):
+            return _audit_failure("", "plain key")
+    for registration in expected:
+        if not _plain_text(registration.source_id) or not _plain_text(registration.key):
+            return _audit_failure("", "plain key")
+    for milestone in evidence.milestones:
+        if (
+            not _plain_text(milestone.candidate.source_id)
+            or not _plain_text(milestone.candidate.candidate_id)
+            or not _plain_text(milestone.candidate.snapshot_identity)
+        ):
+            return _audit_failure("", "plain key")
+    return None
+
+
 def _audit_failure(source_id: str, observed: str) -> InvestmentFailure:
     return InvestmentFailure(
         1,
@@ -838,10 +876,11 @@ def parse_milestone_page(
         return _parser_failure(
             envelope, "unconfirmed", "confirmed shape", "unconfirmed"
         )
-    missing = envelope.missing()
+    # Ruling L-1001 (decision 0059, S2-T30): a missing terms reading is a
+    # pending record that fails nothing; other lineage elements still refuse.
+    missing = envelope.missing_refusal()
     if missing:
-        check = "missing_terms" if missing.startswith("terms") else "missing_lineage"
-        return _parser_failure(envelope, check, missing, "absent")
+        return _parser_failure(envelope, "missing_lineage", missing, "absent")
     try:
         loaded: object = json.loads(body)
     except (UnicodeDecodeError, ValueError):
@@ -938,10 +977,13 @@ def require_independent_milestone(
     snapshot = _reread_snapshot(candidate.snapshot, candidate.snapshot_identity)
     _ = snapshot.body
     for name in (*LINEAGE_FIELDS, "terms_url", "method", "method_version"):
+        if name in TERMS_READING_FIELDS:
+            # Ruling L-1001 (S2-T30): a pending terms reading is recorded
+            # truthfully and never refuses the milestone.
+            continue
         value = candidate.source_chain.get(name)
         if not isinstance(value, str) or not value:
-            check = "missing_terms" if name.startswith("terms") else "missing_lineage"
-            return _candidate_failure(candidate, check, name, "absent")
+            return _candidate_failure(candidate, "missing_lineage", name, "absent")
     if candidate.source_chain.get("provenance", PROVENANCE_PUBLIC) != PROVENANCE_PUBLIC:
         return _candidate_failure(
             candidate, "provenance", PROVENANCE_PUBLIC, "not Public"
@@ -959,13 +1001,18 @@ def require_independent_milestone(
             candidate, "invalid_evidence_metadata", "archived identity", "mismatch"
         )
     receipt_lineage = _receipt_lineage(snapshot, _MILESTONE_METHOD, PARSER_VERSION)
-    if any(
-        candidate.source_chain.get(name) != value
-        for name, value in receipt_lineage.items()
-    ):
-        return _candidate_failure(
-            candidate, "invalid_evidence_metadata", "receipt lineage", "mismatch"
-        )
+    for name, value in receipt_lineage.items():
+        observed = candidate.source_chain.get(name)
+        if name in TERMS_READING_FIELDS and not (observed and value):
+            # Ruling L-1001 (S2-T30): a pending terms reading (absent or empty)
+            # on either side of the candidate's chain is a recorded state,
+            # never a substitution; a real reading on both sides still has to
+            # match the verified receipt.
+            continue
+        if observed != value:
+            return _candidate_failure(
+                candidate, "invalid_evidence_metadata", "receipt lineage", "mismatch"
+            )
     if (
         candidate.status == "completed"
         or candidate.completion is not None
@@ -986,11 +1033,24 @@ def require_independent_milestone(
     if isinstance(parsed, InvestmentFailure):
         return parsed
     matching = [row for row in parsed if row.candidate_id == candidate.candidate_id]
-    if (
-        len(matching) != 1
-        or replace(candidate, snapshot=None, completion=None, observed_investment=None)
-        != matching[0]
-    ):
+    supplied = replace(
+        candidate, snapshot=None, completion=None, observed_investment=None
+    )
+    if matching:
+        adopted = {
+            name: matching[0].source_chain.get(name)
+            for name in TERMS_READING_FIELDS
+            if not supplied.source_chain.get(name)
+        }
+        if adopted:
+            # Ruling L-1001 (S2-T30): a pending terms reading on the supplied
+            # candidate is its record; the archived parse re-reads the
+            # receipt's reading. A real reading the candidate states is still
+            # compared to that receipt exactly.
+            supplied = replace(
+                supplied, source_chain={**supplied.source_chain, **adopted}
+            )
+    if len(matching) != 1 or supplied != matching[0]:
         return _candidate_failure(
             candidate, "invalid_evidence_metadata", "archived parser row", "mismatch"
         )
@@ -1191,8 +1251,8 @@ def _candidate_failure(
     )
 
 
-def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
-    """Return the verified snapshot, refusing conflicting receipt metadata."""
+def _metadata_failure(item: ProjectSnapshot) -> ProjectSnapshot | InvestmentFailure:
+    """Return the authenticated parser snapshot after archived-row equality."""
     snapshot = _reread_snapshot(item.snapshot, item.identity)
     side = snapshot.sidecar
     _ = snapshot.body
@@ -1223,22 +1283,32 @@ def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
     receipt_lineage = _receipt_lineage(snapshot, FDI_METHOD, PARSER_VERSION)
     for row in item.rows:
         for name in LINEAGE_FIELDS:
+            if name in TERMS_READING_FIELDS:
+                # Ruling L-1001 (S2-T30): a pending terms reading is a record;
+                # a value that differs from the verified receipt still fails.
+                continue
             value = row.get(name)
             if not isinstance(value, str) or not value:
-                check = "missing_terms" if name == "terms_sha256" else "missing_lineage"
-                return _refusal(item, check, name, "absent")
+                return _refusal(item, "missing_lineage", name, "absent")
         for name in ("method", "method_version"):
             if not isinstance(row.get(name), str) or not row[name]:
                 return _refusal(item, "missing_lineage", name, "absent")
-        if not isinstance(side.get("terms_url"), str) or not side["terms_url"]:
-            return _refusal(item, "missing_terms", "terms_url", "absent")
         if row.get("provenance") != PROVENANCE_PUBLIC:
             return _refusal(item, "provenance", PROVENANCE_PUBLIC, "not Public")
         if row.get("join_key") not in (None, ""):
             return _refusal(item, "prohibited_join", "no join", "joined")
         if (
             row.get("source_id") != side.get("source_id")
-            or any(row.get(name) != value for name, value in receipt_lineage.items())
+            or any(
+                row.get(name) != value
+                for name, value in receipt_lineage.items()
+                if name not in TERMS_READING_FIELDS
+            )
+            or any(
+                (row.get(name) or "") != (receipt_lineage.get(name) or "")
+                for name in TERMS_READING_FIELDS
+                if name in receipt_lineage
+            )
             or not row.get("project_key")
             or not row.get("project_id")
         ):
@@ -1261,7 +1331,7 @@ def _metadata_failure(item: ProjectSnapshot) -> Snapshot | InvestmentFailure:
         return _refusal(
             item, "invalid_evidence_metadata", "archived parser output", "mismatch"
         )
-    return snapshot
+    return canonical
 
 
 def _valid_assertion(assertion: SourceAssertion, *, correction: bool = False) -> bool:

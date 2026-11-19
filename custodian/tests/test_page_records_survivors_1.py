@@ -236,8 +236,6 @@ def refused(reason, entry=None, **changes):
     "changes,reason",
     [
         ({"commit_allowed": True}, "commit_refused"),
-        ({"terms_words": ""}, "receipt_missing"),
-        ({"terms_read_on": ""}, "receipt_missing"),
         ({"licence_basis": "SYN-basis"}, "receipt_missing"),
         ({"publisher": ""}, "receipt_missing"),
         (
@@ -254,6 +252,14 @@ def test_entry_refusals_exact(changes, reason):
     refused(reason, replace(pages.page_entry(), **changes))
 
 
+def test_entry_pending_terms_fields_never_refuse():
+    """Ruling L-1001: pending terms fields never refuse a page row."""
+    row = replace(
+        pages.page_entry(), terms_words="", terms_read_on="", licence_basis=""
+    )
+    assert check(row) is None
+
+
 @pytest.mark.parametrize(
     "changes",
     [
@@ -261,12 +267,34 @@ def test_entry_refusals_exact(changes, reason):
         {"licence_basis": "portal_terms"},
         {"licence_basis": "provider_terms"},
         {"licence_basis": "dataset"},
+        {"licence_basis": "pending"},
+        {"licence_basis": ""},
         {"period_last": "2024"},
         {"period_last": "2023"},
     ],
 )
 def test_entry_variants_pass(changes):
     assert check(replace(pages.page_entry(), **changes)) is None
+
+
+def test_pending_terms_fields_still_fetch_and_record(tmp_path):
+    """Ruling L-1001: a pending page row fetches, parses and records its pending values."""
+    row = replace(
+        pages.page_entry(), terms_words="", terms_read_on="", licence_basis=""
+    )
+    result = page_records.fetch_page(
+        row,
+        lambda url: pages.Response(url, pages.BODY, ()),
+        tmp_path,
+        lambda: STAMP,
+        lambda _: None,
+        declaration=pages.review(row),
+    )
+    payload = json.loads(result.body)
+    assert payload["rows"] == [{"syn_name": "SYN-item", "syn_count": 7}]
+    assert result.sidecar["terms_words"] == ""
+    assert result.sidecar["terms_read_on"] == ""
+    assert result.sidecar["licence_basis"] == ""
 
 
 @pytest.mark.parametrize(
@@ -335,6 +363,8 @@ def raw_snapshot(tmp_path, row, **sidecar):
         "licence_basis": "owner_decision",
     }
     side.update(sidecar)
+    # A None value removes the key, for the absent-key plants.
+    side = {name: value for name, value in side.items() if value is not None}
     return publish_snapshot(tmp_path / row.key / "raw", "html", pages.BODY, side)
 
 
@@ -409,17 +439,29 @@ def select(cache, row, identity):
     )
 
 
-def v1_cache(tmp_path, *, page_sha256=None, as_of="2024-02-03"):
+def v1_cache(
+    tmp_path, *, page_sha256=None, as_of="2024-02-03", side=None, raw_side=None
+):
     row = pages.page_entry()
-    raw = raw_snapshot(tmp_path, row)
+    raw = raw_snapshot(tmp_path, row, **(raw_side or {}))
     payload = {
         "raw_identity": raw.sha256,
         "page_sha256": raw.sha256 if page_sha256 is None else page_sha256,
         "as_of": as_of,
     }
-    side = {"source_id": row.source_id, "key": row.key, "retrieved_utc": STAMP}
+    # Ruling L-1016 (applying L-1001): the build itself writes the selected
+    # parsed receipt, so the fixture sidecar carries an explicit basis; a
+    # None value removes the key for the absent-key plants.
+    fields = {
+        "source_id": row.source_id,
+        "key": row.key,
+        "retrieved_utc": STAMP,
+        "licence_basis": "owner_decision",
+    }
+    fields.update(side or {})
+    fields = {name: value for name, value in fields.items() if value is not None}
     parsed = publish_snapshot(
-        tmp_path / row.key, "json", json.dumps(payload).encode(), side
+        tmp_path / row.key, "json", json.dumps(payload).encode(), fields
     )
     select(tmp_path, row, parsed.sha256)
     return row, parsed
@@ -437,6 +479,31 @@ def test_selected_v1_receipt_reason(tmp_path, changes):
     row, _ = v1_cache(tmp_path, **changes)
     with pytest.raises(PageError, match=exact("receipt_missing")):
         page_records.selected_page(tmp_path, row)
+
+
+def test_selected_v1_parsed_receipt_without_the_basis_key_refuses(tmp_path):
+    """Ruling L-1016 (applying L-1001): the build itself writes the selected
+    parsed receipt, so a sidecar without the licence_basis key is a defect,
+    not a terms reading, and refuses receipt_missing."""
+    row, _ = v1_cache(tmp_path, side={"licence_basis": None})
+    with pytest.raises(PageError, match=exact("receipt_missing")):
+        page_records.selected_page(tmp_path, row)
+
+
+def test_selected_v1_raw_receipt_without_the_basis_key_refuses(tmp_path):
+    """Ruling L-1016 (applying L-1001): the build itself writes the raw
+    receipt the version 1 selection reads, so a sidecar without the
+    licence_basis key refuses receipt_missing."""
+    row, _ = v1_cache(tmp_path, raw_side={"licence_basis": None})
+    with pytest.raises(PageError, match=exact("receipt_missing")):
+        page_records.selected_page(tmp_path, row)
+
+
+@pytest.mark.parametrize("basis", ["", "pending"])
+def test_selected_v1_parsed_pending_basis_is_a_record(tmp_path, basis):
+    """Ruling L-1001: a selected parsed receipt with a pending basis is a record."""
+    row, parsed = v1_cache(tmp_path, side={"licence_basis": basis})
+    assert page_records.selected_page(tmp_path, row).sha256 == parsed.sha256
 
 
 def test_selection_missing_reason(tmp_path):
@@ -461,6 +528,8 @@ def v2_cache(
         "licence_basis": "owner_decision",
     }
     raw_fields.update(raw_side or {})
+    # A None value removes the key, for the absent-key plant.
+    raw_fields = {k: v for k, v in raw_fields.items() if v is not None}
     folder = row.key + ("/SYN-real-input" if link else "/inputs/input-0")
     raw = publish_snapshot(tmp_path / folder, "html", b"SYN input", raw_fields)
     if link:
@@ -483,10 +552,13 @@ def v2_cache(
         "source_id": row.source_id,
         "key": row.key,
         "retrieved_utc": STAMP,
+        "licence_basis": "owner_decision",
         "inputs": body["inputs"],
         "as_of": body["as_of"],
     }
     sidecar.update(side or {})
+    # A None value removes the key, for the absent-key plants.
+    sidecar = {name: value for name, value in sidecar.items() if value is not None}
     parsed = publish_snapshot(
         tmp_path / row.key, "json", json.dumps(body).encode(), sidecar
     )
@@ -512,7 +584,6 @@ def test_selected_v2_payload_returned(tmp_path):
         ({"side": {"as_of": "2024-02-04"}}, "receipt_missing"),
         ({"item": {"key": "inputs/input-1"}}, "receipt_missing"),
         ({"item": {"sha256": "0" * 64}}, "receipt_missing"),
-        ({"raw_side": {"licence_basis": ""}}, "receipt_missing"),
         ({"raw_side": {"source_id": "SYN-other"}}, "receipt_missing"),
         ({"link": True}, "cache_path_refused"),
     ],
@@ -521,6 +592,38 @@ def test_selected_v2_refusals_exact(tmp_path, changes, reason):
     row, _ = v2_cache(tmp_path, **changes)
     with pytest.raises(PageError, match=exact(reason)):
         page_records.selected_page(tmp_path, row)
+
+
+@pytest.mark.parametrize("basis", ["", "pending"])
+def test_selected_v2_accepts_a_pending_basis(tmp_path, basis):
+    """Ruling L-1001: a stored input receipt with a pending basis is still selected."""
+    row, parsed = v2_cache(tmp_path, raw_side={"licence_basis": basis})
+    assert page_records.selected_page(tmp_path, row).sha256 == parsed.sha256
+
+
+def test_selected_v2_input_receipt_without_the_basis_key_refuses(tmp_path):
+    """Ruling L-1016 (applying L-1001): a receipt the build itself wrote holds
+    the licence_basis key; a receipt with the key absent is a defect, not a
+    terms reading, and refuses receipt_missing."""
+    row, _ = v2_cache(tmp_path, raw_side={"licence_basis": None})
+    with pytest.raises(PageError, match=exact("receipt_missing")):
+        page_records.selected_page(tmp_path, row)
+
+
+def test_selected_v2_parsed_receipt_without_the_basis_key_refuses(tmp_path):
+    """Ruling L-1016 (applying L-1001): the build itself writes the selected
+    parsed receipt, so a sidecar without the licence_basis key is a defect,
+    not a terms reading, and refuses receipt_missing."""
+    row, _ = v2_cache(tmp_path, side={"licence_basis": None})
+    with pytest.raises(PageError, match=exact("receipt_missing")):
+        page_records.selected_page(tmp_path, row)
+
+
+@pytest.mark.parametrize("basis", ["", "pending"])
+def test_selected_v2_parsed_pending_basis_is_a_record(tmp_path, basis):
+    """Ruling L-1001: a selected parsed receipt with a pending basis is a record."""
+    row, parsed = v2_cache(tmp_path, side={"licence_basis": basis})
+    assert page_records.selected_page(tmp_path, row).sha256 == parsed.sha256
 
 
 def test_selected_v2_inputs_folder_link_out_refused(tmp_path):

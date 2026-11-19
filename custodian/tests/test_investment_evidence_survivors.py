@@ -115,6 +115,7 @@ def project(
     records: tuple[dict[str, object], ...] | None = None,
     day: str = "2026-11-14",
     coverage: dict[str, object] | None = None,
+    pending_terms: bool = False,
 ) -> ProjectSnapshot:
     rows = (invented_record(project_id=1001),) if records is None else records
     body = dashboard_page(rows)
@@ -127,8 +128,8 @@ def project(
         "licence_id": "invented-public-terms",
         "licence_basis": "owner_decision",
         "decision_record": "invented-review",
-        "terms_sha256": "ab" * 32,
-        "terms_url": TERMS,
+        "terms_sha256": "" if pending_terms else "ab" * 32,
+        "terms_url": "" if pending_terms else TERMS,
         "method": "eii_custodian.publicdata.investment_parse.parse_fdi",
         "method_version": "1",
     }

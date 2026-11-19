@@ -49,14 +49,13 @@ def test_fsq_terms_refusal_full_fields():
         b"Copyright 2024 Foursquare Labs, Inc. All rights reserved.",
         b"Apache License, Version 2.0",
     ]:
-        assert astuple(f._terms_refusal(body, URL)) == (
-            1,
-            URL,
-            "licence_mismatch",
-            "Apache License, Version 2.0",
-            "licence text differs",
-        )
+        # Ruling L-1001 (PUB-97): a licence text that differs from the
+        # registry's pinned wording is recorded pending a reviewer's record
+        # and refuses nothing.
+        assert f._terms_refusal(body, URL) is None
+        assert f._licence_pending(body) is True
     assert f._terms_refusal(TERMS, URL) is None
+    assert f._licence_pending(TERMS) is False
 
 
 @pytest.mark.parametrize(
@@ -269,29 +268,20 @@ def test_fsq_fetch_failure_at_each_stage_stores_nothing(tmp_path, stage, mode):
         expected = (6, urls[stage], "unreachable", "reachable host", "unreachable")
     elif mode == "signin":
         expected = (1, urls[stage], "sign_in_demand", "public file", "sign-in")
-    elif stage == "terms":
-        expected = (
-            1,
-            urls[stage],
-            "licence_mismatch",
-            "Apache License, Version 2.0",
-            "licence text differs",
-        )
+    elif stage == "metadata":
+        expected = (1, urls[stage], "metadata_unreadable", "parquet", "other")
     else:
-        expected = (
-            1,
-            urls[stage],
-            "metadata_unreadable" if stage == "metadata" else "not_parquet",
-            "parquet",
-            "other",
-        )
+        # Ruling L-1001 (PUB-97): a differing licence text refuses nothing, so
+        # a malformed terms body is recorded pending and the release proceeds
+        # to the data file, which refuses the non-Parquet body.
+        expected = (1, data_url, "not_parquet", "parquet", "other")
     assert astuple(failure) == expected
-    assert (
-        seen
-        == [entry.url, entry.terms_url, data_url][
-            : ["metadata", "terms", "data"].index(stage) + 1
-        ]
-    )
+    stop = {
+        "metadata": 1,
+        "terms": 3 if mode == "malformed" else 2,
+        "data": 3,
+    }[stage]
+    assert seen == [entry.url, entry.terms_url, data_url][:stop]
     assert not (tmp_path / "cache").exists()
 
 

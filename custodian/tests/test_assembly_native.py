@@ -1,0 +1,254 @@
+"""Native trade manifests keep their existing readers and exact decimal tokens."""
+
+import importlib
+import json
+from pathlib import Path
+
+import pytest
+from custodian.tests.test_production_adapters import context
+
+from eii_custodian.publicdata.fetch.build import run_build
+
+
+@pytest.mark.parametrize(
+    "family,option",
+    [
+        ("baci", "stream_transport"),
+        ("gravity", "gravity_stream"),
+        ("atlas", "atlas_stream"),
+    ],
+)
+def test_reviewed_native_manifest_runs_real_reader(
+    tmp_path: Path, family: str, option: str
+) -> None:
+    fixture = importlib.import_module(
+        "custodian.tests.fixtures." + family + ".invented"
+    )
+    config = importlib.import_module(
+        "eii_custodian.publicdata." + family + ".config"
+    ).Config.from_mapping(fixture.configuration())
+    row = fixture.entry()
+    options = {option: fixture.stream, family + "_config": config}
+    fetched = run_build(
+        (row,),
+        fixture.metadata,
+        tmp_path,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda seconds: None,
+        **options,
+    )
+    assert fetched.failure is None
+    identity = fetched.manifests[row.source_id]
+    (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: identity}))
+    build = context(tmp_path, (row,))
+    build.reviewed_selections()
+    assert set(build.tables) == set(row.release_tables)
+    assert build.receipts[row.key]["source_id"] == row.source_id
+    assert build.tables
+    # A manifest substitution must reach the native reader's own hash guard.
+    path = tmp_path / row.source_id / (identity + ".manifest.json")
+    path.write_text("{}")
+    error = getattr(
+        importlib.import_module("eii_custodian.publicdata." + family + ".config"),
+        family.title() + "Error",
+    )
+    with pytest.raises(error, match="manifest_hash"):
+        context(tmp_path, (row,)).reviewed_selections()
+
+
+def test_investment_tables_use_reviewed_evidence_manifest_and_older_raw_page(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from custodian.tests import test_investment_build as fixture
+
+    row = fixture._fdi_entry()
+    body = fixture.dashboard_page()
+    assert fixture._run(tmp_path, monkeypatch, row, {row.url: body}) == 0
+    pointer, manifest, table = fixture._batch(tmp_path, row.source_id)
+    raw = manifest["pages"][0]["sha256"]
+    selected = pointer["manifest_sha256"]
+    body2 = fixture.dashboard_page((fixture.invented_record(capex=("n", "14.5")),))
+    assert fixture._run(tmp_path, monkeypatch, row, {row.url: body2}) == 0
+    cache = tmp_path / "data/public_cache"
+    (cache / "snapshot_pins.json").write_text(
+        json.dumps({row.key: raw, row.key + "/evidence": selected})
+    )
+    (cache / row.key / "loadable.json").unlink()
+    state = context(cache, (row,))
+    state.reviewed_selections()
+    assert state.tables["fdi_projects"][0]["capex_value"] == "12.5"
+    assert state.tables["fdi_projects"] == table["rows"]
+
+
+def test_gravity_numeric_measures_are_not_omitted_from_the_draw(tmp_path: Path) -> None:
+    from custodian.tests.fixtures.gravity.invented import (
+        configuration,
+        entry,
+        metadata,
+        stream,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+    from eii_custodian.publicdata.gravity.config import Config
+
+    row = entry()
+    outcome = run_build(
+        (row,),
+        metadata,
+        tmp_path,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda seconds: None,
+        gravity_stream=stream,
+        gravity_config=Config.from_mapping(configuration()),
+    )
+    (tmp_path / "snapshot_pins.json").write_text(
+        json.dumps({row.key: outcome.manifests[row.source_id]})
+    )
+    state = context(tmp_path, (row,))
+    state.reviewed_selections()
+    figures = draw_tables(state)["pub_gravity_bilateral"]()
+    ids = {figure.figure_id for figure in figures}
+    for index, data in enumerate(state.tables["pub_gravity_bilateral"]):
+        for field in ("distance", "gdp_origin", "gdp_destination"):
+            if data[field] is not None:
+                assert "pub_gravity_bilateral:" + str(index) + ":" + field in ids
+
+
+@pytest.mark.parametrize("source", ["ilostat_qat", "wb_wdi", "imf_weo", "unctad_fdi"])
+def test_benchmark_adapter_preserves_all_publisher_statuses_and_numeric_labels(
+    tmp_path: Path, source: str
+) -> None:
+    from contextlib import contextmanager
+    from dataclasses import asdict, replace
+
+    from custodian.tests.test_benchmarks import row
+    from custodian.tests.test_benchmarks_fetch import policy
+
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+    from eii_custodian.publicdata.benchmarks.fetch import fetch_benchmark
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import Response, StreamResponse
+
+    p = policy(source)
+    declared = next(e for e in load_registry() if e.source_id == source)
+    declared = replace(
+        declared,
+        skip_reason="",
+        publisher=p.publisher,
+        landing_url=p.page,
+        url=p.url,
+        fetch_host="example.test",
+        row_count_min=1,
+        row_count_max=5,
+        period_first="2020",
+        period_last="2020",
+        columns=(("invented", "string"),),
+    )
+    body = json.dumps(
+        [
+            asdict(replace(row(source, status), scale="1000"))
+            for status in ("historical", "publisher_forecast", "unclassified")
+        ]
+    ).encode()
+
+    @contextmanager
+    def stream(url):
+        yield StreamResponse(url, (), len(body), iter((body,)))
+
+    result = fetch_benchmark(
+        declared,
+        p,
+        lambda url: Response(url, b"invented-page", ()),
+        stream,
+        tmp_path,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
+    )
+    (tmp_path / "snapshot_pins.json").write_text(
+        json.dumps({declared.key: result.digest})
+    )
+    state = context(tmp_path, (declared,))
+    state.reviewed_selections()
+    readers = draw_tables(state)
+    assert len(readers) == 1
+    figures = next(iter(readers.values()))()
+    assert len(figures) == 3
+    assert {figure.value for figure in figures} == {"12.50"}
+    assert all(not figure.figure_id.endswith(":scale") for figure in figures)
+
+
+def test_comtrade_adapter_uses_reviewed_parent_manifest_and_real_assembler(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.fixtures.comtrade.invented import invented_entry
+    from custodian.tests.test_comtrade import _clock, _ok, _sleep
+
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+    from eii_custodian.publicdata.comtrade.fetch import fetch_source
+    from eii_custodian.publicdata.fetch.transport import SlotSecrets
+
+    row = invented_entry()
+    result = fetch_source(
+        row, tmp_path, _clock, _sleep, _ok, SlotSecrets("invented-header", "")
+    )
+    assert result.failure is None
+    (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: result.digest}))
+    state = context(tmp_path, (row,))
+    state.reviewed_selections()
+    figures = draw_tables(state)["pub_comtrade_trade"]()
+    assert figures
+    assert all(figure.figure_id.endswith(":value") for figure in figures)
+    assert state.tables["pub_comtrade_trade"]
+
+
+def test_draw_over_investment_tables(tmp_path: Path, monkeypatch) -> None:
+    from custodian.tests import test_investment_build as fixture
+
+    from eii_custodian.publicdata.assembly_io import write_record
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+    from eii_custodian.publicdata.draw import draw
+
+    entries = (fixture._fdi_entry(), fixture._agency_entry())
+    pins = {}
+    for row in entries:
+        bodies = (
+            {
+                row.url: fixture.dashboard_page(
+                    tuple(
+                        fixture.invented_record(project_id=1001 + i) for i in range(12)
+                    )
+                )
+            }
+            if row.source_id == "fdi_projects"
+            else fixture._agency_transport_bodies()
+        )
+        assert fixture._run(tmp_path, monkeypatch, row, bodies) == 0
+        pointer, manifest, _table = fixture._batch(tmp_path, row.source_id)
+        pins[row.key] = next(
+            page["sha256"] for page in manifest["pages"] if page["url"] == row.url
+        )
+        pins[row.key + "/evidence"] = pointer["manifest_sha256"]
+    cache = tmp_path / "data/public_cache"
+    (cache / "snapshot_pins.json").write_text(json.dumps(pins))
+    state = context(cache, entries)
+    state.reviewed_selections()
+    readers = draw_tables(state)
+    assert set(readers) == {"fdi_projects", "pub_investqa_record"}
+    fdi = readers["fdi_projects"]()
+    assert {figure.figure_id for figure in fdi} == {
+        "fdi_projects:" + str(index) + ":" + field
+        for index in range(12)
+        for field in ("capex_value", "jobs")
+    }
+    assert {
+        figure.kind for figure in fdi if figure.figure_id.endswith(":capex_value")
+    } == {"money"}
+    assert {figure.kind for figure in fdi if figure.figure_id.endswith(":jobs")} == {
+        "count"
+    }
+    # This agency contract stores heading blocks and links, with no numeric measures.
+    assert readers["pub_investqa_record"]() == []
+    write_record(cache, "assembly/build.json", {})
+    selected = draw(readers, 17, cache / "assembly/build.json")
+    assert len(selected) == 20
+    assert all(figure in fdi for figure in selected)

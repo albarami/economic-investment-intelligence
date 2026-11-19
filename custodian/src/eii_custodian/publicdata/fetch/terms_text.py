@@ -4,6 +4,8 @@ The TERMS comparison uses this digest. A per-request token that lives only in
 a tag attribute does not change it. Callers record the kind
 ``visible_text`` beside the digest and compare only that kind, so a build log
 written from raw page bytes does not count as a changed terms page.
+``recorded_terms`` is a different kind: the digest of recorded registry terms
+fields, not a page read, and it is not compared as ``visible_text``.
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ from html.parser import HTMLParser
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
 FINGERPRINT_VISIBLE_TEXT = "visible_text"
+FINGERPRINT_RECORDED_TERMS = "recorded_terms"
 _SKIPPED_TAGS = frozenset({"script", "style"})
 _SPACE = re.compile(r"\s+")
 

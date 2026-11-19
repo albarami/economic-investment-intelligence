@@ -139,6 +139,11 @@ def load_partition_spans() -> dict[int, tuple[int, int]]:
 
     document = read_yaml(REVIEW)
     spans = document.get("accident_spans") if isinstance(document, dict) else None
+    return partition_spans(spans)
+
+
+def partition_spans(spans: object) -> dict[int, tuple[int, int]]:
+    """Validate the accepted spans without treating observations as bounds."""
     if not isinstance(spans, dict) or not spans:
         raise PartitionError("partition_byte_bound_unconfirmed")
     result: dict[int, tuple[int, int]] = {}

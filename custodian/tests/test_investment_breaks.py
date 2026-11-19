@@ -237,15 +237,16 @@ def test_fetch_sidecar_and_entry_bounds(
     )
     assert isinstance(again, InvestmentFailure)
     assert again.check == "snapshot_invalid"
-    empty_terms = tmp_path / entry.key / "empty-terms.meta.json"
+    # Ruling L-1001: an empty terms hash is a pending reading, never a refusal.
     # _receipt keys the sidecar by the digest argument, not a fixed name.
     (tmp_path / entry.key / "blank.meta.json").write_text(
         json.dumps({"terms_sha256": "", "retrieved_utc": RETRIEVED}),
         encoding="utf-8",
     )
-    terms = _receipt(tmp_path, entry.key, "blank", entry.source_id, entry.url)
-    assert isinstance(terms, InvestmentFailure)
-    assert terms.check == "missing_terms"
+    assert _receipt(tmp_path, entry.key, "blank", entry.source_id, entry.url) == (
+        "",
+        RETRIEVED,
+    )
     (tmp_path / entry.key / "blank-time.meta.json").write_text(
         json.dumps({"terms_sha256": "terms-hash", "retrieved_utc": ""}),
         encoding="utf-8",
@@ -253,7 +254,6 @@ def test_fetch_sidecar_and_entry_bounds(
     timed = _receipt(tmp_path, entry.key, "blank-time", entry.source_id, entry.url)
     assert isinstance(timed, InvestmentFailure)
     assert timed.check == "missing_lineage"
-    del empty_terms
     spec = load_source_spec("fdi_projects", url=DASHBOARD_URL)
     assert not isinstance(spec, InvestmentFailure)
     fdi = next(item for item in load_registry() if item.source_id == "fdi_projects")

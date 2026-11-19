@@ -19,7 +19,21 @@ are joined by keys, never by names. District census rows first join the
 map boundary layer by zone and district number; that layer joins licensed
 districts by zone and English name. The district numberings are never compared.
 Unmatched name pairs are reported and excluded until a reviewed alias exists.
-`district_layer_aliases.csv` supplies only human-reviewed aliases.
+The committed `review/district_layer_aliases.csv` keeps the reviewed CSV header.
+Under S2-T22, human-reviewed alias rows are written by the lead to
+`review/district_layer_aliases.csv` inside the uncommitted public cache; no
+source value without an open licence is committed. `district_aliases` reads
+both paths through the same strict CSV reader. With no local alias file it
+uses only the committed file, so a district needing an alias remains unmatched.
+Under L-1027 (a), PO-S2-33 selects reporting: the public-data build's
+`build-log.json` records only `present`, `absent` or `invalid` for that local
+alias file and `local_expectations/PUB-71.json`, using their existing parsers.
+It writes an initial report before the stages, retaining those statuses if a
+stage raises. The initial report preserves the previous terms rows verbatim;
+only a successful build replaces that baseline with its own terms rows. A
+returned failure records its lines and statuses with the previous terms rows.
+No local value or parser error text enters those statuses. Existing stage refusals and alias
+matching remain in force; absence adds no failing check and creates no file.
 
 When an output folder is supplied, the build writes the derived municipality
 mapping to `municipality_names.csv` there for human review. It does so before

@@ -392,8 +392,14 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
             "form=" in entry.period_field
             and parse_period_rule(entry.period_field).form == "published_label"
         )
+        # S2-T08 part B mismatch 2: annual-text rows carry a four-digit year.
+        annual = (
+            "form=" in entry.period_field
+            and parse_period_rule(entry.period_field).form == "year_text"
+        )
+        label = "2020" if annual else "2020-01-01"
         if column:
-            record[column] = "2020-01-01"
+            record[column] = label
         records = [record]
         assert (
             fetch_entry(
@@ -422,21 +428,22 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
             assert receipt["period_last"] is None
             assert receipt["coverage_note"] == "distinct labels 1"
         else:
-            assert receipt["period_first"] == ("2020-01-01" if column else None)
+            assert receipt["period_first"] == (label if column else None)
             assert receipt["period_last"] == receipt["period_first"]
         assert receipt["bytes"] == len(body.read_bytes())
         assert receipt["switched_off"] is False
     assert not list(tmp_path.rglob("*.parquet"))
 
 
-def test_missing_basis_refused(tmp_path):
+def test_missing_basis_loads_as_pending(tmp_path):
+    """Ruling L-1001: a row without the licence_basis key loads as pending."""
 
     row = _block()[0].copy()
     del row["licence_basis"]
     path = tmp_path / "registry.yaml"
     path.write_text(yaml.safe_dump({"sources": [row]}))
-    with pytest.raises(RegistryError, match="missing field licence_basis"):
-        load_registry(path)
+    entries = load_registry(path)
+    assert entries[0].licence_basis == "pending"
 
 
 def test_absent_prohibitive_and_unread_terms_stay_in_use(tmp_path):
@@ -774,10 +781,12 @@ PORTAL_DECLARATIONS = {
         88,
         "year:string economic_activity:string lnsht_lqtsdy:string value:number",
     ),
+    # S2-T08 part B source review, mismatch 6: the publisher's long form
+    # replaced the wide LR-P7 reading.
     "machinery-and-equipment-price-index-mepi": (
         "National Planning Council",
-        10,
-        "code:string group_desc_ar:string group_desc_en:string weight:number h1_20:number h2_20:number h1_21:number h2_21:number h1_22:number h2_22:number h1_23:number h2_23:number h1_24:number h2_24:number",
+        100,
+        "year:string half_year:string nsf_lsn:string group_code:string group:string lmjmw:string weight:number index_value:number",
     ),
     "number-of-hotel-beds-by-hotel-class": (
         "National Planning Council",

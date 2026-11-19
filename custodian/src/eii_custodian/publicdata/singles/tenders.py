@@ -21,6 +21,11 @@ from urllib.parse import urlsplit
 
 from eii_custodian.publicdata.confirm_s2_t13 import CAVEAT
 from eii_custodian.publicdata.fetch.allowlist import approve
+from eii_custodian.publicdata.fetch.certificate_pins import (
+    PinError,
+    inspect_intermediate,
+)
+from eii_custodian.publicdata.fetch.page_requests import PIN_HOSTS
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
@@ -43,6 +48,8 @@ _TENDER_CHAIN: ContextVar[tuple[ssl.SSLContext, str] | None] = ContextVar(
     "tender_checked_chain", default=None
 )
 CHAIN_PATH = Path("data/public_chain/tenders_pub.intermediate.pem")
+_PEM_BEGIN = "-----BEGIN CERTIFICATE-----"
+_PEM_END = "-----END CERTIFICATE-----"
 PAGE_SIZE = 20
 PACE_S = 3
 KIND = "paged_cards"
@@ -479,7 +486,9 @@ def tender_https(
 ) -> Callable[[PageCall], PageBody]:
     """Hand the verifying context and its checked chain hash to ``open_https``."""
     path = CHAIN_PATH if chain_file is None else chain_file
-    context = chain_context(path, entry.chain_intermediate_sha256)
+    context = chain_context(
+        path, entry.chain_intermediate_sha256, host=entry.fetch_host
+    )
 
     def transport(call: PageCall) -> PageBody:
         token = _TENDER_CHAIN.set((context, entry.chain_intermediate_sha256))
@@ -494,24 +503,55 @@ def tender_https(
     return transport
 
 
-def chain_context(path: Path, pin: str) -> ssl.SSLContext:
-    """Add the pinned stand-in to the default verifying context, or refuse."""
-    if not path.is_file():
+def chain_context(path: Path, pin: str, *, host: str = TENDER_HOST) -> ssl.SSLContext:
+    """Add the pinned, inspected intermediate to the default verifying context.
+
+    The file keeps its PEM convention and must hold exactly one issuing
+    authority that is not self-signed (the inspection ``load_pin`` applies,
+    S2-T08 part B, mismatch 7). It is scoped to the tender host on the pin
+    allow-list, read once, and trust is added from the inspected bytes only.
+    """
+    if host != TENDER_HOST or host not in PIN_HOSTS:
+        raise TenderError("certificate_host_mismatch")
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        raise TenderError("certificate_chain_incomplete") from None
+    if hashlib.sha256(raw).hexdigest() != pin.lower():
         raise TenderError("certificate_chain_incomplete")
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    if digest != pin.lower():
-        raise TenderError("certificate_chain_incomplete")
+    der = _single_pem_certificate(raw)
+    try:
+        inspect_intermediate(der)
+    except PinError:
+        raise TenderError("certificate_chain_incomplete") from None
     context = ssl.create_default_context()
     context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     if context.verify_mode != ssl.CERT_REQUIRED or not context.check_hostname:
         raise TenderError("certificate_chain_incomplete")
     try:
-        context.load_verify_locations(cafile=str(path))
-    except ssl.SSLError:
-        # A pinned stand-in that is not a certificate does not extend trust.
-        # The handshake then fails closed. A real intermediate file loads.
-        return context
+        context.load_verify_locations(cadata=der)
+    except (ValueError, ssl.SSLError):
+        raise TenderError("certificate_chain_incomplete") from None
     return context
+
+
+def _single_pem_certificate(raw: bytes) -> bytes:
+    """The DER bytes of a file that is one PEM certificate and nothing else."""
+    try:
+        text = raw.decode("ascii").strip()
+    except UnicodeDecodeError:
+        raise TenderError("certificate_chain_incomplete") from None
+    if (
+        text.count(_PEM_BEGIN) != 1
+        or text.count(_PEM_END) != 1
+        or not text.startswith(_PEM_BEGIN)
+        or not text.endswith(_PEM_END)
+    ):
+        raise TenderError("certificate_chain_incomplete")
+    try:
+        return ssl.PEM_cert_to_DER_cert(text)
+    except ValueError:
+        raise TenderError("certificate_chain_incomplete") from None
 
 
 def fetch_tenders(
@@ -528,7 +568,7 @@ def fetch_tenders(
 ) -> FetchResult:
     """Fetch the six lists in both languages through the injected transport."""
     chosen = tuple(item[0] for item in LIST_PATHS) if lists is None else lists
-    context = chain_context(chain_file, chain_sha256)
+    context = chain_context(chain_file, chain_sha256, host=host)
     if only_urls is not None:
         flags = (int(context.verify_mode), bool(context.check_hostname))
         for url in only_urls:

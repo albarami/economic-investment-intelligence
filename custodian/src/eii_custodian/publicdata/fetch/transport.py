@@ -33,7 +33,7 @@ def metadata_limit(max_bytes: int) -> Iterator[None]:
     """Bound HTTPS reads through existing one-argument transport wrappers.
 
     The scope is local to this call context and reset even after a refusal.
-    Other callers retain the unbounded interface.
+    Other callers retain the general intake ceiling.
     """
     token = _METADATA_LIMIT.set(max_bytes)
     try:
@@ -52,7 +52,18 @@ GRANULE_SUFFIX = ".h5"
 def public_address(url: str) -> str:
     """Return scheme, host and path. A query string is never part of an error."""
     parts = urlsplit(url)
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
+    netloc = parts.netloc
+    if parts.username is not None or parts.password is not None:
+        # Userinfo never reaches an error: rebuild the netloc from host and port.
+        host = parts.hostname or ""
+        netloc = f"[{host}]" if ":" in host else host
+        try:
+            port = parts.port
+        except ValueError:
+            port = None
+        if port is not None:
+            netloc = f"{netloc}:{port}"
+    return urlunsplit((parts.scheme, netloc, parts.path, "", ""))
 
 
 def authorization_header(url: str, token: str) -> dict[str, str]:
@@ -89,6 +100,26 @@ class TransportFault(Exception):
         super().__init__(f"{kind} {self.url}")
 
 
+# The owner ruling of 2026-11-18 retains the general ceiling; required large
+# sources use the file-stream intake. Lower source caps keep their own refusal.
+INTAKE_CEILING_BYTES = 300 * 1024 * 1024
+INTAKE_CEILING_STATUS = "bounded intake with required-source streams"
+READ_CHUNK_BYTES = 65536
+
+
+class BodyTooLarge(TransportFault):
+    """A body above the intake ceiling: declared by its header, or read past it.
+
+    observed is ``declared N`` or ``more than C``; no full size or hash of a
+    refused body is claimed.
+    """
+
+    def __init__(self, url: str, ceiling: int, observed: str) -> None:
+        super().__init__("body_bytes", url)
+        self.ceiling = ceiling
+        self.observed = observed
+
+
 @dataclass(frozen=True)
 class StreamResponse:
     """Metadata and bounded chunks; consumed only inside its open context."""
@@ -97,6 +128,7 @@ class StreamResponse:
     hops: tuple[str, ...]
     declared_length: int | None
     chunks: Iterator[bytes]
+    etag: str | None = None
 
 
 StreamTransport = Callable[[str], AbstractContextManager[StreamResponse]]
@@ -224,8 +256,7 @@ def open_https(
     fault: str | None = None
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
-            limit = _METADATA_LIMIT.get()
-            body = response.read() if limit is None else response.read(limit + 1)
+            body = _bounded_body(response, str(url))
             final = str(response.geturl())
             if reviewed_urls is not None and (
                 final not in reviewed_urls or not _stream_allowed(final)
@@ -270,6 +301,35 @@ def open_https(
         body_sha256=digest,
         headers=public_headers,
     )
+
+
+def _bounded_body(response: HTTPResponse, url: str) -> bytes:
+    """Read fixed chunks, refusing the general cap and preserving lower caps."""
+    limit = _METADATA_LIMIT.get()
+    scoped = limit is not None and limit <= INTAKE_CEILING_BYTES
+    ceiling = limit if scoped and limit is not None else INTAKE_CEILING_BYTES
+    if scoped and ceiling + 1 <= READ_CHUNK_BYTES:
+        return response.read(ceiling + 1)
+    declared = response.headers.get("Content-Length")
+    if (
+        not scoped
+        and isinstance(declared, str)
+        and declared.isascii()
+        and declared.isdigit()
+        and int(declared) > ceiling
+    ):
+        raise BodyTooLarge(url, ceiling, f"declared {int(declared)}")
+    chunks: list[bytes] = []
+    count = 0
+    while count <= ceiling:
+        chunk = response.read(min(READ_CHUNK_BYTES, ceiling + 1 - count))
+        if not chunk:
+            break
+        count += len(chunk)
+        if count > ceiling and not scoped:
+            raise BodyTooLarge(url, ceiling, f"more than {ceiling}")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def _redirect_guard(
@@ -366,7 +426,11 @@ def open_https_stream(
                     yield chunk
 
             yield StreamResponse(
-                final, tuple(hops), None if length is None else int(length), chunks()
+                final,
+                tuple(hops),
+                None if length is None else int(length),
+                chunks(),
+                response.headers.get("ETag"),
             )
     except TransportFault:
         raise
@@ -422,7 +486,9 @@ def open_attempt(request: PreparedRequest) -> AttemptResult:
     opener = urllib.request.build_opener(_Stop)
     try:
         with opener.open(call, timeout=HTTP_TIMEOUT_S) as response:
-            body = response.read()
+            body = _bounded_body(response, request.url)
+    except BodyTooLarge:
+        raise OpenerFault("body_bytes") from None
     except OpenerFault:
         raise
     except urllib.error.HTTPError:

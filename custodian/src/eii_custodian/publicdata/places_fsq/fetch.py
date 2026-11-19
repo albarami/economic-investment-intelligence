@@ -94,6 +94,7 @@ def fetch_release(
         )
     terms_body = b""
     terms_url = entry.terms_url
+    licence_pending = False
     if terms_url:
         terms, failure = _get(entry, transport, terms_url)
         if failure is not None or terms is None:
@@ -101,6 +102,7 @@ def fetch_release(
         refusal = _terms_refusal(terms.body, terms.final_url)
         if refusal is not None:
             return None, refusal
+        licence_pending = _licence_pending(terms.body)
         terms_body = terms.body
         terms_url = terms.final_url
     stored: list[tuple[str, bytes, str]] = []
@@ -141,6 +143,7 @@ def fetch_release(
         terms_url,
         retrieved,
         host_of(metadata.final_url),
+        licence_pending,
     )
     return ReleaseFetch(digest, host_of(metadata.final_url)), None
 
@@ -196,11 +199,15 @@ def _terms_refusal(body: bytes, url: str) -> ReleaseFailure | None:
     folded = text.casefold()
     if any(mark in folded for mark in _SIGN_IN):
         return ReleaseFailure(1, url, "sign_in_demand", "public file", "sign-in")
-    if LICENCE_NAME not in text or COPYRIGHT_LINE not in text:
-        return ReleaseFailure(
-            1, url, "licence_mismatch", LICENCE_NAME, "licence text differs"
-        )
     return None
+
+
+def _licence_pending(body: bytes) -> bool:
+    """Ruling L-1001 (decision 0059, PUB-97): a licence text different from the
+    registry's pinned wording is archived and recorded pending a reviewer's
+    record, and fails nothing."""
+    text = body.decode("utf-8", errors="replace")
+    return LICENCE_NAME not in text or COPYRIGHT_LINE not in text
 
 
 def _data_url(file_path: str) -> str:
@@ -217,6 +224,7 @@ def _store(
     terms_url: str,
     retrieved: str,
     host: str,
+    licence_pending: bool = False,
 ) -> str:
     directory = cache_directory(cache, entry.key)
     meta_digest = sha256_hex(metadata)
@@ -249,6 +257,10 @@ def _store(
         "terms_sha256": terms_digest or None,
         "terms_url": terms_url or None,
     }
+    if licence_pending:
+        # Ruling L-1001 (PUB-97): the differing licence text is archived with
+        # its hash and the date read, pending a reviewer's record.
+        manifest["licence_review"] = "pending"
     payload = json.dumps(manifest, sort_keys=True).encode("utf-8")
     digest = sha256_hex(payload)
     if terms:

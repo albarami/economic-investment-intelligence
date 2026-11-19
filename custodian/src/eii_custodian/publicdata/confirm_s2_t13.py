@@ -27,7 +27,9 @@ OUTCOMES = frozenset(
         "none_found",
     }
 )
-BASES = frozenset({"dataset", "portal_terms", "provider_terms", "none_stated", ""})
+# Empty records a missing publisher basis, including pending/absent-terms evidence.
+# The admitted registry basis is separately checked through basis_of_use.
+BASES = frozenset({"dataset", "portal_terms", "provider_terms", ""})
 RECORDED = OUTCOMES - {"not_yet_recorded", "none_found"}
 CAVEAT = "No public tender source is recorded"
 

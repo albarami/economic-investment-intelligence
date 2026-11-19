@@ -436,7 +436,10 @@ def test_build_public_joined_trade_bindings(
     assert "SYN-configuration-secret" not in output
     cache = tmp_path / "data/public_cache"
     if plant == "none":
-        assert code == 0
+        # The source fixture fetches successfully; a whole assembly still
+        # refuses because this fixture supplies no reviewed snapshot pins.
+        assert code == 1
+        assert "snapshot_selection_invalid" in output
         assert any(kind == "metadata" for kind, _ in calls)
         assert any(kind == "stream" for kind, _ in calls)
         assert list(cache.rglob("*.manifest.json"))
@@ -505,7 +508,8 @@ def test_build_public_joined_comtrade(tmp_path, monkeypatch, capsys, plant):
     output = captured.out + captured.err
     cache = tmp_path / "data/public_cache"
     if plant == "none":
-        assert code == 0 and calls and reads
+        assert code == 1 and calls and reads
+        assert "snapshot_selection_invalid" in output
         assert f"PASS {entry.key}" in output
         assert list(cache.rglob("manifest.json"))
     else:
@@ -561,7 +565,9 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
             return self.url
 
         def read(self, size=-1):
-            return b"SYN-no-day-folder"
+            body = b"SYN-no-day-folder" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body
 
     def open_request(request, **kwargs):
         sent.append((request.full_url, request.get_header("Authorization")))
@@ -592,8 +598,9 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
             [],
             sleep=lambda _: None,
         )
-        == 0
+        == 1
     )
+    assert "snapshot_selection_invalid" in capsys.readouterr().out
     assert sent == [(terms, None)]
     assert not list((tmp_path / "data/public_cache" / entry.key).rglob("index/*.json"))
     from custodian.tests.fixtures.grids.invented import night_file
@@ -605,11 +612,16 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
 
     def read_body(self, size=-1):
         if self.url == entry.url:
-            return b'<a href="001/">SYN-day</a>'
-        if self.url == day:
-            return b'<a href="VNP46A3.A2024001.h23v06.SYN.h5">SYN-granule</a>'
-        assert self.url == granule
-        return body
+            answer = b'<a href="001/">SYN-day</a>'
+        elif self.url == day:
+            answer = b'<a href="VNP46A3.A2024001.h23v06.SYN.h5">SYN-granule</a>'
+        else:
+            assert self.url == granule
+            answer = body
+        position = getattr(self, "position", 0)
+        result = answer[position:] if size < 0 else answer[position : position + size]
+        self.position = position + len(result)
+        return result
 
     monkeypatch.setattr(Body, "read", read_body)
     monkeypatch.setattr(command, "load_registry", lambda: (entry,))
@@ -621,8 +633,9 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
             [],
             sleep=lambda _: None,
         )
-        == 0
+        == 1
     )
+    assert "snapshot_selection_invalid" in capsys.readouterr().out
     assert sent == [(entry.url, None), (day, None), (granule, "Bearer SYN-earthdata")]
     assert list(
         (tmp_path / "complete/data/public_cache" / entry.key / "index").glob("*.json")

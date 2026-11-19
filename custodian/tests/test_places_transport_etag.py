@@ -27,9 +27,10 @@ class _Answer:
     def __init__(self, url: str, etag: str | None) -> None:
         self.headers = _Headers(etag)
         self._url = url
+        self._body = io.BytesIO(b"SYN")
 
-    def read(self) -> bytes:
-        return b"SYN"
+    def read(self, size: int = -1) -> bytes:
+        return self._body.read(size)
 
     def geturl(self) -> str:
         return self._url

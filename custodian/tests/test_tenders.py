@@ -11,6 +11,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from custodian.tests.fixtures.invented_chain import intermediate_pem
 from custodian.tests.repository_root import repository_root
 from custodian.tests.singles_entries import TENDER_TERMS, tender_entry
 
@@ -704,8 +705,11 @@ def test_list_paths_page_size_and_registry_entry() -> None:
 
 
 def _chain(tmp_path: Path) -> tuple[Path, str]:
-    path = tmp_path / "chain-stand-in"
-    body = b"invented-chain-stand-in"
+    # S2-T08 part B, mismatch 7: chain_context now inspects the file, so a
+    # non-certificate stand-in is refused; an invented issuing intermediate
+    # stands in for the reviewed chain. No host certificate is used.
+    path = tmp_path / "SYN-chain.pem"
+    body = intermediate_pem()
     path.write_bytes(body)
     return path, hashlib.sha256(body).hexdigest()
 

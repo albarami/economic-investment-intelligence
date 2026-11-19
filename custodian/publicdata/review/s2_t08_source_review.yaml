@@ -1,0 +1,1036 @@
+# S2-T08 part B source review: proposed by the builder, awaiting the lead's review.
+# One row per registry correction (plan section 2, "Registry review: yes").
+# Shape, hash and date come from the S2-T08 part B live shape pack of 2026-11-18,
+# its "Step 2: per-source tables" rows and its numbered "Mismatches the build brief
+# must cover"; the terms basis is the registry row's own. Under decision 0026 item 3
+# a correction needs reviewed source evidence, not a new permission decision, and
+# commit_allowed stays false. No fetched value is recorded here: only shapes,
+# hashes, counts the registry already holds, dates and the declared change.
+review: s2_t08_source_review
+status: proposed
+shape_pack_date: "2026-11-18"
+rows:
+  - key: bank_credit_act/local-banks-credit-by-economic-activity
+    mismatch: 2
+    shape: JSON array of 88 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 66032f9f0dabf685a4d323a4778485dd1fa621ab330d1b071f5d15bcef7e7cad
+    metadata_sha256: c1a2f5ca548909549d69bfd9cc803402145f61d55118dabf96dd6a739e9fd760
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2012-01-01'
+        to: '2012'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month
+    mismatch: 2
+    shape: JSON array of 72 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 208a68bc7e5b79937bd009b85c9988a394271fc297aed2c3399f43caa0249488
+    metadata_sha256: 0f435effed36dfd620a2f31472ef4f597ae6508f8d9ec27cc30236046cbd2159
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2021-01-01'
+        to: '2021'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: ea1816dd364d89d33d8361b80a63f5446d5187a0951df6f18f1316959b17d09f
+    metadata_sha256: dd5a072b0e7336a0905bdc195e593f76ccfa5194deca95a69182bcdb66feb43a
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: fc920b6a6bf829757c0977abc4a9440873b572100d6ccd50a8a941cc90d33b70
+    metadata_sha256: f89041739a775acc88c410a46d5e8f5cf38ec8872d6065ea1a5e70daa5793b2e
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 19e61c8032f1fa8f891ae250ec7d8b8721eff19a8f2a97963fd29776ebec7f47
+    metadata_sha256: f58f44256d7f0f8d100d25ff4cf7ca11598b7ea91a8f31f29893d9fe4f2354a2
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shamal-municipality
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 7945b350bb13872fbc79659a9f10416beeb32a11ea57bd5f3aceb78ec890e49b
+    metadata_sha256: 900c6e24784f8d81b47c9b21b9093fc3ba195c14a2cc646b432df2953f3362a2
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 398496f87308edc81fae8e073e1fa2afbffa30e4dd932cb121ffb499c172636c
+    metadata_sha256: f5e46e8903eade14ee6f5a5629020901259b99111630a4a88529a46572f5ae3d
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 9b3682abfa43340f814d3b07ebee87e3d1bb4e2da148ba718c70f71f9d66dfed
+    metadata_sha256: 403fce613d4c260131a561c7d2ed63eb4cc8664aeca5234749e4e2c6dfb537e2
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: d40a56cd4315fe540331272ae4661a4fac6c0c287e59e11242ba806864aa2f53
+    metadata_sha256: e000cf1135f2ecca7cf2d8793c003a8ee1e0cb74a558ad7bf51a4a47fad0e3bd
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/electricity-network-coverage
+    mismatch: 2
+    shape: JSON array of 7 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 1f948cb8b8ebaef37e34db265067ab1613708e32186e578f406e1d4e1c2b4ab0
+    metadata_sha256: cf50046a0db3545244b1b0fec67f989d17c417b3837b7ba0745c96449243813a
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/electricity-network-coverage-by-municipality
+    mismatch: 2
+    shape: JSON array of 56 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: bd619c6e88e0f895199fb16645e9bf46fd1e27fe7b54690d3d59163c26958497
+    metadata_sha256: 626c73c9434fd3b877d1c83339fe081ce7681b5cdf09bf38fce457b79406462d
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
+    mismatch: 2
+    shape: JSON array of 24 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 5f431266972a4f08bb22e786bc40f1c18c7314e9b6747de5cf42c12500097c27
+    metadata_sha256: 653e482d88c80117c818d2c504ceaa99d17815bf4c5b86a52c54fedc21a829c3
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
+    mismatch: 2
+    shape: JSON array of 192 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 9d713d6c6686e0ebb80338d9679e5ff0348fa880684aadd7e0d1a887e76428f6
+    metadata_sha256: b7850ace015f59547be8605f8345c159d2525ff42d936a51299d60d3c09bf13a
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
+    mismatch: 2
+    shape: JSON array of 24 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 412183cde8455afc49da2dd363ad2ed551e5ec415738d58825b60cae8cc6df3b
+    metadata_sha256: 63c4b5c5e220805b4f366937dba4818951ddc08696e90db8bb03ae186d8f85fd
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2016-01-01'
+        to: '2016'
+      period_last:
+        from: '2021-01-01'
+        to: '2021'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/water-supply-coverage
+    mismatch: 2
+    shape: JSON array of 21 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 6e22facfa8936df83707df9a72e642ae10e9de5844d84988211fe3644531c1c6
+    metadata_sha256: 116c8c6962bcdf4a442dada354d623d88ac7962eed35a15b53d809b015d2de0d
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: coverage_ext/water-supply-coverage-by-municipality
+    mismatch: 2
+    shape: JSON array of 56 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 411e99302259eae32ddaba03a4f831c97679cd0f83a8a8937346479f57165166
+    metadata_sha256: 3c6ad5cfff2518aa95a0e601d30c54b39de850ffd6d103232288e2d6db64bcdf
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: dcool_capacity/design-cooling-capacity-by-status-municipality-and-sector-tr
+    mismatch: 2
+    shape: JSON array of 69 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: b4bde12d20eabb8abc1ba95a74920c58a6f872b64555e2d80cd2e192c7d05215
+    metadata_sha256: 2f94c3e8fefe0b0f57b114ec622b4901be13919dd1b075ad82c0a985caad1023
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: fdi_stats/sdg-17-3-1-foreign-direct-investment-inflows
+    mismatch: 2
+    shape: JSON array of 35 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 6639a91a4672bdc8ef48a73f4b7250ca05c3f636cfb60f1746454e5d515b7433
+    metadata_sha256: 18cf837b4003bce12a822f52cedd77b634b302aa171de4901ae110ede224d90f
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '1990-01-01'
+        to: '1990'
+      period_last:
+        from: '2024-01-01'
+        to: '2024'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: hotel_ext/number-of-hotel-beds-by-hotel-class
+    mismatch: 2
+    shape: JSON array of 5 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 1058b937f63323cc15daaba27c2404a68184dcd410a5458841a6bed9c594b09d
+    metadata_sha256: 4af2bbff191418e28d4417d60f661aef6491a1239e3a96b44f2b79aab61c5414
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-nationality
+    mismatch: 2
+    shape: JSON array of 5 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 78406b4d38fab2162779a5d0df285089b295053b7826c37b45145adc6f55d4ba
+    metadata_sha256: c9799249e6bee41961a0c50f27829d3f8193222247d5a1be7c9313c3dcb2f557
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: hotel_ext/number-of-hotel-rooms-by-hotel-class
+    mismatch: 2
+    shape: JSON array of 5 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 505641367d1430b244c2a855e24143c24c547713ae97da128044fdfdb07bdfa7
+    metadata_sha256: f91275eaf974c36cb9fc07439d47e20747a73844e6a903cdc68265eb73c7bedc
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: hotel_ext/number-of-hotels-by-hotel-class
+    mismatch: 2
+    shape: JSON array of 5 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 330ad0083caf74ee0f942c64700843b58847d5a12c8bfd3b9e74c66412459d71
+    metadata_sha256: f73f8cfb1590e9870a69a34e1dfa641d131cb1ee9ed18e2c3d560e41b67af9ea
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: hotel_ext/number-of-hotels-rooms-and-beds-by-hotel-type
+    mismatch: 2
+    shape: JSON array of 32 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 6106ea832f21d931b4fa7be0185fafdf44b92107454933e59605a66033d78bbf
+    metadata_sha256: 52bc18315c1e644d889dd038d0bb9e035c05b1e8fbbe22ca7e5a3cdb386a9121
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2015-01-01'
+        to: '2015'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
+    mismatch: 2
+    shape: JSON array of 128 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: c971d06371714c0532e1fed05114bd057c573a418160e2c04bb3661893c06a6d
+    metadata_sha256: f8397c636ab7ee0a47697b65e58ce93edd7b2268dcb4cbc83d0a658ee68a9307
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
+    mismatch: 2
+    shape: JSON array of 121 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 41b72585621b50cc662c6f1086a3c7764d72a382de3264c0f0a1ad6619d3f222
+    metadata_sha256: 55825330065e6ab7c09aa5a71fc8c0c5dcef2d3c90d4e532f7fbaf9950f0e9c4
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/qatari-unemployed-15-with-secondary-education-and-training-quarterly
+    mismatch: 2
+    shape: JSON array of 158 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: c3d762c0d981f40a2d20bfd5b997a670901bf0c848591498f3a8eaba9a6a66e4
+    metadata_sha256: 1b7e457f97a2072393d800374c8460ff33aedc88359bc30a58d2dc99d7494eb8
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
+    mismatch: 2
+    shape: JSON array of 28 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: ccf0c4d781d12cc78e199efe3de38b129945ef3aef8720b7f06b5a7c6061aa0e
+    metadata_sha256: c4cc4480e3d1ff8d5c7e6fd3834fe35b0563ad260912075742e87accc2b6b28f
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
+    mismatch: 2
+    shape: JSON array of 32 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: d6387e00acdc7624a6bc5e17ef30a76a6851b0b768ffe50c7b9f40a47c93e5a0
+    metadata_sha256: beae4a958097028dae707f3f52a70b3f4cde995959913ae0b78f65cd23eaec61
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2024-01-01'
+        to: '2024'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
+    mismatch: 2
+    shape: JSON array of 46 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 5db68358016084943b2e6f5557b852dd5f2106b119044349ffb06803430e2df9
+    metadata_sha256: 9e0a924a2f65b04ac48ba4e440ef191c746b1802585762634f567c0b7e0a4623
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
+    mismatch: 2
+    shape: JSON array of 24 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: c4bd939ee1fc222e2c98b4dea30066ab6dc0c6bd8b04c954a4314cae4a28511b
+    metadata_sha256: 6b3d258d30d84aa366c6aa6dbcb838d19d83d7787179b30cccb9ded5e4c12464
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
+    mismatch: 2
+    shape: JSON array of 54 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 748f6fefc0712fd23447b79ee5b17fe4c488402835f53e9f64c56e083157480c
+    metadata_sha256: a4d392fec1c730267079723497364c095514474ac86d8948e9c59513de72c07f
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: jobseekers/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
+    mismatch: 2
+    shape: JSON array of 84 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 2ac37f35d5bfc7e6ffe9ee58fbf9a3c65e98e31392b25f81ab89b6e127470f08
+    metadata_sha256: 6e649992988083a35258bc904cde304f25b650238b12696624ff71dab995ed94
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2017-01-01'
+        to: '2017'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: price_ext/producer-price-index-ppi
+    mismatch: 2
+    shape: JSON array of 1292 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: baab5e7ac39b5992a7efa30521cc68f70406d85cdc01160d206aa6c07cd4d16b
+    metadata_sha256: 015e5ced8bb01feb21909c6ab2d18e05150d7e51f8ad06a38933c31d3f8aacb2
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: portal_terms
+      licence_id: ''
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2026-01-01'
+        to: '2026'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: price_ext/producer-price-index-ppi-by-activity-monthly
+    mismatch: 2
+    shape: JSON array of 1224 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 1dfa519df803dd3be7bfe55b3b3910d119cbb1aaef4da94ec38e000a9a8ac8e3
+    metadata_sha256: 2e266589d44cf8437de0a89816b8f7e391d5b05a73700e11c9af71dd91f6910f
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: talent_ext/education-statistics-number-of-graduates-on-scholarships-abroad-by-field-of-study-and-gender
+    mismatch: 2
+    shape: JSON array of 568 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 4a0d2082409e7e1f9e82cfd23e4e259c160ec01e63ffadae0a4beb71597fbe01
+    metadata_sha256: e6e81e67b97224a479d98e4cabddddcc036ec000f9c2f977cc4600bc85486364
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2010-01-01'
+        to: '2010'
+      period_last:
+        from: '2023-01-01'
+        to: '2023'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: talent_ext/trainees-at-the-private-training-centers-by-employment-status-gender-nationality-and-field-of
+    mismatch: 2
+    shape: JSON array of 120 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 98e0cd5e5504637b8e7fac947c47066755f1a3f095dd36acd8497852925ca45c
+    metadata_sha256: 969b1ad80ef7c479d2741acd2c99500e659a6aee028d9eec83af3b537bf297b5
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: talent_ext/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
+    mismatch: 2
+    shape: JSON array of 240 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 990a0ef0cc14b18b8474171a218d5350178b2cc1ce8335492b02e0997dafa999
+    metadata_sha256: 181394bb645abb74aec76b8b8ec33dd58ecb534f7814130a090cad9b05cc1e06
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2018-01-01'
+        to: '2018'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: trade_ext/imports-by-nature-of-items-and-year
+    mismatch: 2
+    shape: JSON array of 30 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 69a58372203b37453493c4afcfd556b6140f6f8fd8704fa6fd4ff87cf384ac2c
+    metadata_sha256: 3ea95cb6339bec9ccef81457e8378d210be91a3be2ca488041be0c7bbadd0fa9
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2013-01-01'
+        to: '2013'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: trade_ext/imports-by-utilization-of-items-and-year
+    mismatch: 2
+    shape: JSON array of 30 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: f52d307c21e965d32f401c2379580d5e3299c354afd791d8ca1e8a4dbae8980c
+    metadata_sha256: 64a917bb32e41468740743fa27156f36837f738c0d64d28fdfb94542fb0471d9
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2013-01-01'
+        to: '2013'
+      period_last:
+        from: '2022-01-01'
+        to: '2022'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: trade_ext/qatar-export-statistics-2019-2024
+    mismatch: 2
+    shape: JSON array of 142720 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 12f685f73ac555947e852a966b9fe71f037f768401c237c209a3c8cf8442f948
+    metadata_sha256: c6e68868964c5821103b3897817059393261ad60b7421129e1096f85b4752492
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2014-01-01'
+        to: '2014'
+      period_last:
+        from: '2026-01-01'
+        to: '2026'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: utilities_ext/operational-peak-district-cooling-load
+    mismatch: 2
+    shape: JSON array of 6 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: 950da119ea878ba48caef397b12ce6d3cd25012c809f0abe36d5cacd006bc472
+    metadata_sha256: 772ced8d97db191ef8c397b88b47afe99d64ee9a398ca16db4a9f20d66e1d1ee
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2019-01-01'
+        to: '2019'
+      period_last:
+        from: '2024-01-01'
+        to: '2024'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: utilities_ext/sectoral-electricity-consumption-mwh
+    mismatch: 2
+    shape: JSON array of 2 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: ab78cd83b72dd3907d295c0785c8457f50046264518d2abc22ea67d15b98065b
+    metadata_sha256: 1fdb8c60f2a17cf0bb42d1eaeb70e1af3b4587edebe66a0b0eb0a5566a3ad3c7
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2023-01-01'
+        to: '2023'
+      period_last:
+        from: '2024-01-01'
+        to: '2024'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: utilities_ext/total-electricity-consumption-by-sectors
+    mismatch: 2
+    shape: JSON array of 576 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: a635ecd4b80992f68ca6a19cefe8a6645f67733cf515449845f40efc95d95ba7
+    metadata_sha256: 6bf74226051ca48d7588b3478612cf07cba219e29000d01c85f6a0c9812ecff7
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: utilities_ext/total-water-consumption-by-sectors
+    mismatch: 2
+    shape: JSON array of 648 records; every value of field year is four-digit text; metadata types year as date with year precision
+    export_sha256: b0878a2bb7928797a58b305c9a85a9ad6c86e7586f0939c78da394e09feb924f
+    metadata_sha256: fe62f548fdce59accc190ea771bf2d567d64fbf90472e3930d344281dd2063f9
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      period_field:
+        from: sit=row;form=date;field=year
+        to: sit=row;form=year_text;field=year
+      period_first:
+        from: '2020-01-01'
+        to: '2020'
+      period_last:
+        from: '2025-01-01'
+        to: '2025'
+      basis_note: added
+    disposition: corrected to the existing year_text form; the year bounds keep their years; date parsing is not broadened
+  - key: prop_sales
+    mismatch: 3
+    shape: JSON array of 26719 records with 18 fields; usage in place of property_usage; lstkhdm, share_area, share_value, number_of_shares_2400 and price_per_square_foot present; area_square_feet absent; the shape pack shows names only
+    export_sha256: 9f4867dc61cc14bd2b0f4393c1ed62632a120be1eee617582c8314a9f8c570b1
+    metadata_sha256: db294ceceeadb7bd10762fcfc94670e77d42bacc3a98a0efa829967bf501e9bc
+    shape_date: '2026-11-18'
+    publisher_unchanged: the export body is byte-identical to the 2026-11-17 run that passed; the registry columns had changed, not the publisher
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-14'
+    change:
+      columns:
+        removed: [property_usage, area_square_feet]
+        added: [lstkhdm, usage, share_area, price_per_square_foot, number_of_shares_2400, share_value]
+        types_not_evidenced: [lstkhdm, share_area, price_per_square_foot, number_of_shares_2400, share_value]
+      basis_note: added
+      adapter: property/bulletin.py sales_export_rows (exact observed fields; usage read as the usage field; published square metres; square feet absent)
+    disposition: corrected; any value in a share field refuses by name (share_semantics_unconfirmed) until the lead confirms what the share fields mean; the declared types of the five fields above await the live run, where a wrong type refuses
+  - key: bnd_muni_2025
+    mismatch: 4
+    shape: JSON array of 8 records; keys geo_point, geo_shape, name; geo_shape is a GeoJSON Feature object (type, geometry, properties) whose geometry is a MultiPolygon
+    export_sha256: e52258062418e59ccd828c8e0f8ba0427458eed62cfa97a3833f3e2cc4737b19
+    metadata_sha256: 580cdce4e2dbfee6cb9267e8db01630ec2381e4e36d6b38f64db81ee5b512e1a
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: portal_terms
+      licence_id: portal-terms
+      terms_read_on: '2026-11-14'
+    change:
+      columns:
+        geo_shape: {from: geojson_geometry, to: geojson_feature_polygon}
+      type_vocabulary: geojson_feature_polygon added, declarable by bnd_muni_2025 only (fetch/registry.py FEATURE_POLYGON_SOURCES; fetch/checks.py _feature_polygon)
+      basis_note: added
+    disposition: corrected; admitted at the fetch only; no seam unwraps it and it never stands in for the frame's licensed municipality geometry
+  - key: price_ext/machinery-and-equipment-price-index-mepi
+    mismatch: 6
+    shape: "portal export: JSON array of 100 records in long form; keys group, group_code, half_year, index_value, lmjmw, nsf_lsn, weight, year (names only)"
+    export_sha256: 4a0ed7f7eb1964060f1d5835540692664f1e6a909fd080c5d710868b853b2cd2
+    metadata_sha256: 56e22df1d4d96168e9a7288cbc5c636e723e4ccd8ad3223a229209151ab39756
+    shape_date: '2026-11-18'
+    terms_basis:
+      licence_basis: dataset
+      licence_id: CC-BY-4.0
+      terms_read_on: '2026-11-15'
+    change:
+      columns:
+        removed: [code, group_desc_ar, group_desc_en, h1_20, h2_20, h1_21, h2_21, h1_22, h2_22, h1_23, h2_23, h1_24, h2_24]
+        added: [year, half_year, nsf_lsn, group_code, group, lmjmw, index_value]
+        kept: [weight]
+        types_not_evidenced: "the shape pack holds field names only; types are declared from the names (labels as string, weight and index_value as number) and a retype refuses at the fetch"
+      row_count: {from: "10..10", to: "100..100"}
+      closed_shape: "an undeclared field is refused (fetch/checks.py CLOSED_SHAPE_KEYS); no other row is changed"
+      period: "none, as before: year and half_year stay published labels; no canonical period is inferred"
+      basis_note: replaced (LR-P7 wide-form note)
+    disposition: "registry corrected to the observed long form with the exact reviewed count; any later count change refuses and needs a new source review"

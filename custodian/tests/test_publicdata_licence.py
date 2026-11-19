@@ -9,6 +9,7 @@ from pathlib import Path
 from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.report import licence_pending_line
 from eii_custodian.publicdata.fetch.transport import Response, Transport
 
 KEY_NAMES = (
@@ -123,8 +124,9 @@ def test_cc_by_4_accepts_only_the_portal_statement_and_records_it(
     assert side["portal_licence_url"] == CC_BY_URL
 
 
-def test_cc_by_4_rejects_any_other_portal_statement(tmp_path: Path) -> None:
-    """Any licence text or URL other than the portal's CC BY pair fails and stores nothing."""
+def test_any_other_portal_statement_is_recorded_pending(tmp_path: Path) -> None:
+    """Ruling L-1001 (PUB-09): any licence text or URL other than the portal's
+    CC BY pair is recorded pending beside the registry licence, and stores."""
     statements = (
         ("CC BY 4.0", ""),
         ("CC BY", ""),
@@ -134,14 +136,20 @@ def test_cc_by_4_rejects_any_other_portal_statement(tmp_path: Path) -> None:
     )
     for index, (text, url) in enumerate(statements):
         cache = tmp_path / str(index)
-        failure = fetch_entry(_entry(), _transport(text, url), cache, _clock, _sleep)
-        assert failure is not None, (text, url)
-        assert failure.check == "licence_mismatch", (text, url)
-        assert [path for path in cache.rglob("*") if path.is_file()] == []
+        assert (
+            fetch_entry(_entry(), _transport(text, url), cache, _clock, _sleep) is None
+        ), (text, url)
+        side = _sidecar(cache)
+        assert side["licence_id"] == "CC-BY-4.0"
+        assert side["portal_licence"] == text, (text, url)
+        assert side["portal_licence_url"] == (url or None), (text, url)
 
 
 def test_fail_line_names_check_expected_and_observed(tmp_path: Path) -> None:
-    """A planted mismatch is named on the FAIL line and in the build log, with no key."""
+    """A planted mismatch is named on the FAIL line and in the build log, with no key.
+
+    Ruling L-1001: a licence different from the registry is no FAIL line; the
+    build carries the licence_pending_line advisory beside the PASS line."""
     observed_url = "https://example.invalid/licence"
     cache = tmp_path / "licence"
     outcome = run_build(
@@ -151,16 +159,13 @@ def test_fail_line_names_check_expected_and_observed(tmp_path: Path) -> None:
         _clock,
         _sleep,
     )
-    line = _one_fail(outcome.lines)
-    assert "licence_mismatch" in line
-    assert (
-        f"expected=text:{CC_BY_TEXT} url:{CC_BY_URL} "
-        f"observed=text:closed url:{observed_url}"
-    ) in line
+    assert outcome.failure is None
+    advisory = licence_pending_line("planted", "CC-BY-4.0", "closed", _clock())
+    assert advisory in outcome.lines
     logged = _logged_lines(cache)
-    assert line in logged
+    assert advisory in logged
     for name in KEY_NAMES:
-        assert name not in line
+        assert name not in advisory
         assert name not in "\n".join(logged)
 
     publisher = tmp_path / "publisher"

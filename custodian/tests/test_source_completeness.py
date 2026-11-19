@@ -146,6 +146,16 @@ def test_missing_or_substituted_receipt_chain(field):
     assert failures(c.check(**args))
 
 
+def test_pending_terms_receipt_fields_do_not_exclude():
+    """Ruling L-1001: a receipt with pending terms fields keeps the source in use."""
+    row = entry(terms_words="", terms_read_on="", licence_basis="")
+    assert c.in_use(row, {row.key: receipt(row)}) is True
+    args = inputs()
+    args["entries"] = [row]
+    args["receipts"] = {row.key: receipt(row)}
+    assert not failures(c.check(**args))
+
+
 def test_absence_is_exact_and_terms_do_not_exclude():
     args = inputs()
     args["receipts"] = {}
@@ -362,6 +372,43 @@ def test_absence_caveat_must_be_declared():
         "reason": "source_absence_caveat_invalid",
     } in record
     assert not any(row["state"] == "NO_DATA" for row in record)
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        "| `family` | invented | invented |",
+        "| `family` | invented | invented | portal `slug-a` |",
+        "| `family` | invented |",
+        "| `family` |",
+    ],
+)
+def test_truncated_family_row_refuses_before_the_width_skip(row):
+    # PO-S2-72: under a five-column header a truncated family row is refused by
+    # name instead of being skipped by the width test.
+    text = f"""### 2.1 Identity
+| source_id | Dataset | Publisher | How fetched | Licence |
+|---|---|---|---|---|
+{row}
+### 2.3 Trade
+| source_id | Publisher | Use |
+### 2.4 Pages
+| source_id | Publisher | Use |
+"""
+    with pytest.raises(ValueError, match=r"^pack_family_row_truncated$"):
+        c.pack_sources(text, {"family": 1})
+
+
+def test_short_ordinary_row_is_still_skipped_by_width():
+    text = """### 2.1 Identity
+| source_id | Dataset | Publisher | How fetched | Licence |
+| `ordinary` | invented |
+### 2.3 Trade
+| source_id | Publisher | Use |
+### 2.4 Pages
+| source_id | Publisher | Use |
+"""
+    assert c.pack_sources(text, {}).sources == {}
 
 
 def test_pack_source_duplicate_refuses():

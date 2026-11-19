@@ -3,6 +3,14 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
+from pathlib import Path
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from eii_custodian.publicdata.fetch.registry import Entry
+
+LocalFileStatus = Literal["present", "absent", "invalid"]
 
 _SOURCE_KEY = re.compile(r"^[a-z][a-z0-9_.-]*(?:/[a-z][a-z0-9_.-]*)*$")
 _BARE_DIGITS = re.compile(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])")
@@ -16,6 +24,34 @@ _EVIDENCE_REASONS = frozenset(
         "snapshot_selection_missing",
     }
 )
+
+
+def local_file_statuses(cache: Path, review: Path) -> dict[str, LocalFileStatus]:
+    """Describe the two hand-written local inputs without exporting their values.
+
+    The production readers alone decide validity. Reporting a refusal does not
+    replace the stage's own refusal or make an absent alias file a build error.
+    """
+    from eii_custodian.publicdata.frame.live import district_aliases
+    from eii_custodian.publicdata.stage import LOCAL_EXPECTATIONS_DIR, _local_expected
+
+    def status(path: Path, reader: Callable[[], object]) -> LocalFileStatus:
+        if not path.is_file():
+            return "absent"
+        try:
+            reader()
+        except (OSError, ValueError):
+            return "invalid"
+        return "present"
+
+    expectations = f"{LOCAL_EXPECTATIONS_DIR}/PUB-71.json"
+    aliases = "review/district_layer_aliases.csv"
+    return {
+        expectations: status(
+            cache / expectations, lambda: _local_expected(cache, "PUB-71")
+        ),
+        aliases: status(cache / aliases, lambda: district_aliases(review, cache)),
+    }
 
 
 def evidence_line(
@@ -76,6 +112,57 @@ def terms_host_line(key: str, host: str, terms_url: str) -> str:
 def terms_unread_line(key: str, check: str, terms_url: str) -> str:
     """Return the advisory when a terms page cannot be read."""
     return f"TERMS {key} not read: {check} ({terms_url})"
+
+
+def licence_pending_line(
+    key: str, licence_id: str, observed: str, date_read: str
+) -> str:
+    """Return the advisory when a fetched licence differs from the registry.
+
+    Ruling L-1001 (decision 0059, the PUB-09 and PUB-97 passages): a licence
+    different from the registry is recorded with the date read, pending a
+    reviewer's record, and fails nothing.
+    """
+    return (
+        f"LICENCE {key} read {date_read}: observed {observed} "
+        f"differs from registry {licence_id}; pending a reviewer's record"
+    )
+
+
+def licence_unstated_line(key: str, licence_id: str, date_read: str) -> str:
+    """Return the advisory when a portal states no licence at all.
+
+    Ruling L-1016 (applying L-1001): a publisher-terms reading is a record,
+    never a gate; a dataset-basis portal row that states no licence is
+    recorded with the date read, pending a reviewer's record, and fails
+    nothing. publisher_missing and publisher_mismatch stay refusals.
+    """
+    return (
+        f"LICENCE {key} read {date_read}: no licence stated where registry "
+        f"{licence_id} was expected; pending a reviewer's record"
+    )
+
+
+TERMS_HOST_NOT_LISTED = "host_not_allow_listed"
+
+
+def terms_attempt_record(
+    entry: Entry, reason: str, attempted_utc: str
+) -> dict[str, object]:
+    """Return one unread-terms attempt for the build log (S2-T08 part B, class 9).
+
+    The attempt time and reason are kept apart from the row's recorded
+    ``terms_read_on`` and own words, which are copied unchanged: an attempt is
+    never a reading, so no reading date is made from it.
+    """
+    return {
+        "key": entry.key,
+        "terms_url": entry.terms_url,
+        "terms_attempted_utc": attempted_utc,
+        "terms_unread_reason": reason,
+        "terms_read_on": entry.terms_read_on,
+        "terms_words": entry.terms_words,
+    }
 
 
 def citation_line(key: str) -> str:

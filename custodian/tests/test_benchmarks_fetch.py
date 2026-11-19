@@ -177,6 +177,59 @@ def test_roundtrip_and_raw_tamper(tmp_path, source):
         read_selected(tmp_path, source, result.digest)
 
 
+def test_pending_terms_fields_still_fetch_and_read(tmp_path):
+    """Ruling L-1001: pending terms fields never refuse a benchmark release."""
+    from contextlib import contextmanager
+
+    from eii_custodian.publicdata.benchmarks.contracts import read_selected
+    from eii_custodian.publicdata.benchmarks.fetch import fetch_benchmark
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import Response, StreamResponse
+
+    source = "ilostat_qat"
+    p = policy(source)
+    entry = replace(
+        next(e for e in load_registry() if e.source_id == source),
+        skip_reason="",
+        publisher=p.publisher,
+        landing_url=p.page,
+        url=p.url,
+        fetch_host="example.test",
+        row_count_min=1,
+        row_count_max=5,
+        period_first="2020",
+        period_last="2020",
+        columns=(("invented", "string"),),
+        terms_words="terms to be read",
+        terms_read_on="pending",
+        licence_basis="pending",
+        decision_record="",
+    )
+    body = json.dumps([asdict(row(source))]).encode()
+
+    def metadata(url):
+        return Response(url, b"invented-page", ())
+
+    @contextmanager
+    def stream(url):
+        yield StreamResponse(url, (), len(body), iter((body,)))
+
+    result = fetch_benchmark(
+        entry,
+        p,
+        metadata,
+        stream,
+        tmp_path,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
+    )
+    release = read_selected(tmp_path, source, result.digest)
+    assert release.rows
+    assert release.receipt["terms_words"] == "terms to be read"
+    assert release.receipt["terms_read_on"] == "pending"
+    assert release.receipt["licence_basis"] == "pending"
+
+
 def test_build_dispatch_pending_no_transport(tmp_path):
     from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.registry import load_registry

@@ -54,7 +54,7 @@ def build_live_frame(
     ]
     hdx = entries["bnd_hdx"]
     for table in ("municipality", "zone", "district", "gazetteer"):
-        if hdx.licence_basis == "none_stated" or table not in hdx.release_tables:
+        if table not in hdx.release_tables:
             raise FrameError(f"bnd_hdx: invalid release source for {table}")
     body, receipt = read_cached(cache, hdx, digest=selections.get(hdx.key, ""))
     sources["bnd_hdx"] = receipt

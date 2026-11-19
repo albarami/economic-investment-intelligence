@@ -373,9 +373,15 @@ def test_other_covering_bases(basis):
     assert tender_disposition(t, e, receipt(t, e)).shown
 
 
-@pytest.mark.parametrize("basis", ["", "none_stated"])
-def test_unstated_covering_basis_refused(basis):
-    with pytest.raises(ValueError, match="missing covering terms evidence"):
+@pytest.mark.parametrize(
+    "basis,reason",
+    [
+        ("", "missing covering terms evidence"),
+        ("none_stated", "forbidden licence basis"),
+    ],
+)
+def test_unstated_covering_basis_refused(basis, reason):
+    with pytest.raises(ValueError, match=reason):
         tender_disposition(tender(licence_basis=basis, basis_of_use=basis), None, None)
 
 
@@ -388,7 +394,7 @@ def test_absent_terms_can_be_recorded_without_a_terms_page():
         terms_words="",
         terms_url="",
         terms_sha256="",
-        licence_basis="none_stated",
+        licence_basis="",
     )
     e = registry_record(t)
     assert (
@@ -669,3 +675,11 @@ def test_loader_flags_refused_as_non_booleans(tmp_path, field):
     data["tender"][field] = 1
     with pytest.raises(ValueError, match=f"{field} is not a boolean"):
         read_invented(tmp_path, data)
+
+
+@pytest.mark.parametrize("outcome", ["not_yet_recorded", "none_found", "terms_absent"])
+def test_retired_basis_is_never_a_confirmation_placeholder(outcome):
+    with pytest.raises(ValueError, match="forbidden licence basis"):
+        tender_disposition(
+            replace(Tender(), outcome=outcome, licence_basis="none_stated"), None, None
+        )

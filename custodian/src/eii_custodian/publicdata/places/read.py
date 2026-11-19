@@ -125,7 +125,9 @@ def stored_confidence(value: float | int | Decimal) -> Decimal:
         except InvalidOperation as exc:
             raise PlacesError("range") from exc
     text = str(value)
-    return Decimal(text).quantize(_FOUR, rounding=ROUND_HALF_EVEN)
+    return Decimal(text).quantize(
+        _FOUR, rounding=ROUND_HALF_EVEN, context=_STORED_CONTEXT
+    )
 
 
 def require_receipt(path: Path, receipt: FileReceipt | None) -> FileReceipt:

@@ -315,8 +315,9 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
             transport=lambda url: Response(url, proof, ()),
             sleep=lambda _: None,
         )
-        == 0
+        == 1
     )
+    assert "snapshot_selection_invalid" in (cache / "build-log.json").read_text()
     index = next((cache / entry.key / "index").glob("*.json"))
     result = read_snapshot(cache / entry.key, index.stem)
     assert result.sidecar["award_check"]["matched"] == 1

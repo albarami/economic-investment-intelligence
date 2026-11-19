@@ -641,6 +641,11 @@ def test_reconciliations_compute_while_all_display_is_blocked(tmp_path: Path) ->
 
     support_entries, support_hashes = selected_fixture(tmp_path)
     fixtures["lic_active"] = active_rows()
+    # S2-T08 part B, B13: an unmapped spelling refuses the build, so the
+    # cancelled and issued fixture rows name a municipality of this frame.
+    for source in ("lic_cancelled", "lic_issued"):
+        for row in fixtures[source]:
+            row["lbldy"] = FRAME[0].name_ar
     # Decimal JSON fixture numbers are decoded exactly by selected_source.
     entries, selected = [], {}
     for source, rows in fixtures.items():
@@ -786,7 +791,8 @@ def test_finish_build_missing_and_invalid_receipts(tmp_path: Path) -> None:
     refused_lines = ["PASS util_elec sha256=" + "a" * 64 + " host=invented"]
     missing_body = finish_build([entry], tmp_path, refused_lines)
     assert missing_body is not None and missing_body.check == "public_data"
-    assert refused_lines[-1] == "FAIL series selected input refused"
+    assert refused_lines[-1] == "FAIL series selected_input_refused"
+    assert missing_body.observed == "selected_input_refused"
 
 
 def test_display_gate_clears_stale_file_even_when_regressions_pass(
@@ -1289,18 +1295,28 @@ def test_r3_licence_periods_and_reports(tmp_path):
     )
     assert [r["period"] for r in cancelled] == [None, "2020-07", "2022-06", "2024-09"]
     assert [r["cancelled_count"] for r in cancelled] == [2, 3, 3, 3]
-    rows = fixtures["lic_active"] + [
-        {**fixtures["lic_active"][0], "lbldy": "بلدية غير مطابقة"}
-    ]
-    entry, digest = series_cache(tmp_path, "lic_active", rows)
+    entry, digest = series_cache(tmp_path, "lic_active", fixtures["lic_active"])
     result = build_series(tmp_path, [entry], {entry.key: digest}, municipalities=frame)
-    assert result["coverage"]["lic_active.municipality_exact_match"] == [
-        "بلدية غير مطابقة"
-    ]
+    assert result["coverage"]["lic_active.municipality_exact_match"] == []
     assert result["blocked"] == {
         "lic_active": ("regression: supporting provenance selections required",)
     }
     assert "PUB-67" not in result["checks"]
+    # S2-T08 part B, B13: an unmapped spelling refuses by its word before any
+    # table file, keeping the spelling in the internal coverage report only.
+    from eii_custodian.publicdata.series.parse import SeriesRefused
+
+    rows = fixtures["lic_active"] + [
+        {**fixtures["lic_active"][0], "lbldy": "بلدية غير مطابقة"}
+    ]
+    entry, digest = series_cache(tmp_path, "lic_active", rows)
+    with pytest.raises(SeriesRefused) as caught:
+        build_series(tmp_path, [entry], {entry.key: digest}, municipalities=frame)
+    assert caught.value.word == "unmapped_municipality_spelling"
+    assert json.loads((tmp_path / "series/internal/coverage.json").read_text())[
+        "lic_active.municipality_exact_match"
+    ] == ["بلدية غير مطابقة"]
+    assert not (tmp_path / "series/internal/pub_licence_active.json").exists()
 
 
 def test_r3_reference_review_remains_explicit():
@@ -1719,3 +1735,195 @@ def test_r1_size_match_records_count_and_different_scope(tmp_path):
     ]
     assert report["status"] == "open"
     assert not list((tmp_path / "series/display").iterdir())
+
+
+# S2-T08 part B, B13 and B15 (plan r3 section 3). Invented names and rows only.
+INVENTED_FRAME_NAME = "بلدية مخترعة"
+INVENTED_SPELLING = "بلدية مخترعة بصيغة أخرى"
+
+
+def frame_output(cache: Path, rows=((("SYN-A", INVENTED_FRAME_NAME),))) -> None:
+    from eii_custodian.publicdata.frame.municipality_output import (
+        write_municipality_output,
+    )
+
+    write_municipality_output(
+        cache,
+        [
+            {"municipality_code": code, "name_en": "invented", "name_ar": name}
+            for code, name in rows
+        ],
+    )
+
+
+def names_review(tmp_path: Path, monkeypatch, rows) -> Path:
+    folder = tmp_path / "invented_review"
+    folder.mkdir()
+    (folder / "municipality_names.csv").write_text(
+        "name,municipality_code\n" + "".join(f"{name},{code}\n" for name, code in rows),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.series.parse.MUNICIPALITY_NAMES_REVIEW", folder
+    )
+    return folder
+
+
+def cancelled_row(spelling: str, **changes) -> dict[str, object]:
+    return {
+        "sn_llg": "2020",
+        "shhr_llg": 7,
+        "lbldy": spelling,
+        "rmz_lnsht_ltjry": "invented-code",
+        "sm_lnsht_ltjry": "نشاط تجريبي",
+        "dd_lrkhs_lmlg": 3,
+        **changes,
+    }
+
+
+def run_finish(tmp_path: Path, source: str, rows):
+    from eii_custodian.publicdata.series.figures import finish_build
+
+    entry, digest = series_cache(tmp_path, source, rows)
+    lines = [f"PASS {entry.key} sha256={digest} host=invented"]
+    return finish_build([entry], tmp_path, lines), lines
+
+
+@pytest.mark.public_data
+def test_reviewed_spelling_reaches_the_licence_join(tmp_path, monkeypatch):
+    frame_output(tmp_path)
+    names_review(tmp_path, monkeypatch, [(INVENTED_SPELLING, "SYN-A")])
+    # Whitespace differs from the reviewed row: one spelling rule, normalise_name.
+    spelling = INVENTED_SPELLING.replace(" ", "  ", 1)
+    failure, lines = run_finish(tmp_path, "lic_cancelled", [cancelled_row(spelling)])
+    # The real stage compares invented values with section 10: the figure fails.
+    assert failure is not None and failure.source_id == "PUB-68"
+    assert lines[-1] == "FAIL PUB-68 public_data selected-cache check"
+    table = json.loads(
+        (tmp_path / "series/internal/pub_licence_cancelled.json").read_text()
+    )
+    assert [row["municipality_code"] for row in table["rows"]] == ["SYN-A"]
+
+
+@pytest.mark.public_data
+def test_unmapped_spelling_is_refused_by_its_word(tmp_path, monkeypatch):
+    frame_output(tmp_path)
+    names_review(tmp_path, monkeypatch, [(INVENTED_SPELLING, "SYN-A")])
+    failure, lines = run_finish(
+        tmp_path, "lic_cancelled", [cancelled_row("بلدية لا يعرفها الملف")]
+    )
+    assert failure is not None
+    assert lines[-1] == "FAIL series unmapped_municipality_spelling"
+    assert (failure.source_id, failure.check, failure.observed) == (
+        "series",
+        "public_data",
+        "unmapped_municipality_spelling",
+    )
+    assert not (tmp_path / "series/internal/pub_licence_cancelled.json").exists()
+    assert list((tmp_path / "series/display").iterdir()) == []
+
+
+@pytest.mark.public_data
+def test_refused_names_file_is_named(tmp_path, monkeypatch):
+    frame_output(tmp_path, (("SYN-A", INVENTED_FRAME_NAME), ("SYN-B", "بلدية ثانية")))
+    names_review(
+        tmp_path,
+        monkeypatch,
+        [(INVENTED_SPELLING, "SYN-A"), (INVENTED_SPELLING, "SYN-B")],
+    )
+    failure, lines = run_finish(
+        tmp_path, "lic_cancelled", [cancelled_row(INVENTED_FRAME_NAME)]
+    )
+    assert failure is not None and failure.observed == "municipality_names_refused"
+    assert lines[-1] == "FAIL series municipality_names_refused"
+
+
+@pytest.mark.public_data
+def test_reviewed_spelling_that_contradicts_the_frame_is_refused(tmp_path, monkeypatch):
+    frame_output(tmp_path, (("SYN-A", INVENTED_FRAME_NAME), ("SYN-B", "بلدية ثانية")))
+    names_review(tmp_path, monkeypatch, [(INVENTED_FRAME_NAME, "SYN-B")])
+    failure, lines = run_finish(
+        tmp_path, "lic_cancelled", [cancelled_row(INVENTED_FRAME_NAME)]
+    )
+    assert failure is not None and failure.observed == "municipality_names_refused"
+    assert lines[-1] == "FAIL series municipality_names_refused"
+
+
+@pytest.mark.public_data
+def test_refusal_text_and_type_never_reach_the_line_or_record(tmp_path, monkeypatch):
+    frame_output(tmp_path)
+    names_review(tmp_path, monkeypatch, [(INVENTED_SPELLING, "SYN-A")])
+    marker = "invented_marker_field"
+    failure, lines = run_finish(
+        tmp_path,
+        "lic_cancelled",
+        [cancelled_row(INVENTED_FRAME_NAME, **{marker: 1})],
+    )
+    assert failure is not None
+    assert lines[-1] == "FAIL series selected_input_refused"
+    fields = (failure.source_id, failure.url, failure.check, failure.expected)
+    for text in (*lines, *fields, failure.observed):
+        assert marker not in text and "Error" not in text
+    assert failure.observed == "selected_input_refused"
+
+
+def test_series_refusal_words_are_one_closed_tuple():
+    from eii_custodian.publicdata.series import figures, parse
+
+    assert figures.SERIES_REFUSALS is parse.SERIES_REFUSALS
+    assert parse.SERIES_REFUSALS == (
+        "municipality_frame_not_supplied",
+        "unmapped_municipality_spelling",
+        "municipality_names_refused",
+        "selected_input_refused",
+    )
+    for word in parse.SERIES_REFUSALS:
+        assert parse.SeriesRefused(word, "invented text").word == word
+    with pytest.raises(ValueError, match=r"^series_refusal_unknown$"):
+        parse.SeriesRefused("series_mapping", "invented text")
+
+
+@pytest.mark.public_data
+@pytest.mark.parametrize(
+    "source,figure,rows",
+    [
+        # compute_checks needs zone 69 in 2021 and 2025: a missing year refuses.
+        ("util_elec", "PUB-62", [{"year": "2021", "zone_number": "69", "value": 12}]),
+        # Two rows of one month are refused as a duplicate transit period.
+        (
+            "transit_monthly",
+            "PUB-70",
+            [
+                {
+                    "year": "2024",
+                    "month": "December",
+                    "lshhr": "شهر تجريبي",
+                    "public_transport_buses": 1,
+                    "doha_metro": 10,
+                    "lusail_tram": 3,
+                }
+            ]
+            * 2,
+        ),
+        # A dated cancellation outside the C2 calendar is refused.
+        (
+            "lic_cancelled",
+            "PUB-68",
+            [cancelled_row(INVENTED_FRAME_NAME, sn_llg="2010")],
+        ),
+    ],
+)
+def test_real_stage_names_the_figure_of_a_blocked_source(
+    tmp_path, monkeypatch, source, figure, rows
+):
+    # B15 step 1: on the real stage, with nothing replaced, a refusal of
+    # compute_checks leaves the figure's regression file absent, so the stage
+    # names that figure; the build never needs a series_mapping fallback.
+    frame_output(tmp_path)
+    names_review(tmp_path, monkeypatch, [(INVENTED_SPELLING, "SYN-A")])
+    failure, lines = run_finish(tmp_path, source, rows)
+    build = json.loads((tmp_path / "series/internal/build.json").read_text())
+    assert build["blocked"][source][0].startswith("regression: ")
+    assert build["mismatch"] == figure
+    assert failure is not None and failure.source_id == figure
+    assert lines[-1] == "FAIL " + figure + " public_data selected-cache check"

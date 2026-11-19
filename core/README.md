@@ -24,3 +24,8 @@ These contracts are exercised by `tests/test_decimal_context_contract.py` and
 Calculations carry exact rationals to the output and round once, half up, at the
 output. The stated fifty-digit context applies only to a root that is not rational
 and its derived values, with refusal near a rounding or comparison boundary.
+
+The calculation-purity guard discovers every Python file below `calc/`, including
+new modules, and plants an unlisted module that attempts I/O. Dynamic attribute
+access remains forbidden; apportioning lineage and trade compatibility use
+explicit fields. Existing per-field refusal tests cover both contracts.

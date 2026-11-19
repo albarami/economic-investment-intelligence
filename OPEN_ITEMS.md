@@ -2799,6 +2799,34 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: S2-T10 disposes the proposal under REV-42. The review suggests a mock whose communicate returns an empty stdout/stderr pair and whose __enter__ returns itself; if implemented, demonstrate value-specific failures for both invented values through subprocess.run/check_output. Record the limits of other child seams, or justify and independently verify any extension; do not silently claim them covered.
 - NEEDED BY: slice S2 review follow-up S2-T10, before the slice S2 gate.
 
+Existing open items reused; no new OI number is allocated by this draft.
+
+- OI-03 — retain the signed reconciliation requirement and the affected-fact block. S2-T08B builds report plumbing; no source-bound sign-off is supplied. OI-300 separately retains the lead-only selected-cache C4 and build-public checks. Sources: OPEN_ITEMS.md OI-03/OI-300; S2-T08B/design3 and log.lines.md.
+- OI-209/OI-210/OI-211 — retain publisher-record, source-disposition and release-boundary evidence separately. Decision 0059 permits pending terms; that does not supply a live release or the missing per-source acceptance record. No S2-T21 box is changed here. Sources: OPEN_ITEMS.md, those items; S2-T08B terms reviews and assembly_reports.py.
+- OI-274 — the tender chain inspection option is implemented in S2-T08B pass 1. The real pin and intake placement evidence needed by this whole item is not supplied. Record the built sub-step without claiming the whole item closed. Sources: S2-T08B/commits.md, log.lines.md; singles/tenders.py; OPEN_ITEMS.md OI-274.
+- OI-275 — the awards profile and accident spans still require the lead's live public build and receipts. OI-277 separately requires the actual unmatched double-space count; a new counter/test is not the actual count. Sources: the existing items; S2-T08B/commits.md and log.lines.md.
+- OI-308 — a lead log entry dated 2026-11-18 15:52 says the refused-file list was made, with seven files and their consumers. I1 subsequently streams all seven required keys, approved by its two bounded lenses after the fixes. The list itself is not supplied; keep the item's dated-list record pending for the lead to attach. Sources: S2-T08B/log.lines.md, revI1A/revI1B2/cfI1B2; OPEN_ITEMS.md OI-308.
+- OI-227 — append the I1-tree scripts occurrence: exit 1, one failed and 883 passed, test_interrupt_kills_the_process_group reporting no result within 30 s; three isolated passes do not close it. PO-S2-06 is the separate, already recorded ignored-SIGINT launch cause. The later terms lv6 launch explicitly lacked SIGINT reset; do not infer this diagnoses the earlier I1 occurrence or OI-227's historical seed. Sources: S2-T08B/revI1A, revI1B2, log.lines.md; OPEN_ITEMS.md OI-227/PO-S2-06.
+- OI-131 — only PART MET here: wage_bands_priv declares no unsupported split; sec_hr_comp_occ and ref_min_wage have no recorded columns, so both empty split declarations are checked against an empty column list. The original item also names active_nat_occ_act and visitors_markets; these batch-b changes alone do not establish whole-item closure. Source: S2-T10E-b/rev1 E5/N4, conf3 C4; OPEN_ITEMS.md OI-131. OI-131 stays open as partly met: active_nat_occ_act and visitors_markets remain for a later task..
+- OI-230 and OI-231 — append closing resolutions, numbered with their existing IDs: FIXED at approved local 4db4216, joined through ba99e5b. Confidence conversion quantizes under its private Decimal context, with caller-context plants; success receipt paths use independent literals, with a default-suffix plant. Sources: S2-T10E-a/commits.md, rev1 E1/E2 and a2 confirmation. Do not rewrite earlier NOT CLOSED/history paragraphs.
+- OI-158 — remains open for merged-hosted evidence. Part E changes no timing criterion or runner limit; preserve the two existing timing ticks. Source: TASKS.md S2-T10 and OPEN_ITEMS.md OI-158.
+
+Existing proposed items reused, with closure drafts and evidence in CHECK.md:
+
+- PO-S2-25/26/59/63, PO-S2-75/76/77/78/87 and PO-S2-33/35: append the bounded resolutions listed in CHECK.md; allocate no new ID for the same defect. PO-S2-63 explicitly retains empty confirmation basis as NOT VALID to retire. PO-S2-77 and PO-S2-78 retain their review qualifications.
+- PO-S2-81: close NOT VALID for repository reuse by the lead's one-off audit disposition; distinct output paths and existing-output refusal remain a standing lead rule. PO-S2-82: the lead log says separate tooling was APPROVED and installed, but its actual tool verdict and installation identity are not supplied; attach them before the lead records that closure. Source: S2-T10E-a/rulings.rows.md, batch-c choices; S2-T10E-c/log.lines.md; CHECK.md.
+- PO-S2-72: append the reviewed FIXED closure at local 13bde6c / train 2e245b0 as it stands at 8814bb0. The family-width correction and its planted tests are explicitly covered by Moonshot AI Kimi K3.1 Pro pass-1 lens A APPROVED 8814bb0; SpaceXAI Grok 4.7 pass-1 lens B also APPROVED that head. This replaces the first draft's pending-review qualification; it does not close live source completeness (S2-T08B/review.wP1A.md, REV-10; review.wP1B.md; commits.md).
+- PO-S2-90: append the terms4 duplicate-launch incident, verified-tree timing, waiter remedy, and train-lv1 process-tree/core move. The item's existing scope already covers duplicate worktrees and fixed-tree evidence; no new numbered item is needed. Sources: S2-T08B/log.lines.md, 02:32 result; forced/train.log.lines.md, scheduling correction.
+
+The new hardening proposals and join caveat are in po_items.md. Broad existing items OI-239 (catalogue evidence statuses), OI-253 (clean-environment ownership) and PO-S2-70 (real milestone registration) do not cover the new in-process audit status-authentication probe; the proposal explains that comparison. This draft claims no live source, cache or application release has been inspected.
+
+Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confirmations and refreshed log):
+
+- Pass-1 P1/P2 and passes-3/4 P1 reuse the train/task ledger and pending hosted/exact-head evidence; no duplicate numbered item. The review timeout/missing-cache result stays in log.md. Pass-1 lens-B P1 and passes-3/4 lens-B F1 are fixed by the exact rule-44 sentence at 4d2d845, confirmed by both fix5 lenses. Lens-B F2 remains lead-owned records work: this draft is input for insertion, not proof those tracked records have been appended.
+- Passes-3/4 lens-A P2 is resolved by the lead's draw rule: untagged multi-source tables, including computed multi-source aggregates without row tags, stay out with a recorded reason. No new item asks the lead to choose again. F1/F2 are fixed by 4d2d845, with the cited red/green evidence and two approvals; broad acceptance boxes stay open.
+- Fix5's seven clean-environment failures reuse the existing OI-253 environment ownership context and the earlier worker offline-wheel limitation; the exact failure and head stay in log.md. New full-head whole-test evidence remains pending, never inferred from these proposals.
+- PO-S2-101 to PO-S2-106 hold the distinct newly raised residual points; the first ten draft proposals remain unnumbered. The mapping and deduplication are explicit in CHECK.md.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4075,6 +4103,179 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - CONCERNS: launch status interpretation and test-tree identity
 - EVIDENCE: A governor redirect actually launched OpenAI Sol; the lead then launched another OpenAI Sol writer in the same workspace. One returned exit 1, the other exit 0, and both described the same changes; the lead inspected a coherent final diff and checked it before e9db07b. Earlier S2-T29 checks were stopped or downgraded to pre-checks when their tree changed during execution, including the records commit ab6d6fc. Sources: `.overnight/IN/S2-T32T/log.lines.md` and S2-T29/log.lines.md. Existing OI-227/OI-228 concern distinct random failures; no existing item at 55ee3c3 covers this duplicate-launch and mutable-tree incident.
 - NEEDED: Retain the incident, read launch status before relaunching redirected builds, and keep acceptance checks on a fixed committed tree. Retain the wrong processor-gate launch argument as a lead launch error. Later checks supply later evidence and never rewrite failed or downgraded runs. This is a record and workflow point; no launcher code is changed here.
+
+### PO-S2-91 — Required-stream bad-hop guard needs its own plant
+
+- ID: PO-S2-91
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S2-T08B I1 second lens B review, hardening note
+- CONCERNS: publicdata/fetch/large.py, receive; test_large_intake.py
+- COMPARISON: OI-274 concerns a tender certificate, not required-stream redirect hops. No existing item names this missing direct plant.
+- EVIDENCE: The direct receive test plants only the final URL; the reviewer independently supplied a bad hop and observed blocked_host with zero bytes written. The guard holds; this is hardening, not an open security finding. Source: S2-T08B/review.S2-T08B.revI1B2.md, proposed open items; cfI1B2 retains it.
+- NEEDED: Add a bad-hop case to the direct required-stream test with a positive control and the specific refusal; preserve the existing opener redirect tests and host guards.
+
+### PO-S2-92 — The stream readers repeat their chunk size
+
+- ID: PO-S2-92
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S2-T08B I1 second lens B review, hardening note
+- CONCERNS: publicdata/fetch/transport.py, open_https_stream and READ_CHUNK_BYTES; publicdata/fetch/large.py, receive
+- COMPARISON: OI-308 covers source file ceilings and the list; it does not address duplicated chunk constants.
+- EVIDENCE: The reviewer finds matching literal 65536 values in the reader and receive check beside READ_CHUNK_BYTES. The implemented sizes agree on its reviewed head; cfI1B2 leaves this note open. Source: S2-T08B/review.S2-T08B.revI1B2.md.
+- NEEDED: Consider one shared constant with plants that retain the fixed-read and oversize-chunk contracts. No ceiling or per-source bound is changed by this proposal.
+
+### PO-S2-93 — Runtime purity execution covers fewer files than the static scan
+
+- ID: PO-S2-93
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T10E-a rev1 N1
+- CONCERNS: core/tests/test_calculation_purity.py, MODULES and recursive static scan
+- COMPARISON: PO-S2-59's named static coverage defect is fixed; this is a separate runtime-execution parity note, not grounds to withhold that closure.
+- EVIDENCE: Static rglob includes nested calculation modules, while the exec-under-monkeypatch list uses a top-level glob. A future nested module would receive static checks only. Source: S2-T10E-a/review.S2-T10E-a.rev1.md, N1; a2 confirmation keeps it open.
+- NEEDED: Decide whether runtime execution must also recurse; if changed, plant a nested module that exercises that runtime guard without widening any purity allowance.
+
+### PO-S2-94 — Stored confidence non-finite refusal and doc wording
+
+- ID: PO-S2-94
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T10E-a rev1 N2
+- CONCERNS: publicdata/places/read.py, stored_confidence
+- COMPARISON: OI-230 is the repaired caller Decimal context; it does not settle non-finite or extreme input error typing.
+- EVIDENCE: The private context makes conversion deterministic, but non-finite/extreme values can raise raw decimal.InvalidOperation and the docstring says infinities are left as they are. The reviewer calls it pre-existing and outside the context fix. Source: S2-T10E-a/review.S2-T10E-a.rev1.md, N2.
+- NEEDED: Align the documented contract and chosen typed refusal with focused input plants; retain the private rounding context and finite-result behavior.
+
+### PO-S2-95 — Copied pytest settings serialize only today's TOML value shapes
+
+- ID: PO-S2-95
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T10E-a rev1 N3
+- CONCERNS: scripts/mutation.py, run_packages pytest configuration writer
+- COMPARISON: PO-S2-26's current settings omission is fixed. This concerns a future nested-table shape, not missing current settings.
+- EVIDENCE: json.dumps emits valid TOML for the current scalar/list settings; a future table would emit invalid inline syntax and fail closed. The reviewer accepts the current implementation. Source: S2-T10E-a/review.S2-T10E-a.rev1.md, N3.
+- NEEDED: Before a table-valued pytest setting is introduced, define its serializer or an explicit unsupported-shape refusal with a planted test.
+
+### PO-S2-96 — A copied package's existing pytest table can be duplicated
+
+- ID: PO-S2-96
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T10E-a rev1 N4
+- CONCERNS: scripts/mutation.py, package pyproject configuration append
+- COMPARISON: PO-S2-26 closes the copied current settings; no existing item records this future/pre-existing duplicate-table case.
+- EVIDENCE: Appending a root pytest table to a package that already has one duplicates it. The reviewer identifies the append pattern as pre-existing, not a regression. Source: S2-T10E-a/review.S2-T10E-a.rev1.md, N4.
+- NEEDED: Before a package gains its own pytest table, define a merge or explicit refusal with a real table collision plant; retain root settings and restoration on exit.
+
+### PO-S2-97 — Project evidence keeps a production fallback used only by tests
+
+- ID: PO-S2-97
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T10E-b rev1 N3
+- CONCERNS: publicdata/investment_evidence.py, build_project_evidence Snapshot fallback; test_investment_evidence_survivors_6.py
+- COMPARISON: PO-S2-87 closes authenticated projection/audit identity on the production parser path. This is a distinct unreachable production test seam retained by that fix.
+- EVIDENCE: The isinstance(authenticated, Snapshot) branch keeps caller rows and is reached only because two older tests monkeypatch _metadata_failure to return Snapshot instead of ProjectSnapshot. Source: S2-T10E-b/review.S2-T10E-b.rev1.md, E3/N3.
+- NEEDED: Consider removing this branch and update those two tests to supply the authenticated ProjectSnapshot shape; preserve every identity, geography and lineage refusal.
+
+### PO-S2-98 — The project audit trusts caller evidence status and candidate independence
+
+- ID: PO-S2-98
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T10E-b rev1 N6 and conf3 M1; the lead adopted the new proposal
+- CONCERNS: publicdata/investment_evidence.py, audit_project_evidence milestone classification
+- COMPARISON: PO-S2-87 addresses identity, now fixed. PO-S2-70 concerns registering and reviewing real independent sources, while OI-239 concerns catalogue evidence binding. Neither covers this in-process status-classification boundary.
+- EVIDENCE: rev1 finds MilestoneEvidence.evidence_status is supplied by the caller rather than recomputed. In the c39b116 confirmation probe, a MilestoneCandidate subclass with __ne__ returning False passes the candidate equality comparison; its independence field and supplied validated status yield observed_independent_milestone for an archived publisher_announcement. The intended classification is missing_evidence/milestone_not_independent. A source_id forgery through this trick still refuses archive metadata differs, so the retained defect affects status, not the closed identity boundary. Probe exit 0 is evidence of the attack, not a passing protection. Sources: S2-T10E-b/rev1 N6; conf3 M1; S2-T10E-a/rulings.rows.md, audit-review disposition.
+- NEEDED: Derive evidence classification from the authenticated candidate and reviewed link, or require exact MilestoneCandidate type with the corresponding status rule. Add planted candidate-subclass and caller-status cases with controls; preserve missing-evidence semantics and archive identity. This is not claimed to be an external input exploit.
+
+### PO-S2-99 — Local-file status is an advisory parser observation
+
+- ID: PO-S2-99
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T10E-c rev1 N2–N4
+- CONCERNS: publicdata/fetch/report.py, local_file_statuses
+- COMPARISON: PO-S2-33's requested report is fixed and its scope remains advisory; no existing item covers these specific parser-observation edges.
+- EVIDENCE: district_aliases also parses a committed alias record, so an error there can label the local file invalid. A file disappearing after is_file can report present. Exceptions outside OSError/ValueError, such as RecursionError, propagate just as the stage reader does. These were approved as notes, not blocking defects. Source: S2-T10E-c/review.S2-T10E-c.rev1.md, N2–N4.
+- NEEDED: Record these status semantics and decide whether additional hardening is useful; any change needs isolated plants. Do not turn legitimate alias-file absence into a failing check or leak source values/parser diagnostics into the log.
+
+### PO-S2-100 — Failed seeded assemblies keep an inherited terms-write behavior
+
+- ID: PO-S2-100
+- TYPE: OPEN
+- RAISED BY: OpenAI Codex, S2-T10E-c resolver limits, retained by Cognition Devin SWE-2 High join-confirmation notes
+- CONCERNS: publicdata/fetch/build.py, seeded-assembly failure and _fetch_only writers; batch-c terms baseline guarantee
+- COMPARISON: PO-S2-33's local reporting and direct-path failure tests are fixed. This source-level join caveat concerns seeded paths absent from the original batch-c base and is not erased by its original approval.
+- EVIDENCE: The resolved direct path keeps previous terms on raising/returned failure and records current attempts. The seeded-assembly failure writer and _fetch_only writer remain T08B's unconflicted current-terms writes. The resolver explicitly disclaims an every-seeded-failure prior-baseline guarantee; Q3 approves the union as scoped and notes the inherited behavior. Sources: S2-T10E-c/rejoin.S2-T10E-cj.return.md, Open points and limits; forced/VERDICT.S2-4.conf.md, Notes.
+- NEEDED: The lead records the bounded guarantee and assigns any all-path baseline repair separately, with a seeded-failure plant and another-maker confirmation. Do not describe c3's original 'every failed build' wording as proof of the joined seeded paths, and do not alter the approved join during ledger drafting.
+
+### PO-S2-101 — Internal series refusals can retain raw exception text
+
+- ID: PO-S2-101
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S2-T08B pass-1 lens B P2, hardening
+- CONCERNS: publicdata/series/parse.py, municipality_names; series/figures.py, _refused
+- COMPARISON: No existing OPEN_ITEMS entry names this internal exception-text boundary. The first draft's bad-hop proposal concerns a separate streaming transport guard; OI-274 concerns the tender certificate.
+- EVIDENCE: At 8814bb0, the reviewer finds str(exc) in SeriesRefused on municipality-name OSError paths. The published line and record already expose only the closed word, covered by test_refusal_text_and_type_never_reach_the_line_or_record. This is an internal-message hardening note, not a demonstrated published-path leak or a rejection. Fix5's eight-file scope does not change series/parse.py. Sources: S2-T08B/review.wP1B.md, P2; commits.fix5.md.
+- NEEDED: If tightened, use the closed word for the exception message too, with an invented path-bearing OSError plant and a positive control; preserve the existing published-line/record protection.
+
+### PO-S2-102 — Selected-input refusals retain less cause discrimination
+
+- ID: PO-S2-102
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T08B passes-3/4 lens A P3, record point
+- CONCERNS: selected archive reader refusal contracts and their changed tests
+- COMPARISON: No existing OPEN_ITEMS entry names the selected_input_refused cause consolidation. PO-S2-103 separately concerns tests accepting any exception, so it is not the same point.
+- EVIDENCE: Several changed tests at 8814bb0 expect selected_input_refused instead of hash_mismatch, hash_absent, cache_receipt, content_hash_mismatch or malformed_hash. They continue to assert refusal; the reviewer explicitly says this is not a weakened assertion under REV-15, while the cause is no longer distinguished. Fix5 does not change those reader tests. Sources: S2-T08B/review.wP34A.md, P3 and REV-15; commits.fix5.md.
+- NEEDED: Preserve the narrowed diagnostic contract in the record; decide whether a separately scoped change should distinguish causes. Do not claim lost refusal enforcement or silently restore old reason words while drafting the ledger.
+
+### PO-S2-103 — Archive-reader plants accept an unrelated exception
+
+- ID: PO-S2-103
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T08B passes-3/4 lens A P4, hardening
+- CONCERNS: custodian/tests/test_assembly_readers.py, selected-hash substitution, missing older snapshot and implicit reader pin plants
+- COMPARISON: PO-S2-102 records refusal-word consolidation; it does not cover an exception assertion without any matched reason. No existing OPEN_ITEMS entry covers these reader plants.
+- EVIDENCE: The review identifies pytest.raises((ValueError, AdditionError)) without match=; an unrelated exception can satisfy the plant. The same broad assertions remain at a2fdab1, and the file is outside fix5's changes. Sources: S2-T08B/review.wP34A.md, P4; custodian/tests/test_assembly_readers.py at a2fdab1; commits.fix5.md.
+- NEEDED: Assert the exact intended refusal word for each reader and failure path, with a valid control and a wrong-reason counterexample. Keep the hash, selected-snapshot and missing-pin refusals and every existing plant.
+
+### PO-S2-104 — The OVT listing receipt exception lacks a negative plant
+
+- ID: PO-S2-104
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T08B passes-3/4 lens A P5, hardening
+- CONCERNS: publicdata/completeness.py, receipt_valid; custodian/tests/test_production_adapters.py
+- COMPARISON: PO-S2-72's family-width fix is reviewed closed here; it does not test the separate OVT /listing acceptance. No current OPEN_ITEMS entry records this missing negative plant.
+- EVIDENCE: The listing acceptance for places_ovt and bldg_ovt has the positive test test_overture_parent_pin_reads_its_declared_listing_archive. The reviewer found no negative plant showing a /listing receipt on another source refuses. No fix5 file adds it. Sources: S2-T08B/review.wP34A.md, P5; commits.fix5.md.
+- NEEDED: Add an invented other-source /listing receipt that refuses for the intended reason beside the existing valid listing control. Preserve receipt identity, hash and source-specific scope; this proposal does not assert the current guard accepts the bad receipt.
+
+### PO-S2-105 — Secondary agency pages retain landing-page attribution
+
+- ID: PO-S2-105
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T08B passes-3/4 lens A P6, hardening
+- CONCERNS: investment agency rows and figure source-page attribution
+- COMPARISON: The fix5 F1 defect concerns binding a row to the wrong source receipt. This note is finer page attribution within a source. Existing PO-S2-70 concerns independent milestone registration, not agency secondary-page attribution; no existing item covers this note.
+- EVIDENCE: Secondary-page agency rows cite the source entry's landing fetch_url. Their page hash is retained, so the reviewer says the chain resolves, but less finely. The fix5 confirmations approve row-specific source receipts and classify agency heading/link metadata; neither claims a secondary-page URL repair. Sources: S2-T08B/review.wP34A.md, P6; review.fix5.md; review.cf5A.md; review.cf5B.md.
+- NEEDED: Consider carrying the actual secondary-page URL beside its retained page hash, with an invented multi-page source fixture and exact URL/hash assertions. Do not describe the already-resolving page-hash chain as absent or the fix5 source-receipt correction as undone.
+
+### PO-S2-106 — Empty multi-source tables receive an ambiguous-lineage reason
+
+- ID: PO-S2-106
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S2-T08B fix5 confirmation lens A N1, non-blocking hardening
+- CONCERNS: publicdata/assembly_reports.py, _draw_row_sources and draw exclusion record
+- COMPARISON: No existing OPEN_ITEMS entry records the empty-table reason. PO-S2-101 to PO-S2-105 come from the earlier pass reviews; this note was raised by the later fix5 confirmation and needs its own next number.
+- EVIDENCE: At approved 4d2d845, an empty table with multiple sources is excluded with assembly_draw_lineage_ambiguous although it is simply empty. No figure is lost. The same fix5 blob is present at a2fdab1. Sources: S2-T08B/review.cf5A.md, N1; forced/JOIN-PROOF-fix5.txt; read-only Git blob comparison recorded in CHECK.md.
+- NEEDED: Consider skipping empty tables before ambiguity checks, or recording a separate empty-table reason. Add an empty multi-source fixture and keep the untagged nonempty exclusion, partially tagged refusal and exact exclusion-metadata plants unchanged.
+
+Record points retained without further new numbers:
+
+- PO-S2-90 holds duplicate terms4 launches and train-lv1 core relocation. OI-227 and PO-S2-06 keep the unknown and specifically explained interrupt occurrences separate. OI-308 holds the dated source-file list; OI-275/OI-277 hold the live profile/count evidence.
+- Batch-a N5 limits the identity-check proof (run_packages mock versus main real-git); N6 distinguishes earlier three reds from final four; N7/N9 are the worker's missing pinned offline wheel; N8 accepts the copy-boundary tripwire. Keep these in log.md without inventing a new guard defect.
+- Batch-b N1/N2/N4 are qualifications of the PO-S2-77/78/OI-131 resolutions. N5 is fixed at c39b116. M2's empty-snapshot loops cannot emit under current equality; retain it as optional cleanup, not a new identity defect.
+- Batch-c N1 is a behind-main comparison issue resolved by the train and main move; N5's empty lines/prior terms split is documented. Keep the resolver's original two integration failures and formatting correction, pre-sync collection errors, missing individual lead runs and pending train checks in log.md/CHECK.md.
+
+Revision-2 record points without extra numbers:
+
+- Pass-1 P1/P2 and passes-3/4 P1 reuse the lead's task/hosted evidence and records marks. The review-command/seed documentation is fixed at 4d2d845; pending ledger insertion is not a new code defect.
+- Passes-3/4 P2's aggregate-draw choice is answered by the lead's explicit exclusion rule, implemented and confirmed in fix5. No undecided-choice proposal remains for it.
+- Fix5 scripts failures, pass-1 reviewer timeout and the final-head pending checks remain in log.md/CHECK.md; later successful counts never erase their own results.
 
 ## Sources
 

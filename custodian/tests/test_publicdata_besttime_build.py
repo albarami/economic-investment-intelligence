@@ -359,7 +359,6 @@ def test_besttime_failed_transport_no_retry_or_load(tmp_path, failure):
 @pytest.mark.parametrize(
     "field,value",
     [
-        ("terms_words", ""),
         ("url", "https://evil.example"),
         ("commit_allowed", True),
         ("licence_basis", "owner_decision"),
@@ -374,6 +373,18 @@ def test_besttime_registry_guards_before_request(tmp_path, field, value):
         build_busyness(
             entry, lambda req: pytest.fail("sent"), cache, lambda: "unused", env, review
         )
+
+
+def test_besttime_pending_terms_words_still_build(tmp_path):
+    """Ruling L-1001: pending terms words never refuse the busyness build."""
+    from dataclasses import replace
+
+    entry, review, cache, env = setup(tmp_path)
+    entry = replace(entry, terms_words="")
+    calls, rows, manifest, _digest = run(entry, review, cache, env)
+    assert calls
+    assert rows
+    assert manifest["source"]["terms_words"] == ""
 
 
 @pytest.mark.parametrize("field", ["name"])

@@ -173,25 +173,20 @@ def test_non_string_null_equal_location_keeps_absence(tmp_path: Path) -> None:
     assert result.revisions[0].geography_absence_reason == "not_stated_by_source"
 
 
-_ID = "fdi_projects:project:1001"
-
-
 @pytest.mark.parametrize(
-    ("field", "missing_on", "expected_first", "absence"),
+    ("field", "missing_on"),
     [
-        ("source_id", 3, (_ID, "fdi_projects", "1001"), (":project:1001",)),
-        ("project_id", 3, (_ID, "fdi_projects", "1001"), ("fdi_projects:project:",)),
-        ("source_id", 4, (":project:1001", "", "1001"), ()),
-        ("project_id", 4, ("fdi_projects:project:", "fdi_projects", ""), ()),
-        ("project_key", 3, (_ID, "fdi_projects", "1001"), ()),
+        ("source_id", 3),
+        ("project_id", 3),
+        ("source_id", 4),
+        ("project_id", 4),
+        ("project_key", 3),
     ],
 )
 def test_unstable_caller_key_never_invents_identifier_text(
     tmp_path: Path,
     field: str,
     missing_on: int,
-    expected_first: tuple[str, str, str],
-    absence: tuple[str, ...],
 ) -> None:
     class UnstableKey(str):
         __hash__ = str.__hash__
@@ -217,28 +212,32 @@ def test_unstable_caller_key_never_invents_identifier_text(
     }
     result = evidence.build_project_evidence((replace(first, rows=(row,)), second))
     control = evidence.build_project_evidence((first, second))
-    # The expectations record today's behaviour for a caller key ruled not
-    # reachable from the archived-bytes callers (PO-S2-87): a missing identity
-    # part stays empty and never becomes invented text such as None or XXXX.
-    # A boundary fix that refuses these keys replaces them with its refusal.
+    # After archived-row equality, identity, geography and source chain come
+    # from the authenticated parser rows. A caller key cannot empty them.
     assert isinstance(result, ProjectEvidence)
     assert isinstance(control, ProjectEvidence)
-    assert len(result.revisions) == 2
-    first_rev, second_rev = result.revisions
-    assert (
-        first_rev.project_identity,
-        first_rev.source_id,
-        first_rev.project_id,
-    ) == expected_first
-    expected_key = "" if field == "project_key" else control.revisions[0].project_key
-    assert first_rev.project_key == expected_key
-    assert (
-        second_rev.project_identity,
-        second_rev.source_id,
-        second_rev.project_id,
-        second_rev.project_key,
-    ) == (_ID, "fdi_projects", "1001", control.revisions[1].project_key)
-    assert tuple(item.project_identity for item in result.absences) == absence
+    assert [
+        (
+            revision.project_identity,
+            revision.source_id,
+            revision.project_id,
+            revision.project_key,
+            revision.geography,
+            revision.source_chain,
+        )
+        for revision in result.revisions
+    ] == [
+        (
+            revision.project_identity,
+            revision.source_id,
+            revision.project_id,
+            revision.project_key,
+            revision.geography,
+            revision.source_chain,
+        )
+        for revision in control.revisions
+    ]
+    assert result.absences == control.absences
 
 
 @pytest.mark.parametrize("kind", ["revision", "absence"])
@@ -257,38 +256,82 @@ def test_audit_fallback_never_rewrites_retained_entry_fields(
     assert isinstance(built, ProjectEvidence)
     if kind == "revision":
         supplied = replace(built, revisions=EqualToEmpty(built.revisions))
-        expected = EvidenceAuditEntry(
-            PROJECT,
-            PROJECT,
-            PROJECT_IDENTITY,
-            item.identity,
-            "public",
-            "observed_announcement",
-            "retained_revision",
-            "",
-        )
     else:
         absence = evidence.ProjectAbsence(
             PROJECT_IDENTITY, PROJECT, item.identity, "not_present_in_source_snapshot"
         )
         supplied = ProjectEvidence((), absences=EqualToEmpty((absence,)))
-        expected = EvidenceAuditEntry(
-            PROJECT,
-            PROJECT,
-            PROJECT_IDENTITY,
-            item.identity,
-            "public",
-            "missing_evidence",
-            "absent_from_snapshot",
-            "not_present_in_source_snapshot",
-        )
     result = evidence.audit_project_evidence((), supplied, ())
-    # These tuple subclasses expose a separate boundary issue (PO-S2-87).
-    # Preserve fields if returned; a future fix should refuse their projection.
-    if isinstance(result, evidence.InvestmentFailure):
-        assert result.check == "evidence_audit_incomplete"
-        return
-    assert result.entries == (expected,)
+    assert result == failure(
+        "",
+        "",
+        "evidence_audit_incomplete",
+        "every registration, revision and absence",
+        "plain sequence",
+    )
+
+
+def test_audit_refuses_non_plain_str_key(tmp_path: Path) -> None:
+    class SubKey(str):
+        pass
+
+    row = replace(candidate(tmp_path), source_id=SubKey(SOURCE))
+    supplied = ProjectEvidence(
+        (), (MilestoneEvidence(row, None, "missing_evidence", ""),), ()
+    )
+    result = evidence.audit_project_evidence((), supplied, ())
+    assert result == failure(
+        "",
+        "",
+        "evidence_audit_incomplete",
+        "every registration, revision and absence",
+        "plain key",
+    )
+
+
+def test_audit_refuses_non_plain_tuple_history(tmp_path: Path) -> None:
+    class History(tuple):
+        def __eq__(self, other: object) -> bool:
+            return other == ()
+
+        def __ne__(self, other: object) -> bool:
+            return other != ()
+
+    item = project(tmp_path)
+    built = evidence.build_project_evidence((item,))
+    assert isinstance(built, ProjectEvidence)
+    supplied = replace(built, revisions=History(built.revisions))
+    result = evidence.audit_project_evidence((), supplied, ())
+    assert result == failure(
+        "",
+        "",
+        "evidence_audit_incomplete",
+        "every registration, revision and absence",
+        "plain sequence",
+    )
+
+
+def test_audit_refuses_non_plain_tuple_absence(tmp_path: Path) -> None:
+    class Absences(tuple):
+        def __eq__(self, other: object) -> bool:
+            return other == ()
+
+        def __ne__(self, other: object) -> bool:
+            return other != ()
+
+    item = project(tmp_path)
+    absence = evidence.ProjectAbsence(
+        PROJECT_IDENTITY, PROJECT, item.identity, "not_present_in_source_snapshot"
+    )
+    supplied = ProjectEvidence((), absences=Absences((absence,)))
+    result = evidence.audit_project_evidence((), supplied, ())
+    assert result == failure(
+        "",
+        "",
+        "evidence_audit_incomplete",
+        "every registration, revision and absence",
+        "plain sequence",
+    )
 
 
 def test_cache_keeps_conflicting_archive_selection_validation(tmp_path: Path) -> None:

@@ -7,7 +7,7 @@ Grid sums are relative weights only; admission requires file, licence and schema
 confirmation. The S2-T13 confirmation currently selects area, never a live grid.
 """
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from decimal import Context, Decimal, localcontext
 from fractions import Fraction
 
@@ -44,7 +44,19 @@ class Lineage:
     method_version: str
 
     def complete(self) -> bool:
-        return all(getattr(self, f.name).strip() for f in fields(self))
+        return all(
+            value.strip()
+            for value in (
+                self.source_id,
+                self.publisher,
+                self.page,
+                self.licence,
+                self.retrieved,
+                self.sha256,
+                self.method,
+                self.method_version,
+            )
+        )
 
 
 @dataclass(frozen=True)

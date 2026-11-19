@@ -15,6 +15,7 @@ from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request
 
 import pytest
+from custodian.tests.fixtures.invented_chain import intermediate_pem
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_s2_t29_live_acquire import school, school_transport
 from custodian.tests.test_s2_t29_live_shapes import STAMP, embedded, entry
@@ -222,7 +223,9 @@ def test_unscoped_page_pin_host_refuses_before_send(host, role):
 
 def test_fix7_legacy_tender_checked_chain_reaches_transport(tmp_path):
     """Invented stand-in proves the adapter seam, not a TLS handshake."""
-    raw = b"SYN-invented-chain-stand-in"
+    # S2-T08 part B, mismatch 7: the chain is now inspected, so the stand-in is
+    # an invented issuing intermediate rather than text.
+    raw = intermediate_pem()
     chain = tmp_path / "SYN-chain.pem"
     chain.write_bytes(raw)
     row = next(r for r in load_registry() if r.key == "tenders_pub")
@@ -234,7 +237,7 @@ def test_fix7_legacy_tender_checked_chain_reaches_transport(tmp_path):
         patch("urllib.request.build_opener") as opener,
     ):
         response = opener.return_value.open.return_value.__enter__.return_value
-        response.read.return_value = b"SYN-page"
+        response.read.side_effect = [b"SYN-page", b""]
         response.geturl.return_value = url
         response.headers = {}
         result = tenders.tender_https(row, chain_file=chain)(
@@ -313,7 +316,8 @@ def test_fix7_tender_seam_does_not_share_checked_pin(mode):
 @pytest.mark.parametrize("host", sorted(PIN_HOSTS))
 def test_fix7_tender_legacy_bridge_does_not_authorize_redirect(host, tmp_path):
     """The actual opener's guard refuses every unscoped page pin redirect."""
-    raw = b"SYN-invented-chain-stand-in"
+    # S2-T08 part B, mismatch 7: an invented intermediate, as above.
+    raw = intermediate_pem()
     chain = tmp_path / "SYN-chain.pem"
     chain.write_bytes(raw)
     row = next(r for r in load_registry() if r.key == "tenders_pub")

@@ -17,7 +17,11 @@ from eii_custodian.publicdata.fetch.bounded import (
     stream_download,
 )
 from eii_custodian.publicdata.fetch.receipts import archive_auxiliary, sidecar_for
-from eii_custodian.publicdata.fetch.registry import LICENCE_BASES, Entry
+from eii_custodian.publicdata.fetch.registry import (
+    LICENCE_BASES,
+    TERMS_READ_ON_PENDING,
+    Entry,
+)
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError, publish_file
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.fetch.transport import StreamTransport, Transport
@@ -54,14 +58,17 @@ def _entry_check(entry: Entry, config: Config) -> None:
         or (entry.licence_basis != "owner_decision" and entry.decision_record == ""),
         "licence_basis",
     )
-    require(bool(entry.terms_words.strip()), "terms_metadata")
-    try:
-        require(
-            date.fromisoformat(entry.terms_read_on).isoformat() == entry.terms_read_on,
-            "terms_date",
-        )
-    except ValueError:
-        raise GravityError("terms_date") from None
+    # Ruling L-1001: pending terms fields are records, never refusals. Only a
+    # non-empty reading date that is not a real date is a typing error.
+    if entry.terms_read_on not in ("", TERMS_READ_ON_PENDING):
+        try:
+            require(
+                date.fromisoformat(entry.terms_read_on).isoformat()
+                == entry.terms_read_on,
+                "terms_date",
+            )
+        except ValueError:
+            raise GravityError("terms_date") from None
     require(entry.publisher == config.publisher and bool(entry.title_en), "publisher")
     require(entry.landing_url == config.page, "page")
     require(bool(config.source_version.strip()), "version")

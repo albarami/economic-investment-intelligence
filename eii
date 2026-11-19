@@ -14,7 +14,7 @@ usage() {
     'up --embedded' \
     'down' \
     'test [--seed N]' \
-    'build-public' \
+    'build-public [--seed N]' \
     'build-public --cdse-backup' \
     'build-world' \
     'build-release' \

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Callable, Mapping, Sequence
 from functools import partial
@@ -84,8 +85,13 @@ def run(
     gravity_stream: StreamTransport | None = None,
     atlas_stream: StreamTransport | None = None,
     benchmark_stream: StreamTransport | None = None,
+    large_stream: StreamTransport | None = None,
 ) -> int:
-    """Fetch the registry. Extra arguments are a usage error and open nothing."""
+    """Validate the arguments before any input or credential read.
+
+    No argument, ``--seed N`` (the draw seed) or ``--cdse-backup`` alone;
+    anything else is a usage error and opens nothing.
+    """
     if tuple(args) == ("--cdse-backup",):
         credentials = cdse_credentials(environ)
         reason = (
@@ -93,9 +99,16 @@ def run(
         )
         print(f"satellite_cdse_backup omitted: {reason}")
         return 0
-    if len(args) != 0:
-        table.write_usage()
-        return 2
+    seed = 0
+    if args:
+        if (
+            len(args) != 2
+            or args[0] != "--seed"
+            or re.fullmatch(r"[0-9]{1,20}", args[1]) is None
+        ):
+            table.write_usage()
+            return 2
+        seed = int(args[1])
     token = earthdata_token(environ)
     opener = open_https if transport is None else transport
     if transport is None and token:
@@ -189,6 +202,11 @@ def run(
         utc_now,
         pause,
         stream_transport=stream,
+        large_stream=(
+            open_https_stream
+            if transport is None and large_stream is None
+            else large_stream
+        ),
         baci_config=baci_config,
         gravity_config=gravity_config,
         atlas_config=atlas_config,
@@ -201,6 +219,7 @@ def run(
         token=token,
         key_name=VARIABLE,
         environ=environ,
+        seed=seed,
     )
     for line in outcome.lines:
         print(line)

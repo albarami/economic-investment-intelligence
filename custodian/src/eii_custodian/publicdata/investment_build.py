@@ -40,6 +40,7 @@ from eii_custodian.publicdata.investment_contracts import (
     SCHEMA_FDI,
     SCHEMA_MANIFEST,
     SHAPE_ID,
+    TERMS_READING_FIELDS,
     Bounds,
     Confirmation,
     DashboardShape,
@@ -189,7 +190,9 @@ def validate_investment(
     ):
         if not flag:
             return fail_of(envelope, name, "recorded", "missing")
-    missing = envelope.missing()
+    # Ruling L-1001: a missing terms reading is a pending record that fails
+    # nothing; any other missing lineage element still refuses.
+    missing = envelope.missing_refusal()
     if missing:
         return fail_of(envelope, "missing_lineage", missing, "absent")
     count = len(rows)
@@ -678,7 +681,9 @@ def _receipt(
         )
     terms = side.get("terms_sha256")
     retrieved = side.get("retrieved_utc")
-    if not isinstance(terms, str) or terms == "":
+    # Ruling L-1001: a missing or empty terms reading is a pending record and
+    # never refuses; a non-string slot stays a malformed record.
+    if terms is not None and not isinstance(terms, str):
         return InvestmentFailure(
             1, source_id, url, "missing_terms", "terms hash", "absent"
         )
@@ -686,7 +691,7 @@ def _receipt(
         return InvestmentFailure(
             1, source_id, url, "missing_lineage", "retrieved_utc", "absent"
         )
-    return terms, retrieved
+    return terms if isinstance(terms, str) else "", retrieved
 
 
 def _row_failure(
@@ -694,6 +699,13 @@ def _row_failure(
 ) -> dict[str, object] | InvestmentFailure:
     for name in LINEAGE_FIELDS:
         value = row.get(name)
+        if name in TERMS_READING_FIELDS:
+            # Ruling L-1001: a pending terms reading (empty or absent) is a
+            # record and never refuses a row; a non-string slot stays a
+            # malformed record and keeps its refusal.
+            if value is not None and not isinstance(value, str):
+                return fail_of(envelope, "missing_terms", name, "absent")
+            continue
         if not isinstance(value, str) or value == "":
             return fail_of(envelope, "missing_lineage", name, "absent")
     provenance = row.get("provenance")

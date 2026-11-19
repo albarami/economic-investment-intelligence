@@ -8,6 +8,7 @@ this module neither imports their unmerged code nor assumes their file shapes.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
@@ -76,6 +77,29 @@ def coverage_geography(
     return {"geography": "NATIONAL", "row": "", "reason": "municipality_row_absent"}
 
 
+def load_dispositions(raw: bytes) -> dict[str, object]:
+    """Read the dispositions file; anything but a JSON object holds no entry.
+
+    B14: bytes that are not UTF-8, text that is not JSON and JSON that is not
+    an object all leave every disposition pending; no exception escapes.
+    """
+    try:
+        loaded = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def _disposition_state(entry: object) -> str:
+    """A recorded status is a text that is not empty once white space is removed."""
+    if not isinstance(entry, Mapping):
+        return "pending"
+    status = entry.get("status")
+    if not isinstance(status, str) or not status.strip():
+        return "pending"
+    return status
+
+
 def oi03_line(
     *,
     entries: Sequence[Entry],
@@ -84,7 +108,7 @@ def oi03_line(
     signoff: Mapping[str, object],
     sources: frozenset[str],
     open_item_type: str,
-    dispositions: Mapping[str, Mapping[str, object]],
+    dispositions: Mapping[str, object],
 ) -> dict[str, object]:
     """Gather accepted decision, bound sign-off, registry rows and dispositions.
 
@@ -93,7 +117,10 @@ def oi03_line(
     The existing series producer's closed/reconciled dispositions are retained
     verbatim; an open or unknown disposition stays pending.
     """
-    text = decision.decode("utf-8")
+    try:
+        text = decision.decode("utf-8")
+    except UnicodeDecodeError:
+        text = ""
     match = re.search(r"^\| Status \| ([^|]+) \|$", text, re.M)
     status = match.group(1).strip() if match else "not recorded"
     binding = "resolved:" + PurePosixPath(decision_name).stem
@@ -113,9 +140,7 @@ def oi03_line(
     resolved = {row.source_id for row in affected_rows} == sources and all(
         row.reconciliation == binding for row in affected_rows
     )
-    states = {
-        key: dispositions.get(key, {}).get("status", "pending") for key in ("R1", "R2")
-    }
+    states = {key: _disposition_state(dispositions.get(key)) for key in ("R1", "R2")}
     dispositions_resolved = states["R1"] == "closed: not published" and states[
         "R2"
     ] in (

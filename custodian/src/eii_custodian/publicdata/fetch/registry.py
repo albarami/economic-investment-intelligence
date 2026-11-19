@@ -12,8 +12,13 @@ import yaml
 from eii_custodian.publicdata.fetch.cadence import Cadence, parse_cadence
 
 LICENCE_BASES = frozenset(
-    {"dataset", "portal_terms", "provider_terms", "owner_decision"}
+    {"dataset", "portal_terms", "provider_terms", "owner_decision", "pending"}
 )
+# Ruling L-1001: a pending terms reading is a record, never a gate. These are
+# the exact pending values the reader records; no other word is accepted.
+LICENCE_BASIS_PENDING = "pending"
+TERMS_READ_ON_PENDING = "pending"
+TERMS_WORDS_PENDING = "terms to be read"
 DECISION_RECORD = "0026"
 _DATE_TEXT = re.compile(r"\A\d{4}-\d{2}-\d{2}\Z")
 _SKIP_LICENCE = "licen"
@@ -33,6 +38,9 @@ KINDS = frozenset(
         "cdse_backup",
     }
 )
+# S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
+# in a GeoJSON Feature (live shape pack of 2026-11-18, Mismatches item 4).
+FEATURE_POLYGON_SOURCES = frozenset({"bnd_muni_2025"})
 COLLECTED_FAMILIES = frozenset(
     {
         "trade_ext",
@@ -159,13 +167,10 @@ REQUIRED = frozenset(
         "title_en",
         "publisher",
         "licence_id",
-        "licence_basis",
         "decision_record",
         "fetch_host",
         "url",
         "terms_url",
-        "terms_words",
-        "terms_read_on",
         "landing_url",
         "nightly_live_fetch",
         "public_splits",
@@ -178,9 +183,28 @@ REQUIRED = frozenset(
         "extension",
     }
 )
+# Ruling L-1001: licence_basis, terms_words and terms_read_on are no longer
+# required; a row without one of them loads as its pending record, and only a
+# present non-string value still refuses.
 
 _REGISTRY = Path(__file__).resolve().parents[4] / "publicdata" / "sources.yaml"
 _UNCONFIRMED_REFETCH = Cadence("none", "frequency_unconfirmed", "")
+_CONTRACT_SPLIT_SOURCES = frozenset(
+    {"sec_hr_comp_occ", "wage_bands_priv", "ref_min_wage"}
+)
+
+
+def _splits_carried_by_columns(
+    columns: tuple[tuple[str, str], ...],
+) -> tuple[str, ...]:
+    """Sex and nationality splits implied by recorded column names."""
+    names = {name for name, _kind in columns}
+    carried: list[str] = []
+    if names & {"sex", "gender"}:
+        carried.append("sex")
+    if any("nationality" in name for name in names):
+        carried.append("nationality")
+    return tuple(carried)
 
 
 class RegistryError(Exception):
@@ -245,6 +269,12 @@ class Entry:
     skip_reason: str
     extension: str
     landing_url: str
+    # A missing or blank terms_words loads as the unread-terms pending marker
+    # TERMS_WORDS_PENDING ("terms to be read"); a missing or blank
+    # terms_read_on loads as the exact pending value TERMS_READ_ON_PENDING
+    # ("pending"). Ruling L-1001: both are records that hold no source back;
+    # only a malformed non-empty date or a row without a required field is
+    # refused.
     terms_words: str
     terms_read_on: str
     licence_url: str = ""
@@ -412,7 +442,12 @@ def _entry(row: object) -> Entry:
         raise RegistryError("unknown kind")
     layer = _layer(row, kind)
     comtrade_policy = _comtrade_policy(row, kind)
-    basis = _text(row, "licence_basis")
+    basis = _optional_text(row, "licence_basis")
+    if basis == "":
+        # Ruling L-1001: a missing or blank basis of use is recorded as
+        # pending, never refused. A pending basis is never committable and
+        # needs no decision record.
+        basis = LICENCE_BASIS_PENDING
     if basis not in LICENCE_BASES:
         raise RegistryError("unknown licence_basis")
     record = _text(row, "decision_record")
@@ -425,7 +460,7 @@ def _entry(row: object) -> Entry:
     if commit and basis != "dataset":
         raise RegistryError("cannot be committed")
     terms_words = _terms_words(row)
-    terms_read_on = _calendar_date(row, "terms_read_on")
+    terms_read_on = _terms_read_on(row)
     terms_watch = _terms_watch(row)
     basis_note = _basis_note(row)
     if terms_watch and basis_note.strip() == "":
@@ -442,6 +477,12 @@ def _entry(row: object) -> Entry:
     except ValueError as exc:
         raise RegistryError(str(exc)) from None
     columns = _columns(row.get("columns"))
+    if source_id not in FEATURE_POLYGON_SOURCES and any(
+        kind == "geojson_feature_polygon" for _name, kind in columns
+    ):
+        raise RegistryError(
+            "geojson_feature_polygon is declared for bnd_muni_2025 only"
+        )
     public_splits = _strings(row, "public_splits")
     if any(name in {"sex", "gender"} for name, _kind in columns):
         if "sex" not in public_splits:
@@ -449,6 +490,11 @@ def _entry(row: object) -> Entry:
     if any("nationality" in name for name, _kind in columns):
         if "nationality" not in public_splits:
             raise RegistryError("nationality field requires public_splits nationality")
+    if (
+        source_id in _CONTRACT_SPLIT_SOURCES
+        and public_splits != _splits_carried_by_columns(columns)
+    ):
+        raise RegistryError("public_splits contract mismatch")
     return Entry(
         refetch=refetch,
         key=_text(row, "key"),
@@ -653,11 +699,30 @@ def _basis_note(row: dict[object, object]) -> str:
 
 
 def _terms_words(row: dict[object, object]) -> str:
-    """Return the publisher's words, or the marker. Blank text is refused."""
-    value = _text(row, "terms_words")
+    """Return the publisher's words, or the unread-terms pending marker.
+
+    A missing or blank value is the pending reading of ruling L-1001 and
+    loads as TERMS_WORDS_PENDING, the marker the registry already uses for
+    unread terms; only a present non-string value still refuses.
+    """
+    value = _optional_text(row, "terms_words")
     if value.strip() == "":
-        raise RegistryError("terms_words is empty")
+        return TERMS_WORDS_PENDING
     return value
+
+
+def _terms_read_on(row: dict[object, object]) -> str:
+    """Return the reading date, or the exact pending value "pending".
+
+    A missing or blank date is the pending reading of ruling L-1001 and
+    loads as TERMS_READ_ON_PENDING, and so does the marker itself when a
+    stored entry is read back; a non-empty date that is not a real
+    YYYY-MM-DD text date is a typing error and keeps its refusal.
+    """
+    value = _optional_text(row, "terms_read_on")
+    if value.strip() == "" or value == TERMS_READ_ON_PENDING:
+        return TERMS_READ_ON_PENDING
+    return _calendar_date(row, "terms_read_on")
 
 
 def _calendar_date(row: dict[object, object], name: str) -> str:
@@ -785,6 +850,7 @@ def _columns(value: object) -> tuple[tuple[str, str], ...]:
             "object",
             "point_2d",
             "geojson_geometry",
+            "geojson_feature_polygon",
         }:
             raise RegistryError("unknown column type")
         found.append((name, kind))

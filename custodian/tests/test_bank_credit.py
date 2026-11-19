@@ -33,9 +33,10 @@ def test_entry_matches_the_recorded_slug() -> None:
     entry = bank_credit_entry()
     assert entry.publisher == "National Planning Council"
     assert entry.licence_basis == "dataset"
-    assert entry.period_field == "sit=row;form=date;field=year"
-    assert entry.period_first == "2012-01-01"
-    assert entry.period_last == "2022-01-01"
+    # S2-T08 part B mismatch 2: the export sends the year as four-digit text.
+    assert entry.period_field == "sit=row;form=year_text;field=year"
+    assert entry.period_first == "2012"
+    assert entry.period_last == "2022"
     assert entry.public_splits == ()
     assert [name for name, _kind in entry.columns] == [
         "year",

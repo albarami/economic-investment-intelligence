@@ -75,7 +75,12 @@ def test_metadata_acquisition_bound(source, phase, case, tmp_path, monkeypatch):
     assert all(size == limit + 1 for _, size in reads)
     assert len(reads) == len(closed)
     if case == "exact":
-        assert code == 0
+        # A completed source fetch is retained; the full assembly needs pins.
+        assert code == 1
+        assert (
+            "snapshot_selection_invalid"
+            in (tmp_path / "data/public_cache/build-log.json").read_text()
+        )
         assert list(tmp_path.rglob("*.manifest.json"))
     else:
         assert code == 1
@@ -83,8 +88,12 @@ def test_metadata_acquisition_bound(source, phase, case, tmp_path, monkeypatch):
         assert not list(tmp_path.rglob("*.zip"))
 
 
-def test_unbounded_transport_default_unchanged(monkeypatch):
-    """All other sources keep the pre-existing no-limit interface."""
+def test_unscoped_transport_reads_to_the_intake_ceiling(monkeypatch):
+    """All other sources keep no scoped limit and read to the intake ceiling.
+
+    S2-T08 part B, mismatch class 8: the former whole-body read is bounded by
+    the general intake ceiling and one byte.
+    """
     reads = []
     url = "https://www.data.gov.qa/invented-other-page"
 
@@ -102,7 +111,9 @@ def test_unbounded_transport_default_unchanged(monkeypatch):
 
         def read(self, size=-1):
             reads.append(size)
-            return b"invented other source"
+            body = b"invented other source" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body
 
     monkeypatch.setattr(
         transport.urllib.request,
@@ -110,7 +121,7 @@ def test_unbounded_transport_default_unchanged(monkeypatch):
         lambda *args: SimpleNamespace(open=lambda *args, **kwargs: Body()),
     )
     assert transport.open_https(url).body == b"invented other source"
-    assert reads == [-1]
+    assert reads == [transport.READ_CHUNK_BYTES, transport.READ_CHUNK_BYTES]
 
 
 def test_metadata_limit_resets_after_exception(monkeypatch):
@@ -133,7 +144,9 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
 
         def read(self, size=-1):
             reads.append(size)
-            return b"invented"
+            body = b"invented" if not getattr(self, "done", False) else b""
+            self.done = True
+            return body[:size]
 
     monkeypatch.setattr(
         transport.urllib.request,
@@ -148,7 +161,9 @@ def test_metadata_limit_resets_after_exception(monkeypatch):
             transport.open_https(url)
             raise LookupError("invented failure")
     transport.open_https(url)
-    assert reads == [8, 4, 8, -1]
+    # The last read has no scoped limit and stops at the intake ceiling and one
+    # byte (S2-T08 part B, mismatch class 8).
+    assert reads == [8, 4, 8, transport.READ_CHUNK_BYTES, transport.READ_CHUNK_BYTES]
 
 
 def test_baci_metadata_read_stays_unbounded():

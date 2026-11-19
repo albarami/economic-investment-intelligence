@@ -8,12 +8,15 @@ identifiers stay inside the build as join keys and never reach a release row.
 
 from eii_custodian.publicdata.property.bulletin import (
     BULLETIN_FIELDS,
+    SALES_EXPORT_FIELDS,
+    SALES_SHARE_FIELDS,
     SQ_M_PER_SQ_FT,
     BulletinDeals,
     Deal,
     parse_bulletin,
     quarter_of,
     refuse_release_identifiers,
+    sales_export_rows,
 )
 from eii_custodian.publicdata.property.quarter import (
     forecast_window,
@@ -35,6 +38,8 @@ __all__ = [
     "ANY_USAGE",
     "BULLETIN_FIELDS",
     "LAND_MARKER",
+    "SALES_EXPORT_FIELDS",
+    "SALES_SHARE_FIELDS",
     "SQ_M_PER_SQ_FT",
     "UNIT_TYPES",
     "USE_MAP_COLUMNS",
@@ -48,6 +53,7 @@ __all__ = [
     "quarter_aggregates",
     "quarter_of",
     "refuse_release_identifiers",
+    "sales_export_rows",
     "square_feet",
     "use_lookup",
 ]

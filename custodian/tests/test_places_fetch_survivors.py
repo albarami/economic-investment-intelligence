@@ -246,8 +246,20 @@ def test_recorded_refusals(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize("extension", ["", "invented"])
-def test_success_receipt(tmp_path: Path, extension: str) -> None:
+@pytest.mark.parametrize(
+    "extension,expected_file",
+    [
+        (
+            "",
+            "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb.parquet",
+        ),
+        (
+            "invented",
+            "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb.invented",
+        ),
+    ],
+)
+def test_success_receipt(tmp_path: Path, extension: str, expected_file: str) -> None:
     entry = replace(
         _invented(),
         extension=extension,
@@ -268,11 +280,7 @@ def test_success_receipt(tmp_path: Path, extension: str) -> None:
     }
     assert calls == [URL]
     directory = tmp_path / "places_ovt/part-00014"
-    suffix = extension or "parquet"
-    assert (
-        directory
-        / f"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb.{suffix}"
-    ).read_bytes() == b"a"
+    assert (directory / expected_file).read_bytes() == b"a"
     receipt = json.loads(
         (
             directory

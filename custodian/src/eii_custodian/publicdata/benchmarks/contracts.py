@@ -102,6 +102,7 @@ def read_selected(cache: Path, source_id: str, manifest_sha256: str) -> Release:
     from eii_custodian.publicdata.fetch.bounded import file_hash
     from eii_custodian.publicdata.fetch.receipts import sidecar_for
     from eii_custodian.publicdata.fetch.registry import _entry
+    from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_RECORDED_TERMS
 
     from .config import METHOD, Policy, digest_ok, require
     from .fetch import build_rows, entry_check, terms_fingerprint
@@ -143,11 +144,12 @@ def read_selected(cache: Path, source_id: str, manifest_sha256: str) -> Release:
             "source_chain",
         )
         retrieved = receipt["retrieved_utc"]
+        try:
+            parsed_clock = datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            raise ValueError("retrieval_date") from None
         require(
-            datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ").strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            )
-            == retrieved,
+            parsed_clock.strftime("%Y-%m-%dT%H:%M:%SZ") == retrieved,
             "retrieval_date",
         )
         require(receipt["fetch_host"] == entry.fetch_host, "source_chain")
@@ -166,6 +168,11 @@ def read_selected(cache: Path, source_id: str, manifest_sha256: str) -> Release:
             terms_sha256=terms_fingerprint(entry),
         )
         expected_receipt["coverage"] = parsed.coverage
+        expected_receipt["terms_fingerprint"] = FINGERPRINT_RECORDED_TERMS
+        require(
+            receipt.get("terms_fingerprint") == FINGERPRINT_RECORDED_TERMS,
+            "terms_fingerprint",
+        )
         require(receipt == expected_receipt, "source_chain")
         require(
             json.loads(output.read_text(encoding="utf-8"))

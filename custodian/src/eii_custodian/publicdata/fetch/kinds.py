@@ -30,6 +30,7 @@ from eii_custodian.publicdata.fetch.transport import (
     ATTEMPT_LIMIT,
     BACKOFF_S,
     MAX_RETRIES,
+    BodyTooLarge,
     Response,
     Transport,
     TransportFault,
@@ -69,6 +70,12 @@ class Prepared:
     coverage_note: str = ""
     auxiliary: tuple[Response, ...] = ()
     requests: tuple[dict[str, object], ...] = ()
+    # Ruling L-1001: the observed licence when it differs from the registry
+    # licence id, recorded with the date read pending a reviewer's record.
+    licence_pending: str = ""
+    # Ruling L-1016 (applying L-1001): a dataset-basis row whose portal states
+    # no licence at all; the licence is recorded pending, never a gate.
+    licence_unstated: bool = False
 
 
 TERMS_HOST_UNLISTED = "host_unlisted"
@@ -136,7 +143,8 @@ def _reader(transport: Transport, sleep: Callable[[float], None]) -> Read:
             try:
                 response = transport(url)
             except TransportFault as exc:
-                if exc.kind == "blocked_host":
+                # A size refusal is not retried: the same body would be read again.
+                if exc.kind in {"blocked_host", "body_bytes"}:
                     raise
                 fault = exc
                 if attempt < MAX_RETRIES:
@@ -190,6 +198,10 @@ def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure |
         return None, AttemptFailure(
             1, exc.url, "blocked_host", "allow-listed host", exc.url
         )
+    except BodyTooLarge as exc:
+        return None, AttemptFailure(
+            1, exc.url, "body_bytes", f"at most {exc.ceiling} bytes", exc.observed
+        )
     except TransportFault as exc:
         if exc.kind == "unreachable":
             return None, AttemptFailure(
@@ -215,70 +227,11 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         export, failure = _call(entry, entry.url, reader)
         if failure is not None or export is None:
             return _failed(entry, failure)
-    observed = _portal_meta(meta.body)
-    if observed is None:
-        return _failed(
-            entry,
-            AttemptFailure(
-                1,
-                meta.final_url,
-                "metadata_unreadable",
-                "portal metadata",
-                "unreadable",
-            ),
-        )
-    publisher, licence, licence_url, modified = observed
-    if (
-        publisher == ""
-        and entry.key == "bnd_muni_2025"
-        and entry.publisher
-        == "National open data portal (dataset publisher field empty, read 2026-11-16)"
-        and entry.licence_basis == "portal_terms"
-    ):
-        publisher = entry.publisher
-    if publisher == "":
-        return _failed(
-            entry,
-            AttemptFailure(
-                1,
-                meta.final_url,
-                "publisher_missing",
-                entry.publisher or "publisher",
-                "",
-            ),
-        )
-    if not _same_publisher(publisher, entry.publisher):
-        return _failed(
-            entry,
-            AttemptFailure(
-                1, meta.final_url, "publisher_mismatch", entry.publisher, publisher
-            ),
-        )
-    if licence == "":
-        if entry.licence_basis == "dataset":
-            return _failed(
-                entry,
-                AttemptFailure(
-                    1,
-                    meta.final_url,
-                    "licence_missing",
-                    _licence_expected(entry.licence_id),
-                    _licence_observed("", licence_url),
-                ),
-            )
-        licence = ""
-        licence_url = ""
-    elif not _licence_matches(licence, licence_url, entry.licence_id):
-        return _failed(
-            entry,
-            AttemptFailure(
-                1,
-                meta.final_url,
-                "licence_mismatch",
-                _licence_expected(entry.licence_id),
-                _licence_observed(licence, licence_url),
-            ),
-        )
+    info = portal_metadata(entry, meta)
+    if info.failure is not None:
+        return info
+    publisher, modified = info.publisher, info.source_modified
+    licence, licence_url = info.portal_licence, info.portal_licence_url
     if entry.key == "accident":
         from eii_custodian.publicdata.fetch.partitions import partition_export
 
@@ -340,6 +293,83 @@ def _portal(entry: Entry, reader: Read) -> Prepared:
         saw_periods,
         coverage_note=coverage_note,
         requests=requests,
+        licence_pending=info.licence_pending,
+        licence_unstated=info.licence_unstated,
+    )
+
+
+def portal_metadata(entry: Entry, meta: Response) -> Prepared:
+    """Validate the same publisher and licence for buffered and streamed exports."""
+    observed = _portal_meta(meta.body)
+    if observed is None:
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                meta.final_url,
+                "metadata_unreadable",
+                "portal metadata",
+                "unreadable",
+            ),
+        )
+    publisher, licence, licence_url, modified = observed
+    if (
+        publisher == ""
+        and entry.key == "bnd_muni_2025"
+        and entry.publisher
+        == "National open data portal (dataset publisher field empty, read 2026-11-16)"
+        and entry.licence_basis == "portal_terms"
+    ):
+        publisher = entry.publisher
+    if publisher == "":
+        return _failed(
+            entry,
+            AttemptFailure(
+                1,
+                meta.final_url,
+                "publisher_missing",
+                entry.publisher or "publisher",
+                "",
+            ),
+        )
+    if not _same_publisher(publisher, entry.publisher):
+        return _failed(
+            entry,
+            AttemptFailure(
+                1, meta.final_url, "publisher_mismatch", entry.publisher, publisher
+            ),
+        )
+    licence_unstated = False
+    if licence == "":
+        if entry.licence_basis == "dataset":
+            # Ruling L-1016 (applying L-1001): a publisher-terms reading is a
+            # record, never a gate. A dataset row whose portal states no
+            # licence fetches and is used; the licence is recorded pending
+            # with the date read, and the build log names the absence. The
+            # publisher_missing and publisher_mismatch refusals above stay.
+            licence_unstated = True
+        licence = ""
+        licence_url = ""
+    licence_pending = ""
+    if licence and not _licence_matches(licence, licence_url, entry.licence_id):
+        # Ruling L-1001 (decision 0059, PUB-09 and PUB-97): a licence different
+        # from the registry is recorded with the date read, pending a
+        # reviewer's record, and fails nothing. The receipt keeps the registry
+        # licence beside the observed one; the build log names the difference.
+        licence_pending = licence
+    return Prepared(
+        b"",
+        entry.url,
+        entry.fetch_host,
+        publisher,
+        modified,
+        None,
+        "",
+        None,
+        portal_licence=licence,
+        portal_licence_url=licence_url,
+        licence_pending=licence_pending,
+        licence_unstated=licence_unstated,
     )
 
 
@@ -701,18 +731,6 @@ def _folded_publisher(name: str) -> str:
     return _SPACE_RUN.sub(" ", name.casefold()).strip()
 
 
-def _licence_expected(licence_id: str) -> str:
-    """Return the portal statement a registry licence id requires."""
-    if licence_id == "CC-BY-4.0":
-        return _licence_observed(_CC_BY_4_TEXT, _CC_BY_4_URL)
-    return _licence_observed(licence_id, "")
-
-
-def _licence_observed(text: str, url: str) -> str:
-    """Return the portal licence text and URL as read."""
-    return f"text:{text} url:{url}"
-
-
 def _licence_matches(text: str, url: str, licence_id: str) -> bool:
     """CC-BY-4.0 passes only for the portal's own CC BY text and 4.0 URL."""
     if licence_id == "CC-BY-4.0":
@@ -845,7 +863,9 @@ def _paged_declared(
                     ),
                 )
             final = page.final_url
-            refused = _declared_features(layer, batch, oid_name, page.final_url)
+            refused = _inherit_page_reference(batch, page.body, page.final_url)
+            if refused is None:
+                refused = _declared_features(layer, batch, oid_name, page.final_url)
             if refused is not None:
                 return _failed(entry, refused)
             features.extend(batch)
@@ -1004,6 +1024,37 @@ def _declared_features(
             )
         if not _wkid_4326(geometry):
             return AttemptFailure(1, url, "spatial_reference", "4326", "other")
+    return None
+
+
+def _inherit_page_reference(
+    features: list[dict[str, object]], body: bytes, url: str
+) -> AttemptFailure | None:
+    """Copy a page's validated EPSG:4326 reference into geometries lacking one.
+
+    S2-T08 part B, mismatch class 1: a declared layer's server states the
+    reference once at the page's top level. Only a page reference that passes
+    ``_wkid_4326`` is copied; a geometry whose own reference disagrees with a
+    stated page reference refuses. ``_declared_features`` still checks every
+    geometry, so a missing, boolean or other reference refuses there.
+    """
+    try:
+        loaded = json.loads(body.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return None
+    stated = isinstance(loaded, dict) and "spatialReference" in loaded
+    page = loaded.get("spatialReference") if stated else None
+    valid = _wkid_4326({"spatialReference": page})
+    for feature in features:
+        geometry = _text_dict(feature.get("geometry"))
+        if geometry is None:
+            continue
+        if "spatialReference" not in geometry:
+            if valid and isinstance(page, dict):
+                geometry["spatialReference"] = dict(page)
+                feature["geometry"] = geometry
+        elif stated and not (valid and _wkid_4326(geometry)):
+            return AttemptFailure(1, url, "spatial_reference", "4326", "conflicting")
     return None
 
 

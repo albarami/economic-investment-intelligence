@@ -21,6 +21,7 @@ import rasterio
 import yaml
 from custodian.tests.fixtures.heights import invented
 from custodian.tests.repository_root import repository_root
+from custodian.tests.snapshot_fixture import update_receipt
 from rasterio.transform import from_origin
 from shapely.geometry import Point, Polygon
 
@@ -64,6 +65,7 @@ from eii_custodian.publicdata.heights.read import (
     sha256_path,
 )
 from eii_custodian.publicdata.heights.step import build_heights
+from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 REPO = repository_root(Path(__file__))
 PACKAGE = Path(heights_package.__file__).resolve().parent
@@ -575,14 +577,11 @@ def test_read_refusals_and_absent_reasons(tmp_path: Path) -> None:
     digest = invented.store(changed / "cache", row, body)
     target = changed / "cache" / "bldg_3dglobfp" / f"{digest}.{row.extension}"
     target.write_bytes(b"planted other bytes")
-    with pytest.raises(HeightError, match="content_hash_mismatch"):
+    with pytest.raises(HeightError, match="selected_input_refused"):
         _sources(changed, (row,))
     switched = tmp_path / "four"
     digest = invented.store(switched / "cache", row, body)
-    receipt_path = next((switched / "cache" / "bldg_3dglobfp").glob("*.meta.json"))
-    receipt = json.loads(receipt_path.read_text())
-    receipt["switched_off"] = True
-    receipt_path.write_text(json.dumps(receipt, sort_keys=True) + "\n")
+    update_receipt(switched / "cache", row.key, digest, {"switched_off": True})
     with pytest.raises(HeightError, match="switched_off"):
         _sources(switched, (row,))
 
@@ -779,6 +778,8 @@ def test_non_commercial_terms_never_block_the_source(
         return Response(final_url=url, body=wsf, hops=())
 
     cache = tmp_path / "data" / "public_cache"
+    cache.mkdir(parents=True, exist_ok=True)
+    select_fixture(cache, row.key, sha256_hex(wsf))
     outcome = run_build((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / "bldg_wsf3d").glob("*.meta.json"))
@@ -869,6 +870,8 @@ def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
             [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
         )
     )
+    cache.mkdir(parents=True, exist_ok=True)
+    select_fixture(cache, row.key, sha256_hex(globfp))
     outcome = run_build((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
@@ -1011,6 +1014,8 @@ def test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns(
             [invented.building_feature("SYN-B-0001", invented.square(0.1, 0.1, 0.5))]
         )
     )
+    cache.mkdir(parents=True, exist_ok=True)
+    select_fixture(cache, row.key, sha256_hex(globfp))
     outcome = run_build((row,), no_transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
@@ -1067,10 +1072,10 @@ def test_run_build_skips_heights_on_an_absent_table(tmp_path: Path) -> None:
     assert outcome.lines.count("SKIP heights building_table_absent") == 1
 
 
-def test_build_public_returns_0_and_prints_the_skip_line(
+def test_build_public_requires_assembly_pins_before_the_height_phase(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
-    """B10: `./eii build-public` stays green while the table is absent."""
+    """An empty registry cannot pass the complete assembly; B10 stays on the height seam."""
     import commands.build_public as build_public
 
     def transport(url: str) -> Response:
@@ -1079,8 +1084,10 @@ def test_build_public_returns_0_and_prints_the_skip_line(
     monkeypatch.setattr(build_public, "load_registry", lambda: ())
     monkeypatch.setattr(build_public, "utc_now", lambda: _clock())
     code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
-    assert code == 0
-    assert "SKIP heights building_table_absent" in capsys.readouterr().out
+    assert code == 1
+    output = capsys.readouterr().out
+    assert "snapshot_selection_invalid" in output
+    assert "SKIP heights building_table_absent" not in output
 
 
 def test_an_fe50_table_fails_the_build_and_writes_no_heights(
@@ -1393,7 +1400,7 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
 
 
 def test_a_receipt_that_is_not_json_is_a_named_refusal(tmp_path: Path) -> None:
-    """V2: a receipt that is not JSON is refused as cache_receipt."""
+    """V2: a receipt that is not JSON is refused at the archive integrity boundary."""
     row = invented.entry("bldg_3dglobfp", extension="zip")
     cache = tmp_path / "cache"
     invented.store(cache, row, invented.globfp_zip([(invented.square(0, 0, 1), "7")]))
@@ -1406,7 +1413,7 @@ def test_a_receipt_that_is_not_json_is_a_named_refusal(tmp_path: Path) -> None:
             load_rules(invented.rules_file(tmp_path / "r.yaml")),
             bounds=None,
         )
-    assert err.value.name == "cache_receipt"
+    assert err.value.name == "selected_input_refused"
 
 
 def test_an_exception_the_step_does_not_own_still_propagates(
@@ -1810,14 +1817,22 @@ def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
     cache = tmp_path / "two" / "cache"
     invented.store(cache, row, body)
     invented.store(cache, row, body + b" invented")
+    (cache / "snapshot_pins.json").unlink()
     with pytest.raises(HeightError) as err:
         run(cache)
-    assert err.value.name == "cache_receipt"
+    assert err.value.name == "snapshot_selection_invalid"
 
     cache = tmp_path / "dup" / "cache"
     invented.store(cache, row, body)
     meta = next((cache / row.key).glob("*.meta.json"))
-    meta.write_text('{"source_id": "a", "source_id": "b"}')
+    text = meta.read_text()
+    meta.write_text(text.rstrip()[:-1] + ', "source_id": "bldg_3dglobfp"}')
+    import hashlib
+
+    index = cache / row.key / "index" / (meta.name.removesuffix(".meta.json") + ".json")
+    record = json.loads(index.read_text())
+    record["receipt_sha256"] = hashlib.sha256(meta.read_bytes()).hexdigest()
+    index.write_text(json.dumps(record))
     with pytest.raises(HeightError) as err:
         run(cache)
     assert err.value.name == "cache_receipt"
@@ -1831,19 +1846,16 @@ def test_cache_refusals_are_planted_and_named_in_full(tmp_path: Path) -> None:
     meta.write_text('["valid json", "not an object"]')
     with pytest.raises(HeightError) as err:
         run(cache)
-    assert err.value.name == "cache_receipt"
+    assert err.value.name == "selected_input_refused"
 
     for change, reason in (
         ({"source_id": "other"}, "cache_receipt_mismatch"),
         ({"publisher": ""}, "cache_receipt_missing"),
-        ({"sha256": "abc"}, "malformed_hash"),
+        ({"sha256": "abc"}, "selected_input_refused"),
     ):
         cache = tmp_path / reason / "cache"
-        invented.store(cache, row, body)
-        meta = next((cache / row.key).glob("*.meta.json"))
-        receipt = json.loads(meta.read_text())
-        receipt.update(change)
-        meta.write_text(json.dumps(receipt, sort_keys=True) + "\n")
+        digest = invented.store(cache, row, body)
+        update_receipt(cache, row.key, digest, change)
         with pytest.raises(HeightError) as err:
             run(cache)
         assert err.value.name == reason

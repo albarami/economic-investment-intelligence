@@ -219,7 +219,8 @@ def test_duplicate_annual_is_missing_without_calendar_claim():
         ("import",),
         ("invented-scope",),
     )
-    assert result[0].mismatch_codes == ("missing_side",)
+    assert result[0].mismatch_codes == ("missing_side", "duplicate_annual")
+    assert "incomplete_calendar" not in result[0].mismatch_codes
 
 
 def test_single_month_has_coverage_refusal():

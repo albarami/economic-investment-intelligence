@@ -208,6 +208,9 @@ LINEAGE_FIELDS = (
     "retrieved_utc",
     "page_sha256",
 )
+# Ruling L-1001: a missing terms reading (hash or page) is a pending record
+# that fails nothing; every other lineage element still does.
+TERMS_READING_FIELDS = frozenset({"terms_sha256", "terms_url"})
 
 _DECIMAL = re.compile(r"^[0-9]+(?:\.[0-9]+)?$")
 _INTEGER = re.compile(r"^[0-9]+$")
@@ -257,6 +260,22 @@ class SourceEnvelope:
             return "method"
         if self.terms_url == "":
             return "terms_url"
+        return ""
+
+    def missing_refusal(self) -> str:
+        """Return the first empty lineage element outside the terms reading.
+
+        Ruling L-1001: a missing terms reading (hash or page) is a pending
+        record and never a refusal, so those elements are skipped here; every
+        other empty element still names its refusal.
+        """
+        for name in LINEAGE_FIELDS:
+            if name in TERMS_READING_FIELDS:
+                continue
+            if getattr(self, name) == "":
+                return name
+        if self.method == "" or self.method_version == "":
+            return "method"
         return ""
 
 

@@ -1,5 +1,13 @@
-"""Exact source-separated trade differences. No conversion or inferred equivalence."""
+"""Exact source-separated trade differences. No conversion or inferred equivalence.
 
+A calculated calendar accepts only the twelve zero-padded months ``YYYY-MM``
+of one year. Lineage is ordered by parsed year and month. For that form, text
+order and chronological order match. An unpadded month is refused, because
+text order would place ``2020-10`` before ``2020-2``. Two annual figures for
+one source and role are ``duplicate_annual``, not only a missing side.
+"""
+
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
@@ -87,14 +95,36 @@ def _text(value: Fraction) -> str:
     return sign + (digits[:-places] + "." + digits[-places:] if places else digits)
 
 
+def _attributes(row: TradeFigure) -> dict[str, str | int | tuple[str, ...]]:
+    """Closed compatibility fields, without dynamic attribute access."""
+    return {
+        "partner": row.partner,
+        "flow": row.flow,
+        "year": row.year,
+        "periods": row.periods,
+        "classification": row.classification,
+        "hs_revision": row.hs_revision,
+        "product_scope": row.product_scope,
+        "coverage_key": row.coverage_key,
+        "currency": row.currency,
+        "unit": row.unit,
+        "scale": row.scale,
+        "valuation_basis": row.valuation_basis,
+        "source_id": row.source_id,
+        "source_version": row.source_version,
+        "role": row.role,
+    }
+
+
 def compare_trade_sources(
     left: TradeFigure | None, right: TradeFigure | None
 ) -> Comparison:
     if left is None or right is None:
         return Comparison(left, right, None, ("missing_side",))
     mismatches = []
+    left_fields, right_fields = _attributes(left), _attributes(right)
     for name in COMPATIBILITY:
-        a, b = getattr(left, name), getattr(right, name)
+        a, b = left_fields[name], right_fields[name]
         if a != b or (isinstance(a, str) and a in UNKNOWN) or not a:
             mismatches.append(name)
     if not left.lineage or not right.lineage:
@@ -106,6 +136,32 @@ def compare_trade_sources(
     assert left.value is not None and right.value is not None
     gap = exact(subtract(_number(right.value), _number(left.value)))
     return Comparison(left, right, _text(gap), ())
+
+
+_MONTH_TEXT = re.compile(r"\A([0-9]{4})-([0-9]{1,2})\Z")
+
+
+def _row_month_rank(row: TradeFigure) -> tuple[int, int]:
+    """Rank one monthly row. Any other period shape is not a native month."""
+    if len(row.periods) != 1:
+        raise ValueError("annual_coverage")
+    return monthly_period_rank(row.periods[0])
+
+
+def monthly_period_rank(period: str) -> tuple[int, int]:
+    """Rank a month by year and month number, not by text order.
+
+    Accepted native months of a calculated calendar stay the zero-padded
+    ``YYYY-MM`` set. An unpadded month still ranks by its number, so
+    ``2020-2`` precedes ``2020-10``.
+    """
+    match = _MONTH_TEXT.fullmatch(period)
+    if match is None:
+        raise ValueError("annual_coverage")
+    month = int(match.group(2))
+    if month < 1 or month > 12:
+        raise ValueError("annual_coverage")
+    return (int(match.group(1)), month)
 
 
 def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeFigure:
@@ -123,12 +179,14 @@ def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeF
         or len({row.input_id for row in rows}) != len(rows)
     ):
         raise ValueError("annual_coverage")
+    first_fields = _attributes(first)
     for row in rows:
+        row_fields = _attributes(row)
         for name in (*COMPATIBILITY, "source_id", "source_version", "role"):
             if name == "periods":
                 continue
-            value = getattr(row, name)
-            if value != getattr(first, name) or (
+            value = row_fields[name]
+            if value != first_fields[name] or (
                 isinstance(value, str) and value in UNKNOWN
             ):
                 raise ValueError("annual_compatibility")
@@ -144,7 +202,8 @@ def annual_trade_sum(rows: tuple[TradeFigure, ...], *, output_id: str) -> TradeF
         value=_text(total),
         figure_kind="calculated",
         lineage=tuple(
-            row.input_id for row in sorted(rows, key=lambda row: row.periods)
+            row.input_id
+            for row in sorted(rows, key=lambda row: monthly_period_rank(row.periods[0]))
         ),
     )
 
@@ -177,11 +236,23 @@ def all_pairs(
     scopes: tuple[str, ...],
 ) -> tuple[PairResult, ...]:
     """Retain every requested source-role pair, even two absent sides."""
-    from itertools import combinations, product
-
     results = []
-    for partner, year, flow, scope in product(partners, years, flows, scopes):
+    requested = (
+        (partner, year, flow, scope)
+        for partner in partners
+        for year in years
+        for flow in flows
+        for scope in scopes
+    )
+    pairs = tuple(
+        (left, right)
+        for index, left in enumerate(sources)
+        for right in sources[index + 1 :]
+    )
+    for partner, year, flow, scope in requested:
         candidates: dict[tuple[str, str], TradeFigure] = {}
+        absent: set[tuple[str, str]] = set()
+        duplicated: set[tuple[str, str]] = set()
         for source in sources:
             rows = tuple(
                 r
@@ -191,11 +262,16 @@ def all_pairs(
                 == (partner, year, flow, scope)
             )
             if not rows:
+                absent.add(source)
                 continue
             annual = tuple(r for r in rows if r.periods == (str(year),))
-            if len(annual) == 1:
+            if len(annual) > 1:
+                duplicated.add(source)
+            elif len(annual) == 1:
                 candidates[source] = annual[0]
-        for left_key, right_key in combinations(sources, 2):
+            else:
+                absent.add(source)
+        for left_key, right_key in pairs:
             left, right = candidates.get(left_key), candidates.get(right_key)
             comparison = compare_trade_sources(left, right)
             incomplete = any(
@@ -206,9 +282,12 @@ def all_pairs(
                 and (r.source_id, r.role) not in candidates
                 for r in figures
             )
-            codes = comparison.mismatch_codes + (
-                ("incomplete_calendar",) if incomplete else ()
-            )
+            codes = comparison.mismatch_codes
+            if left_key in duplicated or right_key in duplicated:
+                if left_key not in absent and right_key not in absent:
+                    codes = tuple(code for code in codes if code != "missing_side")
+                codes = (*codes, "duplicate_annual")
+            codes = codes + (("incomplete_calendar",) if incomplete else ())
             results.append(
                 PairResult(
                     partner,
@@ -243,8 +322,8 @@ def comparison_figures(rows: tuple[TradeFigure, ...]) -> tuple[TradeFigure, ...]
     for group in groups.values():
         if any(r.periods == (str(r.year),) for r in group):
             continue
-        ordered = tuple(sorted(group, key=lambda r: r.periods))
         try:
+            ordered = tuple(sorted(group, key=_row_month_rank))
             aggregates.append(
                 annual_trade_sum(
                     ordered, output_id="annual:" + ":".join(r.input_id for r in ordered)

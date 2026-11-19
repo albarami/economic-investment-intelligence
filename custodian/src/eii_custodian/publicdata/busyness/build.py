@@ -115,8 +115,8 @@ def build_busyness(
     review: Path = REVIEW,
 ) -> str:
     """Validate inputs before sending; stage every answer before publishing anything."""
-    if not entry.terms_words.strip():
-        raise ValueError("busy_besttime terms_words empty")
+    # Ruling L-1001 (decision 0059, S2-T16 passage): an empty terms text is a
+    # pending reading, recorded truthfully in the receipt, and fails nothing.
     if (
         entry.url != FORECAST_URL
         or entry.commit_allowed

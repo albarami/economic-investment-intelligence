@@ -845,16 +845,25 @@ sources:
         type: "string"
       - name: "property_type"
         type: "string"
-      - name: "property_usage"
+      - name: "lstkhdm"
+        type: "string"
+      - name: "usage"
         type: "string"
       - name: "area_square_meters"
         type: "integer"
-      - name: "area_square_feet"
-        type: "integer"
+      - name: "share_area"
+        type: "number"
+      - name: "price_per_square_foot"
+        type: "number"
       - name: "price_per_square_meter"
         type: "integer"
+      - name: "number_of_shares_2400"
+        type: "number"
+      - name: "share_value"
+        type: "number"
       - name: "property_value"
         type: "integer"
+    basis_note: "Columns are the observed export fields (S2-T08 part B source review, mismatch 3; custodian/publicdata/review/s2_t08_source_review.yaml). The shape pack shows names only: the types of lstkhdm and of the four numeric fields first declared there await the lead's live run. Share fields refuse by name until their meaning is confirmed."
     row_count_min: 26719
     row_count_max: 26719
     reconciliation: "none"
@@ -1356,7 +1365,8 @@ sources:
     columns:
       - {name: "name", type: "string"}
       - {name: "geo_point", type: "point_2d"}
-      - {name: "geo_shape", type: "geojson_geometry"}
+      - {name: "geo_shape", type: "geojson_feature_polygon"}
+    basis_note: "geo_shape is a GeoJSON Feature wrapping a MultiPolygon (S2-T08 part B source review, mismatch 4; custodian/publicdata/review/s2_t08_source_review.yaml). Admitted at the fetch only; never the frame's municipality geometry."
     row_count_min: 8
     row_count_max: 8
     reconciliation: "none"
@@ -8138,9 +8148,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 88
     row_count_max: 88
-    period_first: '2012-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2012'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8189,9 +8200,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 72
     row_count_max: 72
-    period_first: '2021-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2021'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8240,9 +8252,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-khor-and-al-thakhira
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8291,9 +8304,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-rayyan-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8342,9 +8356,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8444,9 +8459,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8495,9 +8511,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-doha-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8546,9 +8563,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-umm-slal-municipality0
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: completions_ext
@@ -8597,9 +8615,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/electricity-network-coverage
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8640,9 +8659,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 7
     row_count_max: 7
-    period_first: '2019-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/electricity-network-coverage-by-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8687,9 +8707,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 56
     row_count_max: 56
-    period_first: '2019-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8739,9 +8760,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 24
     row_count_max: 24
-    period_first: '2020-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/proportion-of-mobile-network-coverage-at-least-2g-and-at-least-3g-by-gender-and-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8795,9 +8817,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 192
     row_count_max: 192
-    period_first: '2020-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/sdg-9-c-1-proportion-of-population-covered-by-a-mobile-network-by-technology
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8842,9 +8865,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 24
     row_count_max: 24
-    period_first: '2016-01-01'
-    period_last: '2021-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2016'
+    period_last: '2021'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/water-supply-coverage
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8889,9 +8913,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 21
     row_count_max: 21
-    period_first: '2019-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: coverage_ext/water-supply-coverage-by-municipality
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: coverage_ext
@@ -8936,9 +8961,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 56
     row_count_max: 56
-    period_first: '2019-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: dcool_capacity/design-cooling-capacity-by-status-municipality-and-sector-tr
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: dcool_capacity
@@ -9012,9 +9038,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 69
     row_count_max: 69
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: fdi_stats/foreign-direct-investment
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: fdi_stats
@@ -9103,9 +9130,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 35
     row_count_max: 35
-    period_first: '1990-01-01'
-    period_last: '2024-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '1990'
+    period_last: '2024'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: gis_address
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: gis_address
@@ -9632,9 +9660,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 5
     row_count_max: 5
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: hotel_ext/number-of-hotel-guests-and-nights-of-stay-by-month
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
@@ -9732,9 +9761,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 5
     row_count_max: 5
-    period_first: '2018-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: hotel_ext/number-of-hotel-rooms-by-hotel-class
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
@@ -9781,9 +9811,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 5
     row_count_max: 5
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: hotel_ext/number-of-hotels-by-hotel-class
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
@@ -9830,9 +9861,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 5
     row_count_max: 5
-    period_first: '2019-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: hotel_ext/number-of-hotels-rooms-and-beds-by-hotel-type
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: hotel_ext
@@ -9881,9 +9913,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 32
     row_count_max: 32
-    period_first: '2015-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2015'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/qatari-unemployed-15-by-gender-and-willingness-to-work-quarterly
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -9936,9 +9969,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 128
     row_count_max: 128
-    period_first: '2018-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/qatari-unemployed-15-not-willing-to-work-by-reason-quarterly
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -9987,9 +10021,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 121
     row_count_max: 121
-    period_first: '2018-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/qatari-unemployed-15-with-secondary-education-and-training-quarterly
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10042,9 +10077,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 158
     row_count_max: 158
-    period_first: '2018-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-whether-offered-work-in-private-sector
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10095,9 +10131,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 28
     row_count_max: 28
-    period_first: '2017-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-15-years-and-above-by-gender-and-willingness-to-work-in-private-sector
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10148,9 +10185,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 32
     row_count_max: 32
-    period_first: '2017-01-01'
-    period_last: '2024-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2024'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-15-years-and-above-with-secondary-education-who-attended-training-programs-by
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10202,9 +10240,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 46
     row_count_max: 46
-    period_first: '2017-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10255,9 +10294,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 24
     row_count_max: 24
-    period_first: '2017-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10308,9 +10348,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 54
     row_count_max: 54
-    period_first: '2017-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: jobseekers/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: jobseekers
@@ -10362,9 +10403,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 84
     row_count_max: 84
-    period_first: '2017-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2017'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: price_ext/machinery-and-equipment-price-index-mepi
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
@@ -10395,44 +10437,32 @@ sources:
     release_tables: []
     caveat_keys: []
     columns:
-    - name: code
+    - name: year
       type: string
-    - name: group_desc_ar
+    - name: half_year
       type: string
-    - name: group_desc_en
+    - name: nsf_lsn
+      type: string
+    - name: group_code
+      type: string
+    - name: group
+      type: string
+    - name: lmjmw
       type: string
     - name: weight
       type: number
-    - name: h1_20
-      type: number
-    - name: h2_20
-      type: number
-    - name: h1_21
-      type: number
-    - name: h2_21
-      type: number
-    - name: h1_22
-      type: number
-    - name: h2_22
-      type: number
-    - name: h1_23
-      type: number
-    - name: h2_23
-      type: number
-    - name: h1_24
-      type: number
-    - name: h2_24
+    - name: index_value
       type: number
     reconciliation: none
     skip_reason: ''
     extension: json
     licence_url: https://creativecommons.org/licenses/by/4.0/
-    row_count_min: 10
-    row_count_max: 10
+    row_count_min: 100
+    row_count_max: 100
     period_first: null
     period_last: null
     period_field: ''
-    basis_note: 'LR-P7: no period field; first column label H1-20, last column label H2-24; labels, not inferred dates.'
+    basis_note: 'Published long form (S2-T08 part B source review, mismatch 6; custodian/publicdata/review/s2_t08_source_review.yaml): one record per year, half-year and group; exact reviewed count 100; year and half-year are published labels and no period is inferred from them; column types are declared from the field names and are not evidenced by the shape pack. Replaces the wide-form note LR-P7.'
   - key: price_ext/producer-price-index-ppi
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
@@ -10477,9 +10507,10 @@ sources:
     licence_url: ''
     row_count_min: 1292
     row_count_max: 1292
-    period_first: '2020-01-01'
-    period_last: '2026-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2026'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: price_ext/producer-price-index-ppi-by-activity-monthly
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: price_ext
@@ -10530,9 +10561,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 1224
     row_count_max: 1224
-    period_first: '2020-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: survey_ext/hotels-and-restaurants-statistics-production-value-by-type-of-revenue-and-main-economic-activity
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: survey_ext
@@ -11186,9 +11218,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 568
     row_count_max: 568
-    period_first: '2010-01-01'
-    period_last: '2023-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2010'
+    period_last: '2023'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: talent_ext/total-students-on-scholarships-at-home-and-abroad-by-degree-and-gender
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
@@ -11304,9 +11337,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 120
     row_count_max: 120
-    period_first: '2018-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: talent_ext/trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: talent_ext
@@ -11365,9 +11399,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 240
     row_count_max: 240
-    period_first: '2018-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2018'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: tenders_pub
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: tenders_pub
@@ -11445,9 +11480,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 30
     row_count_max: 30
-    period_first: '2013-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2013'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: trade_ext/imports-by-utilization-of-items-and-year
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
@@ -11492,9 +11528,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 30
     row_count_max: 30
-    period_first: '2013-01-01'
-    period_last: '2022-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2013'
+    period_last: '2022'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: trade_ext/qatar-export-statistics-2019-2024
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
@@ -11553,9 +11590,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 142720
     row_count_max: 142720
-    period_first: '2014-01-01'
-    period_last: '2026-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2014'
+    period_last: '2026'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: trade_ext/qatar-imports-2014-2018
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
@@ -11659,9 +11697,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 6
     row_count_max: 6
-    period_first: '2019-01-01'
-    period_last: '2024-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2019'
+    period_last: '2024'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: utilities_ext/sectoral-electricity-consumption-mwh
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
@@ -11712,9 +11751,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 2
     row_count_max: 2
-    period_first: '2023-01-01'
-    period_last: '2024-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2023'
+    period_last: '2024'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: utilities_ext/total-electricity-consumption-by-sectors
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
@@ -11763,9 +11803,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 576
     row_count_max: 576
-    period_first: '2020-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: utilities_ext/total-water-consumption-by-sectors
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext
@@ -11814,9 +11855,10 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 648
     row_count_max: 648
-    period_first: '2020-01-01'
-    period_last: '2025-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2020'
+    period_last: '2025'
+    period_field: "sit=row;form=year_text;field=year"
+    basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
 # END S2-T19 sources
 
 # S2-T20 — the two height sources of PUB-106 (decision 0023 item A2).

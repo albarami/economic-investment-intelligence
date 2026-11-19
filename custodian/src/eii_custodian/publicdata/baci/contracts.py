@@ -10,7 +10,11 @@ from pathlib import Path
 from typing import Any, cast
 
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
-from eii_custodian.publicdata.fetch.registry import RegistryError, _entry
+from eii_custodian.publicdata.fetch.registry import (
+    TERMS_READ_ON_PENDING,
+    RegistryError,
+    _entry,
+)
 
 from .config import METHOD, TABLES, BaciError, Config, digest_ok, require
 from .fetch import _entry_check
@@ -92,11 +96,12 @@ def read_selected(cache: Path, selected: str) -> Release:
             manifest["terms_fingerprint_kind"] == "visible_text", "terms_fingerprint"
         )
         retrieved = receipt["retrieved_utc"]
+        try:
+            parsed_clock = datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            raise BaciError("retrieval_date") from None
         require(
-            datetime.strptime(retrieved, "%Y-%m-%dT%H:%M:%SZ").strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            )
-            == retrieved,
+            parsed_clock.strftime("%Y-%m-%dT%H:%M:%SZ") == retrieved,
             "retrieval_date",
         )
         digest = manifest["archive_sha256"]
@@ -113,7 +118,10 @@ def read_selected(cache: Path, selected: str) -> Release:
             and receipt["commit_allowed"] is False,
             "source_chain",
         )
-        date.fromisoformat(receipt["terms_read_on"])
+        # Ruling L-1001: the pending reading date is a record, not a date; any
+        # other non-empty value that is not a real date still fails this read.
+        if receipt["terms_read_on"] != TERMS_READ_ON_PENDING:
+            date.fromisoformat(receipt["terms_read_on"])
         require(
             not config.publisher_sha256 or config.publisher_sha256 == digest,
             "archive_checksum",

@@ -379,6 +379,15 @@ def test_activated_portal_fetches_with_declared_schema(tmp_path, key):
         "number": 1.5,
         "point_2d": {"lon": 1.0, "lat": 2.0},
         "geojson_geometry": {"type": "Polygon", "coordinates": []},
+        # S2-T08 part B mismatch 4: an invented Feature wrapping a polygon.
+        "geojson_feature_polygon": {
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [[[[1.0, 2.0], [1.5, 2.0], [1.5, 2.5], [1.0, 2.0]]]],
+            },
+            "properties": {},
+        },
     }
     row = {name: values[kind] for name, kind in entry.columns}
     body = json.dumps([row] * entry.row_count_min).encode()

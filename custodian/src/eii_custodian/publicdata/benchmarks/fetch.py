@@ -50,6 +50,7 @@ def _fetch_benchmark(
         stream_download,
     )
     from eii_custodian.publicdata.fetch.receipts import sidecar_for
+    from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_RECORDED_TERMS
 
     from .config import METHOD, require, safe_url
     from .parse import parse_with_coverage
@@ -124,6 +125,7 @@ def _fetch_benchmark(
             row_count=len(rows),
             terms_sha256=terms_fingerprint(entry),
         )
+        receipt["terms_fingerprint"] = FINGERPRINT_RECORDED_TERMS
         receipt["coverage"] = parsed.coverage
         encoded_entry = {
             key: value
@@ -189,12 +191,10 @@ def entry_check(entry: Entry, policy: Policy) -> None:
             "native_schema",
         )
     require((entry.row_count_min, entry.row_count_max) == policy.raw_rows, "raw_bounds")
-    require(
-        bool(entry.licence_id)
-        and bool(entry.terms_words)
-        and bool(entry.terms_read_on),
-        "terms_metadata",
-    )
+    # Ruling L-1001: pending terms fields (words, reading date, blank or the
+    # pending value) are records and never refuse an entry; only a missing
+    # licence id still does.
+    require(bool(entry.licence_id), "licence_metadata")
 
 
 @dataclass(frozen=True)
@@ -226,7 +226,7 @@ def fetch_benchmark(
 
 
 def terms_fingerprint(entry: Entry) -> str:
-    """Bind recorded terms words, date and basis, without claiming a live page read."""
+    """Bind recorded terms fields. The receipt kind is ``recorded_terms``, not a page."""
     import hashlib
     import json
 

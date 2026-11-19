@@ -226,20 +226,38 @@ def award_entry():
     return next(e for e in load_registry() if e.source_id == awards.SOURCE)
 
 
-@pytest.mark.parametrize("plant", ["source", "commit", "basis"])
+@pytest.mark.parametrize("plant", ["source", "commit"])
 def test_publish_entry_guards(tmp_path, plant):
     entry = replace(
         award_entry(),
         **{
             "source": {"source_id": "SYN other"},
             "commit": {"commit_allowed": True},
-            "basis": {"licence_basis": ""},
         }[plant],
     )
     with pytest.raises(AwardError, match=r"^receipt_missing$"):
         awards.publish_awards(
             entry, tmp_path, batch(), profile(), STAMP, 73, lambda _: row(), []
         )
+
+
+@pytest.mark.parametrize("value", ["", "pending"])
+def test_publish_entry_pending_basis_is_published_as_written(tmp_path, value):
+    """Ruling L-1001: a blank or pending basis of use is a record, never a
+    refusal; the snapshot is published and the sidecar keeps the basis as
+    written (ruling L-1025 item a)."""
+    entry = replace(award_entry(), licence_basis=value)
+    result = awards.publish_awards(
+        entry,
+        tmp_path,
+        batch(),
+        profile(),
+        STAMP,
+        73,
+        lambda _: row(),
+        [{"registration": "SYN-reg", "name": "SYN Company"}],
+    )
+    assert result.sidecar["licence_basis"] == value
 
 
 def test_publish_preserves_full_lineage_and_canonical_body(tmp_path):

@@ -44,13 +44,20 @@ def test_require_milestone_artifact_lineage_and_public_boundary(tmp_path: Path) 
     ) == failure(SOURCE, URL, "missing_artifact", "archived milestone", "missing")
     for field, check in (
         ("publisher", "missing_lineage"),
-        ("terms_sha256", "missing_terms"),
         ("method", "missing_lineage"),
     ):
         planted = replace(row, source_chain={**row.source_chain, field: ""})
         assert evidence.require_independent_milestone(
             planted, linked, identities
         ) == failure(SOURCE, URL, check, field, "absent")
+    # Ruling L-1001 (S2-T30): a pending terms reading in the chain is recorded
+    # truthfully and never refuses the milestone.
+    pending = replace(
+        row, source_chain={**row.source_chain, "terms_sha256": "", "terms_url": ""}
+    )
+    kept = evidence.require_independent_milestone(pending, linked, identities)
+    assert not hasattr(kept, "check")
+    assert kept.candidate.source_chain["terms_sha256"] == ""
     synthetic = replace(
         row, source_chain={**row.source_chain, "provenance": "synthetic"}
     )
@@ -383,7 +390,6 @@ def test_metadata_lineage_and_row_refusals_are_exact(tmp_path: Path) -> None:
         "licence_id",
         "licence_basis",
         "decision_record",
-        "terms_sha256",
         "retrieved_utc",
         "page_sha256",
         "method",
@@ -391,15 +397,17 @@ def test_metadata_lineage_and_row_refusals_are_exact(tmp_path: Path) -> None:
     )
     for field in fields:
         planted = replace(item, rows=({**item.rows[0], field: ""},))
-        check = "missing_terms" if field == "terms_sha256" else "missing_lineage"
         assert evidence.build_project_evidence((planted,)) == failure(
-            PROJECT, DASHBOARD_URL, check, field, "absent"
+            PROJECT, DASHBOARD_URL, "missing_lineage", field, "absent"
         )
     for field, value in (
         ("project_key", ""),
         ("project_id", ""),
         ("source_id", "invented_other"),
         ("terms_sha256", "cd" * 32),
+        # Ruling L-1001: a cleared hash against a receipt that holds a reading
+        # is a substituted record, not a pending one, and still fails.
+        ("terms_sha256", ""),
     ):
         planted = replace(item, rows=({**item.rows[0], field: value},))
         assert evidence.build_project_evidence((planted,)) == failure(
@@ -419,22 +427,18 @@ def test_metadata_lineage_and_row_refusals_are_exact(tmp_path: Path) -> None:
     )
 
 
-def test_metadata_terms_url_and_archived_output_refusals(
+def test_metadata_pending_terms_retain_the_revision_and_drift_still_refuses(
     tmp_path: Path, monkeypatch
 ) -> None:
+    """Ruling L-1001 (S2-T30): a pending terms reading fails nothing and the
+    archived parser output is still refused when it drifts."""
     monkeypatch.setattr(registry_module, "load_registry", lambda: ())
-    item = project(tmp_path)
-    side = {
-        name: value
-        for name, value in item.snapshot.sidecar.items()
-        if name != "terms_url"
-    }
-    directory = tmp_path / "without-terms" / PROJECT
-    archived = publish_snapshot(directory, "html", item.snapshot.body, side)
-    without_terms = replace(item, snapshot=read_snapshot(directory, archived.sha256))
-    assert evidence.build_project_evidence((without_terms,)) == failure(
-        PROJECT, DASHBOARD_URL, "missing_terms", "terms_url", "absent"
-    )
+    pending = project(tmp_path, pending_terms=True)
+    result = evidence.build_project_evidence((pending,))
+    assert not hasattr(result, "check")
+    assert len(result.revisions) == 1
+    assert all(row["terms_sha256"] == "" for row in pending.rows)
+    item = project(tmp_path / "held", day="2026-11-15")
     plants = (
         replace(item, rows=({**item.rows[0], "capex_value": "99.5"},)),
         replace(item, observation=SourceAssertion("2024", "year", "")),

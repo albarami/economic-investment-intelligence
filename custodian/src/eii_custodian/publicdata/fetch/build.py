@@ -5,10 +5,11 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict, cast
 
 from eii_custodian.publicdata.additions.common import (
     ADDITION_FAMILIES as _ADDITION_FAMILIES,
@@ -45,12 +46,17 @@ from eii_custodian.publicdata.fetch.receipts import (
 )
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import (
+    TERMS_HOST_NOT_LISTED,
     citation_line,
     coverage_line,
     evidence_line,
     fail_line,
+    licence_pending_line,
+    licence_unstated_line,
+    local_file_statuses,
     pass_line,
     skip_line,
+    terms_attempt_record,
     terms_changed_line,
     terms_host_line,
     terms_unread_line,
@@ -61,6 +67,7 @@ from eii_custodian.publicdata.fetch.transport import (
     SlotReader,
     StreamTransport,
     Transport,
+    TransportFault,
     public_address,
 )
 from eii_custodian.publicdata.gravity.config import Config as GravityConfig
@@ -73,9 +80,12 @@ from eii_custodian.publicdata.investment_build import (
     publish_investment,
 )
 from eii_custodian.publicdata.investment_contracts import (
+    EvidenceAuditEntry,
+    EvidenceProjection,
     ExpectedInput,
     FetchAttempt,
     InvestmentFailure,
+    MilestoneArchiveSelection,
     ProjectArchiveSelection,
 )
 from eii_custodian.publicdata.investment_evidence import (
@@ -96,6 +106,15 @@ LOG_NAME = "build-log.json"
 Sleeper = Callable[[float], None]
 Clock = Callable[[], str]
 TOKEN_SOURCE = "ntl_blackmarble"
+
+
+class _StreamOptions(TypedDict, total=False):
+    large_stream: StreamTransport
+
+
+def _stream_options(stream: StreamTransport | None) -> _StreamOptions:
+    """Keep the existing callback signature when no stream was configured."""
+    return {} if stream is None else {"large_stream": stream}
 
 
 @dataclass(frozen=True)
@@ -128,6 +147,9 @@ class BuildOutcome:
     lines: tuple[str, ...]
     failure: FetchFailure | None
     manifests: dict[str, str] = field(default_factory=dict)
+    investment_attempts: tuple[FetchAttempt, ...] = ()
+    terms: tuple[dict[str, object], ...] = ()
+    terms_attempts: tuple[dict[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -139,6 +161,11 @@ class _Fetched:
     retrieved_utc: str
     terms_sha256: str
     terms_unread: str
+    # Ruling L-1001: the observed licence when it differs from the registry.
+    licence_pending: str = ""
+    # Ruling L-1016 (applying L-1001): the portal stated no licence at all on a
+    # dataset-basis row; the licence is recorded pending, never a gate.
+    licence_unstated: bool = False
 
 
 def _digest_pages(directory: Path) -> str:
@@ -213,9 +240,13 @@ def fetch_entry(
     clock: Clock,
     sleep: Sleeper,
     token: str = "",
+    *,
+    large_stream: StreamTransport | None = None,
 ) -> FetchFailure | None:
     """Fetch one row. An unlisted host is refused before the transport is called."""
-    _fetched, failure = _fetch_row(entry, transport, cache, clock, sleep, token)
+    _fetched, failure = _fetch_row(
+        entry, transport, cache, clock, sleep, token, **_stream_options(large_stream)
+    )
     return failure
 
 
@@ -227,6 +258,7 @@ def _fetch_row(
     sleep: Sleeper,
     token: str = "",
     registry_entries: tuple[Entry, ...] | None = None,
+    large_stream: StreamTransport | None = None,
 ) -> tuple[_Fetched | None, FetchFailure | None]:
     """Fetch one row and return the receipt values this run wrote."""
     if entry.url and not approve(entry.url).ok:
@@ -237,6 +269,45 @@ def _fetch_row(
             "blocked_host",
             "allow-listed host",
             entry.url,
+        )
+    from .large import REQUIRED_KEYS, IntakeError, fetch_large
+
+    if large_stream is not None and entry.key in REQUIRED_KEYS:
+        try:
+            found = fetch_large(entry, transport, large_stream, cache, clock, sleep)
+        except IntakeError as exc:
+            return None, FetchFailure(
+                1,
+                entry.source_id,
+                entry.url,
+                str(exc),
+                "complete streamed input",
+                "NO_DATA",
+            )
+        except TransportFault as exc:
+            return None, FetchFailure(
+                6 if exc.kind == "unreachable" else 1,
+                entry.source_id,
+                entry.url,
+                exc.kind,
+                "complete streamed input",
+                "NO_DATA",
+            )
+        except (OSError, ValueError):
+            return None, FetchFailure(
+                1, entry.source_id, entry.url, "write_failed", "stored file", "NO_DATA"
+            )
+        return (
+            _Fetched(
+                found.digest,
+                found.fetch_host,
+                found.retrieved_utc,
+                "",
+                "",
+                found.licence_pending,
+                found.licence_unstated,
+            ),
+            None,
         )
     try:
         prepared = (
@@ -271,6 +342,8 @@ def _fetch_row(
                 clock(),
                 prepared.terms_sha256,
                 prepared.terms_unread,
+                prepared.licence_pending,
+                prepared.licence_unstated,
             ),
             None,
         )
@@ -310,6 +383,11 @@ def _fetch_row(
     )
     if prepared.requests:
         sidecar["requests"] = list(prepared.requests)
+    if prepared.licence_unstated:
+        # Ruling L-1016 (applying L-1001): the licence the portal did not state
+        # is recorded pending, with the date read in retrieved_utc, and fails
+        # nothing.
+        sidecar["licence_review"] = "pending"
     if entry.source_id in INVESTMENT_SOURCES:
         sidecar["terms_url"] = entry.terms_url
     try:
@@ -345,6 +423,8 @@ def _fetch_row(
             retrieved,
             prepared.terms_sha256,
             prepared.terms_unread,
+            prepared.licence_pending,
+            prepared.licence_unstated,
         ),
         None,
     )
@@ -374,8 +454,118 @@ def run_build(
     benchmark_stream: StreamTransport | None = None,
     reconciliation_selection: Selection | None = None,
     environ: Mapping[str, str] | None = None,
+    large_stream: StreamTransport | None = None,
+    seed: int | None = None,
+    _fetch_only: bool = False,
 ) -> BuildOutcome:
-    """Fetch each row in order, then run the public_data stage."""
+    """Run the production assembly when a seed is supplied; retain the fetch seam."""
+    if seed is not None:
+        from eii_custodian.publicdata.assembly import AssemblyError
+        from eii_custodian.publicdata.assembly_adapters import Production
+
+        if type(seed) is not int or seed < 0:
+            raise AssemblyError("figure_seed_invalid")
+
+        def fetch_only() -> BuildOutcome:
+            return run_build(
+                entries,
+                transport,
+                cache,
+                clock,
+                sleep,
+                stream_transport=stream_transport,
+                baci_config=baci_config,
+                gravity_config=gravity_config,
+                atlas_config=atlas_config,
+                gravity_stream=gravity_stream,
+                atlas_stream=atlas_stream,
+                opener=opener,
+                slots=slots,
+                token=token,
+                key_name=key_name,
+                benchmark_policies=benchmark_policies,
+                benchmark_stream=benchmark_stream,
+                environ=environ,
+                large_stream=large_stream,
+                _fetch_only=True,
+            )
+
+        build = Production(
+            tuple(entries),
+            cache,
+            _review_dir(),
+            cache.parent.parent,
+            transport,
+            clock,
+            sleep,
+            seed,
+            environ or {},
+            fetcher=fetch_only,
+            reconciliation_selection=reconciliation_selection,
+        )
+        try:
+            build.run()
+        except Exception as exc:
+            # No exception text crosses the source/credential boundary. Preserve
+            # an existing structured fetch failure and its network exit code.
+            if build.fetched is not None and build.fetched.failure is not None:
+                return cast(BuildOutcome, build.fetched)
+            from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
+            from eii_custodian.publicdata.series.parse import (
+                SERIES_REFUSALS,
+                SeriesRefused,
+            )
+
+            reason = "assembly_build_refused"
+            if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
+                reason = exc.word
+            elif (
+                isinstance(exc, MunicipalityFrameRefused)
+                and exc.reason in SERIES_REFUSALS
+            ):
+                reason = exc.reason
+            if isinstance(exc, AssemblyError) and str(exc) in {
+                "snapshot_selection_invalid",
+                "assembly_gate_pending",
+                "assembly_frame_incomplete",
+                "assembly_places_incomplete",
+                "assembly_membership_invalid",
+                "assembly_regression_refused",
+                "assembly_intake_invalid",
+                "assembly_tender_pages_incomplete",
+            }:
+                reason = str(exc)
+            assembly_failure = FetchFailure(
+                1,
+                "assembly",
+                "",
+                reason,
+                "verified ordered outputs",
+                "NO_DATA",
+            )
+            build.lines.append(
+                fail_line(
+                    "assembly",
+                    "",
+                    assembly_failure.check,
+                    assembly_failure.expected,
+                    assembly_failure.observed,
+                )
+            )
+            _write_log(
+                cache,
+                build.lines,
+                list(build.fetched.terms) if build.fetched else [],
+                list(build.fetched.terms_attempts) if build.fetched else [],
+            )
+            return BuildOutcome(tuple(build.lines), assembly_failure)
+        _write_log(
+            cache,
+            build.lines,
+            list(build.fetched.terms) if build.fetched else [],
+            list(build.fetched.terms_attempts) if build.fetched else [],
+        )
+        return BuildOutcome(tuple(build.lines), None)
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
     if (
@@ -391,8 +581,13 @@ def run_build(
     lines: list[str] = []
     pending: list[Entry] = []
     terms: list[dict[str, object]] = []
+    terms_attempts: list[dict[str, object]] = []
     benchmark_obstacles: list[dict[str, object]] = []
-    previous = _previous_term_hashes(cache)
+    previous_terms = _previous_terms(cache)
+    previous = _term_hashes(previous_terms)
+    # Keep local-input status even when an existing parser later raises. The
+    # terms baseline advances only after a successful build.
+    _write_log(cache, lines, previous_terms, [])
     failure: FetchFailure | None = None
     selected: list[tuple[str, str]] = []
     fetched_entries: list[Entry] = []
@@ -613,7 +808,15 @@ def run_build(
                 )
             if entry.terms_url and entry.kind not in {"public_page", "awards_intake"}:
                 _read_terms_apart(
-                    entry, transport, sleep, clock, lines, terms, previous, cache
+                    entry,
+                    transport,
+                    sleep,
+                    clock,
+                    lines,
+                    terms,
+                    previous,
+                    cache,
+                    terms_attempts,
                 )
             lines.append(skip_line(entry.key, entry.skip_reason))
             continue
@@ -695,7 +898,7 @@ def run_build(
             continue
         if is_place_file(entry):
             placed, place_failure = fetch_place_file(
-                entry, transport, cache, clock, sleep
+                entry, transport, cache, clock, sleep, **_stream_options(large_stream)
             )
             if place_failure is not None:
                 lines.append(
@@ -746,6 +949,7 @@ def run_build(
             sleep,
             token,
             registry_entries=tuple(entries),
+            **_stream_options(large_stream),
         )
         if result is not None:
             if entry.source_id in INVESTMENT_SOURCES:
@@ -767,10 +971,18 @@ def run_build(
             break
         assert fetched is not None
         if entry.kind == "terms_page":
-            _note_fetched_terms(entry, fetched, lines, terms, previous)
+            _note_fetched_terms(entry, fetched, lines, terms, previous, terms_attempts)
         elif entry.terms_url:
             _read_terms_apart(
-                entry, transport, sleep, clock, lines, terms, previous, cache
+                entry,
+                transport,
+                sleep,
+                clock,
+                lines,
+                terms,
+                previous,
+                cache,
+                terms_attempts,
             )
         if entry.source_id in _ADDITION_FAMILIES:
             selected.append((entry.key, fetched.digest))
@@ -811,9 +1023,46 @@ def run_build(
                 FetchAttempt(entry.source_id, entry.key, "success", fetched.digest, "")
             )
         lines.append(pass_line(entry.key, fetched.digest, fetched.fetch_host))
+        if fetched.licence_pending:
+            # Ruling L-1001: the differing licence is recorded with the date
+            # read, pending a reviewer's record, and fails nothing.
+            lines.append(
+                licence_pending_line(
+                    entry.key,
+                    entry.licence_id,
+                    fetched.licence_pending,
+                    fetched.retrieved_utc,
+                )
+            )
+        elif fetched.licence_unstated:
+            # Ruling L-1016 (applying L-1001): the licence the portal did not
+            # state is recorded with the date read, pending a reviewer's
+            # record, and fails nothing.
+            lines.append(
+                licence_unstated_line(
+                    entry.key, entry.licence_id, fetched.retrieved_utc
+                )
+            )
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    if _fetch_only:
+        from eii_custodian.publicdata.busyness.security import assert_clean
+
+        if failure is not None:
+            _archive_investment_attempts(
+                entries, investment_attempts, cache, clock, lines
+            )
+        assert_clean(environ if environ is not None else {}, lines)
+        _write_log(cache, lines, terms, terms_attempts)
+        return BuildOutcome(
+            tuple(lines),
+            failure,
+            manifests,
+            tuple(investment_attempts),
+            tuple(terms),
+            tuple(terms_attempts),
+        )
     attempt_failure = _archive_investment_attempts(
         entries, investment_attempts, cache, clock, lines
     )
@@ -878,7 +1127,7 @@ def run_build(
                 )
             )
         if failure is None:
-            failure = _heights(cache, entries, lines)
+            failure = _heights(cache, entries, lines, terms_attempts)
 
     if benchmark_obstacles:
         cache.mkdir(parents=True, exist_ok=True)
@@ -997,7 +1246,9 @@ def run_build(
     from eii_custodian.publicdata.busyness.security import assert_clean
 
     assert_clean(environ if environ is not None else {}, lines)
-    _write_log(cache, lines, terms)
+    _write_log(
+        cache, lines, terms if failure is None else previous_terms, terms_attempts
+    )
     return BuildOutcome(tuple(lines), failure, manifests)
 
 
@@ -1007,6 +1258,10 @@ def _archive_investment_attempts(
     cache: Path,
     clock: Clock,
     lines: list[str],
+    *,
+    audit_history: bool = False,
+    audit_entries: list[EvidenceAuditEntry] | None = None,
+    milestones: tuple[MilestoneArchiveSelection, ...] = (),
 ) -> FetchFailure | None:
     """Retain investment attempts without changing fetch fail-fast behaviour."""
     expected = tuple(
@@ -1014,7 +1269,7 @@ def _archive_investment_attempts(
         for entry in entries
         if entry.source_id in INVESTMENT_SOURCES
     )
-    if not expected:
+    if not expected and not milestones:
         return None
     retrieved = clock()
     sidecars = {
@@ -1040,7 +1295,7 @@ def _archive_investment_attempts(
             if registration.source_id == "fdi_projects"
         )
         projection = None
-        if project_registrations:
+        if project_registrations or milestones:
             selections = tuple(
                 ProjectArchiveSelection(
                     registration.key, str(attempt.snapshot_identity), {}
@@ -1052,11 +1307,25 @@ def _archive_investment_attempts(
                 and attempt.status == "success"
                 and isinstance(attempt.snapshot_identity, str)
             )
+            if audit_history:
+                # History is an audit input only. Release consumers still require
+                # their explicit reviewed selection and never choose a latest file.
+                selections = tuple(
+                    ProjectArchiveSelection(registration.key, path.stem, {})
+                    for registration in project_registrations
+                    for path in sorted(
+                        (cache / registration.key / "index").glob("*.json")
+                    )
+                )
             projection = build_cache_evidence(
                 cache,
                 projects=selections,
-                milestones=(),
-                expected=project_registrations,
+                milestones=milestones,
+                expected=project_registrations
+                + tuple(
+                    ExpectedInput(item.envelope.source_id, item.key, "milestone")
+                    for item in milestones
+                ),
                 attempts=tuple(attempts),
             )
         audited = (
@@ -1096,6 +1365,12 @@ def _archive_investment_attempts(
             audited.check,
             audited.expected,
             audited.observed,
+        )
+    if audit_entries is not None:
+        if isinstance(projection, EvidenceProjection):
+            audit_entries.extend(projection.audit.entries)
+        audit_entries.extend(
+            entry for entry in audited.entries if entry not in audit_entries
         )
     registry_keys = frozenset(registration.key for registration in expected)
     for entry in audited.entries:
@@ -1152,6 +1427,7 @@ def _heights(
     cache: Path,
     entries: tuple[Entry, ...] | list[Entry],
     lines: list[str],
+    terms_attempts: list[dict[str, object]],
 ) -> FetchFailure | None:
     """Run the heights step after the stage; a missing table only skips (B10)."""
     from eii_custodian.publicdata.heights.step import (
@@ -1169,6 +1445,7 @@ def _heights(
             root / BUILDINGS_RELATIVE,
             root / HEIGHTS_RELATIVE,
             lines,
+            terms_attempts=tuple(terms_attempts),
         )
     except HeightError as error:
         lines.append(
@@ -1192,6 +1469,7 @@ def _note_fetched_terms(
     lines: list[str],
     terms: list[dict[str, object]],
     previous: dict[str, str],
+    attempts: list[dict[str, object]],
 ) -> None:
     """Record the fingerprint a terms_page row already read inside its fetch."""
     if not entry.terms_url:
@@ -1200,10 +1478,16 @@ def _note_fetched_terms(
         lines.append(
             terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
+        attempts.append(
+            terms_attempt_record(entry, TERMS_HOST_NOT_LISTED, fetched.retrieved_utc)
+        )
         return
     if fetched.terms_unread:
         lines.append(
             terms_unread_line(entry.key, fetched.terms_unread, entry.terms_url)
+        )
+        attempts.append(
+            terms_attempt_record(entry, fetched.terms_unread, fetched.retrieved_utc)
         )
         return
     if fetched.terms_sha256:
@@ -1226,16 +1510,23 @@ def _read_terms_apart(
     terms: list[dict[str, object]],
     previous: dict[str, str],
     cache: Path,
+    attempts: list[dict[str, object]],
 ) -> None:
-    """Read a terms page that the row's own fetch does not read."""
+    """Read a terms page that the row's own fetch does not read.
+
+    An unread page keeps its advisory line and adds one attempt record with the
+    attempt time and reason; the recorded reading date is never set from it.
+    """
     if not approve(entry.terms_url).ok:
         lines.append(
             terms_host_line(entry.key, host_of(entry.terms_url), entry.terms_url)
         )
+        attempts.append(terms_attempt_record(entry, TERMS_HOST_NOT_LISTED, clock()))
         return
     read = read_terms_page(entry, transport, sleep)
     if read.failure is not None:
         lines.append(terms_unread_line(entry.key, read.failure.check, entry.terms_url))
+        attempts.append(terms_attempt_record(entry, read.failure.check, clock()))
         return
     retrieved = clock()
     archive_auxiliary(
@@ -1275,18 +1566,28 @@ def _previous_term_hashes(cache: Path) -> dict[str, str]:
     A row with no ``terms_fingerprint`` of ``visible_text`` was hashed from
     raw page bytes and is not compared.
     """
+    return _term_hashes(_previous_terms(cache))
+
+
+def _previous_terms(cache: Path) -> list[object]:
+    """Read historical terms rows once, preserving their complete contents."""
     path = cache / LOG_NAME
     if not path.is_file():
-        return {}
+        return []
     try:
         loaded: object = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return {}
+        return []
     if not isinstance(loaded, dict):
-        return {}
+        return []
     rows = loaded.get("terms")
     if not isinstance(rows, list):
-        return {}
+        return []
+    return rows
+
+
+def _term_hashes(rows: Sequence[object]) -> dict[str, str]:
+    """Select only visible-text fingerprints from the historical rows."""
     found: dict[str, str] = {}
     for item in rows:
         if not isinstance(item, dict):
@@ -1320,9 +1621,25 @@ def _write_citation(entry: Entry, cache: Path, retrieved: str) -> None:
     commit_citation(cache_directory(cache, entry.key), sidecar)
 
 
-def _write_log(cache: Path, lines: list[str], terms: list[dict[str, object]]) -> None:
+def _write_log(
+    cache: Path,
+    lines: list[str],
+    terms: Sequence[object],
+    terms_attempts: list[dict[str, object]],
+) -> None:
     cache.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps({"lines": lines, "terms": terms}, sort_keys=True) + "\n"
+    payload = (
+        json.dumps(
+            {
+                "lines": lines,
+                "terms": terms,
+                "terms_attempts": terms_attempts,
+                "local_files": local_file_statuses(cache, _review_dir()),
+            },
+            sort_keys=True,
+        )
+        + "\n"
+    )
     partial = cache / ".build-log.json.partial"
     final = cache / LOG_NAME
     try:

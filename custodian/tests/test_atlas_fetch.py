@@ -209,7 +209,11 @@ def test_atlas_hosts_and_binding(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(build_public, "load_atlas_config", lambda: config)
     monkeypatch.setattr(build_public, "open_https", byte)
     monkeypatch.setattr(build_public, "open_https_stream", chunks)
-    assert build_public.run(tmp_path / "bind", {}, [], sleep=lambda _: None) == 0
+    assert build_public.run(tmp_path / "bind", {}, [], sleep=lambda _: None) == 1
+    assert (
+        "snapshot_selection_invalid"
+        in (tmp_path / "bind" / "data/public_cache/build-log.json").read_text()
+    )
     assert observed == [
         config.reviewed_urls,
         config.reviewed_urls,

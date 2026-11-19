@@ -131,7 +131,9 @@ def fetch_source(
     if check is not None or not isinstance(policy, Policy):
         held = policy if isinstance(policy, UnconfirmedPolicy) else None
         return _stopped(check or "metadata_unconfirmed", held)
-    if entry.commit_allowed or entry.terms_words == "":
+    # Ruling L-1001: pending terms words never stop the fetch; only a row that
+    # claims committability does.
+    if entry.commit_allowed:
         return _stopped("commit_forbidden", policy)
     directory = cache / entry.key
     try:

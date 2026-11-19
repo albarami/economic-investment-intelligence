@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import locale
 from collections.abc import Callable
 from dataclasses import replace
@@ -229,16 +230,32 @@ def test_activation_failure_keeps_the_policy_out_of_the_refusal(tmp_path: Path) 
     _shape(result, _open("licence_basis"), "", 0, 0, 0)
 
 
-def test_commit_and_empty_terms_name_the_first_host(tmp_path: Path) -> None:
-    """Commit and empty terms stop with the first template host."""
+def test_commit_names_the_first_host(tmp_path: Path) -> None:
+    """A committed row stops with the first template host."""
     policy = _policy()
-    cases = (
-        _entry(policy, commit_allowed=True),
-        _entry(policy, terms_words=""),
+    result = _run(
+        tmp_path, _entry(policy, commit_allowed=True), _silent, SlotSecrets(HEADER, "")
     )
-    for entry in cases:
-        result = _run(tmp_path, entry, _silent, SlotSecrets(HEADER, ""))
-        _shape(result, _stopped("commit_forbidden"), PUBLIC_HOST, 0, 0, 0)
+    _shape(result, _stopped("commit_forbidden"), PUBLIC_HOST, 0, 0, 0)
+
+
+def test_pending_terms_words_still_fetch_every_cell(tmp_path: Path) -> None:
+    """Ruling L-1001: empty terms words never stop the comtrade fetch."""
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+
+    policy = _policy()
+    entry = _entry(policy, terms_words="")
+    result = _run(tmp_path, entry, _ok, SlotSecrets(HEADER, ""))
+    assert result.failure is None
+    assert result.requested_cells == 2
+    assert result.present_cells == 2
+    assert result.gap_cells == 0
+    folder = tmp_path / entry.key
+    metas = sorted(folder.glob("*.meta.json"))
+    assert metas
+    for path in metas:
+        side = json.loads(path.read_text(encoding="utf-8"))
+        assert side["terms_sha256"] == sha256_hex(b"")
 
 
 def test_held_lock_names_its_check_and_the_first_host(tmp_path: Path) -> None:

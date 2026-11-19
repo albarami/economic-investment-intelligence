@@ -179,6 +179,15 @@ def load_pin(cache: Path, source: str, config: object) -> Pin:
     validate_pin(pin.host, pin)
     if pin.host not in PIN_HOSTS:
         raise PinError("certificate_host_mismatch")
+    inspect_intermediate(der)
+    return pin
+
+
+def inspect_intermediate(der: bytes) -> None:
+    """Admit exactly one issuing authority that is not self-signed, or refuse.
+
+    Shared by ``load_pin`` and the tender chain (S2-T08 part B, mismatch 7).
+    """
     # Inspect in an empty store: system roots must not mask extra certificates.
     inspection = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     try:
@@ -193,7 +202,6 @@ def load_pin(cache: Path, source: str, config: object) -> Pin:
         or authorities[0]["issuer"] == authorities[0]["subject"]
     ):
         raise PinError("certificate_chain_incomplete")
-    return pin
 
 
 def load_capture(cache: Path, source: str, pin: Pin) -> Capture | None:

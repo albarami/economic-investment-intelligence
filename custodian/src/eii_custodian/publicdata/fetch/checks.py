@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
-from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.registry import FEATURE_POLYGON_SOURCES, Entry
+
+# Rows whose reviewed shape is closed: a field the registry does not declare is
+# refused. Only a row corrected by a source review joins this set (S2-T08 part B
+# source review, mismatch 6); every other row keeps the open check below.
+CLOSED_SHAPE_KEYS = frozenset({"price_ext/machinery-and-equipment-price-index-mepi"})
 
 
 @dataclass(frozen=True)
@@ -24,10 +30,18 @@ def count_failure(
     """Fail when the row count is missing or outside the declared range."""
     if entry.row_count_min is None and entry.row_count_max is None:
         return None
+    return count_value_failure(entry, None if rows is None else len(rows), url)
+
+
+def count_value_failure(
+    entry: Entry, count: int | None, url: str
+) -> AttemptFailure | None:
+    """The same count gate for row streams, without retaining their records."""
+    if entry.row_count_min is None and entry.row_count_max is None:
+        return None
     span = _count_span(entry)
-    if rows is None:
+    if count is None:
         return AttemptFailure(1, url, "row_count", span, "unreadable")
-    count = len(rows)
     if entry.row_count_min is not None and count < entry.row_count_min:
         return AttemptFailure(1, url, "row_count", span, str(count))
     if entry.row_count_max is not None and count > entry.row_count_max:
@@ -48,7 +62,19 @@ def schema_failure(
             return AttemptFailure(
                 1, url, "schema_missing", entry.columns[0][0], "missing"
             )
+        if entry.key in CLOSED_SHAPE_KEYS:
+            declared = {name for name, _kind in entry.columns}
+            for name in record:
+                if name not in declared:
+                    return AttemptFailure(1, url, "extra_field", "declared", str(name))
         for name, kind in entry.columns:
+            if (
+                kind == "geojson_feature_polygon"
+                and entry.source_id not in FEATURE_POLYGON_SOURCES
+            ):
+                return AttemptFailure(
+                    1, url, "declaration_scope", f"{name}:{kind}", entry.source_id
+                )
             if name not in record:
                 return AttemptFailure(1, url, "schema_missing", name, "missing")
             if not _type_ok(record[name], kind):
@@ -183,4 +209,61 @@ def _type_ok(value: object, kind: str) -> bool:
             and value.get("type") in ("Polygon", "MultiPolygon")
             and isinstance(value.get("coordinates"), list)
         )
+    if kind == "geojson_feature_polygon":
+        return _feature_polygon(value)
     return False
+
+
+def _feature_polygon(value: object) -> bool:
+    """A closed GeoJSON Feature whose geometry is a Polygon or MultiPolygon.
+
+    S2-T08 part B, mismatch class 4. The Feature holds exactly ``type``,
+    ``geometry`` and ``properties`` (an object or null); the geometry holds
+    exactly ``type`` and ``coordinates``, nested to its type's depth, each ring a
+    non-empty list of positions of two or three finite numbers.
+    """
+    if not isinstance(value, dict) or set(value) != {"type", "geometry", "properties"}:
+        return False
+    if value["type"] != "Feature":
+        return False
+    if value["properties"] is not None and not isinstance(value["properties"], dict):
+        return False
+    geometry = value["geometry"]
+    if not isinstance(geometry, dict) or set(geometry) != {"type", "coordinates"}:
+        return False
+    coordinates = geometry["coordinates"]
+    if geometry["type"] == "Polygon":
+        return _polygon(coordinates)
+    if geometry["type"] == "MultiPolygon":
+        return (
+            isinstance(coordinates, list)
+            and len(coordinates) > 0
+            and all(_polygon(polygon) for polygon in coordinates)
+        )
+    return False
+
+
+def _polygon(rings: object) -> bool:
+    return (
+        isinstance(rings, list)
+        and len(rings) > 0
+        and all(
+            isinstance(ring, list)
+            and len(ring) > 0
+            and all(_position(point) for point in ring)
+            for ring in rings
+        )
+    )
+
+
+def _position(point: object) -> bool:
+    return (
+        isinstance(point, list)
+        and len(point) in (2, 3)
+        and all(
+            isinstance(axis, (int, float))
+            and not isinstance(axis, bool)
+            and math.isfinite(axis)
+            for axis in point
+        )
+    )

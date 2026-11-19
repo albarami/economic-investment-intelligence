@@ -17,7 +17,7 @@ from custodian.tests.test_investment_build_survivors import (
 )
 
 import eii_custodian.publicdata.investment_build as build
-from eii_custodian.publicdata.investment_contracts import Bounds
+from eii_custodian.publicdata.investment_contracts import Bounds, InvestmentFailure
 
 
 def test_bounds_uses_fallback_only_for_absent_entry_limits() -> None:
@@ -108,10 +108,9 @@ def test_cached_body_missing_mismatched_and_verified(tmp_path: Path) -> None:
             "1|SYN-source|https://syn.invalid/page|missing_artifact|sidecar|missing",
         ),
         ([], "1|SYN-source|https://syn.invalid/page|missing_artifact|sidecar|missing"),
-        ({}, "1|SYN-source|https://syn.invalid/page|missing_terms|terms hash|absent"),
         (
-            {"terms_sha256": "", "retrieved_utc": "2026-01-03T04:05:06Z"},
-            "1|SYN-source|https://syn.invalid/page|missing_terms|terms hash|absent",
+            {},
+            "1|SYN-source|https://syn.invalid/page|missing_lineage|retrieved_utc|absent",
         ),
         (
             {"terms_sha256": 3},
@@ -146,6 +145,23 @@ def test_receipt_refuses_each_incomplete_slot(
     )
 
 
+def test_receipt_records_an_absent_terms_reading_as_pending(
+    tmp_path: Path,
+) -> None:
+    """Ruling L-1001: a missing or empty terms hash is a pending reading, not a
+    refusal; a non-string slot stays a malformed record."""
+    source = tmp_path / "SYN-cache"
+    source.mkdir()
+    for name, side in (
+        ("blank", {"terms_sha256": "", "retrieved_utc": "2026-01-03T04:05:06Z"}),
+        ("absent", {"retrieved_utc": "2026-01-03T04:05:06Z"}),
+    ):
+        (source / f"{name}.meta.json").write_text(json.dumps(side), encoding="utf-8")
+        assert build._receipt(
+            tmp_path, "SYN-cache", name, "SYN-source", "https://syn.invalid/page"
+        ) == ("", "2026-01-03T04:05:06Z")
+
+
 def test_receipt_returns_the_selected_sidecar_values(tmp_path: Path) -> None:
     (tmp_path / "SYN-cache").mkdir()
     (tmp_path / "SYN-cache/SYN-hash.meta.json").write_text(
@@ -165,7 +181,6 @@ def test_receipt_returns_the_selected_sidecar_values(tmp_path: Path) -> None:
         "licence_id",
         "licence_basis",
         "decision_record",
-        "terms_sha256",
         "retrieved_utc",
         "page_sha256",
     ],
@@ -178,7 +193,6 @@ def test_row_lineage_refuses_missing_slot(name: str, value: object) -> None:
         "licence_id": "1|fdi_projects|https://syn.invalid/page|missing_lineage|licence_id|absent",
         "licence_basis": "1|fdi_projects|https://syn.invalid/page|missing_lineage|licence_basis|absent",
         "decision_record": "1|fdi_projects|https://syn.invalid/page|missing_lineage|decision_record|absent",
-        "terms_sha256": "1|fdi_projects|https://syn.invalid/page|missing_lineage|terms_sha256|absent",
         "retrieved_utc": "1|fdi_projects|https://syn.invalid/page|missing_lineage|retrieved_utc|absent",
         "page_sha256": "1|fdi_projects|https://syn.invalid/page|missing_lineage|page_sha256|absent",
     }
@@ -187,6 +201,32 @@ def test_row_lineage_refuses_missing_slot(name: str, value: object) -> None:
             (_row(**{name: value}),), _spec().bounds, _spec().confirmation, _envelope()
         ),
         expected[name],
+    )
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_row_pending_terms_reading_is_a_record_and_never_refuses(
+    value: object,
+) -> None:
+    """Ruling L-1001: an absent or empty terms reading is pending and publishes."""
+    row = _row(terms_sha256=value)
+    result = build.validate_investment(
+        (row,), _spec().bounds, _spec().confirmation, _envelope()
+    )
+    assert not isinstance(result, InvestmentFailure)
+    cleaned = dict(row)
+    cleaned.pop("join_key", None)
+    assert result == (cleaned,)
+    assert result[0]["terms_sha256"] == value
+
+
+def test_row_non_string_terms_slot_still_refuses() -> None:
+    """Ruling L-1001: a non-string terms slot is a malformed record and refuses."""
+    _failure(
+        build.validate_investment(
+            (_row(terms_sha256=3),), _spec().bounds, _spec().confirmation, _envelope()
+        ),
+        "1|fdi_projects|https://syn.invalid/page|missing_terms|terms_sha256|absent",
     )
 
 

@@ -1,0 +1,229 @@
+"""S2-T08 part B, mismatch class 3: the observed ``prop_sales`` export shape.
+
+The live shape pack's Mismatches item 3 shows the export with ``usage`` in place
+of ``property_usage``, five further fields (``lstkhdm``, ``share_area``,
+``share_value``, ``number_of_shares_2400``, ``price_per_square_foot``) and no
+``area_square_feet``. A source-specific adapter checks that exact shape, reads
+the published square metres, leaves square feet absent and refuses, by name,
+any share field that holds a value: the share semantics are not confirmed and
+no whole-deal meaning is invented. Every row below is invented.
+"""
+
+from __future__ import annotations
+
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+from custodian.tests.repository_root import repository_root
+from custodian.tests.test_property_quarter import _blocked, _frame, _map
+
+from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.fetch.checks import schema_failure
+from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.property.bulletin import (
+    SALES_EXPORT_FIELDS,
+    SALES_SHARE_FIELDS,
+    parse_bulletin,
+    sales_export_rows,
+)
+from eii_custodian.publicdata.property.quarter import quarter_aggregates
+
+REPO = repository_root(Path(__file__))
+# The names of the shape pack's prop_sales row, in the portal metadata's order.
+OBSERVED = (
+    "registration_date",
+    "encrypted_transaction_number",
+    "encrypted_parcel_number",
+    "sm_lbldy",
+    "municipality_name",
+    "sm_lmntq",
+    "district_name",
+    "nw_l_qr",
+    "property_type",
+    "lstkhdm",
+    "usage",
+    "area_square_meters",
+    "share_area",
+    "price_per_square_foot",
+    "price_per_square_meter",
+    "number_of_shares_2400",
+    "share_value",
+    "property_value",
+)
+
+
+def _export(**overrides: object) -> dict[str, object]:
+    row: dict[str, object] = {
+        "registration_date": "2025-10-02",
+        "encrypted_transaction_number": "SYN-TX-S1",
+        "encrypted_parcel_number": "SYN-PX-S1",
+        "sm_lbldy": "SYN Coast AR",
+        "municipality_name": "SYN Coast",
+        "sm_lmntq": "SYN North AR",
+        "district_name": "SYN North",
+        "nw_l_qr": "SYN-LAND-1",
+        "property_type": "SYN-EN-LAND",
+        "lstkhdm": "SYN-USE-AR",
+        "usage": "SYN-USE-RESI",
+        "area_square_meters": 100,
+        "share_area": None,
+        "price_per_square_foot": None,
+        "price_per_square_meter": None,
+        "number_of_shares_2400": None,
+        "share_value": None,
+        "property_value": 100000,
+    }
+    row.update(overrides)
+    return row
+
+
+def _parse(rows: list[dict[str, object]], tmp_path: Path):
+    return parse_bulletin(
+        sales_export_rows(rows), "prop_sales", _map(), _frame(tmp_path / "frame")
+    )
+
+
+def test_the_adapter_names_the_observed_fields() -> None:
+    assert SALES_EXPORT_FIELDS == OBSERVED
+    assert SALES_SHARE_FIELDS == (
+        "share_area",
+        "number_of_shares_2400",
+        "share_value",
+    )
+
+
+def test_registry_declares_the_exact_observed_shape() -> None:
+    entry = next(
+        e
+        for e in load_registry(REPO / "custodian/publicdata/sources.yaml")
+        if e.key == "prop_sales"
+    )
+    assert tuple(name for name, _kind in entry.columns) == OBSERVED
+    kinds = dict(entry.columns)
+    assert kinds["usage"] == "string"
+    assert kinds["area_square_meters"] == "integer"
+    assert "property_usage" not in kinds
+    assert "area_square_feet" not in kinds
+    assert entry.commit_allowed is False
+    assert schema_failure(entry, [_export()], "https://invented.test") is None
+    old = _export()
+    old["property_usage"] = old.pop("usage")
+    failure = schema_failure(entry, [old], "https://invented.test")
+    assert failure is not None
+    assert (failure.check, failure.expected) == ("schema_missing", "usage")
+
+
+def test_exact_shape_keeps_a_deal_in_published_square_metres(tmp_path: Path) -> None:
+    parsed = _parse([_export()], tmp_path)
+    assert len(parsed.deals) == 1
+    deal = parsed.deals[0]
+    assert deal.area_m2 == Decimal(100)
+    assert deal.area_ft2 is None
+    assert deal.use_key == "residential"
+    row = next(r for r in quarter_aggregates(parsed.deals) if r["unit_type"] == "all")
+    # 100000 * 0.09290304 / 100, the card's factor; no published square feet.
+    assert row["median_price_per_ft2"] == Decimal("92.90")
+
+
+def test_published_price_per_square_foot_is_never_read(tmp_path: Path) -> None:
+    parsed = _parse([_export(price_per_square_foot=1)], tmp_path)
+    assert parsed.deals[0].area_ft2 is None
+    row = next(r for r in quarter_aggregates(parsed.deals) if r["unit_type"] == "all")
+    assert row["median_price_per_ft2"] == Decimal("92.90")
+
+
+def test_adapter_output_never_carries_square_feet_or_share_fields() -> None:
+    (row,) = sales_export_rows([_export()])
+    assert "area_square_feet" not in row
+    assert not set(SALES_SHARE_FIELDS) & set(row)
+    assert "price_per_square_foot" not in row
+    assert row["property_usage"] == "SYN-USE-RESI"
+
+
+@pytest.mark.parametrize("old", ["property_usage", "area_square_feet"])
+def test_old_field_names_are_refused(old: str) -> None:
+    row = _export()
+    row[old] = row.pop("usage") if old == "property_usage" else 2000
+    with pytest.raises(AdditionError) as refused:
+        sales_export_rows([row])
+    assert refused.value.name == "unknown_source_field"
+
+
+def test_extra_field_is_refused() -> None:
+    with pytest.raises(AdditionError) as refused:
+        sales_export_rows([_export(syn_extra="invented")])
+    assert refused.value.name == "unknown_source_field"
+
+
+@pytest.mark.parametrize("missing", ["usage", "lstkhdm", "share_value"])
+def test_missing_field_is_refused(missing: str) -> None:
+    row = _export()
+    del row[missing]
+    with pytest.raises(AdditionError) as refused:
+        sales_export_rows([row])
+    assert refused.value.name == "source_field_missing"
+
+
+@pytest.mark.parametrize(
+    "field", ["share_area", "number_of_shares_2400", "share_value"]
+)
+@pytest.mark.parametrize(
+    "value",
+    [1, 0, 2400, 1.5, "1", ""],
+    ids=["one", "zero", "whole", "fraction", "text", "empty_text"],
+)
+def test_a_share_value_is_refused_until_its_meaning_is_confirmed(
+    field: str, value: object
+) -> None:
+    with pytest.raises(AdditionError) as refused:
+        sales_export_rows([_export(), _export(**{field: value})])
+    assert refused.value.name == "share_semantics_unconfirmed"
+
+
+@pytest.mark.parametrize("rows", [None, {}, "rows", [["not", "a", "row"]]])
+def test_rows_that_are_not_a_list_of_objects_are_refused(rows: object) -> None:
+    with pytest.raises(AdditionError) as refused:
+        sales_export_rows(rows)
+    assert refused.value.name in {"bulletin_rows", "bulletin_row"}
+
+
+@pytest.mark.parametrize("area", [None, 0, -5])
+def test_missing_or_nonpositive_area_keeps_no_deal(
+    tmp_path: Path, area: object
+) -> None:
+    parsed = _parse([_export(area_square_meters=area)], tmp_path)
+    assert parsed.deals == ()
+    assert _blocked(parsed, "nonpositive_area") == 1
+
+
+def test_duplicate_deal_that_disagrees_is_blocked(tmp_path: Path) -> None:
+    parsed = _parse(
+        [_export(), _export(property_value=200000)],
+        tmp_path,
+    )
+    assert parsed.deals == ()
+    assert _blocked(parsed, "repeated_deal_price_disagreement") == 1
+
+
+def test_duplicate_deal_that_agrees_counts_once(tmp_path: Path) -> None:
+    parsed = _parse([_export(), _export()], tmp_path)
+    assert len(parsed.deals) == 1
+
+
+def test_review_record_holds_the_correction() -> None:
+    import yaml
+
+    review = yaml.safe_load(
+        (REPO / "custodian/publicdata/review/s2_t08_source_review.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    (row,) = [r for r in review["rows"] if r["mismatch"] == 3]
+    assert row["key"] == "prop_sales"
+    assert row["export_sha256"].startswith("9f4867dc")
+    assert len(row["export_sha256"]) == 64
+    assert set(row["change"]["columns"]["removed"]) == {
+        "property_usage",
+        "area_square_feet",
+    }

@@ -70,18 +70,36 @@ def refusal(result, url, check, expected, observed, publisher="Planted publisher
             "Planted publisher",
             "Invented mismatch",
         ),
-        (
-            _portal_meta("Planted publisher", licence="invented licence"),
-            "Planted publisher",
-            "licence_mismatch",
-            "text:CC BY url:https://creativecommons.org/licenses/by/4.0/",
-            "text:invented licence url:https://creativecommons.org/licenses/by/4.0/",
-        ),
     ],
 )
 def test_portal_metadata_failure(meta, publisher, check, expected, observed):
     result = kinds.prepare(portal(publisher=publisher), transport(meta, []), _sleep)
     refusal(result, META, check, expected, observed, publisher)
+
+
+def test_portal_licence_difference_is_recorded_pending():
+    """Ruling L-1001 (PUB-09): a licence different from the registry is recorded
+    with the date read, pending a reviewer's record, and fails nothing."""
+    meta = _portal_meta("Planted publisher", licence="invented licence")
+    result = kinds.prepare(
+        portal(publisher="Planted publisher"), transport(meta, []), _sleep
+    )
+    assert result.failure is None
+    assert result.portal_licence == "invented licence"
+    assert result.licence_pending == "invented licence"
+
+
+def test_portal_licence_absence_on_a_dataset_row_is_recorded_pending():
+    """Ruling L-1016 (applying L-1001): a dataset-basis portal row whose portal
+    states no licence is a record, never a gate; it fails nothing, and the
+    publisher plants above still refuse."""
+    meta = _portal_meta("Planted publisher", licence="")
+    result = kinds.prepare(
+        portal(publisher="Planted publisher"), transport(meta, []), _sleep
+    )
+    assert result.failure is None
+    assert result.portal_licence == ""
+    assert result.licence_unstated is True
 
 
 @pytest.mark.parametrize(

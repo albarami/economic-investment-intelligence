@@ -121,3 +121,25 @@ The spatial-loaded parser run remains a lead check: the custodian mutation suite
 runs in a copy of git-listed files without the ignored engine-extension folder.
 This pass uses the permitted connection-setting test without a skip or a path
 back to the original workspace.
+
+## Offline excluded-file audit (PO-S2-35)
+
+S2-T10 adds the separate offline callable `scripts.fsq_exclusions.check_exclusions`
+for the lead's coverage audit (PO-S2-35). It takes the summary's explicit local
+path, an exact mapping of every excluded summary key to a reviewed local file,
+and explicit `max_files` and `max_footer_bytes` budgets. It seeks over data pages,
+reads only each header, footer and trailer, and compares coordinate bounds with
+the same reader as the fetch. It refuses an incomplete or extra mapping, stale
+bounds, unreadable statistics or an exceeded budget; it never samples exclusions.
+A completed record holds the summary footer digest, selected keys and every
+checked key and footer digest, ordered by key, under `fsq_exclusions.v1`.
+
+This adds no CLI or network call and does not make the normal fetch check
+exclusions. Footer reads are bounded by `max_footer_bytes * (max_files + 1)`,
+including the summary. The lead must supply the excluded files independently;
+the callable does not acquire them or prove that the summary lists the whole
+release. Its digests cover header, footer and trailer only, not data pages.
+No real-copy audit was run in this task. Before deployment reliance, record an
+audit against the exact release and summary used, with independent file-list
+completeness and acquisition evidence; otherwise this exclusion limit stands.
+See document 17, **Further-places excluded-file coverage (PO-S2-35)**.
