@@ -17,7 +17,13 @@ FORBIDDEN = {
     "eii_custodian": ("eii_product", "eii_gateway"),
     "eii_product": ("eii_custodian", "eii_gateway"),
 }
-ENV_NAMES = ("EII_DECISION_PROVIDER", "JEV_PRO_API_KEY", "EARTHDATA_API_KEY")
+ENV_NAMES = (
+    "EII_DECISION_PROVIDER",
+    "JEV_PRO_API_KEY",
+    "EARTHDATA_API_KEY",
+    "CDSE_CLIENT_ID",
+    "CDSE_CLIENT_SECRET",
+)
 BYTECODE_DIR = "__pycache__"
 
 
@@ -59,6 +65,7 @@ def _group_and_sort(
         "relative-escape",
         "forbidden-import",
         "env-name",
+        "cdse-cache",
     )
 
     def rule_of(line: str) -> str:
@@ -177,9 +184,32 @@ def check_imports(root: Path) -> tuple[list[str], list[str]]:
                         )
                         continue
                     if not is_exempt_bytecode(path):
+                        allowed_cdse = package == "eii_custodian" and (
+                            "/publicdata/cdse/" in rel_file
+                            or rel_file.endswith("/publicdata/fetch/registry.py")
+                        )
+                        cache_markers: tuple[bytes, ...] = (
+                            b"satellite_cdse_backup",
+                            b"cdse_backup",
+                            b"publicdata.cdse",
+                        )
+                        if package != "eii_custodian":
+                            cache_markers += (b"data/public_cache",)
+                        if not allowed_cdse and any(
+                            marker in data or marker in rel_file.encode()
+                            for marker in cache_markers
+                        ):
+                            add_fail(
+                                f"FAIL cdse-cache: {rel_file}: optional backup must remain unread outside its cache tooling"
+                            )
                         for env_name in ENV_NAMES:
                             if (
-                                env_name == "EARTHDATA_API_KEY"
+                                env_name
+                                in {
+                                    "EARTHDATA_API_KEY",
+                                    "CDSE_CLIENT_ID",
+                                    "CDSE_CLIENT_SECRET",
+                                }
                                 and package == "eii_custodian"
                             ):
                                 continue

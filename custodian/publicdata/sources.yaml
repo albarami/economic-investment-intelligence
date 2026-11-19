@@ -12592,6 +12592,32 @@ sources:
     skip_reason: awards_profile_pending
     extension: html
 
+  - key: "satellite_cdse_backup"
+    refetch: {value: none, reason: "explicit_lead_shell_only", evidence: "proposed decision 0066"}
+    source_id: "satellite_cdse_backup"
+    slug: ""
+    kind: "cdse_backup"
+    title_en: "Optional unread satellite backup cache"
+    publisher: ""
+    licence_id: ""
+    licence_basis: "provider_terms"
+    decision_record: ""
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "2026-11-19"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    reconciliation: "none"
+    skip_reason: "provider_contract_pending"
+    extension: "tif"
+
 forecast_series:
   - key: licence_issues
     state: held

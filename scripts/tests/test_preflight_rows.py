@@ -409,6 +409,32 @@ class Rows(unittest.TestCase):
                 self.assertNotIn(key, line.text())
         self.assertEqual(ran, labels)
 
+    def test_cdse_pair_presence_only(self) -> None:
+        names = ("CDSE_CLIENT_ID", "CDSE_CLIENT_SECRET")
+        values = ("FAKE-CDSE-CLIENT-VALUE", "FAKE-CDSE-SECRET-VALUE")
+        for env in (
+            {},
+            dict.fromkeys(names, ""),
+            dict.fromkeys(names, "  "),
+            {names[0]: values[0]},
+            {names[1]: values[1]},
+            dict(zip(names, values, strict=True)),
+        ):
+            with (
+                mock.patch("socket.socket") as sock,
+                mock.patch("subprocess.Popen") as child,
+            ):
+                lines = (rows.cdse_client_id_row(env), rows.cdse_client_secret_row(env))
+                for name, check, line in zip(
+                    names, ("cdse-client-id", "cdse-client-secret"), lines, strict=True
+                ):
+                    presence = "present" if env.get(name, "").strip() else "absent"
+                    self.assertEqual(line.text(), f"PASS {check}: {presence}")
+                    for value in values:
+                        self.assertNotIn(value, line.text())
+                sock.assert_not_called()
+                child.assert_not_called()
+
     def test_night_lights_key_row(self) -> None:
         """OPS-06: night-lights key presence uses only the supplied mapping."""
         key = stubs.dummy("night")

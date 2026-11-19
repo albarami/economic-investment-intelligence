@@ -6,7 +6,9 @@ import contextlib
 import io
 import os
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import commands_support as support
 
@@ -27,7 +29,7 @@ class Commands(unittest.TestCase):
     def test_usage_lists_every_command(self) -> None:
         expected = support.expected_usage(ROOT)
         rows = support.architecture_table(ROOT)
-        self.assertEqual(len(rows), 12)
+        self.assertEqual(len(rows), 13)
         for args in ((), ("bogus",)):
             with self.subTest(args=args):
                 proc = support.run_launcher(args, {"PATH": ""}, ROOT)
@@ -42,7 +44,7 @@ class Commands(unittest.TestCase):
 
         self.assertEqual(table.usage_text(), expected)
         specs = table.COMMANDS
-        self.assertEqual(len(specs), 12)
+        self.assertEqual(len(specs), 13)
         for spec, (command, plane) in zip(specs, rows, strict=True):
             self.assertEqual(spec.form, support.usage_form(command))
             self.assertEqual(spec.plane, plane)
@@ -256,21 +258,66 @@ class Commands(unittest.TestCase):
         self.assertTrue(stderr.startswith("eii: usage error:"), stderr)
         self.assertIn("build-public", stderr)
         import commands.build_public as build_public
+        from eii_custodian.publicdata.fetch.registry import load_registry
         from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
+        entry = replace(
+            next(e for e in load_registry() if e.kind == "https_file"),
+            key="planted_command_file",
+            source_id="planted_command_file",
+            url="https://download.openstreetmap.fr/invented-command.bin",
+            fetch_host="download.openstreetmap.fr",
+            terms_url="",
+            landing_url="",
+            skip_reason="",
+            extension="bin",
+            release_tables=(),
+        )
+        failed_entry = replace(
+            entry,
+            key="planted_command_unreachable",
+            source_id="planted_command_unreachable",
+            url="https://download.openstreetmap.fr/invented-unreachable.bin",
+        )
+
         def unreachable(url: str) -> Response:
+            if url == entry.url:
+                return Response(url, b"invented-command-bytes", ())
             raise TransportFault("unreachable", url)
 
         secret = "planted-token-value"
+        cdse_client = "FAKE-CDSE-COMMAND-ID"
+        cdse_secret = "FAKE-CDSE-COMMAND-SECRET"
+        cdse_env = {"CDSE_CLIENT_ID": cdse_client, "CDSE_CLIENT_SECRET": cdse_secret}
+        recorded_argv: list[str] = []
+        child_environments: list[str] = []
+
+        def record_child(args: object, **kwargs: object) -> MagicMock:
+            recorded_argv.append(repr(args))
+            env = kwargs.get("env")
+            child_environments.append(repr(os.environ if env is None else env))
+            return MagicMock()
+
         stdout_buf = io.StringIO()
         stderr_buf = io.StringIO()
         with (
             contextlib.redirect_stdout(stdout_buf),
             contextlib.redirect_stderr(stderr_buf),
+            patch.object(
+                build_public, "load_registry", return_value=(entry, failed_entry)
+            ),
+            patch("socket.socket", side_effect=AssertionError("network")),
+            patch.dict(os.environ, cdse_env, clear=True),
+            patch("subprocess.Popen", side_effect=record_child) as children,
         ):
             code = build_public.run(
                 root,
-                {"PATH": "", "EARTHDATA_API_KEY": secret, "TOMTOM_API_KEY": secret},
+                {
+                    "PATH": "",
+                    "EARTHDATA_API_KEY": secret,
+                    "TOMTOM_API_KEY": secret,
+                    **cdse_env,
+                },
                 (),
                 transport=unreachable,
                 sleep=lambda _seconds: None,
@@ -278,12 +325,28 @@ class Commands(unittest.TestCase):
         stdout = stdout_buf.getvalue()
         stderr = stderr_buf.getvalue()
         self.assertEqual(code, 6)
-        self.assertNotIn(secret, stdout)
-        self.assertNotIn(secret, stderr)
         self.assertIn("unreachable", stderr)
-        for path in root.rglob("*"):
-            if path.is_file():
-                self.assertNotIn(secret, path.read_text(encoding="utf-8"))
+        files = support.snapshot(root)
+        receipts = {
+            name: body
+            for name, body in files.items()
+            if name.endswith(".meta.json") and body is not None
+        }
+        self.assertTrue(receipts, "the leak check must exercise produced receipts")
+        for value in (secret, cdse_client, cdse_secret):
+            with self.subTest(value=value):
+                self.assertNotIn(value, stdout)
+                self.assertNotIn(value, stderr)
+                self.assertNotIn(value, repr(recorded_argv))
+                for child_env in child_environments:
+                    self.assertNotIn(value, child_env)
+                for name, body in files.items():
+                    self.assertNotIn(value, name)
+                    if body is not None:
+                        self.assertNotIn(value.encode(), body, name)
+                for name, body in receipts.items():
+                    self.assertNotIn(value.encode(), body, name)
+        self.assertEqual(children.call_args_list, [], "unexpected build child")
 
     def test_down_deletes_nothing(self) -> None:
         folder = support.stub_folder(self)

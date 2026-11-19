@@ -35,6 +35,7 @@ KINDS = frozenset(
         "besttime",
         "public_page",
         "awards_intake",
+        "cdse_backup",
     }
 )
 # S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
@@ -425,6 +426,18 @@ def _entry(row: object) -> Entry:
     if source_id in BANNED_SOURCE_IDS:
         raise RegistryError("traffic provider has no registry row")
     kind = _text(row, "kind")
+    if source_id == "satellite_cdse_backup" or kind == "cdse_backup":
+        if (
+            source_id != "satellite_cdse_backup"
+            or kind != "cdse_backup"
+            or row.get("key") != source_id
+            or row.get("commit_allowed") is not False
+            or row.get("nightly_live_fetch") is not False
+            or row.get("release_tables") != []
+            or row.get("columns") != []
+            or row.get("licence_basis") != "provider_terms"
+        ):
+            raise RegistryError("CDSE backup must remain optional and unread")
     if kind not in KINDS:
         raise RegistryError("unknown kind")
     layer = _layer(row, kind)

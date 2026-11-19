@@ -173,7 +173,11 @@ def usage_form(command: str) -> str:
 def expected_usage(root: Path) -> str:
     """Build the usage text from the architecture table."""
     forms = [usage_form(command) for command, _plane in architecture_table(root)]
-    return USAGE_PREFIX + "\n" + "\n".join(forms) + "\n"
+    return (
+        USAGE_PREFIX + "\n" + "\n".join(forms) + "\n"
+        "CDSE backup boundary: possession of both CDSE values, "
+        "held only by the lead's wrapper.\n"
+    )
 
 
 def pinned_words(root: Path) -> tuple[str, ...]:
