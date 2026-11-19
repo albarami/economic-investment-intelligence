@@ -2776,6 +2776,34 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The lead confirms what the F5 calibration values are, where they are owed and the task that closes them before its gate.
 - NEEDED BY: the slice S4 gate.
 
+## OI-287 — Catalogue spike part-two acceptance and publisher reading
+
+- ID: OI-287
+- TYPE: OPEN
+- RAISED BY: S6-T33 rev1 P3, P6–P8, cf1/cf2 and the lead's pins/open-points ruling
+- CONCERNS: TASKS.md S6-T33; decision 0056, Acceptance status and Limits and follow-up; web/spikes/catalogue/README.md
+- COMPARISON: OI-247 concerns production catalogue-family population and caveat ownership; OI-249 concerns installed catalogue discovery. Neither covers this spike's missing browser/candidate/activation evidence. OPEN_ITEMS.md's unnumbered S6-T34 part-one handoff already covers the corresponding chart prerequisites, so no chart handoff duplicate is proposed.
+- EVIDENCE: The corrected offline task is APPROVED at `9877d93` by Anthropic Claude Opus 5.5, and its train checksum difference is APPROVED at `435fe5c` by Z.ai GLM-5.3. Decision 0056 still marks browser output, interrupted-stream transient exposure, real same-turn activation, numeric Fact chips and decision isolation BLOCKED. A2UI's Node import fails with HTMLElement unavailable; json-render receives constant application-owned markup; envelopes do not exercise full candidate grammars. negotiate/severity are scenario seams outside prepare, and byte-prefix checking uses a stub oracle. Publisher web-page reading remains open under the lead's ruling; installed-package reading and untried retreats do not close it. Sources: `.overnight/IN/S6-T33/review.S6-T33.rev1.md` P3/P7/P8; cf1/cf2; task README; decision 0056.
+- NEEDED: Assign part-two ownership; obtain the publisher reading; use the shared Fact-chip family and actual candidate surfaces; observe live DOM/accessibility and interrupted commits; connect version/severity and real activation to the validated path; cut streams with the real validator. Keep native and every missing-evidence label until its own proof exists. No owner-device capture is required by S6-T33. Keep decision 0056 Proposed pending part-two native evidence; PO-S6-3 records the stale review-pending wording without silently rewriting earlier evidence.
+- NEEDED BY: S6-T33 full acceptance and its dispatcher consumers, under the unchanged off-critical-path spike rules of document 14.
+
+## OI-288 — Catalogue evidence environment and oracle identity
+
+- ID: OI-288
+- TYPE: ASSUMPTION
+- RAISED BY: S6-T33 rev1 P2 and cf1 P11, retained by cf2
+- CONCERNS: web/spikes/catalogue/tests/helpers.mjs; record.mjs; evidence/results.json environment; source-checksum reproducibility
+- COMPARISON: OI-251 concerns declared runtime package dependencies and OI-249 installed catalogue discovery. Neither establishes the Python environment or measured affinity of this offline spike. Existing S6-T34 handoff concerns native collection, not this recorder's environment labels.
+- EVIDENCE: helpers.mjs invokes system python3 and its PyYAML rather than locked uv. The source receipt hashes the validator sources but not that interpreter environment. record.mjs writes the literal “launcher cores 20,21”; PROGRESS.md's FIX1 correction records actual cores 4–7 and discloses the inherited discrepancy. cf2 retains P11. Sources: `.overnight/IN/S6-T33/review.S6-T33.rev1.md` P2; cf1 P11; cf2 Limits; PROGRESS.md S6-T33 FIX1 correction.
+- NEEDED: Bind or explicitly record the interpreter/dependency identity and measure affinity, or clearly label the string as historical supplied metadata. Make any new evidence update a separately scoped change with reproducibility checks and the task's own confirmation where decision 0032 requires it; do not refresh the current receipt to erase history.
+
+Existing items reused, with no new numbered section:
+
+- OPEN_ITEMS.md, “S6-T34 part-one handoff — numbering reserved to the lead”, already covers C1–C6's fixture/cardinality, instrumentation, Fact-chip/DOM, laptop/phone/transport, publisher-page, decision-number and review points. Keep its heading unchanged and append the single review-correction line supplied through spec.json brief_edits: SpaceXAI Grok 4.7 APPROVED `45d5ac5`; decision 0057 stays Proposed pending part-two native evidence, and qualified capture remains open. Source: S6-T34/review.S6-T34.pinconf2.md; LEAD-ANSWERS.md, Item numbers and Decisions 0056 and 0057. Retain the existing matrix-control correction.
+- OI-09 and OI-250 already cover native Arabic review. Reuse their pending native-review scope for S6-T33's never-displayed paired Arabic fixture, recorded in log.md; allocate no duplicate.
+- OI-227 retains the historical interrupt-test random failure; PO-S2-06 records the distinct inherited ignored-signal explanation and is closed as a documentation entry, not proof that the S6 run has that cause. Keep the S6 lv1 timeout/interrupted observation with its exact run and load; no causal closure follows from head-2 passing that test.
+- PO-S2-90 already covers duplicate launches, mutable worktrees and incorrect processor-gate arguments. Reuse that workflow item for the duplicate S6-T33 review launch and disqualified S6-T34 lv1 run recorded in log.md; allocate no duplicate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4053,6 +4081,113 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: A governor redirect actually launched OpenAI Sol; the lead then launched another OpenAI Sol writer in the same workspace. One returned exit 1, the other exit 0, and both described the same changes; the lead inspected a coherent final diff and checked it before e9db07b. Earlier S2-T29 checks were stopped or downgraded to pre-checks when their tree changed during execution, including the records commit ab6d6fc. Sources: `.overnight/IN/S2-T32T/log.lines.md` and S2-T29/log.lines.md. Existing OI-227/OI-228 concern distinct random failures; no existing item at 55ee3c3 covers this duplicate-launch and mutable-tree incident.
 - NEEDED: Retain the incident, read launch status before relaunching redirected builds, and keep acceptance checks on a fixed committed tree. Retain the wrong processor-gate launch argument as a lead launch error. Later checks supply later evidence and never rewrite failed or downgraded runs. This is a record and workflow point; no launcher code is changed here.
 
+### PO-S6-1 — Catalogue spike guards have no required gate owner
+
+- ID: PO-S6-1
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S6-T33 rev1 P1; adopted as a proposal by the lead
+- CONCERNS: web/package.json test:spike:catalogue, scripts/run_tests.py and hosted checks
+- COMPARISON: OI-281 records mutation runner tests absent from required checks, a different test group. No existing item covers the catalogue guard suite.
+- EVIDENCE: The spike's guards run through its own script, while whole-test/hosted web checks include catalogue-isolation only. The lead separately records catalogue runs and their hash failure/fix. Sources: `.overnight/IN/S6-T33/review.S6-T33.rev1.md` P1; forced/train.log.lines.md; web/package.json.
+- NEEDED: Keep explicit spike-command exits in the ledger; decide whether and where a required check owns this suite. These ledger inputs change no gate.
+
+### PO-S6-2 — Catalogue acceptance statuses are not asserted by evidence verification
+
+- ID: PO-S6-2
+- TYPE: OPEN
+- RAISED BY: Anthropic Claude Opus 5.5, S6-T33 rev1 P5
+- CONCERNS: web/spikes/catalogue/verify-evidence.mjs
+- COMPARISON: OI-247's family coverage is a different production concern; no current item covers this status message.
+- EVIDENCE: The verifier prints that blocked rows remain blocked but asserts no acceptance statuses. The reviewer proposes either asserting all ten statuses or changing that message; no supplied confirmation says this was fixed. Source: `.overnight/IN/S6-T33/review.S6-T33.rev1.md` P5 and cf2's unchanged-code limit.
+- NEEDED: Choose one approach and plant a changed acceptance-status record if statuses become enforced. Preserve current missing-evidence labels and source hashes.
+
+### PO-S6-3 — Catalogue decision and attribution records need appended qualifications
+
+- ID: PO-S6-3
+- TYPE: OPEN
+- RAISED BY: S6-T33 rev1 P4/P6/P10; cf1/cf2; supplied task launch records
+- CONCERNS: decision 0056 header and acceptance row; catalogue README builder label; task status and ledger records
+- COMPARISON: PO-S2-88 concerns a different task's attribution/check evidence. No current item resolves these catalogue records.
+- EVIDENCE: The task has an independent approval at `9877d93`, while decision 0056 and README still say review pending. rev1 P4 says the native-retention disposition is substantively recorded but its status is process-blocked; P6 notes proposed number/owner-header form; P10 flags build attribution, now resolved to OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6). Sources: `.overnight/IN/S6-T33/review.S6-T33.rev1.md`; cf2; log.lines.md; decision 0056.
+- NEEDED: Keep decision 0056 Proposed pending part-two native evidence, leave its stale review-pending wording unchanged in this train, and retain its header-form observation for an appended records qualification. Build attribution: OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6). Source: LEAD-ANSWERS.md, Build-model names and Decisions 0056 and 0057. Append the approval with its actual commit and retain the earlier pending state as history. Complete criterion 6 only on an attributable disposition; this draft leaves it unchecked.
+
+### PO-S6-4 — Chart playback plant overlaps the frame-ceiling failure
+
+- ID: PO-S6-4
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S6-T34 rev1 P1; retained by the lead
+- CONCERNS: web/spikes/charts/tests/trace.node-test.mjs; trace.mjs; criterion C4
+- COMPARISON: The existing S6-T34 handoff covers absent native qualification; it does not cover this independent unit-plant weakness.
+- EVIDENCE: The playback-equality sample uses 1000/30-ms frames and asserts only a false result; the same frames exceed 33 ms, so relaxing the playback check could still fail the frame rule. Source: `.overnight/IN/S6-T34/review.S6-T34.rev1.md` P1.
+- NEEDED: Prove the playback comparison with a plant whose result cannot be supplied by the frame ceiling, for example an isolated rule assertion or factored checker with a control. Keep both budgets unchanged; this is not native evidence.
+
+### PO-S6-5 — Chart p95 tests need a non-uniform rank control
+
+- ID: PO-S6-5
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S6-T34 rev1 P2
+- CONCERNS: web/spikes/charts/trace.mjs and tests/trace.node-test.mjs; criterion C4
+- COMPARISON: No existing item pins the chart nearest-rank index; the existing handoff only keeps native collection open.
+- EVIDENCE: The implementation uses ceil(n * 0.95) minus one; uniform latency samples cannot distinguish the wrong index. Source: `.overnight/IN/S6-T34/review.S6-T34.rev1.md` P2.
+- NEEDED: Add a non-uniform positive/negative sample that fails with a wrong rank index. Retain strict under-100-ms acceptance and the native evidence boundary.
+
+### PO-S6-6 — Chart numeral guard omits description text
+
+- ID: PO-S6-6
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S6-T34 rev1 P3
+- CONCERNS: web/spikes/charts/guards.mjs and tests/guards.node-test.mjs; criterion C5
+- COMPARISON: The existing S6-T34 handoff retains actual DOM/Fact-chip integration; this is a distinct descriptor-guard hardening point.
+- EVIDENCE: The guard scans view.text but a numeral in description passes. The reviewer also requests named Arabic-Indic and Extended Arabic-Indic failures. Source: `.overnight/IN/S6-T34/review.S6-T34.rev1.md` P3.
+- NEEDED: Scan every audience string in the closed descriptor, add isolated plants/controls and assert the specific digit-family errors. This does not certify actual DOM or shared Fact chips.
+
+### PO-S6-7 — Chart common-shell method and joined-lock identity
+
+- ID: PO-S6-7
+- TYPE: OPEN
+- RAISED BY: SpaceXAI Grok 4.7, S6-T34 rev1 P4; train draft's static receipt comparison
+- CONCERNS: decision 0057, Evidence and acceptance; PROGRESS.md, Chart spike part one; web/spikes/charts/evidence/bundle.json
+- COMPARISON: The existing S6-T34 handoff covers native capture identity, not the offline bundle's stale joined-lock identity and method wording.
+- EVIDENCE: PROGRESS.md retains both direct-entry history and final common-shell deltas; decision 0057 says export-preserving adapter output without naming common-shell deltas. At `0c499f7`, bundle.json still records lock prefix `32a58aa`, while the committed joined package-lock.json hashes to prefix `b349533`. The later lead note mentions an uncommitted chart-lock evidence change in the confirmation worktree; `435fe5c` commits catalogue checksums only. Sources: rev1 P4; pinconf2; forced/train.log.lines.md; read-only SHA-256 comparison in CHECK.md.
+- NEEDED: Explicitly name the common-shell method and historical measurement lock; distinguish the old measurement from a joined-head result. The lock prefix is the task's build-time lock; main's lock changes joined, and the byte measurement was not reproduced on the joined lock. Route re-recording to S6-T34 part two (LEAD-ANSWERS.md, Chart lock identity). Do not refresh evidence or infer byte-total reproduction in this draft.
+
+### PO-S6-8 — Join confirmation record differs from the committed proof and lead checks
+
+- ID: PO-S6-8
+- TYPE: OPEN
+- RAISED BY: train S6-1 drafting comparison
+- CONCERNS: Google Gemini 3.1 Pro join confirmation on `afb0740`; forced/JOIN-PROOF.txt; catalogue checksum correction `435fe5c`
+- COMPARISON: PO-S2-89 records a previous train's proof-comment issue, not this verdict's broader file list and execution-head discrepancy.
+- EVIDENCE: The supplied join verdict lists more forced files than the per-task join proof, and claims catalogue tests pass on `afb0740`. The lead's web-check record says that head fails verification after 80 tests pass; the committed correction is `435fe5c`. A later log says the confirmation worktree held uncommitted catalogue/chart hash changes. The separate Z.ai GLM-5.3 confirmation correctly APPROVES the two catalogue checksum values at `435fe5c`; it does not settle the earlier verdict's execution tree. Sources: `.overnight/IN/forced/VERDICT.TRAIN-S6-1.joinconf.md`, JOIN-PROOF.txt and train.log.lines.md; S6-T33/review.TRAIN-S6-1.t33ev.md.
+- NEEDED: The binding rule-33 evidence is extra/LEAD-JOINPROOF.txt: S6-T33 51 of 53 same, S6-T34 32 of 36 same, no join-only file. The wider verdict compared the combined head; T4 PASS used a confirmation worktree with uncommitted evidence edits and is not clean-afb0740 evidence (LEAD-ANSWERS.md, Join proof against the join verdict). Keep the original verdict, failed checks and later bounded confirmation intact; obtain any confirmation required for an actual code/test difference under decision 0032.
+
+### PO-S6-9 — Browser threads reset their processor affinity
+
+- ID: PO-S6-9
+- TYPE: OPEN
+- RAISED BY: the lead's train log, browser-affinity diagnosis
+- CONCERNS: headless browser scheduling during web checks
+- COMPARISON: PO-S2-90 covers launcher/core-gate mistakes; it does not cover a browser thread changing its own affinity.
+- EVIDENCE: The lead records the browser process on cores 6–9 while its own threads reset to cores 0–3, defeating the intended taskset scheduling. Source: `.overnight/IN/forced/train.log.lines.md`, browser-affinity diagnosis.
+- NEEDED: Retain the measured thread-affinity limitation when attributing load and timing, and assign an investigation of actual scheduling. No performance bound, fixture or test assertion is relaxed.
+
+### PO-S6-10 — Dependency install aggregate lacks alert identities
+
+- ID: PO-S6-10
+- TYPE: OPEN
+- RAISED BY: Z.ai GLM-5.3, catalogue evidence confirmation of `435fe5c`
+- CONCERNS: npm ci informational output for the joined dependency tree
+- COMPARISON: OI-113, OI-126 and OI-161 record specific package alerts with historical versions. They do not identify the confirmation's full aggregate, and this draft makes no claim that the sets are equal or additional.
+- EVIDENCE: The confirmation reports 25 alerts: 12 moderate, 12 high, one critical; it treats this as informational and no finding against the two checksum lines. No audit identity report is supplied. Source: `.overnight/IN/S6-T33/review.TRAIN-S6-1.t33ev.md`, Proposed open items.
+- NEEDED: Preserve the informational aggregate as measured install output. No identities were retained; this severity-count aggregate maps to no existing item (LEAD-ANSWERS.md, Dependency aggregate). No network audit, new dependency claim or lock repair is authorised by this drafting task.
+
+Record points covered without another numbered proposal:
+
+- S6-T33 rev1 P3/P7/P8 and publisher reading are routed to items.md's catalogue part-two item; P2/P11 to its environment item; P4/P6/P10 to the catalogue records proposal above; P9 reuses OI-09/OI-250. Every rev1 P1–P10 and cf1 P11 is accounted for.
+- S6-T34 rev1 P1–P4 have separate proposals above; existing “S6-T34 part-one handoff — numbering reserved to the lead” retains the remaining C1–C6 work, with its matrix-control correction and the single appended review correction in spec.json brief_edits.
+- Existing PO-S2-90 holds the duplicate S6-T33 review launch, the wrong core-gate arguments and S6-T34's mutable-worktree check; existing OI-227/PO-S2-06 retain the interrupt observation without an invented cause or closure.
+- The pin module count is corrected to 11; plans have no committed identity; extra/VERDICT.S6-T34.moveconf.md directly supplies the move approval. Historical S6-T33 passed/skipped counts were not retained and that run is not acceptance evidence. Decisions 0056 and 0057 remain Proposed pending part-two native evidence; PO-S6-3 retains the stale review-pending wording. Sources: LEAD-ANSWERS.md, Pin-guard counts, Build-model names, S6-T33 historical lv1, Decisions 0056 and 0057, and Moveconf.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
@@ -4287,3 +4422,5 @@ S6-T34 correction: the offline matrix validator now has passing invented digest,
 attestation/device/viewport-binding and completeness controls. The open item is
 qualified collector integration and instrumentation review, not the absence of
 all matrix-checking code. This does not close native acceptance or C6.
+
+S6-T34 review correction: SpaceXAI Grok 4.7 APPROVED `45d5ac5` (S6-T34/review.S6-T34.pinconf2.md); decision 0057 remains Proposed pending part-two native evidence, and the existing matrix-control correction and native/Fact-chip limits remain open (LEAD-ANSWERS.md, Item numbers and Decisions 0056 and 0057).

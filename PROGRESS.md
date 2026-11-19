@@ -35303,6 +35303,350 @@ Seed:      none
 Notes:     All five work commits must have Conventional Commit subjects. make_spec.py proves the exact replay order, unchanged original messages with no cherry-pick trailers, five equal range-diff rows and all six approved task files byte-identical.
 ```
 
+### MERGE TRAIN S6-1 — Slice S6: final task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/92)
+
+- Author: OpenAI Codex, GPT-6; no narrower deployed variant is exposed. Persona: senior release engineer finishing traceable train ledgers. Strict self-review persona: release-evidence reviewer. Skills: task-standards, project-orientation, sanad-provenance, muhasabah-gate, github-flow and strict-reviewer. These final ledger inputs apply the supplied lead answers and read-only Git inspection; they are not an independent implementation approval. Source paths below are relative to `.overnight/IN/` unless a repository path is named. FORM-TRAIN-S2-3 supplies form only. The specification dry run prepares inputs only; no test, network call, ledger execution or Git write runs in this finalisation session.
+
+#### The train's part
+
+- Ledger scope (L-1048): ledger BASE `8d9baa1d8f82058b5be8c3ac254192b1540b043f` is main `8d9baa1`, the parent of the last move merge as L-886 requires; runtime WORK `4ccd425faef1afa20e9766fdcff238a19dbd5e12`. 8d9baa1..WORK holds 15 commits (the task commits, the two join merges and the two moves onto main) and 81 changed paths, the train's own; make_spec.py first asserted the full inventory from the original base `81e62db` (20 commits and 208 changed paths including inherited main changes) and permitted only the announced documents-only main move (Git inventories in make_spec.py; LEAD-ANSWERS.md, PR, hosted checks, ledger seed).
+
+- Decision 0032 items 1 to 3 governs this two-task train of slice S6. Order: S6-T33, approved head `9877d93`, then S6-T34, approved head `45d5ac5`, both originally on main `81e62db`. Anthropic Claude Opus 5.5 APPROVED S6-T33 at `9877d93` in cf2; SpaceXAI Grok 4.7 APPROVED S6-T34 at `45d5ac5` in pinconf2. Build attribution: OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6), as resolved in LEAD-ANSWERS.md, Build-model names. Approval is of offline part one, with the acceptance limits below, not completed native acceptance.
+- Dependencies are merged: TASKS.md S6-T33 names S3-T07 and accepted decision 0042; S6-T34 names S1-T12 and accepted decision 0042. Read-only Git history of base `b380109` contains S3-T07 as `5cfff64` (pull request 63), S1-T12 as `2bbdad2` (pull request 55), and decision 0042 as `89ab3f0` (pull request 65). Their files and the two task Depends lines are present. No dependency is supplied by an unmerged third task. Document 14, section “slice S6 — The flagship location choice”, keeps these front-end spikes off the critical path and outside S6-T06's blanket dependency; their own criteria and review still apply.
+- Joiner: the lead, attributed to Anthropic Claude Opus 5.5 by the task commit records, joined onto main `b380109` as `87a36ad` for S6-T33 and then `afb0740` for S6-T34. The binding rule-33 file-by-file proof is the lead's independent rerun, extra/LEAD-JOINPROOF.txt: S6-T33 51 of 53 same (AGENTS.md and CLAUDE.md differ); S6-T34 32 of 36 same (AGENTS.md, CLAUDE.md, web/package.json and web/package-lock.json differ); no file only in either join. This reproduces forced/JOIN-PROOF.txt. The lock union records 638 entries, from 534 base plus 30 catalogue and 74 chart entries; both tasks' version, resolved and integrity fields remain unchanged (forced/JOIN-PROOF.txt; extra/LEAD-JOINPROOF.txt; forced/train.log.lines.md, join result).
+- The run-folder joinproof.sh masks a failing diff inside ops() with `|| true` under pipefail; the lead's independent rerun in extra/LEAD-JOINPROOF.txt is the evidence. This run-folder tool is not a repository check and was not executed here (LEAD-ANSWERS.md, Join script).
+- S6-T33 forced difference, AGENTS.md: rule 44 retains main's intervening commands and the catalogue commands (first join proof and lead join result).
+- S6-T33 forced difference, CLAUDE.md: the same rule-44 union; bytes remain identical to AGENTS.md (same sources).
+- S6-T34 forced difference, AGENTS.md: rule 44 retains main and catalogue commands together with chart commands (same sources).
+- S6-T34 forced difference, CLAUDE.md: the identical rule-44 union (same sources).
+- S6-T34 forced difference, web/package.json: one comma changes at the additive script/dependency union (same sources).
+- S6-T34 forced difference, web/package-lock.json: regenerated union preserves each task's package identities (same sources).
+- Google Gemini 3.1 Pro through Droid returned APPROVED on `afb0740`, T1–T4 PASS, findings none, including the task-specific forced-difference confirmations. Its wider comparison of the combined head lists S6-T33 differences in AGENTS.md, CLAUDE.md, PROGRESS.md, docs/README.md and pins.toml; for S6-T34 it lists AGENTS.md, CLAUDE.md, OPEN_ITEMS.md, PROGRESS.md, TASKS.md, docs/README.md, pins.toml, web/eslint.config.js, web/package-lock.json and web/package.json. The independent per-task proof above is binding. T4 PASS ran in a confirmation worktree with uncommitted evidence edits and is not evidence for clean `afb0740` (LEAD-ANSWERS.md, Join proof against the join verdict). The launcher's return code is recorded as 0, duration 2471 s; its claimed test counts are 863 web checks, 80 catalogue and 48 charts (forced/train.log.lines.md; join verdict).
+- Lead web checks at `afb0740`, cores 2–5: npm ci, build, check, lint, format:check and typecheck exit 0; test:checks exits 0 in 709 s; chart tests and chart build exit 0. Catalogue tests exit 1 after 80 passed, followed by HASH_MISMATCH:../../package.json; catalogue evidence verification also exits 1. Cause: S6-T34 changed the package manifest and lock that S6-T33 fingerprints. Chart evidence verification exits 1 with “BLOCKED: missing native capture matrix”, the task's recorded blocked result, not a passing acceptance check (forced/train.log.lines.md, web-check result).
+- Forced evidence difference, `435fe5c`: the lead ran spike:catalogue:record and changed only the manifest and lock hash values in web/spikes/catalogue/evidence/checksums.json. Results and all 31 cases are unchanged; catalogue tests and evidence verification then exit 0, with 80 tests passed. (forced/JOIN-PROOF.txt; forced/train.log.lines.md, web-check result).
+- S6-T33 forced-evidence confirmation by Z.ai GLM-5.3 APPROVED `435fe5c`, C1–C4 PASS, findings none; it independently checked the two hashes and reproduced a one-character hash plant, exit 1, then restored bytes and verified exit 0 (S6-T33/review.TRAIN-S6-1.t33ev.md). The launch log initially names Moonshot Kimi K3.1 Pro, then records a model-unavailable refusal and relaunch on GLM-5.3; the actual verdict identifies Z.ai GLM-5.3. These are a failed launch and its replacement, not two completed reviews.
+- Main `ef21945` was merged by the lead as `0c499f7`, parents `435fe5c` and `ef21945`. PROGRESS.md append blocks were both retained; docs/README.md decision rows were retained in number order. JOIN2-PROOF.txt compares `b380109..435fe5c` with `ef21945..0c499f7`: 80 of 81 task-file changes are identical and no extra task file appears. The lead describes PROGRESS.md as the same line set in a different order; the draft's independent zero-context diff count finds every nonempty changed line retained, with one fewer empty separator addition. That is a records-only qualification of the supplied proof, not lost task evidence. No web file changes between `435fe5c` and `0c499f7`. The lead records docs, tree, agent-byte parity and whitespace checks exit 0. This records-only move carries the earlier approval evidence under rule 33 and decision 0039; it is not a new verdict on `0c499f7` (forced/train.log.lines.md, join 2; forced/JOIN2-PROOF.txt; CHECK.md).
+- Head-2 whole test: `./eii test --seed 2180478600`, head `0c499f7`, lead cores 8–11, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15. Exit 1, total 10640 passed, one failed, zero skipped in seven suites. Guards: 896 passed, one failed in 334.00 s; core 739, custodian part one 4155, custodian part two 3200, product 786, web checks 863 and web unit one passed. The sole failing test is test_pin_rulings.py, PinRulings.test_every_pin_has_a_ruling_and_retreat: nine notes cite the two absent task-log headings. The two exact headings below answer those citations; CHECK.md records a static comparison of all nine. This is not a passing whole-test rerun. Custodian part durations are not printed in the supplied output (forced/TRAIN-S6-1.head2.wholetest.txt; launch line in forced/train.log.lines.md).
+- Merge subject: the lead renamed the merge `0c499f7` as `a429025` (git commit-tree on the same tree `50582a9` with the same parents `435fe5c` and `ef21945`; subject `chore(train): merge main ef21945 into train S6-1`), because the commits row requires a Conventional Commit subject on every commit and the default merge subject failed it; `git diff 0c499f7 a429025` is empty. Main `8d9baa1` (pull request 90, decision 0064, documents only) was then merged as `4ccd425` with no conflict (OPEN_ITEMS.md, TASKS.md and docs/README.md auto-merged); no code, test or lock file of either task changed. Head-2 above ran on the tree of `0c499f7`, equal to that of `a429025`.
+- Pull request https://github.com/albarami/economic-investment-intelligence/pull/92; hosted checks remain pending for the real head; the lead supplies the ledger seed 4146161478. The dry specification run establishes no hosted or whole-test result. The future ledger must add these headings before the pin guard runs, as the lead directed; no records-first support beyond the supplied ledger contract is assumed here. Final hosted checks and a passing fresh-seed exact merge-result test remain required. Decision 0032's failed-joined-head rule is retained; these inputs grant no exception or merge authority.
+- Join record points: catalogue evidence confirmation reports npm ci's 25 dependency alerts (12 moderate, 12 high, one critical), informational install output only; existing individual dependency-alert items do not establish identities for this aggregate. The lead also recorded headless-browser threads resetting affinity to cores 0–3 despite taskset. The later note that the confirmation worktree held two uncommitted hash changes is not evidence of a second committed change: Git shows `435fe5c` changes only catalogue checksums; the chart bundle still names the pre-join lock. The confirmation worktree's evidence edits disqualify its T4 result for the clean head. The chart bundle names the task's build-time lock; main's joined lock changes were retained, so the historical byte measurement is not reproduced on that joined lock. Re-recording belongs to S6-T34 part two (LEAD-ANSWERS.md, Chart lock identity). Proposed records are in items.md and po_items.md; no tracked evidence is refreshed here.
+
+### S6-T33 — Spike: catalogue enforcement (native dispatcher against A2UI and json-render): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/92)
+
+- Goal and scope: measure whether an adapter adds value while preserving the native typed dispatcher and closed catalogues. This task adds an isolated catalogue/transport harness, invented fixtures, evidence and proposed decision 0056; no runtime dependency enters the critical path (TASKS.md S6-T33; decision 0056, Proposed result).
+- Plan: Codex (plan documents of the run folder; no committed plan identity). Design review: Google Gemini 3.1 Pro, APPROVED, D1–D5 MET, findings none; it maps the criteria and plants, preserves budgets and isolation, and keeps absent prerequisites BLOCKED. The design verdict approved an uncommitted plan document; no committed plan identity is retained (S6-T33/log.lines.md, plan/design launches; review.S6-T33.design1.md).
+- Original commits, in order, from S6-T33/commits.md: `4a54439` exact spike-only development pins by the lead; `55628c0` offline part-one build by OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6), committed by the lead as built; `d5ee09c` the same builder's fix pass for F1–F5; `b66b3a3` lead pin-ruling/task-heading correction; `9877d93` lead records-only correction of cf1 N1/N2.
+- Mapping to the train: those five approved commits are represented together by join `87a36ad`, with the two rule-44 differences above. Subsequent `afb0740` adds the other task; `435fe5c` is this task's separately confirmed forced checksum difference. Main's records-only merge carries the result to `0c499f7` (task commits; both join proofs; t33ev).
+- The lead supplied @a2ui/react 0.15.0 with retreat 0.14.0, @json-render/core and react 0.21.4 with retreat 0.21.3, and @ag-ui/core 1.0.3 with retreat 1.0.2 as spike-only devDependencies. Zod stays transitive. The lead ruled exact supported-version equality, blocking/warning severity, single-use same-turn user activation, every-byte stream cuts and a frozen nonblank/noncomment line list; keep an adapter only if every criterion passes and it removes code. Package README/type/changelog reading is offline at exact installed versions; publisher-page reading remains open. The lead later ruled that the unchanged reading belongs under Package reading in the spike README, preserving the closed reference-notes check (S6-T33/rulings.rows.md, pins/open-points and package-reading rulings; README Package reading).
+- Build and fix personas are senior frontend architect/engineer for measured technology spikes; strict implementation reviewer is Anthropic Claude Opus 5.5. Builder records list project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate; missing test-first, debugging and verification skills were applied by plain meaning. Fix evidence records Linux x64, Node v22.22.3, Python 3.14.4, uv 0.11.31, cores 4–7, offline environment and no random seed. The evidence environment's fixed “launcher cores 20,21” is not a measurement of that fix run (PROGRESS.md, S6-T33 FIX1 correction).
+- rev1, Anthropic Claude Opus 5.5: REJECTED `55628c0`. Findings F1–F5: template-substitution LOC overcount; coverage omissions without plants; three aliased entry points; manufactured literal timelines; invalid pin citations and a forbidden reference-notes section. It ran the real oracle on all 31 cases with zero mismatches and three valid controls, verified source hashes, and recorded versions exit 1 with four faults and reference notes exit 1; node tests were NOT RUN because dependencies were absent and network forbidden (review.S6-T33.rev1.md).
+- The lead accepted all five exact fixes. OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6) implemented `d5ee09c`: rescan templates; check complete candidate/stream/mode/fallback coverage with omission plants; distinct story/Explore/assistant wrappers and divergence plant; observed validated-before-commit/refusal timelines; accepted anchors and unchanged reading move. Retained tests-first reds each exit 1. Green spike tests exit 0, 80 passed; evidence recording/verification, lint, typecheck, formatting, web checks, versions, notes, docs, tree, parity and whitespace checks exit 0. Broad web checks later append exit 0, 859 passed. Final LOC is shared 433, harness 809, tests 626; old-head independently corrected counts were harness 747 and tests 531. Nine valid timelines and 84 refused timelines gain observed validation; other stream figures are unchanged (PROGRESS.md, FIX1 correction and appended broad-suite result; task log; cf1).
+- cf1, Anthropic Claude Opus 5.5: REJECTED `b66b3a3`, F1–F5 RESOLVED. N1: json-render rendering runs in the recorder, not the tests. N2: the moved package reading is beside, rather than inside, Package reading. Its fresh record is byte-identical, independent counts reproduce, disabled-guard plants fail and spike tests pass 80. The pin module has 11 tests, as the confirmations record (cf1; lead fix result).
+- Correction appended: the earlier lead pin-guard count of 18 was a miscount; the module's own count is 11, as the confirmations record. No old evidence row is rewritten (LEAD-ANSWERS.md, Pin-guard counts).
+- cf2, Anthropic Claude Opus 5.5: APPROVED `9877d93`, N1/N2 RESOLVED, F1–F5 preserved, findings none. Two records files change only the exact wording and heading nesting. Spike tests pass 80, evidence verification and formatting exit 0, versions checks 74 components, notes checks two files/six libraries/359 rows, docs checks 991 text/109 Markdown files, parity exit 0. The pin guard exits 1 with four missing headings before the ledger and 0 with 11 tests after scratch headings. cf2 did not rerun cf1's plants/count, relying on unchanged code/evidence. It disclosed two temporary files briefly written outside the assigned workspace and removed; that historical boundary mistake is retained, not repeated here (review.S6-T33.cf2.md).
+- Historical lead lv1 whole check, recorded against `55628c0`, seed 2582489158, cores 4–7: exit 1 after 1912 s, five failed, comprising pin headings, reference notes, interrupt handling and two version checks. The lead's initial checks omitted the hosted versions and notes steps; the lead ruled that all affected hosted Python steps must henceforth run. Passed/skipped counts were not retained; this historical lead run is not acceptance evidence. The build worktree's ongoing whole test required a fresh fix worktree. The head-2 result above is the supplied later full run, not a rewrite of the earlier failure (S6-T33/log.lines.md, lv1 and fix launches/results).
+- Criterion 1: PASS in the corrected offline record—frozen contract and original/paired manifests, identical canonical coverage for 31 cases and omission plants. The initial verdict notes that a single build commit cannot independently prove temporal predeclaration; design review approved the pre-run protocol. Criterion 2: NOT met in full, BLOCKED—unauthorised component, prose, query, fact and action plants refuse in oracle/sinks, but A2UI/live DOM/accessibility/render-commit evidence is absent. Criterion 3: NOT met in full, BLOCKED—every-byte harness interruption/cancellation records zero premature/stale commits, but transient browser exposure is unmeasured (decision 0056, Acceptance status; rev1/cf1/cf2).
+- Criterion 4: PART met, box remains open. Shared distinct entries, exact schema/slots, one repair and validated same-facts fallback pass; version/severity/activation are seam controls, with real same-turn browser activation still BLOCKED. negotiate and severity are called in scenarios rather than on prepare; part two must wire and prove that path. Criterion 5: PASS for the declared CUSTOM-envelope comparison—plain events five lines, AG-UI 21, each measured over normal, malformed, interrupted, duplicate, reordered and late modes. It is not the full AG-UI event family. Criterion 6: native retained with its reason and no loosened bound; the recorded decision_isolation row remains BLOCKED for decision-number/process confirmation. Decision 0056 stays Proposed; acceptance follows the part-two native evidence. Its stale review-pending wording is retained here and routed to PO-S6-3; criterion 6 stays open (LEAD-ANSWERS.md, Decisions 0056 and 0057). tasks_md.json conservatively ticks criteria 1 and 5 only (decision 0056; rev1 P3/P4; cf2).
+- Limits: candidate envelopes carry canonical briefs rather than complete candidate grammars; json-render gets constant application-owned server markup; A2UI runtime import fails with HTMLElement unavailable. Numeric Fact chips, live browser commits/accessibility, real activation and the production accounting gate are not established. Source manifests freeze bytes, not the oracle's system-Python environment. No owner-device capture is required for this task. Part two and catalogue integration retain these limits (spike README Boundaries and evidence; decision 0056 Limits and follow-up).
+- Proposed items and record points, from rev1 P1–P10, cf1 P11, the lead's rulings and t33ev:
+  - Catalogue guard tests run in neither whole-test nor hosted gates; keep a separately recorded spike command and decide gate ownership.
+  - Oracle helper uses system python3/PyYAML rather than the locked environment.
+  - Version/severity functions are not integrated in prepare; real activation remains open.
+  - Decision 0056 remains Proposed pending part-two native evidence; PO-S6-3 retains its stale review-pending wording and process qualification.
+  - Evidence verifier prints that blocked rows stay blocked without asserting acceptance statuses.
+  - Proposed decision owner/header and ledger/status/open-item records need the lead's disposition without copying a personal handle.
+  - Every-byte prefix validation uses a stub oracle, not the real validator; part two should cut real-validator streams.
+  - Full A2UI/json-render fixture grammars and browser surfaces remain to be exercised.
+  - Arabic fixture wording lacks pending-native-review marking; reuse OI-09/OI-250.
+  - Build attribution is OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6); the earlier self-descriptions remain historical records.
+  - Replace or qualify the fixed processor-affinity evidence label on a later authorised record change.
+  - Obtain publisher-page reading; keep retreats untried rather than inferred tested.
+  - Preserve the informational dependency-alert aggregate from t33ev and the failed model launch separately from its actual GLM-5.3 review.
+
+### S6-T34 — Spike: charts and performance (ECharts, Observable Plot, visx): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/92)
+
+- Goal and scope: measure chart integration/performance before admitting specialised libraries, through an isolated workload, offline bundle measurements, native protocol and checker. No invented forecast calculation or relaxed performance gate is authorised (TASKS.md S6-T34).
+- Plan: Codex (plan documents of the run folder; no committed plan identity); design review Moonshot AI Kimi K3.1 Pro, APPROVED, D1–D5 MET, findings none. It covers all seven criteria, plants, existing budgets, isolated pins, missing-evidence refusal and owner handoff. The design verdict approved an uncommitted plan document; no committed plan identity is retained (S6-T34/log.lines.md; review.S6-T34.design1.md).
+- Original commits in order: `5e9f80a` lead exact spike pins; `12d7c94` OpenAI GPT-6.1 Sol through Codex (the model reports itself as GPT-6) offline build committed by the lead as built; `fb8836b` lead unchanged package-reading move; `7e42fcd` lead pin-ruling/heading repair; `45d5ac5` lead correction from “exercised by tests” to “bundled by the offline measurement” (S6-T34/commits.md).
+- Mapping to train: the five commits are represented together by `afb0740` after S6-T33, with four forced differences listed above. `435fe5c` changes catalogue checksums only; the merge of main carries chart files unchanged to `0c499f7` (both join proofs; read-only diffs).
+- The lead supplied ECharts 6.1.0/6.0.0, Observable Plot 0.6.18/0.6.17 and visx shape/scale/group 4.0.0/3.12.0 as primary/retreat spike-only development pins. The lead ruled no substitute Fact-chip family, owner-device capture blocked, fixture sizes proposed where document 10 section 12 is silent, installed-package reading offline and publisher-page reading open. Retreats remain untried (rulings.rows.md, pins/open-points; spike README).
+- Builder persona: senior frontend architect for measured technology spikes; strict reviewer: SpaceXAI Grok 4.7, another maker. Builder records task-standards, project-orientation, sanad-provenance, muhasabah-gate, github-flow and later arabic-rtl. Missing dataviz, frontend-design-pro, test-first and verification skills were applied by plain meaning. Fixed invented workload, no random seed, Linux x64 Node v22.22.3, cores 22–23. Adapters consume one closed workload for hourly profiles, two comparison panels and authored range boundaries; they are measured inputs and are not mounted as numeric charts (PROGRESS.md, Chart spike part one; spike README).
+- Builder evidence retains initial missing-module reds exit 1; malformed-fixture correction after 31 passed/one failed; Plot type-resolution and deprecated-baseUrl build failures exit 2; hook-name lint failure exit 1; virtual-entry measurement failures exit 1; and CSS asset declaration build failure exit 2. Corrections changed implementation/fixture wiring, not assertions or budgets. Final chart tests exit 0 with 48 passed, chart build/measurement/check/lint/type/format/docs/tree/parity/whitespace exit 0; evidence verifier exits 1 because native matrix is missing. The first broad web-check run exits 0 with 857 node tests and 55 browser tests, browser duration 29.2 minutes; this is headless local evidence, not native performance (PROGRESS.md, Chart spike part one and appended corrections).
+- Final common-shell incremental bytes: ECharts gzip 183816/Brotli 151885, Plot 102803/83981, visx 15362/13804, gzip level 9/Brotli quality 11. Earlier direct-entry figures in PROGRESS.md are retained history. Common React shell varies only renderer imports; these are offline export-preserving costs, not integrated product costs. Parse time and memory remain unmeasured; the chart receipt's lock prefix `32a58aa` identifies the task's build-time lock, while joined lock prefix `b349533` includes main's lock changes; this historical measurement has not been reproduced on the joined lock, and PO-S6-7 routes re-recording to S6-T34 part two (bundle.json; PROGRESS.md final common-shell measurement; rev1 P4).
+- rev1, SpaceXAI Grok 4.7: APPROVED `12d7c94`, findings none, C1–C6 BLOCKED and C7 PASS. It ran no command; its acceptance evidence is static inspection of the plan, diff, builder records and files. It leaves whole-test, docs and hosted checks to the lead. The lead separately found reference-notes placement invalid and preserved code approval while requiring the unchanged move (review.S6-T34.rev1.md; task log; package-reading ruling).
+- moveconf, SpaceXAI Grok 4.7: APPROVED `fb8836b`, directly evidenced by extra/VERDICT.S6-T34.moveconf.md, checks 1–4 PASS. The move changes only the package-reading section location and heading; the verdict runs no repository check. Duration 225 s is retained separately from the lead log. The lead records notes 359 rows, versions 75 components, docs/tree/whitespace/Prettier exit 0 for the move (S6-T34/log.lines.md, move and whole-test results).
+- pinconf, SpaceXAI Grok 4.7: REJECTED `7e42fcd`, one finding—the five notes falsely say tests exercise packages when tests import none; adapters import them and measurement bundles them. Exact phrase correction is committed as `45d5ac5`. The review's pin guard exits 1 with ten passed and one failed for the five missing ledger headings; no guard is weakened (review.S6-T34.pinconf.md).
+- pinconf2, SpaceXAI Grok 4.7: APPROVED `45d5ac5`, findings none; only five note bodies change, original implementation and approved reading move preserved. It verifies recorded hashes and bundled imports but does not rerun Vite or the lead's pin guard/versions check. Final notes correctly name the offline measurement; pin/retreat/source/state fields are unchanged (review.S6-T34.pinconf2.md).
+- Lead historical whole run: seed 3541385754, named `12d7c94`, 1959 s, exit 1, 9321 passed/three failed. Failures are pin headings, reference-notes placement and the known interrupt-test failure under load, “FAIL timeout” rather than “FAIL interrupted”. The lead edited the same worktree during that run as `fb8836b`; the log explicitly disqualifies it as immutable-head evidence for either commit and requires a final-head rerun. The pin module has 11 tests, as recorded by the confirmations. Reuse OI-227 and PO-S2-06's distinct signal-handling record, without closing either cause on a green run. Head-2 above is the later supplied full run (S6-T34/log.lines.md).
+- Criterion 1: NOT met, BLOCKED—same invented workloads/contract exist, but fixture cardinalities and instrumentation need confirmation and a committed pre-run seal. Criterion 2: PART met, box open—gzip/Brotli measured, parse and full-story memory absent. Criterion 3: NOT met, BLOCKED—owner laptop/phone native matrix absent; loopback page is a blocked message and recorder refuses. Criterion 4: NOT met as performance acceptance, BLOCKED—policy controls test under 100 ms nearest-rank p95, above 30 fps, at most 33 ms/frame and 800 ms/crossfade, and below 50 MB over three full-story loops; no native trace passes, separate S1 orbit gate retained (decision 0057; rev1).
+- Criterion 5: NOT met, BLOCKED—descriptor controls do not establish ARIA/table/lineage/Western-digit Fact-chip parity in actual bilingual DOM; no second chip family exists. Criterion 6: PART met, box open—required offline input/governance/timing and digest/matrix plants have controls, but actual DOM/chip/native-collector integration remains unavailable. Criterion 7: PASS for explicit per-library blocked results and retaining ECharts with neither challenger adopted; tasks_md.json ticks only this row. All three libraries keep C1–C6 BLOCKED and C7 reporting PASS (decision 0057, Evidence and acceptance; rev1; existing OPEN_ITEMS.md S6-T34 part-one handoff and correction).
+- Existing handoff already covers shared chips/DOM, fixture and instrumentation confirmation, laptop/phone transport and matrix, publisher-page reading, proposed number and review. Its correction says invented digest/attestation/device/viewport/completeness controls exist; what remains is qualified collection/instrumentation, not absence of every validator. Approval is now evidenced at `45d5ac5`; no native acceptance follows. Decision 0057 stays Proposed pending part-two native evidence. The ledger specification appends one review-correction line under the unchanged existing handoff heading; no earlier row is rewritten (OPEN_ITEMS.md handoff; pinconf2).
+- Proposed items and record points, from rev1 P1–P4 and the lead's rulings:
+  - Isolate the playback-threshold plant from the independent over-33-ms frame failure.
+  - Add a non-uniform latency sample that proves the nearest-rank p95 index.
+  - Scan description and all audience strings for numerals, with named Arabic-Indic and Extended Arabic-Indic failures.
+  - Name the final common-shell delta method explicitly in decision 0057; preserve earlier direct-entry history.
+  - Reuse the existing unnumbered S6-T34 handoff for outstanding native/Fact-chip work and append, rather than rewrite, approval and matrix qualifications.
+  - Keep the mutable-worktree check incident under existing PO-S2-90, and the interrupt failure under its existing records.
+
+#### Final ledger-input boundary
+
+- tasks_md.json sets in-review part-one statuses, never done. CHECK.md records the static validation contract and retained limits. items.md/po_items.md compare all allocated items with OPEN_ITEMS.md at HEAD and reuse existing records where they cover the point. Pull request https://github.com/albarami/economic-investment-intelligence/pull/92, hosted results and the real ledger seed 4146161478 remain for the lead. Muhasabah: PASS for these bounded ledger inputs; no implementation, task-completion or merge-readiness verdict is issued.
+
+#### Evidence for the work commit `4ccd425faef1afa20e9766fdcff238a19dbd5e12`
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --experimental-strip-types --test --test-concurrency=2 scripts/tests/catalogue-isolation.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 2 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: catalogue import graph refuses direct and transitive spike imports; catalogue import graph follows extensionless edges and refuses dynamic paths. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The file's whole set (two tests); both tests are named above. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --experimental-strip-types --test --test-concurrency=2 spikes/catalogue/tests/guards.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 78 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: story, Explore and assistant share dispatch outcomes; coverage control includes every case, stream, mode and fallback; recorded candidate timelines include validation before commit or refusal. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --test spikes/charts/tests/contract.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 3 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: strict policy permits inclusive frame and fade boundaries; contract preserves plan budgets and fixture matrix; each adapter validates closed workload before rendering. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --test spikes/charts/tests/evidence.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 9 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: complete invented matrix is a validator control only; matrix plant missing; matrix plant digest. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --test spikes/charts/tests/guards.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 15 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: closed valid input invokes renderer once; valid governance control; production graph positive and planted transitive import. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --test spikes/charts/tests/isolation.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 4 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: actual product import graph excludes all spikes; planted graph edge import '../../spikes/charts/main.tsx';; planted graph edge export * from '../../spikes/charts/main.tsx';. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && node --test spikes/charts/tests/trace.node-test.mjs | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 17 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Coverage anchors: valid threshold control; trace plant latencyEqual; trace plant heapEqual. One-file form of the package script/runner; no per-file count at 0c499f7 is supplied. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   ./eii test --seed 4146161478
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    10641 passed, 0 failed, 0 skipped
+Seed:      4146161478
+Notes:     Fresh whole test at the ledger head with the real lead-supplied seed; provider none, no network. Specification dry values establish no test result. Preserve head-2 exit 1, the unchanged custodian 600-second bound and missing historical part durations (PO-S2-84).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Python lint at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Python formatting at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 407 source files"
+Seed:      none
+Notes:     Python type check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1068 text files, 116 Markdown files: OK"
+Seed:      none
+Notes:     Documentation check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repository tree check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 359 rows: OK"
+Seed:      none
+Notes:     Closed reference-note and anchor check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 79 components: OK"
+Seed:      none
+Notes:     Pinned versions check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && npm run lint
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Web lint at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && npm run typecheck
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Web type check at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && npm run format:check
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Web formatting at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   cd web && npm run test:checks | tee /dev/stderr | grep -E '^# (pass|fail|cancelled|skipped|todo) ' | paste -sd' ' -
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "# pass 863 # fail 0 # cancelled 0 # skipped 0 # todo 0"
+Seed:      none
+Notes:     Shared web checks at the ledger head; execution and real exit belong to the lead's ledger run, not this specification dry run. The node test output is printed whole; its last line joins the summary counts (the pipeline fails with node under pipefail; the ledger tool's regex kind reads the last line only, train S2-3 form).
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','8d9baa1d8f82058b5be8c3ac254192b1540b043f...4ccd425faef1afa20e9766fdcff238a19dbd5e12'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0056-catalogue-and-transport-spike-result.md A:docs/decisions/0057-chart-spike-part-one.md A:web/scripts/tests/catalogue-isolation.node-test.mjs A:web/spikes/catalogue/README.md A:web/spikes/catalogue/adapters/a2ui-runtime.ts A:web/spikes/catalogue/adapters/a2ui.ts A:web/spikes/catalogue/adapters/ag-ui.ts A:web/spikes/catalogue/adapters/json-render.ts A:web/spikes/catalogue/adapters/native.ts A:web/spikes/catalogue/adapters/plain-events.ts A:web/spikes/catalogue/contract.json A:web/spikes/catalogue/count-lines.mjs A:web/spikes/catalogue/evidence/checksums.json A:web/spikes/catalogue/evidence/results.json A:web/spikes/catalogue/fixture-builder.py A:web/spikes/catalogue/fixtures/cases.json A:web/spikes/catalogue/fixtures/catalogue-paired/claims.yaml A:web/spikes/catalogue/fixtures/catalogue-paired/components.yaml A:web/spikes/catalogue/fixtures/catalogue-paired/fragments.yaml A:web/spikes/catalogue/fixtures/catalogue-paired/questions.yaml A:web/spikes/catalogue/fixtures/catalogue/claims.yaml A:web/spikes/catalogue/fixtures/catalogue/components.yaml A:web/spikes/catalogue/fixtures/catalogue/fragments.yaml A:web/spikes/catalogue/fixtures/catalogue/questions.yaml A:web/spikes/catalogue/fixtures/manifest.json A:web/spikes/catalogue/fixtures/paired-cases.json A:web/spikes/catalogue/fixtures/paired-manifest.json A:web/spikes/catalogue/guards.mjs A:web/spikes/catalogue/index.html A:web/spikes/catalogue/main.tsx A:web/spikes/catalogue/native-dispatch.ts A:web/spikes/catalogue/network-guard.mjs A:web/spikes/catalogue/oracle.py A:web/spikes/catalogue/record.mjs A:web/spikes/catalogue/repair.ts A:web/spikes/catalogue/scenarios.mjs A:web/spikes/catalogue/stream.ts A:web/spikes/catalogue/tests/guards.node-test.mjs A:web/spikes/catalogue/tests/helpers.mjs A:web/spikes/catalogue/tests/run.mjs A:web/spikes/catalogue/transport.ts A:web/spikes/catalogue/tsconfig.json A:web/spikes/catalogue/verify-evidence.mjs A:web/spikes/catalogue/vite.config.ts A:web/spikes/catalogue/wording.ts A:web/spikes/charts/README.md A:web/spikes/charts/adapters/echarts.tsx A:web/spikes/charts/adapters/plot.tsx A:web/spikes/charts/adapters/visx.tsx A:web/spikes/charts/benchmark.tsx A:web/spikes/charts/contract.json A:web/spikes/charts/evidence.mjs A:web/spikes/charts/evidence/bundle.json A:web/spikes/charts/fixtures/profiles.json A:web/spikes/charts/guards.mjs A:web/spikes/charts/index.html A:web/spikes/charts/main.tsx A:web/spikes/charts/measure-build.mjs A:web/spikes/charts/recorder.ts A:web/spikes/charts/server.mjs A:web/spikes/charts/tests/contract.node-test.mjs A:web/spikes/charts/tests/evidence.node-test.mjs A:web/spikes/charts/tests/guards.node-test.mjs A:web/spikes/charts/tests/isolation.node-test.mjs A:web/spikes/charts/tests/trace.node-test.mjs A:web/spikes/charts/trace.mjs A:web/spikes/charts/tsconfig.json A:web/spikes/charts/verify-evidence.mjs A:web/spikes/charts/vite.config.ts A:web/spikes/charts/workload.ts M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:docs/README.md M:pins.toml M:web/.prettierignore M:web/eslint.config.js M:web/package-lock.json M:web/package.json'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "81 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     The train's own 81 paths: main 8d9baa1 (the parent of the move merge, L-886, L-1048)...WORK. make_spec.py separately asserted the full inventory from the original base 81e62db (208 paths including inherited main changes) before this ledger base was set. Seven one-file command rows cover this train's own changed test files.
+```
+
+```text
+### MERGE TRAIN S6-1 — Slice S6: final task log
+Commit:    4ccd425faef1afa20e9766fdcff238a19dbd5e12
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','8d9baa1d8f82058b5be8c3ac254192b1540b043f..4ccd425faef1afa20e9766fdcff238a19dbd5e12'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Read-only Conventional Commit check of the 15 commits of 8d9baa1..WORK: the task commits, the two join merges and the two moves onto main. The default subject of the first move (0c499f7) was renamed as a429025 on the same tree and parents (L-1048).
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
