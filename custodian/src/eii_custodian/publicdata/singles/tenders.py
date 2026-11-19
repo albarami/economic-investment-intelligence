@@ -44,6 +44,9 @@ from eii_custodian.publicdata.singles.tenders_html import (
 )
 
 TENDER_HOST = "monaqasat.mof.gov.qa"
+# The one TLS 1.2 suite the tender host negotiates (RSA key exchange); the
+# interpreter default list holds none it accepts (LIVE-S2.r5).
+TENDER_SUITE = "AES128-GCM-SHA256"
 _TENDER_CHAIN: ContextVar[tuple[ssl.SSLContext, str] | None] = ContextVar(
     "tender_checked_chain", default=None
 )
@@ -528,11 +531,38 @@ def chain_context(path: Path, pin: str, *, host: str = TENDER_HOST) -> ssl.SSLCo
     context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     if context.verify_mode != ssl.CERT_REQUIRED or not context.check_hostname:
         raise TenderError("certificate_chain_incomplete")
+    _add_tender_suite(context)
     try:
         context.load_verify_locations(cadata=der)
     except (ValueError, ssl.SSLError):
         raise TenderError("certificate_chain_incomplete") from None
     return context
+
+
+def _tls12_suites(context: ssl.SSLContext) -> list[str]:
+    return [c["name"] for c in context.get_ciphers() if c["protocol"] == "TLSv1.2"]
+
+
+def _add_tender_suite(context: ssl.SSLContext) -> None:
+    """Append the host's one suite to the default list, last, and change nothing else.
+
+    The default suites keep their order and the security level; the protocol
+    floor stays at TLS 1.2. A list that grew by anything but the one suite is
+    refused.
+    """
+    default = _tls12_suites(context)
+    level = context.security_level
+    if context.minimum_version < ssl.TLSVersion.TLSv1_2:
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+    try:
+        context.set_ciphers(":".join([f"@SECLEVEL={level}", *default, TENDER_SUITE]))
+    except ssl.SSLError:
+        raise TenderError("certificate_chain_incomplete") from None
+    if (
+        _tls12_suites(context) != [*default, TENDER_SUITE]
+        or context.security_level != level
+    ):
+        raise TenderError("certificate_chain_incomplete")
 
 
 def _single_pem_certificate(raw: bytes) -> bytes:

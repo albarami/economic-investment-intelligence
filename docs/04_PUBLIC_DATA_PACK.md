@@ -864,6 +864,12 @@ placed in the live run of 2026-11-19, not an invented digest. The default verify
 addition to system roots. Missing file, mismatched hash or changed chain leaves this source
 absent with `certificate_chain_incomplete`; the remedy is a reviewed registry change, never
 relaxed verification. The lead read the intermediate's validity ending in March 2031.
+At live run 5 the server accepted TLS 1.2 with RSA key exchange only (suite
+`AES128-GCM-SHA256`), which the interpreter's default list does not hold, so every handshake
+closed. The tender context alone appends that one suite after the default suites, keeping their
+order, the security level, the TLS 1.2 floor and certificate verification; a list that grew by
+anything else is refused with `certificate_chain_incomplete`. Requests to this host carry no
+credential or cookie (the page transport refuses them), and the pages are public.
 The tender terms remain the quotation in section 2.1, read 2026-11-14.
 
 Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution with exact request window and contributing acquisition dates in each receipt. It is an unread cache with no analytical table, release or map adapter. Gaps remain explicit. EOxCloudless 2016 is the owner-selected fallback if free bulk allowance is insufficient; no automatic fallback fetch or display.
