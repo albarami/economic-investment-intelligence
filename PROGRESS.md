@@ -36045,3 +36045,51 @@ Open provider facts, internal placeholder limits, display ownership, independent
 
 - Corrected full custodian run: `PY -m pytest custodian/tests -q -p no:cacheprovider --basetemp=<temporary bt>`, exit 0, 7369 passed, one warning in the existing duplicate-ZIP refusal fixture, 425.10 seconds. Output captured in the task’s ignored evidence after local-path redaction; the child exit was propagated, not hidden. The refresh case added during this run is separately covered in the 141-pass final focused run above. No flaky failure remains unexplained and no retry, skip, tolerance, privacy rule or baseline refresh concealed a failure.
 - Handoff self-audit: PASS for a truthful offline-build handoff; completion/merge gate remains NOT MET because staging/committing and the index-based check are blocked, independent implementation reviews are not yet supplied, and provider facts intentionally remain pending. Proposed decision 0066 is not represented as accepted. No live request, real imagery, wrapper, display or product-readable asset was built or claimed.
+
+
+### S2-T41 fix round 1 — L-1092 correction
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-19 | Correction to S2-T41's uncommitted/index-blocker evidence | The implementation is committed at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` (`7ce5fc6`), committed unchanged by the lead. Before any fix edit in this private clone, `python3 scripts/check_tree.py` exited 0, eight rules checked (`.overnight/tmp/base-tree.log`). The earlier no-commit and unchanged-index refusal statements remain historical observations, superseded by this correction. Fix commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` implements only L-1092 O1, F2 and B1–B3. | OpenAI GPT-6 through Codex; senior security engineer and Python test engineer; strict self-review persona: security reviewer tracing every credential path and rejecting leak tests that do not assert the leaked value. |
+
+Skills read and applied: project-orientation, task-standards, github-flow, strict-reviewer, sanad-provenance and muhasabah-gate. Requested test-driven-development, systematic-debugging, security-review and verification-before-completion are unavailable by those names; their plain meanings are applied as the brief directs. The builder's self-review is not an independent maker verdict; both lens confirmations remain with the lead.
+
+Environment: Python 3.14.6, Linux, `UV_OFFLINE=1`, `PYTHONDONTWRITEBYTECODE=1`; `TMPDIR` resolves to this workspace's `.overnight/tmp`. No seed supplied or printed by these direct pytest/unittest commands. Commands run from the repository root; full output, with local paths redacted, and actual child exits are under `.overnight/tmp/` and `.overnight/tmp/checks.jsonl`.
+
+
+#### S2-T41 fix round 1 — plants and focused evidence
+
+Additional code commit: `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c`, `test: isolate the CDSE leak fixture environment`. The fixture clears the surrounding environment before adding the invented pair, so inherited-child leak diagnostics cannot print unrelated environment values. This follows self-review of commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a`.
+
+| Obligation | Evidence and real exits |
+|---|---|
+| O1 | Existing command refusal required no production change. Before edits, `uv run --locked python -m unittest discover -s scripts/tests -p test_cdse_key.py -q` exited 0, four tests (`base-o1.log`). The expanded optional-mode test covers neither value, each value alone, both empty, each empty with the other present, each whitespace-only with the other present, and a complete invented control. It denies sockets, children, the build seam, file opening and directory creation; stderr and the temporary root stay empty. Deliberately writing when the reader returns no pair makes `uv run --locked python -m unittest discover -s scripts/tests -p test_cdse_key.py -k test_optional_mode_never_opens_before_verification -q` exit 1, one test with eight failing subcases (`o1-file-write-final-red.log`). Remove plant: the four-test module exits 0 (`o1-committed.log`). Help and decision 0066 item 3 state the possession boundary. Expected-help update before implementation: eight command tests, four failures, exit 1 (`help-red.log`); implemented help: eight pass, exit 0. |
+| F2 | `scripts/tests/test_commands.py::Commands.test_build_public_usage_and_unreachable` binds both fake CDSE values, produces a real fixture receipt before a controlled unreachable source, and checks stdout, stderr, every file/path, explicit receipts, recorded argv and each child environment, including inheritance. For each value, temporary leaks into stdout, stderr, a file, a receipt, argv, an explicit child environment and an inherited environment made `uv run --locked python -m unittest discover -s scripts/tests -p test_commands.py -k test_build_public_usage_and_unreachable -q` exit 1: fourteen final plant invocations, each running one test and failing a value-specific assertion. Logs: `cdse_client_id-*-final-red.log` and `cdse_client_secret-*-final-red.log`; the two inherited-environment invocations each expose both fake values. All plants removed: eight command tests pass, exit 0 (`commands-committed.log`). Earlier twelve-channel plant invocations also exited 1 and remain in `checks.jsonl`. |
+| B1 | SYN-88's requirement now excepts only the unread `satellite_cdse_backup` public cache. The optional-backup policy is in that cell; its verification cell retains the sandbox/import-boundary/reviewer checks. Prose change, so no new executable guard or red plant is claimed; verified by reading and `check_docs.py`. |
+| B2 | The invented 1001-pixel cost pins a non-integral unit/quantum ratio above the minimum. The budget pins equality, one quantum below and above the unit allowance, and equality, one request below and above the request allowance. Six temporary source defects (floor, nearest, unit equality refusal, accepting a unit excess, request equality refusal, accepting a request excess) each make `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py -k test_quota_unknown_insufficient_rounding_and_enumeration -q -p no:cacheprovider` exit 1, one failed and five deselected (`b2-*-final-red.log`). Original source bytes restored. `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py -q -p no:cacheprovider`: exit 0, fourteen passed (`cdse-committed.log`). |
+| B3 | Document 02 section 2 Public fetchers ends the vault prohibition with a period before the decision 0066 sentence. Prose-only; source inspection and `check_docs.py`, no new guard or artificial red plant. |
+
+Initial development checks are retained: ruff exited 1 for two B023 test-closure diagnostics; mypy exited 1 for one optional-bytes test diagnostic. Passing explicit arguments to the test helper and narrowing the receipt-file values fixed them without changing assertions or checker settings. First broad runs, started before the final fixture cleanup, both passed: custodian 7370 passed with one existing duplicate-ZIP warning (exit 0, 322.38 s pytest time); scripts 904 tests (exit 0, 332.234 s unittest time). They are not represented as checks started on the final code commit. The repeated broad runs below validate committed code after that cleanup, rather than retrying a failure.
+
+
+#### S2-T41 fix round 1 — committed-code verification
+
+The final broad suites started after code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c`; no code or test changed during those runs. Only these append-only records were completed during verification. Final document/tree/parity/diff checks also cover the records commit. All task-owned plants are removed; `scripts/commands/build_public.py` and `custodian/src/eii_custodian/publicdata/cdse/contracts.py` match base `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` byte for byte.
+
+| Command | Exit | Observed result | Log under `.overnight/tmp/` |
+|---|---:|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_cdse_cache.py custodian/tests/test_cdse_transport.py -q -p no:cacheprovider` | 0 | 14 passed, zero failed/skipped | `cdse-committed.log` |
+| `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -q` | 0 | 904 tests, OK, zero failed/skipped; 312.927 s unittest time | `scripts-committed.log` |
+| `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -x` | 0 | 7370 passed, zero failed/skipped, one existing duplicate-ZIP warning; 309.76 s pytest time | `custodian-committed.log` |
+| `uv run --locked ruff check .` | 0 | All checks passed | `ruff-committed.log` |
+| `uv run --locked ruff format --check .` | 0 | 742 files already formatted | `format-committed.log` |
+| `uv run --locked mypy` | 0 | 414 source files, no issues | `types-committed.log` |
+| `python3 scripts/check_docs.py` | 0 | 1032 text files, 116 Markdown files | `final-records-docs.log`; repeated after final append |
+| `python3 scripts/check_tree.py` | 0 | Eight rules checked | `final-records-tree.log`; repeated after final append |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Bytes identical | `final-records-parity.log`; repeated after final append |
+| `git diff --check 7ce5fc6 HEAD` | 0 | No whitespace errors | `committed-diff.log`; repeated on final records commit |
+
+Additional focused final commands: `uv run --locked python -m unittest discover -s scripts/tests -p test_commands.py -q`, exit 0, eight tests (`commands-committed.log`); same discovery with `-p test_cdse_key.py`, exit 0, four tests (`o1-committed.log`). Both records files retain the complete earlier bytes as prefixes. There were no unexplained random failures, retries, skipped tests, weakened guards, changed pins or refreshed baselines. The existing warning is from the deliberate duplicate-ZIP refusal fixture, not a failed test.
+
+Self-review and muhasabah: PASS for this offline fix's evidence and scope. Wrapper confinement is the lead's ruling, not independently exercised here; provider contracts and live behavior remain unverified. No real setup, private input, vault or real public cache was inspected, and no provider request, wrapper, display, mutation campaign, push or merge was performed. Both independent lens confirmations and the normal hosted/exact-merge gates remain with the lead.
