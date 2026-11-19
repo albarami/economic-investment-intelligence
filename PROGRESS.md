@@ -39617,3 +39617,261 @@ Environment: Linux WSL2; Python 3.14.6; uv 0.11.31; Node v22.22.3; npm 10.9.8. `
 Unresolved check evidence: scripts discovery ran 925 tests and reported seven failure entries, all in CleanEnvironment. Its offline clean sync lacked the pyyaml 6.0.3 wheel in the explicitly workspace-only cache; the log records failed syncs, four package-import subtests and the installed-name check. No cache was populated and no failed command was retried. This is worker environment evidence, not a newly allocated project open item and not a demonstrated task-code regression. Every nonzero check remains nonzero in the return. A prior standalone ruff probe also exited 0.
 
 The branch is an integration candidate only. S2-T43's independent verdict remains pending in the supplied brief; this worker has no later verdict. Another-maker train confirmation, resolution of any failed required check, hosted checks and the lead's fresh-seed whole test on the exact merge result remain open. S2-T37 and S2-T40 approvals are the supplied carry-back confirmations under L-1095; S2-T42 approval is the supplied S2-T42.rev1 return. No approval is inferred from a passing focused run.
+
+## S2-T21 part B — offline terms apply, 2026-11-19
+
+Maker: OpenAI; model: GPT-6 (Codex; exact runtime revision not exposed).
+Builder persona: senior public-data provenance engineer. Strict self-review
+persona: sanad reviewer. Skills: project-orientation, task-standards,
+sanad-provenance, github-flow, strict-reviewer and muhasabah-gate;
+test-driven-development and verification-before-completion in the brief's plain
+meaning where those named skills are not installed. No independent review by
+another maker is claimed.
+
+Base and unchanged detached HEAD:
+`98384ae5933dff2efb81721d087e74e6ce600011`.
+The requested `git switch -c work/S2-T21B-apply` failed with exit 128:
+Git could not create the branch ref in the read-only metadata. A second attempt
+confirmed exit 128. No commit, staging, push or merge was performed. The lead
+must make the requested code/tests, documents and records commits, with the
+brief's required trailer, in a writable checkout. This section records working
+changes, not evidence against a new commit.
+
+Scope and sources: TASKS.md S2-T21, decision 0026 items 1 to 5, decision 0059
+items 1 to 4, document 04 PUB-12/PUB-13/PUB-95/PUB-97, document 17 DHA-102,
+OI-209 to OI-212, and the supplied ruling L-1153 items 1 to 6 and evidence tables.
+303 registry rows are preserved. Exactly 190 mapped FILLED rows now carry the
+supplied terms URL, words, date and basis; all 37 mapped NOT FOUND rows are
+value-identical and retain their pending marker. The changed rows by basis are
+181 dataset, three portal_terms, three owner_decision and three provider_terms.
+The per-host inventory and individual pending reasons are recorded in the
+workspace return. No source was added, removed, switched off or newly skipped.
+The only changes beyond the four terms fields are clearing decision_record on
+wb_wdi and unctad_fdi: their supplied portal_terms basis cannot retain an
+owner_decision citation under the existing loader. Every other field is
+unchanged, including activation and commit flags. AGENTS.md and CLAUDE.md are
+unchanged and byte-identical.
+
+HDX uses the linked CC BY 3.0 IGO replacement; geoBoundaries retains separate
+ADM0 ODbL and ADM1/ADM2 CC BY 4.0 words. Quotation parity normalises whitespace
+only. Document 04 records each mapped key, words or pending reason, date or
+checked-on label, basis, evidence references and saved digests. DHA-102 applies
+only the sourced change list and retains prior entries without new evidence.
+OPEN_ITEMS.md has appended updates for OI-209, OI-210 and OI-212; OI-211 and the
+acceptance boxes are unchanged. The five OI-210 skips were already empty on the
+base, while accident retains partition_byte_bound_unconfirmed. Landing metadata
+is not export or parser proof.
+
+Evidence integrity: 30 distinct saved original bodies were rehashed and matched;
+101 available saved text views matched their recorded digests. 123 distinct
+referenced original bodies are absent from the supplied copies; their digest
+and quotation assertions were checked against validation_detail.json, rather
+than presented as independently rehashed bytes. Document 04 and the return state
+this limitation. No network read was used to replace a missing body.
+
+Environment: existing locked Python 3.14.6, pytest 9.2.0 and Hypothesis
+6.170.15, profile eii with database disabled; temporary files are workspace-local.
+No decision provider was selected, no database was started or stopped, no real
+public fetch or data-cache inspection was performed. The supplied full-run seed
+is 2718281901.
+
+Commands and actual results before the whole-run result:
+
+- `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py -vv -p no:cacheprovider`
+  first exited 1: seven failed, four passed, seed 1795100442. Six empty/whitespace
+  fields and an unread-marker/dataset plant were missed before the new audit;
+  the loader already caught the invalid date and unknown basis. This is the
+  test-first red evidence.
+- `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py -vv -p no:cacheprovider`
+  first exited 1: 114 passed, one failed, seed 1795100598. All plants passed;
+  the real-registry audit exposed the pre-existing missing terms URLs.
+- `uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py custodian/tests/test_registry_terms_record.py -vv -p no:cacheprovider`
+  exited 1: 115 passed, one failed, seed 1795100750. The added whitespace parity
+  check passed, including refusal of changed case or punctuation.
+- An intermediate repeat of the guard-only command exited 1: 12 passed, two
+  failed, seed 1795100912. One failure was the real registry; the other was an
+  incorrect new positive expectation that a whitespace-only basis loads. The
+  loader correctly refuses that noncanonical basis. The mistaken positive case
+  was removed; no production behavior or guard was weakened.
+- The final focused three-file command above exited 1: 117 passed, one failed,
+  seed 1795100950. All ten malformed/incomplete plants and both pending-basis
+  positive cases passed. The real-registry guard reports precisely tenders_pub,
+  bldg_3dglobfp/1636 and bldg_3dglobfp/1639, each with empty terms_url. These are
+  outside the supplied map. Scope clarification for three sourced URL-only
+  repairs was requested; no answer or authorization is assumed. The guard is
+  retained with its failure, not skipped or relaxed.
+- `uv run --locked ruff check .` exited 0 on the initial and subsequent runs:
+  All checks passed. The final source pass also exited 0.
+- `uv run --locked ruff format --check .` exited 0 on each run: 823 files already
+  formatted. No formatter mutation was needed.
+- `uv run --locked mypy` exited 0: 443 source files, no issues.
+- `python3 scripts/check_docs.py` exited 0 on the initial and subsequent
+  document runs: 1119 text files and 119 Markdown files.
+- `python3 scripts/check_tree.py` exited 0: eight rules.
+- `uv run --locked python .overnight/tmp/apply_terms.py` first exited 1 before
+  mutation on an absent optional file key in the validation records. The helper
+  was corrected to handle that record shape, then exited 0: 190 applied,
+  37 pending. No evidence source was edited.
+- The inline read-only scope audit first exited 1 on its incorrectly assumed
+  total count; corrected to compare the actual before/after inventories, it
+  exited 0: 303 preserved, 190 changed, 37 pending unchanged, the four terms
+  fields plus two required decision-record clearances, guidance byte-identical.
+- Inline saved-body and text-view digest audits exited 0. The complete missing
+  body inventory remains in the workspace return and its local evidence files.
+- `git diff --check`, `git status --short` and `git rev-parse HEAD` exited 0.
+
+`./eii test --seed 2718281901` is running at this append. Its completed
+python-guards stage reports 938 passed, eight failed and zero skipped; the
+reported failures concern the unavailable/read-only default uv cache, including
+seven clean-environment setup errors and a launcher subtest. The python-core
+stage reports 749 passed, zero failed and zero skipped. No cache substitution,
+retry, skip, fixture refresh or harness modification was applied. The whole
+command's final counts and actual exit are recorded in a subsequent append.
+
+Strict self-review: REJECTED for task completion until the real-registry guard,
+missing-original-byte and Git-delivery gaps are resolved. Muhasabah: PASS for
+candid, sourced reporting of these bounded edits and uncompleted requirements;
+no full-green, independent-approval, release or merge claim is made.
+
+### S2-T21 part B — affected expectation corrections and scope audit
+
+The ongoing whole run reported python-custodian-1: 4599 passed, one failed,
+zero skipped; its sole failure is the new audit of the three existing empty
+terms URLs. Python-custodian-2 reported 3731 passed, three failed, zero skipped.
+Those three failures were affected old expectations in test_places_fetch.py
+(two SKIP-prefix assertions) and test_weather_cache.py (an empty terms URL
+assertion). Filling the recorded terms introduces an advisory before SKIP,
+and the weather row now carries its supplied terms page. The assertions were
+updated to require the exact advisory/skip sequence and sourced weather URL/date;
+no transport-call, build-stage, size, ETag, host or redirect assertion was removed
+or relaxed. Production code and the allow-list remain unchanged.
+
+`uv run --locked python -m pytest custodian/tests/test_places_fetch.py custodian/tests/test_weather_cache.py -vv -p no:cacheprovider`
+exited 0: 30 passed, seed 1795101622. These are the focused green regressions
+for those three whole-run reds. Subsequent `uv run --locked ruff check .` and
+`uv run --locked ruff format --check .` exited 0; the formatter reported
+823 files already formatted. The whole run also reports python-product:
+786 passed, zero failed and zero skipped; its web checks are still running.
+The initial whole run began before these test-expectation corrections, so its
+results are retained as that revision's evidence rather than an exact final
+whole-project verdict.
+
+The complete inline read-only scope/privacy audit was interrupted with exit 130
+because an unnecessarily slow repeated comparison of the large historical
+ledger delayed it. It changed no source or evidence file. The efficient
+`uv run --locked python .overnight/tmp/check_apply.py` exited 0 (and repeated
+with exit 0 after the affected-test edits): 303 registry rows preserved,
+190 filled terms records matching their own document rows, 37 pending rows
+unchanged, only the four terms fields and two necessary citation clearances,
+open-item history preserved, PROGRESS.md append-only, guidance byte-identical,
+and return-marker and added-text privacy checks passing. No body hash or
+quotation evidence was altered by these helper corrections.
+
+After correcting the older document 04 terms summaries and benchmark pending
+history to agree with the new dated records, `python3 scripts/check_docs.py`
+exited 0: 1119 text files and 119 Markdown files. The closing source check
+`uv run --locked mypy` exited 0: 443 source files; `python3 scripts/check_tree.py`
+exited 0: eight rules; `git diff --check` exited 0. Later whole-run results and
+any final records-only checks follow below.
+
+### S2-T21 part B — same guard, complete supplied map
+
+The read-only `uv run --locked python -` mapped-scope check exited 0:
+`MAPPED GUARD GREEN: 227 mapped rows pass the unchanged guard; full-registry failure remains recorded separately`.
+It selected exactly the 227 keys of the supplied rows_map.tsv, wrote their
+unchanged current registry rows to a temporary registry under the workspace,
+and called the very same _assert_terms_records function. No guard was stubbed,
+no source field was changed, and the temporary file was removed. This is green
+evidence for all 190 filled and all 37 pending mapped records; it does not replace
+the retained failing audit of the complete 303-row registry, whose three empty
+terms URLs are outside that map. The whole command remains in its web stage.
+
+### S2-T21 part B — concrete, unapplied URL repair
+
+A read-only preparation command (`uv run --locked python -`) exited 0 and
+wrote .overnight/tmp/proposed-url-repairs.patch. It changes only the three empty
+terms_url fields: the tender uses the terms address already present on other
+registry declarations, and each height file uses its own recorded figshare
+landing URL. The command verified the exact three changed keys/fields and that
+the workspace registry text remained unchanged. No scope authorization is
+assumed and the patch was not applied.
+
+A second read-only command (`uv run --locked python -`) exited 0:
+`PROPOSED COPY GUARD GREEN: 303 rows; unapplied patch only; workspace registry unchanged`.
+It applied only those URL values to a temporary full registry and called the
+unchanged guard. This is a concrete proposed remedy for review, not a claim that
+the actual registry or whole suite passes. Required checks remain necessary if
+the lead authorizes and applies it. The document 17 Sources entry now accurately
+identifies the supplied saved evidence and the absence of a new apply-pass fetch.
+
+### S2-T21 part B — completed whole-command result
+
+`./eii test --seed 2718281901` completed with actual exit **1**. The runner's
+own summaries were:
+
+- python-guards: 938 passed, eight failed, zero skipped; the default uv-cache
+  environment/setup and launcher failures recorded above.
+- python-core: 749 passed, zero failed, zero skipped.
+- python-custodian-1: 4599 passed, one failed, zero skipped; the new audit of
+  tenders_pub and the two height rows with empty terms_url.
+- python-custodian-2: 3731 passed, three failed, zero skipped; the affected old
+  places/weather expectations, subsequently corrected with the separate
+  30-test green evidence above.
+- python-product: 786 passed, zero failed, zero skipped.
+- web-checks: counts unavailable. The unchanged 1800-second limit expired; the
+  runner killed the process group and reported FAIL timeout. The partial
+  browser passes are not a completed suite verdict, and no cause or exact
+  blocked test is inferred from the last displayed test. No timeout, web file,
+  assertion, baseline or gate was changed and no retry was performed.
+- web-unit: one passed, zero failed, zero skipped.
+
+The runner total was **10804 passed, 12 failed, zero skipped in seven suites,
+four with problems; RESULT: FAILED**. The unavailable web counts are not a
+completed aggregate and are not folded into a fabricated failed-test count.
+The initial whole run began before the affected Python expectations were
+corrected; their later focused green does not make this a final whole-project
+pass. The runner-level web timeout is appended to OPEN_ITEMS.md OI-319 as a
+separate occurrence for the lead, without claiming causal identity with its
+older readiness failure. A green rerun alone does not close it.
+
+Closing source checks after the affected test and document edits:
+`uv run --locked ruff check .` exited 0;
+`uv run --locked ruff format --check .` exited 0, 823 files already formatted;
+`uv run --locked mypy` exited 0, 443 source files;
+`python3 scripts/check_docs.py` exited 0, 1119 text files/119 Markdown files;
+`python3 scripts/check_tree.py` exited 0, eight rules;
+`git diff --check` exited 0; and
+`uv run --locked python .overnight/tmp/check_apply.py` exited 0 with all
+scope, per-key parity, history, guidance, marker and privacy checks passing.
+
+No branch or commit was possible because Git metadata is read-only. The actual
+registry keeps the three outside-map empty URL defects; their concrete,
+three-field patch is prepared but unapplied pending scope authorization. All
+227 mapped rows pass the unchanged guard; the proposed temporary full registry
+passes it for all 303 rows. Missing original evidence bodies remain explicitly
+unverified in this apply pass. Independent review, S2-T08/OI-211 proof, hosted
+checks and merge remain with their owners. The return report retains all counts,
+commands, real failures, pending reasons and proposed open items; no acceptance
+box is ticked.
+
+Final records-only checks after the completed run: `python3 scripts/check_docs.py`
+exited 0 (1119 text files/119 Markdown files); `python3 scripts/check_tree.py`
+exited 0 (eight rules); `git diff --check` and the scope/parity audit each exited
+0. `git rev-parse HEAD` exited 0 and confirmed the unchanged base hash above;
+`git status --short` exited 0 and reports only the nine intended working files.
+The return finalization helper initially exited 1 on an overbroad placeholder
+predicate matching legitimate pending-term wording. Its corrected, specific
+unfinished-command checks exited 0, preserving all pending source reasons and
+the required final marker. No source, test or evidence input was changed by
+that report-only correction. The report remains explicit that the task is
+partial and unapproved; all required check outcomes and blockers are retained.
+
+Lead application of the prepared three-field patch (appended, earlier rows
+unchanged): under lead ruling L-1159 the lead applied
+`.overnight/tmp/proposed-url-repairs.patch` (the `terms_url` of `tenders_pub`,
+the address already recorded for the same publisher in the registry, and of the
+two `bldg_3dglobfp` height files, each row's own recorded `landing_url`); no other
+field changed. `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py
+custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py
+custodian/tests/test_places_fetch.py custodian/tests/test_weather_cache.py -q -p no:cacheprovider`
+exited 0, 148 passed. The whole test command is run again by the lead after the commits.

@@ -1961,6 +1961,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Default:** the lead's live reading fills the words and the date row by row, in document 04 first and then in the registry, so that the guard test covers each row as it is filled; a row whose page cannot be read as a visitor keeps the marker and says so.
 - NEEDED BY: task S2-T08 (its criterion that every Public source in the release carries the publisher's terms in its own words), before the slice S2 gate; the two criteria of S2-T21 are ticked no earlier (its part B).
 
+- UPDATE (2026-11-19, S2-T21 part B apply): OI-209 now has 190 mapped registry rows with the supplied publisher words, date read, URL and basis, repeated per key in document 04 section "S2-T21 part B terms readings". The 37 NOT FOUND readings keep their existing marker and have their individual reasons recorded there (ruling L-1153 item 5). The HDX replacement and geoBoundaries per-level record follow ruling item 2; terms never change a skip. Original bodies missing from the supplied copies are identified as such; their hashes and quotation checks are carried from validation_detail.json, not claimed as independent rehashes. Those original-byte checks and the pending readings remain outstanding. OI-211 release proof and the S2-T21 acceptance boxes are unchanged.
+
 ## OI-210 — Six rows are skipped with one phrase that names no actual technical reason
 
 - ID: OI-210
@@ -1970,6 +1972,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: The first build renamed nine rows. At the join onto the tree of train B three of them (`zone_population`, `est_census`, `census_hh_type_2020`) kept the licence cells and skip reasons that the tree had since confirmed, so six rows carry the phrase at `5147fdecdcac222a150464e0e43644d26f89d24d`. Raised by the builder of S2-T21 as its proposed item (c): the rows "stay skipped until the lead states the actual technical reason of each or confirms the row fetchable".
 - OPTIONS: **Default:** the lead reads each source as a visitor and records the reason found (an unconfirmed file, address or schema, a failed check) or clears the skip; a row skipped for its licence alone becomes fetchable.
 - NEEDED BY: task S2-T08 (source completeness), before the slice S2 gate.
+
+- UPDATE (2026-11-19, S2-T21 part B apply, ruling L-1153 item 4): the five rows wage_sector, wage_bands_priv, work_hours_act, cpi_group and bnd_muni_2025 already have empty skip_reason on the base commit, so their part of OI-210 is resolved on main. accident already records partition_byte_bound_unconfirmed and keeps that technical absence; its unresolved partition bound is not cleared by this terms pass. The six oi210.tsv observations report matching landing-page metadata under the recorded type mapping, not a successful export or parser test: robots disallows /api/ and no export was requested. This records the actual reasons without a terms-based switch or a claim of fetchability.
 
 ## OI-211 — The release half of both criteria of S2-T21 is proved by the pack assembly
 
@@ -1990,6 +1994,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - DONE SO FAR: Nothing in document 17. The builder named a machine check that joins the DHA-102 list to the registry as hardening that it did not build (PO-S2-65).
 - OPTIONS: **Default:** the pass that records the publishers' words (OI-209) updates DHA-102 in the same change and the criterion's clause is judged then.
 - NEEDED BY: the tick of the second criterion of S2-T21; before the slice S2 gate.
+
+- UPDATE (2026-11-19, S2-T21 part B apply): DHA-102 now records the sourced agency, weather and Comtrade updates, the conditional classification, news-content and selected World Bank indicator reviews, and the recorded census, GIS and archived-workbook read limits. Each changed entry cites its supplied terms_pages.tsv row and saved source-view lines; document 04 records the body hashes. The geoBoundaries per-level correction is a licence-compliance note, not an invented permission requirement. Entries without changed source evidence retain their earlier reading (ruling L-1153 item 3). This applies the present OI-212 change list; unread terms and re-reading for real use remain pending, and OI-211 and the acceptance boxes are unchanged.
 
 ## OI-213 — One timed-out mutant of the loader's campaign was not classified
 
@@ -2851,6 +2857,7 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED BY: honest S2-T35 handoff and the owning investigation's closure review.
 
 
+- UPDATE (2026-11-19, S2-T21 part B apply): `./eii test --seed 2718281901` at unchanged HEAD `98384ae5933dff2efb81721d087e74e6ce600011` with the terms working changes exited 1. The web-checks stage reached its unchanged 1800-second suite limit; the runner killed its process group and reported counts unavailable. Partial browser passes do not supply a completed suite verdict. This runner-level timeout is attached to the lead's investigation alongside OI-319, without asserting that its cause or exact blocked test is the same as the earlier readiness failure. No web file, timeout, assertion, baseline or gate was changed; no green rerun or closure is claimed. Full suite counts and the separate focused correction of affected Python expectations are recorded under S2-T21 part B in PROGRESS.md.
 
 
 
