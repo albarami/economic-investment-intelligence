@@ -1044,6 +1044,7 @@ These coarse tasks are refined at the slice S3 gate without weakening their crit
 - Scope: world-build fit checks and reports.
 - Depends: S4-T11, S4-T13, S4-T03, S4-T09. Additional source-wiring inputs under decision 0040: S2-T02, S2-T03, S2-T11.
 - Requirements: SYN-90, SYN-91, TST-265.
+- Amendment ([decision 0062](docs/decisions/0062-the-tolerances-of-the-calibration-fit.md), accepted on 2026-11-19 with every default of its open points): [ ] the roster binds each declaration the record fills to the record's `tolerance_ref` before the run; [ ] every value the record leaves open (the numbers of F19 and F21, X1's minimum number of zones, `international_visitors`, the additional correlations) and every family without its producing task's declaration stays a named gap, never a pass; [ ] the record's derivation plants become production guards with their own tests and review; `custodian/mobility/scorecard.yaml`, the calibration manifest and the fit roster change only in this task.
 - Delivery: hard; builder persona senior statistician and data-governance engineer; strict reviewer persona independent statistical/privacy reviewer from another maker; status queued.
 
 ### S4-T13 — Employment gender field and draw
