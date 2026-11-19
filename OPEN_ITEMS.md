@@ -4615,3 +4615,13 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - **Correction, 2026-11-19, S2-T41 fix round 1 (L-1092):** the implementation is committed unchanged by the lead at `7ce5fc6537ac541f9af6cc60991edf65e4b9f591` (`7ce5fc6`), and `python3 scripts/check_tree.py` passes on it (exit 0, eight rules; `.overnight/tmp/base-tree.log`). This supersedes the earlier uncommitted/index-blocker statement without rewriting it. Fix commit `4f1bc01e820cd5cc876d945ff1eab6f03c4cc62a` addresses O1, F2 and B1–B3. Per L-1092, possession of both values held only by the lead's wrapper is the boundary; no caller-admission flag or wrapper is added. Review A's rejected F2 and review B's adopted notes await both lenses' confirmation of this fix; provider evidence, later display ownership, hosted checks and the exact-merge whole test remain with the lead.
 
 - **Fix-round verification, 2026-11-19:** final code commit `2d1ccf41e2cbf822391cbdce7c507f0a1c73bb0c` additionally closes the fake fixture's inherited environment. Final full custodian and scripts suites pass (7370 passed and 904 tests, each exit 0), with zero skips and no unexplained random failure. Evidence is appended under PROGRESS.md's S2-T41 fix-round headings. This closes no provider-evidence or later-display item and supplies no independent review verdict.
+
+
+### PO-S2-116 — Closure status for published venue visits
+
+- ID: PO-S2-116
+- TYPE: OPEN
+- RAISED BY: OpenAI Codex (GPT-6), S2-LR3F under lead ruling L-1141
+- CONCERNS: `pub_venue_visits` closure or restricted-opening status
+- EVIDENCE: Document 03, `pub_venue_visits` contract, has `value int` and no status column. The S2-LR3F brief binds four exact note forms to the National Planning Council museum-visits JSON export retrieved 2026-11-19, SHA-256 `8a89835ea0587994cdaff627395e66935ae1dabf8caceae8e20640be77d8a040`. Under L-1141 these cells are reviewed missing values, counted in coverage and never zero; this change does not store closure as a separate fact.
+- NEEDED: A decision record on a closure status of `pub_venue_visits`, or one line saying why not.

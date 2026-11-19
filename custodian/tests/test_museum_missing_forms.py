@@ -1,12 +1,9 @@
 """S2-T08 part B, mismatch class 5: museum measure text outside the reviewed forms.
 
-The live shape pack's Mismatches item 5 shows the museum export's ``number``
-field holding notes that the reviewed list does not name; the review file keeps
-them as descriptions under ``unconfirmed`` without their exact spelling. Until
-the lead supplies hash-bound exact spellings, such text keeps the named refusal
-``measure_unparsed``. Once a form is reviewed, a row holding it is omitted and
-counted, never read as zero. Every note below is invented; no real spelling is
-written here.
+L-1141 supplies the four exact missing-note forms, bound to the lead's public
+export hash in the S2-LR3F brief. Counts, venue names and rows here are invented.
+A reviewed missing cell is counted and omitted, never read as zero; every
+unreviewed text retains the named refusal ``measure_unparsed``.
 """
 
 from __future__ import annotations
@@ -24,15 +21,27 @@ from custodian.tests.test_additions_property_venues import (
 )
 
 from eii_custodian.publicdata.additions import property_venues
-from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.additions.common import (
+    AdditionError,
+    MeasureKind,
+    read_measure,
+)
 from eii_custodian.publicdata.additions.property_venues import (
     missing_forms_for,
+    parse_health_centres,
     parse_museum,
 )
 from eii_custodian.publicdata.fetch.kinds import _measure_failure
 
 KEY = "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum"
 URL = "https://invented.test/museum"
+CLOSURE_NOTES = (
+    "مغلق",
+    "مغلق للتجديد Closed of Renovation",
+    "مغلق للتجديد Closed For Renovation",
+    "يفتح للزوار الرسميين Only Open ToOfficial Visitors",
+)
+REVIEWED_FORMS = ("-", "--", *CLOSURE_NOTES)
 # An invented note standing for a reviewed exact spelling; it is not a real one.
 NOTE = "SYN closed note"
 NEAR = {
@@ -67,13 +76,11 @@ def _parse(folder: Path, rows: list[dict[str, object]], field_map: dict[str, obj
     )
 
 
-def test_the_reviewed_forms_stay_the_two_dashes() -> None:
-    assert missing_forms_for(KEY) == ("number", frozenset({"-", "--"}))
+def test_the_reviewed_forms_are_exact_and_scoped_to_number() -> None:
+    assert missing_forms_for(KEY) == ("number", frozenset(REVIEWED_FORMS))
     item = _field_map()["missing_measures"][KEY]  # type: ignore[index]
-    assert item["forms"] == ["-", "--"]
-    # The unconfirmed texts are descriptions for the lead, never admitted forms.
-    assert len(item["unconfirmed"]) == 3
-    assert not set(item["unconfirmed"]) & set(item["forms"])
+    assert item["forms"] == list(REVIEWED_FORMS)
+    assert "unconfirmed" not in item
 
 
 def test_an_unreviewed_note_is_refused_at_the_fetch() -> None:
@@ -88,9 +95,16 @@ def test_an_unreviewed_note_is_refused_at_the_fetch() -> None:
     )
 
 
-@pytest.mark.parametrize("description", range(3), ids=["first", "second", "third"])
-def test_the_unconfirmed_descriptions_themselves_are_refused(description: int) -> None:
-    text = _field_map()["missing_measures"][KEY]["unconfirmed"][description]  # type: ignore[index]
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Arabic word for closed; the inventory counts 4 rows and does not quote the word",
+        "closed-for-renovation note, two English spellings; the inventory counts 4 rows",
+        "open-to-official-visitors-only note; the inventory counts 1 row",
+    ],
+    ids=["first", "second", "third"],
+)
+def test_the_unconfirmed_descriptions_themselves_are_refused(text: str) -> None:
     failure = _measure_failure(_entry("visits_museum"), [{"number": text}], URL)
     assert failure is not None
     assert failure.check == "measure_unparsed"
@@ -151,3 +165,94 @@ def test_a_reviewed_note_is_omitted_and_counted_never_zero(tmp_path: Path) -> No
     assert _coverage(parsed, "missing_measure") == 2
     assert [row["value"] for row in parsed.rows] == [4, 0]
     assert len({row["period"] for row in parsed.rows}) == 2
+
+
+def test_source_reviewed_forms_preserve_counts_and_period_coverage(
+    tmp_path: Path,
+) -> None:
+    rows = [
+        _museum_row(month="January", number="7"),
+        _museum_row(month="February", number=CLOSURE_NOTES[0]),
+        _museum_row(month="March", number=CLOSURE_NOTES[1]),
+        _museum_row(month="April", number=CLOSURE_NOTES[2]),
+        _museum_row(month="May", number=CLOSURE_NOTES[3]),
+        _museum_row(month="June", number="-"),
+        _museum_row(month="July", number="--"),
+        _museum_row(month="August", number="0"),
+        _museum_row(month="September", number=CLOSURE_NOTES[0]),
+    ]
+    assert _measure_failure(_entry("visits_museum"), rows, URL) is None
+    parsed = _parse(tmp_path, rows, _field_map())
+    assert [(row["period"], row["value"]) for row in parsed.rows] == [
+        ("2024-01", 7),
+        ("2024-08", 0),
+    ]
+    assert _coverage(parsed, "missing_measure") == 7
+    assert (parsed.period_first, parsed.period_last) == ("2024-01", "2024-09")
+
+
+@pytest.mark.parametrize("text", REVIEWED_FORMS)
+def test_source_reviewed_cell_has_no_number_or_value_row(
+    tmp_path: Path, text: str
+) -> None:
+    measure = read_measure(text, missing_forms=frozenset(REVIEWED_FORMS), integral=True)
+    assert measure.kind is MeasureKind.MISSING
+    assert measure.number is None
+    parsed = _parse(tmp_path, [_museum_row(number=text)], _field_map())
+    assert parsed.rows == ()
+    assert _coverage(parsed, "missing_measure") == 1
+    assert (parsed.period_first, parsed.period_last) == ("2024-01", "2024-01")
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "مفتوح",
+        *(note + " " for note in CLOSURE_NOTES),
+        *(" " + note for note in CLOSURE_NOTES),
+        "مغلق  للتجديد Closed of Renovation",
+        "مغلق للتجديد Closed  For Renovation",
+        "يفتح للزوار الرسميين Only Open To Official Visitors",
+    ],
+)
+def test_source_note_unknown_text_and_space_changes_are_refused(
+    tmp_path: Path, text: str
+) -> None:
+    failure = _measure_failure(_entry("visits_museum"), [{"number": text}], URL)
+    assert failure is not None
+    assert (failure.check, failure.expected, failure.observed) == (
+        "measure_unparsed",
+        "number",
+        "measure_unparsed",
+    )
+    with pytest.raises(AdditionError) as refused:
+        _parse(tmp_path, [_museum_row(number=text)], _field_map())
+    assert refused.value.name == "measure_unparsed"
+
+
+@pytest.mark.parametrize("text", CLOSURE_NOTES)
+def test_source_note_does_not_apply_to_another_registry_key_or_field(
+    tmp_path: Path, text: str
+) -> None:
+    assert missing_forms_for("visits_museum/SYN-other-slug") is None
+    entry = _entry("visits_phcc")
+    assert missing_forms_for(entry.key) is None
+    links = _venues(
+        tmp_path,
+        f"{entry.key},SYN Centre,syn_centre,,reviewer,2026-01-02\n",
+    )
+    with pytest.raises(AdditionError) as refused:
+        parse_health_centres(
+            entry,
+            [
+                {
+                    "health_center_name": "SYN Centre",
+                    "region": "SYN Region",
+                    "2020": text,
+                }
+            ],
+            {"retrieved_utc": "2026-03-04T05:06:07Z", "sha256": "ab" * 32},
+            _field_map(),
+            {"venues": links},
+        )
+    assert refused.value.name == "measure_unparsed"

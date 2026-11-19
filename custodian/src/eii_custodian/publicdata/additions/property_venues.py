@@ -117,7 +117,7 @@ def parse_museum(
     field_map: Mapping[str, object],
     crosswalks: Mapping[str, object],
 ) -> FamilyParse:
-    """Parse museum visits. A dash drops the row; any other non-numeric text stops the build."""
+    """Count and omit reviewed missing cells; other non-numeric text stops the build."""
     return _parse_visits(entry, raw, receipt, field_map, crosswalks, museum=True)
 
 

@@ -1,6 +1,5 @@
 # Reviewed field map for residential unit sales and venue visits.
-# Missing-measure forms are the exact texts the inventory quotes. Word forms whose
-# exact spelling the inventory does not give stay under unconfirmed and are not guessed.
+# Missing-measure forms are exact reviewed texts, scoped to one registry key and field.
 version: 1
 unit_types:
   "Residential Unit": residential_unit
@@ -10,10 +9,12 @@ missing_measures:
     forms:
       - "-"
       - "--"
-    unconfirmed:
-      - "Arabic word for closed; the inventory counts 4 rows and does not quote the word"
-      - "closed-for-renovation note, two English spellings; the inventory counts 4 rows"
-      - "open-to-official-visitors-only note; the inventory counts 1 row"
+      # L-1141: public JSON export retrieved 2026-11-19; source counts 4, 2, 2, 1.
+      # SHA-256: 8a89835ea0587994cdaff627395e66935ae1dabf8caceae8e20640be77d8a040
+      - "مغلق"
+      - "مغلق للتجديد Closed of Renovation"
+      - "مغلق للتجديد Closed For Renovation"
+      - "يفتح للزوار الرسميين Only Open ToOfficial Visitors"
 repeated_transaction: >-
   deal_count counts distinct transaction numbers; one agreed per-square-metre
   price is kept once; disagreeing prices block that deal; property_value is never summed
