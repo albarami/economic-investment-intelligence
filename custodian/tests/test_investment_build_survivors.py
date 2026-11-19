@@ -196,7 +196,15 @@ def test_publish_refusals_preserve_source_and_all_text(
             "1|fdi_projects|https://syn.invalid/page|unconfirmed|fdi_projects|unreadable",
         ),
         (
+            '{"schema_version": "investment_pages.v1", "sources": {"fdi_projects": {}}}',
+            "1|fdi_projects|https://syn.invalid/page|inventory_schema|investment_pages.v2|unsupported",
+        ),
+        (
             '{"sources": {"fdi_projects": {}}}',
+            "1|fdi_projects|https://syn.invalid/page|inventory_schema|investment_pages.v2|unsupported",
+        ),
+        (
+            '{"schema_version": "investment_pages.v2", "sources": {"fdi_projects": {}}}',
             "1|fdi_projects|https://syn.invalid/page|confirmation_inventory|recorded|missing",
         ),
     ],

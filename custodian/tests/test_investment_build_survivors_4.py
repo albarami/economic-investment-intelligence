@@ -98,9 +98,9 @@ def _dashboard(monkeypatch: pytest.MonkeyPatch) -> dict[str, object]:
         "location_precision": "location_text",
         "snapshot_identity": "page_sha256",
         "shape_id": "fdi-dashboard-v2",
-        "country_iso3": {"SYN-country": "SYN"},
-        "municipality_code": {"SYN-area": "SYN-area-AA-0001"},
-        "place_key": {"SYN-place": "SYN-place-AA-0001"},
+        "country_iso3": {},
+        "municipality_code": {},
+        "place_key": {},
     }
 
 
@@ -131,7 +131,7 @@ def _agency() -> dict[str, object]:
             for kind in ("sector", "opportunity", "incentive", "setup", "law")
         },
         "pages": [
-            {"kind": kind, "url": f"https://syn.invalid/{kind}"}
+            {"language": "en", "kind": kind, "url": f"https://syn.invalid/{kind}"}
             for kind in ("sector", "opportunity", "incentive", "setup", "law")
         ],
     }
@@ -144,7 +144,12 @@ def _load(
     import yaml
 
     path = tmp_path / "SYN-pages.yaml"
-    path.write_text(yaml.safe_dump({"sources": {source: row}}), encoding="utf-8")
+    path.write_text(
+        yaml.safe_dump(
+            {"schema_version": "investment_pages.v2", "sources": {source: row}}
+        ),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(build, "_PAGES", path)
     return build.load_source_spec(source, url="https://syn.invalid/page")
 
@@ -291,9 +296,9 @@ def test_dashboard_spec_retains_every_contract_slot(
         "announced": "project_date",
         "location_text": "project_address",
     }
-    assert spec.dashboard.country_iso3 == {"SYN-country": "SYN"}
-    assert spec.dashboard.municipality_code == {"SYN-area": "SYN-area-AA-0001"}
-    assert spec.dashboard.place_key == {"SYN-place": "SYN-place-AA-0001"}
+    assert spec.dashboard.country_iso3 == {}
+    assert spec.dashboard.municipality_code == {}
+    assert spec.dashboard.place_key == {}
 
 
 @pytest.mark.parametrize(
@@ -348,9 +353,10 @@ def test_agency_spec_preserves_defaults_and_explicit_zero(
 ) -> None:
     row = _agency()
     row["pages"] = [
-        {"kind": "sector", "url": "https://syn.invalid/sector"},
+        {"language": "en", "kind": "sector", "url": "https://syn.invalid/sector"},
         {
             "kind": "law",
+            "language": "en",
             "url": "https://syn.invalid/law",
             "minimum_blocks": 0,
             "minimum_paragraphs": 0,
@@ -387,9 +393,16 @@ def test_agency_spec_preserves_defaults_and_explicit_zero(
         [None],
         [{}],
         [{"kind": 3, "url": "https://syn.invalid/page"}],
-        [{"kind": "sector", "url": 3}],
+        [{"language": "en", "kind": "sector", "url": 3}],
         [{"kind": "SYN-unknown", "url": "https://syn.invalid/page"}],
-        [{"kind": "sector", "url": "https://syn.invalid/page", "minimum_blocks": True}],
+        [
+            {
+                "language": "en",
+                "kind": "sector",
+                "url": "https://syn.invalid/page",
+                "minimum_blocks": True,
+            }
+        ],
         [
             {
                 "kind": "sector",
@@ -397,7 +410,14 @@ def test_agency_spec_preserves_defaults_and_explicit_zero(
                 "minimum_paragraphs": False,
             }
         ],
-        [{"kind": "sector", "url": "https://syn.invalid/page", "minimum_blocks": "3"}],
+        [
+            {
+                "language": "en",
+                "kind": "sector",
+                "url": "https://syn.invalid/page",
+                "minimum_blocks": "3",
+            }
+        ],
         [
             {
                 "kind": "sector",

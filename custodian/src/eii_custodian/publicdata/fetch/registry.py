@@ -454,7 +454,12 @@ def _entry(row: object) -> Entry:
     if basis == "owner_decision":
         if record != DECISION_RECORD:
             raise RegistryError("owner_decision needs a decision record")
-    elif record != "":
+    elif record != "" and not (
+        basis == LICENCE_BASIS_PENDING and record == DECISION_RECORD
+    ):
+        # Decision 0059: omitting the basis alone must stay pending even if
+        # the existing local-project citation is still recorded. Unknown
+        # citations and a citation on any other basis remain typing errors.
         raise RegistryError("decision_record set without owner_decision")
     commit = _bool(row, "commit_allowed")
     if commit and basis != "dataset":

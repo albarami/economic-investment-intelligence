@@ -966,6 +966,47 @@ sources:
       last_selector: ''
       path_template: ''
     profile: '[LEAD: evidence 3]'
+  fc_register:
+    version: 2
+    kind: fc_company_cards
+    url: https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx
+    reviewed_urls:
+    - https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx
+    - https://www.qfc.qa/en/terms-of-use/
+    columns:
+    - [qfc_number, string]
+    - [company_name, string]
+    - [company_name_ar, string]
+    - [metadata, string]
+    - [licence_status, string]
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: READ-T36 R2 states no total; no invented row bound. Byte bound awaits lead activation.
+    pins:
+    - host: eservices.qfc.qa
+      sha256: '[LEAD: reviewed intermediate SHA-256]'
+      file: '[LEAD: approved DER filename]'
+      security_review: PENDING
+    evidence: 'S2-T36; READ-T36 R2-R5 and saved dated/hashed register/terms/robots evidence; L-1045 items 1-4; L-1049 items 1-4; L-1051 items 1-4. Form fields below are an offline fixture assumption pending activation review: hidden state was omitted from the saved reading. No later page was read. No fetched bytes are fixtures.'
+    hold: acquisition_bound_unconfirmed
+    max_bytes: null
+    shape:
+      pane: div.pr-results-list
+      card: div.pr-result-card
+      fields:
+        qfc_number: div.pr-result-number > a.pr-num-value
+        company_name: div.pr-company-name > a
+        company_name_ar: span.pr-company-name-ar > a
+        metadata: div.pr-result-meta
+        licence_status: div.pr-result-status > span.licence-text
+      pager_targets: [PrCompanyPager1$ctl02$ctl00, PrCompanyPager$ctl02$ctl00]
+      form_fields: [__VIEWSTATE, __EVENTVALIDATION, __EVENTTARGET, __EVENTARGUMENT]
+      progress_fields: [shown_page, continuation]
+      projection: fc_company_pane@v1
+      producer: fc_register_paged_capture@v1
+
 host_pins:
 - *id010
 - *id009

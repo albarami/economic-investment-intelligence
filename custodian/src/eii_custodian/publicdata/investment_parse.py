@@ -9,6 +9,7 @@ from __future__ import annotations
 from eii_custodian.publicdata.investment_agency import parse_agency
 from eii_custodian.publicdata.investment_contracts import (
     AGENCY_METHOD,
+    AGENCY_PARSER_VERSION,
     FDI_METHOD,
     PAGE_FIELDS,
     PARSER_VERSION,
@@ -16,6 +17,7 @@ from eii_custodian.publicdata.investment_contracts import (
     InvestmentFailure,
     SourceEnvelope,
 )
+from eii_custodian.publicdata.investment_crosswalk import source_membership
 from eii_custodian.publicdata.investment_flight import read_dashboard
 
 _PAGE_FIELD_SET = frozenset(PAGE_FIELDS)
@@ -37,6 +39,9 @@ def parse_fdi(
     if isinstance(read, InvestmentFailure):
         return read
     rows, empty_coordinates = read
+    refused = source_membership(shape.crosswalk, rows, envelope)
+    if refused is not None:
+        return refused
     return tuple(_with_lineage(row, envelope) for row in rows), empty_coordinates
 
 
@@ -109,5 +114,5 @@ def agency_envelope(envelope: SourceEnvelope) -> SourceEnvelope:
         retrieved_utc=envelope.retrieved_utc,
         page_sha256=envelope.page_sha256,
         method=AGENCY_METHOD,
-        method_version=PARSER_VERSION,
+        method_version=AGENCY_PARSER_VERSION,
     )

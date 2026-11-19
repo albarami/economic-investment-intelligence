@@ -89,12 +89,14 @@ class Response:
     etag: str | None = None
     body_sha256: str = ""
     headers: Mapping[str, str] = field(default_factory=dict, repr=False)
+    evidence: Mapping[str, object] = field(default_factory=dict)
 
 
 class TransportFault(Exception):
     """A transport failure. kind is unreachable, http or blocked_host."""
 
-    def __init__(self, kind: str, url: str) -> None:
+    def __init__(self, kind: str, url: str, status: int | None = None) -> None:
+        self.status = status if type(status) is int and 100 <= status <= 599 else None
         self.kind = kind
         self.url = public_address(url)
         super().__init__(f"{kind} {self.url}")
@@ -166,7 +168,13 @@ def open_https(
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
     from .certificate_pins import PinError, browser_agent, current_pin, verified_context
-    from .page_requests import PIN_HOSTS, active, check_target, page_context
+    from .page_requests import (
+        PIN_HOSTS,
+        PagePostback,
+        active,
+        check_target,
+        page_context,
+    )
 
     check_target(url)
     supplied_partial_chain = ssl_context is not None and bool(
@@ -216,6 +224,7 @@ def open_https(
         strict=reviewed_urls is not None,
         reviewed_urls=reviewed_urls,
         keyed_url=str(url) if keyed else None,
+        postback=isinstance(url, PagePostback),
     )
     if page_scoped:
 
@@ -252,7 +261,15 @@ def open_https(
         if url.method != method or not url.environ.get(variable, "").strip():
             raise TransportFault("credentials", str(url))
         address += "?" + urlencode({**url.parameters, parameter: url.environ[variable]})
-    request = urllib.request.Request(address, method=method, headers=request_headers)
+    data = None
+    if isinstance(url, PagePostback):
+        method = "POST"
+        data = urlencode(
+            {**url.fields, "__EVENTTARGET": url.target, "__EVENTARGUMENT": url.argument}
+        ).encode()
+    request = urllib.request.Request(
+        address, data=data, method=method, headers=request_headers
+    )
     fault: str | None = None
     try:
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
@@ -274,11 +291,25 @@ def open_https(
         if not keyed:
             raise
         fault = "blocked_host"
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as exc:
         if not keyed:
-            raise TransportFault("http", url) from None
+            raise TransportFault(
+                "http", url, exc.code if page_scoped else None
+            ) from None
         fault = "http"
-    except (urllib.error.URLError, OSError, ValueError, TransportReadError):
+    except ssl.SSLError:
+        if page_scoped:
+            raise PinError("certificate_chain_incomplete") from None
+        if not keyed:
+            raise TransportFault("unreachable", url) from None
+        fault = "unreachable"
+    except urllib.error.URLError as exc:
+        if page_scoped and isinstance(exc.reason, ssl.SSLError):
+            raise PinError("certificate_chain_incomplete") from None
+        if not keyed:
+            raise TransportFault("unreachable", url) from None
+        fault = "unreachable"
+    except (OSError, ValueError, TransportReadError):
         if not keyed:
             raise TransportFault("unreachable", url) from None
         fault = "unreachable"
@@ -339,6 +370,7 @@ def _redirect_guard(
     reviewed_urls: tuple[str, ...] | None = None,
     *,
     keyed_url: str | None = None,
+    postback: bool = False,
 ) -> type[urllib.request.HTTPRedirectHandler]:
 
     class _Guard(urllib.request.HTTPRedirectHandler):
@@ -351,6 +383,8 @@ def _redirect_guard(
             headers: HTTPMessage,
             newurl: str,
         ) -> urllib.request.Request | None:
+            if postback:
+                raise TransportFault("blocked_host", "")
             if keyed_url is not None:
                 # No redirected send can become a second chargeable request.
                 raise TransportFault("blocked_host", keyed_url)

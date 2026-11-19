@@ -135,6 +135,7 @@ def test_exact_due_boundary(cadence, start, boundary):
 
 def test_recorded_family_assignments():
     families = {
+        "fc_register": ("registers", "weekly"),
         "events_visit_qatar": ("event_pages", "daily"),
         "events_qncc": ("event_pages", "daily"),
         "suppliers_tawteen": ("supplier_credentials", "weekly"),

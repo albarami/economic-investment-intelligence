@@ -174,6 +174,17 @@ def test_existing_investment_confirmation_flags_are_used():
             for key in ("fdi_projects", "investqa_pages")
         }
     }
+    document["sources"]["investqa_pages"].update(
+        {
+            "language_confirmation": {
+                "ar": {**flags, "read_on": "2026-11-19", "reference": "invented-review"}
+            },
+            "pages": [
+                {"language": "ar", "kind": kind}
+                for kind in ("sector", "opportunity", "incentive", "setup", "law")
+            ],
+        }
+    )
     item = g.investment_evidence(document, "invented investment review")
     assert all(item.checks.values())
     document["sources"]["fdi_projects"]["confirmation"]["live_page_compared"] = False

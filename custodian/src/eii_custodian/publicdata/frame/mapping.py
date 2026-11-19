@@ -10,7 +10,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from .census import UNITS
+from .census import SOURCES, unit_for
 from .checks import FrameError
 
 POP_MAPPING = {
@@ -161,7 +161,10 @@ def inspect_source(
         row = {column: record[field] for field, (_, column) in POP_MAPPING.items()}
         row["municipality_name"] = row.pop("municipality_code")
         row["indicator"] = indicators[record["indicator"]]
-        row["unit"] = UNITS[row["indicator"]]
+        unit = unit_for(SOURCES["pop_muni"], row["indicator"])
+        if unit is None:
+            raise FrameError(f"pop_muni: invalid_indicator: {row['indicator']}")
+        row["unit"] = unit
         rows.append(row)
     reason = ""
     if omitted:

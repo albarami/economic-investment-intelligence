@@ -225,6 +225,7 @@ def test_investment_adapter_exact_identity_and_each_check():
             "investqa_pages:field_coverage_recorded": True,
             "investqa_pages:fixture_comparison_recorded": True,
             "investqa_pages:live_page_compared": True,
+            "investqa_pages:arabic_evidence": False,
         },
     )
 
@@ -254,6 +255,7 @@ def test_investment_missing_blocks_have_exact_false_checks(document):
             "investqa_pages:field_coverage_recorded": False,
             "investqa_pages:fixture_comparison_recorded": False,
             "investqa_pages:live_page_compared": False,
+            "investqa_pages:arabic_evidence": False,
         },
     )
 

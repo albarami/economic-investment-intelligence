@@ -42,8 +42,9 @@ from eii_custodian.publicdata.singles import tenders
 _SOURCE = repository_root(Path(__file__)) / "custodian" / "src"
 
 
-def test_only_four_page_pin_hosts_remain():
+def test_only_reviewed_page_pin_hosts_remain():
     assert PIN_HOSTS == {
+        "eservices.qfc.qa",
         "www.qcb.gov.qa",
         "monaqasat.mof.gov.qa",
         "www.edu.gov.qa",

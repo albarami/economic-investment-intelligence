@@ -434,6 +434,11 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 
 Decision 0035 replaces visible-origin clauses in the slice scopes and existing task criteria with absence tests and explicit backend marker checks; it does not remove source-chain checks or method honesty. The sequence starts at the map base S3-T18 and its standing script S3-T19, then proceeds through S6-T26, S7-T21, S8-T11, S9-T07, S10-T07 and S11-T08. The per-slice task bullets below and TASKS.md give dependencies. Each slice integrates the removal before its existing gate and review follow-up, whose order and other conditions are unchanged. S4-T01, S5-T04 and S9-T01 implement the explicit backend origin and generator metadata in contracts, release manifests, databases and ledgers with planted missing-marker tests. Slices S4 and S5 draw no audience mark and need no removal task.
 
+S2-T36 supplies the financial-centre register's company-only acquisition and
+complete-name contribution (decision 0064 item 5, supplied task text). It adds no
+release table and retains the geocoded file input. The lead's reviewed activation
+and live receipt remain required; tests use invented shapes only.
+
 ## 11. slice S3 — Living map and Public-only answer
 
 **Decision 0040 source work and named sub-steps.** [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) adds the following; no non-queued task is amended and no completed evidence is relabelled. Each item belongs to this slice's existing integration and review gate.

@@ -200,6 +200,8 @@ def test_exact_hosts_and_pack_list():
         "besttime.app",
     }
     added = {
+        "eservices.qfc.qa",
+        "www.qfc.qa",
         "services.gisqatar.org.qa",
         "monaqasat.mof.gov.qa",
         "www.qcb.gov.qa",

@@ -410,6 +410,12 @@ def parse(
     if review["hold"] is not None:
         raise ShapeError(review["hold"])
     kind, shape, columns = review["kind"], review["shape"], review["columns"]
+    if kind == "fc_company_cards":
+        from ..fc_register.parse import fragment, project
+
+        projected = body if body.startswith(b"{") else project(body, shape).body
+        rows: list[dict[str, object]] = fragment(projected)["rows"]
+        return rows
     if kind == "embedded_json":
         return embedded(body, shape, columns)
     if kind == "xlsx_sheet":

@@ -42,6 +42,7 @@ from .transport import Transport
 
 SOURCES = frozenset(
     {
+        "fc_register",
         "insurance_tables",
         "events_visit_qatar",
         "events_qncc",

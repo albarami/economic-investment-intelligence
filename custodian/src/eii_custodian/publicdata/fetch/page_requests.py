@@ -6,6 +6,7 @@ import ssl
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
+from types import MappingProxyType
 from urllib.parse import parse_qsl, urlsplit
 
 from .allowlist import approve
@@ -15,6 +16,7 @@ from .transport import TransportFault
 
 PIN_HOSTS = frozenset(
     {
+        "eservices.qfc.qa",
         "www.qcb.gov.qa",
         "monaqasat.mof.gov.qa",
         "www.edu.gov.qa",
@@ -40,11 +42,66 @@ def page_requests(urls: tuple[str, ...], pins: Mapping[str, Pin]) -> Iterator[No
         _FRAME.reset(token)
 
 
+_POSTBACK: ContextVar[tuple[dict[str, str], str] | None] = ContextVar(
+    "delivered_page_state", default=None
+)
+
+
+class PagePostback(str):
+    """A public pager request; its string and repr contain no form state."""
+
+    fields: Mapping[str, str]
+    target: str
+    argument: str
+
+    def __new__(
+        cls, url: str, fields: Mapping[str, str], target: str, argument: str = ""
+    ) -> PagePostback:
+        instance = super().__new__(cls, url)
+        instance.fields = MappingProxyType(dict(fields))
+        instance.target = target
+        instance.argument = argument
+        return instance
+
+    def __repr__(self) -> str:
+        return "PagePostback(redacted)"
+
+
+@contextmanager
+def delivered_state(fields: Mapping[str, str], target: str) -> Iterator[None]:
+    token = _POSTBACK.set((dict(fields), target))
+    try:
+        yield
+    finally:
+        _POSTBACK.reset(token)
+
+
 def active() -> bool:
     return _FRAME.get() is not None
 
 
 def check_target(url: str) -> None:
+    from ..fc_register.constants import STATE_FIELDS, TARGETS, URL
+
+    if isinstance(url, PagePostback):
+        delivered = _POSTBACK.get()
+        if (
+            not active()
+            or str(url) != URL
+            or url.target not in TARGETS
+            or url.argument != ""
+            or delivered is None
+            or dict(url.fields) != delivered[0]
+            or url.target != delivered[1]
+            or set(url.fields) != set(STATE_FIELDS)
+        ):
+            raise TransportFault("schema_missing", "")
+    if (
+        active()
+        and (urlsplit(url).hostname or "") == "eservices.qfc.qa"
+        and str(url) != URL
+    ):
+        raise TransportFault("blocked_host", "")
     frame = _FRAME.get()
     if frame is not None and (url not in frame or not approve(url).ok):
         raise TransportFault("blocked_host", "")

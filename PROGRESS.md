@@ -36810,6 +36810,453 @@ Seed:      3921975331
 Notes:     Fresh whole test at the exact ledger head with the lead-supplied seed; provider none and no network. Preserve every failure and the unchanged custodian 600-second bound. Hosted checks follow the push.
 ```
 
+### MERGE TRAIN S2-5 — Slice S2: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/99)
+
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant not exposed).
+Persona: careful senior release coordinator tracing every ledger claim to a Git object, log entry or file. Strict self-review persona: records reviewer rejecting unsupported claims; this self-audit is not another-maker approval. Skills: project-orientation, task-standards, sanad-provenance, github-flow and muhasabah-gate. The named verification-before-completion skill is unavailable in the session catalogue; its plain requirement is applied by recording actual exits and checking generated inputs, without running tests or the ledger.
+
+This is a draft for PR https://github.com/albarami/economic-investment-intelligence/pull/99 (the brief identifies planned PR 99), with seed 2421425381. Sources below beginning with an evidence filename mean `.overnight/IN/` followed by that filename. Log times are on 2026-11-19. Git objects and tracked records are read-only. No source data, data cache, network, test, ledger, Git write or tracked-file edit was used by this drafter. Historical test results below belong to their named builders, reviewers or lead, not this session.
+
+#### Git inventory and task boundaries
+
+- BASE is `55657e59d80098d9860d3a8463431cd33bdf45a7`; WORK is `9ec9f4aea040cdc2afb26674137b4c4c081f81e0`. Read-only `git log --reverse --format=%H BASE..WORK` supplies nine linear work commits, with no merge commits. `git diff --name-status --no-renames BASE WORK` supplies 74 paths. These inventories are frozen in make_spec.py; its own read-only check supplies `merges: []`, rather than relying on a later manual edit. The brief identifies BASE as main after train S2-4, PR 98; no hosted PR query was made.
+- Four task parts ride: S2-T35 (four commits), S2-T38 (one), S2-T39 part A (two), S2-T36 (two). The commit/task table below is generated from the nine Git commit objects, their cherry-pick trailers and each original commit's parent. All hashes in that table are full hashes. The original task base is the parent of its first original build commit, not the train's newer BASE. Original Git commit authors or committers do not establish builder maker; use the explicit build attribution below.
+- TASKS.md dependencies: S2-T35 depends on S2-T22; S2-T38 on S2-T02; S2-T39 on S2-T12 and S2-T27; S2-T36 on S2-T01, S2-T15 and S2-T27. The ledger draft does not claim complete dependency acceptance or a slice gate from a status line. Earlier source-work acceptance remains separately recorded in TASKS.md.
+
+| Task | Original work commit | Its original parent/base | Joined work commit |
+|---|---|---|---|
+| S2-T35 | `484a050a4ca275b7ee80822feeb548cadfcad5d7` | `8d9baa1d8f82058b5be8c3ac254192b1540b043f` | `53ae2a5512dee752ca4a0c1731977f838bb913c1` |
+| S2-T35 | `c974ab830dc5cec866a74465926ea792c7669f63` | `484a050a4ca275b7ee80822feeb548cadfcad5d7` | `b8f7b25271b47981fff188f46a63ecbc286a96d7` |
+| S2-T35 | `c889a7d5df43779b154296381f6906cb1034e57c` | `c974ab830dc5cec866a74465926ea792c7669f63` | `fca628ad648108575c1bf70fe8a13757dcbd386a` |
+| S2-T35 | `c2881636cb8c1f643ffdacfd2de1542271d04770` | `c889a7d5df43779b154296381f6906cb1034e57c` | `23ca06f488dfde6b65c3b01a803c8fdeedf4de92` |
+| S2-T38 | `68ab302aba7086da9a36ebeaff2c4962604c7e35` | `84080e265926b3367a864d239e6d9bc60f654884` | `7b865bcc360f24f6deca830faea32716bb054c9b` |
+| S2-T39 part A | `cb7fbfe790d4583f839b1f4dda57daffa95130d2` | `84080e265926b3367a864d239e6d9bc60f654884` | `b0e2337c974109b6fea74ba5e41d2f9e792f3f24` |
+| S2-T39 part A | `8da4e4eb2c7f7e8fc15c33a3c01732923773ae43` | `cb7fbfe790d4583f839b1f4dda57daffa95130d2` | `55889abeea928eee8136fbb3464d4cc91cd93621` |
+| S2-T36 | `785f6b2485e753e83b04af9cda2910fc6f467bb9` | `67311c879b0fd8c68216d53abd33d61282a7b3d5` | `435f32a5583b93847cfa2d4912f66be04d9a5a7d` |
+| S2-T36 | `6197c617c6f7c82b1e45fc62f81f03a0974b10ba` | `785f6b2485e753e83b04af9cda2910fc6f467bb9` | `9ec9f4aea040cdc2afb26674137b4c4c081f81e0` |
+
+#### Join, forced differences and rebase
+
+- Joiner: Anthropic Claude Opus 5.5 through login C for join1/join2 (LOG-S2-5-verdicts.md, 08:14); the lead performed the r4 rejoin onto `a813688a` and its PROGRESS resolution (13:12). The review maker is Cognition, distinct from both attributions. The earlier join1 stopped on rule 44 rather than silently resolving a substantive conflict; its stopped-head checks were custodian/core 8830 passed, scripts 907 OK and statics/parity zero (08:14). S2-T37 and S2-T40 were discussed for an earlier train proposal but are not in this nine-commit Git inventory.
+- TRAIN-S2-5.r4.forced.txt has four explanatory entries, one combining the two instruction files. (1) AGENTS.md and CLAUDE.md rule 44 keep both the earlier `--cdse-backup` sentence and S2-T35's `-vv` command. (2) `custodian/tests/test_publicdata_registry.py` keeps both added source counts, S2-T36's owner count and both excluded nightly sources. (3) document 04 PUB-03 keeps both the CDSE sentence and S2-T36's host sentence. (4) `custodian/publicdata/sources.yaml` keeps both inserted source rows. These are the supplied reasons, not four newly inferred code edits.
+- Distinguish those explanatory entries from the join proof's four DIFF files: AGENTS.md, CLAUDE.md, `custodian/tests/test_publicdata_registry.py`, and `docs/04_PUBLIC_DATA_PACK.md`. The confirmation reports 70 of 74 SAME, those four DIFF and no joined-only file. `sources.yaml` retained both rows but was not a DIFF file in that proof. This distinction follows TRAIN-S2-5.r4conf1.return.md Q1/Q2 and LOG-S2-5-verdicts.md 13:12/13:40.
+- Cognition Devin SWE-2 High returns **APPROVED** at `54b1f5eb8b088ad26e696204bc7f50064d939cd5`, findings none (TRAIN-S2-5.r4conf1.return.md; lead log 13:40). Q1 confirms the exact four DIFF files; Q2 confirms both source rows, exclusions, count changes and rule/host wording; Q3 confirms the records; Q4 relies on the lead's quick checks. This is the supplied different-maker forced-test-difference confirmation required by decision 0032 item 2. Its scope includes the S2-T36 registry-test adjustment. The reviewer used file reading, did not run checks, and discloses one initial read-only directory listing. Its byte-parity conclusion is bounded by read tools; the lead's separate cmp exit zero supplies the executable comparison.
+- The rejoin record states PROGRESS conflicts were resolved by insertion-only ours-plus-theirs append, with 70/74 edit streams unchanged (lead log 13:12). The confirmation describes preserved earlier records and acknowledges that full previous-base blobs were not directly readable to it. It is not a claim that historical ledger rows were regenerated. Sources: the same confirmation Q3 and lead log 13:12/13:40.
+- TRAIN-S2-5.r5rebase.proof.txt reports **74 of 74 same; files changed only in the joined diff: none** on the move to main `55657e59`. Every current BASE..WORK path is named by that proof. This is supplied proof of unchanged task changes, not a new code/test move needing invented approval. The earlier confirmed join object is unavailable locally; M08 records that independent reproduction limit. The original local task objects remain readable and their mappings are confirmed by the joined commits' cherry-pick trailers.
+- TRAIN-S2-5.r4.quick.out contains eight printed command records, each `exit=0`: custodian/core pytest 9069 passed, one warning in 362.68 s; scripts unittest discovery (output excerpt truncated, no count established there); ruff check; ruff format (822 files); mypy (443 source files); docs (1118 text files, 119 Markdown files); tree (8 rules); cmp. The lead log at 13:25/13:40 calls these nine checks. M09 retains this count discrepancy rather than inventing a ninth command. These are pre-rebase r4 quick checks, not a whole-test, hosted or exact merge-result pass at WORK.
+- The draft's commands include each changed/added test file with source-derived coverage anchors, shared lint/format/type/docs/tree/parity/scope/commits rows, and the required `./eii test --seed 2421425381` suite row. No command row asserts an unmeasured per-file result. One command inventory entry is lead-only; see M10. No ledger has been run and no release readiness is claimed.
+
+### S2-T35 — Values without an open licence, pinned in the lead's data tests: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/99)
+
+- Original base: `8d9baa1d8f82058b5be8c3ac254192b1540b043f`. Original four commits run through approved `c2881636cb8c1f643ffdacfd2de1542271d04770`, mapped to the first four train commits through `23ca06f488dfde6b65c3b01a803c8fdeedf4de92`. The table supplies each commit and its own parent. Builder maker: OpenAI, GPT-6.1 Sol through Codex by the original/ joined commit descriptions; builder self-reports in PROGRESS identify GPT-6 Codex without a narrower serving identity. The lead committed returned trees unchanged; lead coauthor trailers are not builder credit.
+- Plan: design1 rejected by Anthropic Opus 5.5 at 02:53, design2 rejected at 03:21, design3 rejected at 03:47, plan4 confirmed **APPROVED** by Anthropic Claude Opus 5.5 at 04:03, P1-P6 applied. RULINGS-S2-5.md names L-1041 and L-1046 but supplies labels only; the detailed dispositions above come from LOG-S2-5-verdicts.md's named entries, not unseen ruling text. Scope is real-cache checks of restricted findings with value-free committed metadata, ordinary invented-cache guards and no committed source values.
+- Build pass 1 `484a050a`: original commit body explicitly retains two red child-summary tests, 69 of 71 passing; this is not a green build. Fix pass 1 `c974ab8` pins verbosity and summary prefix; commit body records 75 task tests passing. Anthropic lens A **REJECTED** `c974ab8` at 05:20 (metadata, pinned count, precision text, isolated plants); xAI/SpaceXAI Grok 4.7 through Cursor lens B **APPROVED** that older head at 05:37. Do not describe that head as jointly approved. Sources: Git bodies; lead log those times.
+- Fix pass 2 `c889a7d`: both confirmations **APPROVED**, Anthropic Opus lens A and xAI Grok lens B, lead log 06:05. PROGRESS's fix-pass-2 section records final guard pytest exit 0, 76 passed; earlier 3 failed/73 passed and correction of the historical-resolution plant remain historical. The lead's 06:27 real-cache run at that head exits 1, 6 failed/15 passed: B plus PUB-71:source_invalid, leading to D1 fix pass 3 under L-1065.
+- Fix pass 3 `c288163`: lead check 06:52, 79 guards passed, three plants red at the earlier replay then green, statics/docs/tree/parity/whitespace exit zero. xAI Grok lens B confirmation **APPROVED** reported by 07:07; its separate result time is not supplied. Anthropic Opus lens A **APPROVED** at 07:17 with one cosmetic README note. Those two bounded D1 confirmations, following the two fix-pass-2 approvals, supply the final local approval chain; they are not real-cache acceptance.
+- Lead proof at 07:17: baseline and restoration step each exit 1 with exactly five B failures and 16 passes. The wrong-value step instead gave B plus record_checksum_mismatch because the lead did not recompute the record checksum. The lead acknowledges its error and reran steps 2/3 with the checksum recomputed (lead log 07:36): step 2 exit 1 with B plus PUB-71:expectation_mismatch, so the wrong-value plant is caught; both files restored with hashes equal to the originals; step 3 exit 1 with exactly B. The outstanding B entries are C12-MTH-46 awaiting routine, H2 and the three GIS findings awaiting expectation; `COUNT-bnd_muni_2025` was removed in fix pass 2 because the registry already pins that count. Sources: PROGRESS fix-pass-2/3 headings, custodian/data_tests/README.md and lead log 06:27/07:17.
+- Historical full run: PROGRESS builder section records seed 3647102991, exit 1, 10681 passed/9 failed/0 skipped, begun before final summary assertions. The uv-cache/clean-environment failures are retained with OI-253 context. New OI-319 preserves the later full-street-load readiness timeout for the lead/S3-T22; OI-160 is an older, CLOSED occurrence, not closure of this later failure, and no green rerun closes it. Mutation coverage of local_expectations comparators/counters is **not measured**, not passed; OI-318 below records the explicit handoff proposal. The fix-pass-2 ownership/C7/C17/warning-summary proposals have no supplied detailed wording (M07).
+
+### S2-T38 — Employed people by municipality, a Public fact: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/99)
+
+- Original base: `84080e265926b3367a864d239e6d9bc60f654884`. Approved original commit `68ab302aba7086da9a36ebeaff2c4962604c7e35` maps to joined `7b865bcc360f24f6deca830faea32716bb054c9b`. Builder maker: Anthropic Claude Opus 5.5, explicitly named in PROGRESS's task heading and evidence rows. Builder persona: senior public-data platform engineer; strict reviewer persona: privacy and data-contract reviewer of another maker.
+- Plan design1 **APPROVED** by OpenAI GPT-6.1 Sol through Codex, lead log 02:46, with L-1038 and D1-D6 PASS. The PROGRESS builder row self-identifies the supplied plan review as GPT-6 and names plan artifact commit `77e37e55ef842422c3e4a6d241cede4151a55e08`; this log does not confuse that plan artifact with the build's base.
+- Build evidence at the PROGRESS task heading: tests first 35 failed/9 passed; affected five-file run exit 0, 451 passed; fifteen planted violations each exit 1 and restored run exit 0; statics/docs/tree/parity zero. The change admits the Public employed indicator on the source's own municipality geography and keeps the four audit-count pairs fixed. Existing OI-170 carries the later S5 attack-model choice; no new privacy rule or lowered attack requirement is claimed.
+- Lens B **APPROVED** `68ab302`, Droid Z.ai GLM-5.3 at 03:36: AC1-AC4, assumptions and forced differences accepted; 8147 custodian/core passed and statics exit zero. Lens A **APPROVED** the same commit, Cursor SpaceXAI Grok 4.7 at 03:36: findings none, 280 focused passed. Both reviewers differ from the Anthropic builder. The lead's whole test at `68ab302` (lead log, S2-T38.lv1): seed 2663379000, 10692 passed, 0 failed, 0 skipped, 7 suites, RESULT: PASSED.
+- Historical builder whole run: seed 3141592653, exit 1, 10685 passed/7 failed, all seven failures in clean-environment setup; preserve the PROGRESS environmental inference as an inference, not closure. Actual public-cache checks were not run by the builder. Sources: PROGRESS task table; LOG-S2-5-verdicts.md 02:46 and both 03:36 entries. No wholly completed source release or S5 design is asserted.
+
+### S2-T39 — The investment sources in full (part A): task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/99)
+
+- Original base: `84080e265926b3367a864d239e6d9bc60f654884`. Approved two-commit local part A ends at `8da4e4eb2c7f7e8fc15c33a3c01732923773ae43`, mapped through joined `55889abeea928eee8136fbb3464d4cc91cd93621`. Builder maker: OpenAI GPT-6.1 Sol through Codex according to the commit descriptions; PROGRESS self-report says GPT-6 Codex. Builder persona: senior public-data engineer for bilingual parsing and reviewed crosswalks; strict reviewers: independent public-data/provenance reviewers.
+- Plan design2 **APPROVED** by Cognition Devin SWE-2 High at 03:28 after the earlier rejection; F1-F4 applied, F5 agency-only parser version adopted. The log's build queue says ef21945, but actual first build parent and PROGRESS both say `84080e2`; the actual Git parent governs this table, preserving that distinction rather than inventing a rebase.
+- Build `cb7fbfe`: bilingual page metadata, exact-byte cached quotations, closed source-issued identifier crosswalk reader with an empty production template, and Arabic-evidence gate mechanism. Part B release rows and DAT-143 were explicitly untouched. The 0029 condition is now accepted on BASE (docs/README.md decision row), but acceptance of that decision does not deliver part B. Existing OI-178, OI-181 and OI-182 remain the release/Arabic/real-mapping records.
+- At 04:25 Anthropic Opus 5.5 lens B **REJECTED** `cb7fbfe`: vacuous network plant and broken contract-column sentence. At 04:26 Cognition Devin lens A **REJECTED** it: unplanted inventory_schema refusal and uncovered real CSV-target branch. Both accepted offline scope but did not approve the build. L-1052 all four fixes adopted; fix pass 1 `8da4e4e` changes tests and the exact document sentence, with the false earlier network-plant claim corrected additively in PROGRESS.
+- Anthropic lens B confirmation **APPROVED** `8da4e4e` at 04:53, both findings resolved with red/green probes and the correction row. Cognition lens A confirmation **APPROVED** the same commit at 05:02, both findings resolved with scratch red/green evidence. Final local approval rests on these two entries; it is bounded to part A offline mechanics. PROGRESS fix-pass-1 records 566 investment tests and 103 focused tests, exits zero; the original builder whole run seed 3192026119 exited 1 with 10674 passed/13 failed/0 skipped, guards only, predating final tests.
+- Lead log 05:02 explicitly carries N2-N5 and N7 to the ledger: stale-snapshot mapping behavior; no code-only municipality target; overstated crosswalk docstring; S2-T12 gate-row attribution; dead lookup and review_reference digit-run check. New proposals below preserve exactly that level of detail. N6, the lead-only check on the cached English pages, was done by the lead at `8da4e4e` (lead log 05:50): the agency-batch count command over the 27 cached English registry pages exits 0 with 683 records from 27 pages, equal to the S2-T12 fix 1 real run; the parser refuses any bare eight- or eleven-digit run, and none was refused. Live Arabic page selection/comparison and individually reviewed real mappings are part B and live remainders of the task (OI-181, OI-182), not part of part A's approval. No source page, actual count or name-based mapping is invented.
+
+### S2-T36 — The financial centre's company register: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/99)
+
+- Original base: `67311c879b0fd8c68216d53abd33d61282a7b3d5`. Original build `785f6b2485e753e83b04af9cda2910fc6f467bb9` and fix `6197c617c6f7c82b1e45fc62f81f03a0974b10ba` map to joined `435f32a5583b93847cfa2d4912f66be04d9a5a7d` and WORK. Builder maker: OpenAI GPT-6.1 Sol through Codex by the lead/commit attribution; PROGRESS reports GPT-6 Codex. Builder persona: public-data acquisition/provenance engineer; reviewer personas: independent acquisition/security reviewers.
+- Plans 2/3 rejected by OpenAI Codex (03:46/04:01); plan4 **APPROVED** by OpenAI GPT-6.1 Sol through Codex at 04:18, with the invented-counterexample wording applied. Design review is recorded separately from different-maker implementation review; the same-maker plan verdict is not represented as implementation approval. The task was built ahead on S2-4 head `67311c8`, with later task text supplied, as the actual base and PROGRESS say.
+- Offline build projects closed company fields before persistence, chains requests to the previous full-response hash, supports bounded eligible capture and contributes names including hidden duplicates to the inventory. PROGRESS build section records final package suite exit 0, 8111 passed/one warning, but an earlier whole test seed 1938475621 exited 1, 11413 passed/18 failed/0 skipped and predates final corrections. Initial missing-module collection reds and the absence of isolated semantic-red chronology for every guard remain limitations, not complete failing-first proof.
+- Cognition Devin lens A **REJECTED** `785f6b2` at 05:45: terms added a non-company input, and the registration-required obstacle affected all v2 sources. Cursor Grok lens B **REJECTED** the same head at 05:57: sign-in and size plants were not company-page-shaped. L-1062 accepts all four. Fix `6197c61` preserves company-only receipt inputs during the terms read, narrows the obstacle tuple and repairs both plants. PROGRESS fix-pass-1 records four independent red proofs; green 3 focused, 96 FC and 527 shared-acquisition regression tests; statics/docs/tree/parity/whitespace zero after an initial formatting failure was corrected.
+- At 06:30 the lead log explicitly reports Cursor Grok lens B **APPROVED** `6197c61` and says both lenses approved. Cognition Devin SWE-2 High lens-A confirmation **APPROVED** `6197c617c6f7c82b1e45fc62f81f03a0974b10ba`, finished 06:12, with no new open item proposed. The later Cognition join confirmation is a different scope.
+- Reviewed live certificate pin, byte bound, actual hidden-state/selector confirmation, producer session and live public-register snapshot remain the task's lead-owned live activation; the declaration holds them and there is no permissive fallback. Lens A's proposed items at `785f6b2`: PO-1 (the intake must hold exactly the continuation receipts) and PO-2 (per-guard red chronology incomplete) become PO-S2-112 and PO-S2-113; PO-3 is the live activation above; PO-4 (a company name containing a sign-in phrase refuses the run, the safe direction) and PO-5 (defence-in-depth checks not reachable through verified artifacts) are recorded notes needing no action. Lens B's one proposed item (the exact-URL block of the target check can be removed without a red test) becomes PO-S2-114. No company record, real company name, live fetch, owner lookup or full acceptance is asserted.
+
+#### Remaining ledger records and MISSING register
+
+- tasks_md.json copies each old Delivery/status line exactly from HEAD:TASKS.md and supplies four train review replacements plus the seat-audit's S2-T09 #87, S2-T30 #85, S2-T34 #89 and S2-T41 #97 done replacements. It does not tick any acceptance box. S2-T32 part T #86 also occurs in the 11:59 audit, but the brief explicitly limits these stale replacements to four tasks; no ninth status row is added.
+- items.md proposes OI-318 for S2-T35's explicit mutation-coverage handoff and OI-319 for its later readiness-timeout occurrence. po_items.md proposes PO-S2-107 to PO-S2-111 for the five named S2-T39 residual notes. IDs are unused at HEAD and are reservations for the lead, not claims that tracked OPEN_ITEMS.md has changed. Existing OI-160, OI-170, OI-178, OI-181, OI-182, OI-195, OI-253 and OI-276 remain separate; no earlier item is closed by this draft.
+- Resolved by the lead from the run log before the ledger: M01 (S2-T36 lens-A confirmation APPROVED 6197c617, 06:12), M02 (corrected real-cache steps 2/3, 07:36), M03 (S2-T38 lv1 whole test 10692 passed), M05 (N6 counts, 05:50), M07 (S2-T36 proposed items, PO-S2-112 to PO-S2-114). M04 and M06 are live remainders of S2-T39 part B and S2-T36 activation, kept open in TASKS.md and the open items, not part of the approvals carried here.
+- M08: the join objects `54b1f5eb` and `d1cdfe5e` exist in the main repository; the 74/74 rebase proof onto `55657e59` stands.
+- M09: the r4 quick checks were eight commands, all exit 0 (custodian and core 9069 passed, the scripts unittest discovery, ruff, format, mypy, check_docs, check_tree, cmp); the lead's earlier "nine" was a miscount, corrected in the lead log.
+- M10: the real-cache command is lead-only under rule 44 and decision 0034 and is never run by the ledger, tests, gates or CI; its evidence is the lead's proof above.
+- M11: the ledger's whole test, the head checks with a fresh seed, the hosted checks and the merge-result whole test are the next steps of this pull request.
+- M12: the task reviews and rulings are cited by their run-record times; their full texts stay in the run's records.
+
+Self-audit: PASS for a bounded, sourced draft with the listed gaps. This is not independent task approval, a successful ledger run, merge approval or a completed slice gate.
+
+#### Evidence for the work commit `9ec9f4aea040cdc2afb26674137b4c4c081f81e0`
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest core/tests/test_apportion.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    161 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_agesex_weight_is_refused; test_c18_area_example_and_lineage; test_c18_population_example. Source: core/tests/test_apportion.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    31 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_live_same_target_empty_argument_advances_and_projects; test_live_chain_plants_refuse_without_partial_publication; test_shape_and_request_plants. Source: custodian/tests/test_fc_register.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_end_to_end_initial_capture_and_live_prefix; test_every_eligible_transition_attempts_capture; test_capture_plants_refuse_without_copy_or_publication. Source: custodian/tests/test_fc_register_capture.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_inventory_with_terms_keeps_only_company_page_inputs; test_complete_inventory_retains_hidden_duplicate_names_and_caller_refuses; test_inventory_lineage_refusals. Source: custodian/tests/test_fc_register_inventory.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_actual_post_is_bounded_and_contains_only_delivered_fields; test_post_header_refusals_precede_opener; test_post_token_and_missing_pin_refuse_before_send. Source: custodian/tests/test_fc_register_transport.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_seventh.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    72 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_stored_point_owns_cell; test_rounding_is_explicit_half_even; test_ownership_index_reads_grid_once. Source: custodian/tests/test_frame_seventh.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_coverage_geography; test_reconciliation_closure_and_transitive_refusal; test_reconciliation_stays_pending. Source: custodian/tests/test_gate_records.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    30 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_coverage_exact_record; test_reconciliation_multiline_status_and_both_resolutions; test_pending_reconciliation_preserves_full_report. Source: custodian/tests/test_gate_records_survivors.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_bilingual_normal_seam_exact_quotations; test_quotation_plants; test_wrong_language_keeps_previous_batch. Source: custodian/tests/test_investment_bilingual.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_atomic_bytes_creates_parents_and_replaces_exact_partial; test_publish_refusals_preserve_source_and_all_text; test_spec_file_refusal_paths. Source: custodian/tests/test_investment_build_survivors.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_dashboard_requires_its_shape; test_dashboard_publishes_exact_document_and_page_metadata; test_agency_publishes_exact_counts_and_each_kind. Source: custodian/tests/test_investment_build_survivors_2.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build_survivors_4.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    73 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_dashboard_spec_reaches_every_refusal; test_dashboard_spec_retains_every_contract_slot; test_agency_spec_reaches_every_refusal. Source: custodian/tests/test_investment_build_survivors_4.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_crosswalk.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_csv_country_target; test_review_covers_both_sides_and_identifier_lookup; test_crosswalk_plants. Source: custodian/tests/test_investment_crosswalk.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_population_employed.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    47 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_committed_review_loads_employed_by_municipality_and_year; test_live_build_carries_employed_with_source_and_year; test_census_rows_admits_employed_in_the_population_table. Source: custodian/tests/test_population_employed.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_registry_cadence_closed; test_unconfirmed_cannot_acquire_schedule; test_cadence_requires_explicit_confirmation. Source: custodian/tests/test_public_cadence.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    79 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_registry_holds_every_required_input_and_no_traffic_row; test_owner_decision_and_validation_only; test_nightly_selection_rejects_the_excluded_sources. Source: custodian/tests/test_publicdata_registry.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    79 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_restricted_replay_and_lineage; test_restricted_null_coverage_zone; test_restricted_half_null_row. Source: custodian/tests/test_restricted_expectation_guards.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_all_s2_t19_sources_are_registered; test_absent_layer_needs_no_invented_id; test_live_layer_still_requires_id. Source: custodian/tests/test_s2_t19_registry.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_f1_all_unscoped_openers_refuse; test_f2_tender_requires_root_chain; test_f2_supplied_partial_chain_refuses. Source: custodian/tests/test_s2_t29_fix10.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    91 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_only_reviewed_page_pin_hosts_remain; test_off_list_refusal_loads_and_normal_dispatch_never_fetches; test_off_list_fetching_row_refuses_without_transport. Source: custodian/tests/test_s2_t29_fix6.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_non_capture_source_accepts_registration_required_text; test_school_bounded_offsets; test_school_request_field_refused_before_any_fetch. Source: custodian/tests/test_s2_t29_live_acquire.py at 9ec9f4aea040cdc2afb26674137b4c4c081f81e0. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Static lint at WORK; record the actual exit, not the earlier r4 result.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "822 files already formatted"
+Seed:      none
+Notes:     Formatter check only; actual final summary at WORK, with no formatting mutation.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 443 source files"
+Seed:      none
+Notes:     Locked type check at WORK; no inferred source-file count.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1118 text files, 119 Markdown files: OK"
+Seed:      none
+Notes:     Document validation at WORK; the command supplies its actual counts.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repository tree guard at WORK; preserve its closed rules.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte comparison of the two agent instruction files at WORK.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','55657e59d80098d9860d3a8463431cd33bdf45a7...9ec9f4aea040cdc2afb26674137b4c4c081f81e0'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/data_tests/README.md A:custodian/data_tests/local_expectations.py A:custodian/data_tests/restricted_cases.py A:custodian/data_tests/test_restricted_findings.py A:custodian/publicdata/review/fdi_crosswalks.yaml A:custodian/src/eii_custodian/publicdata/fc_register/README.md A:custodian/src/eii_custodian/publicdata/fc_register/__init__.py A:custodian/src/eii_custodian/publicdata/fc_register/acquire.py A:custodian/src/eii_custodian/publicdata/fc_register/build.py A:custodian/src/eii_custodian/publicdata/fc_register/capture.py A:custodian/src/eii_custodian/publicdata/fc_register/constants.py A:custodian/src/eii_custodian/publicdata/fc_register/errors.py A:custodian/src/eii_custodian/publicdata/fc_register/names.py A:custodian/src/eii_custodian/publicdata/fc_register/parse.py A:custodian/src/eii_custodian/publicdata/fetch/page_identity.py A:custodian/src/eii_custodian/publicdata/investment_crosswalk.py A:custodian/src/eii_custodian/publicdata/investment_quotation.py A:custodian/src/eii_custodian/publicdata/name_inventory.py A:custodian/tests/fixtures/fc_register/page.html A:custodian/tests/test_fc_register.py A:custodian/tests/test_fc_register_capture.py A:custodian/tests/test_fc_register_inventory.py A:custodian/tests/test_fc_register_transport.py A:custodian/tests/test_investment_bilingual.py A:custodian/tests/test_investment_crosswalk.py A:custodian/tests/test_population_employed.py A:custodian/tests/test_restricted_expectation_guards.py M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:core/tests/test_apportion.py M:custodian/README.md M:custodian/publicdata/investment_pages.yaml M:custodian/publicdata/review/population_indicators.csv M:custodian/publicdata/review/s2_t29_sources.yaml M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/fetch/allowlist.py M:custodian/src/eii_custodian/publicdata/fetch/cadence.py M:custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py M:custodian/src/eii_custodian/publicdata/fetch/kinds.py M:custodian/src/eii_custodian/publicdata/fetch/page_acquire.py M:custodian/src/eii_custodian/publicdata/fetch/page_records.py M:custodian/src/eii_custodian/publicdata/fetch/page_requests.py M:custodian/src/eii_custodian/publicdata/fetch/page_schema.py M:custodian/src/eii_custodian/publicdata/fetch/page_shapes.py M:custodian/src/eii_custodian/publicdata/fetch/registry.py M:custodian/src/eii_custodian/publicdata/fetch/transport.py M:custodian/src/eii_custodian/publicdata/frame/census.py M:custodian/src/eii_custodian/publicdata/frame/mapping.py M:custodian/src/eii_custodian/publicdata/frame/population.py M:custodian/src/eii_custodian/publicdata/gate_report.py M:custodian/src/eii_custodian/publicdata/investment_agency.py M:custodian/src/eii_custodian/publicdata/investment_build.py M:custodian/src/eii_custodian/publicdata/investment_contracts.py M:custodian/src/eii_custodian/publicdata/investment_counts.py M:custodian/src/eii_custodian/publicdata/investment_flight.py M:custodian/src/eii_custodian/publicdata/investment_parse.py M:custodian/tests/investment_fixtures.py M:custodian/tests/test_frame_seventh.py M:custodian/tests/test_gate_records.py M:custodian/tests/test_gate_records_survivors.py M:custodian/tests/test_investment_build_survivors.py M:custodian/tests/test_investment_build_survivors_2.py M:custodian/tests/test_investment_build_survivors_4.py M:custodian/tests/test_public_cadence.py M:custodian/tests/test_publicdata_registry.py M:custodian/tests/test_s2_t19_registry.py M:custodian/tests/test_s2_t29_fix10.py M:custodian/tests/test_s2_t29_fix6.py M:custodian/tests/test_s2_t29_live_acquire.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/14_IMPLEMENTATION_PLAN.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; output "74 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact name-status scope from BASE..WORK, generated from read-only Git; no records have been written by this draft.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','55657e59d80098d9860d3a8463431cd33bdf45a7..9ec9f4aea040cdc2afb26674137b4c4c081f81e0'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Conventional Commit subjects for each of the nine BASE..WORK commits; merges is generated explicitly in the spec.
+```
+
+```text
+### MERGE TRAIN S2-5 — Slice S2: task log
+Commit:    9ec9f4aea040cdc2afb26674137b4c4c081f81e0
+Command:   ./eii test --seed 2421425381
+Exit code: 0
+Date:      2026-11-19
+Run by:    lead (local)
+Counts:    11663 passed, 0 failed, 0 skipped
+Seed:      2421425381
+Notes:     Lead's fresh whole test at WORK using the supplied seed, provider none, no network and unchanged limits. This row is required; r4 quick checks are not whole-test evidence. Exact merge-result and hosted/head checks remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -37683,3 +38130,666 @@ The final broad suites started after code commit `2d1ccf41e2cbf822391cbdce7c507f
 Additional focused final commands: `uv run --locked python -m unittest discover -s scripts/tests -p test_commands.py -q`, exit 0, eight tests (`commands-committed.log`); same discovery with `-p test_cdse_key.py`, exit 0, four tests (`o1-committed.log`). Both records files retain the complete earlier bytes as prefixes. There were no unexplained random failures, retries, skipped tests, weakened guards, changed pins or refreshed baselines. The existing warning is from the deliberate duplicate-ZIP refusal fixture, not a failed test.
 
 Self-review and muhasabah: PASS for this offline fix's evidence and scope. Wrapper confinement is the lead's ruling, not independently exercised here; provider contracts and live behavior remain unverified. No real setup, private input, vault or real public cache was inspected, and no provider request, wrapper, display, mutation campaign, push or merge was performed. Both independent lens confirmations and the normal hosted/exact-merge gates remain with the lead.
+
+### S2-T35 — Restricted findings: builder evidence (2026-11-19)
+- Builder: OpenAI GPT-6 Codex; persona: senior data-platform engineer for public-data pipelines, provenance and privacy. Later reviewer persona: strict provenance and regression reviewer, another maker; implementation/inventory review is pending, not self-approved. Source: .overnight/BRIEF.md PERSONA and L-1039/L-1041/L-1046.
+- Base commit: `8d9baa1d8f82058b5be8c3ac254192b1540b043f`; git remains read-only; lead commits the delivered work. No TASKS.md status or checkbox changes.
+- Skills loaded: project-orientation, task-standards, sanad-provenance, github-flow and muhasabah-gate. test-driven-development and verification-before-completion unavailable in this session; equivalent tests-first, planted violations and actual-exit verification applied. Brief overrides git mutation/publication steps.
+- Environment: managed Python/uv workspace, Linux; commands below use `TMPDIR="$PWD/.overnight/tmp" UV_OFFLINE=1` (TMPDIR expands to the workspace absolute temporary directory). No network, real public-cache read, expectation preparation, secret read or database operation by the builder. Ordinary tests use invented temporary caches. The existing whole-command harness encountered its absent default uv cache; it was neither populated nor repaired.
+- Inventory: `custodian/data_tests/restricted_cases.py:CASES`, reconciled against S2-T22 task log, OI-195, OI-276, document 04 section 2.2 and PUB-71. Includes PUB-71, C12/MTH-46, H2, the three GIS boundary services and the locally retained census/boundary count records. Standing places of decision 0034 item 3 and the nonnumeric district-alias name are excluded. Completeness still requires another maker; no expected source value or expected-record digest is committed.
+- Outstanding B (from CASES/outstanding; status execution tested): `C12-MTH-46:awaiting_routine`, `H2:awaiting_expectation`, `GIS-ZONES:awaiting_expectation`, `GIS-MUNICIPALITIES:awaiting_expectation`, `GIS-DISTRICTS:awaiting_expectation`, `COUNT-bnd_muni_2025:awaiting_expectation`. C12 owner S6-T13; remaining confirmation owners S2-T35. These are named failures, never passes/skips/xfails. The lead-only baseline/plant/restoration proof remains unrun; no ready record is supplied by this builder. See data-tests README for its exact command, full B, hashes/restoration and complete FAILED/ERROR accounting.
+- ASSUMPTION: document 04 section 2.2 locally recorded source counts qualify for this inventory. Seven have a census-map schema replay; the municipality count has no confirmed replay recipe and stays outstanding. The GIS evidence file cited by the committed pointer is not among the supplied inputs. H2 period, predicate, denominator, weighting and partition binding cannot be recovered from the supplied records. No acquisition range is substituted for a finding.
+- Tests-first diagnostic: `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider`, exit 1, 33 failed/1 passed because the new modules were absent (selection control passed). This first diagnostic used the default seed, not printed by quiet mode; no seed is asserted for it. Every later task-suite run uses explicit seed `3647102991`.
+- Iteration commands: same pytest command plus `--hypothesis-seed=3647102991`: exit 1, 15 failed/19 passed (14 reporting-wrapper test-interface mistakes and the parser-message leak); corrected test interface and moved pytest reporting outside the exception handler, then exit 0, 34 passed. Added guards: exit 1, 1 failed/41 passed (boolean precision accepted as integer); enforced integer types. Summary-only test-first run with `-k summary_accounting`: exit 1, 8 failed/42 deselected (routine absent). Implemented routine, full task suite exit 0, 50 passed. Refined independent guard plants/direct comparator: exit 0, 51 passed. Final expanded contract/lineage suite: exit 0, 71 passed in 8.80s. No skip, retry, loosened bound, refreshed baseline or suppressed failure.
+- Safe-output proof: invented child loads the copied root conftest and project configuration, correct pair exit 0 before the plant; wrong expectation with recomputed checksum exit 1/PUB-71:expectation_mismatch. Distinct expected, actually computed and parser-exception sentinels absent from combined default output. C12 child exits 1/C12-MTH-46:awaiting_routine; all other B entries exercised directly as named failures.
+- Break-pass method: disposable scripts under `.overnight/tmp/` replace guards/counters in child-process memory, run the named original test, and leave repository module bytes intact. The first `expected_fields` break exited 0 because the plant also failed the tolerance/checksum checks; the plant was corrected to recompute both, then the break exited 1. The duplicate-JSON plant was likewise made a complete valid-shaped record, and the ERROR-summary plant now precedes a valid count line. These are test refinements, not surviving defects hidden by a rerun.
+- Break `record_fields`: `test_restricted_record_plants[unknown_field-record_invalid]`; altered guard exit 1, 1 failed in 0.17s; restored implementation covered by the 71-passed task suite.
+- Break `unknown_case`: `test_restricted_record_plants[unknown_case-record_invalid]`; altered guard exit 1, 1 failed in 0.15s; restored implementation covered by the 71-passed task suite.
+- Break `origin`: `test_restricted_record_plants[empty_origin-record_invalid]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `decimal`: `test_restricted_record_plants[malformed-record_invalid]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `expected_fields`: `test_restricted_record_plants[expected_extra-record_invalid]`; altered guard exit 1, 1 failed in 0.16s; restored implementation covered by the 71-passed task suite.
+- Break `checksum`: `test_restricted_record_plants[checksum-record_checksum_mismatch]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `pin_agreement`: `test_restricted_record_plants[source-source_pin_mismatch]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `version_precision`: `test_restricted_record_plants[version-record_invalid]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `tolerance`: `test_restricted_record_plants[tolerance-record_invalid]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `bool_precision`: `test_restricted_record_plants[precision_bool-record_invalid]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `duplicate_json`: `test_restricted_record_plants[duplicate-record_invalid]`; altered guard exit 1, 1 failed in 0.15s; restored implementation covered by the 71-passed task suite.
+- Break `path_symlink`: `test_restricted_record_plants[folder_symlink-path_refused]`; altered guard exit 1, 1 failed in 0.14s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_table`: `test_restricted_lineage_and_bytes_plants[table]`; altered guard exit 1, 1 failed in 0.24s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_licence`: `test_restricted_lineage_and_bytes_plants[licence]`; altered guard exit 1, 1 failed in 0.27s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_version`: `test_restricted_lineage_and_bytes_plants[version]`; altered guard exit 1, 1 failed in 0.24s; restored implementation covered by the 71-passed task suite.
+- Break `boundary_counter`: `test_restricted_counters`; altered guard exit 1, 1 failed in 0.04s; restored implementation covered by the 71-passed task suite.
+- Break `hour_counter`: `test_restricted_counters`; altered guard exit 1, 1 failed in 0.04s; restored implementation covered by the 71-passed task suite.
+- Break `comparison`: `test_restricted_comparator`; altered guard exit 1, 1 failed in 0.05s; restored implementation covered by the 71-passed task suite.
+- Break `inventory_shape`: `test_restricted_inventory_plants[extra]`; altered guard exit 1, 1 failed in 0.16s; restored implementation covered by the 71-passed task suite.
+- Break `inventory_recipe`: `test_restricted_inventory_plants[decimal]`; altered guard exit 1, 1 failed in 0.19s; restored implementation covered by the 71-passed task suite.
+- Break `inventory_identifier`: `test_restricted_inventory_plants[place]`; altered guard exit 1, 1 failed in 0.17s; restored implementation covered by the 71-passed task suite.
+- Break `inventory_basis`: `test_restricted_inventory_plants[dataset]`; altered guard exit 1, 1 failed in 0.17s; restored implementation covered by the 71-passed task suite.
+- Break `historical_resolution`: `test_restricted_inventory_plants[historical_missing]`; altered guard exit 1, 1 failed in 0.19s; restored implementation covered by the 71-passed task suite.
+- Break `summary_exit`: `test_restricted_summary_accounting[exit]`; altered guard exit 1, 1 failed in 0.04s; restored implementation covered by the 71-passed task suite.
+- Break `summary_count`: `test_restricted_summary_accounting[count]`; altered guard exit 1, 1 failed in 0.04s; restored implementation covered by the 71-passed task suite.
+- Break `summary_errors`: `test_restricted_summary_accounting[error]`; altered guard exit 1, 1 failed in 0.03s; restored implementation covered by the 71-passed task suite.
+- Break `read_layer_import`: `test_restricted_import_and_override_guards`; altered guard exit 1, 1 failed in 0.08s; restored implementation covered by the 71-passed task suite.
+- Break `network_import`: `test_restricted_import_and_override_guards`; altered guard exit 1, 1 failed in 0.08s; restored implementation covered by the 71-passed task suite.
+- Break `environment_override`: `test_restricted_import_and_override_guards`; altered guard exit 1, 1 failed in 0.07s; restored implementation covered by the 71-passed task suite.
+- Break `selection`: `test_restricted_selection_plants`; altered guard exit 1, 1 failed in 0.03s; restored implementation covered by the 71-passed task suite.
+- Break `replay_signature`: `test_restricted_replay_independence`; altered guard exit 1, 1 failed in 0.31s; restored implementation covered by the 71-passed task suite.
+- Break `required_identity`: `test_restricted_lineage_required_fields[dataset]`; altered guard exit 1, 1 failed in 0.19s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_url`: `test_restricted_lineage_required_fields[fetch_url]`; altered guard exit 1, 1 failed in 0.19s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_hash`: `test_restricted_lineage_required_fields[sha256]`; altered guard exit 1, 1 failed in 0.20s; restored implementation covered by the 71-passed task suite.
+- Break `lineage_date`: `test_restricted_lineage_required_fields[retrieved]`; altered guard exit 1, 1 failed in 0.19s; restored implementation covered by the 71-passed task suite.
+- Break `companion_fields`: `test_restricted_record_plants[companion_extra-record_invalid]`; altered guard exit 1, 1 failed in 0.16s; restored implementation covered by the 71-passed task suite.
+- Break `companion_version`: `test_restricted_record_plants[companion_version-record_invalid]`; altered guard exit 1, 1 failed in 0.15s; restored implementation covered by the 71-passed task suite.
+- Break harness commands: `uv run --locked python .overnight/tmp/break_pass.py` initial exit 1 (four caught breaks, one redundant plant as above); continuation after plant refinement exit 0 (all remaining breaks caught); `uv run --locked python .overnight/tmp/break_guard_helpers.py` exit 0 (five caught guard breaks); `uv run --locked python .overnight/tmp/break_lineage.py` exit 0 (six caught lineage/companion breaks). Every constituent altered-guard test exits 1 as listed. These are thin break proofs, not a mutation campaign.
+- Preliminary checks: `uv run --locked ruff check .` initially exit 1/one raw-regex style finding in the new test, fixed, subsequent exit 0/all checks passed; `uv run --locked ruff format --check .` exit 0/737 files; `uv run --locked mypy` exit 0/407 source files (new data-test code excluded by existing mypy scope); `python3 scripts/check_docs.py` exit 0/1024 text files and 113 Markdown files; `python3 scripts/check_tree.py` exit 0/eight rules; `cmp AGENTS.md CLAUDE.md` exit 0/one identical pair; `git diff --check` exit 0/no whitespace errors. Final evidence follows after the whole run and ledger checks.
+- Whole command: `./eii test --seed 3647102991` started with the environment above; first results: python-guards runner reports 889 passed/8 failed/0 skipped (pytest detail 890 passed/1 failed/7 setup errors); default uv cache absent/read-only, in existing CleanEnvironment and launcher tests. python-core 739 passed/0 failed/0 skipped; python-custodian-1 4206 passed/0 failed/0 skipped. Remaining results appended below when complete. Final test-only plant/coverage refinements occurred during the whole run; targeted 71-case result above covers the final task file.
+- Mutation handoff: `precision`, `compare`, `summary_reasons`, `boundary_finding_counts` and `h2_hour_counts`, method version S2-T35-v1, are outside the mutation runner module roots: mutation coverage **not measured**, not passed. No campaign, mutation gate or edit to docs/18_MUTATION_TESTING_HANDOFF.md (L-1046 item 5, design review P6, decision 0055). Proposed open items appear only in .overnight/RETURN.md for the lead to number.
+- Regression preservation: only a pointer paragraph changes an existing custodian README. The new ordinary-suite file is granted by L-1041 item 2/L-1046 item 5. Existing production code, cache helpers, tests/assertions/fixtures/bounds, selection/gateway/CI configuration and AGENTS/CLAUDE are unchanged. No implementation approval or real-cache acceptance closure is claimed.
+
+- S2-T35 correction/additional evidence: the earlier 71-passed result did not parse actual child-process short summaries. Two new integration assertions now do. `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider --hypothesis-seed=3647102991 -k 'wrong_value_and_safe_output or outstanding_subprocess'` exits 1, two failed/69 deselected. Both child runs have the correct named failure body and exit one, but `pytest.fail(..., pytrace=False)` leaves the default FAILED summary line without the reason. `summary_reasons` refuses it as `summary_unparsed`. This contradicts the approved plan's required summary-based B proof. The two red assertions are retained; no suppression, alternate traceback, node-ID rewrite, runner or marker change was made. README records the blocker; a lead reporting ruling was requested. Synthetic-summary fixtures and the earlier green result do not close this defect.
+- Whole-command continuation: python-custodian-2 3200 passed/0 failed/0 skipped; python-product 786 passed/0 failed/0 skipped. The whole command began before the final test-only summary assertions and is not evidence for their final state. Web results and final exit will be appended when available.
+- Final task-suite state after the reporting assertions: same explicit-seed pytest command, exit 1, 69 passed and two failed in 8.36s. Both failures are the actual-default-summary conflict, not an expected-value disagreement or leak. Earlier green task counts are historical and do not claim the current suite is green.
+- Process limitation: the planned another-maker inventory completeness check before implementation was not available in this worker session. Inventory and implementation are delivered for that review, with no inferred approval. Required final static checks currently remain exit zero: ruff check; format check (737 files); mypy (407 source files); docs (1024 text/113 Markdown files); tree (eight rules); AGENTS/CLAUDE comparison; diff whitespace.
+
+- S2-T35 final whole-command evidence: `TMPDIR="$PWD/.overnight/tmp" UV_OFFLINE=1 ./eii test --seed 3647102991` exits 1. Runner total: 10681 passed, nine failed, zero skipped, seven suites, two with problems; RESULT: FAILED. Suites: python-guards 889 passed/eight failed/zero skipped (pytest detail 890 passed/one failed/seven setup errors); python-core 739 passed; python-custodian-1 4206 passed; python-custodian-2 3200 passed; python-product 786 passed; web-checks 860 passed/one failed/zero skipped; web-unit one passed. Guards failures are the existing absent/default-read-only uv-cache setup and launcher failure already recorded. The web browser detail is 54 passed/one failed: `web/spikes/performance/tests/performance.spec.ts`, `roads full street load draws every link and carries the Simulated mark`, `spike readiness timed out`; the node wrapper reports that failed child. No timeout, assertion, baseline, fixture, gate or web file was changed; no retry. This failure stays unresolved and cannot be closed with a green rerun alone. Proposed open item is in RETURN for lead numbering.
+- This whole run began before the final test-only default-summary assertions; the final task-file result remains 69 passed/two failed. No all-green completion, independent approval, inventory acceptance or real-cache proof is claimed. The lead reporting ruling remains unanswered in this session. Git remains read-only; all proposed open items appear only in .overnight/RETURN.md.
+- Final handoff checks after recording the whole result: `python3 scripts/check_docs.py` exit 0 (1024 text files, 113 Markdown files); `git diff --check` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0. Final status lists exactly the two authorized existing-file edits (PROGRESS and custodian README) and five new task files. RETURN ends with MARKER-S2-T35-BUILD. Muhasabah passes for truthful handoff only; acceptance remains unmet as recorded.
+
+### S2-T35 — Fix pass 1 under L-1056 (2026-11-19)
+- Builder: OpenAI GPT-6 Codex; senior data-platform engineer for public-data pipelines, provenance and privacy. Reviewer persona: strict provenance and regression reviewer, another maker, pending; no independent approval claimed. Skills loaded/applied: project-orientation, task-standards, sanad-provenance, github-flow, muhasabah-gate; test-driven-development and verification-before-completion absent from the installed catalogue, applied by their plain meanings. Sources: .overnight/BRIEF.md and .overnight/IN/RULING-L1056.md items 1 to 5; L-1039/L-1041/L-1046 remain binding.
+- Starting and unchanged full HEAD: `484a050a4ca275b7ee80822feeb548cadfcad5d7`, branch `local/S2-T35`, initially clean. Git read-only; lead commits. Environment: Linux managed uv workspace; check commands use `TMPDIR="$PWD/.overnight/tmp" UV_OFFLINE=1`, with TMPDIR expanded to the absolute workspace temporary directory at execution. No network or real public-cache read; invented inputs only. No explicit seed supplied by the mandated quiet command; its automatic seed is not asserted.
+- Correction to earlier reporting diagnosis: L-1056 identifies verbosity-dependent short-summary truncation and the parser's missing `Failed: ` prefix. `pytrace=False` is preserved unchanged, not blamed for removing the reason. README now pins `-vv` in the proof command and explains the actual cause; the single child-run helper pins `-vv` for every invented child run, without COLUMNS or terminal dependence.
+- Tests first: corrected the valid summary fixture and added exact `summary_unparsed` plants for truncated, missing-prefix, unknown-case and ERROR lines before implementation. `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider` exit 1; last line `4 failed, 71 passed in 7.31s`. Red tests: retained wrong-value/safe-output and outstanding-child assertions; corrected valid-format control; new missing-prefix refusal (`DID NOT RAISE ValueError`). The truncated plant already refused under the previous parser and stays asserted; no fabricated claim that it independently failed first.
+- Implemented L-1056 items 1 to 4 only: `summary_reasons` requires exactly `FAILED <node> - Failed: <CASE>:<reason>` and reports unknown cases as `summary_unparsed`; existing closed reasons and count/exit checks preserved. No `check_case`, retained integration assertion or leak-sentinel assertion changed. First green same command exit 0; last line `75 passed in 7.52s`. Final verification after raw-regex lint correction exit 0; last line `75 passed in 7.41s`. Both retained child assertions pass; full combined child output remains subject to the existing expected-value, computed-value and parser-message sentinel assertions under `-vv`.
+- `uv run --locked ruff check .`: first exit 1, last line `Found 1 error.` (RUF043 in the new regex-match assertion); changed it to a raw string, final exit 0, last line `All checks passed!`. `uv run --locked ruff format --check .`: exit 0, last line `737 files already formatted` (also unchanged on final check).
+- `uv run --locked mypy`: exit 0, last line `Success: no issues found in 407 source files` (existing type-check scope unchanged). `python3 scripts/check_docs.py`: exit 0, last line `checked 1024 text files, 113 Markdown files: OK`. `python3 scripts/check_tree.py`: exit 0, last line `checked 8 rules: OK`. `cmp AGENTS.md CLAUDE.md`: exit 0, no output. `git diff --check`: exit 0, no output. Commands use the environment above; no failure hidden or assertion loosened.
+- Changed files: custodian/data_tests/README.md (proof command/reporting explanation); custodian/data_tests/local_expectations.py (summary parser only); custodian/tests/test_restricted_expectation_guards.py (child verbosity, valid fixture and refusal plants); append-only PROGRESS.md; .overnight/RETURN.md. No runner, CI, addopts, gate, real-cache expectation, inventory, TASKS.md, OPEN_ITEMS.md or AGENTS/CLAUDE edit.
+- Open points unchanged under L-1056 item 5: another-maker inventory completeness review, then the lead's independently prepared expectations and real-cache baseline/plant/restoration proof; outstanding B and mutation coverage not measured remain as recorded in pass 1. Known S3-T22 full-street-load timeout stays with the lead. `./eii test` was not run in this fix. Scoped reporting handoff passes muhasabah; no full-task acceptance or merge readiness claimed. Full return: .overnight/RETURN.md, MARKER-S2-T35-FIX1.
+
+### S2-T35 — Fix pass 2 under L-1059 (2026-11-19)
+- Builder: OpenAI GPT-6 (Codex), senior data-platform engineer. Reviewer persona: strict senior provenance and regression reviewer; the existing other-maker lens A (REJECTED) and lens B (APPROVED) returns are the review authorities, with confirmation of these fixes pending. Skills loaded/applied: project-orientation, task-standards, sanad-provenance, github-flow, muhasabah-gate. Test-driven-development and verification-before-completion are not installed; their plain meanings are applied through tests first, scratch guard removals and recorded verification. Sources: .overnight/BRIEF.md; .overnight/IN/REVIEW-A.md Findings F1 to F4 and Proposed open item 5; .overnight/IN/REVIEW-B.md; .overnight/IN/RULING-L1059.md items 1 to 3.
+- Starting and unchanged full HEAD: `c974ab830dc5cec866a74465926ea792c7669f63`, branch `local/S2-T35`, initially clean. Git read-only; lead commits. Linux managed uv workspace; all checks/proofs use `TMPDIR="$PWD/.overnight/tmp" UV_OFFLINE=1`, with TMPDIR expanded to the absolute workspace temporary directory at execution. No explicit test seed supplied by the mandated command; automatic seed not asserted. Invented inputs only; no network or real data-cache read. Scratch changes remain under .overnight/tmp/fix-p2-scratch.
+- F1: C12-MTH-46 now names source_key/source_ids/geography `census_district_pop` and selector `POP2020`; status, owner, method and anchor retained. Module docstring cites document 07, C12 "Research note" (ruling item 1). F2: removed COUNT-bnd_muni_2025 and its B entry; README records its registry row_count_min/row_count_max fetch check instead. Sources: document 07 C12 Research note; sources.yaml census_district_pop and bnd_muni_2025; fetch/checks.py row-count checks; lens A exact fixes.
+- F3: decimal text must match its declared fractional precision after integer-type validation; compare uses exact text equality. Added precision_text record plant with recomputed checksum and comparator assertion for differently formatted equal values. F4: each inventory plant asserts its exact reason; missing and historical_missing retain the valid primary source and add invented_missing on an unmodified registry. Production source-resolution guard unchanged. Ruling item 2: only the lead data-test command changes from -q to -vv in both AGENTS.md and CLAUDE.md.
+- Tests were edited before implementation. Initial scratch proof command `uv run --locked python .overnight/tmp/fix-p2-proof.py red`: exit 0 for the proof driver; each child exit 1 with DID NOT RAISE. F3 precision_text: `1 failed in 0.40s`; comparator: `1 failed in 0.12s`; F4 missing: `1 failed in 0.18s`; historical_missing: `1 failed in 0.19s`. The scratch copy used pre-fix F3 code and weakened only the F4 source-resolution guard to continue. Initial restored proof command with argument green: driver exit 0; respective child exits 0, last lines `1 passed in 0.23s`, `1 passed in 0.10s`, `1 passed in 0.18s`, `1 passed in 0.19s`. Sources: .overnight/tmp/fix-p2-red.json and fix-p2-green.json.
+- CORRECTION (lens A Proposed open item 5): the earlier builder row "Break historical_resolution" did not isolate the source-row resolution guard. Removing accident from the registry also triggers inventory_identifier, and the prior unqualified ValueError assertion could not distinguish it. That earlier exit 1 does not prove P5's missing-source guard. The F4 plants now add invented_missing while preserving accident and the registry, demand inventory_source, and go red when that specific guard is weakened; the final proof below supersedes that claim without rewriting the original row.
+- Initial required task command `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider`: exit 1, last line `3 failed, 73 passed in 7.51s`. The exact F1 selector exposed that POP2020 is in frame.layers.COUNTS, not registry columns; this caused inventory_identifier and masked the duplicate plant. The F3 precision rule correctly refused the existing fractional wrong-value sentinel in a zero-precision count field as record_invalid. These were deterministic integration failures, fixed before the final run; no retry or loosened assertion.
+- Forced changes beyond the literal fixes: inventory identifiers include only the existing COUNTS["census_district_pop"] field tuple, so the mandated POP2020 selector resolves to its committed layer contract; the lens-B-approved wrong-value child uses an invented integer sentinel consistent with its declared zero precision, with the same mismatch, summary and leak assertions. The computed/parser sentinels and all other lens-B-approved safety, reporting and selection logic remain unchanged. No registry, tolerance, runner, workflow, addopts, gate, TASKS.md or OPEN_ITEMS.md edit.
+- Final isolation proof command `uv run --locked python .overnight/tmp/fix-p2-final-proof.py`: driver exit 0; last line `{"finding": "ruling-2", "phase": "green", "exit": 0, "last_line": "Rule 44 verbosity and identical rules: OK"}`. Each F3/F4 guard was removed/weakened separately in the final scratch code, with all other guards retained, then restored for the identical child command `python -m pytest custodian/tests/test_restricted_expectation_guards.py::<node> -q -p no:cacheprovider`. Every red reports DID NOT RAISE. Source: .overnight/tmp/fix-p2-final-proof.json and per-plant red/green logs.
+- Final F3 precision_text-record_invalid child: red exit 1, `1 failed in 0.23s`; green exit 0, `1 passed in 0.22s`. F3 comparator child: red exit 1, `1 failed in 0.12s`; green exit 0, `1 passed in 0.14s`. F4 missing-inventory_source child: red exit 1, `1 failed in 0.18s`; green exit 0, `1 passed in 0.16s`. F4 historical_missing-inventory_source child: red exit 1, `1 failed in 0.18s`; green exit 0, `1 passed in 0.16s`.
+- Metadata probes in the final proof compare unchanged HEAD content against working-tree content. F1: old exit 1, `AssertionError: F1_metadata`; fixed exit 0, `F1 metadata and anchor: OK`. F2: old exit 1, `AssertionError: F2_exclusion`; fixed exit 0, `F2 pinned-count exclusion: OK`. Ruling item 2: old exit 1, `AssertionError: rule44_verbosity`; fixed exit 0, `Rule 44 verbosity and identical rules: OK`.
+- Re-derived outstanding B, from `restricted_cases.outstanding()` (exit 0) and the final task tests: `C12-MTH-46:awaiting_routine`, `GIS-DISTRICTS:awaiting_expectation`, `GIS-MUNICIPALITIES:awaiting_expectation`, `GIS-ZONES:awaiting_expectation`, `H2:awaiting_expectation`. README quotes this same five-entry set. Lead-only baseline/plant/restoration remains unrun; acceptance remains unticked. Ruling item 3's ownership, C7/C17 scope and warning-summary open items remain with the lead; mutation coverage remains not measured.
+- Final required task command `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider`: exit 0, last line `76 passed in 7.93s`. Initial and final `uv run --locked ruff check .`: exit 0, `All checks passed!`; initial and final `uv run --locked ruff format --check .`: exit 0, `737 files already formatted`; initial and final `uv run --locked mypy`: exit 0, `Success: no issues found in 407 source files`. Formatter application `uv run --locked ruff format .`: exit 0, `737 files left unchanged`.
+- Initial remaining checks: `python3 scripts/check_docs.py` exit 0, `checked 1024 text files, 113 Markdown files: OK`; `python3 scripts/check_tree.py` exit 0, `checked 8 rules: OK`; `cmp AGENTS.md CLAUDE.md` exit 0, no output; `git diff --check` exit 0, no output. Final records checks follow after this append. Full return: .overnight/RETURN.md, MARKER-S2-T35-FIX-P2. This is a bounded fix handoff, not independent approval or full-task completion.
+- Final records checks after writing the ledger and RETURN: `python3 scripts/check_docs.py` exit 0, last line `checked 1024 text files, 113 Markdown files: OK`; `python3 scripts/check_tree.py` exit 0, last line `checked 8 rules: OK`; `cmp AGENTS.md CLAUDE.md` exit 0, no output; `git diff --check` exit 0, no output. Additional read-only Python assertions exit 0: `Scoped diff, append-only ledger, exact rule edit and return marker: OK`. They verify exactly the seven authorized tracked files, preserve all prior ledger bytes, and restrict the identical rule-file edits to the one command substitution. Muhasabah PASS for the scoped handoff; other-maker confirmation and lead-only proof remain pending.
+
+### S2-T35 — Fix pass 3 under L-1065 (2026-11-19)
+- Builder: OpenAI GPT-6 (Codex), senior data-platform engineer; exact serving variant not exposed. Reviewer persona: strict senior provenance and regression reviewer of another maker; lens A and lens B confirmation of this pass remain with the lead. Skills loaded/applied: project-orientation, task-standards, sanad-provenance, github-flow, muhasabah-gate. Test-driven-development and verification-before-completion are not installed by those names; their plain meanings are applied. Sources: .overnight/BRIEF.md, .overnight/IN/RULING-L1065.md items 1 to 3, the two supplied confirmation returns and the supplied lead-run summary.
+- Starting and unchanged full HEAD: `c889a7d5df43779b154296381f6906cb1034e57c`, branch `local/S2-T35-fix3`, initially clean. Git read-only; lead commits. Linux managed uv workspace; every proof/check uses `TMPDIR="$PWD/.overnight/tmp" UV_OFFLINE=1`, expanding TMPDIR to the absolute workspace temporary directory only at execution. No explicit test seed supplied; automatic seed not asserted. Invented temporary inputs only; no network or real data-cache read.
+- Item 1: PUB-71 validates that Private and Total_Economic_active___15 are either both counts or both null, refuses half-null rows as source_invalid, excludes both-null rows from both national sums, and refuses zone_missing when either target zone has no counted row. Target coverage is checked before national arithmetic, including when both target zones are null. README adds the one sentence required by the ruling about the published national sums and original public-data stage. Sources: local_expectations.py replay; README PUB-71 paragraph; ruling item 1.
+- Tests were added before the replay change. Initial selected test command: `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider -k 'null_coverage_zone or half_null_row or target_zone_null_coverage'`, exit 1, last line `3 failed, 76 deselected in 0.98s`. CORRECTION: the new extra-zone fixture initially omitted geometry; this red is not accepted as evidence of D1. After the first replay fix the same command exited 1, `2 failed, 1 passed, 76 deselected in 1.00s`; the fixture omission was then corrected, with no production parser relaxation.
+- Authoritative red on unchanged c889a7d replay with corrected invented fixtures: selected command above, executed by the workspace interpreter inside a `try/finally` baseline substitution from read-only `git show HEAD:custodian/data_tests/local_expectations.py`; child exit 1, last line `3 failed, 76 deselected in 0.79s` (wrapper exit 1, BASELINE_EXIT=1). Null-coverage test: unexpected PUB-71:source_invalid. Half-null test: paired both-null control unexpectedly source_invalid. Target-zone test: source_invalid instead of zone_missing for zone 69. Restored fixed replay: same selected command exit 0, `3 passed, 76 deselected in 1.53s`.
+- Item 2 precision: baseline already refuses each half-null orientation through share() TypeError. No independent half-null-refusal red at baseline is claimed. The paired control distinguishes valid both-null coverage from invalid half-null input. Diagnostic command `uv run --locked python .overnight/tmp/fix-p3-proof.py` verified source schemas and check_employment pass for all three invented shapes, and the baseline refusal context is TypeError inside share(). It then removed only the new half-null guard while retaining exclusion: selected half-null test exit 1, `1 failed in 0.53s`, DID NOT RAISE; finally restored the replay bytes. Driver exit 0, last line `baseline diagnosis and isolated guard proof: OK`. This is the precise evidence and limitation of the brief's request that every plant be independently red at baseline.
+- Initial full required test command exited 0, `79 passed in 10.38s`. An added both-targets-null case then exposed ordering still within ruling item 1: `uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py::test_restricted_target_zone_null_coverage -q -p no:cacheprovider` exited 1, `1 failed in 0.83s`, source_invalid instead of zone_missing. Moved the target-presence guard before arithmetic. Final full required test command exit 0, `79 passed in 9.18s`; this includes all three plants, both half-null orientations, targets 69 and 70 separately and together, reporter/summary preservation, and all previous guards.
+- Item 3 forced changes beyond replay and the required sentence: check_case and summary_reasons add only zone_missing to their closed reason sets, so the mandated reason survives the reporting boundary; the target-presence check moves before national arithmetic to preserve that reason without a denominator. New fixture helper uses invented source-shaped snapshots with updated source pins and companion metadata; expected values stay unchanged. No existing test assertion, fixture, guard, precision, tolerance, inventory, -vv pin, runner, CI, gate, AGENTS.md, CLAUDE.md, TASKS.md or OPEN_ITEMS.md changed.
+- Re-derived B via `uv run --locked python -c 'from custodian.data_tests.restricted_cases import outstanding; print("\n".join(sorted(outstanding())))'`, exit 0: `C12-MTH-46:awaiting_routine`, `GIS-DISTRICTS:awaiting_expectation`, `GIS-MUNICIPALITIES:awaiting_expectation`, `GIS-ZONES:awaiting_expectation`, `H2:awaiting_expectation`; last line `H2:awaiting_expectation`. Same set as before this pass and the README list.
+- Formatter application `uv run --locked ruff format .`: exit 0, `2 files reformatted, 735 files left unchanged`. Final `uv run --locked ruff check .`: exit 0, `All checks passed!`; `uv run --locked ruff format --check .`: exit 0, `737 files already formatted`; `uv run --locked mypy`: exit 0, `Success: no issues found in 407 source files`. Earlier runs of those three read-only checks also exited 0 before the additional target-coverage case; no retry of an unchanged failure.
+- Remaining required checks before this records append: `python3 scripts/check_docs.py` exit 0, `checked 1024 text files, 113 Markdown files: OK`; `python3 scripts/check_tree.py` exit 0, `checked 8 rules: OK`; `cmp AGENTS.md CLAUDE.md` exit 0, no output; `git diff --check` exit 0, no output. Final records checks follow. Changed tracked files are only the replay, its README, additive guard tests and this append-only ledger. Full return: .overnight/RETURN.md, MARKER-S2-T35-FIX-P3. Muhasabah PASS for the scoped truthful handoff; independent confirmations and the lead's real-cache baseline/plant/restoration remain pending, B remains outstanding, and full-task acceptance is not claimed.
+- Final records checks after writing PROGRESS.md and RETURN: `python3 scripts/check_docs.py` exit 0, `checked 1024 text files, 113 Markdown files: OK`; `python3 scripts/check_tree.py` exit 0, `checked 8 rules: OK`; `cmp AGENTS.md CLAUDE.md` exit 0, no output; `git diff --check` exit 0, no output. Read-only scope assertions exit 0, `Scoped diff, additive tests, append-only ledger, unchanged pins and return marker: OK`; they verify the four scoped tracked files, all prior ledger bytes, no removed test lines, unchanged rule/inventory files and the return marker. `git branch --show-current` exits 0, `local/S2-T35-fix3`; status lists exactly those four modified tracked files.
+
+## S2-T38 — Employed people by municipality, a Public fact
+
+Senior expert persona: senior data-platform engineer (public-data pipelines, provenance, privacy guards and their tests) (builder: Anthropic Claude Opus 5.5). Strict reviewer persona: senior privacy and data-contract reviewer of another maker. Skills: project-orientation, task-standards, test-driven-development, verification-before-completion, sanad-provenance, muhasabah-gate. Plan r1 with its facts file, design review APPROVED (OpenAI GPT-6, Codex) at `77e37e55ef842422c3e4a6d241cede4151a55e08`, lead ruling L-1038 (Q1 to Q5). Built on base `84080e265926b3367a864d239e6d9bc60f654884`; uv 0.11.31, Python 3.14.6 in the locked environment; TMPDIR the workspace's own temporary folder.
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-19 | Red, tests first | `uv run --locked python -m pytest custodian/tests/test_population_employed.py -q -p no:cacheprovider`: exit 1, 35 failed and 9 passed. Every failure was the missing feature: no `census.unit_for` or `census.TABLE_UNITS`, no `population.validate_employed_use`, `pop_muni: invalid_indicator: employed` from `load_indicators`, `invalid indicator/unit` from `census_rows`, the committed review file mapping `Employed` blank, and the 7.3 row and DAT-128 without the token. The 9 passing were plants on existing guards (the three other census tables, wrong units, an unknown indicator with no unit, a missing retrieval date). K2 pin rewrite in `test_frame_seventh.py`: exit 1, 4 failed, each on the committed file still mapping `Employed` blank. Later additions, each red first: inspection of an unadmitted token, exit 1, 3 failed (`DID NOT RAISE FrameError`); the guard's own refusal reasons, exit 1, 2 failed. The pin added to `core/tests/test_apportion.py` holds on the unchanged map (4 passed); it is a guard pin, proved by its planted copies and P13 below. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Build | `frame/census.py`: `TABLE_UNITS` admits (`pub_population_municipality`, `employed`) → `persons` only, and `unit_for` serves `census_rows`; `UNITS`, the four audit-count pairs, unchanged. `frame/mapping.py`: `inspect_source` takes the unit from `unit_for` and refuses an unadmitted token. `frame/population.py`: `load_indicators` accepts a token through `unit_for`; `validate_employed_use` refuses another table (`employed_table_unlisted`), any reserved use (`employed_reserved_use`) and a movement anchor (`employed_not_anchor`), then delegates to `split_policy.validate_split_use` for the joins, segmentation, apportionment, geography, category, lineage and protected-composite refusals. `custodian/publicdata/review/population_indicators.csv`: `Employed,employed`. Document 03: the 7.3 row lists `indicator` (`residents`, `employed`) and `unit` (`persons`); DAT-128 gains one sentence. OI-170: UPDATE line appended. No change to `split_policy.py`, `apportion.py`, document 04 or document 06. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Green | The five affected test files (`test_population_employed.py`, `test_frame_seventh.py`, `core/tests/test_apportion.py`, `test_frame_census.py`, `test_additions_split_policy.py`): exit 0, 451 passed. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Planted violations in the tracked files | Fifteen plants, each applied to the tracked file, its guard test run, the file restored and the test run again: P01 to P03 the review file mapping `Employed` to `employees`, `residents` or blank (K2 pin); P04 `employed` admitted in `pub_census_zone`; P05 a fifth `UNITS` pair; P06 `census_rows` accepting a missing unit; P07 to P09 the guard's table, reserved-use and anchor checks removed; P10 the guard admitting without the flag checks (14 failed); P11 inspection keeping an unadmitted token; P12 `load_indicators` without its token check; P13 `COUNT_TABLES["employed"]` holding `pub_population_municipality`; P14 the 7.3 row without `employed`; P15 the DAT-128 sentence removed. Each planted run exited 1 with the guard's own assertion or refusal; each restored run exited 0. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Checks | `uv run --locked ruff check .` 0; `uv run --locked ruff format --check .` 0 (734 files); `uv run --locked mypy` 0 (407 source files); `python3 scripts/check_docs.py` 0; `python3 scripts/check_tree.py` 0 (8 rules); `cmp AGENTS.md CLAUDE.md` 0; `git diff --check` 0; `git diff` on document 04, document 06, `custodian/src/eii_custodian/publicdata/additions/` and `core/src`: empty. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Mutation, deferred | `custodian/src/eii_custodian/publicdata/frame/census.py` and `frame/population.py` compare indicator tokens; their campaign is deferred until after go live and is no gate (decision 0055 items 1 and 2; L-1038 item 4). Recorded here only. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Not run here | The real-cache data tests (rule 44, lead's shell only); their report should no longer list `Employed` among the rows not loaded. | Anthropic Claude Opus 5.5 |
+| 2026-11-19 | Whole test | `./eii test --seed 3141592653`: exit 1, 10685 passed and 7 failed in seven suites, 1 with problems (python-guards 890 passed and 7 failed, python-core 743, python-custodian-1 4204, python-custodian-2 3200, python-product 786, web-checks 861, web-unit 1). The 7 are errors at class setup of `scripts/tests/test_clean_environment.py` (`FileNotFoundError` on the default user uv cache folder in `seed_cache`): the pytest child environment of `scripts/run_tests_exec.py` passes `HOME` but not `UV_CACHE_DIR`, and on this build machine the uv cache is kept elsewhere, so the default folder was absent when the suite ran. Inference: environmental, since this change touches nothing under `scripts/`, no `pyproject.toml` and not `uv.lock`; not closed by any re-run and proposed as an open item. Every custodian, core and product test passed. | Anthropic Claude Opus 5.5 |
+
+## S2-T39 part A — bilingual acquisition and reviewed identifier crosswalk mechanics
+
+2026-11-19. Builder: OpenAI GPT-6 (Codex), senior public-data engineer for bilingual acquisition,
+versioned parsers and reviewed identifier crosswalks. Later strict reviewer persona: senior reviewer
+of public-data parsers, release contracts and crosswalks from another maker; independent build
+review remains with the lead. Supplied design review r2 approves the plan; no implementation
+approval is inferred from it. Skills loaded: project-orientation, task-standards, sanad-provenance,
+muhasabah-gate and github-flow. Requested test-driven-development and verification-before-completion
+skill files were unavailable in the installed roots; their failing-first and verification rules
+were applied directly. The brief's read-only Git boundary supersedes ordinary commit steps.
+
+Working-tree changes over full base `84080e265926b3367a864d239e6d9bc60f654884`; no builder commit,
+push, task-status change or open-item edit. Work commit remains for the lead. Scope is decision
+0064 item 32 and L-1043/L-1044 part A only: criteria 1, 3 and 4. The real Arabic inventory and
+reading, real reviewed mappings and another maker's confirmation remain unperformed; no live
+acceptance is claimed. The agency release row and DAT-143 are byte-identical to base. Only the
+agency parser gains its own version constant; dashboard and milestone versions stay unchanged.
+
+Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, existing locked environment.
+uv commands used `TMPDIR="$PWD/.overnight/tmp"`, `UV_OFFLINE=1`, `UV_NO_SYNC=1` and
+`UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`. Paths resolve within this workspace. Every pytest
+run used `--hypothesis-seed=3192026119`; the whole runner used `--seed 3192026119`. No live fetch,
+cache-data reading, dependency installation or mutation campaign was performed by the builder.
+
+Failing-first evidence (all actual command exits; command prefix `uv run --locked python -m pytest`):
+
+- `custodian/tests/test_investment_crosswalk.py custodian/tests/test_investment_bilingual.py -q
+  --hypothesis-seed=3192026119`: exit 1, 34 failed before implementation. Missing APIs were an
+  initial red, separately supplemented by the named raw-refusal proof below.
+- Adding `custodian/tests/test_gate_records.py` with `--tb=short`: exit 1, 1 failed/50 passed;
+  conflict validation was ordered before duplicate detection. Fixed the detection order.
+- `custodian/tests -k investment -q --hypothesis-seed=3192026119 --tb=short`: initially exit 1,
+  84 failed/458 passed/6847 deselected; next exit 1, 3 failed/539 passed/6847 deselected. Updated
+  explicitly changed inventory, language, gate and manifest fixtures, replaced legacy-map success
+  fixtures with empty maps and separately tested refusals, and preserved malformed-field refusal
+  precedence. No numeric baseline, attack size or tolerance changed.
+- Bilingual file with `-k 'requires_all or intro_identifiers or fetched_content'`: exit 1,
+  4 failed/20 deselected. Added real missing-language-family and introductory-identifier guards;
+  corrected the fourth failure's test-harness call to the existing `data_untracked` function.
+  Broad investment selection then exited 0, 550 passed/6847 deselected.
+- Crosswalk/bilingual/gate focused set: exit 0, 63 passed after normal-publisher target tests.
+- Bilingual file with `-k count_command`: red exit 1, 1 failed/24 deselected; green exit 0,
+  1 passed/24 deselected after passing the inventory language through the counts CLI.
+- Crosswalk file with `-k missing_key_field`: red exit 1, 1 failed/22 deselected; green exit 0,
+  1 passed/22 deselected after requiring a present typed target key rather than stringifying a
+  missing value. Broad investment selection then exited 0, 556 passed/6847 deselected.
+- New bilingual/crosswalk files with `-v --hypothesis-seed=3192026119 --tb=short`: exit 0,
+  48 passed, also supplying the environment versions above.
+- Bilingual file with `-k 'malformed_page or calendar_date'`: red exit 1, 3 failed/25 deselected;
+  green exit 0, 3 passed/25 deselected after named refusal for unhashable language metadata,
+  noninteger page order and invalid Arabic review dates. Final broad investment selection:
+  exit 0, 559 passed/6847 deselected. Final focused bilingual/crosswalk/gate/gate-survivor set:
+  exit 0, 98 passed, including runtime dashboard/milestone parser-version checks.
+
+Raw guard evidence: `uv run --locked python .overnight/tmp/prove_investment_guards.py planted`
+first exited 1 with 38 refused, then, after adding the remaining boundary cases, exited 1 with
+41 refused/zero accepted. Its `clean` form exited 0 with 41 accepted/zero refused. It changes
+invented inputs only, never a production guard. Every case's planted/clean raw exit was 1/0:
+review role/date/reference; unknown/missing target and missing target-key field; target hash;
+duplicate/conflicting mapping; name/hashed-name key and municipality-name-map path; restricted
+crosswalk content; identifier width; crosswalk tamper; stale source snapshot; changed source
+value; absent source identifier; all three legacy name maps; omitted introduction/list;
+rewritten whitespace/punctuation; translation/substitution; missing page hash/date/language/order/
+kind; wrong-language batch; missing Arabic family; introductory identifiers of both forbidden
+widths; Arabic truncation/table drift; absent Arabic evidence; tracked fetched-content path;
+and a socket-attempt sentinel. Named refusals and corresponding test names are recorded in
+`.overnight/RETURN.md`. The three later robustness guards and counts CLI have their own red/green
+test runs above. Earlier publication artifacts remain byte-identical under the tested refusals.
+
+Checks: whole-tree `uv run --locked ruff check .` initially exited 1 with 20 import/unused-variable
+diagnostics, then exited 0. An earlier combined shell printed 16 narrower lint diagnostics before
+mypy success; only its combined exit 0 was captured, so no individual lint exit is inferred.
+`uv run --locked ruff format .` exited 0 (9 reformatted/728 unchanged, later 1/736 and 2/735 after
+test additions). Latest `ruff format --check .` exited 0, 737 files formatted; `mypy` exited 0,
+409 source files. `python3 scripts/check_docs.py` exited 0, 1024 text files/112 Markdown files
+before this evidence append; final record checks follow. `python3 scripts/check_tree.py` exited
+0, 8 rules; `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0. Read-only base-byte
+invariant check exited 0: agency release rows, DAT-143, task/open-item files, instruction files,
+sources.yaml and investment_evidence.py unchanged. Stable-anchor check exited 0, 21 required
+document anchors resolved. Current history contains dependency train PR 82 at
+`d66d742c3736168560278d717da257fdaa34aac5`; its older task status lines remain unchanged.
+
+Full runner `./eii test --seed 3192026119` is still running at this append; its final result will
+be appended, not substituted here. It began during implementation. The guard wrapper reported
+884 passed/13 failed/zero skipped; embedded pytest reported 885 passed/6 failed/7 errors. Failures
+include uv's default cache being outside the writable workspace, clean-environment setup, and
+an unformatted newly added count-command test. The latter defect was corrected; the command
+`uv run --locked python -m pytest scripts/tests/test_pychecks_config.py
+scripts/tests/test_pychecks_ruff.py -q --hypothesis-seed=3192026119 --tb=short` then exited 0,
+14 passed. Environment failures are not waived or repaired outside this task's boundaries.
+Core 739, custodian part 1 4180, custodian part 2 3223 and product 786 have passed with zero
+failed/skipped. The last three robustness tests postdate whole-run collection; final focused
+and broad investment runs cover them. No exact final-tree whole-run pass is claimed.
+
+Lead steps: finish OI-181/182 evidence under the rulings, obtain another maker's read-only build
+review, commit the task/evidence, and run the whole suite in the prepared lead environment on
+the final reviewed tree and exact merge result. Part B waits for accepted decision 0029 (OI-178).
+No new open-item number is assigned here. Muhasabah: PASS for scoped work and honest limits.
+
+### S2-T39 part A — appended self-audit correction
+
+After the earlier evidence row, self-audit found three more defects in the new code. Command
+`uv run --locked python -m pytest custodian/tests/test_investment_crosswalk.py
+custodian/tests/test_investment_bilingual.py -k 'during_read or names_its_source_url' -q
+--hypothesis-seed=3192026119 --tb=short` exited 1, 3 failed/51 deselected: a target changed during
+parsing could retain its old pin; removal of the crosswalk during reading raised an unhandled
+file error; and page-evidence refusal omitted the known source URL. Added final integrity
+checks with named refusals and retained source URLs, including publisher context on crosswalk
+reader failures. Same command then exited 0, 3 passed/51 deselected. Final broad command
+`uv run --locked python -m pytest custodian/tests -k investment -q
+--hypothesis-seed=3192026119 --tb=short` exited 0, 562 passed/6847 deselected in 5.90 seconds.
+Ruff format application exited 0, 2 files reformatted/735 unchanged; subsequent whole-tree
+ruff check exited 0, format check exited 0 (737 files), and mypy exited 0 (409 source files).
+The same workspace-local/offline environment and full base hash of the preceding entry apply.
+The first whole-run collection also predates these additions; the final investment selection
+covers them. No earlier evidence has been replaced. The symbol-anchor check additionally
+exited 0, resolving 56 anchors in 18 files. Ledger-prefix, report-marker and instruction-parity
+invariants exited 0. Whole-run completion and final record checks follow in another append.
+
+### S2-T39 part A — whole-run completion and handoff
+
+The recorded `./eii test --seed 3192026119` completed with actual exit 1: 10674 passed,
+13 failed, zero skipped in seven suites, one with problems. Wrapper counts: python-guards
+884 passed/13 failed; python-core 739 passed; python-custodian-1 4180 passed;
+python-custodian-2 3223 passed; python-product 786 passed; web-checks 861 passed;
+web-unit 1 passed. All seven reported zero skipped; only python-guards failed. Its embedded
+pytest tail separately reported 885 passed/6 failed/7 errors; no reconciliation is guessed.
+The output identifies uv's default cache/clean-environment setup outside the writable workspace
+and the earlier unformatted count-command test. That formatting defect was fixed and the
+14 affected guard tests passed, as recorded above. Both web suites completed normally;
+there was no web timeout. The whole run began during iteration and predates six final new
+robustness/integrity tests; final changed-path coverage is the 562-test investment run above,
+not an asserted final-tree whole-run pass. The lead's prepared-environment and exact-merge
+whole tests remain required. No failed test, restriction or earlier evidence is hidden.
+
+Final records: `python3 scripts/check_docs.py` exit 0 (1024 text files, 112 Markdown files);
+`python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0;
+`git diff --check` exit 0. Final source checks already passed after the last code change:
+ruff check 0, ruff format check 0 (737 files), mypy 0 (409 source files). The ledger's original
+base bytes remain an exact prefix; protected task/shared files remain unchanged. Full return,
+all plants, assumptions, forced hunks, unresolved lead inputs and changed files are in
+`.overnight/RETURN.md`, ending `MARKER-S2-T39-BUILD-A`. No commit, task criterion or status
+was changed. Muhasabah PASS: offline mechanics and full-run failure are distinguished from
+live acceptance; no independent build approval or complete part-A delivery is claimed.
+
+
+### S2-T39 part A — fix pass 1 under L-1052
+
+Base commit: `cb7fbfe790d4583f839b1f4dda57daffa95130d2`; branch `local/S2-T39`.
+Maker/model: OpenAI GPT-6 (Codex). Builder persona: senior public-data engineer for
+bilingual acquisition, versioned parsers and reviewed identifier crosswalks. Self-audit
+persona: strict senior public-data contract and test reviewer; this is not another maker's
+implementation approval. Independent re-review remains with the two supplied review lenses.
+Skills loaded: project-orientation, task-standards, github-flow, sanad-provenance and
+muhasabah-gate. Requested test-driven-development and verification-before-completion files
+were not found in the installed skill roots; applied their plain meaning: tests first,
+removed-guard failures confined to scratch, passing workspace checks and honest evidence.
+Git remains read-only as the brief requires. No network or real public cache was used.
+
+Scope: L-1052 items 1–4 only. Lens A F-1 adds exactly the stale-v1 and absent-schema cases
+to `test_spec_file_refusal_paths`. Lens A F-2 adds `test_csv_country_target[False]` (invented
+CSV with `iso3`, accepted through `read_crosswalk` and `parse_fdi`) and `[True]` (CSV with
+an unrelated column, refused as `crosswalk_target`). Lens B F1 replaces the direct socket
+call with an injected transport's socket attempt through the publisher, asserts the
+`network_attempt` sentinel and absence of a published batch. Lens B F2 moves only the
+review sentence into the municipality/place entry's closing parenthesis in document 03
+section 7.3, using the reviewer's exact wording. No production module changes. A byte
+comparison against the base proves the entire contract equals that one replacement, so
+`pub_investqa_record` and DAT-143 are unchanged. L-1052 item 5 remains the lead's ledger work.
+
+Correction required by L-1052 item 3: the earlier S2-T39 evidence and BUILD-RETURN described
+`test_network_attempt_is_an_explicit_failure` as a planted network-access violation. At the
+base commit that test invoked the patched socket directly and exercised no production code;
+that earlier description was incorrect. It is now a publisher-path plant. Earlier evidence
+rows are retained unchanged.
+
+Environment: Linux; Python 3.14.6; pytest 9.2.0; Hypothesis 6.170.15; existing locked
+environment, no install. Every uv command uses `TMPDIR="$PWD/.overnight/tmp"`,
+`UV_OFFLINE=1`, `UV_NO_SYNC=1`, `UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`.
+All pytest invocations use `--hypothesis-seed=3192026119`. No test was skipped, retried,
+suppressed or given a relaxed assertion. The whole test remains the lead's.
+
+Removed-guard evidence: `uv run --locked python .overnight/tmp/fix1_plants.py` exited 0.
+The driver copies allow-listed tracked source/configuration files into
+`.overnight/tmp/fix1-scratch`, verifies that production imports resolve there, and runs each
+pytest command with the same locked interpreter. It restores each edited scratch file and
+checks byte equality after the run; production guards in the workspace are never removed.
+Each inner invocation is `python -m pytest FILE -q -p no:cacheprovider -k EXPRESSION
+--hypothesis-seed=3192026119 --tb=short`, in that scratch root:
+
+- FILE `custodian/tests/test_investment_build_survivors.py`, EXPRESSION
+  `test_spec_file_refusal_paths and inventory_schema`: removing the schema-version guard
+  gives exit 1, 2 failed/27 deselected. Both stale and absent schema produce the wrong
+  `confirmation_inventory` refusal rather than the required `inventory_schema` refusal.
+  Output: `.overnight/tmp/fix1-red-inventory_schema.log`.
+- FILE `custodian/tests/test_investment_crosswalk.py`, EXPRESSION
+  `test_csv_country_target and False`: disabling the CSV-reader branch gives exit 1,
+  1 failed/26 deselected; the valid CSV is incorrectly refused. Output:
+  `.overnight/tmp/fix1-red-csv_reader.log`.
+- Same FILE, EXPRESSION `test_csv_country_target and True`: removing target membership
+  validation gives exit 1, 1 failed/26 deselected; the CSV without its key field is
+  incorrectly accepted. Output: `.overnight/tmp/fix1-red-csv_membership.log`.
+- FILE `custodian/tests/test_investment_bilingual.py`, EXPRESSION
+  `test_network_attempt_is_an_explicit_failure`: replacing the socket sentinel with a
+  no-op gives exit 1, 1 failed/28 deselected (`DID NOT RAISE AssertionError`). The publisher
+  completes using invented responses, proving the real publisher path is exercised;
+  the fake socket never opens a connection. Output:
+  `.overnight/tmp/fix1-red-network_sentinel.log`.
+
+Green command on the workspace: `uv run --locked python -m pytest
+custodian/tests/test_investment_build_survivors.py custodian/tests/test_investment_crosswalk.py
+custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider
+-k 'inventory_schema or test_csv_country_target or test_network_attempt_is_an_explicit_failure'
+--hypothesis-seed=3192026119 --tb=short`: exit 0, 5 passed/80 deselected. Both inventory
+plants, both CSV cases and the publisher socket plant pass with their guards present.
+
+Required source checks (all from the repository root):
+
+- `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k investment
+  --hypothesis-seed=3192026119`: exit 0, 566 passed/6847 deselected in 7.30 seconds.
+- `uv run --locked python -m pytest custodian/tests/test_investment_bilingual.py
+  custodian/tests/test_investment_crosswalk.py custodian/tests/test_gate_records.py
+  custodian/tests/test_gate_records_survivors.py -q -p no:cacheprovider
+  --hypothesis-seed=3192026119`: exit 0, 103 passed in 1.24 seconds.
+- `uv run --locked ruff check .`: exit 0, all checks passed (zero diagnostics).
+- `uv run --locked ruff format --check .`: exit 0, 737 files already formatted.
+- `uv run --locked mypy`: exit 0, 409 source files, no issues.
+
+The scope/contract invariant script exited 0: exactly four changed tracked files before this
+ledger append, exact document replacement, protected contract rows unchanged. Final document,
+tree, instruction-parity and whitespace checks follow after the evidence append. Handoff
+records go in `.overnight/RETURN.md`; independent re-review and the whole test are not claimed.
+
+
+S2-T39 fix-pass final record checks after the evidence append: `python3 scripts/check_docs.py`
+exit 0 (1024 text files, 112 Markdown files); `python3 scripts/check_tree.py` exit 0
+(8 rules); `cmp AGENTS.md CLAUDE.md` exit 0 (one byte-identical pair);
+`git diff --check` exit 0 (zero whitespace defects). Five tracked files changed: this ledger,
+three investment test files and document 03. Muhasabah PASS for L-1052 items 1–4: named
+red/green evidence and exact contract replacement verified; independent re-review and the
+lead's whole test remain owed. No other finding, live acceptance or part-B work is claimed.
+
+## S2-T36 offline build — 2026-11-19
+
+Builder: OpenAI / GPT-6 (Codex), senior data-platform engineer for public-data
+acquisition, provenance and request-chain integrity. Later reviewer persona:
+strict reviewer of public-data fetchers, transport guards, predecessor binding,
+projection-before-write and planted violations; another-maker review is pending.
+Skills applied: project-orientation, task-standards, github-flow,
+sanad-provenance and muhasabah-gate. The named test-driven-development and
+verification-before-completion skills are unavailable; their plain requirements
+were applied directly. Git remained read-only as the task brief requires.
+
+Binding build base: `67311c879b0fd8c68216d53abd33d61282a7b3d5` on
+`local/S2-T36`. The task entry and decision 0064 are supplied in the brief's
+input artifacts, not added to this older tree. No task criterion/status or open
+item was changed. This records an offline implementation, not live activation,
+a completed source fetch or reviewer approval. The lead retains the reviewed
+pin, byte bound, hidden-state/selector confirmation, producer session, real-cache
+run and commit. `EII_FC_REGISTER_FILE` and release tables are unchanged.
+
+All recorded pytest runs used seed `1938475621`, the locked workspace environment,
+`UV_OFFLINE=1` in the invoking shell and `TMPDIR` set to this workspace's
+`.overnight/tmp` by its absolute resolved path. The whole-test runner builds its
+own child allow-list environment and selects decision provider `none`. No public
+source, live capture, private input, vault or real data cache was read by the
+builder. Commands below run from the repository root. Detailed local transcripts
+are under `.overnight/`; local paths in completed transcripts were redacted.
+
+| Evidence | Command | Exit and observed result |
+|---|---|---|
+| Initial shape interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register.py -q --hypothesis-seed=1938475621` | 2; one collection error: FC package absent. This is interface absence, not a semantic guard proof. |
+| Initial capture interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q --hypothesis-seed=1938475621` | 2; one collection error: producer module absent. |
+| Initial inventory interface red | `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py -q --hypothesis-seed=1938475621` | 2; one collection error: build adapter absent. |
+| Schools recovery red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k v2_school --hypothesis-seed=1938475621` | 1; five failed: connection/403/429/503/refusal-body cases did not recover. |
+| TLS classification red | `uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -k tls_errors --hypothesis-seed=1938475621` | 1; two failed: direct/wrapped TLS failures were classified as recoverable connections. |
+| Independent missing-basis red | `uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 1; 89 passed, one failed: removing the basis alone left decision 0026 and was refused by registry typing. Corrected under decision 0059; unknown citations still refuse. |
+| Terminal-without-anchor red | `uv run --locked python -m pytest custodian/tests/test_fc_register.py -q -k terminal_pager_without --hypothesis-seed=1938475621` | 1; one failed: a pager without a next control was incorrectly refused. |
+| Invalid capture time red | `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k 'plants and time' --hypothesis-seed=1938475621` | 1; one failed: invalid UTC evidence escaped the dated failure path. |
+| FC suite green | `uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 0; 94 passed, no skips. Exact capture refusal reasons are asserted; both required capture-chain fixtures succeed without persisted state. |
+| Initial broader regression | `uv run --locked python -m pytest custodian/tests/test_s2_t29* custodian/tests/test_source_completeness* custodian/tests/test_publicdata_registry.py -q --hypothesis-seed=1938475621` | 1; 727 passed, seven failed. The failures identified a local import defect, declaration placement, source counts/nightly inventory and exact terms quotation. All were corrected; no test was removed. |
+| Corrected affected regressions | `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_publicdata_registry.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621` | 0; 333 passed at that revision. Later FC additions have their own 94-pass run above. |
+| Lint | `uv run --locked ruff check .` | 0; all checks passed after correcting unused imports, import order and regex literals. Earlier runs exited 1 (23, then three, then two findings); all are retained in the local transcripts. |
+| Format | `uv run --locked ruff format --check .` | 0; 801 files already formatted. Formatter applications exited 0; the final application reformatted one task test file. |
+| Types | `uv run --locked mypy` | 0; 434 source files. Initial exit 1 had three nullable HTML-attribute errors, corrected before the passing check. |
+| Lock | `uv lock --check` | 0; 69 packages resolved. No dependency or lock change. |
+| Version pins | `uv run --locked python scripts/check_versions.py` | 0; 70 components. |
+| Reference notes | `uv run --locked python scripts/check_reference_notes.py` | 0; two files, six libraries, 359 rows. No new external library used. |
+| Docs, preliminary | `python3 scripts/check_docs.py` | 0; 1089 text files, 112 Markdown files before this evidence append. |
+| Tree, preliminary | `python3 scripts/check_tree.py` | 0; eight rules. |
+| Instructions | `cmp AGENTS.md CLAUDE.md` | 0; byte-identical, unchanged. |
+| Whitespace | `git diff --check` | 0; no output. |
+
+Correction record: intermediate FC runs also exposed a test certificate's missing
+PEM decode (48 failed, nine passed), an overly generic expected TLS diagnostic
+(one failed, 56 passed), an incorrectly nested registry row (one failed, 64 passed),
+and a missing invented pin in a fixture (one failed, 20 passed). These were fixture,
+assertion or implementation defects, corrected without skips, raised timeouts,
+refreshed baselines or weakened guards. Subsequent FC milestones passed 65, 82,
+90, 92 and 93 tests before the final 94-test set. Not every guard has an isolated
+semantic-red test run before implementation: the first three reds above are
+collection errors. This limitation is carried to the return report, not represented
+as complete per-guard failing-first evidence.
+
+The tests retain separate inside-card and outside-pane personal-name sentinels;
+projection strips both before any successful write, on live and producer/replay
+paths. Failed chains leave only dated closed failures and preserve any earlier
+complete snapshot. Capture replay/duplicate/missing/reordered/wrong-page/repeated-
+response/predecessor/false-terminal plants refuse; unknown fields, company-detail
+requests, undelivered state, credential headers, TLS/pins, off-frame paths and
+oversize responses remain terminal. The composed name inventory keeps both names
+on duplicate QFC numbers and the caller refuses its source-only collision plant.
+
+No mutation campaign was run (decision 0055). Proposed open items, assumptions,
+whole-test results and the shared-file hunk inventory are reported in
+`.overnight/RETURN.md`; final validation is appended after the whole run completes.
+
+### S2-T36 correction and closing targeted evidence
+
+The first whole run additionally exposed the exact weekly-family expectation and
+an existing keyed-transport exception-context regression introduced by the TLS
+classification change. The transport again raises its keyed closed fault outside
+the upstream exception handler. The affected command
+`uv run --locked python -m pytest custodian/tests/test_fc_register*.py custodian/tests/test_public_cadence.py custodian/tests/test_publicdata_besttime_transport.py -q --hypothesis-seed=1938475621`
+exited 0, 152 passed (`transport-regression-final.log`).
+
+The same whole run exposed a duplicate redirect/pin recheck in the new pre-recovery
+logic and the exact host inventory requiring the two reviewed hosts. The duplicate
+check was removed: original responses are checked before recovery; admitted
+captures are checked after admission. The existing exact-count survivor assertion
+was not changed. The command
+`uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, 151 passed (`redirect-regression-final.log`).
+
+The expanded broad command
+`uv run --locked python -m pytest custodian/tests/test_s2_t29* custodian/tests/test_source_completeness* custodian/tests/test_publicdata_registry.py custodian/tests/test_public_cadence.py custodian/tests/test_publicdata_besttime_transport.py custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, 886 passed (`regression-final.log`). The existing style/config guard
+command `uv run --locked python -m pytest scripts/tests/test_pychecks_config.py scripts/tests/test_pychecks_ruff.py -q --hypothesis-seed=1938475621`
+exited 0, 14 passed (`guard-style-final.log`).
+
+A further direct-entry boundary plant was written and run:
+`uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -k direct_fc_admission --hypothesis-seed=1938475621`
+exited 1, one failed, because the shared admission function accepted an FC raw
+legacy capture when called without its projected identity. FC acquisition already
+required projected evidence, but the direct admission API did not. Admission now
+requires the closed projected contract for the exact FC URL regardless of supplied
+optional metadata; intake checks the current projection and upstream digest too.
+The command `uv run --locked python -m pytest custodian/tests/test_fc_register*.py custodian/tests/test_s2_t29_transport.py -q --hypothesis-seed=1938475621`
+then exited 0, 146 passed (`admission-green.log`). The final FC-only command
+`uv run --locked python -m pytest custodian/tests/test_fc_register*.py -q --hypothesis-seed=1938475621`
+exited 0, **95 passed**, no skips (`fc-final95.log`). This supersedes the earlier
+94-test count for the completed focused suite; the earlier result is retained.
+
+Post-patch-validation was applied for coverage reasoning. Its isolated Git-worktree
+runner cannot run under this brief's read-only Git rule, so no formal runner or
+independent review is claimed. A local source-comparison harness under the
+documented `.overnight/tmp/ppv/` loads the binding-base transport or the patched
+transport with final sibling modules and intercepts all network sends. Commands:
+
+- `T36_TRANSPORT_SOURCE=.overnight/tmp/ppv/base_transport.py uv run --locked python -m pytest .overnight/tmp/ppv/test_tls_validation.py -q -s --hypothesis-seed=1938475621`: exit 1, two failed and three passed. The direct and URLError-wrapped certificate cases each print `PPV_REACHED`, then fail the TLS-not-connection-recovery safety assertion.
+- `T36_TRANSPORT_SOURCE=custodian/src/eii_custodian/publicdata/fetch/transport.py uv run --locked python -m pytest .overnight/tmp/ppv/test_tls_validation.py -q -s --hypothesis-seed=1938475621`: exit 0, five passed. Benign selected output is byte-identical; the keyed error-context and adjacent off-host checks pass on both sources.
+
+The final tracked implementation patch (excluding this append-only ledger) is
+`.overnight/T36.final.patch`, SHA-256
+`835f981cccf855c4fc7036808b1a88038726ab205ce8ac4ce65a179be8d2d891`.
+The final input manifest `.overnight/validation-inputs.final.json` hashes 37
+changed/new implementation, test, fixture and documentation files, SHA-256
+`7db1a635a4e4a5d75db31e2a8e2f6dc0eca0cd88696d9070e399468951d807eb`.
+A read-back hash check exited 0 and confirmed every implementation input unchanged.
+The earlier patch/manifest remain preserved as earlier evidence, not overwritten.
+
+Closing checks after the last source change: `uv run --locked ruff check .` exit 0;
+`uv run --locked ruff format --check .` exit 0, 801 files; `uv run --locked mypy`
+exit 0, 434 source files; `python3 scripts/check_docs.py` exit 0, 1089 text files
+and 112 Markdown files; `python3 scripts/check_tree.py` exit 0, eight rules;
+`cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Evidence files are
+`closing-ruff.log`, `closing-format.log`, `closing-mypy.log`, `closing-docs.log`
+and `closing-tree.log`. The return-marker/absolute-path/email check first exited 1
+because its broad path predicate also matched the documented relative temporary
+folder; the corrected absolute-path predicate exited 0. No source check was
+suppressed or changed by this report-only correction.
+
+The whole-project run is still running its existing web checks at this append.
+Its final exit and counts follow in a later row; its initial failures are not
+represented as a passing whole-project result. Only the lead may resolve the
+reported evidence gaps and acceptance status.
+
+### S2-T36 final complete custodian suite
+
+With the final 37 implementation inputs unchanged, the command
+`uv run --locked python -m pytest custodian/tests -q --hypothesis-seed=1938475621`
+ran with `PYTHONHASHSEED=1938475621`, the same workspace-local `TMPDIR` and
+`UV_OFFLINE=1`. It exited **0: 8111 passed, one warning, no skips**, in 323.96 s
+(`custodian-final.log`). The warning is the existing invented duplicate ZIP member
+fixture `test_read_sheet_duplicate_zip_entries_refused`. This run occurred while
+the earlier whole command was in its unchanged web suites; no timeout or test
+setting was changed. It verifies the completed custodian code, including every
+custodian regression found by the earlier whole run.
+
+### S2-T36 whole command result and final disposition
+
+`./eii test --seed 1938475621`, invoked with workspace-local `TMPDIR` and
+`UV_OFFLINE=1`, completed with exit **1**. Its own summary was **11413 passed,
+18 failed, zero skipped**, seven suites, three with problems (`eii-test.log`).
+The run began before the final corrections and is retained as that revision's
+evidence, not represented as a passing run of the final input manifest.
+
+| Suite | Runner counts |
+|---|---|
+| python-guards | 917 passed, 13 failed, zero skipped |
+| python-core | 745 passed, zero failed, zero skipped |
+| python-custodian-1 | 4413 passed, three failed, zero skipped |
+| python-custodian-2 | 3690 passed, two failed, zero skipped |
+| python-product | 786 passed, zero failed, zero skipped |
+| web-checks | 861 passed, zero failed, zero skipped |
+| web-unit | one passed, zero failed, zero skipped |
+
+The guard failures include the brief's known unavailable UV-cache environment
+errors and in-progress style/config failures. The final style/config rerun passed
+14 tests. The five custodian failures named earlier in this ledger are corrected
+and covered by the subsequent final complete package run: 8111 passed. No failing
+whole command was hidden, no baseline was refreshed, no timeout was raised and no
+random failure was closed on a green rerun. The brief's hash-dependent S2-T40
+failure did not appear in this run. The unchanged web suites both passed.
+
+Muhasabah: PASS for factual reporting, sources, explicit assumptions and scope;
+full task acceptance is not claimed. The per-guard semantic-red chronology gap,
+lead-owned live activation/evidence, different-maker implementation review and
+future S4-T05 caller are explicit in `.overnight/RETURN.md`. Proposed open items
+remain in that return only. The final report lists every changed/new file and all
+54 shared-file hunks. No task status, open-item number or accepted decision was
+silently changed. Final file/report checks follow this append.
+
+Final post-append verification: `python3 scripts/check_docs.py` exited 0
+(1089 text files, 112 Markdown files); `python3 scripts/check_tree.py` exited 0
+(eight rules); `cmp AGENTS.md CLAUDE.md` exited 0; `git diff --check` exited 0.
+The final implementation-hash/unchanged-task-files/report-marker/hunk-inventory/
+absolute-path/email check exited 0. Return evidence is complete as a report;
+acceptance limitations remain explicit, including the failing whole run.
+
+### S2-T36 fix pass 1 — ruling L-1062 — 2026-11-19
+
+Builder: OpenAI / GPT-6 Codex, senior data-platform engineer. Strict reviewer
+personas: other-maker public-acquisition and security reviewers, the two lenses
+named in `.overnight/IN/REVIEW-A.md` and `.overnight/IN/REVIEW-B.md`; their fix
+confirmation remains with the lead. Skills loaded: project-orientation,
+task-standards, sanad-provenance, muhasabah-gate and github-flow.
+test-driven-development and verification-before-completion are not installed;
+their plain requirements were applied: tests before fixes, isolated semantic red
+proofs, then actual green commands before reporting. Git remained read-only.
+
+Base commit: `785f6b2485e753e83b04af9cda2910fc6f467bb9`.
+Authority and scope: `.overnight/IN/RULING-L1062.md` item 1 only; no proposed open
+item was built. Commands ran from the repository root with `UV_OFFLINE=1` and
+`TMPDIR` set to the absolute resolution of this workspace's `.overnight/tmp`.
+The locked environment was used; no seed override was supplied, and all new or
+changed plants use deterministic invented fixtures. No live fetch was performed.
+
+- A-F1: chose the smaller acquisition change at
+  `custodian/src/eii_custodian/publicdata/fetch/page_acquire.py:531`:
+  `projection=kind == "fc_company_cards"` on the terms read. Terms still get a
+  visible-text hash; they no longer append a non-company input to this source's
+  company-page chain. The inventory reader was untouched. The new test at
+  `custodian/tests/test_fc_register_inventory.py:32` uses two live company pages
+  and a nonempty reviewed terms URL, then verifies the returned names, exact
+  request sequence, company-only input chain and retained terms hash.
+- A-F2: dropped only `registration required` from the obstacle credential tuple
+  at `custodian/src/eii_custodian/publicdata/fc_register/acquire.py:38`.
+  Both sign-in spellings remain. The new non-capture v2 regression at
+  `custodian/tests/test_s2_t29_live_acquire.py:85` accepts a valid invented event
+  title carrying that phrase through normal acquisition.
+- B-F1: `custodian/tests/test_fc_register_capture.py:254` now puts `sign in` in
+  the outside-person cell of a valid terminal company page and matches
+  `credentials`; `load_capture.assert_not_called()` remains at line 262.
+- B-F2: the same test at line 257 now pads a valid terminal company page with an
+  HTML comment beyond the declared byte bound and matches `metadata_bytes`;
+  capture is still forbidden. The size guard itself was untouched.
+- Forced changes in passed parts: only the A-F1 terms-call hunk in shared
+  acquisition and the A-F2 regression added to the existing shared acquisition
+  test file. The B findings share one loop, which now pairs bodies with exact
+  refusal reasons and binds each body in its response lambda. Formatting changes
+  stay inside these test edits. No additional production code was changed.
+
+Red evidence, with tests edited before either production fix:
+
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py::test_inventory_with_terms_keeps_only_company_page_inputs -q -p no:cacheprovider`
+  — exit 1; last line `1 failed in 0.42s`. Original source at the base commit
+  refused `contribution()` with `PageError receipt_missing` after its terminal
+  company fragment, reproducing A-F1.
+- `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py::test_non_capture_source_accepts_registration_required_text -q -p no:cacheprovider`
+  — exit 1; last line `1 failed in 5.54s`. Original source refused the valid
+  non-capture v2 response as `PageError unavailable`, reproducing A-F2.
+- `uv run --locked python .overnight/tmp/fix-p1/prove.py sign-in` — exit 1;
+  pytest last line `1 failed in 0.31s`, wrapper last line `Exit: 1`.
+  In a scratch package copy only the credential word tuple was emptied; the
+  changed B-F1 plant failed with `DID NOT RAISE PageError`.
+- `uv run --locked python .overnight/tmp/fix-p1/prove.py size` — exit 1;
+  pytest last line `1 failed in 0.32s`, wrapper last line `Exit: 1`.
+  In a separate scratch copy only the response-size guard was removed; the
+  changed B-F2 plant failed with `DID NOT RAISE PageError`.
+  Both copies and sanitized logs are under `.overnight/tmp/fix-p1/`; neither
+  guard was removed from the workspace source.
+
+Green evidence and required checks:
+
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_inventory.py::test_inventory_with_terms_keeps_only_company_page_inputs custodian/tests/test_s2_t29_live_acquire.py::test_non_capture_source_accepts_registration_required_text custodian/tests/test_fc_register_capture.py::test_sign_in_pin_and_size_are_terminal -q -p no:cacheprovider`
+  — exit 0; last line `3 passed in 5.51s`. Covers all four findings.
+- `uv run --locked python -m pytest custodian/tests/test_fc_register.py custodian/tests/test_fc_register_capture.py custodian/tests/test_fc_register_inventory.py custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider`
+  — exit 0; last line `96 passed in 3.14s`.
+- `uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_s2_t29_live_acquire.py custodian/tests/test_s2_t29_live_shapes.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider`
+  — exit 0; last line `527 passed in 55.64s`. These are the affected shared
+  acquisition, school-query/capture-support and transport regression files;
+  the FC suite also ran the five school v2 eligible-capture cases.
+- `uv run --locked ruff check .` — exit 0; last line `All checks passed!`.
+- First `uv run --locked ruff format --check .` — exit 1; last line
+  `2 files would be reformatted, 799 files already formatted`. Corrected only
+  the two reported layouts in the changed tests. Subsequent identical command
+  — exit 0; last line `801 files already formatted`.
+- `uv run --locked mypy` — exit 0; last line
+  `Success: no issues found in 434 source files`.
+- `python3 scripts/check_docs.py` — exit 0; last line
+  `checked 1089 text files, 112 Markdown files: OK`.
+- `python3 scripts/check_tree.py` — exit 0; last line `checked 8 rules: OK`.
+- `cmp AGENTS.md CLAUDE.md` — exit 0; no output.
+- `git diff --check` — exit 0; no output.
+
+Muhasabah: PASS for this bounded fix report. Claims follow the inspected ruling,
+diff and actual command outputs. This is offline fix evidence; live activation,
+the lead's commit and both other-maker confirmations remain outside this pass.
+Earlier evidence rows, task statuses and open-item dispositions were not rewritten.
+
+Post-report verification for fix pass 1: `python3 scripts/check_docs.py` exited 0
+with `checked 1089 text files, 112 Markdown files: OK`;
+`python3 scripts/check_tree.py` exited 0 with `checked 8 rules: OK`;
+`cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0 with no output.
+The read-only inline scope/report audit (`uv run --locked python -`, same
+environment) exited 0; last line:
+`PASS: six-file scope, unchanged HEAD/index, append-only ledger, exact production fixes, isolated guard proofs, report marker and content checks`.
+It verified the exact two production replacements against the full base commit,
+both scratch guard removals, the six changed tracked files, unchanged index and
+HEAD, the original ledger prefix, and the report marker/content constraints.

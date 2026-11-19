@@ -1558,6 +1558,7 @@
 - OPTIONS: **Recommendation:** decide at the slice S5 privacy design, before any task loads or uses the count; loading it earlier needs that decision first.
 - NEEDED BY: the design of slice S5.
 - UPDATE: 2026-11-19, by [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 15: the owner restores the indicator. S2-T38 loads it as a Public fact on the source's own geography, with source and year, never joined to a synthetic record, used to segment one, apportioned to a drawn area or combined with a protected figure (rule 10). The item stays open only for how the attack model of slice S5 counts the published figure, a point of S5's privacy design in which no privacy rule, attack size or tolerance is relaxed (rule 12).
+- UPDATE: 2026-11-19, by S2-T38: `custodian/publicdata/review/population_indicators.csv` maps `Employed` to the token `employed`, unit `persons`, admitted in `pub_population_municipality` only (`TABLE_UNITS` of `frame/census.py`); the other three census tables refuse it. It is not `employees`/`persons` and is not one of the four audit-count pairs of PUB-84 and DAT-128 (`UNITS` is unchanged and pinned with a planted fifth pair), so it is no audit selector. Document 03 lists it in the 7.3 row of the table and in DAT-128. For S5's privacy design: the attack model counts the published figure either as `not_applicable` with one closed PRV-115 reason, or as `enabled` after a release-contract revision that lists the pair with its stated relation (`equal`, `upper` or `lower`); until then DAT-128's strict default holds, and a count found applicable fails the privacy build. No privacy rule, attack size, tolerance or audit selector changed. Every later consumer of the rows routes through `validate_employed_use` of `frame/population.py`, which admits Public display on the source's geography only and refuses joins, segmentation, apportionment, invented geography, protected composites, movement anchors and the reserved grid use, each with a planted test; no consumer calls it yet.
 
 ## OI-171 — Three bed-linen lines whose two descriptions disagree
 
@@ -2826,6 +2827,28 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - Passes-3/4 lens-A P2 is resolved by the lead's draw rule: untagged multi-source tables, including computed multi-source aggregates without row tags, stay out with a recorded reason. No new item asks the lead to choose again. F1/F2 are fixed by 4d2d845, with the cited red/green evidence and two approvals; broad acceptance boxes stay open.
 - Fix5's seven clean-environment failures reuse the existing OI-253 environment ownership context and the earlier worker offline-wheel limitation; the exact failure and head stay in log.md. New full-head whole-test evidence remains pending, never inferred from these proposals.
 - PO-S2-101 to PO-S2-106 hold the distinct newly raised residual points; the first ten draft proposals remain unnumbered. The mapping and deduplication are explicit in CHECK.md.
+
+## OI-318 — Restricted-finding helper mutation coverage is not measured
+
+- ID: OI-318
+- TYPE: OPEN
+- RAISED BY: S2-T35 builder handoff, as recorded in PROGRESS.md under S2-T35 — Restricted findings: builder evidence and the data-tests README's Coverage limit.
+- CONCERNS: `custodian/data_tests/local_expectations.py`: `precision`, `compare`, `summary_reasons`, `boundary_finding_counts` and `h2_hour_counts`; method version S2-T35-v1.
+- EVIDENCE: These helpers lie outside the mutation runner's module roots. The builder explicitly records mutation coverage as not measured, not passed, and requests an open-item handoff. Invented-input guards and thin break proofs are separately recorded and are not a mutation campaign. Source: the two tracked headings above at WORK, and LOG-S2-5-verdicts.md 2026-11-19 03:47's P6 disposition.
+- NEEDED: Keep this coverage limit in the task ledger and hand it to any receiving team considering mutation work after go live. No campaign, runner-root expansion, new gate or edit to document 18 is authorized by this item; decision 0055 remains unchanged. Real-cache executions remain lead-shell-only under AGENTS.md rule 44.
+- COMPARISON: OI-195 and OI-276 concern source-use records, not the helpers' measurement coverage. OI-253 concerns clean-environment ownership. Existing coverage campaigns do not establish measurement of these out-of-root helpers.
+- NEEDED BY: S2-T35's truthful handoff; any post-go-live testing decision.
+
+## OI-319 — New full-street-load readiness timeout during S2-T35
+
+- ID: OI-319
+- TYPE: OPEN
+- RAISED BY: S2-T35 builder's final whole-command evidence and proposed-item handoff in PROGRESS.md, 2026-11-19.
+- CONCERNS: `web/spikes/performance/tests/performance.spec.ts`, the full-street-load readiness test; lead/S3-T22 investigation.
+- EVIDENCE: PROGRESS.md under S2-T35 — Restricted findings: builder evidence records `./eii test --seed 3647102991` exiting 1 with 10681 passed, nine failed and zero skipped. The browser detail is 54 passed and one failed, with `spike readiness timed out` in the full-street-load test. The builder changed no web file, bound or assertion and explicitly retained this failure as unresolved. Its later fix-pass-1 entry leaves the known S3-T22 full-street-load timeout with the lead.
+- NEEDED: Attach this occurrence to the lead's S3-T22 causal investigation, preserving its actual seed, revision and failure. Establish the cause or the exact evidence required by rule 39; a green rerun alone is not closure. No timeout, assertion, baseline or gate is relaxed by this record.
+- COMPARISON: OI-160 covers an older occurrence and is CLOSED at HEAD under its specific hosted-run default. It is historical context, not evidence that this later failure is closed. OI-227 concerns a different interrupt-test failure. No new causal diagnosis is asserted here.
+- NEEDED BY: honest S2-T35 handoff and the owning investigation's closure review.
 
 ## Change control
 
@@ -4276,6 +4299,86 @@ Revision-2 record points without extra numbers:
 - Pass-1 P1/P2 and passes-3/4 P1 reuse the lead's task/hosted evidence and records marks. The review-command/seed documentation is fixed at 4d2d845; pending ledger insertion is not a new code defect.
 - Passes-3/4 P2's aggregate-draw choice is answered by the lead's explicit exclusion rule, implemented and confirmed in fix5. No undecided-choice proposal remains for it.
 - Fix5 scripts failures, pass-1 reviewer timeout and the final-head pending checks remain in log.md/CHECK.md; later successful counts never erase their own results.
+
+### PO-S2-107 — FDI crosswalks become stale when their source snapshot changes
+
+- ID: PO-S2-107
+- TYPE: OPEN
+- RAISED BY: Anthropic Opus 5.5, S2-T39A lens B N2; retained by the lead's L-1052 ledger disposition.
+- CONCERNS: investment crosswalk snapshot binding.
+- EVIDENCE: LOG-S2-5-verdicts.md 2026-11-19 04:25 says stale-snapshot refusal blocks FDI on each page change once mappings exist, with lead confirmation or decision required. The 05:02 entry explicitly carries N2 to the ledger after both fix confirmations. This is a reported residual, not a new runtime reproduction by this drafter.
+- NEEDED: Attach the detailed note and the lead's confirmation/disposition of the refresh behavior. Preserve reviewed source/snapshot binding; no stale-map acceptance or name-matching fallback is implied.
+- COMPARISON: OI-182 owns filling the real reviewed mappings. This note concerns their subsequent snapshot refresh and does not close OI-182.
+
+### PO-S2-108 — The crosswalk has no municipality-code-only target
+
+- ID: PO-S2-108
+- TYPE: OPEN
+- RAISED BY: Anthropic Opus 5.5, S2-T39A lens B N3; retained by L-1052.
+- CONCERNS: the reviewed municipality target contract for FDI crosswalks.
+- EVIDENCE: LOG-S2-5-verdicts.md 2026-11-19 04:25 N3 says no code-only municipality target exists and calls for an open item. Its 05:02 entry retains N3 for the ledger.
+- NEEDED: Attach the detailed review note and settle the supported source-issued municipality target within the task's reviewed identifier contracts. Do not manufacture a geography key or add name matching.
+- COMPARISON: Related to OI-182's unfilled mappings, but records the specific missing target contract rather than repeating an assertion that maps are empty.
+
+### PO-S2-109 — Crosswalk pin documentation overstates its guarantee
+
+- ID: PO-S2-109
+- TYPE: OPEN
+- RAISED BY: Anthropic Opus 5.5, S2-T39A lens B N4; retained by L-1052.
+- CONCERNS: the crosswalk pin docstring.
+- EVIDENCE: LOG-S2-5-verdicts.md 2026-11-19 04:25 labels N4 as an overstated crosswalk-pin docstring; its 05:02 entry retains N4 for the ledger. The excerpt supplies no exact replacement sentence.
+- NEEDED: Retrieve the detailed finding and make the docstring describe only what the implemented checks establish. No stronger pin guarantee or already-completed fix is asserted by this draft.
+- COMPARISON: OI-182's real mapping review is distinct from the wording of the pin guarantee.
+
+### PO-S2-110 — Confirm the S2-T12 gate row's attribution
+
+- ID: PO-S2-110
+- TYPE: OPEN
+- RAISED BY: Anthropic Opus 5.5, S2-T39A lens B N5; retained by L-1052.
+- CONCERNS: S2-T12 gate evidence attribution.
+- EVIDENCE: LOG-S2-5-verdicts.md 2026-11-19 04:25 identifies N5 only as S2-T12 gate-row attribution; its 05:02 entry explicitly carries N5 to open items at the ledger. No detailed correction is supplied.
+- NEEDED: Attach the original note and verify the row against its actual producing source and task before recording a disposition. Do not infer a missing source chain or completed correction from the brief label.
+- COMPARISON: PO-S2-105 concerns secondary agency-page URLs rather than attribution of this gate row; keep the records distinct until the full finding is inspected.
+
+### PO-S2-111 — Crosswalk dead lookup and review-reference digit-run note
+
+- ID: PO-S2-111
+- TYPE: OPEN
+- RAISED BY: Anthropic Opus 5.5, S2-T39A lens B N7; retained by L-1052.
+- CONCERNS: the reported dead lookup and `review_reference` digit-run handling.
+- EVIDENCE: LOG-S2-5-verdicts.md 2026-11-19 04:25 names both points as N7; its 05:02 entry carries N7 to the ledger. The excerpt does not provide a plant, affected line or exact correction.
+- NEEDED: Retrieve the full N7 note, separate its two points if the evidence requires it, and record a bounded disposition with suitable guards. No real source value or identifier may be copied into a test or record.
+- COMPARISON: N6's lead-only counts of digit runs in cached English pages are a different missing step (M05 in log.md); that missing live evidence is not supplied or closed by this proposal.
+
+### PO-S2-112 — The register capture intake must hold exactly the continuation receipts
+
+- ID: PO-S2-112
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T36 lens A PO-1 at `785f6b2`.
+- CONCERNS: the paged-capture intake check of the financial centre's company register.
+- EVIDENCE: the intake check requires the capture files to equal the captured ordinals, so a full producer output 1..N together with a live prefix 1..k refuses `paging_incomplete` (shown in the reviewer's scratch copy).
+- NEEDED: either document that the operator presents only the continuation receipts, or accept receipts for ordinals already covered live; no permissive fallback.
+- COMPARISON: none.
+
+### PO-S2-113 — Per-guard red chronology of S2-T36 is incomplete
+
+- ID: PO-S2-113
+- TYPE: OPEN
+- RAISED BY: Cognition Devin SWE-2 High, S2-T36 lens A PO-2; disclosed first by the builder.
+- CONCERNS: the failing-first record of the S2-T36 guards.
+- EVIDENCE: several guards have only interface-red history; the reviewer's independent removal proofs went red for the chain, projection, header, redirect, TLS, identity, raw-admission and 404 guards.
+- NEEDED: a lead disposition of the remaining guards' red evidence.
+- COMPARISON: none.
+
+### PO-S2-114 — The register target check's exact-URL block has no test that fails without it
+
+- ID: PO-S2-114
+- TYPE: OPEN
+- RAISED BY: xAI Grok 4.7 through Cursor, S2-T36 lens B proposed item.
+- CONCERNS: `check_target` in the register page requests.
+- EVIDENCE: removing the exact-URL block for the register host, or only its frame condition, leaves `test_frame_and_path_refusals` green (exit 0, 3 passed), because the host block and the approval cover those strings; the fetcher builds only the constant register URL.
+- NEEDED: a planted test that fails when that block is removed, or a recorded reason it is redundant.
+- COMPARISON: none.
 
 ## Sources
 
