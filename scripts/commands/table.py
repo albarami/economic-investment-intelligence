@@ -9,6 +9,10 @@ from typing import Literal
 USAGE_PREFIX = "eii: usage error: unknown command or flag."
 TEST_FORM = "test [--seed N]"
 NOT_YET = "not_built (not built yet)"
+CDSE_BOUNDARY = (
+    "CDSE backup boundary: possession of both CDSE values, "
+    "held only by the lead's wrapper."
+)
 State = Literal["real", "placeholder"]
 
 
@@ -66,7 +70,7 @@ def by_word(word: str) -> Command:
 def usage_text() -> str:
     """Return the usage error text, one form per line."""
     forms = "\n".join(row.form for row in COMMANDS)
-    return f"{USAGE_PREFIX}\n{forms}\n"
+    return f"{USAGE_PREFIX}\n{forms}\n{CDSE_BOUNDARY}\n"
 
 
 def write_usage() -> None:

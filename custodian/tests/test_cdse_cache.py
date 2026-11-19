@@ -135,6 +135,8 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
     )
     assert model.picture_cost(101, bands=3, samples=1) == Decimal("0.5")
     assert model.picture_cost(1000, bands=3, samples=1) == Decimal(3)
+    # 3.003 units / 0.1 quantum must ceil to 3.1, above the minimum.
+    assert model.picture_cost(1001, bands=3, samples=1) == Decimal("3.1")
     plan = k.bulk_budget(
         (tile(),),
         model,
@@ -148,6 +150,32 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
     assert plan.requests == 5
     assert plan.pixels == 4
     assert plan.kinds == ("token", "metadata", "process", "token", "process")
+    assert plan.units == Decimal("1.7")
+
+    def budget(free_units, free_requests):
+        return k.bulk_budget(
+            (tile(),),
+            model,
+            free_units,
+            free_requests,
+            metadata=1,
+            refresh=1,
+            retries=1,
+            reserve_note="Invented lead choice",
+        )
+
+    for free_units, free_requests, allowed in (
+        (Decimal("1.7"), 5, True),
+        (Decimal("1.8"), 5, True),
+        (Decimal("1.6"), 5, False),
+        (Decimal("1.7"), 6, True),
+        (Decimal("1.7"), 4, False),
+    ):
+        if allowed:
+            assert budget(free_units, free_requests) == plan
+        else:
+            with pytest.raises(ValueError, match="bulk_allowance_insufficient"):
+                budget(free_units, free_requests)
     for cost, units, requests in (
         (None, Decimal(10), 10),
         (model, None, 10),

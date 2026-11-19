@@ -37,24 +37,44 @@ class CdseWiring(unittest.TestCase):
         self.assertNotIn("FAKE-CDSE", repr(pair))
 
     def test_optional_mode_never_opens_before_verification(self) -> None:
+        complete = {
+            "CDSE_CLIENT_ID": "FAKE-CDSE-ID",
+            "CDSE_CLIENT_SECRET": "FAKE-CDSE-SECRET",
+        }
         for env in (
             {},
             {"CDSE_CLIENT_ID": "FAKE-CDSE-ID"},
             {"CDSE_CLIENT_SECRET": "FAKE-CDSE-SECRET"},
-            {
-                "CDSE_CLIENT_ID": "FAKE-CDSE-ID",
-                "CDSE_CLIENT_SECRET": "FAKE-CDSE-SECRET",
-            },
+            {"CDSE_CLIENT_ID": "", "CDSE_CLIENT_SECRET": ""},
+            {"CDSE_CLIENT_ID": "", "CDSE_CLIENT_SECRET": "FAKE-CDSE-SECRET"},
+            {"CDSE_CLIENT_ID": "FAKE-CDSE-ID", "CDSE_CLIENT_SECRET": ""},
+            {"CDSE_CLIENT_ID": " \t", "CDSE_CLIENT_SECRET": "FAKE-CDSE-SECRET"},
+            {"CDSE_CLIENT_ID": "FAKE-CDSE-ID", "CDSE_CLIENT_SECRET": " \t"},
+            complete,
         ):
             with (
+                self.subTest(env=env),
                 tempfile.TemporaryDirectory() as folder,
                 patch("socket.socket", side_effect=AssertionError("network")),
                 patch("subprocess.Popen", side_effect=AssertionError("child")),
+                patch.object(command, "run_build", side_effect=AssertionError("build")),
+                patch("pathlib.Path.open", side_effect=AssertionError("file")),
+                patch("pathlib.Path.mkdir", side_effect=AssertionError("directory")),
                 contextlib.redirect_stdout(io.StringIO()) as out,
+                contextlib.redirect_stderr(io.StringIO()) as err,
             ):
                 self.assertEqual(command.run(Path(folder), env, ("--cdse-backup",)), 0)
                 self.assertIn("omitted", out.getvalue())
                 self.assertNotIn("FAKE-CDSE", out.getvalue())
+                self.assertEqual(err.getvalue(), "")
+                expected = (
+                    "provider_contract_pending"
+                    if env == complete
+                    else "credentials_absent"
+                )
+                self.assertEqual(
+                    out.getvalue(), f"satellite_cdse_backup omitted: {expected}\n"
+                )
                 self.assertEqual(list(Path(folder).iterdir()), [])
 
     def test_default_never_selects_backup(self) -> None:
