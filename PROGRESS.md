@@ -43036,3 +43036,176 @@ reported checks; independent review and live confirmation remain the lead's work
 - Finding: the lead's ledger try 1 (seed 2547224853) whole test stopped the python-core suite at collection: `core/tests/test_classification.py` imported `custodian.tests.fixtures.classification` and, through `parse`, the custodian reader; the runner starts pytest with `python -P`, so the import failed with `No module named 'custodian'`. Focused runs from the repository root put the working folder on the import path and hid it.
 - Fix: the module moves unchanged to `custodian/tests/test_classification_resolver.py` (custodian tests may import core; core tests import no custodian code), with one docstring sentence saying why; `docs/03_DATA_CONTRACTS.md` names the new path among the focused tests.
 - Evidence (project runner, seed 2547224853): python-core exit 0, 749 passed; python-custodian-1 exit 0, 4743 passed; python-custodian-2 exit 0, 4167 passed. Before the fix: python-core interrupted, 1 error.
+### S6-T14 step one — Published-series calculation handoff
+
+Date: 2026-11-19. Builder: OpenAI, GPT-6 through Codex (exact serving variant not
+exposed). Persona: senior economist-engineer for published economic series and
+forecasts with typed Python schemas. Strict self-review persona: reviewer rejecting
+uncomputed numbers, unplanted guards, invented readers/sources/history and unsupported
+completion claims. This is builder evidence, not another maker's implementation
+APPROVED verdict. The approved revised plan and the lead's step-one ruling supplied
+with the task govern scope; step two waits for S3-T09's shared Fact family.
+
+Full base commit: `55657e59d80098d9860d3a8463431cd33bdf45a7` on
+`local/S6-T14-b1`. Part-A tip: `d1a733713be8249002f637e6b8a0570b6a4b7446`.
+Only its own twenty-one-file tip delta was reconciled; its older ancestry was not
+transplanted. The task's per-file reuse/rebase/supersede inventory and source/current
+hashes are recorded in the return's `part-a-adaptation.json`. The backtest, candidate
+formulas and candidate hand tests remain byte-identical to part A. Newer base
+calculation modules and discovered-module purity checks remain. No stale mutation
+survivor explanations were copied. Series definitions are `c30-series-v2`, candidates
+`c30-candidates-v1`, method `c30_rolling_origin@v1`; horizon one is retained pending
+OI-319. Display places are explicit retained assumptions, not publisher precision.
+
+Skills read/applied: project-orientation, task-standards, github-flow,
+sanad-provenance, strict-reviewer (self-review only) and muhasabah-gate. The named
+TDD, executing-plans and verification-before-completion skills are absent from the
+available catalogue; their plain meanings are applied as the brief directs.
+No new library, dependency pin or external API integration is introduced. No
+network, real source cache, private input or vault was read; no mutation campaign,
+push, merge, database service change or live-source acceptance is claimed.
+
+Environment: Linux x86_64; the locked uv commands use Python 3.14.6, uv 0.11.31,
+pytest 9.2.0, ruff 0.17.4 and mypy 2.4.1. `UV_OFFLINE=1`; final check children also
+use `PYTHONDONTWRITEBYTECODE=1` and the workspace's `.overnight/tmp` as `TMPDIR`.
+The small check recorder itself runs Python 3.14.4: its early JSON `python` fields
+refer to that recorder, not the uv test interpreter. No exact seed was supplied or
+printed by early development commands. Final pytest checks explicitly use and
+print `--hypothesis-seed=614`; unittest and static checks have no seed.
+
+Delivered within the available base: explicit release-evidence binding checks,
+unchanged open-source reasons without fabricated input history, original source
+pipeline versions plus separate derived lineage on every companion, integer count
+input validation, immutable qualifiers, Public geography/split-ranking guards,
+conditional Public snapshot establishment stocks, national hotel `adr`, row-carried
+USD capex units, seven-companion/two-clamp catalogue declarations and available-field
+layout validation. Both English sentences are pinned. Source-less requests may
+use `forecast_source_refusal(key)` before a reader or series is constructed.
+No calculation is moved outside `eii_core.calc`.
+
+#### S6-T14 step one — red-first and development evidence
+
+The early runs below were observed in tool output; they are not represented as
+archived full raw logs. Exact commands and outcomes are in the return's
+`development-runs.json`. Parameter labels remain in the touched test files.
+
+- Retained part-A baseline: exit 0, 224 passed. These are regressions, not fresh red evidence.
+- `core/tests/test_forecast_admission.py` initial red: exit 1, 24 failed. Functions:
+  `test_source_pipeline_version_survives_forecast_derivation`;
+  `test_open_source_reason_survives_without_fitting` (five registry keys);
+  `test_release_evidence_required_before_fitting`;
+  `test_foreign_release_table_grain_or_source_fails_before_fitting` (five plants);
+  `test_admission_digest_plants` (six plants);
+  `test_conditional_establishment_history_is_public_and_not_backfilled`;
+  `test_public_split_never_becomes_ranking_criterion` (two splits);
+  `test_released_generator_metadata_is_mandatory`;
+  `test_forecast_qualifiers_cannot_be_mutated_after_validation`;
+  `test_unpublished_input_never_reaches_fitting`. The failures were the intended missing or incorrect guards.
+- Per-companion derivation red: exit 1, one failed and 24 passed. After implementation,
+  the core admission/forecast/ordinary-regression selection passed 219 tests, exit 0.
+- Invalid input count red: exit 1, two failed and 25 passed (`-1`, `1.5` accepted before the guard).
+- Published hotel binding red: exit 1, one failed and 27 passed; after fixing `adr`
+  and national grain the same test failed at unsupported `usd_million`, exit 1,
+  one failed and 27 passed. The existing document-03 unit was then admitted without conversion.
+- Geography relabelling red: exit 1, three failed and 28 passed; fixed municipal
+  input/forecast selection: exit 0, 159 passed. Source-only refusal red: exit 1,
+  one failed and 31 passed; the missing pure metadata boundary was then implemented.
+- Product wording/declaration development run: exit 1, 28 failed and 11 passed.
+  One failure was a test-authoring error on FastAPI's included-router representation,
+  not an intended red plant; isolated run: exit 1, one failed, 19 deselected. The
+  boundary test now checks the application schema, without inventing a route.
+- After the declarations were carried forward, catalogue-load plants failed for
+  the intended reason: exit 1, 19 failed and one passed. The old loader accepted a
+  missing companion/clamp, extra/duplicate prop or wrong prop kind. Layout plants
+  for wrong metric, period, lineage, evidence, provenance and unit: exit 1,
+  six failed and 20 passed. Both production checks were implemented, not test-only assertions.
+- One intermediate core run had exit 1, eight failed and 220 passed, caused by an
+  automated test-import insertion also entering `isinstance` calls. Corrected the
+  test text; no production guard or assertion was relaxed. Import-style development
+  checks exited 1 first for three diagnostics and later for one remaining blank
+  line. All were corrected with the checks unchanged. Initial mypy: exit 0,
+  436 source files. Formatter application runs all exited 0 (10, 1, 3, 1 and 1
+  reformatted files respectively); no unrelated file was changed.
+- Focused development groups passed 397 tests (no explicit seed), 409 and 411
+  tests (seed 614), each exit 0. The archived 411-test focused run also exited 0.
+  After all code/test changes, the same touched-file list passed 415 tests,
+  exit 0, seed 614 (`checks/focused-1.log`). No test was skipped or weakened.
+
+#### S6-T14 step one — first broad checks and remaining boundaries
+
+The first broad run started before the final geography/source-only changes and
+is not presented as final-snapshot verification: command
+`uv run --locked python -m pytest core/tests product/tests custodian/tests -q -p no:cacheprovider --hypothesis-seed=614`,
+exit 0, 9858 passed, zero failed/skipped, one warning from the deliberate duplicate
+ZIP refusal fixture; seed 614. The first scripts command
+`uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'`
+exited 0, 920 tests, OK, no failures/skips. Both final-snapshot runs are recorded
+separately below when they finish. There was no unexplained random failure.
+
+The small post-code checks passed: ruff exit 0; format-check exit 0, 812 files;
+mypy exit 0, 436 source files; docs exit 0, 1105 text files and 118 Markdown files;
+tree exit 0, eight rules; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check`
+exit 0. Final evidence/patch checks follow the completed suites below. Logs and
+real child exits are retained under the task return's `checks/` folder.
+
+Git staging was attempted on the task's named paths and refused with exit 128:
+the workspace's `.git` is read-only and its index lock cannot be created. No task
+commit exists; the full hash above is the base, not a fabricated task hash.
+The authorised fallback is `.overnight/OUT/changes.patch`, built from
+`git diff --binary HEAD` plus binary-capable new-file diffs. An initial
+`git apply --reverse --check .overnight/OUT/changes.patch` exited 0; the patch
+will be refreshed after this append-only evidence is complete. No push was attempted.
+
+Open items appended: OI-318 (C1 source confirmation), OI-319 (C2 horizon list),
+OI-320 (C3 identity, zero-scale wire unit and display assumptions), OI-321 (C4
+real histories/adapters), OI-322 (C5 canonical clamp/companion binding), OI-323
+(C6 Fact family/native Arabic/design), OI-324 (C7 missing reader/emitter/seat
+integration/parity) and OI-325 (C8 external open-entry mapping). OI-03, OI-98 and
+OI-102 remain open. TASKS.md keeps its original S6-T14 status and every box unticked.
+
+ReleaseAdmission validates supplied in-memory evidence only. The base lacks a
+verified mounted-series reader, concrete ReleaseStore forecast query, canonical
+forecast fact emitter and authenticated seat dispatch. Product imports no
+custodian reader and supplies no SQL; no conditional API module or forecast
+claim/route is invented. ReturnedFact lacks full release/series/horizon identity,
+values and clamp metadata: available-field catalogue checks cannot complete that
+accounting. The canonical identity and ratio-only error gap remain explicit.
+Step two still owns the card, stepped band, metadata/history chips and rendered
+success, short, carried, suppressed and clamp states on the approved shared Fact
+family, with native Arabic/design review. No screen acceptance or independent
+implementation approval is claimed.
+
+#### S6-T14 step one — final-snapshot verification
+
+No source or test changed after these final suites started. Only append-only
+evidence and return artifacts were completed. Full base commit remains
+`55657e59d80098d9860d3a8463431cd33bdf45a7`; Git's read-only index prevents a task
+commit. No result below is attributed to a nonexistent commit.
+
+| Command | Real exit | Observed counts/result | Return log |
+|---|---:|---|---|
+| `uv run --locked python -m pytest` on the eleven touched test files, with `-q -p no:cacheprovider --hypothesis-seed=614` (full argument list in `checks/exits.jsonl`) | 0 | 415 passed, zero failed/skipped; seed 614 | `checks/focused-1.log` |
+| `uv run --locked python -m pytest core/tests product/tests custodian/tests -q -p no:cacheprovider --hypothesis-seed=614` | 0 | 9862 passed, zero failed/skipped, one deliberate duplicate-ZIP warning; seed 614; 467.67 seconds pytest time | `checks/broad-1.log` |
+| `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` | 0 | 920 tests, OK, zero failed/skipped; 346.713 seconds unittest time | `checks/scripts-1.log` |
+| `uv run --locked ruff check .` | 0 | All checks passed | `checks/ruff-1.log` |
+| `uv run --locked ruff format --check .` | 0 | 812 files already formatted | `checks/format-1.log` |
+| `uv run --locked mypy` | 0 | 436 source files, no issues | `checks/mypy-1.log` |
+| `python3 scripts/check_docs.py` | 0 | 1105 text files, 118 Markdown files; repeated after the first evidence append | `checks/docs-2.log` |
+| `python3 scripts/check_tree.py` | 0 | Eight rules | `checks/tree-2.log` |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Bytes identical | `checks/parity-2.log` |
+| `git diff --check` | 0 | No whitespace errors | `checks/diff-2.log` |
+
+Additional preservation check exited 0: PROGRESS.md and OPEN_ITEMS.md retain their
+entire original bytes as prefixes; AGENTS.md, CLAUDE.md and
+scripts/mutation_explained.toml match the base byte for byte; the S6-T14 task's
+original criteria/status remain verbatim and no checkbox was ticked. The return
+inventories 32 changed source/test/document paths, including the append-only records.
+No new random failure or open-item closure is claimed.
+
+Self-audit: PASS for this offline handoff's scope and evidence honesty. It does
+not establish a mounted series, wire fact, two-store parity, rendered screen or
+independent implementation APPROVED verdict. OI-318 through OI-325 and the
+conditional reader/emitter/Fact-family boundaries above remain open. Final
+record/patch checks and the complete per-file return are delivered in
+`.overnight/RETURN.md`; the binary-capable fallback patch is refreshed after the
+records, without a push or further Git mutation attempt.

@@ -19,10 +19,12 @@ from types import ModuleType
 
 import pytest
 from method_rows import energy, measure, trade
+from test_forecast import construction
 
 from eii_core import classification
 from eii_core.calc import (
     facts,
+    forecast,
     public_methods,
     public_series,
     sector_economics,
@@ -49,6 +51,10 @@ ALLOWED_IMPORTS = {
     "re",
     "statistics",
     "building_heights",
+    "forecast",
+    "forecast_list",
+    "forecast_models",
+    "forecast_backtest",
     "public_series",
     "facts",
     "public_methods",
@@ -151,6 +157,7 @@ def test_purity_guard_and_planted_io_helper():
     for plant in [
         'def helper():\n return open("invented")',
         "import os",
+        "import eii_custodian",
         "def helper():\n return getattr(clock, 'utc' + 'now')()",
         "def helper():\n return __builtins__['open']('invented')",
         "def helper():\n return clock.now()",
@@ -204,6 +211,7 @@ def test_calls_and_imports_need_no_io_clock_or_random(monkeypatch):
         measure(1000, geography="national", kind="national"),
     )["value"].value == D(10)
     assert public_series.ratio(D(4), D(2)) == 2
+    assert forecast.forecast_series(construction()).value.value == D(16)
     assert sector_economics.sector_norms(
         employees=measure(10, unit="count", **common),
         productivity=measure(100, unit="qar", **common),

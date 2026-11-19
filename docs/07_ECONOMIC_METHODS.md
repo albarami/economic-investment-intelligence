@@ -1719,6 +1719,26 @@ each forecast is computed at request time from release tables and is never writt
 | MTH-99 | Under decision 0038 inventory items 1 and 14, a conformal procedure may replace the baseline error-extreme interval only after its per-family coverage test; its own held-out backtest supplies the interval and the same caption counts, with no probability or confidence claim. The following is the retained baseline procedure. Every forecast is shown with its interval and its measured backtest error. The interval at each horizon runs from the forecast plus the smallest to the forecast plus the largest backtest error of the chosen candidate at that horizon, and its caption states how many past values of the backtest fell inside the range that the other past errors gave, each value checked against a range built without its own error, and how many there were, both as Fact chips and never as a percentage. It is never called a probability or a confidence level and never said to hold for the next value. A forecast chart draws it as a band with that caption. The projection of C21 keeps its own rules and is never shown as a forecast. |
 | MTH-100 | A forecast is `inferred`, takes the subject, geography and class of its series, and its lineage names the method and version and the series; the model and the horizon identify the fact, and the interval ends, the backtest error and the number of backtest points are facts of the same computation, shown with it, resolving to the source like any fact (MTH-08). Every forecast of card C30, of a Public series or of a released monthly series, is computed at request time by `eii_core.calc` from release tables, as a projection is (DAT-144), and none is written to the release. A forecast of a released monthly series carries the Synthetic class, the word "forecast" and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`, has the subject `area` of its series and the last released month as its origin, is a labelled projection from the released months and not a protected statistic of a later month (PRV-54), states no change between two months (ARC-130), and is off in public-only mode as a ranking criterion (MTH-65); a series with a carried-forward month in its window returns `SUPPRESSED` with `CARRIED_FORWARD`. A forecast of a Public split by sex or nationality stays on the source's own geography and categories. The licence series keep their names, licence issues and licence cancellations (PUB-94), and no net series is formed. The class `forecast_not_offered` declines three cases: a forecast of the success of a venture; a forecast, estimate, share, score, rank or fit for a named real place, building, business, owner or person; and a forecast of a series that is not on the list. |
 
+**S6-T14 step-one implementation boundary.** The baseline formulas above are
+carried forward unchanged and checked on invented histories, with series list
+`c30-series-v2`, candidate list `c30-candidates-v1` and method
+`c30_rolling_origin@v1`. The production horizon remains one until the horizon
+list is decided (OI-319). Display places and count rounding remain explicit
+handoff assumptions (OI-320). Each companion keeps the input pipeline and adds
+its own derived C30 lineage; no wire identity is invented. The unscaled error
+when the seasonal scale is zero keeps the series unit and is not relabelled a
+ratio. Static open registry entries return their original source reason before
+fitting; only an admitted short history returns `series_too_short` (OI-318,
+OI-325). Public monthly establishments join conditionally where genuine
+snapshot stock history exists, under decision 0064 item 38, never generated
+openings/closures or current-stock backfill (OI-321). No registry promotion or
+real history is claimed. Missing admission evidence, unpublished inputs and
+missing released window/generator metadata fail validation. The API reader and
+canonical emitter are missing (OI-324); catalogue declarations and exact English
+strings do not establish screen acceptance. The Fact family, card, stepped band,
+metadata/history chips, clamp rendering and native Arabic remain step two
+(OI-322, OI-323). OI-03, OI-98 and OI-102 stay open.
+
 ### C31 Entry, closure and survival base rates
 
 **Purpose.** Show, for an activity on the source's own geography, what share of past licences were issued, cancelled or still held, as base rates from the Public licence tables with their counts and period ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 7). A base rate describes past licences of that activity and area, not the user's own venture.

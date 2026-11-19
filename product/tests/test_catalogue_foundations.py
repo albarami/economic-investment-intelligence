@@ -198,7 +198,11 @@ def test_four_catalogue_files_load() -> None:
     module = _api()
     loaded = module.load_catalogue(SHIPPED)
     assert loaded.claims == ()
-    assert tuple(item.key for item in loaded.components) == ("foundation_note",)
+    assert {item.key for item in loaded.components} == {
+        "foundation_note",
+        "series_forecast_card",
+        "series_forecast_chart",
+    }
     assert loaded.components[0].max_count == 1
     assert loaded.components[0].props == ()
     assert tuple(item.key for item in loaded.fragments) == (

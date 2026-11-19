@@ -21,6 +21,7 @@ from eii_product.assistant.catalogue.slots import (
     match_slot_list,
     returned_fact_refusal,
 )
+from eii_product.assistant.templates.series_forecast import FACT_BINDINGS
 
 _OBSERVED_FIELDS = frozenset({"claim_key", "slots"})
 _INFERRED_FIELDS = frozenset({"claim_key", "slots", "strength"})
@@ -238,6 +239,47 @@ def _layout(
             refusal = _prop_value(props[name], field, f"{path}.props.{name}", facts)
             if refusal is not None:
                 return refusal
+        if component.key in ("series_forecast_card", "series_forecast_chart"):
+            refusal = _forecast_bindings(props, facts, path)
+            if refusal is not None:
+                return refusal
+    return None
+
+
+def _forecast_bindings(
+    props: dict[object, object], facts: Mapping[str, ReturnedFact], path: str
+) -> Refusal | None:
+    """Validate available wire fields only; no missing identity fields invented.
+
+    Full release/series/horizon and clamp binding still needs the canonical
+    emitter and shared Fact family. ReturnedFact has no such fields yet.
+    """
+    bound = props["value"]
+    if not isinstance(bound, str):
+        return Refusal("FORECAST_BINDING", path)
+    anchor = facts[bound]
+    for name, metric in FACT_BINDINGS:
+        identity = props[name]
+        if not isinstance(identity, str):
+            return Refusal("FORECAST_BINDING", path)
+        fact = facts[identity]
+        unit = (
+            "count"
+            if name in ("points", "inside", "tested")
+            else "ratio"
+            if name == "error"
+            else anchor.unit
+        )
+        if (
+            fact.metric_key != metric
+            or fact.unit != unit
+            or fact.period != anchor.period
+            or fact.geography_kind != anchor.geography_kind
+            or fact.provenance != anchor.provenance
+            or fact.evidence_status != "inferred"
+            or fact.lineage_ref != anchor.lineage_ref
+        ):
+            return Refusal("FORECAST_BINDING", f"{path}.props.{name}")
     return None
 
 

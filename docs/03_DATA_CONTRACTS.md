@@ -2501,3 +2501,19 @@ filtering or deduplication. The composition entry point is
 collision. Source, selected snapshot, method, licence and retrieval lineage travel
 with the contribution. S4-T05 supplies other contributions and its configured edit
 distance; this task introduces no new collision threshold or normaliser.
+
+## S6-T14 step-one handoff
+
+DAT-158's seven forecast metrics are represented by the internal `ForecastFact`
+and `ForecastLineage` of `eii_core.calc.forecast`. Each companion retains its
+original source method/version and adds separate C30 method/version,
+series/indicator, model/horizon and release/window/generator/home-family
+metadata. `ReleaseAdmission` checks the supplied table grain, release identity,
+schema/table digests and source hashes; it does not verify mounted bytes.
+No forecast is written into a release table. No canonical fact emitter is
+present on this base. DAT-93's series/indicator identity and DAT-158's
+ratio-only error for zero-scale history remain OI-320; exact typed output is
+retained without a false ratio or fractional displayed count. The generic fact
+schema and its qualifiers are unchanged. Document 03 section 12's
+`app.read_seat_context()` remains required before a future endpoint dispatch;
+a custodian `contracts.read_selected` is not a product reader (OI-324).

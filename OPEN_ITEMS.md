@@ -5033,3 +5033,58 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - NEEDED: measure the per-operation cost on the build machine under load and state the assumption beside the bound; a deterministic plant for each of the three cases, or a line saying why it is out of scope under REV-42.
 - NEEDED BY: task S2-T10's closure of slice S2 items.
 
+## OI-318 — S6-T14 C1: source-owner forecast admission confirmation
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: CPI/import summary wording conflicts with unchanged S2-T17 open entries. Quarterly mapping/crosswalk and OI-03/OI-98/OI-102 confirmations remain outstanding. Keep every affected entry open or output withheld; terms alone are not a blocker.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-319 — S6-T14 C2: the forecast horizon list
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: Neither C30 nor the pack fixes a production horizon list beyond the retained part-A value. Keep horizon one pending the owner's list, without silently narrowing or widening it; generic backtest helper horizons are not API permissions.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-320 — S6-T14 C3: canonical forecast identity, units and display places
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: DAT-93 lacks a resolved distinct-series/indicator binding beside DAT-158's model/horizon qualifiers. Zero seasonal scale gives unscaled MAE in the series unit while the wire error allows ratio only. Retain exact typed results, integer half-up count display and the part-A display-place assumptions; confirm that policy and the canonical emitter before wire emission. Add no unapproved qualifier or false ratio.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-321 — S6-T14 C4: real histories and adapter bindings
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: Conditional Public monthly establishment stocks may use genuinely kept snapshot histories only. No real stock history has been verified, no new S2-T17 registry row is claimed and the source owner must confirm stock/flow binding before mounting it. Employment uses the retained worker-pay count route; stayer origin uses the later month of its pair. Confirm those routes and remaining hotel/capex adapter unit mappings; never invent or backfill history.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-322 — S6-T14 C5: canonical endpoint clamp and companion binding
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: Calculation validation and catalogue declarations require both independent clamp marks and all companions. ReturnedFact has no values or clamp metadata. A missing or wrong mark fails calculation validation; the canonical emitter and shared Fact family must carry and validate the marks, property history counts and metadata through rendering. No silent clamp or generic layout flag proves that integration.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-323 — S6-T14 C6: shared Fact family and screen review
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: S3-T09 supplies the shared Fact family after the S3 re-cut. Step two consumes it for the card, stepped band, metadata/date/history chips and rendered success, short, carried, suppressed and clamp states. Native Arabic and design review remain required; pinned English constants are not bilingual screen acceptance.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-324 — S6-T14 C7: missing product forecast reader and emitter
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: The implementation base exposes a tile spike, with no product ReleaseStore.fetch forecast QueryName, mounted-manifest verifier, authenticated app.read_seat_context integration or canonical forecast emitter. Internal ReleaseAdmission validates caller-supplied bindings only. No conditional API module, custodian reader import or direct SQL is invented. Build those dependencies before mounted acceptance, emission and two-store parity.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.
+
+## OI-325 — S6-T14 C8: open registry entry and executable tool mapping
+
+- Status: OPEN; S6-T14 step-one conservative default, awaiting the responsible owner.
+- Source: TASKS.md S6-T14; document 07 C30; approved plan section 4.2 and the lead's S6-T14 step-one ruling.
+- Boundary: Internal ForecastOpen preserves the exact S2-T17 reason, state open and no numeric facts, with proposed external status OUT_OF_SCOPE for an entry outside the executable list. The source/API owners must confirm that cross-document mapping with the canonical emitter; no new DAT-90 reason is added. Missing sources are never relabelled series_too_short or generic forecast_not_offered.
+- Closure: source/API/UI owner confirmation and the affected task's different-maker review; no fixture or green rerun alone supplies it.

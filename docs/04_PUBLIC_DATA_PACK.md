@@ -1945,3 +1945,21 @@ No register-specific permission or later-page coverage is inferred. Terms do not
 hold the source; the technical activation evidence does. The FC adapter README
 specifies the closed transport-failure table, producer procedure, capture receipts
 and selected-snapshot name adapter. Only the lead runs the live/capture session.
+
+## S6-T14 step-one forecast admission
+
+PUB-103 and S2-T17 are admission metadata, not proof of mounted history. The
+S2-T17 registry still marks CPI `publisher_or_licence_unconfirmed` and imports
+`past_count_not_stated`; its open entries stay open despite the held wording
+in the earlier PUB-103 summary table. Pending terms alone do not refuse a
+series (decision 0059). No source-owner confirmation is invented (OI-318).
+The calculation list mirrors every registry key/state/table/open reason and
+separately inventories conditional Public `establishments_by_area` from genuine
+monthly `pub_register_snapshot` counts, under decision 0064 item 38. That entry
+is not registry-held; it admits no generated flow or current-stock backfill
+(OI-321). Monthly hotel input preserves `demand` and `adr` as separate indicators
+on the national star-class table, and announced capex preserves its row-carried
+unit, including `usd_million`. No monthly municipality hotel series is invented.
+Quarterly property remains open with its original mapping/crosswalk reason;
+annual and quarterly price units are never combined. No cache was read and no
+Public figure was produced by this task.
