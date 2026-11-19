@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.kinds import read_bounded
@@ -48,6 +48,7 @@ from eii_custodian.publicdata.investment_contracts import (
     KindRule,
     SourceEnvelope,
 )
+from eii_custodian.publicdata.investment_crosswalk import load_crosswalk
 from eii_custodian.publicdata.investment_parse import (
     agency_envelope,
     dashboard_envelope,
@@ -55,6 +56,7 @@ from eii_custodian.publicdata.investment_parse import (
     parse_agency,
     parse_fdi,
 )
+from eii_custodian.publicdata.investment_quotation import page_evidence
 
 Sleeper = Callable[[float], None]
 Clock = Callable[[], str]
@@ -70,6 +72,7 @@ class PageSpec:
     url: str
     minimum_blocks: int
     minimum_paragraphs: int
+    language: str = "en"
 
 
 @dataclass(frozen=True)
@@ -166,6 +169,10 @@ def load_source_spec(source_id: str, *, url: str) -> SourceSpec | InvestmentFail
     if not isinstance(row, dict):
         return InvestmentFailure(
             1, source_id, url, "unconfirmed", source_id, "unreadable"
+        )
+    if loaded.get("schema_version") != "investment_pages.v2":
+        return InvestmentFailure(
+            1, source_id, url, "inventory_schema", "investment_pages.v2", "unsupported"
         )
     if source_id == "fdi_projects":
         return _dashboard_spec(row, url)
@@ -307,6 +314,11 @@ def _audit_pages(
             return InvestmentFailure(
                 1, source_id, url, "hash_mismatch", page_hash, "mismatch"
             )
+    if source_id == "investqa_pages":
+        for order, page in enumerate(pages[1:], 1):
+            checked = page_evidence(cache / source_id, page, order)
+            if isinstance(checked, InvestmentFailure):
+                return checked
     return None
 
 
@@ -395,11 +407,18 @@ def _publish_agency(
     )
     if missing_family is not None:
         return missing_family
+    for language in {page.language for page in spec.pages}:
+        missing = require_page_families(
+            tuple(page.kind for page in spec.pages if page.language == language),
+            _envelope(entry, entry.url, digest, "", "", method=""),
+        )
+        if missing is not None:
+            return missing
     receipt = _receipt(cache, entry.key, digest, entry.source_id, entry.url)
     if isinstance(receipt, InvestmentFailure):
         return receipt
     terms, landing_retrieved = receipt
-    pages: list[dict[str, str]] = [
+    pages: list[dict[str, object]] = [
         {
             "url": entry.url,
             "sha256": digest,
@@ -408,7 +427,7 @@ def _publish_agency(
         }
     ]
     rows: list[dict[str, object]] = []
-    for page in spec.pages:
+    for order, page in enumerate(spec.pages, 1):
         fetched = _fetch_page(entry, cache, page.url, transport, sleep, clock, terms)
         if isinstance(fetched, InvestmentFailure):
             return fetched
@@ -419,6 +438,8 @@ def _publish_agency(
                 "sha256": page_digest,
                 "retrieved_utc": retrieved,
                 "kind": page.kind,
+                "language": page.language,
+                "order": order,
             }
         )
         envelope = agency_envelope(
@@ -434,6 +455,7 @@ def _publish_agency(
             minimum_blocks=page.minimum_blocks,
             minimum_paragraphs=page.minimum_paragraphs,
             envelope=envelope,
+            language=page.language,
         )
         if isinstance(parsed, InvestmentFailure):
             return parsed
@@ -507,10 +529,27 @@ def _commit_batch(
     spec: SourceSpec,
     envelope: SourceEnvelope,
     document: Mapping[str, object],
-    pages: tuple[Mapping[str, str], ...],
+    pages: tuple[Mapping[str, object], ...],
     terms: str,
     retrieved: str,
 ) -> InvestmentFailure | None:
+    if entry.source_id == "investqa_pages":
+        if len(pages) != len(spec.pages) + 1:
+            return fail_of(envelope, "page_evidence", "complete inventory", "missing")
+        for order, (page, expected) in enumerate(
+            zip(pages[1:], spec.pages, strict=True), 1
+        ):
+            if (
+                page.get("url") != expected.url
+                or page.get("language") != expected.language
+                or page.get("kind") != expected.kind
+            ):
+                return fail_of(
+                    envelope, "page_evidence", "inventory agreement", "different"
+                )
+            checked = page_evidence(cache / entry.source_id, dict(page), order)
+            if isinstance(checked, InvestmentFailure):
+                return checked
     text = _dump(document)
     table_digest = sha256_hex(text.encode("utf-8"))
     table_path = cache / entry.source_id / "staging" / f"{table_digest}.json"
@@ -777,6 +816,19 @@ def _period_failure(
 def _dashboard_spec(
     row: Mapping[str, object], url: str
 ) -> SourceSpec | InvestmentFailure:
+    for name in ("country_iso3", "municipality_code", "place_key"):
+        if row.get(name, {}) != {}:
+            return InvestmentFailure(
+                1,
+                "fdi_projects",
+                url,
+                "name_derived_key",
+                "identifier crosswalk",
+                "legacy map",
+            )
+    crosswalk = load_crosswalk()
+    if isinstance(crosswalk, InvestmentFailure):
+        return replace(crosswalk, url=url)
     confirmation = _confirmation(row.get("confirmation"), "fdi_projects", url)
     if isinstance(confirmation, InvestmentFailure):
         return confirmation
@@ -850,6 +902,7 @@ def _dashboard_spec(
             country_iso3=_string_map(row.get("country_iso3")),
             municipality_code=_string_map(row.get("municipality_code")),
             place_key=_string_map(row.get("place_key")),
+            crosswalk=crosswalk,
         ),
         pages=(),
         parameter_units={},
@@ -932,7 +985,17 @@ def _pages(
             return InvestmentFailure(
                 1, "investqa_pages", url, "missing_page", "page family", "unreadable"
             )
-        found.append(PageSpec(kind, page_url, blocks, paragraphs))
+        language = item.get("language")
+        if not isinstance(language, str) or language not in {"en", "ar"}:
+            return InvestmentFailure(
+                1,
+                "investqa_pages",
+                url,
+                "page_language",
+                "en or ar",
+                "missing or unknown",
+            )
+        found.append(PageSpec(kind, page_url, blocks, paragraphs, language))
     return tuple(found)
 
 

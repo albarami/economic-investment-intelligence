@@ -125,6 +125,8 @@ def test_agency_publishes_exact_counts_and_each_kind(
                 "retrieved_utc": "2026-11-14T08:00:00Z",
             }
         )
+    for order, page in enumerate(expected[1:], 1):
+        page.update(language="en", order=order)
     assert manifest["pages"] == expected
     for row in table["rows"]:
         assert row["retrieved_utc"] == "2026-11-14T08:00:00Z"

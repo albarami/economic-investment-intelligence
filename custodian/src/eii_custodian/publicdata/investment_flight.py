@@ -36,10 +36,10 @@ from eii_custodian.publicdata.investment_contracts import (
     ValueKind,
     bare_digit_run,
     fail,
-    lookup,
     parse_decimal,
     project_key,
 )
+from eii_custodian.publicdata.investment_crosswalk import mapped_columns
 
 _SCRIPT = re.compile(r"<script\b[^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL)
 _PAYLOAD_PREFIX = "self.__next_f.push("
@@ -59,6 +59,10 @@ def read_dashboard(
     """Return project rows and the count of empty coordinates, or one failure."""
     if shape.shape_id != SHAPE_ID:
         return fail(envelope, "shape_mismatch", SHAPE_ID, shape.shape_id or "missing")
+    if shape.country_iso3 or shape.municipality_code or shape.place_key:
+        return fail(
+            envelope, "name_derived_key", "source-issued identifier", "legacy map"
+        )
     try:
         page = body.decode("utf-8")
     except UnicodeError:
@@ -373,17 +377,10 @@ def _record(
         if name in {"jobs", "lat", "lng"}:
             continue
         row[name] = loaded[name]
-    country = row.get("source_country")
-    location = row.get("location_text")
-    row["source_country_iso3"] = lookup(
-        shape.country_iso3, country if isinstance(country, str) else None
-    )
-    row["municipality_code"] = lookup(
-        shape.municipality_code, location if isinstance(location, str) else None
-    )
-    row["place_key"] = lookup(
-        shape.place_key, location if isinstance(location, str) else None
-    )
+    mapped = mapped_columns(shape.crosswalk, loaded["project_id"], key, envelope)
+    if isinstance(mapped, InvestmentFailure):
+        return mapped
+    row.update(mapped)
     if shape.column_from != COLUMN_FROM_PAGE:
         return fail(envelope, "confirmation_fields", "mapped fields", "incomplete")
     return row, emptied

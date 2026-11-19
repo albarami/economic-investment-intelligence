@@ -1,0 +1,5 @@
+# S2-T39 part A: lead fills reviewed source-issued identifiers after the build.
+# No fetched names, page text or raw source values belong here.
+# Invented mapping examples are constructed in test_investment_crosswalk.py.
+schema_version: fdi_crosswalks.v1
+mappings: []

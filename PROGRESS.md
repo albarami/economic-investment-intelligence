@@ -37804,3 +37804,148 @@ Senior expert persona: senior data-platform engineer (public-data pipelines, pro
 | 2026-11-19 | Mutation, deferred | `custodian/src/eii_custodian/publicdata/frame/census.py` and `frame/population.py` compare indicator tokens; their campaign is deferred until after go live and is no gate (decision 0055 items 1 and 2; L-1038 item 4). Recorded here only. | Anthropic Claude Opus 5.5 |
 | 2026-11-19 | Not run here | The real-cache data tests (rule 44, lead's shell only); their report should no longer list `Employed` among the rows not loaded. | Anthropic Claude Opus 5.5 |
 | 2026-11-19 | Whole test | `./eii test --seed 3141592653`: exit 1, 10685 passed and 7 failed in seven suites, 1 with problems (python-guards 890 passed and 7 failed, python-core 743, python-custodian-1 4204, python-custodian-2 3200, python-product 786, web-checks 861, web-unit 1). The 7 are errors at class setup of `scripts/tests/test_clean_environment.py` (`FileNotFoundError` on the default user uv cache folder in `seed_cache`): the pytest child environment of `scripts/run_tests_exec.py` passes `HOME` but not `UV_CACHE_DIR`, and on this build machine the uv cache is kept elsewhere, so the default folder was absent when the suite ran. Inference: environmental, since this change touches nothing under `scripts/`, no `pyproject.toml` and not `uv.lock`; not closed by any re-run and proposed as an open item. Every custodian, core and product test passed. | Anthropic Claude Opus 5.5 |
+
+## S2-T39 part A — bilingual acquisition and reviewed identifier crosswalk mechanics
+
+2026-11-19. Builder: OpenAI GPT-6 (Codex), senior public-data engineer for bilingual acquisition,
+versioned parsers and reviewed identifier crosswalks. Later strict reviewer persona: senior reviewer
+of public-data parsers, release contracts and crosswalks from another maker; independent build
+review remains with the lead. Supplied design review r2 approves the plan; no implementation
+approval is inferred from it. Skills loaded: project-orientation, task-standards, sanad-provenance,
+muhasabah-gate and github-flow. Requested test-driven-development and verification-before-completion
+skill files were unavailable in the installed roots; their failing-first and verification rules
+were applied directly. The brief's read-only Git boundary supersedes ordinary commit steps.
+
+Working-tree changes over full base `84080e265926b3367a864d239e6d9bc60f654884`; no builder commit,
+push, task-status change or open-item edit. Work commit remains for the lead. Scope is decision
+0064 item 32 and L-1043/L-1044 part A only: criteria 1, 3 and 4. The real Arabic inventory and
+reading, real reviewed mappings and another maker's confirmation remain unperformed; no live
+acceptance is claimed. The agency release row and DAT-143 are byte-identical to base. Only the
+agency parser gains its own version constant; dashboard and milestone versions stay unchanged.
+
+Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, existing locked environment.
+uv commands used `TMPDIR="$PWD/.overnight/tmp"`, `UV_OFFLINE=1`, `UV_NO_SYNC=1` and
+`UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`. Paths resolve within this workspace. Every pytest
+run used `--hypothesis-seed=3192026119`; the whole runner used `--seed 3192026119`. No live fetch,
+cache-data reading, dependency installation or mutation campaign was performed by the builder.
+
+Failing-first evidence (all actual command exits; command prefix `uv run --locked python -m pytest`):
+
+- `custodian/tests/test_investment_crosswalk.py custodian/tests/test_investment_bilingual.py -q
+  --hypothesis-seed=3192026119`: exit 1, 34 failed before implementation. Missing APIs were an
+  initial red, separately supplemented by the named raw-refusal proof below.
+- Adding `custodian/tests/test_gate_records.py` with `--tb=short`: exit 1, 1 failed/50 passed;
+  conflict validation was ordered before duplicate detection. Fixed the detection order.
+- `custodian/tests -k investment -q --hypothesis-seed=3192026119 --tb=short`: initially exit 1,
+  84 failed/458 passed/6847 deselected; next exit 1, 3 failed/539 passed/6847 deselected. Updated
+  explicitly changed inventory, language, gate and manifest fixtures, replaced legacy-map success
+  fixtures with empty maps and separately tested refusals, and preserved malformed-field refusal
+  precedence. No numeric baseline, attack size or tolerance changed.
+- Bilingual file with `-k 'requires_all or intro_identifiers or fetched_content'`: exit 1,
+  4 failed/20 deselected. Added real missing-language-family and introductory-identifier guards;
+  corrected the fourth failure's test-harness call to the existing `data_untracked` function.
+  Broad investment selection then exited 0, 550 passed/6847 deselected.
+- Crosswalk/bilingual/gate focused set: exit 0, 63 passed after normal-publisher target tests.
+- Bilingual file with `-k count_command`: red exit 1, 1 failed/24 deselected; green exit 0,
+  1 passed/24 deselected after passing the inventory language through the counts CLI.
+- Crosswalk file with `-k missing_key_field`: red exit 1, 1 failed/22 deselected; green exit 0,
+  1 passed/22 deselected after requiring a present typed target key rather than stringifying a
+  missing value. Broad investment selection then exited 0, 556 passed/6847 deselected.
+- New bilingual/crosswalk files with `-v --hypothesis-seed=3192026119 --tb=short`: exit 0,
+  48 passed, also supplying the environment versions above.
+- Bilingual file with `-k 'malformed_page or calendar_date'`: red exit 1, 3 failed/25 deselected;
+  green exit 0, 3 passed/25 deselected after named refusal for unhashable language metadata,
+  noninteger page order and invalid Arabic review dates. Final broad investment selection:
+  exit 0, 559 passed/6847 deselected. Final focused bilingual/crosswalk/gate/gate-survivor set:
+  exit 0, 98 passed, including runtime dashboard/milestone parser-version checks.
+
+Raw guard evidence: `uv run --locked python .overnight/tmp/prove_investment_guards.py planted`
+first exited 1 with 38 refused, then, after adding the remaining boundary cases, exited 1 with
+41 refused/zero accepted. Its `clean` form exited 0 with 41 accepted/zero refused. It changes
+invented inputs only, never a production guard. Every case's planted/clean raw exit was 1/0:
+review role/date/reference; unknown/missing target and missing target-key field; target hash;
+duplicate/conflicting mapping; name/hashed-name key and municipality-name-map path; restricted
+crosswalk content; identifier width; crosswalk tamper; stale source snapshot; changed source
+value; absent source identifier; all three legacy name maps; omitted introduction/list;
+rewritten whitespace/punctuation; translation/substitution; missing page hash/date/language/order/
+kind; wrong-language batch; missing Arabic family; introductory identifiers of both forbidden
+widths; Arabic truncation/table drift; absent Arabic evidence; tracked fetched-content path;
+and a socket-attempt sentinel. Named refusals and corresponding test names are recorded in
+`.overnight/RETURN.md`. The three later robustness guards and counts CLI have their own red/green
+test runs above. Earlier publication artifacts remain byte-identical under the tested refusals.
+
+Checks: whole-tree `uv run --locked ruff check .` initially exited 1 with 20 import/unused-variable
+diagnostics, then exited 0. An earlier combined shell printed 16 narrower lint diagnostics before
+mypy success; only its combined exit 0 was captured, so no individual lint exit is inferred.
+`uv run --locked ruff format .` exited 0 (9 reformatted/728 unchanged, later 1/736 and 2/735 after
+test additions). Latest `ruff format --check .` exited 0, 737 files formatted; `mypy` exited 0,
+409 source files. `python3 scripts/check_docs.py` exited 0, 1024 text files/112 Markdown files
+before this evidence append; final record checks follow. `python3 scripts/check_tree.py` exited
+0, 8 rules; `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0. Read-only base-byte
+invariant check exited 0: agency release rows, DAT-143, task/open-item files, instruction files,
+sources.yaml and investment_evidence.py unchanged. Stable-anchor check exited 0, 21 required
+document anchors resolved. Current history contains dependency train PR 82 at
+`d66d742c3736168560278d717da257fdaa34aac5`; its older task status lines remain unchanged.
+
+Full runner `./eii test --seed 3192026119` is still running at this append; its final result will
+be appended, not substituted here. It began during implementation. The guard wrapper reported
+884 passed/13 failed/zero skipped; embedded pytest reported 885 passed/6 failed/7 errors. Failures
+include uv's default cache being outside the writable workspace, clean-environment setup, and
+an unformatted newly added count-command test. The latter defect was corrected; the command
+`uv run --locked python -m pytest scripts/tests/test_pychecks_config.py
+scripts/tests/test_pychecks_ruff.py -q --hypothesis-seed=3192026119 --tb=short` then exited 0,
+14 passed. Environment failures are not waived or repaired outside this task's boundaries.
+Core 739, custodian part 1 4180, custodian part 2 3223 and product 786 have passed with zero
+failed/skipped. The last three robustness tests postdate whole-run collection; final focused
+and broad investment runs cover them. No exact final-tree whole-run pass is claimed.
+
+Lead steps: finish OI-181/182 evidence under the rulings, obtain another maker's read-only build
+review, commit the task/evidence, and run the whole suite in the prepared lead environment on
+the final reviewed tree and exact merge result. Part B waits for accepted decision 0029 (OI-178).
+No new open-item number is assigned here. Muhasabah: PASS for scoped work and honest limits.
+
+### S2-T39 part A — appended self-audit correction
+
+After the earlier evidence row, self-audit found three more defects in the new code. Command
+`uv run --locked python -m pytest custodian/tests/test_investment_crosswalk.py
+custodian/tests/test_investment_bilingual.py -k 'during_read or names_its_source_url' -q
+--hypothesis-seed=3192026119 --tb=short` exited 1, 3 failed/51 deselected: a target changed during
+parsing could retain its old pin; removal of the crosswalk during reading raised an unhandled
+file error; and page-evidence refusal omitted the known source URL. Added final integrity
+checks with named refusals and retained source URLs, including publisher context on crosswalk
+reader failures. Same command then exited 0, 3 passed/51 deselected. Final broad command
+`uv run --locked python -m pytest custodian/tests -k investment -q
+--hypothesis-seed=3192026119 --tb=short` exited 0, 562 passed/6847 deselected in 5.90 seconds.
+Ruff format application exited 0, 2 files reformatted/735 unchanged; subsequent whole-tree
+ruff check exited 0, format check exited 0 (737 files), and mypy exited 0 (409 source files).
+The same workspace-local/offline environment and full base hash of the preceding entry apply.
+The first whole-run collection also predates these additions; the final investment selection
+covers them. No earlier evidence has been replaced. The symbol-anchor check additionally
+exited 0, resolving 56 anchors in 18 files. Ledger-prefix, report-marker and instruction-parity
+invariants exited 0. Whole-run completion and final record checks follow in another append.
+
+### S2-T39 part A — whole-run completion and handoff
+
+The recorded `./eii test --seed 3192026119` completed with actual exit 1: 10674 passed,
+13 failed, zero skipped in seven suites, one with problems. Wrapper counts: python-guards
+884 passed/13 failed; python-core 739 passed; python-custodian-1 4180 passed;
+python-custodian-2 3223 passed; python-product 786 passed; web-checks 861 passed;
+web-unit 1 passed. All seven reported zero skipped; only python-guards failed. Its embedded
+pytest tail separately reported 885 passed/6 failed/7 errors; no reconciliation is guessed.
+The output identifies uv's default cache/clean-environment setup outside the writable workspace
+and the earlier unformatted count-command test. That formatting defect was fixed and the
+14 affected guard tests passed, as recorded above. Both web suites completed normally;
+there was no web timeout. The whole run began during iteration and predates six final new
+robustness/integrity tests; final changed-path coverage is the 562-test investment run above,
+not an asserted final-tree whole-run pass. The lead's prepared-environment and exact-merge
+whole tests remain required. No failed test, restriction or earlier evidence is hidden.
+
+Final records: `python3 scripts/check_docs.py` exit 0 (1024 text files, 112 Markdown files);
+`python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0;
+`git diff --check` exit 0. Final source checks already passed after the last code change:
+ruff check 0, ruff format check 0 (737 files), mypy 0 (409 source files). The ledger's original
+base bytes remain an exact prefix; protected task/shared files remain unchanged. Full return,
+all plants, assumptions, forced hunks, unresolved lead inputs and changed files are in
+`.overnight/RETURN.md`, ending `MARKER-S2-T39-BUILD-A`. No commit, task criterion or status
+was changed. Muhasabah PASS: offline mechanics and full-run failure are distinguished from
+live acceptance; no independent build approval or complete part-A delivery is claimed.

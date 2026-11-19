@@ -1049,6 +1049,39 @@ basis of use under [decision 0026](decisions/0026-public-sources-used-in-full-lo
 | PUB-87 | `fdi_projects` is read from the dashboard page `https://fdiprojects.invest.qa/` (data from fDi Markets) on every `./eii build-public`. Every project field the page holds is loaded into the contract `fdi_projects` ([03](03_DATA_CONTRACTS.md)); a field the contract does not declare fails the build until the contract adds it, so no field is dropped at loading. Every field may appear on the project card, in lists and on the map: investing company and parent, origin country and city, sector and sub-sector, business function, project type, date, city, free zone, address, map point, capital, jobs and short description. A changed page is stored under its new hash and enters a release through the reviewed registry change of PUB-10. Capex keeps the currency and unit the page states; nothing is converted. Every card, list and map legend credits the national investment promotion agency as publisher, the data gatherer as the page names it, the date read and a link to the dashboard, in the existing collapsed map-credits style. The page's caveat appears with it in its own words: the data "includes estimates of publicly announced projects" and "does not capture all investment projects"; its data is subject to change. Capital and jobs are always labelled announced estimates, never added to measured figures or shown beside them without that label; a forecast of announced investment by sector (card C30) carries both notes in its fact and its chip, and has the subject of its series, never that of a project. The subject `fdi_project` accepts Public slots only: no Synthetic or Simulated fact is attached to it, it is never joined to synthetic data, the attached records of a register company included ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), and it is shown as a published announcement with its source and the estimate note, never as a lookup of a firm ([AGENTS.md](../AGENTS.md) rule 24); no named query filters projects by company name ([03](03_DATA_CONTRACTS.md) DAT-142). A project is placed only at the location the page gives, resolved to an official geography through the gazetteer: a location given as a city or municipality is shown on that geography, never at an invented point, and is never counted as inside a drawn shape; an unresolved location has no map position. Its company names are real business names in the public cache, so the name-collision check of SYN-20 covers them. |
 | PUB-88 | `investqa_pages` loads the sector, opportunity, incentive, set-up and law pages of `https://www.invest.qa/` into `pub_investqa_record`: one typed record per sector, opportunity, incentive package (with its parameters), set-up step and law (with its link), each with its page URL and retrieval date. Screens show these records only through application templates, with a link to each page. Every number parsed from a page (an incentive parameter, for example) is a typed field shown only as a Public fact; a record whose page states no period is shown as read on its retrieval date. A forecast stated on a page (of revenue, demand, market size or growth) is not loaded as a figure; the record links to the page instead; the verbatim quotation of decision 0029 may show it as the publisher's own words, never as a figure, fact or forecast of this product, because a publisher's forecast has no tested method, backtest or lineage of this project ([AGENTS.md](../AGENTS.md) rules 7 and 16, PUB-80). Incentive packages are optional scenario inputs of the break-even calculator of [07](07_ECONOMIC_METHODS.md), tagged "your inputs" with their source page; they never change a Public figure. |
 
+### Investment acquisition and identifier review (S2-T39 part A)
+
+`investment_pages.v2` declares each agency page's language and its extraction bounds.
+The existing inventory records English pages only; the Arabic inventory, confirmed shapes,
+reading date and live comparison remain for the lead under decision 0064 item 32 and OI-181.
+No Arabic URL, bound or confirmation is inferred from an English page. The gate requires
+separate Arabic evidence covering every page family. Offline invented bilingual fixtures
+exercise the normal publisher, including refusal without replacing an earlier batch.
+
+Original HTML bytes remain in the immutable archive with each page's URL, language, inventory
+order, original retrieval UTC and SHA-256. `investment_quotation.read_quotation` reads an
+explicitly selected archived manifest and verified page receipt, preserving introductory
+prose, lists, spacing and punctuation in those bytes. The heading-led blocks are a lossy
+cache index and are never used to reconstruct a complete quotation. This acquisition
+interface supplies no screen-delivery proof and adds no release column: the
+`pub_investqa_record` release columns and DAT-143 remain unchanged until part B after
+accepted decision record 0029. Only the agency envelope uses `AGENCY_PARSER_VERSION`;
+the dashboard and milestone parser versions remain unchanged.
+
+`review/fdi_crosswalks.yaml` is the committed empty review template. Invented crosswalks
+in parser tests establish mechanics only. The lead supplies real mappings from the selected
+cache snapshot and another maker confirms them before AC3 can close (OI-182). Each mapping
+uses the source-issued `project_id`, snapshot hash and content-derived `project_key`, names
+one of the three derived columns, and pins its selected Public target resource and key.
+Target resources are direct CSV or YAML files beside the review file; their typed key
+column is `iso3`, `municipality_code` or `place_key`. Names are never lookup keys;
+`municipality_names.csv` is explicitly refused in this route. Per-mapping lead role, date
+and reference are the review evidence for both sides, independently of shared target review
+flags. Missing review, changed hashes or source values, absent targets and duplicate or
+conflicting mappings refuse. Misses retain null columns and cache coverage reasons;
+no coordinate or drawn-shape membership is generated. Every Public row still belongs in
+the PRV-115 applicability inventory when S2-T08 assembles its release.
+
 ### Announced-project evidence history (S2-T30)
 
 The tracker reads only explicitly selected S2-T27 snapshots through the cache-only adapter called by the production investment fetch path. Existing parsers derive every accepted row and source assertion from the verified bytes; separately supplied values, dates, correction flags or terms do not override them. Project, milestone and receipt-lineage validation resolves the selected snapshot through `read_snapshot` again, so coordinated or sidecar-only caller substitutions and receipt tampering cannot replace its verified lineage. Project validation refuses conflicting supplied values of verified receipt fields, and each project revision takes its raw-page checksum, original retrieval UTC and source grouping from that verified snapshot. It also retains the receipt, parser method and version, terms chain, schema and its own source geography. Different project locations coexist in one snapshot, and unstated geography remains null with `not_stated_by_source`, separately from snapshot coverage metadata. Observation, publication and correction assertions retain source precision; a present date's parsed granularity equals that precision. When the source does not state one, the value is null with its absence reason. A successful recheck and `source_modified` remain separate and never supply those assertions. Changed bytes add history, equal bytes retain the original receipt and add only a verified check, and no latest-file or mutable-pointer fallback selects evidence.

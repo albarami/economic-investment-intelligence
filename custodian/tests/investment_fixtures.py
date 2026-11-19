@@ -642,5 +642,5 @@ def _token(value: object) -> str:
 
 
 def _agency_html(inner: str) -> bytes:
-    html = "<!DOCTYPE html><html><body>" + inner + "</body></html>"
+    html = '<!DOCTYPE html><html lang="en"><body>' + inner + "</body></html>"
     return html.encode("utf-8")

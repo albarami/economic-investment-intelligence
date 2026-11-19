@@ -75,10 +75,12 @@ def _agency(path: Path, url: str, kind: str) -> int:
         return 1
     minimum_blocks = rule.minimum_blocks
     minimum_paragraphs = rule.minimum_paragraphs
+    language = ""
     for page in spec.pages:
         if page.url == url and page.kind == kind:
             minimum_blocks = page.minimum_blocks
             minimum_paragraphs = page.minimum_paragraphs
+            language = page.language
             break
     body = path.read_bytes()
     parsed = parse_agency(
@@ -88,6 +90,7 @@ def _agency(path: Path, url: str, kind: str) -> int:
         minimum_blocks=minimum_blocks,
         minimum_paragraphs=minimum_paragraphs,
         envelope=agency_envelope(_envelope("investqa_pages", url, body)),
+        language=language,
     )
     if isinstance(parsed, InvestmentFailure):
         print(f"fail {parsed.check}")
@@ -122,10 +125,12 @@ def _agency_batch(folder: Path) -> int:
             return 1
         minimum_blocks = rule.minimum_blocks
         minimum_paragraphs = rule.minimum_paragraphs
+        language = ""
         for page in spec.pages:
             if page.url == url and page.kind == kind:
                 minimum_blocks = page.minimum_blocks
                 minimum_paragraphs = page.minimum_paragraphs
+                language = page.language
                 break
         body = (folder / name).read_bytes()
         parsed = parse_agency(
@@ -135,6 +140,7 @@ def _agency_batch(folder: Path) -> int:
             minimum_blocks=minimum_blocks,
             minimum_paragraphs=minimum_paragraphs,
             envelope=agency_envelope(_envelope("investqa_pages", url, body)),
+            language=language,
         )
         if isinstance(parsed, InvestmentFailure):
             print(f"fail {parsed.check}")

@@ -12,6 +12,7 @@ import json
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import PurePosixPath
 
 from eii_custodian.publicdata.completeness import in_use
@@ -30,7 +31,8 @@ CONFIRMATION_CHECKS = {
         key + ":" + flag
         for key in ("fdi_projects", "investqa_pages")
         for flag in INVESTMENT_FLAGS
-    ),
+    )
+    | {"investqa_pages:arabic_evidence"},
     "S2-T13": frozenset({"completion_evidence"}),
     "S2-T15": frozenset({"release_matches"}),
     "S2-T17": frozenset({"series_validated", "record_present"}),
@@ -304,7 +306,41 @@ def investment_evidence(
             checks[key + ":" + flag] = (
                 isinstance(block, dict) and block.get(flag) is True
             )
+    agency = sources.get("investqa_pages") if isinstance(sources, dict) else None
+    checks["investqa_pages:arabic_evidence"] = _arabic_evidence(agency)
     return ConfirmationEvidence("S2-T12", keys, (reference,), checks)
+
+
+def _arabic_evidence(agency: object) -> bool:
+    """English confirmation never establishes an Arabic inventory or reading."""
+    if not isinstance(agency, dict):
+        return False
+    confirmations = agency.get("language_confirmation")
+    arabic = confirmations.get("ar") if isinstance(confirmations, dict) else None
+    pages = agency.get("pages")
+    if not isinstance(arabic, dict) or not isinstance(pages, list):
+        return False
+    try:
+        if (
+            not isinstance(arabic.get("read_on"), str)
+            or date.fromisoformat(arabic["read_on"]).isoformat() != arabic["read_on"]
+        ):
+            return False
+    except ValueError:
+        return False
+    kinds = {
+        page.get("kind")
+        for page in pages
+        if isinstance(page, dict)
+        and page.get("language") == "ar"
+        and isinstance(page.get("kind"), str)
+    }
+    return (
+        kinds >= {"sector", "opportunity", "incentive", "setup", "law"}
+        and all(arabic.get(flag) is True for flag in INVESTMENT_FLAGS)
+        and isinstance(arabic.get("reference"), str)
+        and bool(arabic["reference"].strip())
+    )
 
 
 def fsq_evidence(

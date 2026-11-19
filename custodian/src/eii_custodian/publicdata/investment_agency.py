@@ -62,10 +62,13 @@ class _Collector(HTMLParser):
         self.saw_html_end = False
         self.problem: str | None = None
         self.events: list[tuple[object, ...]] = []
+        self.language = ""
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         """Open a region or a captured element."""
         attr = {name: value or "" for name, value in attrs}
+        if tag == "html":
+            self.language = attr.get("lang", "").split("-")[0].casefold()
         self._open(tag, attr)
         if self.problem is not None or (tag in _VOID and tag != "br"):
             return
@@ -196,6 +199,7 @@ def parse_agency(
     minimum_blocks: int,
     minimum_paragraphs: int,
     envelope: SourceEnvelope,
+    language: str = "",
 ) -> tuple[dict[str, object], ...] | InvestmentFailure:
     """Return the page record and its blocks, or one source failure."""
     try:
@@ -205,6 +209,8 @@ def parse_agency(
     collector = _Collector(furniture, envelope.page_url)
     collector.feed(text)
     collector.close()
+    if language and (language not in {"en", "ar"} or collector.language != language):
+        return fail(envelope, "page_language", language, "missing or different")
     if not collector.saw_main:
         return fail(envelope, "no_main", "main", "absent")
     if collector.problem == "empty_heading":
@@ -213,12 +219,19 @@ def parse_agency(
         return fail(envelope, "unsupported_shape", "no table", collector.problem)
     if collector.unfinished():
         return fail(envelope, "truncated", "closed page", "cut")
+    for event in collector.events:
+        if any(isinstance(value, str) and bare_digit_run(value) for value in event[1:]):
+            return fail(envelope, "identifier_shape", "no bare digit run", "text")
     built = _assemble(
         collector.events, rule, minimum_blocks, minimum_paragraphs, envelope
     )
     if isinstance(built, InvestmentFailure):
         return built
-    return tuple(_lineage(row, envelope) for row in built)
+    rows = tuple(_lineage(row, envelope) for row in built)
+    if language:
+        for row in rows:
+            row["language"] = language
+    return rows
 
 
 def _assemble(

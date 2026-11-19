@@ -17,8 +17,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from eii_custodian.publicdata.fetch.snapshots import Snapshot
+    from eii_custodian.publicdata.investment_crosswalk import ReviewedCrosswalk
 
 PARSER_VERSION = "1"
+AGENCY_PARSER_VERSION = "2"
 FDI_METHOD = "eii_custodian.publicdata.investment_parse.parse_fdi"
 AGENCY_METHOD = "eii_custodian.publicdata.investment_parse.parse_agency"
 CAVEAT_KEY = "fdi_estimates"
@@ -521,6 +523,7 @@ class DashboardShape:
     country_iso3: Mapping[str, str]
     municipality_code: Mapping[str, str]
     place_key: Mapping[str, str]
+    crosswalk: ReviewedCrosswalk | None = None
 
 
 @dataclass(frozen=True)
