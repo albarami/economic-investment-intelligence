@@ -804,6 +804,15 @@ Open question to settle in your plan with options: where the archive persists so
 - Requirements: AGENTS.md rules 36, 37 and 38.
 - Delivery: Mechanical; builder persona senior Python test-tooling engineer for repository guards; strict self-review persona reviewer rejecting a guard that never fails, tests a copy instead of the real file or weakens or skips a check; status in review (pull request https://github.com/albarami/economic-investment-intelligence/pull/103, train S2-6), approved locally at 66b0308f by Anthropic Sonnet 5.5 at 17:37 on 2026-11-19 and joined as 58e739ea; the test-precision note is recorded by the lead as PO-S2-121; hosted and exact merge-result checks remain the lead's gates.
 
+### S2-T44 — The performance spike's readiness does not depend on machine load
+
+- Goal: find and remove the cause of load-sensitive browser readiness without changing any bound or limit.
+- Acceptance criteria: [ ] normal and controlled CPU-load phase measurements identify the cause; [ ] a regression fails before the fix and passes after; [ ] the performance suite passes at normal and the same synthetic load, or measured readiness falls well under its existing bound; [ ] web checks, lint, format, type checks, document and tree checks pass; [ ] no time limit, retry, skip, assertion, plant, layer count or committed evidence changes; [ ] evidence and a proposed PO-S2-118 closing line are returned for independent review.
+- Scope: code and tests under `web/spikes/performance/`, this task entry and append-only evidence in `PROGRESS.md`.
+- Depends: none.
+- Requirements: AGENTS.md rules 12, 36, 37, 38, 39.
+- Delivery: Standard; builder persona senior web test-infrastructure engineer (Playwright, headless Chromium, MapLibre/deck.gl scenes and load-sensitive browser suites); strict self-review persona a reviewer who rejects any fix that raises a bound, time limit or retry, skips or loosens an assertion, or calls a green re-run a fix; status in progress.
+
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
 - Acceptance criteria: [ ] each item of the slice is closed by a fix or by one line saying why it is not valid or is out of scope under REV-42; [ ] the reviewer checks every closure; [ ] no item is deferred out of this task; [ ] no item of the slice is left open; [x] the suite `web-checks` finishes in under 1,200 s on four processors, measured twice (moved here word for word from task S1-T15 by a re-plan of 2026-11-14, with open item OI-158: no test, assertion, planted case or bound is removed or weakened for it); [x] the hosted value of 3,000 s is removed from the whole test command, so that the limit of the suite `web-checks` is 1,800 s on every runner again, with the planted cases of task S1-T16 brought to that state (decision 0027 item 4; open item OI-158, whose three-run condition is met; added by the gate-fix task S1-T17).

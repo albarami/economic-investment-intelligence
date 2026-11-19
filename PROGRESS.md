@@ -39875,3 +39875,220 @@ field changed. `uv run --locked python -m pytest custodian/tests/test_registry_t
 custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py
 custodian/tests/test_places_fetch.py custodian/tests/test_weather_cache.py -q -p no:cacheprovider`
 exited 0, 148 passed. The whole test command is run again by the lead after the commits.
+
+## S2-T44 — Load-sensitive performance readiness: build pass 1
+
+- Date: 2026-11-19. Base commit: `98384ae5933dff2efb81721d087e74e6ce600011`;
+  branch `fix/S2-T44`; initial tracked working tree clean. No commit requested.
+- Builder: senior web test-infrastructure engineer (Playwright, headless Chromium,
+  MapLibre/deck.gl scenes and load-sensitive browser suites). Strict self-review:
+  rejects raised limits, retries, skipped or loosened assertions, and a green
+  re-run presented as a fix. Independent other-maker review remains with the lead.
+- Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+  strict-reviewer and muhasabah-gate. Systematic debugging, test-driven development
+  and verification-before-completion use the plain-meaning rules of the task brief;
+  those named superpowers skills are not installed in this session.
+- Plan: inspect the readiness path; measure both road loads without and with owned
+  CPU contention; name and test a cause; plant a regression before changing code;
+  run the required checks; leave PO-S2-118 closure to the lead.
+- Source of reported failure: `.overnight/IN/OCCURRENCE-1633.txt`, supplied by the
+  lead: full street load exhausted the 170000 ms readiness bound; shared road
+  setups ranged from 37055 to 85617 ms. These are supplied observations, not
+  measurements reproduced by this pass.
+- Snapshot gap: neither S2-T43 nor PO-S2-118 exists in this checkout's TASKS.md or
+  OPEN_ITEMS.md. S2-T44 is inserted after the last numbered task S2-T41 and before
+  S2-T10; the lead must place it after S2-T43 when joining the newer records.
+  OPEN_ITEMS.md remains unchanged; the return proposes a closure for review.
+- Environment probes: Node v22.22.3, npm 10.9.8; `nproc` reports 1, shell CPU
+  affinity is 8-11. Existing machine load was 52.69/40.79/35.39 at the first
+  probe and 66.13/47.46/38.26 at the next. “Normal” below means no added owned
+  load; this shared host is not otherwise idle. Scene seed is the existing 1;
+  counts, viewport, pixel ratio, plants, all timeouts and committed traces stay
+  fixed. Only loopback requests are used.
+- Inspection: buildPage builds once before Playwright launches. Readiness waits
+  for `done`/`failed` after generation, two map-idle waits, initial sample,
+  renderer display frame, smoke orbit, final sample and trace submission.
+  Each sample currently calls synchronous `readPixels` at all 256 interior grid
+  points. Measurements below test whether this is the bottleneck.
+
+S2-T44 baseline and planted regression evidence (all exits are actual):
+
+- Scratch phase probe: `TMPDIR="$PWD/.overnight/tmp" node
+  .overnight/tmp/measure.mjs`, from the root. The first attempt exited 1 during
+  instrumentation because Vite had already transformed the source. The probe was
+  corrected to use a pre-transform plugin; no application change was made for
+  that probe failure. Its subsequent baseline run exited 0, with two measured
+  full-wall scenes. Build 986.8 ms, server 4.4 ms, browser launch 42.5 ms.
+- The probe uses the existing Vite config, loopback static server and installed
+  headless browser. A temporary pre-transform inserts performance marks around
+  generation, both map-idle waits, both samples, orbit and posting. An init script
+  times the actual WebGL2 readPixels calls. It keeps the 170000 ms host readiness
+  race and full wall; all build/sink/browser temporary paths are under the
+  workspace temporary root. No committed source is instrumented.
+- Same command with `--load` exited 1: the full street scene reproduced
+  `spike readiness timed out` at 170015.2 ms, later completing at page clock
+  175613.4 ms. The shared first road scene completed. This run spawned exactly
+  four busy-loop Node children with `taskset -c 8-11`, then stopped all four by
+  their owned process IDs in finally. Build 964.3 ms, server 3.0 ms, browser
+  launch 55.5 ms. No pre-existing process was stopped.
+- Normal full street: generation 177.0 ms; first idle 52854.6 ms; second idle
+  31871.7 ms; initial sample 16485.6 ms; orbit 16938.4 ms; final sample 15916.7 ms
+  (orbit-end to post-start); post-start to done 16312.0 ms; host readiness
+  150386.6 ms; page creation 35.5 ms; navigation 300.3 ms.
+- Normal shared road scene: generation 154.2 ms; first idle 25932.1 ms; second
+  idle 17067.2 ms; initial sample 8723.8 ms; orbit 8897.5 ms; final sample
+  9463.5 ms; posting 5.9 ms; host readiness 70105.5 ms; page creation 22.8 ms;
+  navigation 266.4 ms. Both scenes had all configured layer counts.
+- Loaded full street: generation 360.6 ms; first idle 67412.6 ms; second idle
+  44052.2 ms; initial sample 21271.3 ms; orbit 20996.8 ms; final sample
+  21248.3 ms. Readiness expired before posting completed. Loaded shared road:
+  generation 351.5 ms; first idle 33714.6 ms; second idle 22538.8 ms; initial
+  sample 10672.1 ms; orbit 11025.6 ms; final sample 11049.9 ms; posting 8.8 ms;
+  host readiness 89058.9 ms. Navigation 589.2/543.3 ms and page creation
+  61.0/54.0 ms respectively.
+- The renderer identifies itself as ANGLE/Vulkan SwiftShader. Each scene made
+  512 readPixels calls, preserving the two 256-point samples. Under load, only
+  calls 1 and 257 exceeded 10 ms: full street 21260.4/21227.3 ms; shared road
+  10638.3/11016.8 ms. This rejects the initial suspicion of per-point overhead:
+  the first read waits for a rendered frame; the other reads are cheap.
+- Cause/hypothesis: mountScene submitted identical initial layers again after
+  the first idle and waited for a second idle. That forces redundant full-scene
+  rendering before readiness; it cost 31.9/44.1 seconds in the full street scene
+  without/with owned load. Test by keeping the initially submitted layer
+  instances and reading their initialized counts after the first idle. Playback
+  retains its real setProps updates. No sampler, motion, count or browser
+  assertion is changed.
+- Red: `node --test web/spikes/performance/tests/layers.node-test.mjs` exited 1,
+  11 tests: 10 passed, 1 failed, 0 skipped/cancelled/todo. The new regression
+  observed the old duplicate overlay update (actual 1, required 0). Green after
+  the fix: same command exited 0, 11 passed, 0 failed/skipped/cancelled/todo.
+  The existing error-listener assertion now expects one removal for the one
+  remaining idle wait; error rejection and listener cleanup tests remain.
+- Formatter preparation used a root-relative filename from web/ and exited 1
+  with FileNotFoundError; no file was changed by that preparation. The following
+  `npm run format` from web/ exited 0 and formatted only the changed layer test.
+  Inspection confirmed no unrelated tracked edits, including in evidence/.
+- Initial static checks: `npm run lint`, `npm run format:check` and `npm run
+  typecheck` from web/ each exited 0; no warnings, all matched files formatted,
+  and no type errors. `python3 scripts/check_docs.py` exited 0 (1118 text files,
+  119 Markdown files); `python3 scripts/check_tree.py` exited 0 (8 rules).
+  `cmp AGENTS.md CLAUDE.md` and `git diff --check` each returned no output in a
+  successful inspection shell; final separate invocations follow below.
+
+S2-T44 post-fix phase proof:
+
+- Scratch probe, same root command without `--load`: exit 0, both measured
+  scenes passed configured layer counts, road visibility, actual dash extension,
+  Simulated mark and legend/style assertions. Build 1432.7 ms, server 3.3 ms,
+  browser launch 39.2 ms. Full street readiness 123952.7 ms; shared road
+  readiness 53344.2 ms. Each retained both 256-point canvas samples.
+- Full street phases without added load: generation 195.8 ms; first idle
+  52161.0 ms; second idle absent; initial sample 16645.5 ms; orbit 16090.8 ms;
+  final sample 18169.5 ms; posting 20854.1 ms. Page creation 32.1 ms, navigation
+  316.0 ms. Shared road: generation 218.0 ms; first idle 26420.9 ms; second idle
+  absent; initial sample 8550.9 ms; orbit 8593.5 ms; final sample 9758.0 ms;
+  posting 6.7 ms. Page creation 23.8 ms, navigation 330.8 ms.
+- Same probe with `--load`: exit 0. All four owned busy loops ran for both
+  scenes and were stopped by PID after browser close. Build 647.5 ms, server
+  2.8 ms, browser launch 72.1 ms. Full street readiness 154371.4 ms; shared road
+  readiness 81021.1 ms. Both scenes passed all configured count, road, dash and
+  DOM assertions; the 170000 ms readiness limit was unchanged. This is a
+  reproduced failure followed by a causal change and controlled-load proof,
+  rather than an unmodified green re-run.
+- Full street loaded phases: generation 439.4 ms; first idle 82283.7 ms; second
+  idle absent; initial sample 24814.0 ms; orbit 23521.4 ms; final sample
+  23696.5 ms; posting 13.2 ms. Page creation 69.7 ms, navigation 696.9 ms.
+  Shared road: generation 349.8 ms; first idle 39607.3 ms; second idle absent;
+  initial sample 14302.9 ms; orbit 13242.0 ms; final sample 13795.5 ms; posting
+  15.4 ms. Page creation 50.9 ms, navigation 546.3 ms.
+- The shared machine remained busy (load average 56.14/54.98/49.19 during the
+  post-fix loaded probe). Necessary rendering still costs time and varies with
+  contention; these runs do not establish a guarantee under arbitrary CPU
+  starvation. The eliminated phase is identified directly in the marks.
+- Measurement clarification: the first normal probe accidentally nested its
+  second-sample mark in the first sample. Its final-sample interval above is
+  derived from orbit-end to post-start, which brackets that synchronous call.
+  Later probes fix that scratch instrumentation and mark both samples
+  independently. A parser of the stored marks gives 10672.0 ms for the baseline
+  loaded shared initial sample; the earlier 10672.1 ms used console stamps.
+  This sub-millisecond correction does not change the causal conclusion.
+- Road data is bundled from the recorded fixture at build time; the scene has
+  no remote tiles or glyph fetch. Generation is measured separately and was
+  under one second in each probe. The one page build, server start and browser
+  start occur outside readiness. No library API, package pin or lockfile
+  changes; existing layer/overlay APIs and the reference notes were reused.
+
+S2-T44 required complete performance run:
+
+- From web/: `TMPDIR="$PWD/../.overnight/tmp" npm run
+  test:spike:performance` exited 0. Node: 138 tests passed; 0 failed,
+  cancelled, skipped or todo. Browser: all 55 tests passed, including the
+  originally failing full-street case, each shared scene and every plant.
+- Node duration 1956668.2 ms; measured Playwright browser wall 1952447.6 ms.
+  This was without owned busy loops, on the already busy shared host. It is
+  NOT evidence of satisfying the separate 1800-second web-check gate: that
+  enclosing gate command was not run here and no limit was changed.
+- Shared setups in this complete run: uninterrupted English 84402.1 ms;
+  English pause 80328.2 ms; English reduced motion 103762.2 ms; Arabic playing
+  92539.0 ms; Arabic reduced motion 101957.3 ms. These real suite observations
+  are retained separately from the focused probe's timing results.
+- The loaded web-check proof is the root command `node
+  .overnight/tmp/run-loaded-checks.mjs`. That scratch wrapper starts the same
+  four busy-loop children through `taskset -c 8-11`, runs `npm run test:checks`
+  from web/ with the workspace temporary root, checks that none of its load
+  children exited before the command, records its actual command exit and wall
+  time, and stops only those owned children by PID in finally. Its result follows.
+
+S2-T44 loaded complete web-check verdict:
+
+- `node .overnight/tmp/run-loaded-checks.mjs` exited 0; its child `npm run
+  test:checks` from web/ exited 0. Node: 862 passed, 4 suites, 0 failed,
+  cancelled, skipped or todo. Nested performance browser suite: 55 passed,
+  including the original full-street case (reported duration 2.8 minutes).
+- Node duration 1487897.9 ms; wrapper command wall 1488098.9 ms; measured
+  performance browser wall 1415720.0 ms. The complete loaded web-check command
+  was below 1800 seconds in this run. All four pinned busy loops stayed alive
+  through the command and were then terminated by owned PID; the wrapper
+  waited for their exit and printed `LOAD stopped 4`.
+- Loaded shared setups: uninterrupted English 78406.6 ms; English pause
+  74042.6 ms; English reduced motion 43633.3 ms; Arabic playing 41499.9 ms;
+  Arabic reduced motion 57748.9 ms. The loaded complete run was faster than
+  the earlier no-owned-load run on this shared host; no claim is made that
+  added contention improved performance. The causal evidence is the removed
+  submission/idle phase and the planted regression, not a wall-time ratio.
+- Final code checks from web/: `npm run lint`, `npm run format:check`,
+  `npm run typecheck` each exited 0; no lint warnings, all matched files
+  formatted, no type errors. Separate `cmp AGENTS.md CLAUDE.md` and
+  `git diff --check` invocations each exited 0 with no output.
+- No time limit, assertion, planted browser case, layer count, pixel ratio,
+  viewport, retry, browser spec/config or committed evidence was changed.
+  No commit, staging, push, pull request or merge was performed. Other-maker
+  review, hosted CI, the lead's exact merged-result whole test and the
+  four-processor timing gate remain outside this builder pass. In particular,
+  the earlier 1956.7-second standalone performance run is retained as measured;
+  no two-run four-processor timing claim or OI-158 closure follows from this work.
+
+S2-T44 final record/report audit:
+
+- `python3 scripts/check_docs.py` after the report was written exited 0:
+  1118 text files, 119 Markdown files. `python3 scripts/check_tree.py`
+  exited 0: 8 rules.
+- The first inline scope/privacy audit exited 1: its scratch path detector
+  falsely matched the relative workspace temporary path as an absolute path.
+  Corrected the detector's prefix boundary, with planted absolute-path
+  refusals for each prefix and a relative-path allowance. No application
+  security guard or source rule was changed. `python3
+  .overnight/tmp/audit.py` then exited 0.
+- The audit proves exactly five authorized tracked files changed, HEAD is the
+  recorded base, no changes are staged, the prior PROGRESS bytes are a prefix,
+  TASKS contains only the one inserted entry, and the browser spec/config,
+  counts, package pins, OPEN_ITEMS, both agent-rule files and committed evidence
+  remain unchanged. It checks the return marker and private-path/email
+  absence, and redacts only the workspace prefix in owned scratch logs without
+  changing timings or verdicts. Native evidence is never rewritten.
+- Muhasabah: PASS for the bounded builder report. Every result is sourced to
+  actual output; the scratch instrumentation and audit corrections are
+  disclosed; assumptions about shared load are explicit; no independent
+  approval, native result, four-processor gate or merge is fabricated. The
+  return proposes PO-S2-118 closure for review and notes the absent task/item
+  records; neither OPEN_ITEMS.md nor an earlier evidence row is changed.
