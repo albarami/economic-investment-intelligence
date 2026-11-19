@@ -28,6 +28,7 @@ from eii_custodian.publicdata.investment_contracts import (
     EvidenceAudit,
     EvidenceAuditEntry,
     FetchAttempt,
+    InvestmentFailure,
     MilestoneEvidence,
     ProjectArchiveSelection,
     ProjectEvidence,
@@ -173,14 +174,25 @@ def test_non_string_null_equal_location_keeps_absence(tmp_path: Path) -> None:
     assert result.revisions[0].geography_absence_reason == "not_stated_by_source"
 
 
+_ID = "fdi_projects:project:1001"
+
+# Every comparison of the unstable key that a row-dict layout can direct at a
+# lookup of the key's own field: two to three comparisons in total under the
+# layouts observed on the joined code (the matching-source-metadata lookup and
+# the archived-parser comparison, the first sometimes twice), plus margin for
+# further probe crossings and repeated comparisons another layout adds. An
+# order beyond the last comparison fails no comparison, so that build behaves
+# as the control, which the property below also covers; the seed guard runs
+# this test under fixed hash seeds.
+_MISSING_ORDERS = range(1, 17)
+
+
 @pytest.mark.parametrize(
     ("field", "missing_on"),
     [
-        ("source_id", 3),
-        ("project_id", 3),
-        ("source_id", 4),
-        ("project_id", 4),
-        ("project_key", 3),
+        (name, order)
+        for name in ("source_id", "project_id", "project_key")
+        for order in _MISSING_ORDERS
     ],
 )
 def test_unstable_caller_key_never_invents_identifier_text(
@@ -212,10 +224,35 @@ def test_unstable_caller_key_never_invents_identifier_text(
     }
     result = evidence.build_project_evidence((replace(first, rows=(row,)), second))
     control = evidence.build_project_evidence((first, second))
+    # The expectations record today's behaviour for a caller key ruled not
+    # reachable from the archived-bytes callers (PO-S2-87): whichever
+    # comparison the string hash seed makes the unstable key fail, identity,
+    # geography and source chain come from the authenticated parser rows, so
+    # a missing identity part never becomes invented text such as None or
+    # XXXX; the control and the second revision keep their exact equalities;
+    # and the only other outcome is the metadata refusal. The order of the
+    # comparisons depends on the hash seed (ruling L-1050): a dict lookup
+    # crosses the unstable key's slot for some layouts only, and one lookup
+    # can compare the unstable key more than once, so the failing comparison
+    # lands on a different field lookup per seed (on the joined code, the
+    # matching-source-metadata lookup, then the archived-parser comparison;
+    # under some layouts the first lookup compares the key twice and the
+    # perturbation is absorbed). The test therefore states the property for
+    # every failing comparison, not for one order. A boundary fix that
+    # refuses these keys replaces the property with its refusal.
+    assert isinstance(control, ProjectEvidence)
+    assert len(control.revisions) == 2
+    assert (
+        control.revisions[0].project_identity,
+        control.revisions[0].source_id,
+        control.revisions[0].project_id,
+    ) == (_ID, "fdi_projects", "1001")
+    assert isinstance(result, (ProjectEvidence, InvestmentFailure))
+    if isinstance(result, InvestmentFailure):
+        assert result.check == "invalid_evidence_metadata"
+        return
     # After archived-row equality, identity, geography and source chain come
     # from the authenticated parser rows. A caller key cannot empty them.
-    assert isinstance(result, ProjectEvidence)
-    assert isinstance(control, ProjectEvidence)
     assert [
         (
             revision.project_identity,
@@ -238,6 +275,41 @@ def test_unstable_caller_key_never_invents_identifier_text(
         for revision in control.revisions
     ]
     assert result.absences == control.absences
+    assert len(result.revisions) == 2
+    first_rev, second_rev = result.revisions
+    if field == "source_id":
+        assert first_rev.source_id in ("fdi_projects", "")
+    else:
+        assert first_rev.source_id == "fdi_projects"
+    if field == "project_id":
+        assert first_rev.project_id in ("1001", "")
+    else:
+        assert first_rev.project_id == "1001"
+    if field == "project_key":
+        assert first_rev.project_key in (control.revisions[0].project_key, "")
+    else:
+        assert first_rev.project_key == control.revisions[0].project_key
+    assert first_rev.project_identity == (
+        f"{first_rev.source_id}:project:{first_rev.project_id}"
+    )
+    assert (
+        second_rev.project_identity,
+        second_rev.source_id,
+        second_rev.project_id,
+        second_rev.project_key,
+    ) == (_ID, "fdi_projects", "1001", control.revisions[1].project_key)
+    absence_identity = {
+        "source_id": ":project:1001",
+        "project_id": "fdi_projects:project:",
+        "project_key": None,
+    }[field]
+    assert len(result.absences) <= 1
+    if absence_identity is None:
+        assert result.absences == ()
+    else:
+        assert all(
+            item.project_identity == absence_identity for item in result.absences
+        )
 
 
 @pytest.mark.parametrize("kind", ["revision", "absence"])

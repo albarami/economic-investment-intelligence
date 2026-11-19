@@ -771,6 +771,13 @@ Open question to settle in your plan with options: where the archive persists so
 - Depends: S2-T12, S2-T27.
 - Requirements: PUB-86, PUB-87, PUB-88, PLN-25, DAT-142, DAT-143.
 - Delivery: hard; personas Data; status in review for part A (pull request https://github.com/albarami/economic-investment-intelligence/pull/99, train S2-5), approved locally at 8da4e4e and joined through 55889ab; live Arabic inventory, reviewed real crosswalk entries and part B release/quotation delivery remain open; decision 0029 is accepted but is not implemented by this part.
+### S2-T40 — The unstable-key evidence test holds under every hash seed (ruling L-1050)
+- Goal: Make the unstable-key evidence test hold under every string hash seed, fixed at its cause and never by a skip, retry, pinned seed or weakened assertion, with a guard that runs it under fixed hash seeds (ruling L-1050; OI-314).
+- Acceptance criteria: [ ] the cause is recorded with the equality-call order under two hash seeds, naming which code makes that order depend on the seed; [ ] the test states its property for every order of the unstable key's comparisons (a missing identity part stays empty and never becomes invented text; the control and the second revision keep their exact equalities; the only other outcome is the receipt-metadata refusal), with no case removed and no equality loosened; [ ] a guard runs the test in a subprocess under a fixed list of hash seeds including 0, 1, 2 and 3764211809 and was shown red on the unfixed test; [ ] OI-314 closes when this task merges.
+- Scope: `custodian/tests/test_investment_evidence_survivors_8.py`, its seed guard, and the records; the investment-evidence production module only if the cause is there.
+- Depends: S2-T30.
+- Requirements: AGENTS.md rules 36, 37 and 39.
+- Delivery: Standard; builder persona: senior test-reliability engineer for Python data pipelines; strict reviewer persona: strict test-reliability reviewer from another maker; status in progress.
 ### S2-T41 — Optional offline satellite backup cache from CDSE
 
 - Goal: collect the owner's optional free backup as a receipted, unread cache, off by default, with no effect on any other task or numerical output (L-1069 and L-1078 item 4).
