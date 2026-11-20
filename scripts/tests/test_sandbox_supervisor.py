@@ -587,9 +587,10 @@ class SupervisorRules(unittest.TestCase):
             self._finish(process, marker)
 
     def test_the_cleanup_time_is_bounded(self) -> None:
-        # F2 of the fourth part F review: the clock never moves by itself; it
-        # moves only by the cost of each read, descriptor, signal and blocking
-        # wait of the cleanup, a blocking wait costing its whole time-out. With
+        # F2 of the fourth and fifth part F reviews: the clock never moves by
+        # itself; it moves only by the cost of each read, descriptor, signal,
+        # close and blocking wait of the cleanup, a blocking wait costing its
+        # whole time-out. With
         # a run that settles and one that never settles (an unreadable process),
         # the cleanup ends within KILL_SECONDS of that clock and still kills
         # every taken process and the group.
@@ -628,10 +629,21 @@ class SupervisorRules(unittest.TestCase):
                 clock.now += timeout
                 return real_wait(timeout=5)
 
+            real_close = os.close
+            closed: list[int] = []
+
+            def close(handle: int) -> None:
+                # Each close of a taken process costs a step too, after a wait
+                # that used its whole allowance (F2 of the fifth part F review).
+                clock.spend()
+                closed.append(handle)
+                real_close(handle)
+
             with (
                 patch.object(time, "monotonic", clock),
                 patch.object(Path, "read_text", read),
                 patch.object(os, "pidfd_open", pidfd_open),
+                patch.object(os, "close", close),
                 patch.object(process, "wait", wait),
                 patch.object(select, "poll", clock.poll),
                 spy.installed(),
@@ -640,6 +652,7 @@ class SupervisorRules(unittest.TestCase):
                 ended = launch.end_stalled(process)
                 elapsed = clock.now - started
             self.assertLessEqual(elapsed, launch.KILL_SECONDS)
+            self.assertTrue(closed, "no taken process was closed")
             if unreadable:
                 self.assertFalse(ended)
             self.assertEqual(

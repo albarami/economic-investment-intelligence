@@ -55,6 +55,11 @@ WALK_SECONDS = KILL_SECONDS / 2
 # own. A walk that finds more stops taking, still kills what it took and the
 # group, and leaves the end unconfirmed (F2 of the fourth part F review).
 TARGET_SLOTS = 512
+# The waits for the kills end this part of KILL_SECONDS before the deadline;
+# it is kept for closing the descriptor of every taken process, at most
+# TARGET_SLOTS closes that never block, so that they too end within the
+# deadline (F2 of the fifth part F review).
+CLOSE_SECONDS = KILL_SECONDS / 16
 # os.open flags of a mount source: a path descriptor that does not follow a
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -751,7 +756,8 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
     the walk stops at ``WALK_SECONDS`` (checked before each process is read
     and indexed, each frontier entry and each candidate), and the rest is kept
     for the kills and closes, which are always sent and done, one each per
-    taken process, and for the waits, which never wait past the deadline. The
+    taken process, and for the waits, which end ``CLOSE_SECONDS`` before the
+    deadline so that the closes after them still end within it. The
     kill-and-close work is bounded before a process is taken: at most
     ``TARGET_SLOTS`` are taken, and the group's kill has its own slot. A walk
     that did not settle in time or ran out of slots leaves the end
@@ -759,15 +765,18 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
 
     Returns:
         True only when the walk settled, every signal was sent, the kills were
-        sent before the deadline, the supervisor was reaped and every pinned
-        process ended before the deadline; False when that is not confirmed.
+        sent before the deadline, the supervisor was reaped, every pinned
+        process ended before the waits' end and the closes were done by the
+        deadline; False when that is not confirmed.
     """
     started = time.monotonic()
     walk_deadline = started + WALK_SECONDS
     deadline = started + KILL_SECONDS
+    waits_end = deadline - CLOSE_SECONDS
     pinned: dict[tuple[int, int], int] = {}
     sent = True
     settled = False
+    confirmed = False
     try:
         if process.returncode is not None:
             # Reaped: its id may name another process now; nothing is walked.
@@ -782,15 +791,18 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
         for handle in pinned.values():
             sent &= _signalled(handle, signal.SIGKILL, group=False)
         sent &= _signalled(process.pid, signal.SIGKILL, group=True)
-        on_time = time.monotonic() < deadline
+        on_time = time.monotonic() < waits_end
         try:
-            process.wait(timeout=max(deadline - time.monotonic(), 0.0))
+            process.wait(timeout=max(waits_end - time.monotonic(), 0.0))
         except subprocess.TimeoutExpired:
             return False
-        return sent and settled and on_time and _ended(list(pinned.values()), deadline)
+        confirmed = (
+            sent and settled and on_time and _ended(list(pinned.values()), waits_end)
+        )
     finally:
         for handle in pinned.values():
             os.close(handle)
+    return confirmed and time.monotonic() <= deadline
 
 
 def _drain(process: subprocess.Popen[str]) -> None:
