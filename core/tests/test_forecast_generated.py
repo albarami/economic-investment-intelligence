@@ -245,6 +245,28 @@ def test_missing_confirmed_feeds_refuse_before_fitting(monkeypatch, key, plant):
     )
 
 
+@pytest.mark.parametrize("key", GENERATED_KEYS)
+def test_released_series_without_admission_is_an_error(monkeypatch, key):
+    # Confirmation A N2: a released series with no admission stays an error, as on the Public route.
+    monkeypatch.setattr(
+        f, "backtest", lambda *a, **k: pytest.fail("unadmitted series fitted")
+    )
+    with pytest.raises(ValueError, match="release admission required"):
+        f.forecast_series(replace(generated(key), admission=None))
+
+
+def test_public_admission_with_feed_names_refuses_before_fitting(monkeypatch):
+    # Confirmation A N3: no feed name reaches a Public fact's lineage.
+    series = construction()
+    planted = replace(
+        series, admission=replace(series.admission, feed_names=("wages.v1",))
+    )
+    monkeypatch.setattr(
+        f, "backtest", lambda *a, **k: pytest.fail("feed-named Public series fitted")
+    )
+    assert f.forecast_series(planted) == f.ForecastNotOffered("forecast_not_offered")
+
+
 @pytest.mark.parametrize(
     "key", ["employment_by_area", "employment_by_occupation_workplace"]
 )

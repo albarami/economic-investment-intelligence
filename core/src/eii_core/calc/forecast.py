@@ -552,13 +552,10 @@ def _admitted(series: ForecastSeries, spec: Definition) -> bool:
         and (
             series.key != "establishments_by_area" or series.history_route == "snapshot"
         )
+        and (spec.state != "released" or _released_binding(series))
         and (
-            spec.state != "released"
-            or (
-                _released_binding(series)
-                and type(series.admission) is ReleaseAdmission
-                and set(series.admission.feed_names) == set(spec.confirmed_sources)
-            )
+            type(series.admission) is not ReleaseAdmission
+            or set(series.admission.feed_names) == set(spec.confirmed_sources)
         )
     )
 

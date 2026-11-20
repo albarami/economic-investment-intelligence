@@ -43668,3 +43668,8 @@ for this bounded test addition and its evidence; full task acceptance and
 different-maker approval remain pending.
 
 Lead rerun (2026-11-20, same worktree, seed 3127409581): uv run --locked python -m pytest core/tests/test_forecast_generated.py core/tests/test_forecast.py -q -p no:cacheprovider --hypothesis-seed=3127409581: exit 0, 288 passed; the same file with -k invented_confirmed_feed: exit 0, 4 passed, 156 deselected.
+
+## S6-T25 — confirmations of the fix rounds and the lead's round three, 2026-11-20
+
+- Correction (2026-11-20): the lead committed fix round one as 140d864cf81a55458cf3be7be391931a75a213c5 and fix round two as 4bda0020c6cd823071812cb1238662ddf5306fb4. Confirmation A (Anthropic, Claude Fable 5.2) on 4bda0020c6cd823071812cb1238662ddf5306fb4, offline and without synchronisation: the three-file command of its brief exit 0, 334 passed; the eleven-file regression set exit 0, 521 passed. Confirmation B (Moonshot, Kimi K3.1 Pro) on the same head: CONFIRMED, no finding.
+- Round three (the lead, Anthropic Claude Opus 5.5, applying confirmation A's non-blocking N2 and N3 with its exact block): a released series with no admission raises "release admission required" again, as on the Public route; a Public admission carrying feed names is refused before fitting, so no feed name reaches a Public fact's lineage. Plants `test_released_series_without_admission_is_an_error` (seven keys) and `test_public_admission_with_feed_names_refuses_before_fitting`: red before the change, exit 1, 8 failed; green after, exit 0, 8 passed (seed 2718281829). The eleven-file regression set: exit 0, 529 passed. `ruff check .` exit 0; `ruff format --check .` exit 0, 814 files; `mypy` exit 0, 436 source files.
