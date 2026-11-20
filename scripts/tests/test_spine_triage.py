@@ -566,6 +566,24 @@ class SpineTriageTest(unittest.TestCase):
                 else:
                     path.write_bytes(original)
 
+    def test_missing_provider_defaults_to_none(self) -> None:
+        from spine_triage import main
+
+        baseline = (self.cache / "queue.csv").read_bytes()
+        with (
+            patch.dict(os.environ),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            os.environ.pop("EII_DECISION_PROVIDER", None)
+            self.assertEqual(main(self.args, root=self.root), 0)
+
+        output = self.cache / "spine_triage/invented-run"
+        self.assertEqual((self.cache / "queue.csv").read_bytes(), baseline)
+        self.assertEqual((output / "queue.csv").read_bytes(), baseline)
+        evidence = json.loads((output / "manifest.json").read_text())["evidence"]
+        self.assertEqual(evidence["provider"], "none")
+        self.assertEqual(evidence["model"], "none")
+
     def test_none_fixture_leaves_suite_stdout_clean(self) -> None:
         with contextlib.redirect_stdout(io.StringIO()) as output:
             self.test_none_preserves_queue_without_network_or_key_access()
