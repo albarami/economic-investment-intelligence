@@ -13,11 +13,18 @@ import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
+from typing import Literal
 
 from eii_custodian.publicdata.completeness import in_use
-from eii_custodian.publicdata.confirm_s2_t13 import Confirmation, completion_evidence
+from eii_custodian.publicdata.confirm_s2_t13 import Confirmation
+from eii_custodian.publicdata.confirm_s2_t13 import (
+    completion_evidence as tender_completion_evidence,
+)
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.method_card_validation import (
+    completion_evidence as method_pin_completion_evidence,
+)
 from eii_custodian.publicdata.places_fsq.constants import RELEASE_KEY, RELEASE_POLICY
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.releases import validate_release
@@ -276,7 +283,7 @@ def tender_evidence(
 ) -> ConfirmationEvidence:
     """Reuse S2-T13's existing validation instead of duplicating its loader."""
     try:
-        completion_evidence(confirmation, row, receipt)
+        tender_completion_evidence(confirmation, row, receipt)
     except ValueError:
         confirmed = False
     else:
@@ -376,6 +383,43 @@ def fsq_evidence(
         (reference,),
         {"release_matches": matches},
     )
+
+
+def method_pin_gate(
+    record_path: Path,
+    artifact_path: Path,
+    generation_config_path: Path,
+    methods_doc_path: Path,
+    registry: Sequence[Entry],
+    receipts: Mapping[str, Mapping[str, object]],
+    *,
+    gate: Literal["S2", "S7"] = "S2",
+) -> dict[str, object]:
+    """Run MTH-03 completion evidence for the slice gate acceptance path.
+
+    Pending or mismatched inputs stay pending; nothing here claims reviewer approval.
+    """
+    if gate not in ("S2", "S7"):
+        raise ValueError("pin_gate_unknown")
+    try:
+        method_pin_completion_evidence(
+            record_path,
+            artifact_path,
+            generation_config_path,
+            methods_doc_path,
+            gate=gate,
+            registry=registry,
+            receipts=receipts,
+        )
+        recorded = True
+    except ValueError:
+        recorded = False
+    return {
+        "task": "S2-T09",
+        "state": "recorded" if recorded else "pending",
+        "completion_evidence": recorded,
+        "gate": gate,
+    }
 
 
 def terms_evidence(

@@ -26,12 +26,28 @@ from .method_card_pin_fixtures import (
     blocks,
     case,
     digest,
+    lineage_context,
     methods_document,
     pending,
     save,
     write_json,
     write_yaml,
 )
+
+
+def _record(paths):
+    return yaml.safe_load(paths[0].read_text())
+
+
+def _validate(paths, record, **overrides):
+    ctx = {**lineage_context(record), **overrides}
+    return validate_source_check_record(*paths[:3], **ctx)
+
+
+def _complete(paths, record, *, gate):
+    ctx = lineage_context(record)
+    return completion_evidence(*paths, gate=gate, **ctx)
+
 
 # F10: paths anchor on the test file's own location, never on the working folder.
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,12 +79,12 @@ NONE_NAMED_PINS = (
 
 def test_checked_fixture_and_sync(tmp_path):
     paths, record, _, _ = case(tmp_path)
-    entries = validate_source_check_record(*paths[:3])
+    entries = _validate(paths, record)
     assert set(entries) == set(PINS)
     assert entries["wilson.period"].values == record["pins"][0]["values"]
     verify_method_cards_sync(paths[0], paths[3])
     for gate in ("S2", "S7"):
-        assert set(completion_evidence(*paths, gate=gate)) == set(PINS)
+        assert set(_complete(paths, record, gate=gate)) == set(PINS)
 
 
 def test_plant_tampered_value(tmp_path):
@@ -76,7 +92,7 @@ def test_plant_tampered_value(tmp_path):
     record["pins"][0]["values"]["value"] = "tampered"
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="pin_value_mismatch"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -93,7 +109,7 @@ def test_plant_missing_same_maker_or_variant_reviewer(tmp_path, reviewer, code):
     record["pins"][0]["reviewer_maker"] = reviewer
     save(paths, record, artifact)
     with pytest.raises(ValueError, match=re.escape(code)):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -108,7 +124,7 @@ def test_plant_maker_not_in_closed_set(tmp_path, field, variant, code):
     record["pins"][0][field] = variant
     write_yaml(paths[0], record)
     with pytest.raises(ValueError, match=re.escape(code)):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_wrong_configuration_hash(tmp_path):
@@ -116,7 +132,7 @@ def test_plant_wrong_configuration_hash(tmp_path):
     record["pins"][0]["settings_sha256"] = digest(b"wrong settings")
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="pin_settings_hash_mismatch"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_unrecorded_setting(tmp_path):
@@ -124,7 +140,7 @@ def test_plant_unrecorded_setting(tmp_path):
     artifact["pins"][0]["settings"]["unrecorded_seed"] = 9
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="pin_unrecorded_setting"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize("gate", ["S2", "S7"])
@@ -137,7 +153,7 @@ def test_plant_unpinned_at_gate_even_with_open_item(tmp_path, gate, pin):
     # An OPEN_ITEMS entry cannot supply a missing checked value.
     (tmp_path / "OPEN_ITEMS.md").write_text(f"Recorded: {pin} still unpinned.\n")
     with pytest.raises(ValueError, match=re.escape(gate + ":unpinned:")):
-        completion_evidence(*paths, gate=gate)
+        _complete(paths, record, gate=gate)
 
 
 @pytest.mark.parametrize("treatment", ["", "clean"])
@@ -162,7 +178,7 @@ def test_plant_contaminated_c5_parent(tmp_path, treatment):
         ValueError,
         match=re.escape("c5_parent_requires_includes excluded lines_or_withheld"),
     ):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize("substitute", ["half_year", "2019"])
@@ -184,7 +200,7 @@ def test_plant_half_year_or_2019_substitute(tmp_path, substitute):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_window_prior_2024_required"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -210,7 +226,7 @@ def test_plant_c5_latest_window_substitute(tmp_path, substitute, code):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match=re.escape(code)):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize("defect", ["lines_key", "review_field"])
@@ -231,7 +247,7 @@ def test_plant_c5_parent_review_missing(tmp_path, defect):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_review_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -259,7 +275,7 @@ def test_plant_c5_value_lines_do_not_match_parent_review(tmp_path, defect):
             )
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_review_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_c5_clean_parent_with_withheld_treatment(tmp_path):
@@ -279,7 +295,7 @@ def test_plant_c5_clean_parent_with_withheld_treatment(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_treatment"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_c5_withheld_with_value(tmp_path):
@@ -308,7 +324,7 @@ def test_plant_c5_withheld_with_value(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_withheld_value"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_checked_row_without_evidence(tmp_path):
@@ -320,7 +336,7 @@ def test_plant_checked_row_without_evidence(tmp_path):
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_checked_evidence_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_wrong_card_anchor(tmp_path):
@@ -328,7 +344,7 @@ def test_plant_wrong_card_anchor(tmp_path):
     record["pins"][1]["card_anchor"] = "c6"
     write_yaml(paths[0], record)
     with pytest.raises(ValueError, match="pin_unknown_or_anchor"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_unknown_configuration_pin(tmp_path):
@@ -339,35 +355,35 @@ def test_plant_unknown_configuration_pin(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     write_yaml(paths[0], record)
     with pytest.raises(ValueError, match="pin_artifact_fields"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_artifact_row_duplicated(tmp_path):
-    paths, _, artifact, _ = case(tmp_path)
+    paths, record, artifact, _ = case(tmp_path)
     artifact["pins"].append(copy.deepcopy(artifact["pins"][0]))
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_artifact_duplicate_or_unknown"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_artifact_row_missing(tmp_path):
-    paths, _, artifact, _ = case(tmp_path)
+    paths, record, artifact, _ = case(tmp_path)
     artifact["pins"] = [
         row for row in artifact["pins"] if row["pin_id"] != "wilson.period"
     ]
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_artifact_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_artifact_lineage_mismatch(tmp_path):
-    paths, _, artifact, _ = case(tmp_path)
+    paths, record, artifact, _ = case(tmp_path)
     # c5.hhi is a source pin (pins[1]); pins[0] wilson.period is a
     # configuration pin whose record and artifact lineage are both empty.
     artifact["pins"][1]["source_lineage"][0]["sha256"] = digest(b"different rows")
     write_json(paths[1], artifact)
-    with pytest.raises(ValueError, match="pin_lineage_mismatch"):
-        validate_source_check_record(*paths[:3])
+    with pytest.raises(ValueError, match="pin_lineage_receipt_mismatch"):
+        _validate(paths, record)
 
 
 def test_plant_lineage_date_without_timezone(tmp_path):
@@ -380,7 +396,7 @@ def test_plant_lineage_date_without_timezone(tmp_path):
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_lineage_date"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_lineage_row_duplicated(tmp_path):
@@ -397,7 +413,7 @@ def test_plant_lineage_row_duplicated(tmp_path):
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_lineage_duplicate"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize("where", ["record", "config", "artifact"])
@@ -416,7 +432,7 @@ def test_plant_schema_version(tmp_path, where):
         artifact["schema_version"] = 2
         write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_schema_version"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_unknown_gate(tmp_path):
@@ -445,7 +461,7 @@ def test_plant_pending_row_carries_evidence(tmp_path, field):
         row["review_date"] = "2026-11-18"
     write_yaml(paths[0], record)
     with pytest.raises(ValueError, match="pin_unpinned_carries_evidence"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -546,7 +562,7 @@ def test_plant_record_governed_sections_mismatch(tmp_path):
     record["governed_sections"] = record["governed_sections"][:4]
     write_yaml(paths[0], record)
     with pytest.raises(ValueError, match="card_sync_sections_unrecorded"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_edit_outside_governed_sections_leaves_sync_green(tmp_path):
@@ -618,7 +634,7 @@ def test_closed_record_schema(tmp_path, defect, code):
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match=re.escape(code)):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_pending_fixture_needs_no_live_file(tmp_path):
@@ -628,7 +644,7 @@ def test_pending_fixture_needs_no_live_file(tmp_path):
     write_yaml(paths[0], record)
     paths[1].unlink()
     paths[2].unlink()
-    assert len(validate_source_check_record(*paths[:3])) == len(PINS)
+    assert len(_validate(paths, record)) == len(PINS)
     # No checked block may appear even when all source records are unpinned.
     paths[3].write_text(methods_document([]))
     verify_method_cards_sync(paths[0], paths[3])
@@ -657,7 +673,7 @@ def test_plant_setting_removed_from_both_artifact_and_config(tmp_path, pin):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="pin_unrecorded_setting"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_c6_release_sha256_source_pin_needs_no_settings_value(tmp_path):
@@ -675,7 +691,7 @@ def test_c6_release_sha256_source_pin_needs_no_settings_value(tmp_path):
     for row in record["pins"]:
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
-    entries = validate_source_check_record(*paths[:3])
+    entries = _validate(paths, record)
     assert entries[pin].values == {"value": "invented:" + pin}
     assert entries[pin].source_lineage != ()
 
@@ -690,7 +706,7 @@ def test_plant_source_pin_with_empty_lineage(tmp_path):
     write_yaml(paths[0], record)
     write_json(paths[1], artifact)
     with pytest.raises(ValueError, match="pin_checked_evidence_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_contamination_label_not_recorded_with_value(tmp_path):
@@ -712,7 +728,7 @@ def test_plant_contamination_label_not_recorded_with_value(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_visible_label_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def _mixed_lines(config, other_contains, other_treatment):
@@ -741,7 +757,7 @@ def test_plant_mixed_basket_withheld_line_carrying_a_value(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_withheld_value"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_mixed_basket_includes_line_without_visible_label(tmp_path):
@@ -757,7 +773,7 @@ def test_plant_mixed_basket_includes_line_without_visible_label(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_visible_label_missing"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 def test_plant_mixed_basket_clean_line_carrying_a_marker(tmp_path):
@@ -781,7 +797,7 @@ def test_plant_mixed_basket_clean_line_carrying_a_marker(tmp_path):
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
     with pytest.raises(ValueError, match="c5_parent_treatment"):
-        validate_source_check_record(*paths[:3])
+        _validate(paths, record)
 
 
 @pytest.mark.parametrize(
@@ -811,7 +827,7 @@ def test_mixed_basket_parent_review_accepts_one_clean_and_one_contaminated_line(
     for row in record["pins"]:
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
-    entries = validate_source_check_record(*paths[:3])
+    entries = _validate(paths, record)
     assert entries["c5.prior12"].checked_against_source
 
 
@@ -845,4 +861,59 @@ def test_reviewed_contaminated_parent_must_label_or_withhold_values(
     for row in record["pins"]:
         row["settings_sha256"] = digest(paths[2].read_bytes())
     save(paths, record, artifact)
-    assert validate_source_check_record(*paths[:3])["c5.prior12"].checked_against_source
+    assert _validate(paths, record)["c5.prior12"].checked_against_source
+
+
+def test_plant_unknown_lineage_source_id(tmp_path):
+    # The unknown id is planted only in the record row of the source pin c5.hhi,
+    # with the registry frozen to the pre-plant INVENTED sources so only that guard fails.
+    paths, record, artifact, _ = case(tmp_path)
+    frozen = lineage_context(record)
+    record["pins"][1]["source_lineage"][0]["source_id"] = "invented_missing_source"
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="pin_lineage_source_unknown"):
+        _validate(paths, record, **frozen)
+
+
+def test_plant_lineage_receipt_hash_mismatch(tmp_path):
+    paths, record, artifact, _ = case(tmp_path)
+    record["pins"][1]["source_lineage"][0]["sha256"] = digest(b"wrong receipt body")
+    artifact["pins"][1]["source_lineage"][0]["sha256"] = digest(b"wrong receipt body")
+    save(paths, record, artifact)
+    with pytest.raises(ValueError, match="pin_lineage_receipt_mismatch"):
+        _validate(paths, record)
+
+
+def test_plant_lineage_context_missing_for_checked_source_pin(tmp_path):
+    paths, _, _, _ = case(tmp_path)
+    with pytest.raises(ValueError, match="pin_lineage_context_missing"):
+        validate_source_check_record(*paths[:3])
+
+
+def test_producer_writes_pin_artifact_from_generation_config(tmp_path):
+    from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
+
+    paths, record, artifact, config = case(tmp_path)
+    rows = [
+        {
+            "pin_id": row["pin_id"],
+            "values": row["values"],
+            "source_lineage": row["source_lineage"],
+        }
+        for row in record["pins"]
+    ]
+    built = produce_pin_artifact(config, rows)
+    assert built == artifact
+    write_json(paths[1], built)
+    _validate(paths, record)
+
+
+def test_method_pin_gate_calls_completion_evidence(tmp_path):
+    from eii_custodian.publicdata import gate_report as g
+
+    paths, record, _, _ = case(tmp_path)
+    ctx = lineage_context(record)
+    report = g.method_pin_gate(*paths, **ctx, gate="S2")
+    assert report["task"] == "S2-T09"
+    assert report["completion_evidence"] is True
+    assert report["state"] == "recorded"
