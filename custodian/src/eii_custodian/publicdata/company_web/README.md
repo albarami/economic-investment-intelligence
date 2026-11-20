@@ -135,6 +135,11 @@ fields is refused as a fragment, including when its hashes are recomputed. The
 fragment never replaces the archived full body; its hash is distinct from the
 full-page hash.
 
+HTML fragment validation checks both the joined text and each individual text run.
+Adjacent elements cannot hide contact or personal context by fusing word boundaries;
+the joined check still covers words split across tags. Both microdata and reviewed
+selectors receive these checks at extraction.
+
 A declared block with a telephone, fax or e-mail property is refused in full at
 extraction, even when that property would not become a candidate. A reviewed
 per-host selector can narrow the source block; live coverage remains for the lead

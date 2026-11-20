@@ -130,6 +130,10 @@ def validate_fragment(fragment: bytes) -> None:
                     _source_values(key)
                     _source_values(value)
             _source_values(root.text())
+            for node in (root, *root.descendants()):
+                for child in node.children:
+                    if isinstance(child, str):
+                        _source_values(child)
     except (ShapeError, UnicodeError, json.JSONDecodeError, TypeError, RecursionError):
         raise WebError("fragment_refused") from None
 

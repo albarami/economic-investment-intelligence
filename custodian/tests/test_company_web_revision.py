@@ -39,6 +39,52 @@ from eii_custodian.publicdata.company_web.search import companies, request_url
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.transport import Response
 
+SELECTION = {"block": "section#company", "fields": {"name": "b", "activity": "p"}}
+MICRO = '<div itemscope itemtype="https://schema.org/Organization"><span itemprop="name">{n}</span><span itemprop="isicV4">SYN-class</span>{x}</div>'
+
+
+@pytest.mark.parametrize(
+    "extra",
+    ["<i>Telephone: none</i>", "<i>Chief Executive</i>", "<i>Mr. Invented</i>"],
+)
+def test_adjacent_personal_or_contact_run_refused_in_selected_block(extra):
+    data = f'<section id="company"><b>{NAME}</b><p>SYN activity</p>{extra}</section>'.encode()
+    with pytest.raises(WebError):
+        extract(
+            data,
+            Company("syn-a", NAME, "register", {}),
+            receipt(data),
+            selectors=SELECTION,
+            selectors_reviewed=True,
+        )
+
+
+@pytest.mark.parametrize("extra", ["<i>Telephone: none</i>", "<i>Chief Executive</i>"])
+def test_adjacent_personal_or_contact_run_refused_in_microdata(extra):
+    data = MICRO.format(n=NAME, x=extra).encode()
+    with pytest.raises(WebError):
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+
+
+def test_adjacent_run_microdata_control_matches():
+    data = MICRO.format(n=NAME, x="").encode()
+    assert (
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data)).status
+        == "matched"
+    )
+
+
+def test_selector_block_contact_refused_at_extraction():
+    data = f'<section id="company"><b>{NAME}</b><p>SYN activity</p> <i>Telephone: none</i></section>'.encode()
+    with pytest.raises(WebError):
+        extract(
+            data,
+            Company("syn-a", NAME, "register", {}),
+            receipt(data),
+            selectors=SELECTION,
+            selectors_reviewed=True,
+        )
+
 
 def access_for(tmp_path, value, sent, content):
     tick = [0.0]
