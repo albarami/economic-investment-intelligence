@@ -477,3 +477,33 @@ def test_second_release_propagates_and_receipt_date_mismatch_refuses(
     }
     with pytest.raises(PlacesFsqError, match=r"^source_release$"):
         build_places(**mismatched)
+
+
+@pytest.mark.parametrize(
+    "root",
+    [
+        (
+            "SYN:ListBucketResult",
+            ' xmlns:SYN="https://invented.invalid/SYN-namespace"'
+            ' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"',
+        ),
+        ("ListAllMyBucketsResult", ' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"'),
+    ],
+    ids=["plant-root-namespace-only", "plant-root-name-only"],
+)
+def test_plant_root_alone_wrong_with_s3_children_is_refused(
+    root: tuple[str, str],
+) -> None:
+    """Only the root guard refuses: every child stays in the S3 namespace."""
+    tag, declarations = root
+    body = (
+        listing(f"{_NEW}/")
+        .replace(
+            b'<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            f"<{tag}{declarations}>".encode(),
+        )
+        .replace(b"</ListBucketResult>", f"</{tag}>".encode())
+    )
+    assert f"<{tag}".encode() in body
+    with pytest.raises(PlacesFsqError, match=r"^release_listing$"):
+        select_release(body)

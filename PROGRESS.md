@@ -42762,3 +42762,13 @@ S2-LR5 needs another maker's review and the lead's seeded live build on the patc
 with selected release, listing hash and metadata receipt recorded before closing
 the live-run defect. Muhasabah: PASS for the bounded patch, sourced statements and
 reported checks; independent review and live confirmation remain the lead's work.
+
+### S2-LR5 — lens B finding F1: a plant that only the root guard refuses (2026-11-20)
+
+- Finding (lens B, review of 9a3b97fd): the namespace plant changed the namespace of every element, so it was refused by
+  the child lookups as well and did not decide the root-tag guard of `releases.py`.
+- Fix (test only, by the lead): `test_plant_root_alone_wrong_with_s3_children_is_refused`, two cases, a root in another
+  namespace and a root of another name, each with every child left in the S3 namespace.
+- Red then green: with the root-tag check removed in a disposable copy, the two cases fail (2 failed, 59 passed); on
+  this head, `uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py custodian/tests/test_places_fsq.py -q -p no:cacheprovider`
+  gives 84 passed, exit 0; ruff check and ruff format --check clean.
