@@ -1,12 +1,5 @@
 # Hand list of landmark building heights (S2-T20, decision 0064 item 25).
-# Each height cites its public page, publisher and retrieval date.
+# Each height cites its public page, publisher and retrieval date when present.
 version: 1
-entries:
-  - landmark_id: SYN-LM-0001
-    building_id: SYN-B-LM01
-    name_en: SYN showcase tower
-    height_m: "200.00"
-    citation:
-      page_url: "https://syn-heights.invalid/SYN/landmark-page"
-      publisher: "SYN-publisher"
-      retrieved_on: "2026-11-14"
+pending: basemap_building_ids_unconfirmed
+entries: []

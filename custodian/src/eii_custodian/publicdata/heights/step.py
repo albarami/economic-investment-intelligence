@@ -21,7 +21,6 @@ from eii_core.calc.building_heights import (
 )
 from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
-from eii_custodian.publicdata.fetch.report import skip_line
 
 from .calibration import gba_calibration
 from .landmarks import apply_landmark_heights, load_landmark_heights
@@ -140,16 +139,15 @@ def build_heights(
     *,
     terms_attempts: tuple[dict[str, object], ...] = (),
 ) -> None:
-    """Run the heights step: skip on an absent table, refuse on a bad input.
+    """Run the heights step; refuse on a bad input or a missing building table.
 
     The step's own earlier outputs are removed before anything is read, so a
-    later skip or refusal never leaves an old heights file behind.
+    later refusal never leaves an old heights file behind.
     """
     for name in (HEIGHTS_FILE, MANIFEST_FILE):
         (out_dir / name).unlink(missing_ok=True)
     if not buildings_path.is_file():
-        lines.append(skip_line("heights", "building_table_absent"))
-        return
+        raise HeightError("building_table_absent")
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
     buildings, landmark_citations = apply_landmark_heights(
         load_buildings(buildings_path), load_landmark_heights()

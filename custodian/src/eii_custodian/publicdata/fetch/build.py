@@ -1427,7 +1427,8 @@ def _heights(
     lines: list[str],
     terms_attempts: list[dict[str, object]],
 ) -> FetchFailure | None:
-    """Run the heights step after the stage; a missing table only skips (B10)."""
+    """Run the heights step after the stage; a missing table refuses."""
+    from eii_custodian.publicdata.heights.model import HEIGHTS_FILE, MANIFEST_FILE
     from eii_custodian.publicdata.heights.step import (
         BUILDINGS_RELATIVE,
         HEIGHTS_RELATIVE,
@@ -1436,12 +1437,13 @@ def _heights(
     )
 
     root = cache.parent
+    out_dir = root / HEIGHTS_RELATIVE
     try:
         build_heights(
             cache,
             entries,
             root / BUILDINGS_RELATIVE,
-            root / HEIGHTS_RELATIVE,
+            out_dir,
             lines,
             terms_attempts=tuple(terms_attempts),
         )
@@ -1457,6 +1459,27 @@ def _heights(
         )
         return FetchFailure(
             1, "heights", "", error.name, "valid height inputs", error.name
+        )
+    if (
+        not (out_dir / HEIGHTS_FILE).is_file()
+        or not (out_dir / MANIFEST_FILE).is_file()
+    ):
+        lines.append(
+            fail_line(
+                "heights",
+                "",
+                "heights_output_absent",
+                "heights output files",
+                "heights_output_absent",
+            )
+        )
+        return FetchFailure(
+            1,
+            "heights",
+            "",
+            "heights_output_absent",
+            "heights output files",
+            "heights_output_absent",
         )
     return None
 

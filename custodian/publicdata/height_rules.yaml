@@ -27,9 +27,9 @@ sources:
     dtype: "int16"
     class_field: ""
   bldg_gba:
-    format: "shapefile_zip"
-    field: "Height"
-    class_field: "SYN_class"
+    format: "to be confirmed"
+    field: "to be confirmed"
+    class_field: "to be confirmed"
     unit: "m"
     nodata: ""
     crs: "EPSG:4326"

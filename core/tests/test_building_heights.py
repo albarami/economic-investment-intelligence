@@ -18,6 +18,7 @@ from eii_core.calc.building_heights import (
     ORDER_EXHAUSTED,
     HeightChoice,
     choose_height,
+    error_from_pairs,
     errors_by_class,
     fallback_errors,
     floor_height,
@@ -130,6 +131,27 @@ def test_fallback_errors_come_from_the_candidate_rows_not_the_chosen_height():
     assert wsf3d.mean_signed == Decimal(-10)
     assert wsf3d.mean_absolute == Decimal(10)
     assert wsf3d.median_absolute == Decimal(10)
+
+
+def test_errors_by_class_refuses_an_empty_class_name() -> None:
+    with pytest.raises(ValueError, match="class name required"):
+        errors_by_class([(Decimal("1"), Decimal("2"), "")])
+
+
+def test_error_from_pairs_matches_fallback_errors_for_one_source() -> None:
+    rows = _rows()
+    pairs = []
+    for candidates in rows.values():
+        raw = candidates.get("3dglobfp")
+        recorded = candidates.get("recorded")
+        if raw is not None and recorded is not None:
+            from eii_core.calc.building_heights import height_value
+
+            usable = height_value(raw)
+            recorded_usable = height_value(recorded)
+            if usable is not None and recorded_usable is not None:
+                pairs.append((usable, recorded_usable))
+    assert error_from_pairs(pairs) == fallback_errors(rows.values())["3dglobfp"]
 
 
 def test_errors_by_class_splits_one_fallbacks_pairs_by_class_name():

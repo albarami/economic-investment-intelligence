@@ -701,18 +701,27 @@ class Production:
         # The existing asset convention is relative to the data directory.
         building = local(self.cache.parent, BUILDINGS_RELATIVE)
         output = local(self.cache.parent, HEIGHTS_RELATIVE)
-        build_heights(
-            self.cache,
-            self.entries,
-            building,
-            output,
-            self.lines,
-            terms_attempts=tuple(self.fetched.terms_attempts) if self.fetched else (),
-        )
-        if not building.is_file():
-            return self.record(
-                "heights", {"state": "NO_DATA", "reason": "building_table_absent"}
+        from .heights.step import HeightError
+
+        try:
+            build_heights(
+                self.cache,
+                self.entries,
+                building,
+                output,
+                self.lines,
+                terms_attempts=tuple(self.fetched.terms_attempts)
+                if self.fetched
+                else (),
             )
+        except HeightError as error:
+            if error.name == "building_table_absent":
+                return self.record(
+                    "heights", {"state": "NO_DATA", "reason": "building_table_absent"}
+                )
+            raise
+        if not building.is_file():
+            raise AssemblyError("assembly_heights_incomplete")
         paths = {
             name: file_hash(output / name) for name in (HEIGHTS_FILE, MANIFEST_FILE)
         }

@@ -40,6 +40,7 @@ from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.heights.landmarks import (
+    LANDMARK_FIXTURE_PATH,
     LANDMARK_HEIGHTS_PATH,
     apply_landmark_heights,
     load_landmark_heights,
@@ -116,6 +117,23 @@ def _card_setup(tmp_path):
         invented.rules_file(tmp_path / "rules.yaml"),
     )
     return out_dir, lines
+
+
+def _ensure_building_table(cache: Path) -> Path:
+    """Write a minimal building table beside the public cache."""
+    buildings = cache.parent / "assets" / "buildings" / "buildings.geojson"
+    buildings.parent.mkdir(parents=True, exist_ok=True)
+    if not buildings.is_file():
+        buildings.write_bytes(
+            invented.buildings_bytes(
+                [
+                    invented.building_feature(
+                        "SYN-B-0001", invented.square(0, 0, 1), None, None
+                    )
+                ]
+            )
+        )
+    return buildings
 
 
 def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:
@@ -256,19 +274,19 @@ def test_the_manifest_files_list_carries_hashes_and_receipt_terms(
     assert globfp["terms_read_on"] == "2026-11-14"
 
 
-def test_an_absent_building_table_is_a_skip_line_not_a_failure(
+def test_an_absent_building_table_refuses_the_heights_step(
     tmp_path: Path,
 ) -> None:
-    """B10: the absent table adds one SKIP line and changes no exit code."""
+    """Decision 0064 item 25: a missing building table refuses the heights step."""
     lines: list[str] = []
-    build_heights(
-        tmp_path / "cache",
-        (),
-        tmp_path / "data" / "assets" / "buildings" / "buildings.geojson",
-        tmp_path / "out",
-        lines,
-    )
-    assert lines == ["SKIP heights building_table_absent"]
+    with pytest.raises(HeightError, match="building_table_absent"):
+        build_heights(
+            tmp_path / "cache",
+            (),
+            tmp_path / "data" / "assets" / "buildings" / "buildings.geojson",
+            tmp_path / "out",
+            lines,
+        )
     assert not (tmp_path / "out").exists()
 
 
@@ -385,9 +403,9 @@ def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
     assert wsf.crs == "EPSG:4326"
     assert wsf.dtype == "int16"
     gba = rules.structures["bldg_gba"]
-    assert gba.format == "shapefile_zip"
-    assert gba.field == "Height"
-    assert gba.class_field == "SYN_class"
+    assert gba.format == "to be confirmed"
+    assert gba.field == "to be confirmed"
+    assert gba.class_field == "to be confirmed"
     assert gba.unit == "m"
     assert gba.crs == "EPSG:4326"
 
@@ -707,8 +725,13 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
         if entry.source_id == "bldg_gba":
             assert entry.licence_id == "CC-BY-NC-4.0"
             assert entry.fetch_host == "data.source.coop"
-            assert entry.terms_read_on == "2026-11-14"
+            assert entry.terms_read_on == "2026-11-20"
             assert entry.terms_words
+            assert (
+                entry.publisher
+                == "Technical University of Munich (GlobalBuildingAtlas)"
+            )
+            assert entry.skip_reason == "direct_url_unconfirmed"
         else:
             assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
@@ -717,7 +740,8 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
         assert entry.kind == "https_file"
         assert entry.commit_allowed is False
         assert entry.nightly_live_fetch is False
-        assert entry.skip_reason == ""
+        if entry.source_id != "bldg_gba":
+            assert entry.skip_reason == ""
         assert entry.row_count_min is None
         assert entry.row_count_max is None
         assert entry.terms_watch is False
@@ -806,6 +830,7 @@ def test_non_commercial_terms_never_block_the_source(
     cache = tmp_path / "data" / "public_cache"
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(wsf))
+    _ensure_building_table(cache)
     outcome = run_build((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / "bldg_wsf3d").glob("*.meta.json"))
@@ -843,20 +868,32 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
         invented.entry("bldg_wsf3d", extension="tif"),
     ]
     seen: list[str] = []
+    bodies = {
+        rows[0].url: invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+        rows[1].url: invented.wsf_bytes(tmp_path / "w.tif", [[180]], 1, 1),
+    }
+    selections = {
+        entry.key: sha256_hex(body) for entry in rows for body in [bodies[entry.url]]
+    }
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.read.reviewed_selections",
+        lambda _cache: selections,
+    )
 
     def transport(url: str) -> Response:
         seen.append(url)
-        return Response(final_url=url, body=b"invented-bytes", hops=())
+        return Response(final_url=url, body=bodies[url], hops=())
 
     cache = tmp_path / "data" / "public_cache"
+    _ensure_building_table(cache)
     outcome = run_build(tuple(rows), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert seen == [entry.url for entry in rows]
-    assert "SKIP heights building_table_absent" in outcome.lines
+    assert any("PASS heights" in line for line in outcome.lines)
     for entry in rows:
-        digest = sha256_hex(b"invented-bytes")
+        digest = selections[entry.key]
         stored_body = cache / entry.key / f"{digest}.{entry.extension}"
-        assert stored_body.read_bytes() == b"invented-bytes"
+        assert stored_body.read_bytes() == bodies[entry.url]
         receipt_path = cache / entry.key / f"{digest}.meta.json"
         receipt = json.loads(receipt_path.read_text())
         assert receipt["switched_off"] is False
@@ -1086,16 +1123,17 @@ def test_an_off_list_host_is_refused_before_the_transport(
     assert outcome.failure.check == "blocked_host"
 
 
-def test_run_build_skips_heights_on_an_absent_table(tmp_path: Path) -> None:
-    """B10: the absent table gives one SKIP line and no failure."""
+def test_run_build_refuses_heights_on_an_absent_table(tmp_path: Path) -> None:
+    """A missing building table refuses the build-public heights step."""
     cache = tmp_path / "data" / "public_cache"
 
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
     outcome = run_build((), transport, cache, _clock, _sleep)
-    assert outcome.failure is None
-    assert outcome.lines.count("SKIP heights building_table_absent") == 1
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
+    assert outcome.lines.count("SKIP heights building_table_absent") == 0
 
 
 def test_build_public_requires_assembly_pins_before_the_height_phase(
@@ -1542,20 +1580,20 @@ def test_every_registry_row_of_a_source_is_named_in_the_manifest(
     assert _rows(out_dir)[0]["height_source"] == "3dglobfp"
 
 
-def test_a_skip_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
-    """V4: after a good run, a later SKIP leaves no heights file behind."""
+def test_a_missing_table_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
+    """V4: after a good run, a later refusal leaves no heights file behind."""
     out_dir, _ = _card_setup(tmp_path)
     assert (out_dir / "heights.json").is_file()
     assert (out_dir / "manifest.heights.json").is_file()
     lines: list[str] = []
-    build_heights(
-        tmp_path / "cache",
-        (),
-        tmp_path / "absent.geojson",
-        out_dir,
-        lines,
-    )
-    assert lines == ["SKIP heights building_table_absent"]
+    with pytest.raises(HeightError, match="building_table_absent"):
+        build_heights(
+            tmp_path / "cache",
+            (),
+            tmp_path / "absent.geojson",
+            out_dir,
+            lines,
+        )
     assert not (out_dir / "heights.json").exists()
     assert not (out_dir / "manifest.heights.json").exists()
 
@@ -2704,21 +2742,33 @@ def test_the_height_hosts_join_the_allow_list() -> None:
     ).ok
 
 
-def test_the_committed_landmark_hand_list_carries_a_citation() -> None:
-    """Decision 0064 item 25: each landmark height cites page, publisher and date."""
+def test_the_committed_landmark_hand_list_is_pending_without_entries() -> None:
+    """Production hand list stays empty until basemap building ids are confirmed."""
     rows = load_landmark_heights(LANDMARK_HEIGHTS_PATH)
-    assert len(rows) == 1
-    row = rows[0]
+    assert rows == ()
+    document = yaml.safe_load(LANDMARK_HEIGHTS_PATH.read_text(encoding="utf-8"))
+    assert document["pending"] == "basemap_building_ids_unconfirmed"
+    assert document["entries"] == []
+
+
+def test_the_fixture_landmark_hand_list_carries_a_full_citation() -> None:
+    """Tests load the invented hand list from its fixture, not production."""
+    row = load_landmark_heights(LANDMARK_FIXTURE_PATH)[0]
     assert row.building_id == "SYN-B-LM01"
     assert row.citation.page_url.startswith("https://")
-    assert row.citation.publisher == "SYN-publisher"
-    assert row.citation.retrieved_on == "2026-11-14"
+    assert len(row.citation.page_sha256) == 64
+    assert row.citation.height_excerpt
 
 
 def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The hand list sets recorded height; the manifest keeps the citation."""
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_landmark_heights",
+        lambda: load_landmark_heights(LANDMARK_FIXTURE_PATH),
+    )
     buildings_path = tmp_path / "buildings.geojson"
     buildings_path.write_bytes(
         invented.buildings_bytes(
@@ -2776,7 +2826,7 @@ def test_a_landmark_recorded_conflict_is_refused(tmp_path: Path) -> None:
     )
     buildings = load_buildings(path)
     with pytest.raises(HeightError, match="landmark_height_conflict"):
-        apply_landmark_heights(buildings, load_landmark_heights())
+        apply_landmark_heights(buildings, load_landmark_heights(LANDMARK_FIXTURE_PATH))
 
 
 def test_gba_fetches_through_the_allow_list(tmp_path: Path) -> None:
@@ -2873,10 +2923,10 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     assert any("PASS heights" in line for line in lines)
 
 
-def test_a_planted_skip_on_gba_does_not_skip_the_heights_step(
+def test_a_planted_skip_on_gba_still_runs_the_heights_step(
     tmp_path: Path,
 ) -> None:
-    """A skipped GBA row is absent; the step still passes when the table is present."""
+    """A skipped GBA row is absent; the heights step still passes with the table."""
     buildings_path = tmp_path / "buildings.geojson"
     buildings_path.write_bytes(
         invented.buildings_bytes(
@@ -2919,6 +2969,122 @@ def test_a_planted_skip_on_gba_does_not_skip_the_heights_step(
     )
     assert any("PASS heights" in line for line in lines)
     assert not any(line.startswith("SKIP heights") for line in lines)
+
+
+def _landmark_document(**overrides) -> dict:
+    base = yaml.safe_load(LANDMARK_FIXTURE_PATH.read_text(encoding="utf-8"))
+    base.update(overrides)
+    return base
+
+
+def test_a_landmark_height_of_nan_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["height_m"] = "NaN"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_height"):
+        load_landmark_heights(path)
+
+
+def test_a_landmark_height_of_infinity_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["height_m"] = "Infinity"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_height"):
+        load_landmark_heights(path)
+
+
+def test_a_landmark_height_that_rounds_to_zero_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["height_m"] = "0.001"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_height"):
+        load_landmark_heights(path)
+
+
+def test_duplicate_landmark_building_ids_refuse_in_both_orders(tmp_path: Path) -> None:
+    """Conflicting rows refuse before a dictionary lookup can hide them."""
+    base = _landmark_document()["entries"][0]
+    second = dict(base, landmark_id="SYN-LM-0002", height_m="150.00")
+    for entries in ([base, second], [second, base]):
+        path = tmp_path / "dup.yaml"
+        path.write_text(
+            yaml.safe_dump({"version": 1, "entries": entries}, sort_keys=False),
+            encoding="utf-8",
+        )
+        with pytest.raises(HeightError, match="landmark_heights_duplicate"):
+            load_landmark_heights(path)
+
+
+def test_a_fictitious_landmark_publisher_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["citation"]["publisher"] = "SYN-publisher"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_citation"):
+        load_landmark_heights(path)
+
+
+def test_a_planted_omitted_heights_step_refuses_the_build(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A heights step that writes no output refuses the public build."""
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr("eii_custodian.publicdata.heights.step.build_heights", noop)
+    cache = tmp_path / "data" / "public_cache"
+    _ensure_building_table(cache)
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build((), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "heights_output_absent"
+
+
+def test_gba_calibration_drops_subprecision_values(tmp_path: Path) -> None:
+    """GBA and recorded sides use the same usable-height rule before pairing."""
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+    from eii_custodian.publicdata.heights.read import SourceResult
+
+    buildings_path = tmp_path / "one.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-G03", invented.square(0, 0, 1), 100, None
+                )
+            ]
+        )
+    )
+    building = load_buildings(buildings_path)[0]
+    result = SourceResult(
+        source_id="bldg_gba",
+        state="read",
+        reason="",
+        globfp=(),
+        gba=(
+            (
+                "SYN.shp",
+                ((building.geometry, Decimal("0.001"), "tower"),),
+            ),
+        ),
+        wsf=(),
+        files=(),
+        rows=(),
+        terms_read_on="2026-11-14",
+        terms_words="invented",
+        retrieved_utc="2026-11-14T00:00:00Z",
+    )
+    block = gba_calibration([building], result)
+    assert block["overall"]["count"] == 0
+    assert block["overall"]["reason"] == "no_pairs"
 
 
 def test_the_writer_refusal_output_row_is_planted() -> None:

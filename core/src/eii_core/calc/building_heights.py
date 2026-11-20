@@ -182,6 +182,30 @@ def largest_overlap(
         return min(rows, key=lambda item: (-item[0], item[1], item[2]))
 
 
+def error_from_pairs(pairs: Iterable[tuple[Decimal, Decimal]]) -> FallbackError:
+    """Signed and absolute error statistics for one list of fallback pairs."""
+    found = list(pairs)
+    if not found:
+        return FallbackError(0, None, None, None, NO_PAIRS)
+    with localcontext(CALC_CONTEXT):
+        errors = [fallback - recorded for fallback, recorded in found]
+        absolutes = sorted(abs(error) for error in errors)
+        total = len(errors)
+        middle = total // 2
+        median = (
+            absolutes[middle]
+            if total % 2
+            else (absolutes[middle - 1] + absolutes[middle]) / 2
+        )
+        return FallbackError(
+            total,
+            metres(sum(errors, ZERO) / total),
+            metres(sum(absolutes, ZERO) / total),
+            metres(median),
+            "",
+        )
+
+
 def fallback_errors(
     rows: Iterable[Mapping[str, Decimal | None]],
 ) -> dict[str, FallbackError]:
@@ -208,30 +232,7 @@ def fallback_errors(
                 usable = height_value(raw)
                 if usable is not None:
                     pairs[name].append((usable, recorded_height))
-    result: dict[str, FallbackError] = {}
-    with localcontext(CALC_CONTEXT):
-        for name in FALLBACKS:
-            found = pairs[name]
-            if not found:
-                result[name] = FallbackError(0, None, None, None, NO_PAIRS)
-                continue
-            errors = [fallback - recorded for fallback, recorded in found]
-            absolutes = sorted(abs(error) for error in errors)
-            total = len(errors)
-            middle = total // 2
-            median = (
-                absolutes[middle]
-                if total % 2
-                else (absolutes[middle - 1] + absolutes[middle]) / 2
-            )
-            result[name] = FallbackError(
-                total,
-                metres(sum(errors, ZERO) / total),
-                metres(sum(absolutes, ZERO) / total),
-                metres(median),
-                "",
-            )
-    return result
+    return {name: error_from_pairs(pairs[name]) for name in FALLBACKS}
 
 
 def errors_by_class(
@@ -243,27 +244,10 @@ def errors_by_class(
         if not class_name:
             raise ValueError("class name required")
         grouped.setdefault(class_name, []).append((fallback, recorded))
-    result: dict[str, FallbackError] = {}
-    with localcontext(CALC_CONTEXT):
-        for class_name in sorted(grouped):
-            found = grouped[class_name]
-            errors = [fallback - recorded for fallback, recorded in found]
-            absolutes = sorted(abs(error) for error in errors)
-            total = len(errors)
-            middle = total // 2
-            median = (
-                absolutes[middle]
-                if total % 2
-                else (absolutes[middle - 1] + absolutes[middle]) / 2
-            )
-            result[class_name] = FallbackError(
-                total,
-                metres(sum(errors, ZERO) / total),
-                metres(sum(absolutes, ZERO) / total),
-                metres(median),
-                "",
-            )
-    return result
+    return {
+        class_name: error_from_pairs(grouped[class_name])
+        for class_name in sorted(grouped)
+    }
 
 
 def height_counts(

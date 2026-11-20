@@ -12007,17 +12007,17 @@ sources:
     source_id: "bldg_gba"
     slug: ""
     kind: "https_file"
-    title_en: "GlobalBuildingAtlas height tiles (open global building-height dataset)"
-    publisher: "SYN-publisher"
+    title_en: "GlobalBuildingAtlas LoD1 building footprints and heights (calibration only)"
+    publisher: "Technical University of Munich (GlobalBuildingAtlas)"
     licence_id: "CC-BY-NC-4.0"
     licence_basis: "dataset"
     decision_record: ""
     fetch_host: "data.source.coop"
-    url: "https://data.source.coop/fused/global-building-atlas/SYN-qatar-height.zip"
-    terms_url: "https://data.source.coop/fused/global-building-atlas/README.md"
-    terms_words: "\"CC BY-NC 4.0\" recorded for calibration only; not in the PUB-106 height order pending owner decision (OI-310)."
-    terms_read_on: "2026-11-14"
-    landing_url: "https://data.source.coop/fused/global-building-atlas/"
+    url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
+    terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
+    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
+    terms_read_on: "2026-11-20"
+    landing_url: "https://github.com/zhu-xlab/GlobalBuildingAtlas/"
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -12027,7 +12027,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: ""
+    skip_reason: "direct_url_unconfirmed"
     extension: "zip"
 
   - key: "cepii_baci"

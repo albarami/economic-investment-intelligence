@@ -8,7 +8,24 @@ from pathlib import Path
 
 import yaml
 
+from eii_core.calc.building_heights import height_value
+
 from .model import Building, HeightError
+
+_PENDING = "basemap_building_ids_unconfirmed"
+_CITATION_KEYS = frozenset(
+    {
+        "page_url",
+        "publisher",
+        "retrieved_on",
+        "licence_basis",
+        "page_sha256",
+        "height_excerpt",
+    }
+)
+_ENTRY_KEYS = frozenset(
+    {"landmark_id", "building_id", "name_en", "height_m", "citation"}
+)
 
 
 @dataclass(frozen=True)
@@ -18,6 +35,9 @@ class LandmarkCitation:
     page_url: str
     publisher: str
     retrieved_on: str
+    licence_basis: str
+    page_sha256: str
+    height_excerpt: str
 
 
 @dataclass(frozen=True)
@@ -37,10 +57,17 @@ LANDMARK_HEIGHTS_PATH = (
     / "review"
     / "landmark_heights.yaml"
 )
-_CITATION_KEYS = frozenset({"page_url", "publisher", "retrieved_on"})
-_ENTRY_KEYS = frozenset(
-    {"landmark_id", "building_id", "name_en", "height_m", "citation"}
+LANDMARK_FIXTURE_PATH = (
+    Path(__file__).resolve().parents[4]
+    / "tests"
+    / "fixtures"
+    / "heights"
+    / "landmark_hand_list.yaml"
 )
+
+
+def _valid_sha256(text: str) -> bool:
+    return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
 
 
 def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...]:
@@ -53,8 +80,17 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
     if not isinstance(document, dict) or document.get("version") != 1:
         raise HeightError("landmark_heights")
     entries = document.get("entries")
-    if not isinstance(entries, list) or not entries:
+    if not isinstance(entries, list):
         raise HeightError("landmark_heights")
+    pending = document.get("pending", "")
+    if not entries:
+        if pending != _PENDING:
+            raise HeightError("landmark_heights")
+        return ()
+    if pending:
+        raise HeightError("landmark_heights_entry")
+    seen_buildings: set[str] = set()
+    seen_landmarks: set[str] = set()
     rows: list[LandmarkHeight] = []
     for entry in entries:
         if not isinstance(entry, dict) or set(entry) != _ENTRY_KEYS:
@@ -66,10 +102,20 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
             text = entry[field]
             if not isinstance(text, str) or not text.strip():
                 raise HeightError("landmark_heights_entry")
+        if entry["landmark_id"] in seen_landmarks:
+            raise HeightError("landmark_heights_duplicate")
+        if entry["building_id"] in seen_buildings:
+            raise HeightError("landmark_heights_duplicate")
+        seen_landmarks.add(entry["landmark_id"])
+        seen_buildings.add(entry["building_id"])
         for field in _CITATION_KEYS:
             text = citation[field]
             if not isinstance(text, str) or not text.strip():
                 raise HeightError("landmark_heights_citation")
+        if citation["publisher"].startswith("SYN-"):
+            raise HeightError("landmark_heights_citation")
+        if not _valid_sha256(citation["page_sha256"]):
+            raise HeightError("landmark_heights_citation")
         height_text = entry["height_m"]
         if not isinstance(height_text, str):
             raise HeightError("landmark_heights_height")
@@ -77,7 +123,7 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
             height = Decimal(height_text)
         except ArithmeticError:
             raise HeightError("landmark_heights_height") from None
-        if height <= 0:
+        if height_value(height) is None:
             raise HeightError("landmark_heights_height")
         rows.append(
             LandmarkHeight(
@@ -89,6 +135,9 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
                     page_url=citation["page_url"],
                     publisher=citation["publisher"],
                     retrieved_on=citation["retrieved_on"],
+                    licence_basis=citation["licence_basis"],
+                    page_sha256=citation["page_sha256"],
+                    height_excerpt=citation["height_excerpt"],
                 ),
             )
         )
@@ -121,6 +170,9 @@ def apply_landmark_heights(
                     "page_url": row.citation.page_url,
                     "publisher": row.citation.publisher,
                     "retrieved_on": row.citation.retrieved_on,
+                    "licence_basis": row.citation.licence_basis,
+                    "page_sha256": row.citation.page_sha256,
+                    "height_excerpt": row.citation.height_excerpt,
                 },
             }
         )
@@ -128,6 +180,7 @@ def apply_landmark_heights(
 
 
 __all__ = [
+    "LANDMARK_FIXTURE_PATH",
     "LANDMARK_HEIGHTS_PATH",
     "LandmarkCitation",
     "LandmarkHeight",

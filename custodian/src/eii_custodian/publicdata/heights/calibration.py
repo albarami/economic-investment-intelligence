@@ -2,17 +2,15 @@
 
 from __future__ import annotations
 
-from decimal import Decimal, localcontext
+from decimal import Decimal
 
 from eii_core.calc.building_heights import (
-    NO_PAIRS,
     FallbackError,
+    error_from_pairs,
     errors_by_class,
     height_value,
     largest_overlap,
-    metres,
 )
-from eii_core.calc.public_series import CALC_CONTEXT, ZERO
 
 from .match import globfp_candidates, globfp_index, representative_point
 from .model import Building
@@ -33,28 +31,6 @@ def _error_block(error: FallbackError) -> dict[str, object]:
         ),
         "reason": error.reason,
     }
-
-
-def _pair_error(pairs: list[tuple[Decimal, Decimal]]) -> FallbackError:
-    if not pairs:
-        return FallbackError(0, None, None, None, NO_PAIRS)
-    with localcontext(CALC_CONTEXT):
-        errors = [fallback - recorded for fallback, recorded in pairs]
-        absolutes = sorted(abs(error) for error in errors)
-        total = len(errors)
-        middle = total // 2
-        median = (
-            absolutes[middle]
-            if total % 2
-            else (absolutes[middle - 1] + absolutes[middle]) / 2
-        )
-        return FallbackError(
-            total,
-            metres(sum(errors, ZERO) / total),
-            metres(sum(absolutes, ZERO) / total),
-            metres(median),
-            "",
-        )
 
 
 def _class_name(
@@ -99,7 +75,9 @@ def gba_calibration(
         winner = largest_overlap(matches)
         if winner is None:
             continue
-        gba_height = winner[-1]
+        gba_height = height_value(winner[-1])
+        if gba_height is None:
+            continue
         class_name = _class_name(result.gba, winner[1], winner[2])
         pairs.append((gba_height, recorded_height))
         class_pairs.append((gba_height, recorded_height, class_name))
@@ -107,7 +85,7 @@ def gba_calibration(
         "state": "measured",
         "reason": "",
         "order_status": "pending_owner_decision",
-        "overall": _error_block(_pair_error(pairs)),
+        "overall": _error_block(error_from_pairs(pairs)),
         "by_class": {
             name: _error_block(error)
             for name, error in sorted(errors_by_class(class_pairs).items())
