@@ -12035,20 +12035,20 @@ sources:
     source_id: "cepii_baci"
     slug: ""
     kind: "https_file"
-    title_en: "BACI bilateral trade (unverified source lead)"
+    title_en: "BACI bilateral trade (HS 2017, release 202601)"
     publisher: "CEPII"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    licence_url: ""
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-16"
+    licence_id: "Etalab-2.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.etalab.gouv.fr/licence-ouverte-open-licence/"
+    decision_record: ""
+    fetch_host: "www.cepii.fr"
+    url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip"
+    terms_url: "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
+    terms_words: "Licence: Etalab 2.0"
+    terms_read_on: "2026-11-20"
     terms_watch: false
-    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#cepii_baci. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). Dataset page exceeded the fixed metadata intake ceiling; no complete page hash or page statement is asserted. Alternative dataset/documentation paths returned HTTP 404. Publisher version, Etalab lead, HS revision, units, reconciliation, access and exact bounds remain unverified."
-    landing_url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html"
+    basis_note: "Lead publisher-page reading of 2026-11-20, recorded in document 04 S2-T21 part B terms readings; page SHA-256 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60. HS 2017, release 202601, period 2017-2024. Native columns and row counts remain pending: the supplied page states neither headers nor counts; period_field is empty until the header is read. Fetch remains baci_metadata_unconfirmed because the BACI loader requires declared columns and confirmed archive configuration, including member inventory, reviewed URLs and count/byte bounds; baci.yaml is still unconfirmed. No BACI host is admitted yet."
+    landing_url: "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
@@ -12057,12 +12057,12 @@ sources:
     columns: []
     row_count_min: null
     row_count_max: null
-    period_first: ""
-    period_last: ""
-    period_field: "year"
+    period_first: "2017"
+    period_last: "2024"
+    period_field: ""
     reconciliation: "open"
     skip_reason: "baci_metadata_unconfirmed"
-    extension: "bin"
+    extension: "zip"
   - key: "cepii_gravity"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cepii_gravity"

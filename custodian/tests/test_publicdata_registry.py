@@ -978,7 +978,8 @@ def test_registry_counts_follow_decision_0026() -> None:
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
-    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2
+    # S2-P29 round B: the publisher confirms BACI's dataset licence.
+    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1
     assert {
         entry.key
         for entry in entries
@@ -1126,14 +1127,35 @@ def test_cache_path_is_gitignored(tmp_path: Path) -> None:
 
 
 def test_baci_registry_pending_and_nightly_policy() -> None:
-    """BACI stays eligible; citation-only metadata is not a live fetch exclusion."""
+    """BACI's page is read; archive metadata remains pending and nightly eligible."""
     from dataclasses import replace
 
     entries = load_registry()
     baci = next(entry for entry in entries if entry.source_id == "cepii_baci")
     assert baci.skip_reason == "baci_metadata_unconfirmed"
     assert baci.commit_allowed is False
-    assert baci.url == ""
+    assert baci.url == (
+        "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip"
+    )
+    assert baci.fetch_host == "www.cepii.fr"
+    page = "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
+    assert baci.landing_url == baci.terms_url == page
+    assert baci.title_en == "BACI bilateral trade (HS 2017, release 202601)"
+    assert baci.licence_id == "Etalab-2.0"
+    assert baci.licence_basis == "dataset"
+    assert baci.licence_url == (
+        "https://www.etalab.gouv.fr/licence-ouverte-open-licence/"
+    )
+    assert baci.decision_record == ""
+    assert baci.terms_words == "Licence: Etalab 2.0"
+    assert baci.terms_read_on == "2026-11-20"
+    assert baci.extension == "zip"
+    assert (baci.period_first, baci.period_last) == ("2017", "2024")
+    # The page supplies no header, native year-column name or row counts.
+    assert baci.columns == ()
+    assert baci.row_count_min is baci.row_count_max is None
+    assert baci.period_field == ""
+    assert "columns and row counts remain pending" in baci.basis_note
     assert nightly_blocked([replace(baci, skip_reason="")], ("cepii_baci",)) == ()
 
     def exclusions(rows):

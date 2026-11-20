@@ -466,16 +466,24 @@ This does not add a source or change the frame geometry of PUB-24.
 
 #### BACI pending identity and coverage (S2-T24)
 
-`cepii_baci` identifies the CEPII BACI lead of decision 0040. Its placeholder
-registry row has `baci_metadata_unconfirmed`, `commit_allowed: false` and
-`nightly_live_fetch: true`. The pending record was checked on 2026-11-16; the
-publisher page, version, licence words, Etalab lead, access state, HS revision,
-units, full year coverage and reporter reconciliation are NOT READ. This date
-is not page-reading evidence. Terms remain `terms to be read` on basis
-`owner_decision`, decision 0026. No BACI host is admitted under PUB-03 yet.
+`cepii_baci` identifies CEPII BACI. The lead's publisher-page reading of
+2026-11-20 confirms the selected HS 2017 edition, release 202601, with published
+period 2017-2024 and the exact words "Licence: Etalab 2.0". The registry records
+that dataset licence, its official licence URL and the selected ZIP URL,
+`https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip`.
+The page URL, reading date and supplied page SHA-256 are recorded in section 4,
+"S2-T21 part B terms readings"; this is a page hash, never an archive receipt.
+Native headers, row counts, member inventory, units and complete configuration
+remain pending; no columns or native period-field name are inferred from the page.
+The registry retains `baci_metadata_unconfirmed`, `commit_allowed: false` and
+`nightly_live_fetch: true`: the BACI fetcher requires declared columns and a
+confirmed `baci.yaml` with reviewed URLs, member inventory and byte/count bounds.
+No BACI host is admitted under PUB-03 yet. The fetch remains blocked for those
+technical reasons, and trade input 4 remains `pending_fetch: true` with no hash.
 The future source keeps its own bilateral series; Qatar exporter-or-importer
 selection does not replace or average portal or Comtrade figures. Missing
-coverage stays explicit. Exact attribution awaits the lead's page reading.
+coverage stays explicit. Archive attribution and activation await the lead's
+complete file-header and configuration review; this round performs no fetch.
 
 #### Gravity pending identity and coverage (S2-T25)
 
@@ -594,12 +602,12 @@ are unchanged; OI-309, PO-S2-79 and PO-S2-80 remain open.
 
 [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. Pending registry rows for the named trade sources do not confirm that a file is held or that a page was read. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
 
-Historical leads recorded for decision 0040; current readings are in **Publisher metadata readings (S2-P18)** above. The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Pending registry rows for `cepii_baci`, `cepii_gravity` and `atlas_complexity` record that planned identity only. They do not confirm a page lead, a licence, a version or a host. The addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL. S2-T23 adds the `un_comtrade` registry row with metadata unconfirmed; `wb_wdi`, `unctad_fdi`, `imf_weo` and `ilostat_qat` are not registry rows yet.
+Historical leads recorded for decision 0040; current readings are in **Publisher metadata readings (S2-P18)** above. The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Except for the BACI page reading recorded under **BACI pending identity and coverage (S2-T24)**, pending trade registry rows record their planned identity only. The other addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL. S2-T23 adds the `un_comtrade` registry row with metadata unconfirmed; `wb_wdi`, `unctad_fdi`, `imf_weo` and `ilostat_qat` are not registry rows yet.
 
 | Planned source_id | Publisher, dataset and page address | Page lead and verification task | Intended use |
 |---|---|---|---|
 | `un_comtrade` | United Nations Statistics Division, UN Comtrade; https://comtradeapi.un.org/public/v1 ; https://comtradeapi.un.org/data/v1 ; https://comtradeapi.un.org/tools/v1 ; https://uncomtrade.org/docs/un-comtrade-tools/ | Registry row added by S2-T23 with `licence_basis` `provider_terms`, empty `decision_record`, `commit_allowed` false and `skip_reason` `metadata_unconfirmed`. Free API limits, licence words, hosts, schema and the selection remain to be verified by the lead; nothing is committed | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model"; read 2026-11-19; basis `provider_terms`; per-key evidence and hash in section 4, "S2-T21 part B terms readings". |
-| `cepii_baci` | CEPII, BACI; https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html | The page states HS6 bilateral value/quantity reconciled between reporters, version 202501, Etalab 2.0, to be verified by S2-T24 | Free substitute for Comtrade bulk files; separate comparison series |
+| `cepii_baci` | CEPII, BACI; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37 | Lead page reading 2026-11-20: selected HS 2017 edition, release 202601, published period 2017-2024, "Licence: Etalab 2.0"; native schema, units, row counts and file receipt remain pending under S2-T24 | Free substitute for Comtrade bulk files; separate comparison series |
 | `cepii_gravity` | CEPII, Gravity; https://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=8 | The page states bilateral distance, contiguity, language, colonial links, trade agreements and GDP, version 202211, Etalab 2.0, to be verified by S2-T25 | Bilateral gravity and relatedness covariates; not local catchment observations |
 | `atlas_complexity` | Harvard Growth Lab, Atlas of Economic Complexity; https://atlas.hks.harvard.edu/data-downloads/ ; https://intl-atlas-downloads.s3.amazonaws.com/index.html ; https://dataverse.harvard.edu/dataverse/atlas | The page states finished country-product-year and country-partner-product-year files at four-digit HS with complexity measures, to be verified by S2-T25; licence read on its own page | Finished files only, product/country relatedness comparison and RCA |
 | `wb_wdi` | World Bank, World Development Indicators; https://data.worldbank.org/ | The page states a free benchmark route, to be verified by S2-T26; version and licence words not verified | National economic benchmarks in D1 |
@@ -1283,6 +1291,10 @@ Read on 2026-11-19 from the supplied, saved publisher-page and metadata evidence
 
 Evidence references name rows of the supplied `rows_map.tsv`, `terms_pages.tsv` and `dataset_licences.tsv`; HDX uses `validation_rows_addendum.tsv` and `validation_terms_addendum.tsv`, and geoBoundaries uses `validation_licence_fields.tsv`. The SHA-256 values below identify the saved publisher representations, including the evidence pass's declared privacy redactions. Copies of metadata bodies and some page bodies are absent from this workspace: their hashes and quotation checks are carried from the supplied `validation_detail.json`, rather than represented as independent rehashes here. No data export was fetched in this pass.
 
+The BACI row is updated from the lead's supplied publisher-page reading on
+2026-11-20 (S2-P29 round B). Its SHA-256 is the page digest supplied with that
+reading; this worker neither fetched nor independently rehashed the page.
+
 | Registry key | Publisher terms, verbatim excerpts | Read on / checked on | Basis of use | Evidence rows and saved SHA-256 |
 |---|---|---|---|---|
 | `lic_active` | "CC BY" [...] "You must give appropriate credit, provide a link to the license, and indicate if changes were made." | 2026-11-19 | `dataset` | dataset_licences.tsv#lic_active; terms_pages.tsv#cc-by; 409cf13f9d92110bbea68c994727e08097cd62ecfaff050553be20cdf0638835; cbdb3a0b06a4c944119de328290aa7aa6a3cc37e706a33cc60c65b4f8cda2528; https://creativecommons.org/licenses/by/4.0/ |
@@ -1503,7 +1515,7 @@ Evidence references name rows of the supplied `rows_map.tsv`, `terms_pages.tsv` 
 | `gis_poi_comm` | terms to be read. Pending reason: The service metadata is readable but provides no licence or reuse clause; copyrightText and descriptions are empty where present. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#gis-gis_poi_comm; dataset_licences.tsv#gis_poi_comm; 59c7cdcebbd2bf1eebeea92ca90118d1bbeed09e9025b7636f27aaea35004473 |
 | `gis_rail` | terms to be read. Pending reason: The service metadata is readable but provides no licence or reuse clause; copyrightText and descriptions are empty where present. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#gis-gis_rail; dataset_licences.tsv#gis_rail; f99c3f091578f44ced168679c7483bd6f32086ff905b772802eab271e2d8bebc |
 | `gis_zoning` | terms to be read. Pending reason: The service metadata is readable but provides no licence or reuse clause; copyrightText and descriptions are empty where present. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#gis-gis_zoning; dataset_licences.tsv#gis_zoning; cf353bab16e92d7c06fff674d7aeb5ccedcece35fa509a30eefbcd269ff5be3d |
-| `cepii_baci` | terms to be read. Pending reason: Unconfirmed downloadable-data family; no configured file; the publisher page stalled without an observed HTTP response. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#cepii-unread; no terms-page hash established |
+| `cepii_baci` | "Licence: Etalab 2.0" | 2026-11-20 | `dataset` | S2-P29 round B supplied lead page reading; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37; 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60 |
 | `cepii_gravity` | terms to be read. Pending reason: Unconfirmed downloadable-data family; no configured file or reviewed landing URL; publisher terms remain unread. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#cepii-unread; no terms-page hash established |
 | `atlas_complexity` | terms to be read. Pending reason: Unconfirmed finished-download family; no configured file; the terms page returned a client-side shell. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#atlas-unread; 680119ab9c9f86c313f237b998f20dc84bff980484bfe8fe875683377d79dff4 |
 | `un_comtrade` | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model" | 2026-11-19 | `provider_terms` | terms_pages.tsv#comtrade-license; terms_pages.tsv#comtrade-redistribution; 5c6facb2c8be4836318bba9d490fc52bf397dee12fab6f79da95a4bc0772dc56; 288fbf7e96a4421c76b5bdb5551cc93968343d2833598ed1ced421f79fad64ba; https://comtradeplus.un.org/en/license-agreement |

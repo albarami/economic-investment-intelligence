@@ -1,10 +1,15 @@
 # BACI separate-series source
 
 S2-T24 implements `eii_custodian.publicdata.baci.parse.parse_archive@v1`.
-The source page, licence, publisher version, access state, HS revision, country
-keys, units and reporter reconciliation are NOT READ. Decision 0040 supplies
-leads only. No host has been admitted for BACI. The registry date records the
-pending-record check, not page verification. `confirmed: false` prevents requests.
+The lead's supplied page reading of 2026-11-20 confirms the selected HS 2017
+edition, release 202601, published period 2017-2024 and "Licence: Etalab 2.0".
+Document 04 **S2-T21 part B terms readings** records the page URL and supplied
+SHA-256; the registry records the ZIP URL and dataset licence. Native columns,
+row counts, member inventory, country keys, units, access-state configuration
+and reporter reconciliation remain pending. No host has been admitted for BACI.
+`confirmed: false` and `baci_metadata_unconfirmed` still prevent requests; the
+fetcher requires declared columns and complete archive configuration. The page
+reading supplies no archive hash and is not a completed fetch.
 
 The lead must supply the four live steps of the task brief before activation.
 `baci.yaml` is closed: every field is required and unknown fields fail. Pending

@@ -397,6 +397,8 @@ def test_baci_dispatch_isolated(tmp_path):
         ("landing_url", "", "page"),
         ("fetch_host", "unlisted.invalid", "blocked_host"),
         ("release_tables", (), "release_contract"),
+        # S2-P29: a read publisher page cannot stand in for archive headers.
+        ("columns", (), "release_contract"),
     ],
 )
 def test_baci_entry_plants(tmp_path, field, value, reason):
