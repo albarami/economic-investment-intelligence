@@ -42673,3 +42673,92 @@ The controls in every row were `test_ac1_review_basis_and_binding`, `test_b_prod
 - Strict builder self-review: APPROVE for this tests-only finding-H repair; another-maker review is pending. Muhasabah: PASS for sourced evidence, unchanged production, append-only history, exact scope and explicit limits.
 
 - Post-record verification: `python3 .overnight/tmp/fix2_scope_audit.py` exited 0: exactly three tracked files changed, prior tests and progress bytes retained, production hashes unchanged, 22 unique red/green proofs, disposable copy deleted, all seven recorded checks green, marker and new-text hygiene verified, no staged files. `python3 scripts/check_docs.py` exited 0: 1134 text files and 122 Markdown files. `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0. Final diff: 264 insertions and zero deletions before this evidence line.
+## S2-LR5 — S2-T37 bucket-listing discovery repair, 2026-11-20
+
+Maker: OpenAI Codex. Model: GPT-6 (system identity; the exact served variant is not exposed).
+Builder persona: senior public-source data engineer. Strict self-review persona:
+provenance reviewer rejecting unsafe XML, partial listings, guessed releases and
+cached or pinned fallbacks. Loaded skills: project-orientation, task-standards,
+github-flow, sanad-provenance, strict-reviewer and muhasabah-gate.
+Test-driven-development, systematic-debugging and verification-before-completion
+were unavailable as installed skills and followed in their plain meaning, as
+the brief permits. No independent-maker approval is claimed.
+
+Starting commit: `6f8a16bb4cbbdb39bf696b8cb4a4745d8a1e78e7`.
+Environment: Linux workspace sandbox, Python 3.14.6, uv 0.11.31, locked prepared
+environment. All uv commands used `UV_OFFLINE=1` and
+`UV_CACHE_DIR=.overnight/tmp/uv-cache`. Final individual test runs additionally
+used `PYTEST_ADDOPTS=--hypothesis-seed=73105`; these files contain no randomized
+or property tests. Earlier red and green runs used pytest's automatic seed,
+which quiet output did not expose; none is invented here.
+
+Cause and source: `.overnight/IN/LIVE-RUN-places-lines.txt` records the lead's
+`release_missing` failure. `.overnight/IN/LISTING-SHAPE.md` records a complete,
+namespaced S3 XML listing. The selector read HTML anchors. These supplied
+documents establish the defect and format only; no live fetch was run here.
+
+Fix: standard-library XML parsing rejects DOCTYPEs (including entity declarations)
+and processing instructions. Exact prefix, complete-listing flag, real ISO dates,
+unique object keys and the exact dated `places/_metadata` key are required.
+The greatest qualifying date wins; the invented observed-shape test returns
+`2025-02-06`. Only other objects under dated `places/` folders and root files
+are ignored. Other nested shapes refuse. Closed discovery reasons are in
+`errors.py`; invented `run_build` cases verify the printed reasons and no cached
+fallback. Listing receipts now archive XML. The package README states these rules.
+
+Named plants: `plant-doctype`, `plant-entity-declaration`,
+`plant-processing-instruction` (UTF-8 and UTF-16), processing instructions inside
+and after the root, `plant-prefix`, `plant-key-prefix`, `plant-namespace`,
+`plant-double-prefix`, `plant-missing-truncation`, `plant-truncation-case`,
+`plant-double-key`, `plant-html`, `test_plant_truncated_listing_is_never_read_in_part`
+and `test_plant_dated_folder_without_metadata_is_not_a_release`. Existing
+invalid-date, duplicate and foreign-link plants were translated into bucket keys;
+no assertion was loosened. Four reporting plants exercise the build-public seam.
+
+Red then green: `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_places_fsq_releases.py`
+first exited 1 (26 failed, 29 passed); after adding report and archive assertions,
+before implementation, it exited 1 (30 failed, 29 passed). The same final tests
+then exited 0 (59 passed). The first combined package run,
+`uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_places_fsq*.py`,
+exited 0 (256 passed, no skips). The red log in `.overnight/tmp/releases-red.txt`
+has workspace paths redacted and retains failure counts.
+
+Final per-file checks use `uv run --locked python -m pytest -q -p no:cacheprovider`
+followed by the path below, each exit 0 and no skips:
+
+- `custodian/tests/test_places_fsq.py`: 23 passed.
+- `custodian/tests/test_places_fsq_binary.py`: 51 passed.
+- `custodian/tests/test_places_fsq_breaks.py`: 5 passed.
+- `custodian/tests/test_places_fsq_fetch_checks.py`: 33 passed.
+- `custodian/tests/test_places_fsq_format.py`: 74 passed.
+- `custodian/tests/test_places_fsq_join.py`: 5 passed.
+- `custodian/tests/test_places_fsq_kills.py`: 6 passed.
+- `custodian/tests/test_places_fsq_releases.py`: 59 passed.
+
+Other checks and real results:
+
+- `uv run --locked ruff check .`: initial exit 1, one I001 import-order finding;
+  after correcting that import, exit 0, all checks passed.
+- `uv run --locked ruff format --check .`: exit 0, 828 files already formatted.
+- `uv run --locked mypy`: exit 0, 445 source files, no issues.
+- `python3 scripts/check_docs.py`: exit 0, 1126 text files and 121 Markdown files.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules.
+- `cmp AGENTS.md CLAUDE.md`: exit 0, byte-identical.
+- `git diff --check`: exit 0, no whitespace defects.
+- Read-only source audit: exit 0; both approved date-validator bodies, the
+  column-order reader, partition-selection module, unrelated assembly selector,
+  OPEN_ITEMS.md and the agent-rule files match the starting commit exactly.
+
+Search found only the places fetcher's use of this selector; the HTML path was
+removed. The unrelated investment selector and `assembly_native.py` were left
+unchanged. No limits, tolerances, retries, skips or baselines changed. Neither
+`./eii test` nor a live build-public command was run.
+
+`git switch -c fix/s2-lr5-bucket-listing` exited 128 because Git refs are mounted
+read-only. No commit or push was possible; the task changes remain in the working
+tree. The brief's authorized commit subject and coauthor trailer remain for the
+lead's writable checkout. PROPOSED OPEN ITEM, not written to OPEN_ITEMS.md:
+S2-LR5 needs another maker's review and the lead's seeded live build on the patch,
+with selected release, listing hash and metadata receipt recorded before closing
+the live-run defect. Muhasabah: PASS for the bounded patch, sourced statements and
+reported checks; independent review and live confirmation remain the lead's work.

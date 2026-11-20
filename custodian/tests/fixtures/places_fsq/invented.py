@@ -6,6 +6,7 @@ import struct
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
+from xml.sax.saxutils import escape
 
 _COLUMNS = (
     "fsq_place_id",
@@ -27,10 +28,30 @@ def point_wkb(longitude: float, latitude: float) -> bytes:
     return struct.pack("<BIdd", 1, 1, longitude, latitude)
 
 
-def listing(*hrefs: str) -> bytes:
-    """A tiny invented HTML listing; each href is supplied by the test."""
-    links = "".join(f'<a href="{href}">{href}</a>' for href in hrefs)
-    return f"<html><body>{links}</body></html>".encode()
+def bucket_listing(
+    *keys: str,
+    prefix: str = "fsq-os-places/",
+    truncated: str = "false",
+    namespace: str = "http://s3.amazonaws.com/doc/2006-03-01/",
+) -> bytes:
+    """Invented bucket objects and sizes; no fetched values or ETags."""
+    objects = "".join(
+        f"<Contents><Key>{escape(key)}</Key><Size>17</Size></Contents>" for key in keys
+    )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        f'<ListBucketResult xmlns="{namespace}"><Name>SYN-bucket</Name>'
+        f"<Prefix>{escape(prefix)}</Prefix><MaxKeys>1000</MaxKeys>"
+        f"<IsTruncated>{escape(truncated)}</IsTruncated><Marker/>"
+        f"{objects}</ListBucketResult>"
+    ).encode()
+
+
+def listing(*releases: str) -> bytes:
+    """A tiny bucket listing containing each supplied release's metadata."""
+    return bucket_listing(
+        *(f"fsq-os-places/{release}places/_metadata" for release in releases)
+    )
 
 
 def write_places(

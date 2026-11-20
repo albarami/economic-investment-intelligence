@@ -1,6 +1,6 @@
 # Further places source
 
-This package implements the pinned-copy reader of S2-T15 (PUB-102 and DAT-157).
+This package implements the public-copy reader of S2-T15 (PUB-102 and DAT-157).
 Selection uses coordinate statistics against the frame, never the geographic bbox.
 The parser preserves source fields; display eligibility, duplicates and category
 mapping follow the reviewed policy. Fetch checks every selected file against the
@@ -9,6 +9,32 @@ Receipt validation and summary selection share the same release-path check:
 every complete ISO date appearing anywhere in the path must equal the approved
 release. Repeated equal dates and undated names remain valid; a different date
 refuses with `release_mismatch` (PO-S2-123, ruling L-1178).
+
+At each refresh, S2-T37 selects the greatest real ISO calendar date with an exact
+`<date>/places/_metadata` object in the copy root's complete S3 `ListBucketResult`
+listing, in the `http://s3.amazonaws.com/doc/2006-03-01/` namespace. This shape
+comes from the lead's listing-shape evidence supplied to this repair, read
+2026-11-20; tests use invented keys and sizes, with no copied ETag. The listing's
+`Prefix` must equal the final path segment of the copy root, with its trailing
+slash, and every object key must start with that prefix. Root files such as
+`README.md` are ignored. Every nested key must have a real dated folder followed
+by `places/`; another shape is refused because it is outside the observed places
+layout and cannot establish a places release. Other objects under a dated
+`places/` folder are ignored for discovery; a dated folder without its exact
+metadata key is not a release. Duplicate object keys are refused.
+
+The standard-library XML parser refuses DOCTYPEs, including entity declarations,
+and processing instructions at any position; the XML declaration is allowed.
+`IsTruncated` must be exactly `false`: `true` refuses with `release_truncated`
+before any object is read, and missing, repeated or other values refuse with
+`release_listing`. Wrong prefixes refuse with `release_prefix`, unexpected key
+shapes with `release_key`, duplicate keys with `release_duplicate`, invalid dates
+with `release_invalid`, and no metadata-backed date with `release_missing`.
+Discovery refusals are closed in `errors.py` and passed unchanged to the
+build-public failure report. There is no HTML discovery, pagination, pinned-date
+fallback or cached-release fallback. The listing is archived as XML with its
+existing hash and provenance receipt; metadata and partition validation still
+precede storage. The unrelated investment release selector is unchanged.
 
 ## Format facts this reader relies on
 

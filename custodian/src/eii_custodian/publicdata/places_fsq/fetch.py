@@ -252,7 +252,7 @@ def _store(
     commit_pair(
         directory / "listings",
         listing_digest,
-        "html",
+        "xml",
         listing_body,
         _sidecar(
             entry,
