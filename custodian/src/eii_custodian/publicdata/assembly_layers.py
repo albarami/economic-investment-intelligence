@@ -87,11 +87,14 @@ def build_layers(build: Production) -> None:
             else:
                 build.table(table, rows, (entry.key,))
         elif source == "gis_land_price":
+            from .property.price_as_of import as_of_from_receipt
+
             payload = build.raw(entry, standard_json=True)
             layers = payload.get("layers") if isinstance(payload, dict) else None
             if not isinstance(layers, list):
                 raise AssemblyError("assembly_gis_shape_invalid")
-            rows = land_price_rows(_features(layers), entry.url)
+            as_of = as_of_from_receipt(build.receipts[entry.key])
+            rows = land_price_rows(_features(layers), entry.url, as_of=as_of)
             build.table("pub_land_price", rows, (entry.key,))
         elif source == "gis_context":
             build.raw(entry)
@@ -161,8 +164,17 @@ def build_layers(build: Production) -> None:
             published = publish_tenders(rows_from_pages(*pages).rows, recorded=True)
             build.table("pub_tender", [asdict(r) for r in published.rows], (entry.key,))
     if deal_sources:
+        from .property.price_as_of import as_of_from_receipt
+
+        as_of_by_source = {
+            entry.source_id: as_of_from_receipt(build.receipts[entry.key])
+            for entry in build.entries
+            if entry.key in deal_sources
+        }
         build.table(
-            "pub_property_quarter", quarter_aggregates(deals), tuple(deal_sources)
+            "pub_property_quarter",
+            quarter_aggregates(deals, as_of_by_source=as_of_by_source),
+            tuple(deal_sources),
         )
     for table in sorted(family_rows):
         build.table(table, family_rows[table], tuple(sorted(family_sources[table])))

@@ -43824,3 +43824,17 @@ and the requested scope. The prior temporary-root cleanup warning remains open.
 ## S2 records: document 04 investment pages (lead) — 2026-11-20
 
 - Document 04, investment acquisition section (S2-T39 part A): the sentence saying the inventory records English pages only is corrected to the joined tree, where package P23 lists the Arabic pages, unconfirmed until the lead's live comparison (OI-181); found by an evaluation replay of review S2-P23.r1 (Qwen3.8 Max via Droid) and checked by the lead against `investment_pages.yaml`.
+## S2-P15 overnight package (P15, P20, P22) — 2026-11-20
+
+- Maker: Cursor Composer agent. Personas: senior public-data intake engineer (builder); strict reviewer (self-review against planted guards).
+- Skills loaded: project-orientation, task-standards, test-driven-development, sanad-provenance, verification-before-completion.
+- P15 (PO-S2-133): wired `charset` on investment page fetch receipts; tests `test_fetch_page_receipt_carries_header_charset`, `test_investment_page_header_charset_beats_meta`.
+- P20 (S2-T19 amendment): `property/price_as_of.py`, assembly stamps `as_of` on `pub_property_quarter` and `pub_land_price`; tests in `test_property_price_as_of.py`.
+- P22 (S2-T29 item 46): added `students_n` and `staff_num` to school directory field contract; `test_school_personal_field_refused` for `director`, `phone`, `email`.
+- `uv run --locked python -m pytest custodian/tests/test_property_price_as_of.py custodian/tests/test_investment_bilingual.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_s2_t29_live_acquire.py custodian/tests/test_investment_build.py custodian/tests/test_property_quarter.py custodian/tests/test_gis_layers.py -q -p no:cacheprovider --hypothesis-seed=3847291051`: exit 0, 276 passed.
+- `uv run --locked ruff check .`: exit 0.
+- `uv run --locked ruff format --check .`: exit 0, 837 files already formatted.
+- `uv run --locked mypy`: exit 0, 450 source files.
+- `python3 scripts/check_docs.py`: exit 0, 1140 text files, 123 Markdown.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules.
+- `cmp AGENTS.md CLAUDE.md`: exit 0. No commit.

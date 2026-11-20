@@ -255,6 +255,28 @@ def test_school_count_boundary(tmp_path, count):
         )
 
 
+@pytest.mark.parametrize("field", ["director", "phone", "email"])
+def test_school_personal_field_refused(tmp_path, field):
+    dec, attrs = school()
+    dec["shape"]["page_size"] = 2
+    calls: list[str] = []
+
+    def change(role, obj):
+        if role == "page":
+            obj["features"][0]["attributes"][field] = "SYN-personal"
+
+    refused(
+        "school_field_refused",
+        lambda: run(
+            tmp_path,
+            dec,
+            b"",
+            row=entry(dec, "schools_private_directory"),
+            send=school_send(dec, attrs, calls, change=change),
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     "plant,reason",
     [

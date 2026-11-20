@@ -11,6 +11,7 @@ import json
 import os
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, replace
+from email.message import EmailMessage
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.kinds import read_bounded
@@ -479,6 +480,17 @@ def _publish_agency(
     )
 
 
+def header_charset(headers: Mapping[str, str]) -> str:
+    """Read the charset parameter of ``Content-Type``, if any."""
+    value = headers.get("Content-Type") or headers.get("content-type") or ""
+    if not value:
+        return ""
+    message = EmailMessage()
+    message["content-type"] = value
+    charset = message.get_content_charset()
+    return charset if isinstance(charset, str) else ""
+
+
 def _fetch_page(
     entry: Entry,
     cache: Path,
@@ -510,6 +522,9 @@ def _fetch_page(
         row_count=None,
         terms_sha256=terms,
     )
+    charset = header_charset(response.headers)
+    if charset:
+        side["charset"] = charset
     try:
         commit_pair(directory, page_digest, entry.extension, response.body, side)
         snapshot = read_snapshot(directory, page_digest)

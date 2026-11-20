@@ -377,6 +377,62 @@ def test_arabic_evidence_requires_a_calendar_date():
     assert result.checks["investqa_pages:arabic_evidence"] is False
 
 
+def test_fetch_page_receipt_carries_header_charset(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    pages, bodies = bilingual()
+
+    def transport(url: str) -> Response:
+        if url == b._agency_entry().terms_url:
+            return Response(final_url=url, body=b.TERMS_BODY, hops=())
+        return Response(
+            final_url=url,
+            body=bodies[url],
+            hops=(),
+            headers={"Content-Type": "text/html; charset=utf-8"},
+        )
+
+    assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
+    _, manifest, _ = b._batch(tmp_path, "investqa_pages")
+    digest = manifest["pages"][1]["sha256"]
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    sidecar = read_snapshot(
+        tmp_path / "data/public_cache/investqa_pages", digest
+    ).sidecar
+    assert sidecar.get("charset") == "utf-8"
+
+
+def test_investment_page_header_charset_beats_meta(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    pages, bodies = bilingual()
+    page_url = pages[0].url
+    bodies = dict(bodies)
+    bodies[page_url] = bodies[page_url].replace(b"utf-8", b"invented-encoding")
+
+    def transport(url: str) -> Response:
+        if url == b._agency_entry().terms_url:
+            return Response(final_url=url, body=b.TERMS_BODY, hops=())
+        return Response(
+            final_url=url,
+            body=bodies[url],
+            hops=(),
+            headers={"Content-Type": "text/html; charset=utf-8"},
+        )
+
+    import eii_custodian.publicdata.investment_quotation as q
+
+    assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
+    pointer, _, _ = b._batch(tmp_path, "investqa_pages")
+    quotation = q.read_quotation(
+        tmp_path / "data/public_cache",
+        pointer["evidence_manifest_identity"],
+        1,
+    )
+    assert quotation.body == bodies[page_url]
+
+
 def test_page_evidence_refusal_names_its_source_url(tmp_path: Path, monkeypatch):
     import eii_custodian.publicdata.investment_quotation as q
 

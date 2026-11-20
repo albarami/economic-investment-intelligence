@@ -4625,11 +4625,12 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 ### PO-S2-133 — Resolve the absent receipt charset field
 
 - ID: PO-S2-133
-- TYPE: OPEN
+- TYPE: CLOSED
 - RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 29.
 - EVIDENCE: - (record) the fetch receipt format carries no `charset` field, so the receipt-charset step of the decision's decode order is vacuous today; code honours it when present. Lead to confirm or wire it.
 - NEEDED: Have the lead confirm or wire the charset source in its owning task. Preserve the declared decode order and named refusals; infer no schema amendment.
 - COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+- CLOSED 2026-11-20 (package P15, lead ruling): cause — fetch receipts omitted `Content-Type` charset; fix — `investment_build._fetch_page` records `charset` on the snapshot sidecar when present and decode still falls through to meta when absent; deciding tests — `test_fetch_page_receipt_carries_header_charset`, `test_investment_page_header_charset_beats_meta`, `test_page_receipt_charset_precedes_meta`; red then green — receipt test red before sidecar write, green exit 0, 276 passed in touched modules with hypothesis seed 3847291051.
 
 ### PO-S2-134 — Flag ISO-date refusal in the live inventory review
 
