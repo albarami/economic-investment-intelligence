@@ -131,6 +131,7 @@
 | [0076](decisions/0076-company-web-pages-search-fetch-review-and-storage.md) | Company web pages: search, fetch, review and storage; narrow register-name and company_web host exceptions | Accepted, 2026-11-20; the owner's decision recorded in decision 0074 item 8 and the lead's S2-T48 design-review rulings of 2026-11-20 |
 | [0077](decisions/0077-overture-footprints-as-the-national-building-table.md) | Overture footprints as the national building table: the pinned parts as the canonical national inventory in the shared public frame, counted unmapped optional fields, STAC and frame-box completeness guards, and building-layer attribution | Proposed, 2026-11-20; task-owned under rule 33 and lead ruling L-1285 |
 | [0078](decisions/0078-c2-bulk-months-by-the-centred-median.md) | C2 bulk months use the centred, end-cut thirteen-month median; superseded global rule retained | Accepted, 2026-11-20; the owner on the advisor's answer to S2 gate item 8 (OI-207) |
+| [0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) | Dated national GIS snapshot through level 10 in an independent background lane, offline structured-address search, external-root/selected-file exception, and S3-T29 after-go-live deferral of the national centre's finer imagery and free-text locator; keyed provider unchanged | Accepted, 2026-11-20; the owner on the lead's S2 gate item 9 reading |
 
 ## Identifiers and change control
 

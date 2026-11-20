@@ -239,16 +239,15 @@ class Fixture:
 
     def layout(self, profile_name: str) -> launch.Layout:
         """Return the layout the named profile declares."""
-        common = {
-            "code_root": self.root,
-            "cache": self.root / "data" / "public_cache",
-            "vault": self.root / "data" / "vault" / "b1",
-            "extensions": self.root / "data" / "engine_extensions",
-        }
-        if profile_name == "build-world":
-            return launch.Layout(**common, scenario=self.scenario)
         return launch.Layout(
-            **common, staging=self.root / "data" / "releases" / ".staging" / "b1"
+            code_root=self.root,
+            cache=self.root / "data" / "public_cache",
+            vault=self.root / "data" / "vault" / "b1",
+            extensions=self.root / "data" / "engine_extensions",
+            scenario=self.scenario if profile_name == "build-world" else None,
+            staging=self.root / "data" / "releases" / ".staging" / "b1"
+            if profile_name == "build-release"
+            else None,
         )
 
 

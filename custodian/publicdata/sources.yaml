@@ -9384,6 +9384,7 @@ sources:
     source_id: gis_imagery_history
     slug: ''
     kind: paged_layer
+    basis_note: 'Decision 0079: dedicated eleven-date tile registry review/gis_snapshot.json; ordinary and nightly tile acquisition false; lead-shell mode only.'
     title_en: gis_imagery_history
     publisher: national GIS centre
     licence_id: ''

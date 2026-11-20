@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "source_id": "gis_imagery_history",
+  "publisher": "national GIS centre",
+  "licence_basis": "owner_decision",
+  "decision_record": "0026",
+  "authority": "0079",
+  "max_level": 10,
+  "requests_per_second": 10,
+  "tile_pixels": 512,
+  "format": "JPEG",
+  "crs": "EPSG:2932",
+  "ordinary_build": false,
+  "nightly_live_fetch": false,
+  "root_variable": "EII_GIS_SNAPSHOT_ROOT",
+  "services": [
+    {
+      "date": "1995-02",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer"
+    },
+    {
+      "date": "2003-05",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2003/MapServer"
+    },
+    {
+      "date": "2004-07",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_2004/MapServer"
+    },
+    {
+      "date": "2010-01",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2010/MapServer"
+    },
+    {
+      "date": "2012-08",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2012/MapServer"
+    },
+    {
+      "date": "2017-04",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2017/MapServer"
+    },
+    {
+      "date": "2019-12",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2019/MapServer"
+    },
+    {
+      "date": "2021-09",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte_2021/MapServer"
+    },
+    {
+      "date": "2022-04",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho/MapServer"
+    },
+    {
+      "date": "2024-10",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte2024/MapServer"
+    },
+    {
+      "date": "2025-07",
+      "url": "https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarSatelitte/MapServer"
+    }
+  ]
+}

@@ -9,7 +9,7 @@ a problem even when a sentinel read would still fail.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import extension_tree
@@ -150,6 +150,20 @@ class PolicyInput:
     layout: launch.Layout
     interpreter: launch.Interpreter
     argv: Sequence[str]
+    imagery_roles: dict[str, str] = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "imagery_roles",
+            {
+                "/imagery/"
+                + digest
+                + (".tar" if path.suffix == ".tar" else ".json"): "imagery file "
+                + digest
+                for path, digest in self.layout.imagery
+            },
+        )
 
 
 @dataclass(frozen=True)
@@ -221,6 +235,10 @@ def expected_mounts(item: PolicyInput) -> tuple[MountRecord, ...]:
     )
     if scenario:
         records.append(MountRecord("scenario", READ_ONLY))
+    records.extend(
+        MountRecord("imagery file " + digest, READ_ONLY)
+        for _, digest in item.layout.imagery
+    )
     records.append(MountRecord("vault", WRITABLE))
     if staging:
         records.append(MountRecord("release staging", WRITABLE))
@@ -255,6 +273,11 @@ def judge(item: PolicyInput) -> PolicyJudgement:
         list matches.
     """
     closed_problems = _declaration_problems(item.profile)
+    if item.layout.imagery or item.layout.imagery_root is not None:
+        try:
+            launch.check_profile(item.profile, item.layout)
+        except launch.SandboxError:
+            closed_problems.append("imagery: invalid selected input")
     records, parse_problems = _parse(item)
     if parse_problems == ["bubblewrap: missing, expected present"]:
         return PolicyJudgement(tuple(records), tuple(closed_problems + parse_problems))
@@ -421,6 +444,8 @@ def _role(destination: str, item: PolicyInput) -> str:
     }
     if interpreter.alias is not None:
         named[str(interpreter.alias)] = "interpreter alias"
+    if destination in item.imagery_roles:
+        return item.imagery_roles[destination]
     if destination in named:
         return named[destination]
     folder = extensions / engine / platform
@@ -454,30 +479,25 @@ def _file_role(name: str) -> str:
 def _compare(got: Sequence[MountRecord], expected: Sequence[MountRecord]) -> list[str]:
     """Name every role whose modes differ, then any role the policy does not list."""
     issues: list[str] = []
-    expected_roles = _roles(expected)
-    got_roles = _roles(got)
-    for role in expected_roles:
-        issues.extend(_role_issues(role, _modes(got, role), _modes(expected, role)))
-    for role in got_roles:
-        if role in expected_roles:
+    expected_modes = _grouped(expected)
+    got_modes = _grouped(got)
+    for role, want in expected_modes.items():
+        issues.extend(_role_issues(role, got_modes.get(role, []), want))
+    for role, have in got_modes.items():
+        if role in expected_modes:
             continue
-        for mode in _modes(got, role):
+        for mode in have:
             issues.append(f"{role}: extra {mode} mount, expected absent")
     if not issues and list(got) != list(expected):
         issues.append("mount order: differs, expected the policy order")
     return issues
 
 
-def _roles(records: Sequence[MountRecord]) -> list[str]:
-    found: list[str] = []
+def _grouped(records: Sequence[MountRecord]) -> dict[str, list[str]]:
+    found: dict[str, list[str]] = {}
     for record in records:
-        if record.role not in found:
-            found.append(record.role)
+        found.setdefault(record.role, []).append(record.mode)
     return found
-
-
-def _modes(records: Sequence[MountRecord], role: str) -> list[str]:
-    return [record.mode for record in records if record.role == role]
 
 
 def _role_issues(role: str, have: list[str], want: list[str]) -> list[str]:

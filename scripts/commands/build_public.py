@@ -90,8 +90,8 @@ def run(
 ) -> int:
     """Validate the arguments before any input or credential read.
 
-    No argument, ``--seed N`` (the draw seed), ``--company-web`` or
-    ``--cdse-backup`` alone;
+    No argument, ``--seed N`` (the draw seed), ``--company-web``,
+    ``--cdse-backup`` alone or ``--gis-imagery-snapshot`` alone;
     anything else is a usage error and opens nothing.
     """
     if tuple(args) == ("--company-web",):
@@ -101,6 +101,10 @@ def run(
             open_https if transport is None else transport,
             time.sleep if sleep is None else sleep,
         )
+    if tuple(args) == ("--gis-imagery-snapshot",):
+        from eii_custodian.publicdata.gis.snapshot_runner import run as run_snapshot
+
+        return run_snapshot(environ)
     if tuple(args) == ("--cdse-backup",):
         credentials = cdse_credentials(environ)
         reason = (

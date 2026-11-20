@@ -24,6 +24,15 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
+S2-T51 adds the dedicated national-centre snapshot mode, closed eleven-date registry,
+immutable resumable shards, selected-file sandbox/release seams and offline structured
+address API ([snapshot runbook](custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md),
+[decision 0079](docs/decisions/0079-dated-gis-snapshot-and-structured-address-search.md)).
+Only the lead starts the real fetch after task approval; no earlier gate or task waits for
+completion. Invented tests establish no real imagery coverage, live-store parity or frontend
+integration. The national centre's finer levels and free-text locator are retained in S3-T29,
+after go live; the existing keyed provider is unchanged.
+
 S2-T05 adds [offline spine triage](scripts/spine_triage.md): `uv run --locked python scripts/spine_triage.py` takes the cached inputs and recomputed review queue, keeps its deterministic order with provider `none`, and writes unsigned suggestions separately. Recorded answers may order human review; every mapping still requires individual sign-off through S2-T04 (PUB-35). Decision records remain under eval artefacts.
 
 S2-T07 adds pure Decimal arithmetic in `eii_core.calc` for licence density and churn, wage decomposition, published sector shares, supplier metrics, coverage, utility momentum and typed Public comparisons. Arithmetic tests and invented-row parser tests exercise these APIs offline. The comparison boundary supplies numeric results and source-chain metadata; canonical fact IDs and release validation remain with the release/API owner. Selected source receipts and several worked-example input rows are still absent, so these tests do not establish real-file regression agreement or close OI-03.

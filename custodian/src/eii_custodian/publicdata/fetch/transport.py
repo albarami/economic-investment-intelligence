@@ -721,3 +721,49 @@ def _refuse_redirect(
         raise refusal(policy, descriptor, "redirect_host", header) from None
     if header_value and redirect_host != request_host:
         raise refusal(policy, descriptor, "cross_origin_credential", header) from None
+
+
+def open_gis_snapshot(url: str) -> Response:
+    """One bounded attempt, no redirects; the snapshot runner paces every send."""
+    from eii_custodian.publicdata.gis.snapshot_policy import check_url
+
+    check_url(url)
+
+    class _NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(
+            self,
+            req: urllib.request.Request,
+            fp: IO[bytes],
+            code: int,
+            msg: str,
+            headers: HTTPMessage,
+            newurl: str,
+        ) -> urllib.request.Request | None:
+            raise TransportFault("redirect", "")
+
+    opener = urllib.request.build_opener(_NoRedirect)
+    request = urllib.request.Request(url, method="GET")
+    try:
+        with (
+            metadata_limit(4 * 1024 * 1024),
+            opener.open(request, timeout=HTTP_TIMEOUT_S) as response,
+        ):
+            body = _bounded_body(response, url)
+            return Response(
+                str(response.geturl()),
+                body,
+                (),
+                headers={"Content-Type": response.headers.get("Content-Type", "")},
+            )
+    except urllib.error.HTTPError as error:
+        return Response(
+            url,
+            b"",
+            (),
+            headers={"Retry-After": error.headers.get("Retry-After", "")},
+            evidence={"http_status": error.code},
+        )
+    except TransportFault:
+        raise
+    except (OSError, urllib.error.URLError, HTTPException):
+        raise TransportFault("unreachable", "") from None

@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from types import TracebackType
 from unittest.mock import patch
@@ -58,6 +58,19 @@ COMMAND = [
 def contains_forbidden(text: str) -> list[str]:
     """Return forbidden options that appear quoted in a source text."""
     return [option for option in FORBIDDEN if f'"{option}"' in text]
+
+
+def bound_destinations(argv: Sequence[str]) -> dict[int, str]:
+    """Read mounts from bubblewrap's own arguments, excluding supervisor metadata."""
+    start = argv.index(tables.BWRAP)
+    mounts: dict[int, str] = {}
+    for index in range(start + 1, len(argv) - 2):
+        if argv[index] in {tables.READ_ONLY_BIND, tables.WRITABLE_BIND}:
+            descriptor = int(argv[index + 1])
+            if descriptor in mounts:
+                raise AssertionError("duplicate source descriptor")
+            mounts[descriptor] = argv[index + 2]
+    return mounts
 
 
 def golden_layout(
@@ -610,10 +623,11 @@ class ArgvRules(unittest.TestCase):
             self.assertNotIn(
                 str(tree.extensions), [during[str(number)] for number in passed]
             )
+            destinations = bound_destinations(argv)
             for number in passed:
                 self.assertGreaterEqual(number, 3)
                 os_path = during[str(number)]
-                destination = argv[argv.index(str(number)) + 1]
+                destination = destinations[number]
                 if destination == "/scenario/scenario.bin":
                     self.assertEqual(os_path, str(tree.scenario))
                 else:

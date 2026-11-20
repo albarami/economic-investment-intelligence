@@ -1216,3 +1216,23 @@ The open points of decisions 0016, 0017 and 0019 are settled at the gates that P
 - Rules and build design: [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md), [07](07_ECONOMIC_METHODS.md), [08](08_BACKEND.md), [09](09_AI_ASSISTANT.md) and [10](10_FRONTEND.md).
 - Quality and operation: [11](11_DESIGN_DIRECTION.md), [12](12_TESTING_AND_QUALITY.md), [13](13_DEPLOYMENT_AND_OPERATIONS.md), [15](15_REVIEWER_CHECKLIST.md), [16](16_DEMO_RUNBOOK.md) and [17](17_DEPLOYMENT_HARDENING.md).
 - Decision records [0001](decisions/0001-fully-synthetic-records-real-public-data.md) to [0023](decisions/0023-ten-additions-and-the-data-rule.md); [decision 0013](decisions/0013-one-deep-journey-before-breadth.md) is superseded by [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md). No external source was used directly in this plan.
+
+## Background national GIS snapshot and after-go-live exceptions — decision 0079
+
+S2-T51 — Dated GIS imagery snapshot to level 10 and offline structured-address search — owns
+its registry, dedicated low-priority mode, configured external D: sibling root, immutable
+resume/receipts, selected-file release seam, typed offline `pub_address_point` search and
+planted refusals. Implementation uses existing S2-T01/S2-T19/S2-T27 and released-address/store
+seams, queued behind S2/S3 work on free seats, with ordinary task review and different-maker
+confirmation. The lead alone starts acquisition after approval. No fixed seat or core is held.
+The fetch and first-hour disk/throughput report remain pending; fixture success proves no real
+coverage. S2-T51's background acquisition is excluded from S2-T10's blanket dependency and
+from every before-go-live task, S2/S3 gate, test, whole test and guided story.
+
+S3-T29 — After-go-live GIS finer zoom and free-text locator — retains only the national
+centre's levels 11 and 12 and `QARS_Custom_Locator`, trigger **after go live**, on the owner's
+permission quoted in decision 0079 item 6 (OWNER_RULES 9). Later review must settle API-only
+permissions, default-off/offline controls, attribution, non-storage and plants before enabling
+anything. No adapter or switch is installed now. The keyed imagery provider under decision
+0023 item 7, BE-135 and BE-136 is unchanged. Full acceptance criteria are in TASKS.md,
+S2-T51 and S3-T29; this placement adds no pre-go-live dependency.

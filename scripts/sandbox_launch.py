@@ -14,7 +14,10 @@ in ``sandbox_check``.
 
 from __future__ import annotations
 
+import hashlib
 import os
+import re
+import resource
 import select
 import signal
 import stat
@@ -24,6 +27,7 @@ import time
 from collections import deque
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import Path
 
 import extension_tree
@@ -64,6 +68,7 @@ CLOSE_SECONDS = KILL_SECONDS / 16
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
 FIRST_FREE_DESCRIPTOR = 3
+MAX_IMAGERY_FILES = 10_000
 DESCRIPTOR_LINK = "/proc/self/fd/{}"
 
 
@@ -98,6 +103,8 @@ class Layout:
     extensions: Path
     staging: Path | None = None
     scenario: Path | None = None
+    imagery_root: Path | None = None
+    imagery: tuple[tuple[Path, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -177,6 +184,42 @@ def check_profile(profile: tables.Profile, layout: Layout) -> None:
     Raises:
         SandboxError: A declared element is missing or an undeclared one is given.
     """
+    if layout.imagery or layout.imagery_root is not None:
+        soft_limit = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
+        if len(layout.imagery) > MAX_IMAGERY_FILES or (
+            soft_limit != resource.RLIM_INFINITY
+            and len(layout.imagery) + 64 > soft_limit
+        ):
+            raise SandboxError("imagery: selected input exceeds descriptor budget")
+        root = layout.imagery_root
+        if (
+            profile.name != "build-release"
+            or root is None
+            or not layout.imagery
+            or not root.is_absolute()
+            or root.is_relative_to(layout.code_root)
+            or root.resolve() != root
+        ):
+            raise SandboxError(
+                "imagery: selected verified files required in build-release only"
+            )
+        seen: set[str] = set()
+        for path, digest in layout.imagery:
+            if (
+                not path.is_relative_to(root)
+                or ".." in path.parts
+                or path.resolve() != path
+                or re.fullmatch(r"[a-f0-9]{64}", digest) is None
+                or digest in seen
+            ):
+                raise SandboxError("imagery: invalid selected object")
+            if (
+                re.fullmatch(r"[a-f0-9]{64}\.(?:tar|json|meta\.json)", path.name)
+                is None
+                or re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", path.parent.name) is None
+            ):
+                raise SandboxError("imagery: immutable object required")
+            seen.add(digest)
     if profile.staging != (layout.staging is not None):
         raise SandboxError(
             f"profile {profile.name} needs a staging folder"
@@ -205,6 +248,7 @@ def mount_sources(
     found += [(layout.cache, True), (layout.extensions, True)]
     if profile.scenario and layout.scenario is not None:
         found.append((layout.scenario, False))
+    found += [(path, False) for path, _ in layout.imagery]
     found.append((layout.vault, True))
     if profile.staging and layout.staging is not None:
         found.append((layout.staging, True))
@@ -329,17 +373,36 @@ def open_sources(
     for path, _ in sources:
         if not path.is_absolute():
             raise SandboxError(f"mount source is not absolute: {path}")
-    for index, (first, _) in enumerate(sources):
-        for second, _ in sources[index + 1 :]:
-            if first == second or first in second.parents or second in first.parents:
-                raise SandboxError(f"mount sources overlap: {first} and {second}")
+    # Component order puts every parent immediately before its first descendant.
+    # Named imagery files can be numerous; pairwise validation stays bounded.
+    ordered = sorted(enumerate(sources), key=lambda item: item[1][0].parts)
+    for (first_index, (first, _)), (second_index, (second, _)) in pairwise(ordered):
+        if first == second or first in second.parents:
+            before, after = (
+                (first, second) if first_index < second_index else (second, first)
+            )
+            raise SandboxError(f"mount sources overlap: {before} and {after}")
     opened: dict[Path, int] = {}
     complete = False
+    imagery = dict(layout.imagery)
     try:
         for path, is_folder in sources:
-            descriptor = _open_one(path, is_folder)
+            try:
+                descriptor = _open_one(path, is_folder)
+            except SandboxError:
+                if path in imagery:
+                    raise SandboxError("imagery: selected object unavailable") from None
+                raise
             if path != layout.extensions:
                 opened[path] = descriptor
+                expected = imagery.get(path)
+                if expected is not None:
+                    with open(DESCRIPTOR_LINK.format(descriptor), "rb") as stream:
+                        if (
+                            hashlib.file_digest(stream, "sha256").hexdigest()
+                            != expected
+                        ):
+                            raise SandboxError("imagery: selected object hash mismatch")
                 continue
             try:
                 opened.update(_open_extensions(path, descriptor))
@@ -416,6 +479,12 @@ def build_argv(
     argv += ["--remount-ro", str(layout.extensions)]
     if profile.scenario and layout.scenario is not None:
         argv += bind(tables.READ_ONLY_BIND, layout.scenario, tables.SCENARIO_INSIDE)
+    for path, digest in layout.imagery:
+        argv += bind(
+            tables.READ_ONLY_BIND,
+            path,
+            "/imagery/" + digest + (".tar" if path.suffix == ".tar" else ".json"),
+        )
     argv += bind(tables.WRITABLE_BIND, layout.vault, str(layout.vault))
     if profile.staging and layout.staging is not None:
         argv += bind(tables.WRITABLE_BIND, layout.staging, str(layout.staging))
