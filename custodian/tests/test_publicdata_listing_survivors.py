@@ -58,6 +58,120 @@ def assert_refusal(result, url, check):
     )
 
 
+def mixed_registry(monkeypatch, source):
+    """Both registry child families, with invented bytes and response metadata."""
+    parent, template = fixture(monkeypatch)
+    parent = replace(parent, key=source, source_id=source)
+    monkeypatch.setattr(listing, "PREFIXES", {source: PREFIX})
+    numbers = ("00288", "00384", "00385") if source == "bldg_ovt" else ("00014",)
+    parts = tuple(
+        replace(
+            template,
+            key=source + "/part-" + number,
+            source_id=source,
+            url="https://" + HOST + "/" + PREFIX + number + ".parquet",
+        )
+        for number in numbers
+    )
+    stac = tuple(
+        replace(
+            template,
+            key=source + "/stac-" + suffix,
+            source_id=source,
+            url="https://" + HOST + "/stac/" + suffix + ".json",
+            extension="json",
+            basis_note="Invented STAC metadata; no whole-file size or ETag.",
+        )
+        for suffix in ("collection", "part-00288", "part-00384", "part-00385")
+    )
+    body = (
+        '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">'
+        "<IsTruncated>false</IsTruncated>"
+        + "".join(
+            "<Contents><Key>"
+            + PREFIX
+            + number
+            + '.parquet</Key><Size>4</Size><ETag>"syn-etag"</ETag></Contents>'
+            for number in numbers
+        )
+        + "</ListBucketResult>"
+    ).encode()
+    return parent, parts, stac, body
+
+
+@pytest.mark.parametrize("source", ["bldg_ovt", "places_ovt"])
+@pytest.mark.parametrize("default_registry", [False, True])
+def test_mixed_registry_lists_only_whole_file_parts(
+    monkeypatch, source, default_registry
+):
+    parent, parts, stac, body = mixed_registry(monkeypatch, source)
+    entries = (parent, *parts, *stac)
+    monkeypatch.setattr(registry, "load_registry", lambda: entries)
+    calls = []
+
+    def reader(url):
+        calls.append(url)
+        assert url == parent.url
+        return _ok(url, body)
+
+    result = listing.prepare_listing(
+        parent, reader, None if default_registry else entries
+    )
+    assert result.failure is None
+    assert result.row_count == len(parts)
+    assert calls == [parent.url]
+    assert [
+        base64.b64decode(page)
+        for page in json.loads(result.body)["listing_pages_base64"]
+    ] == [body]
+
+
+@pytest.mark.parametrize("plant", ["size_record", "etag_record", "prefix", "host"])
+def test_mixed_registry_malformed_part_still_refuses(monkeypatch, plant):
+    parent, parts, stac, _body = mixed_registry(monkeypatch, "bldg_ovt")
+    part = parts[0]
+    if plant == "size_record":
+        part = replace(
+            part, basis_note="recorded_bytes: invalid\nrecorded_etag: syn-etag\n"
+        )
+    elif plant == "etag_record":
+        part = replace(part, basis_note="recorded_bytes: 4\n")
+    elif plant == "prefix":
+        part = replace(part, url="https://" + HOST + "/wrong/invented.parquet")
+    else:
+        part = replace(
+            part, url="https://invented-other.invalid/" + PREFIX + "invented.parquet"
+        )
+
+    def reader(url):
+        pytest.fail("Malformed registered part must refuse before a request")
+
+    assert_refusal(
+        listing.prepare_listing(parent, reader, (parent, *stac, part, *parts[1:])),
+        parent.url,
+        "listing_registered_part",
+    )
+
+
+def test_stac_child_is_not_required_in_parquet_listing(monkeypatch):
+    parent, parts, stac, body = mixed_registry(monkeypatch, "bldg_ovt")
+    # Plant valid-looking whole-file metadata and a release URL on a STAC key.
+    # It is deliberately absent from the listing and must never be compared.
+    stac = tuple(
+        replace(
+            entry,
+            url="https://" + HOST + "/" + PREFIX + "metadata-" + str(index) + ".json",
+            basis_note=parts[0].basis_note,
+        )
+        for index, entry in enumerate(stac)
+    )
+    result = listing.prepare_listing(
+        parent, lambda url: _ok(url, body), (parent, *parts, *stac)
+    )
+    assert result.failure is None
+    assert result.row_count == len(parts)
+
+
 @pytest.mark.parametrize(
     "plant",
     [

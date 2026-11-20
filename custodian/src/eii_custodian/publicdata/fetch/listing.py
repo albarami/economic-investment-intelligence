@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from urllib.parse import urlencode, urlsplit
 from xml.etree import ElementTree as ET
 
@@ -33,7 +34,9 @@ def prepare_listing(
         return _refuse(entry, "listing_url")
     expected: dict[str, tuple[int, str]] = {}
     for part in entries if entries is not None else registry.load_registry():
-        if not part.key.startswith(entry.key + "/"):
+        # STAC metadata shares this parent; only whole-file part keys belong
+        # to the release listing. Validate their metadata below, even if broken.
+        if re.fullmatch(re.escape(entry.key) + r"/part-[0-9]{5}", part.key) is None:
             continue
         key = urlsplit(part.url).path.lstrip("/")
         recorded, invalid = _recorded(part)

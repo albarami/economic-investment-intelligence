@@ -427,7 +427,9 @@ class Production:
         building_keys = [
             e.key
             for e in self.entries
-            if e.source_id == "bldg_ovt" and e.key in self.receipts
+            if e.source_id == "bldg_ovt"
+            and e.key in self.receipts
+            and "gazetteer" in e.release_tables
         ]
         if "gazetteer" in self.tables:
             for key in building_keys:

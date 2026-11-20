@@ -29,6 +29,14 @@ The four concrete files are registry rows under the S2-T06 block. Each file's
 receipt is checked before the file is read. Tests use invented Parquet and a
 stand-in transport. They do not fetch those files.
 
+Release listings compare only registered `part-NNNNN` child keys against their
+recorded whole-file size and ETag. STAC metadata children keep their separate
+HTTPS fetch, receipts and building-completeness checks. The places stage selects
+only Parquet entries from either Overture family, so a verified STAC JSON
+snapshot cannot enter a place or building reader.
+Assembly retains those metadata receipts in its source chain and credits a
+gazetteer output only to entries that declare that release table.
+
 The public build samples its injected UTC clock at build start, validates the
 UTC timestamp and forwards that date through the frame to `StageConfig` and the
 verification loader. Receipt retrieval timestamps continue to sample their own

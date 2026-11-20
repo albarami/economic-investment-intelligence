@@ -250,7 +250,11 @@ def _place_from_registry(
     cache: Path, registry: Sequence[Entry]
 ) -> tuple[Path, FileReceipt] | None:
     for entry in registry:
-        if entry.source_id == _PLACES_SOURCE and entry.skip_reason == "":
+        if (
+            entry.source_id == _PLACES_SOURCE
+            and entry.skip_reason == ""
+            and entry.extension == "parquet"
+        ):
             located = _receipt_of(cache, entry)
             if located is not None:
                 return located
@@ -263,7 +267,12 @@ def _buildings_from_registry(
     paths: list[Path] = []
     receipts: list[FileReceipt] = []
     for entry in registry:
-        if entry.source_id != _BUILDINGS_SOURCE or entry.skip_reason != "":
+        # STAC receipts prove completeness; they are not Parquet stage inputs.
+        if (
+            entry.source_id != _BUILDINGS_SOURCE
+            or entry.skip_reason != ""
+            or entry.extension != "parquet"
+        ):
             continue
         located = _receipt_of(cache, entry)
         if located is None:

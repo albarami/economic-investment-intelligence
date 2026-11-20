@@ -2,6 +2,7 @@
 
 import json
 import shutil
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -93,6 +94,66 @@ def test_frame_invokes_real_nested_build_and_refuses_missing_inventory(
     assert build.frame_result is None
     assert "FAIL buildings check=building_part_unregistered" in build.lines
     assert not (prepared.cache / "assembly/frame.json").exists()
+
+
+def test_frame_keeps_stac_lineage_without_claiming_a_metadata_release_table(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from custodian.tests.building_fixture import PARTS, world
+
+    from eii_custodian.publicdata import assembly_adapters
+
+    prepared = world(tmp_path)
+    names = ("municipality", "zone", "district", "grid_cell", "gazetteer")
+    prepared.entries = tuple(
+        replace(
+            row,
+            release_tables=("gazetteer",)
+            if row.key in PARTS
+            else names
+            if row.source_id == "bnd_hdx"
+            else (),
+        )
+        for row in prepared.entries
+    )
+    build = context(prepared.cache, prepared.entries)
+    build.selected = prepared.selected
+    build.reviewed_selections()
+
+    def frame(*_args, **_kwargs):
+        # Use the real pinned building producer and manifest verifier. The
+        # administrative frame and unrelated places outputs are invented here.
+        prepared.produce()
+        directory = prepared.cache / "places_s2_t06"
+        directory.mkdir()
+        for filename in (
+            "pub_place.jsonl",
+            "pub_place_verification.jsonl",
+            "place_points.json",
+            "build_report.json",
+            "flagship_check.json",
+        ):
+            (directory / filename).write_text("[]")
+        return FrameResult(
+            {
+                name: [
+                    {"municipality_code": "SYN-M", "name_en": "SYN", "name_ar": "SYN"}
+                ]
+                for name in names
+            },
+            [],
+            {"bnd_hdx": {"sha256": "a" * 64}, "bnd_zone_2020": {"sha256": "b" * 64}},
+        )
+
+    monkeypatch.setattr(assembly_adapters, "build_public_frame", frame)
+    build.frame()
+    record = json.loads((prepared.cache / "assembly/frame.json").read_text())
+    for row in prepared.entries:
+        if row.source_id != "bldg_ovt":
+            continue
+        assert row.key in record["source_chain"]
+        assert build.source_tables.get(row.key, []) == list(row.release_tables)
+        assert (row.key in build.table_sources["gazetteer"]) == (row.key in PARTS)
 
 
 def test_additions_runs_real_bulletin_and_indexes_its_written_table(
