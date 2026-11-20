@@ -43222,3 +43222,6 @@ original review/guard list and lead disposition. Different-maker review of the
 four implementation closures remains required by the existing workflow.
 
 Final post-append metadata checks: documentation exit 0 (1138 text files, 123 Markdown files), tree exit 0 (8 rules), whitespace exit 0. `python3 .overnight/tmp/p03/audit.py` exited 0: six scoped tracked files, original PROGRESS.md byte prefix and OPEN_ITEMS.md historical lines preserved, TASKS.md/AGENTS.md/CLAUDE.md unchanged, four closures/one open dependency, report marker and authored-text hygiene verified. Results are retained in `.overnight/tmp/p03/` and `.overnight/RETURN.md`.
+
+Correction (S2-P03 review, 2026-11-20): the bad_date and bad_timestamp expectations are CPython 3.14-series datetime messages; the Python pin is the series 3.14.x (retreat 3.13.x), not a patch, and the bad_date text differs before 3.14, so a change of interpreter series must update or replace these two expectations.
+Correction (S2-P03 review, 2026-11-20): the post-ledger check results are those of this block's final line; RETURN.md is an untracked handoff and not evidence of record.

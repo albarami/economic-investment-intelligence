@@ -4035,6 +4035,7 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
 
 - CLOSING LINE — 2026-11-20, S2-P03: **CLOSED by test hardening**. The conditional `expected` lookup let six malformed receipts pass with any ValueError; `absent` already had its own exact assertion and `absent_field` was already mapped. `custodian/tests/test_series_exact_regressions.py::test_pub64_requires_receipt_lineage` now maps all six remaining cases and asserts every mapped reason unconditionally. An in-memory wrong-reason defect made those six cases fail (red exit 1, six failed); unchanged production code passed the shared focused run (green exit 0, 18 passed). Seed 6472901536; proof commands and logs: PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. Independent closure review remains with the lead; no slice acceptance is claimed.
+- REVIEW NOTE — 2026-11-20, S2-P03 review (Anthropic, Claude Opus 5.5): deciding confirmed independently; bad_date and bad_timestamp pin CPython 3.14-series runtime texts, not application reasons; mapping them to one closed PUB-64 reason is an optional later production change, not required by this item.
 
 ### PO-S2-75 — The terms fingerprint means different things in the benchmark rows and document 04
 
