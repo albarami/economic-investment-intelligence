@@ -86,6 +86,116 @@ command = launch.python_command(
 command.append(marker)
 launch.run_in_sandbox("build-world", layout, command, timeout=120)
 """
+# The same driver with the bubblewrap program replaced by the payload's "bwrap"
+# path, in the driver's own process only (OI-129): nothing that ships reads it.
+_DIE_ANCHOR = "payload = json.loads(sys.argv[2])\n"
+if DIE_DRIVER.count(_DIE_ANCHOR) != 1:
+    raise RuntimeError("the die-with-parent driver changed: update STANDIN_DIE_DRIVER")
+STANDIN_DIE_DRIVER = DIE_DRIVER.replace(
+    _DIE_ANCHOR, _DIE_ANCHOR + 'launch.tables.BWRAP = payload["bwrap"]\n'
+)
+# A stand-in for bubblewrap that holds the start-up window of OI-129 open for
+# good: its outer layer arms its parent-death signal as --die-with-parent does,
+# and its inner layer never arms one. The inner layer writes its process id
+# beside the program once it runs, then sleeps; its command line is the outer
+# one, so it carries the test's marker.
+STANDIN_BWRAP = """#!{python} -I
+import ctypes
+import os
+import signal
+import sys
+import time
+from pathlib import Path
+
+PR_SET_PDEATHSIG = 1
+libc = ctypes.CDLL(None, use_errno=True)
+if libc.prctl(PR_SET_PDEATHSIG, signal.SIGKILL, 0, 0, 0) != 0:
+    sys.exit(2)
+inner = os.fork()
+if inner == 0:
+    ready = Path(sys.argv[0]).with_name("inner.pid")
+    part = ready.with_name("inner.part")
+    part.write_text(str(os.getpid()))
+    part.rename(ready)
+    time.sleep(60)
+    os._exit(0)
+os.waitpid(inner, 0)
+"""
+# A supervisor whose cleanup never finishes (F1 of the part F review): it never
+# reads its control pipe and ignores the ending signals. It leaves one child in
+# its own process group and, as bubblewrap's inner layer runs in a session of
+# its own, one child that starts a new session and has a child of its own. Once
+# all four run it writes their process ids beside itself, then sleeps. Every
+# process is a fork, so each command line carries the test's marker. Used only
+# by STALLED_DRIVER, in the test driver's own process.
+STALLED_SUPERVISOR = """
+import os
+import signal
+import time
+from pathlib import Path
+
+for signum in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
+    signal.signal(signum, signal.SIG_IGN)
+grouped = os.fork()
+if grouped == 0:
+    time.sleep(60)
+    os._exit(0)
+report, written = os.pipe()
+leader = os.fork()
+if leader == 0:
+    os.close(report)
+    os.setsid()
+    below = os.fork()
+    if below == 0:
+        os.close(written)
+        time.sleep(60)
+        os._exit(0)
+    os.write(written, str(below).encode())
+    os.close(written)
+    time.sleep(60)
+    os._exit(0)
+os.close(written)
+below = int(os.read(report, 64))
+tree = Path(__file__).with_name("tree.pids")
+part = tree.with_name("tree.part")
+part.write_text(f"{os.getpid()} {grouped} {leader} {below}")
+part.rename(tree)
+time.sleep(60)
+"""
+# A driver that runs the sandbox with the stalled supervisor above, swapped in
+# its own process only, and a time limit of 1 s; it prints the time the launcher
+# took and the text of the time-out it raised.
+STALLED_DRIVER = """
+import json
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, sys.argv[1])
+import sandbox_launch as launch
+payload = json.loads(sys.argv[2])
+marker = sys.argv[3]
+launch.SUPERVISOR = Path(payload["supervisor"])
+root = Path(payload["root"])
+layout = launch.Layout(
+    code_root=root,
+    cache=root / "data" / "public_cache",
+    vault=root / "data" / "vault" / "b1",
+    extensions=root / "data" / "engine_extensions",
+    scenario=Path(payload["scenario"]),
+)
+command = launch.python_command(
+    "-c",
+    "import time; time.sleep(60)",
+    venv=Path(payload["venv"]),
+)
+command.append(marker)
+started = time.monotonic()
+try:
+    launch.run_in_sandbox("build-world", layout, command, timeout=1.0)
+except launch.SandboxTimeout as error:
+    print(json.dumps({"elapsed": time.monotonic() - started, "error": str(error)}))
+"""
 
 
 def assert_not_root() -> None:

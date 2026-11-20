@@ -39249,6 +39249,258 @@ Seed:      1880996636
 Notes:     Lead only, owed; never executed by this preparation. Hosted/head checks and fresh-seed exact merge-result run remain separate.
 ```
 
+### MERGE TRAIN S2-9 — Slice S2: task log (pull request 106)
+
+Maker: Anthropic; model: Claude Fable 5.2 (preparation of these ledger inputs only). Persona: release coordinator writing script-checked ledger inputs; strict self-review as a records reviewer who rejects any claim without a source. Skills loaded: project-orientation, task-standards, sanad-provenance, verification-before-completion, muhasabah-gate.
+
+Train S2-9 carries task S2-T10 part F (open item OI-129): five commits picked in order, and the lead's records commit. Base f8438c5e21250e96ab10b05643959f063d874176; WORK e273fc71255768b56f12b4bc140101eb7f5edfc4; six work commits; twelve files (git diff --name-status of base and WORK). The file-by-file comparison of each pick with its original is in identity-proof.json, written by make_spec.py from Git: the commit messages are equal, the changed lines of every file are equal, and every file is byte-equal after the pick except the record file `PROGRESS.md`, to which both lines of work append; make_spec.py refuses any other difference.
+
+Sources used below. "Log" is the lead's run log of 2026-11-20, cited by its time. "Return" is the review or builder return file of the named job. "Commit" is the Git object. "PROGRESS.md" is the builders' own evidence under the five headings that begin "S2-T10 part F". No test was run to prepare this log; every count below is quoted from its source and none is new. PROGRESS.md numbers the reviews first to fifth in the order rev1, sec1, conf2, conf3, conf4; the fifth commit's message says "the fifth confirmation" for the job the log calls conf4.
+
+#### Commit 1 of 5 — the supervisor (original d6383e44c5af9946c2cd0baac16ae998c1f72181)
+
+- Pick: d10010b7dd1d52f7d322db2141f2d00bd164c3bd.
+- Subject: fix(sandbox): no sandboxed process outlives a driver killed during start-up (S2-T10 part F, OI-129).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M; committed by the lead because the builder's sandbox could not commit. Sources: log 06:04 (launch), log 06:40 (result), the commit's Builder line.
+- Lead's check at the result: 34 passed (supervisor, mounts and argv tests). Source: log 06:40.
+- Review S2-T10F.M.rev1: OpenAI, gpt-6.1-sol through Codex. Verdict REJECTED; finding F1 (unbounded cleanup wait) accepted by ruling L-1193. Sources: log 06:40 (launch), log 06:46 (verdict and ruling). The return file of this review is not among the supplied inputs.
+- Security review S2-T10F.M.sec1: Cognition, Devin SWE-2 High. Verdict APPROVED with findings: 1 is rev1's F1; 2 is a set-up exception before the supervisor's guarded block that exits with a traceback and not a refusal; 3 is a known limit, acceptable. Source: log 06:51. The return file of this review is not among the supplied inputs.
+- Outcome: one fix round, ruled with L-1193 (log 06:51); it is commit 2.
+
+#### Commit 2 of 5 — the bounded cleanup wait (original c55f78675510ad19d1b69fb2347d2910e27886b1)
+
+- Pick: 26b4bcd690b06c59850f3422537f57e88b7b8588.
+- Subject: fix(sandbox): the launcher's cleanup wait is bounded and a stalled supervisor is ended by the launcher (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r2; committed by the lead. Sources: log 06:51 (launch), log 07:28 (result), the commit's Builder line.
+- Lead's checks at the result: four sandbox test files exit 0, 41 passed, 3 subtests; check-enforcement exit 0, OK. Source: log 07:28.
+- Confirmation S2-T10F.M.conf1: Cognition, SWE-2 High through Devin. No verdict: the job ended with an empty response (exit 1), recorded as a tool error and not a finding, and was not retried there. Source: log 07:33.
+- Confirmation S2-T10F.M.conf2: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range d6383e44..c55f7867: F1 stale-ancestor process-number reuse, F2 the deadline not carried through the walk, F3 unreadable metadata confirming falsely; its checks 2, 3 and 5 pass; findings from source inspection, no test run by the reviewer. Sources: log 07:39; return S2-T10F.M.conf2.md.
+- Outcome: all three findings accepted by ruling L-1203 (log 07:39); the fix is commit 3.
+
+#### Commit 3 of 5 — ancestry, deadline and unread processes (original 34294ca91d2838436a49f94e1532f3d95f5dde9b)
+
+- Pick: c2cf6a403b2bd29c9ec2cdbee37dbeeb9a359f5f.
+- Subject: fix(sandbox): the stalled-run cleanup validates ancestry, carries its deadline and never confirms an unread process (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r3; committed by the lead because the builder's Git folder was read-only. Sources: log 07:39 (launch), log 08:06 (result), return S2-T10F.M.r3.md, the commit's Builder line.
+- Lead's checks at the result: 44 passed, 3 subtests; check-enforcement OK. Source: log 08:06.
+- Confirmation S2-T10F.M.conf3: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range c55f7867..34294ca9: F1 and F3 closed; F2 not fixed (index building, frontier processing and finalization outside the deadline); source inspection, no test run by the reviewer. Sources: log 08:15; return S2-T10F.M.conf3.md.
+- Ruling L-1206 (log 08:15) follows this verdict; under it the fourth round changes F2 only (return S2-T10F.M.r4.md, title) and conf4 is the "last round for F2" (log 08:44). The text of the ruling itself is not among the supplied inputs.
+- Not verdicts of record: three pilot replays of the conf3 brief on 34294ca9 (Cognition SWE-2 High, DeepSeek V4.1 Flash, xAI Grok 4.7) each returned CONFIRMED where conf3 rejected on F2; the lead classed each as lesser and kept F2 accepted on the code. Sources: log 08:28, 08:30, 08:33.
+
+#### Commit 4 of 5 — one deadline for the whole cleanup (original c5968f98ef5c8b2a0a280c43c64e0bbe0fb9b98a)
+
+- Pick: ea227d460ce52f1b027b7ca55159738b0e1c8d2c.
+- Subject: fix(sandbox): one deadline bounds the whole stalled-run cleanup (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r4; committed by the lead because Git refused the builder's commit. Sources: log 08:15 (launch), log 08:44 (result), return S2-T10F.M.r4.md, the commit's Builder line.
+- Lead's checks at the result: four sandbox test files exit 0, 48 passed, 5 subtests; check-enforcement OK; ruff check and format clean. Source: log 08:44.
+- Confirmation S2-T10F.M.conf4: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range 34294ca9..c5968f98: the indexing and frontier causes of F2 are closed; the remaining path is the descriptor closes after a wait that used its whole allowance, which run past KILL_SECONDS; TARGET_SLOTS is a fail-safe bound whose value needs an open item; no test run by the reviewer. Sources: log 08:54; return S2-T10F.M.conf4.md.
+- Ruling L-1214 (log 08:54): the remaining path was reproduced on the virtual clock (2.0029 against 2.0) and is real; the lead fixed it (CLOSE_SECONDS, one sixteenth of KILL_SECONDS, kept for the closes; the result judged after them; no bound raised; plant red; 512 closes measured at 0.102 ms); checks green; a narrow confirmation, conf5, by the same reviewing model. The fix is commit 5; the open item for the TARGET_SLOTS value is OI-351 of the records commit.
+
+#### Commit 5 of 5 — the closes inside the deadline (original 15ea661cf0075582422f663ace1acf9b80da6a2b)
+
+- Pick: 20b89cc01d56ce70808e75c84ff3555957d34fb6.
+- Subject: fix(sandbox): the closes after the waits end within the cleanup deadline (S2-T10).
+- Builder: the lead, Anthropic, Claude Opus 5.5. Sources: log 08:54 (ruling L-1214, "the lead fixed it"), log 09:03 ("lead fix committed 15ea661c"), PROGRESS.md "S2-T10 part F, fifth round" (its Builder line), the commit (no Builder line; its trailer names Claude Opus 5.5).
+- Lead's recorded checks: `test_sandbox_supervisor.py` exit 0, 17 passed, 5 subtests; four sandbox test files exit 0, 48 passed, 5 subtests; check-enforcement exit 0, "sandbox enforcement: OK"; scripts unittest exit 0, 947 tests, OK. Sources: PROGRESS.md "S2-T10 part F, fifth round"; log 09:03 for the 947.
+- Confirmation S2-T10F.M.conf5: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict CONFIRMED on 15ea661c against c5968f98, limited to the finalization-deadline fix under L-1214; no finding within that hunk; the remaining F2 path closed for the modelled costs; no test run by the reviewer, the executions being the lead's. Sources: log 09:07; return S2-T10F.M.conf5.md.
+- The lead's closing line: "part F closed; five commits join train S2-9". Source: log 09:07.
+
+#### Records commit (e273fc71255768b56f12b4bc140101eb7f5edfc4)
+
+- Subject: chore(records): train S2-9 records: OI-129 closed by the part F fix; OI-351 and OI-352 (S2-T10).
+- Author: the lead; the commit's trailer names Claude Opus 5.5. Source: the commit.
+- Content, as first committed at e273fc71255768b56f12b4bc140101eb7f5edfc4: `OPEN_ITEMS.md` and `TASKS.md` only, 24 lines added and 2 removed. OI-129 changes from OPEN to CLOSED with a CLOSED BY line; OI-351 (the chosen target count of 512) and OI-352 (the deadline's dependence on fast host operations, and three walk cases still unproved) are appended; the S2-T10 delivery line gains the part F sentence. Source: git show of the commit.
+- No review or confirmation of the records commit is among the supplied inputs. For that reason this ledger passes no open-item file and no TASKS.md replacement: the records commit already carries them.
+
+#### What the evidence does and does not show
+
+- Each of the five commits was read by a maker other than its builder's. The verdicts of record are: commit 1 REJECTED (rev1) and APPROVED with findings (sec1); commits 2, 3 and 4 REJECTED (conf2, conf3, conf4); commit 5 CONFIRMED (conf5).
+- Each accepted finding is answered by the following commit, and its closure is stated by the rejecting maker's next return: conf3 closes F1 and F3 of conf2; conf4 closes the indexing and frontier causes of F2; conf5 closes the remaining F2 path, for the modelled costs.
+- No single review in the supplied inputs returns APPROVED or CONFIRMED for the whole range of the five commits: conf5 is limited to the last fix. This log states no such verdict.
+- Still owed and not claimed here: the confirmation of the joined head by a maker other than the one that joined the train (rule 33, decision 0032), the six hosted checks on the joined head, and the lead's whole test with a fresh seed on the exact merge result. The command rows that follow this log are the lead's runs at WORK.
+
+#### Evidence for the work commit `e273fc71255768b56f12b4bc140101eb7f5edfc4`
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_argv.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_forbidden_options_never_appear; test_no_interpreter_refuses; test_run_starts_bubblewrap_with_nothing_inherited; test_setup_failure_exit_and_timeout; test_start_failure_closes_the_control_pipe. Source: scripts/tests/test_sandbox_argv.py at e273fc71; 16 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_mounts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_driver_killed_at_the_first_sandbox_process; test_driver_killed_while_a_layer_is_unarmed; test_timeout_kills_the_process_group; test_timeout_with_a_stalled_supervisor_is_bounded. Source: scripts/tests/test_sandbox_mounts.py at e273fc71; 11 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_prove.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_prove_runs. Source: scripts/tests/test_sandbox_prove.py at e273fc71; 4 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_supervisor.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "17 passed, 5 subtests passed in 1.54s" (pytest with subtests: the whole summary line is matched, so no failed, error or skipped word passes (precedent: train S2-3); the count is the one recorded at original 15ea661c, whose copy of this file and of the launcher and supervisor is byte-equal)
+Seed:      none
+Notes:     Changed test file of the train (A), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_a_closed_control_pipe_is_refused_and_nothing_starts; test_a_foreign_launcher_is_refused_and_nothing_starts; test_a_setup_error_is_refused_and_nothing_starts; test_a_stale_tree_never_signals_an_unrelated_process; test_an_ending_signal_ends_the_run; test_an_orphan_is_ended_when_the_program_ends; test_an_unreadable_process_is_never_confirmed; test_arguments_are_checked; test_closing_the_control_pipe_ends_the_run; test_status_is_passed_through; test_subreaper_refused_is_reported; test_the_cleanup_time_is_bounded; test_the_frontier_stops_at_the_deadline; test_the_index_is_not_built_after_the_deadline; test_the_kill_work_is_bounded_before_a_process_is_taken; test_the_launcher_ends_a_stalled_run_itself; test_the_walk_stops_at_its_deadline. Source: scripts/tests/test_sandbox_supervisor.py at e273fc71; 17 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "830 files already formatted"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 447 source files"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1128 text files, 121 Markdown files: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte parity at WORK (rule 2); the train changes neither file.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','f8438c5e21250e96ab10b05643959f063d874176...e273fc71255768b56f12b4bc140101eb7f5edfc4'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/sandbox_supervisor.py A:scripts/tests/test_sandbox_supervisor.py M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:scripts/ci_junit.py M:scripts/sandbox_launch.py M:scripts/tests/sandbox_support.py M:scripts/tests/test_sandbox_argv.py M:scripts/tests/test_sandbox_mounts.py M:scripts/tests/test_sandbox_prove.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "12 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK scope: 12 files; 10 are of the five part F commits and the records commit changes OPEN_ITEMS.md and TASKS.md.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f8438c5e21250e96ab10b05643959f063d874176..e273fc71255768b56f12b4bc140101eb7f5edfc4'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Five picks of the approved part F commits and the records commit; linear; six subjects checked by make_spec.py.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     The blocking proof of the generator sandbox on the build machine, owed because the train changes scripts/sandbox_launch.py and adds scripts/sandbox_supervisor.py. The matched line is ENFORCEMENT_OK of scripts/sandbox_check.py.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    947 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the joined tree, run with unittest as rule 44 lists them. They include the four changed sandbox test files and the 8 unchanged test files that import a changed module (test-inventory.json). No expected count is pinned: the recorded 947 was taken on another base.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   ./eii test --seed 3587189981
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11980 passed, 0 failed, 0 skipped
+Seed:      3587189981
+Notes:     The whole test at WORK with the seed given at run time; lead only, never run by this preparation. The hosted checks on the joined head and the fresh-seed run on the exact merge result stay separate.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -42091,3 +42343,94 @@ Preparation command `python3 .overnight/OUT/TRAIN-S2-8-spec/make_spec.py` exited
 Verification remains incomplete until the lead runs the locked tests with an available pinned environment. Lead's correction before commit: the size review was served by Z.ai GLM-5.3 (another maker than the builder, OpenAI), so project rule 35 holds; and the lead runs every listed test file in the pinned environment in the train ledger. Muhasabah: PASS for source attribution, bounded edits, append-only evidence and honest failure reporting; test verification is BLOCKED by missing offline dependencies, not approved. This record makes no task, train or slice completion claim. The final post-report document/tree/parity/JSON and artifact checks are appended as a separate correction after their actual execution.
 
 Final post-report checks, 2026-11-20: python3 scripts/check_docs.py exit 0, 1126 text files and 121 Markdown files; python3 scripts/check_tree.py exit 0, 8 rules; cmp AGENTS.md CLAUDE.md exit 0; the brief's spec JSON parse command exit 0. Artifact audit exit 0: 49 equal source/pick file deltas, append-only PROGRESS.md and OPEN_ITEMS.md, no merges key, preserved WORK placeholders and task checkbox parity, all 11 changed tests included among 84 test files, generated-file forbidden-pattern scan clean, return marker last. Evidence: .overnight/OUT/TRAIN-S2-8-spec/final-checks.json. These checks followed the draft return and precede this evidence append. No test environment failure was closed.
+
+## S2-T10 part F — OI-129: no sandboxed process outlives a driver killed during start-up (2026-11-20)
+
+Builder: Anthropic, Claude Opus 5.5 (overnight worker); persona a senior Linux sandboxing and security engineer; strict self-review as a security reviewer. Skills: project-orientation, task-standards, systematic-debugging, test-driven-development, security-review (plain meaning), verification-before-completion, muhasabah-gate. Base `33df1963`; environment: four processors of the build machine, bubblewrap 0.11.1, kernel 6.6 (WSL2), Python 3.14 from the project environment.
+
+Cause (batch F12, reproduced again here): `scripts/sandbox_launch.py` started bubblewrap as the driver's direct child. Bubblewrap's `--die-with-parent` arms a parent-death signal in each of its layers, but the inner layer (the init of the new pid namespace) arms its own only during its start-up. A driver killed before that kills the outer layer, and the inner layer is re-parented to the system's init and runs the sandboxed command on. Every survivor was that inner `bwrap` with its sandboxed `python`.
+
+Fix: the launcher starts `scripts/sandbox_supervisor.py`, which starts bubblewrap as its child. Before it starts anything the supervisor makes itself a child subreaper (checked by reading the flag back), arms a parent-death signal and checks the driver is still its parent, and checks a control pipe whose only writer is the driver; it refuses the run (status 1, `sandbox supervisor: ` line, nothing started) if any step fails. When the pipe reaches end of file (the driver exited, crashed or was killed, or closed it at its time limit) or an ending signal arrives, the supervisor kills every child it has, present or re-parented to it, and reaps until it has none: a subreaper with no child has no descendant, and killing the inner layer kills its whole pid namespace. Signals are routed to a wake-up pipe, never raised, so the ending cannot be interrupted half-way. The timeout path closes the pipe instead of killing a process group; its message is now "every process of the sandbox was killed". No bubblewrap option, mount, bound or time limit changed.
+
+Red before (unchanged launcher, alone):
+- new `test_driver_killed_while_a_layer_is_unarmed` (a stand-in bubblewrap whose inner layer never arms the signal; the deterministic reproduction, swapped in only in the test driver's own process): 30 runs, 30 failed.
+- new `test_driver_killed_at_the_first_sandbox_process` (real bubblewrap, driver killed at the first process of the launch, no pause): 30 runs, 30 failed.
+- unchanged `test_die_with_parent` with four CPU-bound busy loops on the same four processors: 30 runs, 5 failed ("a sandboxed process outlived its driver"); 4 surviving inner `bwrap` processes found re-parented to init afterwards and killed by pid.
+
+Green after (fixed launcher, four CPU-bound busy loops on the same processors, killed by pid afterwards):
+- unchanged `test_die_with_parent`: 30 runs, 0 failed.
+- `test_driver_killed_while_a_layer_is_unarmed`: 30 runs, 0 failed.
+- `test_driver_killed_at_the_first_sandbox_process`: 30 runs, 0 failed.
+- no marker process left after any series.
+
+Planted violations: the supervisor without the subreaper flag fails `test_driver_killed_while_a_layer_is_unarmed` and four tests of `scripts/tests/test_sandbox_supervisor.py`; the supervisor without the sweep of its children fails the same stand-in test and three supervisor tests; each plant was reverted and the file compared equal to the kept copy.
+
+Checks on the final tree (exit codes): `uv run --locked python -m pytest scripts/tests/test_sandbox_*.py -p no:cacheprovider -q` 0 (87 passed, 16 subtests); `uv run --locked python scripts/sandbox_check.py check` 0, `check-extensions` 0, `check-enforcement` 0; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` 0 (937 tests, OK); `uv run --locked ruff check .` 0; `uv run --locked ruff format --check .` 0; `uv run --locked mypy` 0 (447 files); `python3 scripts/check_docs.py` 0; `python3 scripts/check_tree.py` 0; `cmp AGENTS.md CLAUDE.md` 0. `./eii test` not run (brief). The two new marker tests join `ci_junit.REQUIRED` (21 cases). Independent review by another maker is still needed (rule 35).
+
+## S2-T10 part F, fix round — OI-129: the launcher's cleanup after a timeout is bounded and setup errors are refused (2026-11-20)
+
+Builder: Anthropic, Claude Opus 5.5 (overnight worker, the maker of `d6383e44c5af9946c2cd0baac16ae998c1f72181`); persona a senior Linux systems engineer for process sandboxes; strict self-review as a security reviewer. Reviews answered: the first review of part F (another maker, REJECTED: F1, record notes N1 and N2) and the second (another maker, APPROVED: findings 1 and 2). Skills: test-driven-development and verification-before-completion applied as written; project-orientation, task-standards, systematic-debugging, security-review and muhasabah-gate in their plain meaning (not loaded).
+
+Finding F1 (both reviews). Cause: at the time limit `scripts/sandbox_launch.py` closed the control pipe and then waited for the supervisor with `process.communicate()` and no bound, so a supervisor whose cleanup stalls (stopped, or blocked in `waitpid` on a process that does not end) held the launcher for good. Fix: the wait after the close is bounded by `CLEANUP_SECONDS` (4 s). When it expires, `end_stalled` stops the supervisor's process group, then walks `/proc` by parent from the supervisor, pins each descendant with a process descriptor, checks that it still has the parent the walk saw and stops it, until a walk finds no new one; it then kills every pinned process and the group, and reaps the supervisor, all within `KILL_SECONDS` (2 s). The walk is needed because bubblewrap's inner layer runs in a session of its own, which a kill of the group alone misses. The output is read for at most `DRAIN_SECONDS` (1 s); after that the streams are closed. The time-out then says "the supervisor's cleanup did not finish and its processes were killed by the launcher". If any signal was refused, the walk did not settle, the supervisor was not reaped or a pinned process did not end within the bound, it says instead that they "were sent a kill by the launcher, but their end is not confirmed". It never uses the normal text in either case. With a 1 s limit the sum stays within the existing 10 s of the time-out tests; no limit was raised. Test-only stand-in: `STALLED_SUPERVISOR` in `scripts/tests/sandbox_support.py` (ignores the closed pipe and the ending signals; one child in its group; one child in a new session with a child of its own), swapped in as `launch.SUPERVISOR` only inside `STALLED_DRIVER`, the test's own driver process.
+
+Finding 2 of the second review. Cause: an exception in the supervisor's set-up before its `try` block (for example `os.pipe2` failing) ended it with a traceback instead of a refusal line. Fix: the set-up is wrapped; such an error refuses with "sandbox supervisor: the run was refused after an error in its set-up (TYPE)", where TYPE is the exception's class name, and nothing is started.
+
+Record notes N1 and N2 of the first review: applied as written (the comment of `test_driver_killed_at_the_first_sandbox_process`; the `timeout` argument line of `run_in_sandbox`). The rename that the second review's record note suggested was not done.
+
+Forced change to an existing test, with its reason: `test_sandbox_argv.ArgvRules.test_setup_failure_exit_and_timeout` case "f" pinned the second wait as `timeout=None`, which is the unbounded wait. It now expects `launch.CLEANUP_SECONDS`, so it asserts the bound. That is stricter than before, not weaker. Every other existing test, bound and refusal is unchanged. `test_die_with_parent` and `DIE_DRIVER` are byte-identical to `d6383e44` (same sha256 of the method and of the driver text).
+
+New tests: `test_sandbox_mounts.MountRules.test_timeout_with_a_stalled_supervisor_is_bounded` (marked sandbox module; it joins `ci_junit.REQUIRED`, now 22 cases); `test_sandbox_supervisor.SupervisorRules.test_a_setup_error_is_refused_and_nothing_starts` and `test_the_launcher_ends_a_stalled_run_itself` (three cases: confirmed, a late supervisor, a refused stop signal). These two are in the unmarked module, so they are not in the required list.
+
+Red, with the `d6383e44` launcher and supervisor and the new tests: `uv run --locked python -m pytest` on the three new tests exited 1. The stalled-supervisor test failed with "the launcher did not return after its supervisor stalled" when its 30 s bound on the driver ran out. The set-up test got a traceback and no refusal line. The `end_stalled` test failed with no such attribute. Nothing was left running.
+
+Green after: the same tests pass. Planted violation: with the `/proc` walk turned off, so that only the group is killed, the stalled-supervisor test fails and lists the two processes of the other session as survivors. The plant was reverted and the file compared equal to the kept copy.
+
+Repeat series on the final code, 30 runs each, run by unittest in one process with four CPU-bound busy loops on the same four processors of the affinity mask (all four alive at the end, killed by pid afterwards): `test_die_with_parent` 0 failed; `test_driver_killed_while_a_layer_is_unarmed` 0 failed; `test_driver_killed_at_the_first_sandbox_process` 0 failed; `test_timeout_with_a_stalled_supervisor_is_bounded` 0 failed; `test_timeout_kills_the_process_group` 0 failed; `test_a_setup_error_is_refused_and_nothing_starts` 0 failed; `test_the_launcher_ends_a_stalled_run_itself` 0 failed. No marker process was left afterwards. An earlier series is void: it ran while `end_stalled` was being changed, and its last test failed 30 of 30 against the launcher loaded before the change.
+
+Checks on the final tree (exit codes): `uv run --locked python -m pytest scripts/tests/test_sandbox_supervisor.py scripts/tests/test_sandbox_mounts.py scripts/tests/test_sandbox_prove.py -q -p no:cacheprovider` 0 (25 passed, 3 subtests); `uv run --locked python scripts/sandbox_check.py check-enforcement` 0 ("sandbox enforcement: OK"); `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` 0 (940 tests, OK; its first run on this round exited 1 on the argv case "f" above, before that case was changed); `uv run --locked ruff check .` 0; `uv run --locked ruff format --check .` 0; `uv run --locked mypy` 0 (447 files); `python3 scripts/check_docs.py` 0 (1126 text files, 120 Markdown files); `python3 scripts/check_tree.py` 0 (8 rules); `cmp AGENTS.md CLAUDE.md` 0. `./eii test` not run (brief). Review by another maker is still needed (rule 35).
+
+Lead, 2026-11-20: the round-two tree was committed by the lead because the builder's sandbox could not commit; the lead reran the four sandbox test files on that tree (exit 0, 41 passed, 3 subtests) and the enforcement proof (exit 0, "sandbox enforcement: OK").
+
+Correction (record note N1 of the third part F review, 2026-11-20): the lead's sentence above reads: The lead ran four sandbox test files (exit 0; 41 passed, 3 subtests) and check-enforcement (exit 0; sandbox enforcement: OK).
+
+## S2-T10 part F, third round — OI-129: the stalled-run cleanup validates ancestry, carries its deadline and never confirms an unread process (2026-11-20)
+
+Builder: Anthropic, Claude Opus 5.5 (overnight worker, the maker of `c55f78675510ad19d1b69fb2347d2910e27886b1`); persona a senior Linux sandbox engineer (bubblewrap, pid namespaces, child subreapers, process descriptors, bounded cleanup); strict self-review as a security reviewer. Review answered: the third review of part F (another maker, REJECTED: F1 to F3 and record note N1), all accepted by the lead (ruling L-1203). Skills: test-driven-development and verification-before-completion applied as written; project-orientation, task-standards, systematic-debugging, security-review and muhasabah-gate in their plain meaning (not loaded).
+
+F1. Cause: `end_stalled` took a whole numeric tree from one walk and then checked each process only against its parent's number, so the child of a rejected (reused) parent number was still stopped and killed. Fix: each round (`_walk_round`) reads `/proc` once and goes down from the unreaped supervisor through established processes only. A candidate is pinned by a process descriptor, read again, and kept only when it has not ended after the read, its start time (field 22 of `/proc/<pid>/stat`) equals the walk's, its live parent is the established parent's id, and that parent (pinned, or the unreaped supervisor) has not ended after the read. A candidate that is gone, stale or not established is neither signalled nor gone below; pins are keyed by id and start time. Test: `test_sandbox_supervisor.SupervisorRules.test_a_stale_tree_never_signals_an_unrelated_process` (root -> A -> B -> C, where B and C are an unrelated parent and child that the test started, C's parent really being B's number, and the walk's first read of B naming A as its parent; process descriptors signalled are traced through `/proc/self/fdinfo`).
+
+F2. Cause: the deadline was checked only before each whole walk; enumeration, tree building, pinning and stopping had no check. Fix: one absolute deadline of `KILL_SECONDS` from the call; the walk stops at `WALK_SECONDS` (half of it), checked before each `/proc` entry is read and each candidate is pinned; a walk cut short is not settled, so the end is unconfirmed. The kills (one call per pinned process and one to the group) are always sent and timed: sent after the deadline, the end is unconfirmed; the waits use what is left. No limit was raised (`CLEANUP_SECONDS` 4, `KILL_SECONDS` 2, `DRAIN_SECONDS` 1, unchanged). Test: `test_the_walk_stops_at_its_deadline` (the clock passes the whole bound at the third stat read; no process is read after it, the group's kill is still sent, the result is False, under 2 s of real time).
+
+F3. Cause: `_parent_of` took every `OSError` as a gone process. Fix: `_stat_of` returns None only for ENOENT and ESRCH; any other error or a malformed line raises `_Unread`, which makes the round incomplete, so the walk cannot settle and the launcher cannot say "killed". A supervisor already reaped, or one found ended during the walk, is not walked from and leaves the end unconfirmed. Test: `test_an_unreadable_process_is_never_confirmed` (EACCES on the stat of the stand-in's child in a session of its own; the result is False and that child is indeed still running, then ended by the test).
+
+Red, with the `c55f7867` launcher and the three new tests: exit 1, 3 failed: F1 the unrelated child was signalled; F2 106 stat reads after the deadline; F3 `end_stalled` returned True. Green after: `test_sandbox_supervisor.py` exit 0 (13 passed, 3 subtests). Planted violations in the new launcher, each reverted and compared equal to the kept copy: going below a stale candidate fails the F1 test (the unrelated child signalled); no deadline check in the enumeration fails the F2 test; an unreadable stat taken as gone fails the F3 test (True returned). The three new tests are in the unmarked module, so `ci_junit.REQUIRED` is unchanged (22 cases, none lost). `test_die_with_parent`, `DIE_DRIVER`, `test_sandbox_mounts.py` and `sandbox_support.py` are unchanged.
+
+Repeat series on the final code, 30 runs each, run by unittest in one process with four CPU-bound busy loops on the four processors of the affinity mask (all four alive at the end, killed by pid afterwards; no busy loop or marker process left): `test_die_with_parent`, `test_driver_killed_while_a_layer_is_unarmed`, `test_driver_killed_at_the_first_sandbox_process`, `test_timeout_with_a_stalled_supervisor_is_bounded`, `test_timeout_kills_the_process_group`, `test_a_setup_error_is_refused_and_nothing_starts`, `test_the_launcher_ends_a_stalled_run_itself` and the three new tests: 0 failed each.
+
+Checks on the final tree (exit codes): `uv run --locked python -m pytest scripts/tests/test_sandbox_supervisor.py scripts/tests/test_sandbox_mounts.py scripts/tests/test_sandbox_argv.py scripts/tests/test_sandbox_prove.py -q -p no:cacheprovider` 0 (44 passed, 3 subtests); `uv run --locked python scripts/sandbox_check.py check-enforcement` 0 ("sandbox enforcement: OK"); `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` 0 (943 tests, OK); `uv run --locked ruff check .` 0; `uv run --locked ruff format --check .` 0 (after the formatter was applied to `scripts/sandbox_launch.py`; its first run exited 1 on that file); `uv run --locked mypy` 0 (447 files); `python3 scripts/check_docs.py` 0 (1126 text files, 120 Markdown files); `python3 scripts/check_tree.py` 0 (8 rules); `cmp AGENTS.md CLAUDE.md` 0. `./eii test` not run (brief). Review by another maker is still needed (rule 35).
+
+## S2-T10 part F, fourth round — OI-129: one deadline bounds the whole stalled-run cleanup (2026-11-20)
+
+Builder: Anthropic, Claude Opus 5.5 (overnight worker, the maker of `34294ca91d2838436a49f94e1532f3d95f5dde9b`); persona a senior Linux sandbox engineer; strict self-review as a security reviewer. Skills: project-orientation, task-standards, test-driven-development, systematic-debugging, verification-before-completion, muhasabah-gate; security-review in its plain meaning. Review answered: the fourth part F review (another maker, REJECTED: "F2 — NOT FIXED"; F1 and F3 closed). Only F2 was changed (ruling L-1206).
+
+F2. Cause: at `34294ca9` the deadline bounded only the enumeration of `/proc` and each candidate. After an expired enumeration, `_walk_round` still built the parent index from the whole partial table. It sorted each sibling list before any check, and it took frontier entries with `pop(0)` and no check, so leaf entries were drained after the deadline. The kills and closes of the finalization had no bound fixed before processes were taken. Fix in `scripts/sandbox_launch.py`: `_process_table` places each process under its parent as it is read, inside the deadline-checked loop (`_Table`); the frontier is a `deque` and the deadline is checked before every entry is taken and before every candidate; nothing is sorted. A new constant `TARGET_SLOTS` (512) bounds the kill-and-close work before another process is stopped: each taken process holds one kill slot, the group's kill has its own, and a walk that runs out of slots stops (`_Round.full`), still kills every taken process and the group, closes their descriptors and returns unconfirmed. The waits use only what is left before the deadline. No bound was raised: `CLEANUP_SECONDS` 4, `KILL_SECONDS` 2, `DRAIN_SECONDS` 1, `WALK_SECONDS` `KILL_SECONDS / 2`.
+
+Tests (`scripts/tests/test_sandbox_supervisor.py`, unmarked module): `test_the_index_is_not_built_after_the_deadline` (plant (a): the clock passes the whole bound as the third process read is placed under its parent; no process may be placed after it); `test_the_frontier_stops_at_the_deadline` (plant (b): the clock passes the bound as the last process of the run is stopped, which leaves it, a leaf, on the frontier; no frontier entry may be taken after it, and every stopped process and the group are still killed); `test_the_kill_work_is_bounded_before_a_process_is_taken` (plant (c): two target slots; the walk takes the two children of the stand-in and not the third process; the clock passes the bound at the first kill; both taken processes and the group are still killed, two descriptors are closed, every wait gets a time-out of 0, the result is False and the untaken process is indeed still running, then ended by the test); `test_the_cleanup_time_is_bounded` (a virtual clock that never moves by itself and moves only by a fixed cost per stat read, process descriptor and signal and by the whole time-out of each blocking wait; for a run that settles and one that never settles, an unreadable process, the cleanup ends within `KILL_SECONDS` of that clock and kills every stopped process and the group; no sleep-based timing).
+
+Red, with the `34294ca9` launcher and the four new tests: exit 1, 3 failed, 1 passed (2 subtests). Plant (a) failed with 113 processes indexed after the deadline; plant (b) failed with one leaf frontier entry processed after the deadline; plant (c) failed with three processes taken against two slots. The bound test passed on `34294ca9` as well; it is not one of the plants. Green after: `test_sandbox_supervisor.py` exit 0 (17 passed, 5 subtests). Planted violations in the new launcher, each reverted and compared equal to the kept copy, each exit 1: indexing moved after discovery fails (a); the frontier check removed fails (b); the slot check removed fails (c); the reaping wait given `KILL_SECONDS` instead of what is left fails the bound test in both cases (2.2578125 and 3.001953125 against 2.0). `test_die_with_parent`, `DIE_DRIVER`, `test_sandbox_mounts.py`, `sandbox_support.py` and `scripts/ci_junit.py` are unchanged, so `ci_junit.REQUIRED` keeps its 22 cases.
+
+Repeat series on the final code, 30 runs each, run by unittest in one process with four CPU-bound busy loops on the four processors of the affinity mask (all four alive at the end, killed by pid afterwards; no busy loop or marker process left): `test_die_with_parent`, `test_driver_killed_while_a_layer_is_unarmed`, `test_driver_killed_at_the_first_sandbox_process`, `test_timeout_with_a_stalled_supervisor_is_bounded`, `test_timeout_kills_the_process_group`, `test_a_setup_error_is_refused_and_nothing_starts`, `test_the_launcher_ends_a_stalled_run_itself`, `test_a_stale_tree_never_signals_an_unrelated_process`, `test_the_walk_stops_at_its_deadline`, `test_an_unreadable_process_is_never_confirmed` and the four new tests: 0 failed each.
+
+Checks on the final tree (exit codes; Python 3.14.6, WSL2 kernel 6.6): `uv run --locked python -m pytest scripts/tests/test_sandbox_supervisor.py scripts/tests/test_sandbox_mounts.py scripts/tests/test_sandbox_argv.py scripts/tests/test_sandbox_prove.py -q -p no:cacheprovider` 0 (48 passed, 5 subtests); `uv run --locked python scripts/sandbox_check.py check-enforcement` 0 ("sandbox enforcement: OK"); `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` 0 (947 tests, OK); `uv run --locked ruff check .` 0; `uv run --locked ruff format --check .` 0 (after the formatter was applied to the test file; its first run exited 1 on it); `uv run --locked mypy` 0 (447 files); `python3 scripts/check_docs.py` 0 (1126 text files, 120 Markdown files); `python3 scripts/check_tree.py` 0 (8 rules); `cmp AGENTS.md CLAUDE.md` 0. `./eii test` not run (brief). Review by another maker is still needed (rule 35).
+
+## S2-T10 part F, fifth round — OI-129: the closes after the waits end within the cleanup deadline (2026-11-20)
+
+Builder: Anthropic, Claude Opus 5.5 (the lead, deciding the last finding of round four by reproduction on the deterministic clock, as the round-four ruling set); persona a senior Linux sandbox engineer; strict self-review as a security reviewer. Skills: test-driven-development, systematic-debugging, verification-before-completion, muhasabah-gate.
+
+F2, remaining path (fifth review, on `c5968f98`): `process.wait` and the polls of `_ended` were given every second left before the absolute deadline, and the descriptor of every taken process was closed after them in `finally`, so a wait that used its whole allowance left the closes past the deadline; the result's timeliness was taken before the waits and closes. Reproduction: the bound test charges each close one step of its virtual clock; on `c5968f98` it fails, elapsed 2.0029296875 and 2.0009765625 against `KILL_SECONDS` 2.0 (exit 1, 2 failed, 1 passed).
+
+Fix (`scripts/sandbox_launch.py`): a new constant `CLOSE_SECONDS = KILL_SECONDS / 16` is kept back from the same deadline: the waits and polls end `CLOSE_SECONDS` before it, the closes follow, and the result is True only when every earlier condition held and the clock after the closes is still within the deadline. No bound raised: `CLEANUP_SECONDS` 4, `KILL_SECONDS` 2, `DRAIN_SECONDS` 1, `WALK_SECONDS` 1, `TARGET_SLOTS` 512 unchanged; the waits only end sooner, and a run ending in that last part is reported unconfirmed. Measured basis: 512 closes of process descriptors on this machine took 0.102 ms in all, far inside the 0.125 s kept; that the closes never block is an assumption of the host, as the fifth review's open item states.
+
+Test: `test_the_cleanup_time_is_bounded` charges every close and checks that at least one taken process was closed. Red on `c5968f98`, green here (`test_sandbox_supervisor.py` exit 0, 17 passed, 5 subtests); plant `CLOSE_SECONDS = 0.0`: exit 1, 2 failed, the same two elapsed values; reverted and compared equal to the kept file.
+
+Checks on the final tree: the four sandbox test files `-q -p no:cacheprovider` exit 0, 48 passed, 5 subtests; `sandbox_check.py check-enforcement` exit 0, "sandbox enforcement: OK"; `ruff check .` exit 0; `ruff format --check .` exit 0, 829 files; `mypy` exit 0, 447 files; `check_docs.py` exit 0; `check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `unittest discover -s scripts/tests -p 'test_*.py'` exit 0, Ran 947 tests, OK. `./eii test` is run by the lead on the train.
