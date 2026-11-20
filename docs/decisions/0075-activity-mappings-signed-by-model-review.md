@@ -66,7 +66,7 @@ of those baskets does not settle the worked-example reconciliation of OI-03 or a
    `ensure_ascii=False`, `sort_keys=True`, separators `(',', ':')` and no trailing newline. The canonical form
    and draw are implemented by `audit_rows_sha256` and `audit_sample` in `review/activity.py`.
 
-   The adjacent `activity_spine.binding.json` holds `audit_sha256`, the SHA-256 of the audit file's exact bytes,
+   The adjacent activity_spine.binding.json, written by the lead with the first signed batch, holds audit_sha256, the SHA-256 of the audit file's exact bytes,
    alongside the existing code-system version and class-title inputs. Changed signed rows, changed audit bytes,
    missing or overlapping membership, incorrect samples, errors, maker conflicts, invalid seeds or dates refuse
    the spine build with specific reasons. Existing bindings without the new field remain valid for person-signed

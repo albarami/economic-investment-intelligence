@@ -6,7 +6,7 @@ import csv
 import hashlib
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.registry import load_registry
@@ -123,7 +123,10 @@ def load_context(
     expected = review_binding(CODE_SYSTEM_VERSION, inputs.classes)
     for path in (binding_path(review), binding_path(queue)):
         contained(root, path)
-        if path.exists() and read_review_binding(path) != expected:
+        if (
+            path.exists()
+            and replace(read_review_binding(path), audit_sha256="") != expected
+        ):
             raise Refusal("input refused")
     hashes = {
         "review": file_hash(review),

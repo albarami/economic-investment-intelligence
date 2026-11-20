@@ -773,6 +773,7 @@ def read_review_binding(path: Path) -> ReviewedBinding:
 
 
 _MODEL_PREFIX = "model review:"
+_MODEL_LIKE = re.compile(r"\s*model\W*review", re.IGNORECASE)
 _MODEL_ROLE = re.compile(
     r"model review: ([A-Za-z][A-Za-z0-9_-]*) ([^,\r\n]+), ([^,\r\n]+)"
 )
@@ -897,6 +898,13 @@ def _require_model_audits(
     binding: ReviewedBinding | None,
     path: Path,
 ) -> None:
+    for row in reviews:
+        if (
+            row.status in _MODEL_DECISIONS
+            and _MODEL_LIKE.match(row.reviewed_by_role)
+            and _MODEL_ROLE.fullmatch(row.reviewed_by_role) is None
+        ):
+            raise SpineError("model review role is malformed")
     signed = {
         row.code: row
         for row in reviews

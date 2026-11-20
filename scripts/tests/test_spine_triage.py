@@ -790,6 +790,36 @@ class SpineTriageTest(unittest.TestCase):
         path.write_text(json.dumps({"code_system_version": "stale", "inputs": []}))
         self.assertEqual(self.invoke(), 3)
 
+    def write_audited_review_binding(self, *, stale: bool = False) -> None:
+        binding = review_binding(CODE_SYSTEM_VERSION, self.context().inputs.classes)
+        audit = self.cache / "activity_spine_audits.json"
+        audit.write_text("[]\n")
+        binding_path(self.cache / "review.csv").write_text(
+            json.dumps(
+                {
+                    "code_system_version": binding.code_system_version,
+                    "inputs": [
+                        {
+                            "name": name,
+                            "code": code,
+                            "sha256": "a" * 64 if stale else sha,
+                        }
+                        for name, code, sha in binding.input_sha256
+                    ],
+                    "audit_sha256": hashlib.sha256(audit.read_bytes()).hexdigest(),
+                }
+            )
+            + "\n"
+        )
+
+    def test_full_review_binding_with_audit_hash_admitted(self) -> None:
+        self.write_audited_review_binding()
+        self.assertEqual(self.invoke(), 0)
+
+    def test_stale_review_binding_with_audit_hash_refused(self) -> None:
+        self.write_audited_review_binding(stale=True)
+        self.assertEqual(self.invoke(), 3)
+
     def test_provider_and_arbitrary_argument_refusals(self) -> None:
         self.assertEqual(self.invoke("invalid"), 3)
         self.assertEqual(self.invoke("recorded"), 3)

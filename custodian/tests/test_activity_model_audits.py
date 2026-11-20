@@ -108,6 +108,28 @@ def test_model_signature_without_audit_is_refused():
         )
 
 
+@pytest.mark.parametrize(
+    "role",
+    [
+        SIGNER.replace("model review:", "Model review:"),
+        " " + SIGNER,
+        SIGNER.replace("model review:", "model  review:"),
+    ],
+)
+@pytest.mark.parametrize("rejected", [False, True])
+def test_malformed_model_role_cannot_bypass_audit(role, rejected):
+    reviews = (replace(rows(1, rejected=rejected)[0], reviewed_by_role=role),)
+    with pytest.raises(a.SpineError, match="model review role is malformed"):
+        a.build_spine(
+            (a.ActivityRow(reviews[0].code, reviews[0].name_ar, 1, 0),),
+            CLASSES,
+            reviews,
+            (),
+            supplier_membership=NONE,
+            reviewed_binding=a.review_binding(a.CODE_SYSTEM_VERSION, CLASSES),
+        )
+
+
 @pytest.mark.parametrize("count", [40, 12])
 @pytest.mark.parametrize("rejected", [False, True])
 def test_audited_batch_is_admitted(tmp_path, count, rejected):
@@ -209,8 +231,7 @@ def test_empty_committed_audits_admit_nothing():
     assert json.loads(path.read_text()) == []
     reviews = a.load_seed_reviews()
     assert not any(row.status in {"mapped", "not_mappable_rejected"} for row in reviews)
-    binding = a.load_recorded_binding(a.spine_path(), reviews)
-    assert binding.audit_sha256 == hashlib.sha256(path.read_bytes()).hexdigest()
+    assert a.load_recorded_binding(a.spine_path(), reviews) is None
 
 
 @pytest.mark.parametrize("seed", [True, 1.5, "3141592653", 4294967296, 999999999])
