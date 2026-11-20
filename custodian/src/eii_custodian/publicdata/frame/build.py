@@ -4,7 +4,7 @@ Tests and real builds use build_frame and the same raw-source assembler.
 """
 
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from datetime import date
@@ -37,7 +37,11 @@ class FrameResult:
 
 
 def read_cached(
-    cache: Path, entry: Entry, *, digest: str
+    cache: Path,
+    entry: Entry,
+    *,
+    digest: str,
+    decode: Callable[[bytes], Any] | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     """Read a reviewed hash and verify its dated receipt and bytes."""
     try:
@@ -62,6 +66,8 @@ def read_cached(
     receipt["method"] = "frame.v1"
     if entry.extension == "zip":
         return body, receipt
+    if decode is not None:
+        return decode(body), receipt
     return json.loads(body, parse_float=Decimal), receipt
 
 

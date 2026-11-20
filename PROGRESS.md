@@ -43439,3 +43439,18 @@ Restored-source checks, real exits (raw results in `.overnight/tmp/p10_checks.js
 - Evidence: `custodian/src/eii_custodian/publicdata/singles/families.py`, `assembly_layers.py`, 59 registry `release_tables` in S2-T19 block of `custodian/publicdata/sources.yaml`, docs 03/04 contracts, `test_s2_t19_family_tables.py`, `test_s2_t19_registry.py`.
 - Commands (hypothesis seed 3847291056): deciding pytest 52 passed exit 0; ruff check 0; ruff format --check 0; mypy 0 (450 files); check_docs 0; check_tree 0; cmp AGENTS.md CLAUDE.md 0.
 - TASKS.md: S2-T19 amendment item 29 ticked.
+
+## S2-P19-FIX1 — family parser review fixes — 2026-11-20
+
+- Maker/model: Composer (Cursor agent). Personas: senior public-data release engineer; strict reviewer on planted guards.
+- Skills: project-orientation, test-driven-development, verification-before-completion.
+- Scope: reviewer findings F1 Decimal encode, F2 declared measure kinds, F3 duplicate JSON members; RECORD NOTES in TASKS.md and OPEN_ITEMS.md; no commit.
+- F1 red: `test_decimal_measure_encodes_for_release`, `test_family_assembly_round_trips_decimal_measure` — TypeError on Decimal / quoted string.
+- F1 green: `_encode` lossless Decimal tokens; assembly `family_archive=True` path.
+- F2 red: `test_text_measure_in_number_column_is_refused`, `test_boolean_measure_in_number_column_is_refused` — no FamilyError.
+- F2 green: `_kind_ok` before encode; reason `field_kind`.
+- F3 red: `test_family_assembly_refuses_duplicate_measure_key` — duplicate key collapsed.
+- F3 green: `decode_family_archive` with `object_pairs_hook`; reason `duplicate_member`.
+- Commands (hypothesis seed 5928473016): pytest `test_s2_t19_family_tables.py` + `test_s2_t19_registry.py` 57 passed exit 0; ruff check 0; ruff format --check 0; mypy 0 (450 files); check_docs 0 (1140 text, 123 Markdown); check_tree 0 (8 rules).
+- TASKS.md: S2-T19 amendment item 29 unticked per review RECORD NOTES.
+- OPEN_ITEMS.md: S2-P19 CORRECTION appended.

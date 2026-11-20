@@ -166,9 +166,16 @@ class Production:
         for key in sources:
             self.source_tables.setdefault(key, []).append(name)
 
-    def raw(self, entry: Entry, *, standard_json: bool = False) -> Any:
+    def raw(
+        self, entry: Entry, *, standard_json: bool = False, family_archive: bool = False
+    ) -> Any:
         digest = self.selected.get(entry.key, "")
-        payload, receipt = read_cached(self.cache, entry, digest=digest)
+        decode = None
+        if family_archive:
+            from .singles.families import decode_family_archive
+
+            decode = decode_family_archive
+        payload, receipt = read_cached(self.cache, entry, digest=digest, decode=decode)
         self.receipts[entry.key] = receipt
         if standard_json:
             return json.loads(read_snapshot(local(self.cache, entry.key), digest).body)

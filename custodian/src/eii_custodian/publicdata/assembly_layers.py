@@ -130,7 +130,7 @@ def build_layers(build: Production) -> None:
             deals.extend(result.deals)
             deal_sources.append(entry.key)
         elif source in COLLECTED_FAMILIES:
-            payload = build.raw(entry)
+            payload = build.raw(entry, family_archive=True)
             if not isinstance(payload, list):
                 raise AssemblyError("assembly_family_shape_invalid")
             receipt = build.receipts[entry.key]

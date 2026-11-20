@@ -5355,3 +5355,4 @@ The dated closing lines added under PO-S2-74, PO-S2-91, PO-S2-104 and PO-S2-114 
 ### S2-P19 — ten open-data family tables (2026-11-20)
 
 - CLOSED (package S2-P19; decision 0064 item 29; document 03 DR5): the ten families each name `pub_<source_id>` in the registry, fetch receipt and data contracts; declared portal columns only reach the release table through `parse_family_rows`; deciding tests `test_s2_t19_family_tables.py` and `test_s2_t19_registry.py` release-table assertions. Red: empty `release_tables` and planted undeclared column; green: pytest 52 passed, hypothesis seed 3847291056.
+- CORRECTION (S2-P19 independent review): the CLOSED statement above establishes neither a successful live family-table build nor receipts and hashes for all ten tables; decision 0064 item 29 remains open pending parser fixes, independent verification and the lead's live-build evidence.
