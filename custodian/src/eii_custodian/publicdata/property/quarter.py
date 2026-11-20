@@ -47,6 +47,31 @@ def square_feet(area_m2: Decimal) -> Decimal:
     return (area_m2 / SQ_M_PER_SQ_FT).quantize(_CENT, rounding=ROUND_HALF_UP)
 
 
+def expected_as_of(
+    deals: Iterable[Deal],
+    as_of_by_source: Mapping[str, str],
+) -> dict[tuple[str, ...], str]:
+    """Map each quarter row key to the snapshot date of its contributing deals."""
+    cells: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
+    units: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
+    for deal in deals:
+        cell = (
+            deal.district_key,
+            deal.municipality_code,
+            deal.period,
+            deal.use_key,
+        )
+        cells[cell].append(deal)
+        if deal.unit_type is not None:
+            units[(*cell, deal.unit_type)].append(deal)
+    expected: dict[tuple[str, ...], str] = {}
+    for all_cell, group in cells.items():
+        expected[(*all_cell, "all")] = group_as_of(group, as_of_by_source)
+    for unit_cell, group in units.items():
+        expected[unit_cell] = group_as_of(group, as_of_by_source)
+    return expected
+
+
 def quarter_aggregates(
     deals: Iterable[Deal],
     *,

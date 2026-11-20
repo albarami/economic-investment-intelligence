@@ -168,8 +168,10 @@ def build_layers(build: Production) -> None:
     if deal_sources:
         from .property.price_as_of import (
             as_of_from_receipt,
-            require_rows_match_sources,
+            require_price_as_of,
+            row_has_price_figure,
         )
+        from .property.quarter import expected_as_of
 
         as_of_by_source = {
             entry.source_id: as_of_from_receipt(build.receipts[entry.key])
@@ -184,7 +186,17 @@ def build_layers(build: Production) -> None:
     for table in sorted(family_rows):
         build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
         quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
-        require_rows_match_sources(quarter_rows, as_of_by_source)
+        expected = expected_as_of(deals, as_of_by_source)
+        for row in quarter_rows:
+            if row_has_price_figure(row):
+                key = (
+                    str(row["district_key"]),
+                    str(row["municipality_code"]),
+                    str(row["period"]),
+                    str(row["use_key"]),
+                    str(row["unit_type"]),
+                )
+                require_price_as_of(row, expected[key])
         build.table("pub_property_quarter", list(quarter_rows), tuple(deal_sources))
 
 

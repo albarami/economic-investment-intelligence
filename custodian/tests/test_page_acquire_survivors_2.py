@@ -272,6 +272,71 @@ def test_school_count_fields_taken_as_published_integers():
         typed(412 if name == "students_n" else 37, fields[name])
 
 
+def test_school_published_count_integers_on_rows(tmp_path):
+    dec, attrs = school()
+    dec["shape"]["page_size"] = 2
+    attrs = dict(attrs)
+    attrs["students_n"] = 412
+    attrs["staff_num"] = 37
+    calls = []
+    result = run(
+        tmp_path,
+        dec,
+        b"",
+        row=entry(dec, "schools_private_directory"),
+        send=school_send(dec, attrs, calls),
+    )
+    rows = json.loads(result.body)["rows"]
+    assert [(row["students_n"], row["staff_num"]) for row in rows] == [(412, 37)] * 3
+
+
+def test_school_published_count_nulls_on_rows(tmp_path):
+    dec, attrs = school()
+    dec["shape"]["page_size"] = 2
+    calls = []
+    result = run(
+        tmp_path,
+        dec,
+        b"",
+        row=entry(dec, "schools_private_directory"),
+        send=school_send(dec, attrs, calls),
+    )
+    rows = json.loads(result.body)["rows"]
+    assert all(row["students_n"] is None and row["staff_num"] is None for row in rows)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("students_n", 412.5),
+        ("students_n", "412"),
+        ("students_n", True),
+        ("students_n", 412.0),
+        ("staff_num", 37.5),
+        ("staff_num", "37"),
+    ],
+)
+def test_school_published_count_refused(tmp_path, field, value):
+    dec, attrs = school()
+    dec["shape"]["page_size"] = 2
+    calls: list[str] = []
+
+    def change(role, obj):
+        if role == "page":
+            obj["features"][0]["attributes"][field] = value
+
+    refused(
+        "schema_missing",
+        lambda: run(
+            tmp_path,
+            dec,
+            b"",
+            row=entry(dec, "schools_private_directory"),
+            send=school_send(dec, attrs, calls, change=change),
+        ),
+    )
+
+
 @pytest.mark.parametrize("field", ["director", "phone", "email"])
 def test_school_personal_field_refused(tmp_path, field):
     dec, attrs = school()

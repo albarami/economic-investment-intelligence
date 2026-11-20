@@ -4631,6 +4631,7 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 - NEEDED: Have the lead confirm or wire the charset source in its owning task. Preserve the declared decode order and named refusals; infer no schema amendment.
 - COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
 - PARTIAL 2026-11-20 (package P15, lead ruling: a header charset wins over a differing meta charset, an absent header falls through to meta, neither refuses): investment_build._fetch_page writes the Content-Type charset to the snapshot receipt when the transport supplies it, but fetch.transport.open_https does not yet pass Content-Type, so production receipts still carry none; open until the transport carries it under a test (review S2-P15-rv F1).
+- Update 2026-11-20 (fix cad38d49, review S2-P15-rv confirmation): fetch.transport.open_https passes Content-Type under test_open_https_passes_content_type_charset; the item stays open until an end-to-end test shows a served header charset winning over a differing meta charset through the build (review finding F2).
 
 ### PO-S2-134 — Flag ISO-date refusal in the live inventory review
 

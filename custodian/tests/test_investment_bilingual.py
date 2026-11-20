@@ -403,42 +403,47 @@ def test_fetch_page_receipt_carries_header_charset(tmp_path: Path, monkeypatch):
     assert sidecar.get("charset") == "utf-8"
 
 
-def test_investment_page_header_charset_beats_meta(tmp_path: Path, monkeypatch):
-    from eii_custodian.publicdata.fetch.receipts import sha256_hex
-    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot, read_snapshot
+def _bilingual_with_invalid_ar_meta():
+    pages, bodies = bilingual()
+    page_url = next(
+        url
+        for page, url in ((p, p.url) for p in pages)
+        if page.language == "ar" and page.kind == "sector"
+    )
+    bodies[page_url] = bodies[page_url].replace(
+        b'<meta charset="utf-8">', b'<meta charset="invented-encoding">'
+    )
+    return pages, bodies, page_url
+
+
+@pytest.mark.parametrize("serve_header", [True, False])
+def test_investment_page_header_charset_beats_meta(
+    tmp_path: Path, monkeypatch, serve_header: bool
+):
+    from eii_custodian.publicdata.fetch.transport import Response
     from eii_custodian.publicdata.investment_build import selected_page_rows
 
-    pages, _bodies = bilingual()
+    pages, bodies, page_url = _bilingual_with_invalid_ar_meta()
 
-    def transport(url: str):
-        from eii_custodian.publicdata.fetch.transport import Response
-
+    def transport(url: str) -> Response:
         if url == b._agency_entry().terms_url:
             return Response(final_url=url, body=b.TERMS_BODY, hops=())
-        return Response(final_url=url, body=_bodies[url], hops=(), headers={})
+        headers = {}
+        if serve_header and url == page_url:
+            headers = {"Content-Type": "text/html; charset=utf-8"}
+        return Response(final_url=url, body=bodies[url], hops=(), headers=headers)
 
     assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
     _, manifest, _ = b._batch(tmp_path, "investqa_pages")
     directory = tmp_path / "data/public_cache/investqa_pages"
-    page_url = next(
-        page.url for page in pages if page.language == "ar" and page.kind == "sector"
-    )
-    manifest_page = next(p for p in manifest["pages"] if p["url"] == page_url)
-    snapshot = read_snapshot(directory, str(manifest_page["sha256"]))
-    w1256_body = snapshot.body.decode("utf-8").encode("windows-1256")
-    new_digest = sha256_hex(w1256_body)
-    sidecar = dict(snapshot.sidecar)
-    sidecar["charset"] = "windows-1256"
-    sidecar["sha256"] = new_digest
-    sidecar["bytes"] = len(w1256_body)
-    publish_snapshot(directory, "html", w1256_body, sidecar)
-    manifest_page["sha256"] = new_digest
     rows, refusals = selected_page_rows(directory, manifest["pages"], frozenset())
-    page = next(row for row in rows if row.get("page_url") == page_url)
-    assert "مقدمة" in page["page_text"]
-    assert "مخترعة" in page["page_text"]
-    assert "دون تغيير" in page["page_text"]
-    assert not refusals
+    if serve_header:
+        page = next(row for row in rows if row.get("page_url") == page_url)
+        assert "مقدمة" in page["page_text"]
+        assert not refusals
+    else:
+        assert refusals
+        assert [item["check"] for item in refusals] == ["page_decode"]
 
 
 def test_investment_page_without_header_charset_refuses_when_meta_invalid(

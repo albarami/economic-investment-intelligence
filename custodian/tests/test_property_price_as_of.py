@@ -211,6 +211,79 @@ def test_assembly_property_quarter_carries_receipt_as_of(tmp_path) -> None:
     assert quarter_row["as_of"] == as_of_from_receipt(build.receipts[row.key])
 
 
+SALES_SNAPSHOT_AS_OF = "2026-11-17"
+RESI_SNAPSHOT_AS_OF = "2026-11-18"
+
+
+def test_assembly_refuses_quarter_foreign_source_as_of(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+    import shutil
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_property_quarter import USE_MAP, _frame, _resi
+    from custodian.tests.test_property_sales_export import _export
+
+    import eii_custodian.publicdata.property.quarter as quarter_mod
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    sale_row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_sales"),
+        key="prop_sales",
+    )
+    resi_row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_resi_units"),
+        key="prop_resi_units",
+    )
+    _frame(tmp_path)
+    shutil.copy(USE_MAP, tmp_path / "property_use_map.csv")
+    (tmp_path / "district_crosswalk.csv").write_text(
+        "name,district_keys\n"
+        "SYN North,syn_north\nSYN North AR,syn_north\n"
+        "SYN Inland,syn_inland\nSYN Inland AR,syn_inland\n",
+        encoding="utf-8",
+    )
+    inland = dict(
+        district_name="SYN Inland",
+        sm_lmntq="SYN Inland AR",
+        municipality_name="SYN Inland",
+        sm_lbldy="SYN Inland AR",
+    )
+    sale_digest = write_cached(
+        tmp_path,
+        sale_row,
+        json.dumps([_export()]).encode(),
+        retrieved_utc="2026-11-17T00:00:00Z",
+    )
+    resi_digest = write_cached(
+        tmp_path,
+        resi_row,
+        json.dumps([_resi(**inland)]).encode(),
+        retrieved_utc="2026-11-18T00:00:00Z",
+    )
+    original = quarter_mod.quarter_aggregates
+
+    def stamp_foreign_as_of(deals, *, as_of_by_source):
+        rows = original(deals, as_of_by_source=as_of_by_source)
+        broken = [dict(item) for item in rows]
+        for item in broken:
+            if item["district_key"] == "syn_north" and item["unit_type"] == "all":
+                item["as_of"] = RESI_SNAPSHOT_AS_OF
+        return tuple(broken)
+
+    monkeypatch.setattr(quarter_mod, "quarter_aggregates", stamp_foreign_as_of)
+    build = context(tmp_path, (sale_row, resi_row))
+    build.review = tmp_path
+    build.selected = {sale_row.key: sale_digest.stem, resi_row.key: resi_digest.stem}
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    with pytest.raises(AdditionError, match="price_as_of_missing"):
+        build.gis_property_singles()
+
+
 def test_assembly_refuses_quarter_wrong_snapshot_as_of(
     tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -43840,3 +43840,33 @@ and the requested scope. The prior temporary-root cleanup warning remains open.
 - `cmp AGENTS.md CLAUDE.md`: exit 0. No commit.
 
 - Correction 2026-11-20 (review S2-P15-rv): the package is commit 99c6dfea33c280298444f60320e4d26e5a25d48b on base d5ab31319669ea9b557043ca866099c67b69cc48, not "No commit"; the builder's "strict reviewer (self-review)" is not the review of rule 35, which is the independent review S2-P15-rv (Claude Opus 5.5, REJECTED).
+
+## S2-P15 overnight fix 2 (CONFIRM-R1 O1, O2, O3) — 2026-11-20
+
+- Maker: Cursor agent (Composer 2.5). Personas: senior engineer for page acquisition, character sets and Public table contracts; strict self-review (deciding test must fail when its production hunk is reverted alone). Skills: project-orientation, test-driven-development, sanad-provenance, verification-before-completion.
+- O1 (F2): replaced `test_investment_page_header_charset_beats_meta` with end-to-end `_bilingual_with_invalid_ar_meta` + parametrized transport header; decidings: `test_investment_page_header_charset_beats_meta[True]` / `[False]`. Red with `_fetch_page` charset write removed alone: exit 1 (`StopIteration` / missing decoded row). Green with fix: exit 0, 2 passed in bilingual charset test pair.
+- O2 (F4): `quarter.expected_as_of` and assembly `require_price_as_of(row, expected[key])` per row; deciding test `test_assembly_refuses_quarter_foreign_source_as_of`; snapshots use distinct `write_cached` `retrieved_utc`. Red with `require_rows_match_sources` guard alone: exit 1 (`DID NOT RAISE`). Green with fix: exit 0.
+- O3 (F7): row-level tests `test_school_published_count_integers_on_rows`, `test_school_published_count_nulls_on_rows`, `test_school_published_count_refused` (6 parametrized). Red with `SCHOOL_FIELDS` count columns removed from `page_schema.py` alone: exit 1, 8 failed. Green with fix: exit 0.
+- RECORD NOTES N1 (OPEN_ITEMS.md PO-S2-133 update) and N2 (TASKS.md S2-T19 amendment tail) applied; prior PROGRESS rows untouched.
+- Touched test files (11): `test_investment_bilingual.py`, `test_investment_build.py`, `test_investment_transport_charset.py`, `test_property_price_as_of.py`, `test_property_quarter.py`, `test_gis_layers.py`, `test_page_acquire_survivors_2.py`, `test_s2_t29_live_acquire.py`, `test_page_requests_survivors_1.py`, `test_page_schema_survivors_1.py`, `test_property_sales_export.py`.
+- `uv run --locked python -m pytest` over those 11 files with `--hypothesis-seed=7291051834`: exit 0, 399 passed.
+- `uv run --locked ruff check .`: exit 0.
+- `uv run --locked ruff format --check .`: exit 0, 838 files.
+- `uv run --locked mypy`: exit 0, 450 source files.
+- `python3 scripts/check_docs.py`: exit 0, 1141 text files, 123 Markdown.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules. No commit.
+
+## S2-P15 overnight fix 2 (CONFIRM-R1 O1, O2, O3) — 2026-11-20
+
+- Maker: Cursor agent (Composer 2.5). Personas: senior engineer for page acquisition, character sets and Public table contracts; strict self-review (deciding test must fail when its production hunk is reverted alone). Skills: project-orientation, test-driven-development, sanad-provenance, verification-before-completion.
+- O1 (F2): replaced `test_investment_page_header_charset_beats_meta` with end-to-end `_bilingual_with_invalid_ar_meta` + parametrized transport header; decidings: `test_investment_page_header_charset_beats_meta[True]` / `[False]`. Red with `_fetch_page` charset write removed alone: exit 1 (`StopIteration` / missing decoded row). Green with fix: exit 0, 2 passed in bilingual charset test pair.
+- O2 (F4): `quarter.expected_as_of` and assembly `require_price_as_of(row, expected[key])` per row; deciding test `test_assembly_refuses_quarter_foreign_source_as_of`; snapshots use distinct `write_cached` `retrieved_utc`. Red with `require_rows_match_sources` guard alone: exit 1 (`DID NOT RAISE`). Green with fix: exit 0.
+- O3 (F7): row-level tests `test_school_published_count_integers_on_rows`, `test_school_published_count_nulls_on_rows`, `test_school_published_count_refused` (6 parametrized). Red with `SCHOOL_FIELDS` count columns removed from `page_schema.py` alone: exit 1, 8 failed. Green with fix: exit 0.
+- RECORD NOTES N1 (OPEN_ITEMS.md PO-S2-133 update) and N2 (TASKS.md S2-T19 amendment tail) applied; prior PROGRESS rows untouched.
+- Touched test files (11): `test_investment_bilingual.py`, `test_investment_build.py`, `test_investment_transport_charset.py`, `test_property_price_as_of.py`, `test_property_quarter.py`, `test_gis_layers.py`, `test_page_acquire_survivors_2.py`, `test_s2_t29_live_acquire.py`, `test_page_requests_survivors_1.py`, `test_page_schema_survivors_1.py`, `test_property_sales_export.py`.
+- `uv run --locked python -m pytest` over those 11 files with `--hypothesis-seed=7291051834`: exit 0, 399 passed.
+- `uv run --locked ruff check .`: exit 0.
+- `uv run --locked ruff format --check .`: exit 0, 838 files.
+- `uv run --locked mypy`: exit 0, 450 source files.
+- `python3 scripts/check_docs.py`: exit 0, 1141 text files, 123 Markdown.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules. No commit.
