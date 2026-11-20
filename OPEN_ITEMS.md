@@ -2875,6 +2875,46 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - UPDATE 2026-11-20: a third occurrence in the lead's ledger run S2-7.ledger2 on the same head 33df1963 (2026-11-20): the ledger row `cd web && npm run test:checks` exited 1 with one failure, the browser test "roads full street load draws every link and carries the Simulated mark" stopping at its readiness wait after about 170 seconds while the machine's load average stood near 60; the other 16 rows passed, the whole test among them (11846 passed, 0 failed). The rerun S2-7.ledger3 with a fresh seed passed every row; under rule 39 that rerun does not close this item.
 
 
+## OI-346 — How the Public-only first-map release meets rule 12
+
+- ID: OI-346
+- TYPE: CLOSED (was OPEN (owner))
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 1.
+- CONCERNS: [decision 0071](docs/decisions/0071-after-go-live-operations-and-continuous-promotion.md) items 5 and 6; S3-T02 and S3-T28; AGENTS.md rules 12 and 46.
+- EVIDENCE: Rule 12's `window_key` hashes the four protected feeds. A `public_only` first-map release at the S3 gate has none of them, and S3-T02 refuses freeze for that kind. The owner should rule how the first-map release is frozen.
+- NEEDED: The owner's ruling and reviewed contract reconciliation establish how the first-map release meets rule 12, which binds every release. No exemption, invented protected window, dummy register entry or synthetic table is authorized.
+- NEEDED BY: S3-T28's reviewed plan and contract amendments, before first service.
+- RESOLUTION (2026-11-20, L-1219): CLOSED; the earlier question above is retained under **Change control**. The first map uses a fixed content-addressed `public_only` release and the same L-1212 promotion checklist in decision 0071 item 3. Rule 12 binds every release as written and says "For a frozen release only" for install/start exit 7; document 03 DAT-133 and document 13 OPS-63 say public_only is never frozen or entered in the export register. Document 02 ARC-41 and the glossary **Release** entry exclude Protected/Simulated tables, and ARC-41 omits the protected-window fields; no privacy parameter set is selected. Rule 11 still excludes product custodian imports and vault reads; both stores load with a complete matching receipt and parity with no fallback (document 13 OPS-64, document 02 ARC-22), every security check remains and the fixed content-addressed release_id is kept for rollback. No exemption, dummy register entry or invented protected data is required or allowed. Decision 0071 items 5 and 6 assign setup before the slice S3 gate to S3-T28 and protected freeze/promotion operations to S11-T09.
+
+## OI-347 — Fixed loopback entry and promotion's port switch
+
+- ID: OI-347
+- TYPE: OPEN (owner)
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 2.
+- CONCERNS: [decision 0071](docs/decisions/0071-after-go-live-operations-and-continuous-promotion.md) items 1, 2 and 4; [decision 0041](docs/decisions/0041-remote-mode-through-the-owners-own-host.md) item 1; S3-T20 and S3-T28.
+- EVIDENCE: Decision 0071 says both "a tunnel to a fixed loopback port" and "promotion switches which … port the route serves". S3-T20 has a single entry on port 8088 and refuses a second public port. These need to be reconciled.
+- NEEDED: The owner and lead reconcile the fixed entry with promotion's release and port switch under AGENTS.md rule 46 before implementation. This item chooses no routing design and authorizes no second public port.
+- NEEDED BY: S3-T28's reviewed operational plan, before first service or promotion.
+
+## OI-348 — Priority answers and the guided story's existing scene order
+
+- ID: OI-348
+- TYPE: OPEN (owner)
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 3.
+- CONCERNS: [decision 0070](docs/decisions/0070-the-decision-pack-of-the-value-studies.md) item A; [decision 0045](docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 2; S10-T03 (DES-113); document 14 **Priority before go-live — decision 0070**.
+- EVIDENCE: Decision 0070 item A puts the priority answers first in the guided demo. S10-T03's guided story keeps an in-order criterion for the golden conversation (decision 0045 item 2) with an out-of-order plant. Whether item A reorders its scenes is not decided.
+- NEEDED: The owner rules whether item A reorders the scenes under AGENTS.md rule 46. S10-T03's existing in-order golden-conversation criterion and its out-of-order plant remain unchanged; this item decides no replacement sequence or new check.
+- NEEDED BY: S10-T03's guided-story plan before any scene-order change.
+
+## OI-353 — Protected releases on live before S11-T09
+
+- ID: OI-353
+- TYPE: OPEN (owner)
+- RAISED BY: the lead, accepting the confirmation of decisions 0070 and 0071 (DOCS-0070, proposed item 1).
+- CONCERNS: [decision 0071](docs/decisions/0071-after-go-live-operations-and-continuous-promotion.md) items 3 and 5; AGENTS.md rule 12; S3-T28, S11-T06 and S11-T09.
+- EVIDENCE: Decision 0071 item 3 promotes every ready user-visible piece from the first map on; item 5 gives protected-release promotion to S11-T09, which follows S11-T06. The record does not say whether a `protected` release may go to live before S11-T09 or whether those promotions wait.
+- NEEDED: Must a `protected` release be frozen and registered before it is promoted to live, and if so, do promotions of protected-bearing slices wait for S11-T09 or does the freeze work move earlier? Ruled under AGENTS.md rule 46 before any `protected` release is promoted.
+- NEEDED BY: the first promotion of a `protected` release to live.
 
 ## Change control
 
