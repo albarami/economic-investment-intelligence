@@ -298,7 +298,14 @@ def tender_evidence(
 def investment_evidence(
     document: Mapping[str, object], reference: str
 ) -> ConfirmationEvidence:
-    """Read the existing investment_pages.yaml confirmation blocks (S2-T12)."""
+    """Read investment_pages.yaml confirmation blocks for the S2-T12 gate row.
+
+    The four English inventory flags are S2-T12 criteria. The
+    ``investqa_pages:arabic_evidence`` check is an S2-T39 bilingual criterion
+    (TASKS.md S2-T39, decision 0064 item 32) gathered on this row because both
+    sources share the same confirmation document; it is not an S2-T12 parser
+    flag.
+    """
     keys = ("fdi_projects", "investqa_pages")
     checks: dict[str, bool] = {}
     sources = document.get("sources")

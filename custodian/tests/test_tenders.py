@@ -704,6 +704,14 @@ def test_list_paths_page_size_and_registry_entry() -> None:
     assert TENDER_TERMS in pack
 
 
+def test_tender_path_wording_matches_accept_language_only_guarantee() -> None:
+    pack = (ROOT / "docs/04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
+    assert "credential or cookie (the page transport refuses them)" not in pack
+    tender = pack.split("### Award workbook intake", 1)[0]
+    assert "Accept-Language" in tender
+    assert "no token" in tender or "passes no token" in tender
+
+
 def _chain(tmp_path: Path) -> tuple[Path, str]:
     # S2-T08 part B, mismatch 7: chain_context now inspects the file, so a
     # non-certificate stand-in is refused; an invented issuing intermediate

@@ -43064,3 +43064,12 @@ Final required checks on the completed reconciliation records/report (actual exi
 | `git diff --stat` | 0 | Only OPEN_ITEMS.md, PROGRESS.md and TASKS.md; no code or test change |
 
 The two ledger files retain their complete earlier byte prefixes. `.overnight/RETURN.md` and `.overnight/OUT/S2-recon.md` are the requested untracked handoff outputs; they are outside the tracked diff. Final status is records reconciliation complete, S2 gate NOT READY. No push or commit was made.
+
+## S2-P01 wording and contract-text sweep — 2026-11-20
+
+- Maker/model: Cursor Composer (agent); strict self-review: gate reviewer rejecting weakened wording, guards without plants and closure without red/green. Personas: technical writer and contract-text editor; skills loaded: project-orientation, task-standards, test-driven-development, sanad-provenance (plain meaning where missing; verification-before-completion applied by recorded exits).
+- Package: P01 closes PO-S2-83, PO-S2-110, PO-S2-112, PO-S2-122, PO-S2-124, PO-S2-141; no TASKS.md boxes ticked (package names none).
+- PO-S2-110 choice: lead verdict-log N5 absent; annotated (not moved) `investqa_pages:arabic_evidence` as S2-T39 bilingual criterion on the S2-T12 row per `gate_report.investment_evidence` docstring and TASKS.md S2-T39.
+- Hypothesis seed: 8472936150.
+- Red/green: PUB-04/README/tender doc tests failed on old flat-path, pinned-release and credential parenthetical text, then passed after edits; fc_register continuation plants green on existing guard; fsq_exclusions docstring plant red then green.
+- Checks: `uv run --locked python -m pytest` on touched custodian test files — exit 0, 239 passed; `uv run --locked python -m unittest scripts.tests.test_fsq_exclusions.ExclusionTests.test_module_docstring_names_explicit_release_not_pinned_copy` — exit 0, 1 passed; `uv run --locked ruff check .` — exit 0; `uv run --locked ruff format --check .` — exit 0, 835 files formatted; `uv run --locked mypy` — exit 0, 449 sources; `python3 scripts/check_docs.py` — exit 0, 1138 text files; `python3 scripts/check_tree.py` — exit 0, 8 rules; `uv run --locked python scripts/check_reference_notes.py` — exit 0, 359 rows; `cmp AGENTS.md CLAUDE.md` — exit 0. No commit or push.

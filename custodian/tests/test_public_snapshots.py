@@ -652,6 +652,17 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
         assert read(older_id) == older
 
 
+def test_pub04_row_describes_s2_t27_dated_archive_and_citation_snapshots():
+    document = Path(__file__).resolve().parents[2] / "docs/04_PUBLIC_DATA_PACK.md"
+    text = document.read_text().splitlines()
+    row = next(line for line in text if line.startswith("| PUB-04 |"))
+    assert "retrieval-date" in row
+    assert "0045" in row
+    assert "0064" in row
+    assert "citation_only" in row
+    assert "data/public_cache/<source_id>/<sha256>.<ext>" not in row
+
+
 def test_overture_removal_note_is_separate_and_verbatim():
     document = Path(__file__).resolve().parents[2] / "docs/04_PUBLIC_DATA_PACK.md"
     sentence = (

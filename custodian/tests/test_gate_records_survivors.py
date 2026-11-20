@@ -199,6 +199,14 @@ def test_confirmations_exact_missing_and_recorded_records():
     assert_message(error, "confirmation_task_unknown")
 
 
+def test_s2_t12_arabic_evidence_documents_s2_t39_attribution():
+    from eii_custodian.publicdata import gate_report as g
+
+    assert "investqa_pages:arabic_evidence" in g.CONFIRMATION_CHECKS["S2-T12"]
+    note = (g.investment_evidence.__doc__ or "") + (g.__doc__ or "")
+    assert "S2-T39" in note
+
+
 def test_investment_adapter_exact_identity_and_each_check():
     flags = {
         "inventory_recorded": True,

@@ -96,6 +96,44 @@ def live(folder, pages, ent=None, dec=None):
     return result, sent
 
 
+def test_continuation_only_captures_pass_with_live_first_page(tmp_path):
+    from custodian.tests.test_fc_register_capture import prepared, replay
+
+    p, bodies = prepared(tmp_path)
+    folder = tmp_path / "intake/fc_register"
+    (folder / "capture-1.json").unlink()
+    (folder / "fragment-1.json").unlink()
+    sent = []
+
+    def send(request):
+        sent.append(request)
+        if len(sent) == 1:
+            return Response(str(request), bodies[0], ())
+        raise TransportFault("unreachable", URL)
+
+    result = replay(tmp_path, p, send)
+    value = json.loads(result.body)
+    assert len(value["rows"]) == 3 and len(sent) == 2
+    no_private_outputs(tmp_path)
+
+
+def test_full_capture_set_beside_live_prefix_refuses(tmp_path):
+    from custodian.tests.test_fc_register_capture import prepared, replay
+
+    p, bodies = prepared(tmp_path)
+    sent = []
+
+    def send(request):
+        sent.append(request)
+        if len(sent) == 1:
+            return Response(str(request), bodies[0], ())
+        raise TransportFault("unreachable", URL)
+
+    with pytest.raises(PageError, match="paging_incomplete"):
+        replay(tmp_path, p, send)
+    no_private_outputs(tmp_path)
+
+
 def test_live_same_target_empty_argument_advances_and_projects(tmp_path):
     result, sent = live(tmp_path, [page(1), page(2), page(3, True)])
     assert len(sent) == 3
