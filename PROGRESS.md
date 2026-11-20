@@ -44432,3 +44432,12 @@ cache environment recorded above. Evidence: `.overnight/tmp/p24-fix1-checks.json
 - Test `scripts/tests/test_register_company_task_replan.py`: red exit 1 with three failures before round-2 records (`uv run --locked python -m pytest scripts/tests/test_register_company_task_replan.py -q -p no:cacheprovider`, 3 failed, 1 passed); green exit 0 after (4 passed).
 - TASKS.md boxes: none ticked (S2-T49 is queued documentation only).
 - PROPOSED OPEN ITEMS: none (approved as S2-T49).
+
+## Package S2-P17 — Register-company task re-plan — Round 3 — 2026-11-20
+
+- Maker/model: Cursor Composer; builder of package P17 (planning and records engineer); strict self-review persona: records reviewer.
+- Authority: `.overnight/BRIEF.md` (round 3); review `.overnight/REVIEW-r1.md` findings 1–3 and record note.
+- Item OI-162: **stays closed**; round-3 fix updates OPEN_ITEMS.md `DONE SO FAR` to the review wording; TASKS.md S2-T49 DAT-83 criterion names three permitted registration-number tables with allowed-key and stray-table plants; TASKS.md S3-T12 OI-162 amendment guard exempts permitted `employee_count`; planted test extended (`test_s2_t49_dat_83_criterion`, `test_s3_t12_oi_162_amendment`).
+- Test `scripts/tests/test_register_company_task_replan.py`: planted violation removing the S3-T12 OI-162 amendment line (`TASKS.md`) — red exit 1 (`uv run --locked python -m pytest scripts/tests/test_register_company_task_replan.py -q -p no:cacheprovider`, 1 failed, 5 passed); green exit 0 after restore (6 passed).
+- TASKS.md boxes: none ticked.
+- PROPOSED OPEN ITEMS: none.

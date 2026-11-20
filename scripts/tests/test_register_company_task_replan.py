@@ -23,6 +23,28 @@ CLOSED_MARKER = "CLOSED by register-company task re-plan (OI-162"
 OWNER_SNIPPET = "task S3-T12"
 TABLE_OWNER_SNIPPET = "task S2-T49"
 TASK_HEADING = "### S2-T49 — Commerce and financial-centre register Public tables"
+S3_T12_HEADING = "### S3-T12 — The living map's Public layers"
+OI_162_AMENDMENT = "register-company task re-plan, OI-162"
+SYNTHETIC_GUARD = (
+    "a planted Simulated figure, or a Synthetic figure other than the permitted "
+    "`employee_count`, on a register company fails"
+)
+DAT_83_TABLES = (
+    "outside `register_company_list`, `pub_register_company` and "
+    "`pub_register_snapshot`"
+)
+DAT_83_FIXTURES = (
+    "with a positive allowed-key fixture for each table and a planted registration "
+    "number in any other table failing"
+)
+
+
+def _task_block(text: str, heading: str) -> str:
+    pattern = re.escape(heading) + r"\n(?:(?!^### ).*\n)*"
+    match = re.search(pattern, text, flags=re.MULTILINE)
+    if match is None:
+        return ""
+    return match.group(0)
 
 
 class RegisterCompanyTaskReplanTests(unittest.TestCase):
@@ -36,6 +58,33 @@ class RegisterCompanyTaskReplanTests(unittest.TestCase):
     def test_tasks_md_lists_s2_t49(self) -> None:
         text = TASKS.read_text(encoding="utf-8")
         self.assertIn(TASK_HEADING, text)
+
+    def test_s2_t49_dat_83_criterion(self) -> None:
+        text = TASKS.read_text(encoding="utf-8")
+        block = _task_block(text, TASK_HEADING)
+        self.assertIn(TASK_HEADING, block)
+        self.assertNotIn("two key tables", block)
+        self.assertIn(DAT_83_TABLES, block)
+        self.assertIn(DAT_83_FIXTURES, block)
+
+    def test_s3_t12_oi_162_amendment(self) -> None:
+        text = TASKS.read_text(encoding="utf-8")
+        block = _task_block(text, S3_T12_HEADING)
+        self.assertIn(S3_T12_HEADING, block)
+        amendment_lines = [
+            line for line in block.splitlines() if OI_162_AMENDMENT in line
+        ]
+        self.assertEqual(
+            len(amendment_lines), 1, "S3-T12 OI-162 amendment line missing"
+        )
+        amendment = amendment_lines[0]
+        for snippet in (
+            "company_points",
+            "pub_register_company",
+            "register_company_list",
+        ):
+            self.assertIn(snippet, amendment)
+        self.assertIn(SYNTHETIC_GUARD, amendment)
 
     def test_oi_162_closure_names_s2_t49(self) -> None:
         text = OPEN_ITEMS.read_text(encoding="utf-8")
