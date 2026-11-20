@@ -5001,6 +5001,7 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - REMAINS: the join works, but the cut-off is only the newest parsed workbook award date, never a completeness claim for earlier dates. Portal-list fields and workbook winner/value fields retain separate dated lineage; absent workbook fields are never invented.
 - NEEDED: under the owner's decision of 2026-11-20 recorded in L-1198, fetch the older awarded pages once after the S2 gate as paced, cached enrichment; re-check whole-list date ordering, retain receipts and hashes, count matches and gaps, and add available list fields for workbook gaps. Closure needs that run and independent review; the incremental cut-off alone cannot close it.
 - NEEDED BY: the post-S2-gate enrichment step; no extra pre-gate full awarded-history read is authorized here.
+- UPDATE 2026-11-20: the owner decided at 11:56 that the older pages are fetched if they add value and add no more than two hours to a run; S2-T46 carries both as acceptance criteria (value from the join test result; a measured paced time, resuming across runs when over two hours, so no page is dropped).
 
 ## OI-345 — A failed tender merge leaves the fetched pages without durable evidence
 
