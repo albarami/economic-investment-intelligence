@@ -282,7 +282,7 @@ def open_https(
             etag = response.headers.get("ETag")
             public_headers = {
                 name: response.headers[name]
-                for name in ("x-wp-total", "x-wp-totalpages")
+                for name in ("x-wp-total", "x-wp-totalpages", "Content-Type")
                 if response.headers.get(name) is not None
             }
     except PinError:

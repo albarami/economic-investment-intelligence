@@ -43838,3 +43838,5 @@ and the requested scope. The prior temporary-root cleanup warning remains open.
 - `python3 scripts/check_docs.py`: exit 0, 1140 text files, 123 Markdown.
 - `python3 scripts/check_tree.py`: exit 0, 8 rules.
 - `cmp AGENTS.md CLAUDE.md`: exit 0. No commit.
+
+- Correction 2026-11-20 (review S2-P15-rv): the package is commit 99c6dfea33c280298444f60320e4d26e5a25d48b on base d5ab31319669ea9b557043ca866099c67b69cc48, not "No commit"; the builder's "strict reviewer (self-review)" is not the review of rule 35, which is the independent review S2-P15-rv (Claude Opus 5.5, REJECTED).

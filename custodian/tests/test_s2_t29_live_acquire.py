@@ -88,6 +88,17 @@ def school():
     return dec, attrs
 
 
+def test_schools_private_directory_declaration_includes_count_columns():
+    from eii_custodian.publicdata.fetch.page_records import load_declaration
+    from eii_custodian.publicdata.fetch.page_schema import validate
+
+    declaration = load_declaration("schools_private_directory")
+    validate(declaration)
+    columns = {(name, kind) for name, kind in declaration["columns"]}
+    assert ("students_n", "integer") in columns
+    assert ("staff_num", "integer") in columns
+
+
 def test_non_capture_source_accepts_registration_required_text(tmp_path):
     dec, body, _ = embedded()
     body = body.replace(b"SYN &gt; event", b"SYN registration required")

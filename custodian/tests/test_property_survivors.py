@@ -12,6 +12,7 @@ import pytest
 from custodian.tests.test_additions_property_venues import _deal as venue_deal
 from custodian.tests.test_property_quarter import (
     _all_row,
+    _as_of_map,
     _frame,
     _parse,
     _resi,
@@ -213,7 +214,9 @@ def test_property_per_unit_deal_has_no_square_foot_median(tmp_path: Path) -> Non
         None,
         None,
     )
-    assert quarter.quarter_aggregates(parsed.deals) == (
+    assert quarter.quarter_aggregates(
+        parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+    ) == (
         {
             "district_key": "syn_north",
             "municipality_code": "syn_coast",
@@ -227,6 +230,7 @@ def test_property_per_unit_deal_has_no_square_foot_median(tmp_path: Path) -> Non
             "land_median_price_per_ft2": None,
             "median_price": None,
             "price_basis": None,
+            "as_of": "2026-11-17",
         },
         {
             "district_key": "syn_north",
@@ -241,6 +245,7 @@ def test_property_per_unit_deal_has_no_square_foot_median(tmp_path: Path) -> Non
             "land_median_price_per_ft2": None,
             "median_price": Decimal("1.00"),
             "price_basis": "per_unit",
+            "as_of": "2026-11-17",
         },
     )
 
@@ -294,7 +299,9 @@ def test_property_sum_and_median_round_half_up(tmp_path: Path) -> None:
     )
     with localcontext() as context:
         context.rounding = ROUND_DOWN
-        rows = quarter.quarter_aggregates([deal])
+        rows = quarter.quarter_aggregates(
+            [deal], as_of_by_source=_as_of_map(deal.source_id)
+        )
     assert _all_row(rows)["deal_value"] == Decimal("20.01")
     assert _unit_row(rows)["deal_value"] == Decimal("20.01")
     assert _unit_row(rows)["median_price"] == Decimal("10.01")
@@ -312,7 +319,11 @@ def test_property_odd_median_uses_the_middle_value(tmp_path: Path) -> None:
         tmp_path / "frame",
         _mappings(tmp_path),
     )
-    unit = _unit_row(quarter.quarter_aggregates(parsed.deals))
+    unit = _unit_row(
+        quarter.quarter_aggregates(
+            parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+        )
+    )
     assert unit["deal_count"] == 5
     assert unit["median_price"] == Decimal("5.00")
 
@@ -321,7 +332,10 @@ def test_property_null_value_sums_to_decimal_zero(tmp_path: Path) -> None:
     base = _parse([_resi()], tmp_path / "frame", _mappings(tmp_path)).deals[0]
     # The parser drops this candidate at _unkept; aggregate's public Deal
     # boundary still accepts nullable value fields and must not sum None.
-    rows = quarter.quarter_aggregates([replace(base, value=None, unit_type=None)])
+    rows = quarter.quarter_aggregates(
+        [replace(base, value=None, unit_type=None)],
+        as_of_by_source=_as_of_map(base.source_id),
+    )
     assert len(rows) == 1
     assert rows[0]["deal_count"] == 1
     assert rows[0]["deal_value"] == Decimal("0.00")
@@ -332,7 +346,10 @@ def test_property_missing_unit_price_has_no_partial_median(tmp_path: Path) -> No
     base = _parse([_resi()], tmp_path / "frame", _mappings(tmp_path)).deals[0]
     # _unkept refuses a missing per_m2 price during parsing. Test the public
     # aggregate boundary's nullable Deal.price branch without that parser.
-    rows = quarter.quarter_aggregates([base, replace(base, price=None)])
+    rows = quarter.quarter_aggregates(
+        [base, replace(base, price=None)],
+        as_of_by_source=_as_of_map(base.source_id),
+    )
     unit = _unit_row(rows)
     assert unit["deal_count"] == 2
     assert unit["median_price"] is None
@@ -373,7 +390,7 @@ def test_property_square_foot_price_boundaries(
         basis=basis,
         unit_type=None,
     )
-    rows = quarter.quarter_aggregates([deal])
+    rows = quarter.quarter_aggregates([deal], as_of_by_source=_as_of_map(source))
     assert len(rows) == 1
     assert rows[0]["deal_count"] == 1
     assert rows[0]["median_price_per_ft2"] == expected
@@ -395,7 +412,8 @@ def test_property_aggregate_rows_sort_by_each_cell_key(
         [_sale()], tmp_path / "frame", _mappings(tmp_path), source_id="prop_sales"
     ).deals[0]
     rows = quarter.quarter_aggregates(
-        [replace(base, **{field: later}), replace(base, **{field: earlier})]
+        [replace(base, **{field: later}), replace(base, **{field: earlier})],
+        as_of_by_source=_as_of_map("prop_sales"),
     )
     assert [row[field] for row in rows] == [earlier, later]
     assert [row["deal_count"] for row in rows] == [1, 1]
@@ -407,7 +425,8 @@ def test_property_aggregate_rows_sort_unit_keys(tmp_path: Path) -> None:
     # present reviewed map emits residential_unit, whose order alone would
     # conceal a missing final sort key.
     rows = quarter.quarter_aggregates(
-        [replace(base, unit_type="SYN-Z"), replace(base, unit_type="SYN-A")]
+        [replace(base, unit_type="SYN-Z"), replace(base, unit_type="SYN-A")],
+        as_of_by_source=_as_of_map("prop_resi_units"),
     )
     assert [row["unit_type"] for row in rows] == ["SYN-A", "SYN-Z", "all"]
     assert [row["deal_count"] for row in rows] == [1, 1, 2]

@@ -47,6 +47,20 @@ def require_rows_price_as_of(rows: Iterable[Mapping[str, object]]) -> None:
                 raise AdditionError("price_as_of_missing")
 
 
+def require_rows_match_sources(
+    rows: Iterable[Mapping[str, object]],
+    as_of_by_source: Mapping[str, str],
+) -> None:
+    """Refuse a price row whose ``as_of`` is absent or not from its snapshots."""
+    allowed = set(as_of_by_source.values())
+    require_rows_price_as_of(rows)
+    for row in rows:
+        if row_has_price_figure(row):
+            value = row.get("as_of")
+            if not isinstance(value, str) or value not in allowed:
+                raise AdditionError("price_as_of_missing")
+
+
 def group_as_of(deals: Iterable[Deal], as_of_by_source: Mapping[str, str]) -> str:
     """One ``as_of`` for a deal group; refuse unlike snapshot dates."""
     stamps = {as_of_by_source[deal.source_id] for deal in deals}

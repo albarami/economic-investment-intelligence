@@ -255,6 +255,23 @@ def test_school_count_boundary(tmp_path, count):
         )
 
 
+def test_school_count_fields_taken_as_published_integers():
+    from eii_custodian.publicdata.fetch.page_schema import ShapeError, scalar, typed
+
+    dec, _ = school()
+    fields = dec["shape"]["record_schema"]["fields"]
+    int_spec = {"kind": "integer", "nullable": True, "optional": False}
+    assert scalar(412, "integer") == 412
+    assert scalar(37, "integer") == 37
+    assert scalar(None, "integer") is None
+    for value in (412.5, "412", True, 412.0):
+        with pytest.raises(ShapeError, match="schema_missing"):
+            typed(value, int_spec)
+    for name in ("students_n", "staff_num"):
+        assert fields[name]["kind"] == "integer"
+        typed(412 if name == "students_n" else 37, fields[name])
+
+
 @pytest.mark.parametrize("field", ["director", "phone", "email"])
 def test_school_personal_field_refused(tmp_path, field):
     dec, attrs = school()

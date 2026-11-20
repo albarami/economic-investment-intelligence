@@ -4625,12 +4625,12 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 ### PO-S2-133 — Resolve the absent receipt charset field
 
 - ID: PO-S2-133
-- TYPE: CLOSED
+- TYPE: OPEN
 - RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 29.
 - EVIDENCE: - (record) the fetch receipt format carries no `charset` field, so the receipt-charset step of the decision's decode order is vacuous today; code honours it when present. Lead to confirm or wire it.
 - NEEDED: Have the lead confirm or wire the charset source in its owning task. Preserve the declared decode order and named refusals; infer no schema amendment.
 - COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
-- CLOSED 2026-11-20 (package P15, lead ruling): cause — fetch receipts omitted `Content-Type` charset; fix — `investment_build._fetch_page` records `charset` on the snapshot sidecar when present and decode still falls through to meta when absent; deciding tests — `test_fetch_page_receipt_carries_header_charset`, `test_investment_page_header_charset_beats_meta`, `test_page_receipt_charset_precedes_meta`; red then green — receipt test red before sidecar write, green exit 0, 276 passed in touched modules with hypothesis seed 3847291051.
+- PARTIAL 2026-11-20 (package P15, lead ruling: a header charset wins over a differing meta charset, an absent header falls through to meta, neither refuses): investment_build._fetch_page writes the Content-Type charset to the snapshot receipt when the transport supplies it, but fetch.transport.open_https does not yet pass Content-Type, so production receipts still carry none; open until the transport carries it under a test (review S2-P15-rv F1).
 
 ### PO-S2-134 — Flag ISO-date refusal in the live inventory review
 
@@ -4947,6 +4947,14 @@ them and leaves their disposition to the lead. Full commands, actual exits and
 file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 `.overnight/RETURN.md`. No existing S2-T29 review or live-source hold is closed.
 
+
+## S2-T19 — Proposed open items (package P20 review S2-P15-rv)
+
+### PROPOSED — `pub_property_quarter` row when bulletin snapshots differ by date
+
+- TYPE: PROPOSED
+- RAISED BY: review S2-P15-rv finding F5 (package P20)
+- TEXT: Whether a `pub_property_quarter` row shared by `prop_sales` and `prop_resi_units` snapshots of different retrieval dates refuses the build (`price_as_of_mismatch`, current) or carries the later or both dates; decision 0045 item 4 and DR2
 
 ## S2-T41 — Optional unread CDSE backup, build open points
 

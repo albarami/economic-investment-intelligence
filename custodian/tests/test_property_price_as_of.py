@@ -38,7 +38,11 @@ def test_quarter_rows_carry_snapshot_as_of(tmp_path) -> None:
 
 def test_quarter_refuses_missing_as_of(tmp_path) -> None:
     parsed = _parse([_sale()], tmp_path, source_id="prop_sales")
-    row = _all_row(quarter_aggregates(parsed.deals))
+    rows = quarter_aggregates(
+        parsed.deals, as_of_by_source={"prop_sales": INVENTED_AS_OF}
+    )
+    row = dict(_all_row(rows))
+    row.pop("as_of", None)
     with pytest.raises(AdditionError, match="price_as_of_missing"):
         require_rows_price_as_of((row,))
 
@@ -82,3 +86,171 @@ def test_land_price_rows_carry_as_of() -> None:
     price = next(row for row in rows if row["use_category"] == "ResidentialPrices")
     assert price["as_of"] == INVENTED_AS_OF
     assert price["guide_price"] == Decimal("1200.00")
+
+
+def test_assembly_land_price_rows_carry_receipt_as_of(tmp_path) -> None:
+    import json
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_source_completeness import receipt
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "gis_land_price"),
+        key="gis_land_price",
+    )
+    feature = {
+        "attributes": {
+            "DIST_NO": 14,
+            "District_No": 14,
+            "ResidentialPrices": "1",
+            "ResidentialCityCenter": "1",
+            "ResidentialPriceFlats": "1",
+            "ResidentialPriceVillas": "1",
+            "CommercialPrices": "1",
+        },
+        "geometry": {"rings": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]},
+    }
+    digest = write_cached(
+        tmp_path, row, json.dumps({"layers": [{"features": [feature]}]}).encode()
+    )
+    build = context(tmp_path, (row,))
+    build.selected = {row.key: digest.stem}
+    build.receipts = {row.key: receipt(row)}
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.gis_property_singles()
+    expected = as_of_from_receipt(build.receipts[row.key])
+    for land_row in build.tables["pub_land_price"]:
+        if land_row.get("guide_price") is not None:
+            assert land_row["as_of"] == expected
+
+
+def test_assembly_refuses_land_price_missing_as_of(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_source_completeness import receipt
+
+    import eii_custodian.publicdata.gis.layers as gis_layers
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "gis_land_price"),
+        key="gis_land_price",
+    )
+    feature = {
+        "attributes": {
+            "DIST_NO": 14,
+            "District_No": 14,
+            "ResidentialPrices": "1",
+            "ResidentialCityCenter": "1",
+            "ResidentialPriceFlats": "1",
+            "ResidentialPriceVillas": "1",
+            "CommercialPrices": "1",
+        },
+        "geometry": {"rings": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]},
+    }
+    digest = write_cached(
+        tmp_path, row, json.dumps({"layers": [{"features": [feature]}]}).encode()
+    )
+    original = gis_layers.land_price_rows
+
+    def omit_as_of(*args, **kwargs):
+        rows = original(*args, **kwargs)
+        broken = [dict(item) for item in rows]
+        broken[0].pop("as_of", None)
+        return broken
+
+    monkeypatch.setattr(gis_layers, "land_price_rows", omit_as_of)
+    build = context(tmp_path, (row,))
+    build.selected = {row.key: digest.stem}
+    build.receipts = {row.key: receipt(row)}
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    with pytest.raises(AdditionError, match="price_as_of_missing"):
+        build.gis_property_singles()
+
+
+def test_assembly_property_quarter_carries_receipt_as_of(tmp_path) -> None:
+    import json
+    import shutil
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_property_quarter import USE_MAP, _frame, _parse, _sale
+    from custodian.tests.test_property_sales_export import _export
+    from custodian.tests.test_source_completeness import receipt
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_sales"),
+        key="prop_sales",
+    )
+    _frame(tmp_path)
+    shutil.copy(USE_MAP, tmp_path / "property_use_map.csv")
+    assert _parse([_sale()], tmp_path, source_id="prop_sales").deals
+    digest = write_cached(tmp_path, row, json.dumps([_export()]).encode())
+    build = context(tmp_path, (row,))
+    build.review = tmp_path
+    build.selected = {row.key: digest.stem}
+    build.receipts = {row.key: receipt(row)}
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.gis_property_singles()
+    quarter_row = next(row for row in build.tables["pub_property_quarter"])
+    assert quarter_row["as_of"] == as_of_from_receipt(build.receipts[row.key])
+
+
+def test_assembly_refuses_quarter_wrong_snapshot_as_of(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+    import shutil
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_property_quarter import USE_MAP, _frame, _parse, _sale
+    from custodian.tests.test_property_sales_export import _export
+    from custodian.tests.test_source_completeness import receipt
+
+    import eii_custodian.publicdata.property.quarter as quarter_mod
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_sales"),
+        key="prop_sales",
+    )
+    _frame(tmp_path)
+    shutil.copy(USE_MAP, tmp_path / "property_use_map.csv")
+    assert _parse([_sale()], tmp_path, source_id="prop_sales").deals
+    digest = write_cached(tmp_path, row, json.dumps([_export()]).encode())
+    original = quarter_mod.quarter_aggregates
+
+    def wrong_date(*args, **kwargs):
+        rows = original(*args, **kwargs)
+        broken = [dict(item) for item in rows]
+        for item in broken:
+            if item.get("as_of"):
+                item["as_of"] = OTHER_AS_OF
+        return broken
+
+    monkeypatch.setattr(quarter_mod, "quarter_aggregates", wrong_date)
+    build = context(tmp_path, (row,))
+    build.review = tmp_path
+    build.selected = {row.key: digest.stem}
+    build.receipts = {row.key: receipt(row)}
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    with pytest.raises(AdditionError, match="price_as_of_missing"):
+        build.gis_property_singles()

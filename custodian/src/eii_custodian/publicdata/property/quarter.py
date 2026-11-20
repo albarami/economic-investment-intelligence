@@ -50,7 +50,7 @@ def square_feet(area_m2: Decimal) -> Decimal:
 def quarter_aggregates(
     deals: Iterable[Deal],
     *,
-    as_of_by_source: Mapping[str, str] | None = None,
+    as_of_by_source: Mapping[str, str],
 ) -> tuple[dict[str, object], ...]:
     """Return the ``pub_property_quarter`` rows over the kept deals."""
     cells: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
@@ -79,8 +79,7 @@ def quarter_aggregates(
             land_deal_count=len(land),
             land_median_price_per_ft2=(_median(land_prices) if land_prices else None),
         )
-        if as_of_by_source is not None:
-            built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
+        built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
         rows.append(built)
     for unit_cell, group in units.items():
         bases = {deal.basis for deal in group}
@@ -95,8 +94,7 @@ def quarter_aggregates(
             median_price=(_median(prices) if len(prices) == len(group) else None),
             price_basis=next(iter(bases)),
         )
-        if as_of_by_source is not None:
-            built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
+        built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
         rows.append(built)
     return tuple(
         sorted(

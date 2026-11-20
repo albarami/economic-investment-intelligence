@@ -404,12 +404,103 @@ def test_fetch_page_receipt_carries_header_charset(tmp_path: Path, monkeypatch):
 
 
 def test_investment_page_header_charset_beats_meta(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot, read_snapshot
+    from eii_custodian.publicdata.investment_build import selected_page_rows
+
+    pages, _bodies = bilingual()
+
+    def transport(url: str):
+        from eii_custodian.publicdata.fetch.transport import Response
+
+        if url == b._agency_entry().terms_url:
+            return Response(final_url=url, body=b.TERMS_BODY, hops=())
+        return Response(final_url=url, body=_bodies[url], hops=(), headers={})
+
+    assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
+    _, manifest, _ = b._batch(tmp_path, "investqa_pages")
+    directory = tmp_path / "data/public_cache/investqa_pages"
+    page_url = next(
+        page.url for page in pages if page.language == "ar" and page.kind == "sector"
+    )
+    manifest_page = next(p for p in manifest["pages"] if p["url"] == page_url)
+    snapshot = read_snapshot(directory, str(manifest_page["sha256"]))
+    w1256_body = snapshot.body.decode("utf-8").encode("windows-1256")
+    new_digest = sha256_hex(w1256_body)
+    sidecar = dict(snapshot.sidecar)
+    sidecar["charset"] = "windows-1256"
+    sidecar["sha256"] = new_digest
+    sidecar["bytes"] = len(w1256_body)
+    publish_snapshot(directory, "html", w1256_body, sidecar)
+    manifest_page["sha256"] = new_digest
+    rows, refusals = selected_page_rows(directory, manifest["pages"], frozenset())
+    page = next(row for row in rows if row.get("page_url") == page_url)
+    assert "مقدمة" in page["page_text"]
+    assert "مخترعة" in page["page_text"]
+    assert "دون تغيير" in page["page_text"]
+    assert not refusals
+
+
+def test_investment_page_without_header_charset_refuses_when_meta_invalid(
+    tmp_path: Path, monkeypatch
+):
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot, read_snapshot
+    from eii_custodian.publicdata.investment_build import selected_page_rows
+
+    pages, bodies = bilingual()
+
+    def transport(url: str):
+        from eii_custodian.publicdata.fetch.transport import Response
+
+        if url == b._agency_entry().terms_url:
+            return Response(final_url=url, body=b.TERMS_BODY, hops=())
+        return Response(final_url=url, body=bodies[url], hops=(), headers={})
+
+    assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
+    _, manifest, _ = b._batch(tmp_path, "investqa_pages")
+    directory = tmp_path / "data/public_cache/investqa_pages"
+    page_url = pages[0].url
+    manifest_page = next(p for p in manifest["pages"] if p["url"] == page_url)
+    snapshot = read_snapshot(directory, str(manifest_page["sha256"]))
+    planted = snapshot.body.replace(b"utf-8", b"invented-encoding")
+    new_digest = sha256_hex(planted)
+    sidecar = dict(snapshot.sidecar)
+    sidecar.pop("charset", None)
+    sidecar["sha256"] = new_digest
+    sidecar["bytes"] = len(planted)
+    publish_snapshot(directory, "html", planted, sidecar)
+    manifest_page["sha256"] = new_digest
+    _rows, refusals = selected_page_rows(directory, manifest["pages"], frozenset())
+    assert refusals
+    assert refusals[0]["check"] == "page_decode"
+
+
+@pytest.mark.parametrize(
+    "charset",
+    ["invented-encoding", "utf 8", 'utf-8"x'],
+)
+def test_fetch_page_refuses_unknown_header_charset(
+    tmp_path: Path, monkeypatch, charset: str
+):
     from eii_custodian.publicdata.fetch.transport import Response
 
     pages, bodies = bilingual()
-    page_url = pages[0].url
-    bodies = dict(bodies)
-    bodies[page_url] = bodies[page_url].replace(b"utf-8", b"invented-encoding")
+
+    def transport(url: str) -> Response:
+        if url == b._agency_entry().terms_url:
+            return Response(final_url=url, body=b.TERMS_BODY, hops=())
+        headers = {"Content-Type": f"text/html; charset={charset}"}
+        return Response(final_url=url, body=bodies[url], hops=(), headers=headers)
+
+    assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 1
+
+
+def test_fetch_page_keeps_header_charset_casing(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+    from eii_custodian.publicdata.fetch.transport import Response
+
+    pages, bodies = bilingual()
 
     def transport(url: str) -> Response:
         if url == b._agency_entry().terms_url:
@@ -418,19 +509,16 @@ def test_investment_page_header_charset_beats_meta(tmp_path: Path, monkeypatch):
             final_url=url,
             body=bodies[url],
             hops=(),
-            headers={"Content-Type": "text/html; charset=utf-8"},
+            headers={"Content-Type": "text/html; charset=Windows-1256"},
         )
 
-    import eii_custodian.publicdata.investment_quotation as q
-
     assert b._execute(tmp_path, monkeypatch, b._agency_entry(), transport, pages) == 0
-    pointer, _, _ = b._batch(tmp_path, "investqa_pages")
-    quotation = q.read_quotation(
-        tmp_path / "data/public_cache",
-        pointer["evidence_manifest_identity"],
-        1,
-    )
-    assert quotation.body == bodies[page_url]
+    _, manifest, _ = b._batch(tmp_path, "investqa_pages")
+    digest = manifest["pages"][1]["sha256"]
+    sidecar = read_snapshot(
+        tmp_path / "data/public_cache/investqa_pages", digest
+    ).sidecar
+    assert sidecar.get("charset") == "Windows-1256"
 
 
 def test_page_evidence_refusal_names_its_source_url(tmp_path: Path, monkeypatch):

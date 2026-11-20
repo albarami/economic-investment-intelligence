@@ -7,11 +7,12 @@ beside the old one.
 
 from __future__ import annotations
 
+import codecs
 import json
 import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, replace
-from email.message import EmailMessage
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.kinds import read_bounded
@@ -480,15 +481,31 @@ def _publish_agency(
     )
 
 
+_CHARSET_PARAM = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
 def header_charset(headers: Mapping[str, str]) -> str:
-    """Read the charset parameter of ``Content-Type``, if any."""
+    """Read the charset parameter of ``Content-Type`` exactly as sent."""
     value = headers.get("Content-Type") or headers.get("content-type") or ""
     if not value:
         return ""
-    message = EmailMessage()
-    message["content-type"] = value
-    charset = message.get_content_charset()
-    return charset if isinstance(charset, str) else ""
+    match = re.search(r'charset\s*=\s*(?:"([^"]*)"|([^;]+))', value, re.IGNORECASE)
+    if match is None:
+        return ""
+    raw = match.group(1) if match.group(1) is not None else match.group(2)
+    return raw.strip()
+
+
+def header_charset_accepted(charset: str) -> bool:
+    """True when the header charset is a known text encoding."""
+    if not charset:
+        return True
+    if not _CHARSET_PARAM.fullmatch(charset):
+        return False
+    try:
+        return bool(codecs.lookup(charset)._is_text_encoding)
+    except LookupError:
+        return False
 
 
 def _fetch_page(
@@ -523,6 +540,10 @@ def _fetch_page(
         terms_sha256=terms,
     )
     charset = header_charset(response.headers)
+    if charset and not header_charset_accepted(charset):
+        return InvestmentFailure(
+            1, entry.source_id, url, "page_decode", "known charset", "refused"
+        )
     if charset:
         side["charset"] = charset
     try:
