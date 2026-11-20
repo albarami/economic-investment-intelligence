@@ -357,6 +357,106 @@ def test_pending_method_pin_blocks_otherwise_complete_audit() -> None:
         require_complete(audit)
 
 
+def test_checked_method_pin_reaches_require_complete_through_gather_audit(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(tmp_path)
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "recorded"
+    require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+@pytest.mark.parametrize(
+    "stage_record,stage_outputs",
+    [
+        (False, True),
+        (True, False),
+    ],
+)
+def test_missing_method_pin_staging_refused_at_require_complete(
+    tmp_path: Path, stage_record: bool, stage_outputs: bool
+) -> None:
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(
+        tmp_path, stage_record=stage_record, stage_outputs=stage_outputs
+    )
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+def test_schema_valid_pending_method_pin_refused_at_require_complete(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.method_card_pin_fixtures import pending
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(
+        tmp_path,
+        mutate=lambda _paths, rec, _artifact, _config: pending(rec["pins"][0]),
+    )
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+@pytest.mark.parametrize(
+    "plant",
+    ["corrupt_artifact", "corrupt_receipt"],
+)
+def test_invalid_method_pin_evidence_refused_at_require_complete(
+    tmp_path: Path, plant: str
+) -> None:
+    from custodian.tests.method_card_pin_fixtures import digest, lineage_context
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    def corrupt_artifact(_paths, _record, artifact, _config):
+        artifact["pins"][0]["values"]["value"] = "invented-corrupt"
+
+    mutate = corrupt_artifact if plant == "corrupt_artifact" else None
+
+    build, record, *_ = stage_method_pin_gather_build(tmp_path, mutate=mutate)
+    if plant == "corrupt_receipt":
+        key = next(iter(lineage_context(record)["receipts"]))
+        build.receipts[key] = {**build.receipts[key], "sha256": digest(b"corrupt body")}
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
 def test_duplicate_confirmations_do_not_cover_six_tasks() -> None:
     from eii_custodian.publicdata.assembly_reports import require_complete
 

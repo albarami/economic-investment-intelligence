@@ -8,7 +8,6 @@ compound values, and the per-line C5 value encoding.
 
 import copy
 import re
-import shutil
 from pathlib import Path
 
 import pytest
@@ -1056,19 +1055,15 @@ def test_producer_guard_plants(tmp_path, plant, code):
 
 
 def test_method_pin_evidence_records_staged_s2_outputs(tmp_path):
-    from eii_custodian.publicdata import gate_report as g
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
 
-    paths, record, artifact, config = case(tmp_path)
-    ctx = lineage_context(record)
-    root = tmp_path
-    (root / "custodian/publicdata/review").mkdir(parents=True)
-    (root / "docs").mkdir(parents=True)
-    (root / "assembly").mkdir(parents=True)
-    write_yaml(root / "custodian/publicdata/review/s2_t09_source_checks.yaml", record)
-    write_json(root / "assembly/s2_t09_pin_artifact.json", artifact)
-    write_json(root / "assembly/s2_t09_pin_generation_config.json", config)
-    shutil.copy(paths[3], root / "docs/07_ECONOMIC_METHODS.md")
-    item = g.method_pin_evidence(root, root, tuple(ctx["registry"]), ctx["receipts"])
-    rows = g.confirmations([item], ctx["registry"], ctx["receipts"])
-    pin_row = next(row for row in rows if row["task"] == "S2-T09")
-    assert pin_row["state"] == "recorded"
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(tmp_path)
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "recorded"
+    require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
