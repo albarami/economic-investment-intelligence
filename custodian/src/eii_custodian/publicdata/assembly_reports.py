@@ -267,7 +267,11 @@ def _optional(build: Production, name: str) -> dict[str, Any]:
 
 
 def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
-    """Retain T29 proof statistics and OI-277 without report rows or firm names."""
+    """Retain T29 sample statistics and the remaining OI-277 mismatch counter.
+
+    These sample statistics do not establish the all-link background re-check
+    required by decision 0064 item 41. No report rows or firm names are returned.
+    """
     from .fetch.award_checks import AwardError, validate_check_receipt
 
     try:

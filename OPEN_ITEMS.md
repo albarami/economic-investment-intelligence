@@ -2559,6 +2559,8 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - EVIDENCE: The normalisation runs in the ruled order: compatibility form, case fold, whitespace collapse, then punctuation removal. So "Al - Rayyan" keeps a double space while "Al Rayyan" keeps one. Such a name is counted unmatched, with its reason. The error is in the safe direction, because the same registration number must also be equal.
 - NEEDED: At the first live awards-to-register match (task S2-T08 part B), count the unmatched names whose only difference is a double space. If any exist, a later task proposes a second whitespace collapse, with a planted test.
 
+- 2026-11-20 P12 disposition: the offline normalisation defect is fixed under decision 0064 item 41 by collapsing whitespace again after punctuation removal. `custodian/tests/test_award_double_space.py` plants the spaced pair in both directions, exercises proof comparison, and retains different-name, different-registration and ambiguous-registration refusals; the receipt counter is retained and documented as remaining mismatches. The complete focused original-defect run exited 1 (19 failed, 47 passed, including four award failures); restoring the fixes exited 0 (66 passed), seed 6724135907. **LEFT OPEN** for the lead's all-link background re-check, recorded live match rate and live registration-match evidence. The existing seeded sample does not prove every link was checked; S2-T29's decision 0064 item 41 box stays unticked. No live input or cache was read here.
+
 ## OI-278 — Remaining S2-T29 pin conditions and review-note disposition
 
 - ID: OI-278
@@ -4489,6 +4491,8 @@ Revision-2 record points without extra numbers:
 - NEEDED: A lead disposition and later scoped task for N3/N4, or a recorded reason to retain their current behavior, with suitable planted violations for any guard changed. Keep L-1141's exact key/field admission and unknown-text refusals unchanged; no fix is made by this ledger input.
 - NEEDED BY: The lead's later S2-T11 parser task and truthful review-note handoff; no new current-PR acceptance or mutation gate is invented.
 - COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
+
+- CLOSED 2026-11-20, P14 bounded parser fix: `_museum_rows` now reads the measure field declared by the supplied YAML map, with malformed field declarations refused as `field_map_unreadable`. The shared reader admits exact empty text and reviewed missing forms, while whitespace-only text stops fetch and build with `measure_unparsed`, aligning with document 04's museum missing-value paragraph. `custodian/tests/test_museum_missing_forms.py` plants an invented renamed field, invalid declarations and five whitespace forms at both stages; exact-note admission/refusals, null/empty coverage and numeric zero remain tested. The complete focused original-defect run exited 1 (19 failed, 47 passed, including fifteen museum failures); restoring the fixes exited 0 (66 passed), seed 6724135907. No source mapping, closure-status contract or reviewed form changed. This implementation closure supplies no independent-maker review or slice-gate verdict; S2-T10's review boxes remain unticked.
 
 ### PO-S2-121 — Two plant tests of the mutation-ledger guard accept any parse failure
 

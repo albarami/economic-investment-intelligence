@@ -201,11 +201,11 @@ def _parse_visits(
     links = crosswalks.get("venues")
     if not isinstance(links, tuple):
         raise AdditionError("venue_crosswalk")
-    missing = _missing_forms(field_map, entry.key) if museum else frozenset()
     built: list[dict[str, object]] = []
     dropped = 0
     if museum:
-        built, dropped = _museum_rows(entry, raw, receipt, links, missing)
+        field, missing = _missing_measure(field_map, entry.key)
+        built, dropped = _museum_rows(entry, raw, receipt, links, field, missing)
     else:
         built, dropped = _health_rows(entry, raw, receipt, links)
     refuse_duplicate_keys(tuple(built), VENUE_KEY)
@@ -220,12 +220,13 @@ def _museum_rows(
     raw: list[dict[str, object]],
     receipt: Mapping[str, object],
     links: tuple[dict[str, str], ...],
+    field: str,
     missing: frozenset[str],
 ) -> tuple[list[dict[str, object]], int]:
     built: list[dict[str, object]] = []
     dropped = 0
     for row in raw:
-        measure = read_measure(row.get("number"), missing_forms=missing, integral=True)
+        measure = read_measure(row.get(field), missing_forms=missing, integral=True)
         if measure.kind is MeasureKind.MISSING:
             dropped += 1
             continue
@@ -645,17 +646,25 @@ def _known_districts(rows: list[dict[str, str]]) -> set[str]:
     return known
 
 
-def _missing_forms(field_map: Mapping[str, object], key: str) -> frozenset[str]:
+def _missing_measure(
+    field_map: Mapping[str, object], key: str
+) -> tuple[str, frozenset[str]]:
     block = field_map.get("missing_measures")
     if not isinstance(block, dict):
         raise AdditionError("field_map_unreadable")
     item = block.get(key)
     if not isinstance(item, dict):
         raise AdditionError("field_map_unreadable")
+    field = item.get("field")
     forms = item.get("forms")
-    if not isinstance(forms, list) or not all(isinstance(form, str) for form in forms):
+    if (
+        not isinstance(field, str)
+        or not field
+        or not isinstance(forms, list)
+        or not all(isinstance(form, str) for form in forms)
+    ):
         raise AdditionError("field_map_unreadable")
-    return frozenset(form for form in forms if isinstance(form, str))
+    return field, frozenset(form for form in forms if isinstance(form, str))
 
 
 def _text(row: Mapping[str, object], field: str) -> str:

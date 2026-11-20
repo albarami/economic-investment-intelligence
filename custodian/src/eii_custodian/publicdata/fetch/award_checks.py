@@ -18,9 +18,10 @@ class AwardError(ValueError):
 
 
 def normalise_name(value: str) -> str:
-    """L-790(a): NFKC, case fold, whitespace collapse, punctuation removal only."""
+    """L-790(a), decision 0064 item 41: collapse again after punctuation removal."""
     value = " ".join(unicodedata.normalize("NFKC", value).casefold().split())
-    return "".join(c for c in value if not unicodedata.category(c).startswith("P"))
+    value = "".join(c for c in value if not unicodedata.category(c).startswith("P"))
+    return " ".join(value.split())
 
 
 def _same(
@@ -194,9 +195,11 @@ def double_space_only(
     profile: Mapping[str, Any],
     registers: Sequence[Mapping[str, str]],
 ) -> int:
-    """OI-277: count unmatched names that differ from their one register name
-    only by a double space left by the ruled normalisation. Matching is not
-    changed; only a count is returned, never a name.
+    """OI-277: retain the receipt counter for remaining spacing-only mismatches.
+
+    Post-punctuation whitespace collapse now resolves the planted double-space
+    pair. This counter still reads only unmatched names with one registration
+    candidate; only a count is returned, never a name.
     """
     by_registration: dict[str, list[str]] = {}
     for company in registers:

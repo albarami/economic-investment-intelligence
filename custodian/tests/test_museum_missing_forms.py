@@ -8,6 +8,7 @@ unreviewed text retains the named refusal ``measure_unparsed``.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -66,14 +67,73 @@ def _reviewed(field_map: dict[str, object], *forms: str) -> dict[str, object]:
     return {**field_map, "missing_measures": block}
 
 
-def _parse(folder: Path, rows: list[dict[str, object]], field_map: dict[str, object]):
+def _parse(
+    folder: Path,
+    rows: list[dict[str, object]],
+    field_map: dict[str, object],
+    *,
+    field: str = "number",
+):
+    entry = _entry("visits_museum")
+    entry = replace(
+        entry,
+        columns=tuple(
+            (field if name == "number" else name, kind) for name, kind in entry.columns
+        ),
+    )
     return parse_museum(
-        _entry("visits_museum"),
+        entry,
         rows,
         {"retrieved_utc": "2026-03-04T05:06:07Z", "sha256": "ab" * 32},
         field_map,
         {"frame": folder, "review": folder, "venues": _venues(folder, _LINKS)},
     )
+
+
+@pytest.mark.parametrize("value", ["7", NOTE])
+def test_parser_reads_the_yaml_declared_measure_field(
+    tmp_path: Path, value: str
+) -> None:
+    # INVENTED renamed source field and cells; no production mapping changes.
+    field_map = _reviewed(_field_map(), NOTE)
+    field_map["missing_measures"][KEY]["field"] = "syn_visits"  # type: ignore[index]
+    source_row = _museum_row()
+    source_row.pop("number")
+    source_row["syn_visits"] = value
+    parsed = _parse(tmp_path, [source_row], field_map, field="syn_visits")
+    assert [row["value"] for row in parsed.rows] == ([7] if value == "7" else [])
+    assert _coverage(parsed, "missing_measure") == (0 if value == "7" else 1)
+
+
+@pytest.mark.parametrize("text", [" ", "  ", "\t", "\n", "\u00a0"])
+@pytest.mark.parametrize("stage", ["fetch", "build"])
+def test_whitespace_only_cell_is_refused_at_fetch_and_build(
+    tmp_path: Path, text: str, stage: str
+) -> None:
+    # INVENTED cells: whitespace is not one of the exact reviewed missing forms.
+    if stage == "build":
+        with pytest.raises(AdditionError, match=r"^measure_unparsed$"):
+            _parse(tmp_path, [_museum_row(number=text)], _field_map())
+    else:
+        failure = _measure_failure(_entry("visits_museum"), [{"number": text}], URL)
+        assert failure is not None
+        assert failure.check == "measure_unparsed"
+
+
+@pytest.mark.parametrize("field", [None, "", 7, []])
+def test_invalid_yaml_measure_field_is_refused(tmp_path: Path, field: object) -> None:
+    # INVENTED malformed configuration: never fall back to the literal number.
+    field_map = _field_map()
+    field_map["missing_measures"][KEY]["field"] = field  # type: ignore[index]
+    with pytest.raises(AdditionError, match=r"^field_map_unreadable$"):
+        _parse(tmp_path, [_museum_row()], field_map)
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_null_and_empty_cells_stay_missing(tmp_path: Path, value: object) -> None:
+    parsed = _parse(tmp_path, [_museum_row(number=value)], _field_map())
+    assert parsed.rows == ()
+    assert _coverage(parsed, "missing_measure") == 1
 
 
 def test_the_reviewed_forms_are_exact_and_scoped_to_number() -> None:
