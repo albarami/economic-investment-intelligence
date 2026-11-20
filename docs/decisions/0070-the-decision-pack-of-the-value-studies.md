@@ -104,7 +104,7 @@ additional work only; existing approved weather inputs, forecasts and print/expo
 ## Consequences and change triggers
 
 The task additions are S2-T46, S2-T47, S6-T40, S7-T35 and S8-T19. Each needs its own plan, tests, planted
-violations, evidence and independent review. The companion operations task is assigned by decision 0071.
+violations, evidence and independent review. The companion operations tasks, S3-T28 and S11-T09, are assigned by decision 0071.
 AGENTS.md and CLAUDE.md need no change for this documents-only record. No source was fetched, workbook read,
 crosswalk approved or implementation criterion ticked by this change. Further data, a changed calculation,
 weakened guard or changed accepted scope needs its own decision under AGENTS.md rule 46.

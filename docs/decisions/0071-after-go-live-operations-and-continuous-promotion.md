@@ -5,7 +5,7 @@
 | Status | Accepted, 2026-11-20 |
 | Date | 2026-11-20 |
 | Owner | The owner |
-| Decided by | The owner's decision of 2026-11-20 |
+| Decided by | The owner's decision of 2026-11-20; the first-map release kind and the reading of rule 12 for it (items 1 and 6) are lead ruling L-1219's, on the pack anchors item 6 cites |
 | Amends | [TASKS.md](../../TASKS.md), S3-T28 before the slice S3 gate, S3-T11 Depends and new S11-T09; [14_IMPLEMENTATION_PLAN.md](../14_IMPLEMENTATION_PLAN.md), task rows and slices S3 and S11 operations notes; [OPEN_ITEMS.md](../../OPEN_ITEMS.md), OI-346 resolution; [docs/README.md](../README.md), decision index. Assigns public_only build/load and live/staging setup to S3-T28 and protected freeze/promotion integration to S11-T09, retaining S11-T01 and S11-T06 and all their checks. |
 | Purpose | Start the live site with the approved first map, isolate it from development and staging and promote ready visible work through a recorded green checklist. |
 | Read first | Decision 0041 items 1 to 10; TASKS.md S0-T09, S3-T02, S3-T10, S3-T20, S3-T28, S11-T01, S11-T06 and S11-T09; document 03 DAT-133; document 02 ARC-41 and ARC-22; document 13 sections 5, 6 and 7, OPS-63 and OPS-64; AGENTS.md rules 11, 12, 24, 33, 36, 44 and 45. |
@@ -17,7 +17,8 @@ and promotes subsequent ready user-visible pieces continuously. The first map us
 `public_only` release while development continues elsewhere. This is an operations decision, not a claim that
 the commands or the first map work today.
 
-The owner's placement note, adopted by lead ruling L-1219, puts live and staging setup before the slice S3 gate
+The placement note of 2026-11-20, applied as the owner's decision by lead ruling L-1219, carries the owner's two
+sentences quoted in item 5 and the advisor's reading that live and staging setup comes before the slice S3 gate,
 so the first map does not wait on its own setup. S3-T20 still owns the remote entry after that gate under
 decision 0041. S0-T09 owns the command skeleton, S3-T02 the Public release/load layer, and S11-T01 and S11-T06
 the protected freeze and export register. S3-T28 builds and tests the first map's setup on loopback, then uses
@@ -77,8 +78,8 @@ this record assigns implementation without claiming it exists.
 6. **Every release stays bound by the existing rules as written.** Rule 12 is unchanged and binds every release.
    Its frozen install/start condition says **"For a frozen release only"**. DAT-133 and OPS-63 define a
    `public_only` release as never frozen or entered in the export register. ARC-41 and the glossary **Release**
-   entry define its kind: no Protected or Simulated table; no `window_key`, `protected_sha256`, `parameter_set`,
-   `world_seed` or `scenario_sha256` (ARC-41 also omits `contracts`). The first map selects no privacy parameter
+   entry define its kind: no Protected or Simulated table, never frozen or registered; ARC-41 also omits
+   `window_key`, `protected_sha256`, `parameter_set`, `world_seed`, `scenario_sha256` and `contracts`. The first map selects no privacy parameter
    set, because nothing protected is exported. This is the release-kind contract, not an exemption from rule 12;
    no protected window, dummy register line or synthetic table may be invented to satisfy a frozen-only check.
 
