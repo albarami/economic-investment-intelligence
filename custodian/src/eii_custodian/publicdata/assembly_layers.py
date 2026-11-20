@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
+
+from eii_custodian.publicdata.fetch.registry import COLLECTED_FAMILIES
 
 from .assembly import AssemblyError
 
@@ -31,11 +34,14 @@ def build_layers(build: Production) -> None:
     from .property.use_map import load_use_map
     from .singles.bank_credit import parse_bank_credit
     from .singles.dcool import parse_dcool
+    from .singles.families import family_table_name, parse_family_rows
     from .singles.tenders import publish_tenders, rows_from_pages
 
     grid = build.needed_frame().tables["grid_cell"]
     deals: list[Deal] = []
     deal_sources = []
+    family_rows: dict[str, list[dict[str, object]]] = defaultdict(list)
+    family_sources: dict[str, set[str]] = defaultdict(set)
     parsers: dict[
         str, tuple[str, Callable[[list[dict[str, Any]]], list[dict[str, Any]]]]
     ] = {
@@ -123,6 +129,20 @@ def build_layers(build: Production) -> None:
             )
             deals.extend(result.deals)
             deal_sources.append(entry.key)
+        elif source in COLLECTED_FAMILIES:
+            payload = build.raw(entry)
+            if not isinstance(payload, list):
+                raise AssemblyError("assembly_family_shape_invalid")
+            receipt = build.receipts[entry.key]
+            table = family_table_name(source)
+            cells = parse_family_rows(
+                entry,
+                payload,
+                retrieved_utc=str(receipt["retrieved_utc"]),
+                sha256=str(receipt["sha256"]),
+            )
+            family_rows[table].extend(asdict(cell) for cell in cells)
+            family_sources[table].add(entry.key)
         elif source == "tenders_pub":
             payload = build.raw(entry, standard_json=True)
             if not isinstance(payload, dict) or not isinstance(
@@ -144,6 +164,8 @@ def build_layers(build: Production) -> None:
         build.table(
             "pub_property_quarter", quarter_aggregates(deals), tuple(deal_sources)
         )
+    for table in sorted(family_rows):
+        build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
 
 
 def _features(layers: list[dict[str, Any]]) -> list[dict[str, Any]]:

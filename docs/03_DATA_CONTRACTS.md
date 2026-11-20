@@ -651,6 +651,16 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_poi_comm` | Public | commercial point | `feature_key` | `publicdata` (from the source `gis_poi_comm`, once the reviewed registry change of PUB-92 names it; decision 0023 item 3) | competitors as counts and distances; the map |
 | `pub_tender` | Public | tender | `tender_key` | `publicdata` (from the source `tenders_pub`, read as a visitor and shown in full in version 1 regardless of its terms, PUB-108; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)) | the demand signal for business suppliers (D4, PUB-93) |
 | `pub_district_cooling` | Public | municipality × sector × period × indicator | `municipality_code`, `sector_key`, `period`, `indicator` | `publicdata` (from the source `dcool_capacity`; decision 0023 item 10) | D1, D6, beside the utility series |
+| `pub_completions_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `completions_ext`; decision 0023 item A10; [decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 29) | construction pipeline in D6 |
+| `pub_coverage_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `coverage_ext`; decision 0023 item A10; decision 0064 item 29) | coverage context in D2 |
+| `pub_fdi_stats` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `fdi_stats`; decision 0023 item A10; decision 0064 item 29) | national FDI inflows in D1 |
+| `pub_hotel_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `hotel_ext`; decision 0023 item A10; decision 0064 item 29) | hotel supply and demand in D1 and D3 |
+| `pub_jobseekers` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `jobseekers`; decision 0023 item A10; decision 0064 item 29) | Public context in D5 |
+| `pub_price_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `price_ext`; decision 0023 item A10; decision 0064 item 29) | price context in D1 |
+| `pub_survey_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `survey_ext`; decision 0023 item A10; decision 0064 item 29) | sector context in D1 |
+| `pub_talent_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `talent_ext`; decision 0023 item A10; decision 0064 item 29) | Public context in D5 |
+| `pub_trade_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `trade_ext`; decision 0023 item A10; decision 0064 item 29) | trade context in D1 and D7 |
+| `pub_utilities_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `utilities_ext`; decision 0023 item A10; decision 0064 item 29) | utility context in D6 |
 | `pub_venue_visits` | Public | venue × period × indicator | `venue_key`, `period`, `indicator` | `publicdata` | named public places (`place_public`) |
 | `pub_building_permits` | Public | municipality × period × document × permit type × building type | `municipality_code`, `period`, `document_type`, `permit_type`, `building_type` | `publicdata` | D6, reverse location view |
 | `pub_establishment_size` | Public | bulletin × activity × size class × year × indicator | `table_code`, `activity_key`, `size_class`, `period`, `indicator` | `publicdata` | D1, D3, S1, cases C1 and C2 |
@@ -749,6 +759,14 @@ two files are not merged. Publisher country and product mappings stay
 `pending`. These contracts do not activate a live source (decision 0040 items
 3 and 4). S2-T26 receives the separate series.
 
+#### Open-data family table contracts (S2-T19, decision 0064 item 29)
+
+The ten families of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A10 each
+have one release table `pub_<source_id>`. Every registry slug in the family unpivots to one row per
+declared column; only registry-declared columns are read (PUB-105, PUB-108). The fetch receipt names
+the table and binds the file hash; `./eii build-public` accumulates every slug of the family into
+that table. No method card or screen reads these tables until document 07 names a series.
+
 ### 7.3 Columns
 
 Types follow section 1.2; a column without a stated type is `string`. Every Public table also has
@@ -808,6 +826,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_poi_comm` | `feature_key`; `name` string (as published); `name_ar` string (Y: only where the source gives one); `category` string (Y: null on `POIs_COMM`, which publishes no category; `POI_KEY` is not mapped to it; any later mapping needs a reviewed configuration); `lon`, `lat` decimal(9,6); `cell` cell; source-given fields only, so that no attribute is invented for a real named business |
 | `pub_tender` | `tender_key` string (assigned from release columns as below, never a portal reference, PUB-14; the release check matches `tnd_` plus sixteen hexadecimal characters and an optional `_n`, and exempts that column from the contact scan; every other string column keeps the contact scan); `buying_entity` string (the card's Ministry in the English read, as published, never looked up), `buying_entity_ar` string (Y); `category`, `category_ar` string (Y: Requested Sector Type, as published); `tender_type`, `tender_type_ar` string (Y: Type, as published); `title`, `title_ar` string (Y: cleaned title-link text); `text_cleaned` boolean; `period` (`YYYY-MM-DD`, Y: Publish date only); `closing_date`, `award_date`, `cancel_date` date (Y); `cancel_reason`, `cancel_reason_ar` string (Y: cleaned); `bond_qar`, `documents_value_qar` decimal(18,2) (Y); `company_size` string (Y: non-empty page-order size words from the English card joined by a vertical bar, blank slots dropped and all-empty slots null; Arabic words only when no English card carries any; a difference within one language is refused); `lists` string (the list memberships in the order available, closed, technically_opened, financially_opened, awarded, cancelled, joined by a vertical bar); no derived state, award value, supplier or source reference number |
 | `pub_district_cooling` | `municipality_code` (through the municipality name map of PUB-27); `sector_key` (published key); `period` (as published); `indicator` (published key; capacity, never consumption); `value` decimal(18,2); `unit`; on the source's own geography |
+| `pub_completions_ext`, `pub_coverage_ext`, `pub_fdi_stats`, `pub_hotel_ext`, `pub_jobseekers`, `pub_price_ext`, `pub_survey_ext`, `pub_talent_ext`, `pub_trade_ext`, `pub_utilities_ext` | `source_key` (registry key `<source_id>/<slug>`); `slug`; `row_index` int (read order in the cached export); `period_label` string (Y: the published period field when the registry names one for that slug; otherwise null); `field_name` (a declared registry column name only); `field_value` (canonical JSON text of the published cell); `source_id` (the family id); `publisher`; `licence_id`; `licence_basis`; `retrieved_utc` (from the slug's receipt); `sha256` (from the slug's receipt); undeclared keys in the export are refused at build time |
 | `pub_venue_visits` | `venue_key` (the key of the committed, reviewed venue crosswalk, PUB-89); `venue_kind` (`museum_or_exhibition`, `health_centre`); `name_en` string; `name_ar` string (Y: null when no public Arabic name exists); `region` string (Y: the health region as published; null for museums and exhibitions); `place_id` (Y: the `pub_place` record that the crosswalk links; null otherwise, and the venue then has no map point); `period` (`YYYY-MM` for museums and exhibitions, `YYYY` for health centres); `indicator` (`visitors`, `patient_visits`); `value` int; `unit` (`visits`) |
 | `pub_building_permits` | `municipality_code`; `period` (`YYYY` or `YYYY-MM`, as published); `document_type` (`building_permit`, `completion_certificate`); `permit_type` (published key, or `all`); `building_type` (published key, or `all`); `document_count` int |
 | `pub_establishment_size` | `table_code` (names the survey bulletin, so the size classes of different bulletins are never mixed: one code for each bulletin of `est_size_act`, and one for the hotels and restaurants size table `sec_hr_size`, whose rows give restaurants (ISIC 561) and the other hotel and restaurant activities by size class, as C24 needs); `activity_key` (published activity, with its ISIC Rev.4 code where the bulletin gives one); `size_class` (as that bulletin publishes it); `period` (`YYYY`); `indicator` (`establishments`, `employees`, `compensation`; no survey benchmark is shown by cards C33 or C35 under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 12); `value` decimal(18,2); `unit` |
@@ -2311,12 +2330,12 @@ the quality measure of DAT-24.
   Titles and cancel reasons replace contact-shaped text with `[...]` (LR-T13), recording
   `text_cleaned`. Missing publication dates stay null; coverage counts them and missing
   language counterparts. The live receipt and display proofs remain for the lead and S2-T08.
-- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 10): S2-T19
-  collects the ten families `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`, `talent_ext`,
-  `jobseekers`, `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext` in the cache,
-  with receipts only; no family release table or catalogue row is named in this task (DR5).
-  Tables wait for a use and the columns as really published, then a DAT-120 revision before
-  first load (DAT-83). Sex and nationality splits stay declared Public splits (DAT-141).
+- ANSWERED (S2-T19, decision 0064 item 29, 2026-11-20): the ten families
+  `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`, `talent_ext`, `jobseekers`,
+  `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext` each have a release table
+  `pub_<source_id>` in sections 7.2 and 7.3, a registry `release_tables` entry and a receipt that
+  names the table with the export hash; only declared registry columns enter the build (DR5). Sex
+  and nationality splits stay declared Public splits (DAT-141).
   `gis_boundaries` stays absent with `direct_url_unconfirmed`; PUB-24's frame geometry is
   unchanged. `gis_context` is `ROADFlowlnA` layer 0 only: street centre lines with class and
   names, no flow, volume, speed or direction field; no release table (LR-G11, LR-G12).

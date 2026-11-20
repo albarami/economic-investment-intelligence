@@ -43431,3 +43431,11 @@ Restored-source checks, real exits (raw results in `.overnight/tmp/p10_checks.js
 - Records: the dated P12 disposition and P14 closing line are under their original OPEN_ITEMS.md headings; TASKS.md records the partial offline proof without ticking a box. This PROGRESS.md block is appended after the prior final line. `.overnight/RETURN.md` contains the handoff and remaining lead actions. Earlier evidence rows are unchanged.
 - Strict self-review: APPROVE the bounded offline fixes and evidence; no independent-maker approval, all-link/background implementation, live source evidence or slice-gate verdict is asserted. Muhasabah: PASS for the scoped changes and honest incomplete disposition. PROPOSED OPEN ITEMS: none; the outstanding all-link/live work stays under OI-277 and the existing S2-T29 criterion.
 - Final records validation after the appended block/report: documentation check exit 0 (1138 text files, 123 Markdown files); tree check exit 0 (8 rules); byte comparison exit 0; diff whitespace check exit 0. Inline `python3` record audit exited 0: original PROGRESS.md byte prefix preserved, exactly one P12/P14 block, zero changed acceptance boxes, return maker/marker present, and no new bare forbidden digit token, absolute local path or contact address. The tracked diff contains nine scoped files.
+## S2-P19 — ten open-data family tables — 2026-11-20
+
+- Maker/model: Composer (Cursor agent). Personas: senior data engineer; strict self-review on planted guards.
+- Skills: project-orientation, task-standards, test-driven-development, sanad-provenance, verification-before-completion.
+- Scope: decision 0064 item 29 / S2-T19#14 only; invented fixtures; no network, no `data/public_cache`, no commit.
+- Evidence: `custodian/src/eii_custodian/publicdata/singles/families.py`, `assembly_layers.py`, 59 registry `release_tables` in S2-T19 block of `custodian/publicdata/sources.yaml`, docs 03/04 contracts, `test_s2_t19_family_tables.py`, `test_s2_t19_registry.py`.
+- Commands (hypothesis seed 3847291056): deciding pytest 52 passed exit 0; ruff check 0; ruff format --check 0; mypy 0 (450 files); check_docs 0; check_tree 0; cmp AGENTS.md CLAUDE.md 0.
+- TASKS.md: S2-T19 amendment item 29 ticked.

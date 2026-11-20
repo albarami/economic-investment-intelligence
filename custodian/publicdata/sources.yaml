@@ -8179,7 +8179,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8231,7 +8232,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8283,7 +8285,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8335,7 +8338,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8387,7 +8391,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8438,7 +8443,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8490,7 +8496,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8542,7 +8549,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8594,7 +8602,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8646,7 +8655,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8690,7 +8700,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8739,7 +8750,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8792,7 +8804,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8848,7 +8861,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8896,7 +8910,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8944,7 +8959,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9069,7 +9085,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_fdi_stats
     caveat_keys: []
     columns:
     - name: period
@@ -9117,7 +9134,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_fdi_stats
     caveat_keys: []
     columns:
     - name: year
@@ -9641,7 +9659,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9691,7 +9710,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: month
@@ -9742,7 +9762,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9792,7 +9813,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9842,7 +9864,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9892,7 +9915,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9946,7 +9970,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10002,7 +10027,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10054,7 +10080,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10110,7 +10137,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10164,7 +10192,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10219,7 +10248,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10273,7 +10303,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10327,7 +10358,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10382,7 +10414,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10434,7 +10467,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10484,7 +10518,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10538,7 +10573,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10592,7 +10628,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10647,7 +10684,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10699,7 +10737,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10752,7 +10791,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10807,7 +10847,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10862,7 +10903,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year_lsn
@@ -10914,7 +10956,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10967,7 +11010,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11022,7 +11066,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: academic_year
@@ -11079,7 +11124,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: academic_year
@@ -11142,7 +11188,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11197,7 +11244,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11250,7 +11298,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11308,7 +11357,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11370,7 +11420,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11463,7 +11514,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11511,7 +11563,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11559,7 +11612,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11621,7 +11675,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11682,7 +11737,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11728,7 +11784,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11782,7 +11839,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11834,7 +11892,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year

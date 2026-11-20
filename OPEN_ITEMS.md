@@ -5352,3 +5352,6 @@ The original unnumbered review-disposition section already records S2-T44 placem
 ## S2-P03 guard-plant dispositions — 2026-11-20
 
 The dated closing lines added under PO-S2-74, PO-S2-91, PO-S2-104 and PO-S2-114 supersede their earlier reconciliation holds for the missing-test implementation work. The deciding red proofs and green runs are recorded in PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. Independent closure review remains required; this is no slice-gate approval. PO-S2-113 remains open because its original review/remaining-guard list is absent. No other reconciliation hold or TASKS.md box changes.
+### S2-P19 — ten open-data family tables (2026-11-20)
+
+- CLOSED (package S2-P19; decision 0064 item 29; document 03 DR5): the ten families each name `pub_<source_id>` in the registry, fetch receipt and data contracts; declared portal columns only reach the release table through `parse_family_rows`; deciding tests `test_s2_t19_family_tables.py` and `test_s2_t19_registry.py` release-table assertions. Red: empty `release_tables` and planted undeclared column; green: pytest 52 passed, hypothesis seed 3847291056.
