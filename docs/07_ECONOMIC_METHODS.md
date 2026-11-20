@@ -174,7 +174,9 @@ The denominators `a_j` and `a` include every licence-activity, including legacy 
 | Quantity | Value |
 |---|---|
 | National licence-activity total | 249,622 across 4,755 codes |
+| All licence-activities, Al Daayen | 13,600 |
 | Restaurants (code 5610101), Al Daayen / national | 361 / 4,782 |
+| Coffee shops (5630112), national | 1,042 |
 | Residents, 2025, Al Daayen / national | 111,282 / 3,219,982 |
 | Restaurant licences per 10,000 residents, Al Daayen / national | 32 / 15 (one decimal: 32.4 and 14.9) |
 | LQ, restaurants (5610101), Al Daayen | 1.39 |

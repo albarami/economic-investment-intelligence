@@ -3756,6 +3756,8 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 - EVIDENCE: The arithmetic test on card C8's printed inputs exists since the fix of F1. The data replay was not added: the national census table is not among the pinned sources of the lead's cache (the pins file names ten sources, none of them that table). The fixture's source entry `pub_census_national` carries only the dataset name, where its sibling entries carry publisher, address and licence; the card states that the census layers state no licence.
 - NEEDED: when the national census table is pinned, the replay of card C8 in `custodian/data_tests/` and the publisher and retrieval date in the fixture's source entry, by the task that writes the method-card pins. Or one line saying why the item is not valid.
 
+- P05 PARTIAL DISPOSITION — 2026-11-20: LEFT OPEN (S2-T10; decision 0064 item 43). The committed C8 census inputs and derived share are removed; national arithmetic now reads the existing INVENTED C8 row. The orphan `pub_census_national` fixture metadata is removed instead of inventing a source. Deciding guards `test_methods_fixture_has_no_census_counts` and `test_methods_fixture_sources_have_attribution` were red on the original block/incomplete entry (exit 1), then green in the final focused run (exit 0, 128 passed). The registry and frame's census source map bind `pub_census_national` only to `est_census` (establishments). The existing PUB-71 replay is a national sum over reported zones, not this separate national-table replay; duplicating it would also duplicate the strict lead-proof failure. No C8 data test or substitute source is added. The lead must identify and pin the intended employment source and raw schema, retain complete publisher/URL/licence/retrieval metadata from its actual receipt, and supply the expected values locally before `test_pinned_c8` can be written and run. No real-cache test was run and no closure is claimed. Commands and exits: PROGRESS.md, **S2 P05 pinned method replays — 2026-11-20**.
+
 ### PO-S2-49 — The four calculation modules share one mutable decimal context
 
 - ID: PO-S2-49
@@ -3787,6 +3789,8 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 - EVIDENCE: Card C1 prints the two location quotients 1.39 and 3.05 and not the two counts they need. The lead read both from the cached open-licence table of active licences through the frame's municipality crosswalk and checked both quotients by hand within the card's tolerance of 0.01; the counts entered the method fixture with their source. That check is the lead's hand-check and no committed replay. Card C1 has no data test: it waits for the frame's population table.
 - NEEDED: card C1 prints both counts (task S2-T09); a replay in `custodian/data_tests/` asserts both denominators from the pinned file and the two quotients, and the card's data test follows when the frame's table stands on the same tree. Or one line saying why the item is not valid.
 
+- P05 PARTIAL DISPOSITION — 2026-11-20: LEFT OPEN for the lead's real-cache run and source review (S2-T09/S2-T10). C1 now prints the two counts already recorded by this item and the open-licence fixture; `test_pinned_c1` checks all stock/population inputs, both densities and both LQs through pinned `lic_active`/`pop_muni`. The population cache branch reuses the frame's confirmed schema; the replay uses reviewed names/indicators and counts every activity in each stock denominator. The test-first run was red (exit 1, 7 failed across the fixture/C1 selections); five missing/duplicate/year/indicator/national-coverage plants also went red with denominator guards disabled (exit 1, 5 failed), and two target/indicator plants went red with their guards disabled (exit 1, 2 failed), then green after restoration (final focused exit 0, 128 passed). No data test was run and no task box is ticked from invented-cache success. Commands and exits: PROGRESS.md, **S2 P05 pinned method replays — 2026-11-20**.
+
 ### PO-S2-52 — The third worked row of card C2, by activity class, has no data test
 
 - ID: PO-S2-52
@@ -3795,6 +3799,8 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 - CONCERNS: card C2 of document 07; MTH-03; `custodian/data_tests/test_pinned_methods.py`
 - EVIDENCE: The data tests replay the national cancellations and two municipal rows of card C2. The third worked row, by activity class, needs the reviewed activity spine of task S2-T04. The spine's code joined main with train B5 (pull request 59); its human review remains OI-203 on main.
 - NEEDED: the data test of the third row once the spine is reviewed, named with its owner task. Or one line saying why the item is not valid.
+
+- P05 DISPOSITION — 2026-11-20: LEFT OPEN (S2-T07). The committed `activity_spine.csv` still holds an `unreviewed` food-service row, and OI-16/OI-203 still require a human signer and reviewed input binding, after OI-172's basket confirmation. A class replay cannot claim that binding from an unsigned row or a prefix. No class test or skipped skeleton is added, no review is fabricated, and no red/green or acceptance-box closure is claimed. The lead's signed-spine replay remains owed.
 
 ### PO-S2-53 — One check value is divided under the caller's decimal context
 

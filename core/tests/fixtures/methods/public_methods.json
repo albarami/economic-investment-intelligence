@@ -2,9 +2,6 @@
   "method_version": "S2-T07-v1",
   "rounding": "ROUND_HALF_UP at output only",
   "sources": {
-    "pub_census_national": {
-      "dataset": "Census 2020"
-    },
     "lic_active": {
       "publisher": "Ministry of Commerce and Industry",
       "dataset": "moci-active-certificates-by-municipality-and-business-activity",
@@ -349,15 +346,6 @@
       "weight": "2311E3",
       "unit_value": "8.69",
       "other_checks_status": "Other weights, total rows, HHI and trend not supplied."
-    },
-    "C8": {
-      "anchor": "docs/07_ECONOMIC_METHODS.md C8; Validation-file arithmetic",
-      "sources": [
-        "pub_census_national"
-      ],
-      "private": 1617208,
-      "employed": 2050252,
-      "percent": "78.9"
     },
     "C9": {
       "anchor": "docs/07_ECONOMIC_METHODS.md C9; IN/fix.facts.md",

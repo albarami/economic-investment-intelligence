@@ -12,11 +12,19 @@ from eii_core.calc.public_methods import (
     AnnualEnergy,
     TradeRow,
     licence_churn,
+    licence_density,
+    location_quotient,
     supplier_metrics,
     zone_momentum,
 )
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
+from eii_custodian.publicdata.frame.crosswalk import (
+    municipality_key,
+    municipality_keys,
+    read_csv,
+)
+from eii_custodian.publicdata.frame.population import population_rows
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
 _CACHE_NAME = "eii_data_tests_cache"
@@ -42,6 +50,112 @@ def reading(value, unit, period, chain, geography="national"):
         "public",
         (chain,),
     )
+
+
+def c1_replay(active, active_chain, population, population_chain, review, name):
+    """Replay C1 on reviewed source municipalities, counting legacy activities too."""
+    names = read_csv(review / "municipality_names.csv")
+    target = municipality_key(name, names)
+    active_keys = municipality_keys("lic_active", active, ("lbldy",), names, None)
+    if target not in active_keys:
+        raise ValueError("C1:municipality_missing")
+    residents, reason = population_rows(population, review, names, None)
+    if reason.startswith("unreviewed_indicator"):
+        raise ValueError("C1:population_indicator_unreviewed")
+    residents = [
+        row
+        for row in residents
+        if row["period"] == "2025" and row["indicator"] == "residents"
+    ]
+    resident_keys = [row["municipality_code"] for row in residents]
+    if len(set(resident_keys)) != len(resident_keys):
+        raise ValueError("C1:population_duplicate")
+    if set(resident_keys) != set(active_keys):
+        raise ValueError("C1:population_missing")
+
+    def licences(code=None, local=False):
+        return sum(
+            (
+                D(str(row["dd_lrkhs_lnsht"]))
+                for row, key in zip(active, active_keys, strict=True)
+                if (not local or key == target)
+                and (code is None or row["rmz_lnsht_ltjry"] == code)
+            ),
+            D(0),
+        )
+
+    counts = {
+        "local_all": licences(local=True),
+        "national_all": licences(),
+        "local_restaurants": licences("5610101", local=True),
+        "national_restaurants": licences("5610101"),
+        "local_coffee": licences("5630112", local=True),
+        "national_coffee": licences("5630112"),
+        "local_population": sum(
+            (
+                D(str(row["value"]))
+                for row in residents
+                if row["municipality_code"] == target
+            ),
+            D(0),
+        ),
+        "national_population": sum((D(str(row["value"])) for row in residents), D(0)),
+    }
+
+    def m(key):
+        local = key.startswith("local_")
+        chain = population_chain if key.endswith("population") else active_chain
+        return reading(
+            counts[key],
+            "count",
+            "2025",
+            chain,
+            f"municipality:{target}" if local else "national",
+        )
+
+    return {
+        **counts,
+        "density": (
+            licence_density(m("local_restaurants"), m("local_population")),
+            licence_density(m("national_restaurants"), m("national_population")),
+        ),
+        "lq": tuple(
+            location_quotient(
+                m(f"local_{activity}"),
+                m("local_all"),
+                m(f"national_{activity}"),
+                m("national_all"),
+            )["value"]
+            for activity in ("restaurants", "coffee")
+        ),
+    }
+
+
+def test_pinned_c1():
+    active, active_chain = pinned("lic_active")
+    population, population_chain = pinned("pop_muni")
+    result = c1_replay(
+        active,
+        active_chain,
+        population,
+        population_chain,
+        _cache.ROOT / "custodian/publicdata/review",
+        "Al Daayen",
+    )
+    for key, expected in {
+        "local_all": 13600,
+        "national_all": 249622,
+        "local_restaurants": 361,
+        "national_restaurants": 4782,
+        "local_coffee": 173,
+        "national_coffee": 1042,
+        "local_population": 111282,
+        "national_population": 3219982,
+    }.items():
+        assert result[key] == D(expected), key
+    assert tuple(fact.value for fact in result["density"]) == (D(32), D(15))
+    for fact, expected in zip(result["lq"], ("1.39", "3.05"), strict=True):
+        assert abs(fact.value - D(expected)) <= D("0.01")
 
 
 @pytest.mark.parametrize(
