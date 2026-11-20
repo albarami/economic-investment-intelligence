@@ -111,8 +111,6 @@ def validate_capture(item: Capture) -> dict[str, object]:
     if source not in ROLES:
         refuse("register_source")
     period = month(item.period)
-    if period < "2026-11":
-        refuse("snapshot_month")
     side = item.receipt
     expected = {
         "version",
@@ -147,7 +145,7 @@ def validate_capture(item: Capture) -> dict[str, object]:
     for name in ("publisher", "dataset"):
         if str(side[name]).strip().casefold() in {"pending", "terms to be read"} or str(
             side[name]
-        ).startswith("Lead receipt required"):
+        ).strip().casefold().startswith("lead receipt required"):
             refuse("receipt_metadata")
     if side["licence_basis"] not in LICENCE_BASES:
         refuse("receipt_metadata")

@@ -75,6 +75,8 @@ def _capture(primary: Path, source: str, value: object, *, historical: bool) -> 
     ):
         refuse("register_index_schema")
     period = month(side.get("period"))
+    if historical and period < "2026-11":
+        refuse("snapshot_month")
     files: dict[str, bytes] = {}
     for role, name in names.items():
         if historical:

@@ -50,8 +50,7 @@ def build(
         "fc_register",
     }:
         refuse("current_sources")
-    if len({item.period for item in current}) != 1:
-        refuse("current_month_mismatch")
+    current_months = {item.source_id: month(item.period) for item in current}
     tables: dict[str, list[dict[str, object]]] = {
         "pub_register_company": [],
         "pub_register_snapshot": [],
@@ -63,10 +62,12 @@ def build(
         for item in sorted(batch, key=lambda item: (item.source_id, item.period)):
             side = validate_capture(item)
             if is_snapshot:
+                if item.period < "2026-11":
+                    refuse("snapshot_month")
                 if item.period in kept[item.source_id]:
                     refuse("duplicate_snapshot_month")
                 kept[item.source_id].add(item.period)
-                if item.period > current[0].period:
+                if item.period > current_months[item.source_id]:
                     refuse("snapshot_after_current")
             cards = parse(item.source_id, item.files, frame)
             for card in cards:

@@ -36,7 +36,7 @@ from eii_custodian.publicdata.registers.validate import (
 from eii_custodian.publicdata.review.cache_fixture import read_parquet
 
 
-def write_inputs(tmp_path, history=True):
+def write_inputs(tmp_path, history=True, *, periods=None, snapshot_period="2026-11"):
     env = {}
     indexes = []
     for source, setting, name in [
@@ -47,7 +47,7 @@ def write_inputs(tmp_path, history=True):
         directory.mkdir()
         primary = directory / name
         env[setting] = str(primary)
-        item = capture(source, "2026-12")
+        item = capture(source, (periods or {}).get(source, "2026-12"))
         names = (
             {"establishments": name}
             if source == "biz_register"
@@ -65,8 +65,10 @@ def write_inputs(tmp_path, history=True):
             "snapshots": [],
         }
         if history:
-            older = capture(source, "2026-11")
-            old_names = {role: "2026-11." + role + ".csv" for role in older.files}
+            older = capture(source, snapshot_period)
+            old_names = {
+                role: snapshot_period + "." + role + ".csv" for role in older.files
+            }
             for role, body in older.files.items():
                 (directory / old_names[role]).write_bytes(body)
             index["snapshots"].append({"receipt": older.receipt, "files": old_names})
@@ -104,6 +106,20 @@ def test_explicit_older_pin_no_latest_substitution(tmp_path):
     }
     assert all(item.receipt["kind"] == "register_file" for item in current)
     assert not list(tmp_path.rglob("*cache*"))
+
+
+def test_intake_current_months_are_independent_and_may_predate_keeper(tmp_path):
+    periods = {"biz_register": "2026-10", "fc_register": "2026-09"}
+    env, indexes = write_inputs(tmp_path, history=False, periods=periods)
+    current, history = from_environment(env, index_hashes=index_pins(indexes))
+    assert {item.source_id: item.period for item in current} == periods
+    assert history == ()
+
+
+def test_intake_refuses_snapshot_before_keeper_floor(tmp_path):
+    env, indexes = write_inputs(tmp_path, snapshot_period="2026-10")
+    with pytest.raises(RegisterError, match=r"^snapshot_month$"):
+        from_environment(env, index_hashes=index_pins(indexes))
 
 
 @pytest.mark.parametrize(
@@ -146,7 +162,18 @@ def test_sibling_selection_integrity_plants(tmp_path, plant):
         else:
             index["snapshots"].append(index["snapshots"][0])
         side.write_text(json.dumps(index))
-    with pytest.raises(RegisterError):
+    reason = {
+        "traversal": "register_sibling_selection",
+        "absolute": "register_sibling_selection",
+        "latest": "register_sibling_selection",
+        "month": "register_sibling_selection",
+        "extra": "register_index_schema",
+        "duplicate_month": "duplicate_snapshot_month",
+        "tamper": "receipt_hash_mismatch",
+        "missing": "register_file_unreadable",
+        "symlink": "register_path",
+    }[plant]
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         from_environment(
             env,
             index_hashes=original_pins if plant == "missing" else index_pins(indexes),
@@ -260,7 +287,16 @@ def test_loader_contract_plants(tmp_path, plant):
                 suppression_reason_code=None,
             )
         ]
-    with pytest.raises(RegisterError):
+    reason = {
+        "wrong_type": "release_type",
+        "duplicate": "release_duplicate_key",
+        "unknown_source": "release_source",
+        "bad_date": "malformed_date",
+        "wrong_frame_cell": "release_cell_mismatch",
+        "list_missing_company": "list_company_missing",
+        "list_bad_count": "release_count",
+    }[plant]
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         validate_release(tables, frame)
 
 
@@ -432,8 +468,11 @@ def test_frames_refuse_stored_parent_and_child():
 
 
 def test_raw_bundle_bytes_and_unserializable_artefact_refuse():
-    for value in (b"SYN copied 54321", object()):
-        with pytest.raises(RegisterError):
+    for value, reason in (
+        (b"SYN copied 54321", "registration_egress"),
+        (object(), "artefact_type"),
+    ):
+        with pytest.raises(RegisterError, match="^" + reason + "$"):
             scan_artefact(value, frozenset({"54321"}))
 
 
@@ -453,7 +492,14 @@ def test_card_name_cannot_be_copied_to_metadata(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "publisher", ["", "pending", "Lead receipt required for invented publisher"]
+    "publisher",
+    [
+        "",
+        "pending",
+        "Lead receipt required for invented publisher",
+        "lead receipt required for invented publisher",
+        "  LEAD RECEIPT REQUIRED for invented publisher  ",
+    ],
 )
 def test_placeholder_publisher_cannot_claim_completed_lineage(tmp_path, publisher):
     from dataclasses import replace
@@ -536,7 +582,17 @@ def test_csv_boundary_and_lexeme_plants(plant):
         else:
             lines[1] += ",SYN extra"
         body = ("\n".join(lines) + "\n").encode()
-    with pytest.raises(RegisterError):
+    reason = {
+        "duplicate_header": "input_schema",
+        "missing_column": "input_schema",
+        "extra_cell": "input_schema",
+        "invalid_utf8": "input_csv",
+        "broken_quote": "input_csv",
+        "required_empty": "required_text",
+        "bad_year": "integer_format",
+        "bad_latitude": "coordinate_format",
+    }[plant]
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         parse("biz_register", {"establishments": body}, frame_value())
 
 
@@ -555,7 +611,15 @@ def test_remaining_receipt_format_plants(tmp_path, field, value):
     from dataclasses import replace
 
     item = capture()
-    with pytest.raises(RegisterError):
+    reason = {
+        "licence_basis": "receipt_metadata",
+        "terms_read_on": "receipt_terms_date",
+        "retrieved_utc": "receipt_month_mismatch"
+        if isinstance(value, str) and value.endswith("Z")
+        else "receipt_retrieval",
+        "files": "receipt_files",
+    }[field]
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         build(
             tmp_path,
             "public_only",
@@ -573,7 +637,6 @@ def test_remaining_receipt_format_plants(tmp_path, field, value):
     [
         "missing_current",
         "duplicate_current",
-        "different_current_month",
         "future_snapshot",
         "too_early_snapshot",
         "source_field",
@@ -587,8 +650,6 @@ def test_build_and_source_applicability_plants(tmp_path, plant):
         current = (capture(),)
     elif plant == "duplicate_current":
         current = (capture(), capture())
-    elif plant == "different_current_month":
-        current = (capture(), capture("fc_register", "2026-12"))
     elif plant == "future_snapshot":
         snapshots = (capture(period="2026-12"),)
     elif plant == "too_early_snapshot":
@@ -607,10 +668,21 @@ def test_build_and_source_applicability_plants(tmp_path, plant):
             centre["establishment_nationality"] = "SYN invented attribute"
         else:
             del tables["pub_register_snapshot"]
-        with pytest.raises(RegisterError):
+        reason = (
+            "release_source_field"
+            if plant == "source_field"
+            else "release_tables_missing"
+        )
+        with pytest.raises(RegisterError, match="^" + reason + "$"):
             validate_release(tables, frame_value())
         return
-    with pytest.raises(RegisterError):
+    reason = {
+        "missing_current": "current_sources",
+        "duplicate_current": "current_sources",
+        "future_snapshot": "snapshot_after_current",
+        "too_early_snapshot": "snapshot_month",
+    }[plant]
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         build(tmp_path, "public_only", frame_value(), current, snapshots)
 
 
@@ -668,7 +740,8 @@ def test_release_wrong_container_types_have_fixed_refusals(tmp_path, plant):
         tables["pub_register_company"][0]["source_id"] = []
     else:
         tables["pub_register_snapshot"][0]["period"] = []
-    with pytest.raises(RegisterError):
+    reason = "release_source" if plant == "source_type" else "snapshot_month"
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         validate_release(tables, frame_value())
 
 

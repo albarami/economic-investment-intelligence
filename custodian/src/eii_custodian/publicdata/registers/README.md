@@ -15,8 +15,10 @@ schema and privacy checks; this module does not implement those checks. The
 future release-builder call site remains with its owner.
 
 `contracts.SCHEMAS` is the schema-only lead contract: column list, declared
-lexeme type and value format for each of the four CSV roles. CSV scalar values
-remain strings, preserving leading zeros and publisher spelling. Dates must be
+lexeme type and value format for each of the four CSV roles. CSV scalar lexemes
+are validated as strings. The release projects capital to a non-negative BIGINT
+in QAR and coordinates to finite DOUBLE values; other declared card fields keep
+source strings, preserving leading zeros and publisher spelling. Dates must be
 calendar dates in ISO format. Empty optional fields become null; required fields
 do not get default values. Categories whose values have not been declared by
 document 03 remain open text, tested with invented, previously unseen values.
@@ -33,6 +35,13 @@ names, matched-place labels and match quality never become card facts. A tower
 field needs confirmation that it is published on the card before it can be
 added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
+
+DAT-11 scans every string column, including non-key licence and address strings.
+A string equal to another registration key refuses. Typed capital, coordinates,
+counts and cell keys are not identifier strings; artefact scanning is unchanged.
+The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
+its own source's current capture; current retrieval months may differ and may
+predate the keeper floor.
 
 Blank registration keys, duplicate keys, cross-source key ambiguity, unknown
 columns, unconfirmed branch structure and malformed notice dates refuse with

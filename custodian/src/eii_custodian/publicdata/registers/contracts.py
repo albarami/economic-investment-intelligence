@@ -122,7 +122,10 @@ TABLE_COLUMNS = {
     "pub_register_snapshot": SNAPSHOT_COLUMNS,
     "register_company_list": LIST_COLUMNS,
 }
+NUMERIC_COLUMNS = {"capital_qar": "BIGINT", "lon": "DOUBLE", "lat": "DOUBLE"}
 
 
 def column_type(name: str) -> str:
-    return "UBIGINT" if name == "registered_cell" else "VARCHAR"
+    if name == "registered_cell":
+        return "UBIGINT"
+    return NUMERIC_COLUMNS.get(name, "VARCHAR")

@@ -5,7 +5,14 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping, Sequence
 
-from .contracts import BARE_DIGITS, PREFIXES, REGISTRATION, TABLE_COLUMNS, refuse
+from .contracts import (
+    BARE_DIGITS,
+    NUMERIC_COLUMNS,
+    PREFIXES,
+    REGISTRATION,
+    TABLE_COLUMNS,
+    refuse,
+)
 from .parse import validate_card
 from .provenance import Frame, month
 
@@ -76,7 +83,12 @@ def scan_artefact(value: object, keys: frozenset[str]) -> None:
 
 def scan_content(value: object, content: frozenset[str]) -> None:
     """Card names and published addresses belong in tables, never metadata."""
-    if isinstance(value, str):
+    if isinstance(value, bytes):
+        try:
+            scan_content(value.decode("utf-8"), content)
+        except UnicodeError:
+            refuse("artefact_encoding")
+    elif isinstance(value, str):
         if re.fullmatch(r"[a-f0-9]{64}", value) is None and any(
             text in value for text in content
         ):
@@ -122,6 +134,16 @@ def validate_release(
                 period = month(row["period"])
                 if table == "pub_register_snapshot" and period < "2026-11":
                     refuse("snapshot_month")
+            if table != "register_company_list":
+                source = row["source_id"]
+                if not isinstance(source, str) or source not in {
+                    "biz_register",
+                    "fc_register",
+                }:
+                    refuse("release_source")
+                if key in owners and owners[key] != source:
+                    refuse("ambiguous_cross_source_key")
+                owners[key] = source
             identity = (
                 (key, row["period"]) if table == "pub_register_snapshot" else (key,)
             )
@@ -136,21 +158,15 @@ def validate_release(
                 elif type(count) is not int or count < 0 or reason is not None:
                     refuse("release_count")
                 continue
-            source = row["source_id"]
-            if not isinstance(source, str) or source not in {
-                "biz_register",
-                "fc_register",
-            }:
-                refuse("release_source")
-            if key in owners and owners[key] != source:
-                refuse("ambiguous_cross_source_key")
-            owners[key] = source
             cell = row["registered_cell"]
             if cell is not None and (type(cell) is not int or cell not in frame.cells):
                 refuse("release_cell")
             for name, value in row.items():
                 if (
                     name != "registered_cell"
+                    and not (
+                        table == "pub_register_company" and name in NUMERIC_COLUMNS
+                    )
                     and value is not None
                     and not isinstance(value, str)
                 ):
@@ -181,8 +197,9 @@ def validate_release(
                 scan_artefact(column, frozen)
                 if column == "registration_number" and table in TABLE_COLUMNS:
                     continue
-                # H3 is a typed integer cell key; it is not an identifier token.
-                if table in TABLE_COLUMNS and column == "registered_cell":
-                    continue
-                scan_artefact(value, frozen)
+                # DAT-11 scans every string column. Typed numeric Public values
+                # (including cell keys, capital, counts and coordinates) are not
+                # identifier strings. Non-key card strings get the same scan.
+                if isinstance(value, str):
+                    _text(value, frozen)
     return frozen

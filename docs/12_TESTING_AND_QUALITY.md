@@ -853,11 +853,20 @@ The tests compare the validator's closed table names against document 03
 section **7.2 Table catalogue**, and plant both an illegal registration column
 and a copied registration value in every other table. Separate plants cover
 prefixes, digit runs, manifests, reports, logs, ledger, model payload and web
-bundle. Fixed diagnostics and object representations withhold row content.
+bundle. Every release string column retains DAT-11 scanning, including a
+licence equal to another key and digits in address text. Typed numeric capital,
+coordinates and counts pass without identifier-text scanning (lead ruling
+L-1288); artefact numeric scanning remains unchanged. Byte content is decoded as
+UTF-8 or refused. Placeholder attribution is refused regardless of case or
+surrounding whitespace. Fixed diagnostics and object representations withhold
+row content.
 
 Snapshot tests preserve an exited company's earlier location, distinguish empty
 from missing captures, refuse duplicate months and verify explicit month/hash
-selection without substituting the current file. File-reader plants cover
+selection without substituting the current file. The keeper floor applies to
+snapshots only, including empty captures; current captures may predate it and
+the two current months may differ. Each snapshot compares with its own source's
+current month, independently of input order. File-reader plants cover
 tampered bytes, path traversal, symbolic links, missing siblings, byte bounds and
 a file changed during reading. Network and ambient-input plants prohibit both.
 Terms are tested as records; no pending or prohibitive reading turns off intake.

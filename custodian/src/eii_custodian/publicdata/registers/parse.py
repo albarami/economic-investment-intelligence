@@ -12,7 +12,14 @@ from datetime import date
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.grid import point_cell
 
-from .contracts import CARD_COLUMNS, REGISTRATION, ROLES, SCHEMAS, refuse
+from .contracts import (
+    CARD_COLUMNS,
+    NUMERIC_COLUMNS,
+    REGISTRATION,
+    ROLES,
+    SCHEMAS,
+    refuse,
+)
 from .provenance import Frame
 
 
@@ -60,6 +67,38 @@ def parse_value(value: str, declaration: str) -> str | None:
     else:
         refuse("input_declaration")
     return value
+
+
+def _numeric_value(name: str, value: object, declaration: str) -> None:
+    """Validate a persisted numeric column without treating it as identifier text."""
+    if value is None:
+        parse_value("", declaration)
+    elif name == "capital_qar":
+        if type(value) is not int:
+            refuse("release_type")
+        if not 0 <= value <= 2**63 - 1:
+            refuse("integer_format")
+    else:
+        if type(value) is not float:
+            refuse("release_type")
+        bound = 180 if name == "lon" else 90
+        if not math.isfinite(value) or not -bound <= value <= bound:
+            refuse("coordinate_format")
+
+
+def _project_numbers(row: dict[str, object]) -> None:
+    for name in NUMERIC_COLUMNS:
+        value = row[name]
+        if value is not None:
+            # The CSV lexeme has already passed its numeric declaration.
+            if not isinstance(value, str):
+                refuse("release_type")
+            try:
+                row[name] = int(value) if name == "capital_qar" else float(value)
+            except ValueError:
+                refuse("integer_format")
+            if name == "capital_qar":
+                _numeric_value(name, row[name], "integer?")
 
 
 def _rows(body: bytes, role: str) -> list[dict[str, str | None]]:
@@ -131,6 +170,7 @@ def parse(
                 source_id=source_id,
                 registered_cell=_cell(source, frame),
             )
+            _project_numbers(row)
             result.append(row)
         return result
     companies = _keyed(parsed["companies"], "qfc_number")
@@ -161,12 +201,13 @@ def parse(
             lon=geocode["lon"],
             lat=geocode["lat"],
         )
+        _project_numbers(row)
         result.append(row)
     return result
 
 
 def validate_card(row: Mapping[str, object], frame: Frame) -> None:
-    """Revalidate persisted lexemes and recompute location at the loader seam."""
+    """Revalidate persisted values and recompute location at the loader seam."""
     source = row["source_id"]
     role = "establishments" if source == "biz_register" else "companies"
     allowed = set(SCHEMAS[role]) | {
@@ -182,6 +223,9 @@ def validate_card(row: Mapping[str, object], frame: Frame) -> None:
         if name not in CARD_COLUMNS:
             continue
         value = row[name]
+        if name in NUMERIC_COLUMNS:
+            _numeric_value(name, value, declaration)
+            continue
         if value is not None and not isinstance(value, str):
             refuse("release_type")
         parse_value("" if value is None else value, declaration)
@@ -197,6 +241,9 @@ def validate_card(row: Mapping[str, object], frame: Frame) -> None:
             ("lat", "latitude?"),
         ):
             value = row[name]
+            if name in NUMERIC_COLUMNS:
+                _numeric_value(name, value, declaration)
+                continue
             if value is not None and not isinstance(value, str):
                 refuse("release_type")
             parse_value("" if value is None else value, declaration)
