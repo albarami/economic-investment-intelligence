@@ -43473,3 +43473,11 @@ Restored-source checks, real exits (raw results in `.overnight/tmp/p10_checks.js
 - Red then green: the new test ran first against the unpatched `_pages` — `1 failed, 19 passed`, exit 1 (`ValueError: Invalid IPv6 URL` at `investment_build.py:1017`), seed 7391045826; after the change — `20 passed`, exit 0, same seed.
 - Checks (seed 7391045826): the touched test file plus `test_investment_build.py`, `test_investment_breaks.py` and `test_investment_bilingual.py` — `119 passed`, exit 0; `uv run --locked ruff check .` — exit 0; `uv run --locked ruff format --check .` — exit 0, 836 files already formatted; `uv run --locked mypy` — exit 0, no issues in 449 source files; `python3 scripts/check_docs.py` — exit 0, 1139 text files, 123 Markdown files.
 - Authority: tree changed, no commit, no push, no network.
+
+## S2 records reconciliation (lead) — 2026-11-20
+
+- Maker: the lead (Anthropic Claude Opus 5.5); records only, no code or test change.
+- Re-opened four acceptance boxes whose ticks the independent triage sample (evidence S2-TRIAGE.c1) found not proved: S2-T03 box 2 (R2 still waits on OI-03 and decision 0025 is still proposed), S2-T14 box 6 (both no-key tests assert a refusal, so no test shows the build continuing without the key), S2-T19 box 9 (no plant for the vacancy and tenancy words), S2-T41 box 7 (no planted map-adapter read; the import guard does not scan the web folder).
+- OI-262: its DONE SO FAR line now names pull request 78 in place of the unfilled placeholder.
+- PO-S2-119: the gate-hold table row reconciled to the item's CLOSED 2026-11-20 line; review S2-P12.r1 record notes 1 and 3 recorded under the item; note 1 carried as PO-S2-142 (S2-T11).
+

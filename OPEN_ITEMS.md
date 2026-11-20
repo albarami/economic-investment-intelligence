@@ -2501,7 +2501,7 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - TYPE: PENDING
 - NEEDED: The merge of this fix and S2-T06 part B live run 2 on main showing the three licence sources coded from the frame's own municipalities and PUB-67 passing.
 - WHY: The first live run blocked the three licence sources without frame municipalities and reported a misleading PUB-67 failure (lead ruling L-644, which numbered this item OI-255 in the run's own records).
-- DONE SO FAR: The fix writes and reads the same-build frame output; it is approved, mutation tested and checked locally (pull request {PR}).
+- DONE SO FAR: The fix writes and reads the same-build frame output; it is approved, mutation tested and checked locally (pull request 78).
 - OPTIONS: **Default:** keep the live proof pending; invented fixtures and local suites prove no live success.
 - NEEDED BY: S2-T06 part B live run 2.
 
@@ -4494,6 +4494,7 @@ Revision-2 record points without extra numbers:
 - COMPARISON: PO-S2-116 already in WORK concerns a separate closure-status decision; it does not settle these implementation notes.
 
 - CLOSED 2026-11-20, P14 bounded parser fix: `_museum_rows` now reads the measure field declared by the supplied YAML map, with malformed field declarations refused as `field_map_unreadable`. The shared reader admits exact empty text and reviewed missing forms, while whitespace-only text stops fetch and build with `measure_unparsed`, aligning with document 04's museum missing-value paragraph. `custodian/tests/test_museum_missing_forms.py` plants an invented renamed field, invalid declarations and five whitespace forms at both stages; exact-note admission/refusals, null/empty coverage and numeric zero remain tested. The complete focused original-defect run exited 1 (19 failed, 47 passed, including fifteen museum failures); restoring the fixes exited 0 (66 passed), seed 6724135907. No source mapping, closure-status contract or reviewed form changed. This implementation closure supplies no independent-maker review or slice-gate verdict; S2-T10's review boxes remain unticked.
+- Record note (lead, 2026-11-20, review S2-P12.r1 notes 1 and 3): the `NOTE` case of `test_parser_reads_the_yaml_declared_measure_field` would also pass if the parser ignored the declared field (same omission outcome); the numeric case `7` is the deciding plant. Whitespace-only measure cells now fail in every additions reader, not only the museum reader. Both are recorded here; the first is carried to S2-T11 as a test-strength follow-up, PO-S2-142.
 
 ### PO-S2-121 — Two plant tests of the mutation-ledger guard accept any parse failure
 
@@ -4709,6 +4710,14 @@ Proposals from the supplied two reviews, preserved without inventing a defect or
 - NEEDED: reword that parenthetical to the actual tender path and attach the exact documentation correction and source inspection in OI-340’s pull request. The proposed wording is information for the lead, not a tracked edit made by this preparation.
 - COMPARISON: this explanation correction does not broaden transport behavior or resolve the lack of forward secrecy recorded by OI-340.
 - CLOSED 2026-11-20 (S2-P01-FIX1): cause — tender transport paragraph overstated credential refusal and claimed only `Accept-Language` is sent; fix — reworded to: "Requests on the tender path pass no token and add no cookie or authorization header; the only header the reader adds is the English `Accept-Language` named above (Arabic requests add none), beside the standard library's default request headers; the pages are public."; deciding test — `custodian/tests/test_tenders.py::test_tender_path_wording_matches_accept_language_only_guarantee` and `python3 scripts/check_docs.py`; red then green — failed while the old parenthetical or missing "Arabic requests add none" remained, then passed (pytest 1/1; check_docs exit 0; seed 5829103746).
+
+### PO-S2-142 — Field-binding plant of the additions parser
+
+- ID: PO-S2-142
+- TYPE: OPEN
+- RAISED BY: review S2-P12.r1, record note 1 (2026-11-20).
+- EVIDENCE: in `test_parser_reads_the_yaml_declared_measure_field` the `NOTE` case passes whether or not the parser honours the YAML-declared measure field, because a missing column and the declared field give the same omission; the numeric case `7` alone decides the binding.
+- NEEDED: drop the `NOTE` case from the binding parametrisation, or add a case whose wrong field yields a different value, with a planted removal of the binding showing red. Owning task: S2-T11 (review follow-up).
 
 ## Sources
 
@@ -5305,7 +5314,7 @@ Inspected 257 existing relevant/linked items. Dispositions: 90 carried — gate 
 | PO-S2-112 | **CLOSED**. CLOSED by S2-P01-FIX1: continuation-only intake documented in `acquire.py` and document 04; refusal plant `test_full_capture_set_beside_live_prefix_refuses` and positive control `custodian/tests/test_fc_register_capture.py::test_end_to_end_initial_capture_and_live_prefix[True]`. Source: original PO-S2-112 evidence/needed-by record. |
 | PO-S2-113 | **CARRIED — GATE HOLD**. The remaining per-guard failing-first chronology still needs its lead disposition; the ordinary green suite is not that chronology. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-113 evidence/needed-by record. |
 | PO-S2-114 | **CARRIED — GATE HOLD**. The exact-URL block still needs its own deciding plant or reviewed redundancy reason; source-contract approval is not that proof. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-114 evidence/needed-by record. |
-| PO-S2-119 | **CARRIED — GATE HOLD**. PR 101 is the bounded missing-form repair; it does not settle the separately retained whitespace/field-binding notes. A later parser-task disposition is still requested by this item. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-119 evidence/needed-by record. |
+| PO-S2-119 | **CLOSED 2026-11-20** by package S2-P12/P14 (see the item's dated closing line; this row reconciled to it by the lead the same day). |
 | PO-S2-121 | **CARRIED — GATE HOLD**. The ordinary real-ledger guard is accepted in PR 103; two malformed-copy plants still need the proposed exact-message refinement. This is ordinary test precision, not a deferred campaign. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-121 evidence/needed-by record. |
 | PO-S2-122 | **CLOSED**. CLOSED by S2-P01-FIX1: README S2-T15 paragraph names the newest dated release at each refresh and describes reader behaviour without mis-stating pipeline limits. Deciding test: `test_readme_s2_t15_paragraph_names_newest_release_at_refresh`. Source: original PO-S2-122 evidence/needed-by record. |
 | PO-S2-123 | **CLOSED**. CLOSED by checking every date occurrence in a release path, with the mismatching-later-date plant. releases.py::validate_release_path uses finditer; test_places_fsq_releases.py::test_every_date_in_receipt_and_selection_paths_must_match covers it. Approved 2c7ebaa9/6f8a16bb is merged by PR 108, c2b5910. Source: original PO-S2-123 evidence/needed-by record. |
