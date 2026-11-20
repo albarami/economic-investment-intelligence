@@ -45,6 +45,9 @@ SETUP_PREFIXES = (BWRAP_PREFIX, SUPERVISOR_PREFIX)
 CLEANUP_SECONDS = 4.0
 KILL_SECONDS = 2.0
 DRAIN_SECONDS = 1.0
+# The walk for descendants may use at most this part of KILL_SECONDS; the rest
+# is kept for the kills and the reaping (F2 of the third part F review).
+WALK_SECONDS = KILL_SECONDS / 2
 # os.open flags of a mount source: a path descriptor that does not follow a
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -456,42 +459,206 @@ def supervisor_command(
     ]
 
 
-def _parent_of(pid: int) -> int | None:
-    """Return the parent's process id of ``pid``, or None when it is gone."""
+class _Unread(Exception):
+    """A process exists, but its metadata cannot be read or is not valid."""
+
+
+@dataclass(frozen=True)
+class _Stat:
+    """What the walk reads of a process in ``/proc/<pid>/stat``.
+
+    Attributes:
+        state: The state letter (field 3).
+        parent: The parent's process id (field 4).
+        start: The start time in clock ticks after boot (field 22); with the
+            process id it names one process, as a reused id has a later start.
+    """
+
+    state: str
+    parent: int
+    start: int
+
+
+# The fields after the command name: the state is field 3, so field N is at
+# index N - 3.
+STATE_INDEX, PARENT_INDEX, START_INDEX = 0, 1, 19
+
+
+def _stat_of(pid: int) -> _Stat | None:
+    """Read the state, parent and start time of ``pid``.
+
+    Returns:
+        The metadata, or None only when the process is gone (ENOENT, ESRCH).
+
+    Raises:
+        _Unread: The process may exist, but its metadata cannot be read (for
+            example EACCES) or is not valid; it is never taken as gone (F3 of
+            the third part F review).
+    """
     try:
         text = Path(f"/proc/{pid}/stat").read_text(encoding="ascii", errors="replace")
-    except OSError:
+    except (FileNotFoundError, ProcessLookupError):
         return None
-    # The command name in brackets can hold spaces; the parent follows the
-    # state after the last closing bracket.
+    except OSError as error:
+        raise _Unread(f"{pid}: {type(error).__name__}") from None
+    # The command name in brackets can hold spaces; the fields follow the last
+    # closing bracket.
     fields = text.rpartition(")")[2].split()
-    if len(fields) < 2 or not fields[1].isdigit():
-        return None
-    return int(fields[1])
+    if (
+        len(fields) <= START_INDEX
+        or not fields[PARENT_INDEX].isdigit()
+        or not fields[START_INDEX].isdigit()
+    ):
+        raise _Unread(f"{pid}: not valid")
+    return _Stat(
+        fields[STATE_INDEX], int(fields[PARENT_INDEX]), int(fields[START_INDEX])
+    )
 
 
-def descendants(root: int) -> list[tuple[int, int]]:
-    """Return ``(pid, parent)`` of every descendant of ``root``, parents first.
+def _process_table(deadline: float) -> tuple[dict[int, _Stat], bool]:
+    """Read every process of ``/proc``, stopping at ``deadline``.
 
-    The walk follows the parent of each process in ``/proc``, so it also finds
-    processes in another process group or session, such as bubblewrap's inner
-    layer.
+    Returns:
+        The metadata by process id, and whether the table is complete: False
+        when ``/proc`` cannot be listed, the deadline passed before every
+        process was read, or the metadata of a process could not be read. A
+        process that is gone is left out and keeps the table complete.
     """
+    table: dict[int, _Stat] = {}
+    complete = True
+    try:
+        for entry in Path("/proc").iterdir():
+            if time.monotonic() >= deadline:
+                return table, False
+            if not entry.name.isdigit():
+                continue
+            try:
+                found = _stat_of(int(entry.name))
+            except _Unread:
+                complete = False
+                continue
+            if found is not None:
+                table[int(entry.name)] = found
+    except OSError:
+        return table, False
+    return table, complete
+
+
+def _exited(handle: int) -> bool:
+    """Return whether the process pinned by ``handle`` has ended."""
+    watch = select.poll()
+    watch.register(handle, select.POLLIN)
+    return bool(watch.poll(0))
+
+
+@dataclass(frozen=True)
+class _Ancestor:
+    """A process whose place in the run is established.
+
+    Attributes:
+        pid: Its process id.
+        start: Its start time.
+        handle: Its process descriptor, or None for the unreaped supervisor,
+            whose id cannot be reused before the launcher reaps it.
+    """
+
+    pid: int
+    start: int
+    handle: int | None
+
+
+PINNED, GONE, STALE, UNKNOWN = "pinned", "gone", "stale", "unknown"
+
+
+def _pin(pid: int, seen: _Stat, parent: _Ancestor) -> tuple[str, int]:
+    """Pin ``pid`` and check that it is the process the walk saw below ``parent``.
+
+    The process is pinned by a process descriptor first, then read again. The
+    read is that process's own when the process has not ended after it. The
+    pinned process is the one the walk saw when its start time is the same,
+    and it is a child of ``parent`` when its live parent is ``parent``'s id
+    while ``parent``, pinned or unreaped, has not ended after the read: an id
+    that a live process holds cannot belong to another.
+
+    Returns:
+        ``(PINNED, handle)`` when every check holds; ``(GONE, -1)`` when the
+        process is gone; ``(STALE, -1)`` when it is another process or has
+        another parent; ``(UNKNOWN, -1)`` when its identity or its parent's
+        cannot be established. Only a pinned descriptor stays open.
+    """
+    if seen.start < parent.start:
+        return STALE, -1
+    try:
+        handle = os.pidfd_open(pid)
+    except ProcessLookupError:
+        return GONE, -1
+    except OSError:
+        return UNKNOWN, -1
+    try:
+        live = _stat_of(pid)
+    except _Unread:
+        os.close(handle)
+        return UNKNOWN, -1
+    if live is None or _exited(handle):
+        os.close(handle)
+        return GONE, -1
+    if live.start != seen.start or live.parent != parent.pid:
+        os.close(handle)
+        return STALE, -1
+    if parent.handle is not None and _exited(parent.handle):
+        os.close(handle)
+        return UNKNOWN, -1
+    return PINNED, handle
+
+
+def _walk_round(
+    root: int, pinned: dict[tuple[int, int], int], deadline: float
+) -> tuple[bool, bool]:
+    """Pin and stop every new descendant of ``root`` that one walk can establish.
+
+    The walk reads ``/proc`` once and goes down from ``root`` through
+    established processes only: a process is visited only below a parent that
+    is the unreaped root or a process this or an earlier round pinned; a
+    candidate that is gone, stale or not established is neither signalled nor
+    gone below (F1 of the third part F review). Each new process is stopped
+    as soon as it is pinned, so it starts no other unseen.
+
+    Returns:
+        Whether the round settled, that is it read every process, found the
+        root alive and found nothing new, stale or not established; and
+        whether every stop signal was sent.
+    """
+    table, settled = _process_table(deadline)
+    sent = True
+    found = table.get(root)
+    if found is None or found.state == "Z":
+        # The root has ended: its children have gone to another parent.
+        return False, sent
     below: dict[int, list[int]] = {}
-    for entry in Path("/proc").iterdir():
-        if not entry.name.isdigit():
-            continue
-        parent = _parent_of(int(entry.name))
-        if parent is not None:
-            below.setdefault(parent, []).append(int(entry.name))
-    found: list[tuple[int, int]] = []
-    frontier = [root]
+    for pid, seen in table.items():
+        below.setdefault(seen.parent, []).append(pid)
+    frontier = [_Ancestor(root, found.start, None)]
     while frontier:
         parent = frontier.pop(0)
-        for pid in sorted(below.get(parent, ())):
-            found.append((pid, parent))
-            frontier.append(pid)
-    return found
+        for pid in sorted(below.get(parent.pid, ())):
+            if time.monotonic() >= deadline:
+                return False, sent
+            seen = table[pid]
+            key = (pid, seen.start)
+            if key in pinned:
+                frontier.append(_Ancestor(pid, seen.start, pinned[key]))
+                continue
+            outcome, handle = _pin(pid, seen, parent)
+            if outcome == PINNED:
+                pinned[key] = handle
+                sent &= _signalled(handle, signal.SIGSTOP, group=False)
+                frontier.append(_Ancestor(pid, seen.start, handle))
+                settled = False
+            elif outcome != GONE or pid in below:
+                # A gone process with children in the table has passed them
+                # to another parent, which the next round reads.
+                settled = False
+    return settled, sent
 
 
 def _ended(handles: Sequence[int], deadline: float) -> bool:
@@ -529,54 +696,48 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
 
     The supervisor started a session of its own, so its process group is the
     supervisor's id; bubblewrap's inner layer runs in yet another session, so
-    the group alone can miss it. The group is stopped first; then every
-    descendant found by a walk of ``/proc`` is pinned by a process descriptor
-    and stopped, until a walk finds no new one, so that none can start another
-    unseen. Each pinned process and the group are then killed. The supervisor is
-    not reaped before its group is signalled, so its id cannot have been
-    reused. Every wait is bounded by ``KILL_SECONDS``.
+    the group alone can miss it. The group is stopped first; then rounds of a
+    walk of ``/proc`` (``_walk_round``) pin each descendant by a process
+    descriptor, check its identity and ancestry and stop it, until a round
+    settles, so that none can start another unseen. Each pinned process and
+    the group are then killed. The supervisor is not reaped before its group is
+    signalled, so its id cannot have been reused; a supervisor already reaped
+    is not walked from or signalled at all.
+
+    One absolute deadline, ``KILL_SECONDS`` from the call, bounds everything:
+    the walk stops at ``WALK_SECONDS`` (checked before each process is read
+    and each candidate is pinned), and the rest is kept for the kills, which
+    are one call per pinned process and are always sent, and for the bounded
+    waits. A walk that did not settle in time leaves the end unconfirmed.
 
     Returns:
-        True only when every signal was sent, the walk settled, the supervisor
-        was reaped and every pinned process ended before the bound; False when
-        that is not confirmed.
+        True only when the walk settled, every signal was sent, the kills were
+        sent before the deadline, the supervisor was reaped and every pinned
+        process ended before the deadline; False when that is not confirmed.
     """
-    deadline = time.monotonic() + KILL_SECONDS
-    pinned: dict[int, int] = {}
+    started = time.monotonic()
+    walk_deadline = started + WALK_SECONDS
+    deadline = started + KILL_SECONDS
+    pinned: dict[tuple[int, int], int] = {}
     sent = True
+    settled = False
     try:
-        if process.returncode is None:
-            sent &= _signalled(process.pid, signal.SIGSTOP, group=True)
-        settled = False
-        while not settled and time.monotonic() < deadline:
-            settled = True
-            for pid, parent in descendants(process.pid):
-                if pid in pinned:
-                    continue
-                settled = False
-                try:
-                    handle = os.pidfd_open(pid)
-                except ProcessLookupError:
-                    continue
-                except OSError:
-                    sent = False
-                    continue
-                # The walk and the pin are two steps: keep the pin only when the
-                # process still has the parent that the walk saw.
-                if _parent_of(pid) != parent:
-                    os.close(handle)
-                    continue
-                pinned[pid] = handle
-                sent &= _signalled(handle, signal.SIGSTOP, group=False)
+        if process.returncode is not None:
+            # Reaped: its id may name another process now; nothing is walked.
+            return False
+        sent &= _signalled(process.pid, signal.SIGSTOP, group=True)
+        while not settled and time.monotonic() < walk_deadline:
+            settled, stopped = _walk_round(process.pid, pinned, walk_deadline)
+            sent &= stopped
         for handle in pinned.values():
             sent &= _signalled(handle, signal.SIGKILL, group=False)
-        if process.returncode is None:
-            sent &= _signalled(process.pid, signal.SIGKILL, group=True)
+        sent &= _signalled(process.pid, signal.SIGKILL, group=True)
+        on_time = time.monotonic() < deadline
         try:
             process.wait(timeout=max(deadline - time.monotonic(), 0.0))
         except subprocess.TimeoutExpired:
             return False
-        return sent and settled and _ended(list(pinned.values()), deadline)
+        return sent and settled and on_time and _ended(list(pinned.values()), deadline)
     finally:
         for handle in pinned.values():
             os.close(handle)
