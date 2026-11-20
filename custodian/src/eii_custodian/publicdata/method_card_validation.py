@@ -173,37 +173,54 @@ def _canonical(value: object) -> str:
         raise ValueError("pin_json_invalid") from None
 
 
-def _registry_by_source(registry: Sequence[Entry]) -> dict[str, Entry]:
-    by_source: dict[str, Entry] = {}
+def _registry_by_source(registry: Sequence[Entry]) -> dict[str, tuple[Entry, ...]]:
+    by_source: dict[str, list[Entry]] = {}
     for row in registry:
-        if row.source_id in by_source:
-            raise ValueError("pin_registry_duplicate")
-        by_source[row.source_id] = row
-    return by_source
+        by_source.setdefault(row.source_id, []).append(row)
+    return {key: tuple(rows) for key, rows in by_source.items()}
 
 
 def _resolve_lineage(
     lineage: tuple[SourceLineageRef, ...],
     *,
-    registry_by_source: Mapping[str, Entry],
+    registry_by_source: Mapping[str, tuple[Entry, ...]],
     receipts_by_key: Mapping[str, Mapping[str, object]],
 ) -> None:
     for ref in lineage:
-        entry = registry_by_source.get(ref.source_id)
-        if entry is None:
+        candidates = registry_by_source.get(ref.source_id)
+        if not candidates:
             raise ValueError("pin_lineage_source_unknown")
-        receipt = receipts_by_key.get(entry.key)
-        if not isinstance(receipt, Mapping):
-            raise ValueError("pin_lineage_receipt_missing")
-        receipt_hash = receipt.get("sha256")
-        if not isinstance(receipt_hash, str) or receipt_hash != ref.sha256:
+        matches: list[Entry] = []
+        missing_receipt = False
+        wrong_hash = False
+        for entry in candidates:
+            receipt = receipts_by_key.get(entry.key)
+            if not isinstance(receipt, Mapping):
+                missing_receipt = True
+                continue
+            receipt_hash = receipt.get("sha256")
+            if not isinstance(receipt_hash, str):
+                missing_receipt = True
+                continue
+            if receipt_hash == ref.sha256:
+                matches.append(entry)
+            else:
+                wrong_hash = True
+        if len(matches) > 1:
+            raise ValueError("pin_lineage_source_ambiguous")
+        if len(matches) == 1:
+            continue
+        if wrong_hash:
             raise ValueError("pin_lineage_receipt_mismatch")
+        if missing_receipt:
+            raise ValueError("pin_lineage_receipt_missing")
+        raise ValueError("pin_lineage_source_unknown")
 
 
 def _lineage(
     value: object,
     *,
-    registry_by_source: Mapping[str, Entry] | None = None,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
     receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
 ) -> tuple[SourceLineageRef, ...]:
     if not isinstance(value, list):
@@ -235,7 +252,7 @@ def _lineage(
 def _entry(
     value: object,
     *,
-    registry_by_source: Mapping[str, Entry] | None = None,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
     receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
 ) -> CheckedPinEntry:
     row = _mapping(value, set(CheckedPinEntry.__dataclass_fields__))
@@ -305,7 +322,7 @@ def _entry(
 def _record(
     path: Path,
     *,
-    registry_by_source: Mapping[str, Entry] | None = None,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
     receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
 ) -> tuple[dict[str, CheckedPinEntry], str]:
     try:

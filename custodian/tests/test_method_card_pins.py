@@ -8,6 +8,7 @@ compound values, and the per-line C5 value encoding.
 
 import copy
 import re
+import shutil
 from pathlib import Path
 
 import pytest
@@ -376,14 +377,26 @@ def test_plant_artifact_row_missing(tmp_path):
         _validate(paths, record)
 
 
-def test_plant_artifact_lineage_mismatch(tmp_path):
+def test_plant_artifact_lineage_receipt_mismatch(tmp_path):
     paths, record, artifact, _ = case(tmp_path)
     # c5.hhi is a source pin (pins[1]); pins[0] wilson.period is a
     # configuration pin whose record and artifact lineage are both empty.
+    record["pins"][1]["source_lineage"][0]["sha256"] = digest(b"different rows")
     artifact["pins"][1]["source_lineage"][0]["sha256"] = digest(b"different rows")
-    write_json(paths[1], artifact)
+    save(paths, record, artifact)
     with pytest.raises(ValueError, match="pin_lineage_receipt_mismatch"):
         _validate(paths, record)
+
+
+def test_plant_artifact_lineage_mismatch(tmp_path):
+    paths, record, artifact, _ = case(tmp_path)
+    frozen = lineage_context(record)
+    tampered = copy.deepcopy(artifact["pins"][1]["source_lineage"][0])
+    tampered["method_id"] = "invented.other@v2"
+    artifact["pins"][1]["source_lineage"][0] = tampered
+    write_json(paths[1], artifact)
+    with pytest.raises(ValueError, match="pin_lineage_mismatch"):
+        _validate(paths, record, **frozen)
 
 
 def test_plant_lineage_date_without_timezone(tmp_path):
@@ -917,3 +930,145 @@ def test_method_pin_gate_calls_completion_evidence(tmp_path):
     assert report["task"] == "S2-T09"
     assert report["completion_evidence"] is True
     assert report["state"] == "recorded"
+
+
+def test_method_pin_gate_pending_when_completion_refused(tmp_path):
+    from eii_custodian.publicdata import gate_report as g
+
+    paths, record, _, _ = case(tmp_path)
+    record["pins"][0]["checked_against_source"] = False
+    record["pins"][0]["unpinned_reason"] = "invented pending"
+    write_yaml(paths[0], record)
+    ctx = lineage_context(record)
+    report = g.method_pin_gate(*paths, **ctx, gate="S2")
+    assert report["completion_evidence"] is False
+    assert report["state"] == "pending"
+
+
+def test_plant_lineage_receipt_missing(tmp_path):
+    paths, record, _, _ = case(tmp_path)
+    ctx = lineage_context(record)
+    missing_key = next(iter(ctx["receipts"]))
+    ctx["receipts"] = {
+        key: value for key, value in ctx["receipts"].items() if key != missing_key
+    }
+    with pytest.raises(ValueError, match="pin_lineage_receipt_missing"):
+        _validate(paths, record, **ctx)
+
+
+def test_registry_source_family_resolves_matching_key(tmp_path):
+    from custodian.tests.test_source_completeness import receipt as build_receipt
+
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    paths, record, artifact, _ = case(tmp_path)
+    family = [row for row in load_registry() if row.source_id == "trade_ext"][:2]
+    assert len(family) == 2
+    chosen, other = family
+    body = digest(b"family receipt body")
+    link = record["pins"][1]["source_lineage"][0]
+    link["source_id"] = "trade_ext"
+    link["sha256"] = body
+    artifact["pins"][1]["source_lineage"][0] = dict(link)
+    save(paths, record, artifact)
+    receipts = {
+        chosen.key: {**build_receipt(chosen), "sha256": body},
+        other.key: {**build_receipt(other), "sha256": digest(b"other body")},
+    }
+    ctx = lineage_context(record)
+    ctx["registry"] = [
+        row for row in ctx["registry"] if row.source_id != "trade_ext"
+    ] + family
+    ctx["receipts"] = {
+        key: value for key, value in ctx["receipts"].items() if key != "trade_ext"
+    }
+    ctx["receipts"].update(receipts)
+    _validate(paths, record, **ctx)
+
+
+def test_registry_source_family_ambiguous_hash(tmp_path):
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    paths, record, artifact, _ = case(tmp_path)
+    family = [row for row in load_registry() if row.source_id == "trade_ext"][:2]
+    body = digest(b"ambiguous shared body")
+    link = record["pins"][1]["source_lineage"][0]
+    link["source_id"] = "trade_ext"
+    link["sha256"] = body
+    for row in artifact["pins"]:
+        if row["pin_id"] == "c5.hhi":
+            row["source_lineage"][0] = dict(link)
+    save(paths, record, artifact)
+    receipts = {row.key: {"sha256": body} for row in family}
+    with pytest.raises(ValueError, match="pin_lineage_source_ambiguous"):
+        _validate(paths, record, registry=tuple(family), receipts=receipts)
+
+
+def test_committed_registry_does_not_refuse_duplicate_source_families(tmp_path):
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    paths, record, _, _ = case(tmp_path)
+    invented = lineage_context(record)
+    registry = (*load_registry(), *invented["registry"])
+    with pytest.raises(ValueError, match="pin_lineage_receipt_missing"):
+        validate_source_check_record(*paths[:3], registry=registry, receipts={})
+
+
+@pytest.mark.parametrize(
+    "plant,code",
+    [
+        ("config_lineage", "pin_configuration_lineage_forbidden"),
+        ("source_missing_lineage", "pin_source_lineage_required"),
+        ("duplicate_pin", "pin_artifact_duplicate_or_unknown"),
+        ("missing_settings", "pin_artifact_missing"),
+        ("extra_pin", "pin_artifact_fields"),
+        ("incomplete", "pin_missing_or_duplicate"),
+    ],
+)
+def test_producer_guard_plants(tmp_path, plant, code):
+    from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
+
+    paths, record, _, config = case(tmp_path)
+    rows = [
+        {
+            "pin_id": row["pin_id"],
+            "values": row["values"],
+            "source_lineage": row["source_lineage"],
+        }
+        for row in record["pins"]
+    ]
+    if plant == "config_lineage":
+        rows[0]["source_lineage"] = [dict(rows[1]["source_lineage"][0])]
+    elif plant == "source_missing_lineage":
+        rows[1]["source_lineage"] = []
+    elif plant == "duplicate_pin":
+        rows.append(dict(rows[0]))
+    elif plant == "missing_settings":
+        config["pins"].pop("wilson.period")
+        write_json(paths[2], config)
+    elif plant == "extra_pin":
+        config["pins"]["invented.extra"] = {"value": "invented"}
+        write_json(paths[2], config)
+    else:
+        rows.pop()
+    with pytest.raises(ValueError, match=re.escape(code)):
+        produce_pin_artifact(config, rows)
+
+
+def test_method_pin_evidence_records_staged_s2_outputs(tmp_path):
+    from eii_custodian.publicdata import gate_report as g
+
+    paths, record, artifact, config = case(tmp_path)
+    ctx = lineage_context(record)
+    root = tmp_path
+    (root / "custodian/publicdata/review").mkdir(parents=True)
+    (root / "docs").mkdir(parents=True)
+    (root / "assembly").mkdir(parents=True)
+    write_yaml(root / "custodian/publicdata/review/s2_t09_source_checks.yaml", record)
+    write_json(root / "assembly/s2_t09_pin_artifact.json", artifact)
+    write_json(root / "assembly/s2_t09_pin_generation_config.json", config)
+    shutil.copy(paths[3], root / "docs/07_ECONOMIC_METHODS.md")
+    item = g.method_pin_evidence(root, root, tuple(ctx["registry"]), ctx["receipts"])
+    rows = g.confirmations([item], ctx["registry"], ctx["receipts"])
+    pin_row = next(row for row in rows if row["task"] == "S2-T09")
+    assert pin_row["state"] == "recorded"

@@ -264,6 +264,7 @@ def test_gather_audit_on_registered_sources_without_cache_is_pending(
     assert any(row["state"] == "failed" for row in audit["completeness"])
     assert audit["oi03"]["state"] == "pending"
     assert {row["task"] for row in audit["confirmations"]} == {
+        "S2-T09",
         "S2-T12",
         "S2-T13",
         "S2-T15",
@@ -271,6 +272,10 @@ def test_gather_audit_on_registered_sources_without_cache_is_pending(
         "S2-T19",
         "S2-T20",
     }
+    assert (
+        next(row for row in audit["confirmations"] if row["task"] == "S2-T09")["state"]
+        == "pending"
+    )
 
 
 def test_series_calls_real_builder_and_preserves_regression_refusal(

@@ -29,7 +29,15 @@ from eii_custodian.publicdata.places_fsq.constants import RELEASE_KEY, RELEASE_P
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.releases import validate_release
 
-CONFIRMATION_TASKS = ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+CONFIRMATION_TASKS = (
+    "S2-T09",
+    "S2-T12",
+    "S2-T13",
+    "S2-T15",
+    "S2-T17",
+    "S2-T19",
+    "S2-T20",
+)
 INVESTMENT_FLAGS = (
     "inventory_recorded",
     "field_coverage_recorded",
@@ -37,6 +45,7 @@ INVESTMENT_FLAGS = (
     "live_page_compared",
 )
 CONFIRMATION_CHECKS = {
+    "S2-T09": frozenset({"completion_evidence"}),
     "S2-T12": frozenset(
         key + ":" + flag
         for key in ("fdi_projects", "investqa_pages")
@@ -382,6 +391,90 @@ def fsq_evidence(
         (RELEASE_KEY,),
         (reference,),
         {"release_matches": matches},
+    )
+
+
+def _method_pin_source_keys(
+    record_path: Path,
+    entries: Sequence[Entry],
+    receipts: Mapping[str, Mapping[str, object]],
+) -> tuple[str, ...]:
+    """Registry keys whose receipt hash matches a checked lineage row in the record."""
+    try:
+        import yaml
+
+        loaded = yaml.safe_load(record_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return ()
+    if not isinstance(loaded, dict):
+        return ()
+    pins = loaded.get("pins")
+    if not isinstance(pins, list):
+        return ()
+    by_source: dict[str, tuple[Entry, ...]] = {}
+    for row in entries:
+        by_source.setdefault(row.source_id, (*by_source.get(row.source_id, ()), row))
+    keys: set[str] = set()
+    for pin in pins:
+        if not isinstance(pin, dict) or not pin.get("checked_against_source"):
+            continue
+        lineage = pin.get("source_lineage")
+        if not isinstance(lineage, list):
+            continue
+        for link in lineage:
+            if not isinstance(link, dict):
+                continue
+            source_id = link.get("source_id")
+            digest = link.get("sha256")
+            if not isinstance(source_id, str) or not isinstance(digest, str):
+                continue
+            for entry in by_source.get(source_id, ()):
+                receipt = receipts.get(entry.key)
+                if (
+                    isinstance(receipt, Mapping)
+                    and str(receipt.get("sha256")) == digest
+                ):
+                    keys.add(entry.key)
+    return tuple(sorted(keys))
+
+
+def method_pin_evidence(
+    root: Path,
+    cache: Path,
+    entries: Sequence[Entry],
+    receipts: Mapping[str, Mapping[str, object]],
+) -> ConfirmationEvidence:
+    """Gather S2-T09 completion evidence from the tracked record and assembly outputs."""
+    record = root / "custodian/publicdata/review/s2_t09_source_checks.yaml"
+    methods = root / "docs/07_ECONOMIC_METHODS.md"
+    artifact = cache / "assembly/s2_t09_pin_artifact.json"
+    config = cache / "assembly/s2_t09_pin_generation_config.json"
+    report = method_pin_gate(
+        record,
+        artifact,
+        config,
+        methods,
+        entries,
+        receipts,
+        gate="S2",
+    )
+    confirmed = report.get("completion_evidence") is True
+    source_keys = (
+        _method_pin_source_keys(record, entries, receipts) if confirmed else ()
+    )
+    return ConfirmationEvidence(
+        "S2-T09",
+        source_keys,
+        (
+            "s2_t09_source_checks.yaml",
+            "s2_t09_pin_artifact.json",
+            "s2_t09_pin_generation_config.json",
+            "07_ECONOMIC_METHODS.md",
+        ),
+        {"completion_evidence": confirmed},
+        receipt_sha256={
+            key: str(receipts[key]["sha256"]) for key in source_keys if key in receipts
+        },
     )
 
 

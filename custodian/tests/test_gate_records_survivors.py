@@ -174,7 +174,7 @@ def confirmation_record(task, **changes):
 
 
 def test_confirmations_exact_missing_and_recorded_records():
-    tasks = ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+    tasks = g.CONFIRMATION_TASKS
     assert g.confirmations([], [], {}) == [confirmation_record(task) for task in tasks]
     row = entry()
     item = g.ConfirmationEvidence(
@@ -186,7 +186,7 @@ def test_confirmations_exact_missing_and_recorded_records():
         receipt_sha256={"invented": "a" * 64},
     )
     expected = [confirmation_record(task) for task in tasks]
-    expected[4] = confirmation_record(
+    expected[tasks.index("S2-T19")] = confirmation_record(
         "S2-T19",
         state="recorded",
         reason="",

@@ -359,6 +359,7 @@ def gather_audit(build: Production) -> dict[str, Any]:
         fsq_evidence,
         investment_evidence,
         load_dispositions,
+        method_pin_evidence,
         oi03_line,
         tender_evidence,
         terms_evidence,
@@ -548,6 +549,9 @@ def gather_audit(build: Production) -> dict[str, Any]:
                 if key in build.receipts
             },
         )
+    )
+    evidence.append(
+        method_pin_evidence(build.root, build.cache, build.entries, build.receipts)
     )
     decision_name = "0025-reconciliation-of-restaurant-and-wage-figures.md"
     decision_path = build.root / "docs/decisions" / decision_name

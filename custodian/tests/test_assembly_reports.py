@@ -128,7 +128,15 @@ def _complete_audit() -> dict[str, object]:
         "oi03": {"state": "recorded"},
         "confirmations": [
             {"task": task, "state": "recorded"}
-            for task in ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
         ],
         "regressions": {"missing": [], "mismatch": ""},
     }
@@ -172,7 +180,15 @@ def test_each_missing_or_pending_gate_is_refused() -> None:
         "oi03": {"state": "recorded"},
         "confirmations": [
             {"task": task, "state": "recorded"}
-            for task in ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
         ],
         "regressions": {"missing": [], "mismatch": ""},
     }
@@ -314,6 +330,31 @@ def test_nonfinite_stored_measure_is_refused(tmp_path: Path, value: str) -> None
     )
     with pytest.raises(AssemblyError, match="assembly_draw_value_invalid"):
         draw_tables(state)["pub_invented"]()
+
+
+def test_pending_method_pin_blocks_otherwise_complete_audit() -> None:
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    audit = {
+        "completeness": [{"state": "in use"}],
+        "terms": [{"own_words_state": "recorded"}],
+        "oi03": {"state": "recorded"},
+        "confirmations": [
+            {"task": task, "state": "recorded" if task != "S2-T09" else "pending"}
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
+        ],
+        "regressions": {"missing": [], "mismatch": ""},
+    }
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(audit)
 
 
 def test_duplicate_confirmations_do_not_cover_six_tasks() -> None:
