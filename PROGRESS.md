@@ -44832,3 +44832,15 @@ Final post-write verification: documentation check exit 0 (1169 text files, 127 
 - Custodian tests before: `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests` exit 1, 8799 passed, 193 failed; after: exit 0, 8993 passed, 0 failed.
 - Checks: ruff check exit 0; ruff format --check exit 0; mypy exit 0; check_docs exit 0; check_tree exit 0.
 - No commit; no network.
+
+## S2-P21 fix 5 — CONFIRM-cf5 remediation — 2026-11-20
+
+- Maker/model: Composer (Cursor agent), Composer 2.5; persona: senior test-integrity engineer; strict self-review: plants boundary violations for cleanup and write guards.
+- Skills: project-orientation, task-standards, test-driven-development, verification-before-completion.
+- Base: HEAD 1b15b720; work uncommitted on top of fix 4.
+- F1: removed `_shared_session_assets` and heuristic `shutil.rmtree`; `ensure_minimal_building_table` returns whether it created the file; `fetch_build` unlinks only that helper-created table in `finally`; flat-cache fixtures use `tmp_path/data/public_cache`; plant `test_run_build_leaves_unrelated_assets_in_non_pytest_named_dir`.
+- F2: `test_build_writes_only_under_the_cache` uses exact allowlist (`public_cache/**`, `assets/buildings/buildings.geojson`, `assets/heights/heights.json`, `assets/heights/manifest.heights.json`); building table prepared before build; plant `test_undeclared_asset_write_fails_build_boundary_guard`.
+- `custodian/src` diff empty; no production change.
+- `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests`: exit 0, 8995 passed, 1 warning in 386.98s.
+- Checks: ruff check exit 0; ruff format --check exit 0; mypy exit 0; check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0.
+- No commit; no network.

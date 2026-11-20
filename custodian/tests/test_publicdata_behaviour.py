@@ -12,6 +12,7 @@ from typing import cast
 
 import pytest
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.buildings import ensure_minimal_building_table
 from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.build import fetch_entry
@@ -31,6 +32,12 @@ from eii_custodian.publicdata.fetch.transport import (
     Response,
     TransportFault,
     open_https,
+)
+from eii_custodian.publicdata.heights.model import (
+    BUILDINGS_RELATIVE,
+    HEIGHTS_FILE,
+    HEIGHTS_RELATIVE,
+    MANIFEST_FILE,
 )
 
 PORTAL = "https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/planted-slug/exports/json"
@@ -1339,11 +1346,35 @@ def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> Non
     assert (tmp_path / "planted" / "citation.json").is_file()
 
 
+_BUILD_WRITE_ALLOWLIST = frozenset(
+    {
+        BUILDINGS_RELATIVE,
+        f"{HEIGHTS_RELATIVE}/{HEIGHTS_FILE}",
+        f"{HEIGHTS_RELATIVE}/{MANIFEST_FILE}",
+    }
+)
+
+
+def _assert_files_under_build_contract(
+    data_root: Path, *, extra: Path | None = None
+) -> None:
+    """Every file under the data root matches the fetch and heights write contract."""
+    for path in data_root.rglob("*"):
+        if not path.is_file() or path == extra:
+            continue
+        rel = path.relative_to(data_root).as_posix()
+        if rel.startswith("public_cache/") or rel == "public_cache":
+            continue
+        assert rel in _BUILD_WRITE_ALLOWLIST, rel
+
+
 def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
-    """A successful build writes only under the cache data root (cache and assets)."""
+    """A successful build writes only declared cache paths and height outputs."""
     marker = tmp_path / "marker.txt"
     marker.write_text("keep", encoding="utf-8")
     cache = tmp_path / "data" / "public_cache"
+    cache.mkdir(parents=True)
+    ensure_minimal_building_table(cache)
 
     def transport(url: str) -> Response:
         return _ok(url, b"invented-bytes")
@@ -1351,11 +1382,27 @@ def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
     outcome = run_build((_entry(),), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert marker.read_text(encoding="utf-8") == "keep"
+    _assert_files_under_build_contract(cache.parent)
+
+
+def test_undeclared_asset_write_fails_build_boundary_guard(tmp_path: Path) -> None:
+    """A file under assets/ that the heights step did not write must fail the guard."""
+    cache = tmp_path / "data" / "public_cache"
+    cache.mkdir(parents=True)
+    ensure_minimal_building_table(cache)
+
+    def transport(url: str) -> Response:
+        return _ok(url, b"invented-bytes")
+
+    outcome = run_build((_entry(),), transport, cache, _clock, _sleep)
+    assert outcome.failure is None
     data_root = cache.parent
-    for path in tmp_path.rglob("*"):
-        if path.is_file() and path != marker:
-            rel = path.relative_to(data_root)
-            assert rel.parts[0] in ("public_cache", "assets")
+    _assert_files_under_build_contract(data_root)
+    (data_root / "assets" / "unrelated-output.txt").write_text(
+        "planted", encoding="utf-8"
+    )
+    with pytest.raises(AssertionError, match="unrelated-output"):
+        _assert_files_under_build_contract(data_root)
 
 
 def key_offenders(root: Path) -> tuple[str, ...]:

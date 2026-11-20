@@ -123,7 +123,8 @@ def _ensure_building_table(cache: Path) -> Path:
     """Write a minimal building table beside the public cache."""
     from custodian.tests.support.buildings import ensure_minimal_building_table
 
-    return ensure_minimal_building_table(cache)
+    path, _ = ensure_minimal_building_table(cache)
+    return path
 
 
 def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:

@@ -2,21 +2,10 @@
 
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 from typing import Any
 
 from custodian.tests.support.buildings import ensure_minimal_building_table
-
-
-def _shared_session_assets(cache: Path) -> Path | None:
-    """Return the session-shared assets folder flat-cache runs may pollute."""
-    if cache.name == "public_cache":
-        return None
-    parent = cache.parent
-    if not parent.name.startswith("pytest-"):
-        return None
-    return parent / "assets"
 
 
 def run_build(*args: Any, **kwargs: Any) -> Any:
@@ -28,12 +17,13 @@ def run_build(*args: Any, **kwargs: Any) -> Any:
         cache = args[2]
     if cache is None:
         cache = kwargs.get("cache")
-    cleanup: Path | None = None
+    created_table: Path | None = None
     if cache is not None:
-        ensure_minimal_building_table(cache)
-        cleanup = _shared_session_assets(cache)
+        table_path, created = ensure_minimal_building_table(cache)
+        if created:
+            created_table = table_path
     try:
         return _run_build(*args, **kwargs)
     finally:
-        if cleanup is not None and cleanup.is_dir():
-            shutil.rmtree(cleanup)
+        if created_table is not None and created_table.is_file():
+            created_table.unlink()

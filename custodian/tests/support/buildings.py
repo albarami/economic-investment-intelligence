@@ -14,16 +14,17 @@ def building_table_path(data_root: Path) -> Path:
     return data_root / BUILDINGS_RELATIVE
 
 
-def ensure_minimal_building_table(cache: Path) -> Path:
+def ensure_minimal_building_table(cache: Path) -> tuple[Path, bool]:
     """Write one valid invented building row beside the public cache.
 
     ``cache`` is the directory passed to ``run_build``. The table lives at
-    ``cache.parent / assets/buildings/buildings.geojson``.
+    ``cache.parent / assets/buildings/buildings.geojson``. The second return
+    value is true only when this call created the file.
     """
     path = building_table_path(cache.parent)
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.is_file():
-        return path
+        return path, False
     path.write_bytes(
         invented.buildings_bytes(
             [
@@ -36,4 +37,4 @@ def ensure_minimal_building_table(cache: Path) -> Path:
             ]
         )
     )
-    return path
+    return path, True
