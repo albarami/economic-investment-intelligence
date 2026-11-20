@@ -39759,6 +39759,520 @@ Seed:      2845535193
 Notes:     Seed supplied at run time. Lead only. Hosted checks on the actual head and a fresh-seed whole test on the exact merge result remain separate gates.
 ```
 
+Maker: OpenAI. Model: GPT-6 (Codex; exact runtime variant not exposed).
+Persona: careful senior release coordinator. Strict self-review persona: records reviewer rejecting unsupported claims.
+Skills loaded: project-orientation, task-standards, sanad-provenance, muhasabah-gate, strict-reviewer and github-flow. verification-before-completion is not installed in the supplied catalog; applied in its plain meaning through read-only Git checks and the draft preparation run. The brief's no-Git-write and no-test limits override general workflow steps.
+
+# MERGE TRAIN S6-2 — ledger input log
+
+PR 110; BASE a0e01df3a3d05ea04351d66d7505eab11b26ea9d; WORK 1fe1846e5d33b1833f84359febaa240ba1f647a2. PR and seed in draft outputs are placeholders. Sources below are supplied files under `.overnight/IN/` and Git objects. The command rows are instructions for the lead's later ledger run, not claims of executed checks. Decisions 0032 items 1–3 and 0039 items 2–4 still require the joined-head confirmation, hosted checks and the exact merge-result whole test. This preparation supplies none of those verdicts.
+
+## S6-T14 step one
+
+| Original | Pick | Builder and source |
+| --- | --- | --- |
+| 464393bf7679be3567ac2ff69acfcd8d52d640df | dbdf89ee1d9194be7c3a44cd9c07ee102c10da17 | OpenAI GPT-6.1 Sol via Codex; original commit body; LOG-S6-2-evidence.md, 2026-11-19 15:17 launch and 16:17 result. |
+| cbff06dd1a079b0ffb7dc913580c484f9c7aebe9 | 196e55c0c9a5ad0dd74d04e5f973b26e63d7580b | OpenAI GPT-6.1 Sol via Codex; original commit body; LOG-S6-2-evidence.md, 2026-11-19 16:44. S6-T14.fix1.return.md self-names OpenAI GPT-6 (Codex; exact serving variant not exposed). |
+
+| Review or confirmation | Maker and model as evidenced | Verdict and scope | Source |
+| --- | --- | --- | --- |
+| Original part-A design review (historical) | OpenAI GPT-6 Astra; planner xAI Grok 4.7 | REJECTED; seven findings. This is earlier history, not this train's approval. | LOG-S6-2-evidence.md, undated 23:01 DESIGN REVIEWS entry, with 22:31 PLAN WORKSPACES entry. The extract supplies no date on these entries. |
+| Original part-A code review (historical) | xAI Grok; exact variant absent in this result line | APPROVED d1a733713be8249002f637e6b8a0570b6a4b7446; P1/P2 noted. This train does not pick that commit. | LOG-S6-2-evidence.md, 2026-11-15 02:21; full hash in its 01:32 part-A commit entry. |
+| planrev1 | Cognition Devin SWE-2 High; planner OpenAI Codex (variant not stated in plan-result line) | REJECTED plan r1, F1–F5. | LOG-S6-2-evidence.md, 2026-11-19 14:34, result finished 14:23; plan result 13:53. |
+| planrev2 | Cognition Devin SWE-2 High | APPROVED plan r2; builder nit retained. | LOG-S6-2-evidence.md, 2026-11-19 15:02. |
+| rev1 | Cognition Devin SWE-2 High | REJECTED 464393bf: released geography admission and missing NEEDED/NEEDED BY fields. | S6-T14.rev1.return.md; LOG-S6-2-evidence.md, 2026-11-19 16:31. |
+| conf1 | Cognition Devin SWE-2 High | APPROVED cbff06dd; findings closed. Review reports inspection, not independently executed tests. | S6-T14.conf1.return.md, VERDICT and Could not check; LOG-S6-2-evidence.md, 2026-11-19 16:51. |
+| conf2, separate moved branch | Cognition Devin SWE-2 High | APPROVED 24095da113d5bcee0ae4d18b2ebd121192f7309a on base 98384ae5933dff2efb81721d087e74e6ce600011. Not a confirmation of WORK. | S6-T14.conf2.stdout; LOG-S6-2-evidence.md, 2026-11-19 18:44. |
+
+The 2026-11-19 move1 was by xAI Grok 4.7 High through Cursor per the log (18:05 launch, 18:34 result); S6-T14.move1.return.md self-names “overnight release worker”, model Grok 4.7. It moved 464393bf to ecee24b61cebdc7eb157f72c35fc4a8fc6d3b91c and cbff06dd to 24095da113d5bcee0ae4d18b2ebd121192f7309a, renumbering OI-318..325 to OI-324..331. This train instead picks the approved originals 464393bf and cbff06dd. Its identity proof does not silently admit that renumbering or import conf2 as approval of this train. Source: move1 return, conf2 stdout, the original/pick Git objects and the task brief INTENT.
+
+No step-two UI, mounted reader, canonical emitter or full task acceptance is claimed. Source: TASKS.md S6-T14 Step-one record and document 12 “S6-T14 step-one offline evidence scope”. The proposed ledger replacement corrects only the stale “status remains queued” clause to “later steps remain queued”.
+
+## S6-T25
+
+| Original | Pick | Builder and source |
+| --- | --- | --- |
+| 1491ff73014194504a70710caa6be2d797a4a047 | c9ec8341c42ca1670c74e69d2be48fb47be99176 | OpenAI GPT-6.1 Sol xhigh via Codex B; commit body and LOG-S6-2-evidence.md, 2026-11-20 08:46. |
+| 140d864cf81a55458cf3be7be391931a75a213c5 | dbb036fac1e39d5f9fa3e9c8b8588ac81e473e90 | OpenAI GPT-6.1 Sol xhigh via Codex B; commit body and log, 2026-11-20 09:06. S6-T25.fix1.return.md self-names OpenAI GPT-6 Codex. |
+| 4bda0020c6cd823071812cb1238662ddf5306fb4 | 55e233b04dcd82588c29c0ded377705f8ae3667d | Cognition SWE-2 High via Devin; commit body, S6-T25.fix2.return.md and log, 2026-11-20 09:12. |
+| a487a9c268a0c66a6b097b85e9ce458bf9a973cd | 65e9aec0ff50c91b9e2bb1339b0ba6f28079076b | Lead, Anthropic Claude Opus 5.5, applying confirmation A's block; original commit body and log, 2026-11-20 09:19. |
+
+| Review or confirmation | Maker and model as evidenced | Verdict and scope | Source |
+| --- | --- | --- | --- |
+| dr1 | OpenAI GPT-6.1 Sol high; planner Cognition SWE-2 High | REJECTED plan; F1–F5 accepted into build brief by L-1209. | LOG-S6-2-evidence.md, 2026-11-20 08:16 and 08:28; RULINGS-S6-2.md L-1209. |
+| revA, numbers | Anthropic Claude Opus 5.5 | REJECTED 1491ff73, R1 band row; N1 also noted. | S6-T25.revA.md; log, 2026-11-20 08:56; ruling L-1215. |
+| revB, provenance | Moonshot Kimi K3.1 Pro via relay in log; return self-names Moonshot AI, Kimi | REJECTED 1491ff73, F1 confirmed-source check. | S6-T25.revB.md; log, 2026-11-20 08:48; ruling L-1213. |
+| Pilot revB replay (not a task approval) | xAI Grok 4.7 via Cursor | APPROVED in replay, rated LESSER for missing F1/R1. | LOG-S6-2-evidence.md, 2026-11-20 08:59. |
+| Pilot lens-B replay (not a task approval) | DeepSeek V4.1 Flash | LESSER, missed F1/R1; no review verdict supplied in this log row. | LOG-S6-2-evidence.md, 2026-11-20 09:33. |
+| confB | Moonshot Kimi K3.1 Pro via relay in log; return self-names Moonshot AI, Kimi | REJECTED 140d864c, missing invented-feed plant. | S6-T25.confB.md; log, 2026-11-20 09:07; ruling L-1218. |
+| confA attempted launch | Anthropic Claude Opus 5.5 requested | No verdict: gate refused and routed to Fable 5.2. | Log, 2026-11-20 09:06 and 09:07; ruling L-1218. |
+| confA2 | Anthropic Claude Fable 5.2 | CONFIRMED 4bda0020, R1/N1 closed; N2/N3 non-blocking with exact fix. | S6-T25.confA2.md; log, 2026-11-20 09:19. |
+| confB2 | Moonshot Kimi K3.1 Pro in launch log; return self-names Moonshot AI, Kimi | CONFIRMED 4bda0020, no finding. | S6-T25.confB2.md; log, 2026-11-20 09:12 launch and 09:19 result. |
+| confB3 | Moonshot Kimi K3.1 Pro | CONFIRMED a487a9c2, N2/N3 closed and F1 intact. | S6-T25.confB3.md; log, 2026-11-20 09:20. |
+| Lead disposition | Lead; Anthropic per a487a9c2 commit body | S6-T25 APPROVED at a487a9c2, with lens A's confirmation on 4bda0020 and N2/N3 applied verbatim, lens B confirming both heads. | LOG-S6-2-evidence.md, 2026-11-20 09:20. |
+
+Do not rewrite lens A as having confirmed a487a9c2: its supplied return explicitly reviews 4bda0020. `tasks_md.json` proposes the narrow correction of that attribution in the train records status line. Source-to-release parity, mounted verification and go-live re-fit remain open; no acceptance box is ticked. Sources: TASKS.md S6-T25 and S6-T25.confA2.md.
+
+## S6-T27
+
+| Original | Pick | Builder and source |
+| --- | --- | --- |
+| 8f635165f099f1521b9f9128879274dc5b04a035 | 596265436aa9d35bcf7d2642ad8b8c1f44b856d5 | OpenAI GPT-6.1 Sol xhigh via Codex A; original commit body; LOG-S6-2-evidence.md, 2026-11-20 10:37. |
+| cd4ed344f5009f470aace646dacd9e630099b707 | b6560eb50391ce8285ee2abb7032474bdcd0a9b9 | Lead pin/dependency change; log, 2026-11-20 10:37. Commit trailer identifies Anthropic Claude Opus 5.5; no separate lead runtime model stated in that log entry. |
+| c44cbe0e992352ef42c5238804fe642955f86e34 | bef30908b8a0093a71e187d0a2664b3388c722b4 | OpenAI GPT-6.1 Sol xhigh via Codex A; commit body and log, 2026-11-20 11:03. S6-T27.f1.return.md self-names OpenAI Codex, GPT-6, exact runtime variant not exposed. |
+| 561756c85b0f10fb1474218d222c823fbd2d7213 | 012aa210a5c2bc5ebfafe546f4e9f6902ec0d3c1 | Lead default-dev-group change; log, 2026-11-20 11:03. Commit trailer identifies Anthropic Claude Opus 5.5; no separate lead runtime model stated there. |
+| 8743439f88ff846ef1362781c25d774dd3b2a1dc | 1d045ac09839d2547a08c82ca53d001f7750dd6d | Lead records correction; log, 2026-11-20 11:42 and ruling L-1241; commit trailer identifies Anthropic Claude Opus 5.5. |
+
+| Review or confirmation | Maker and model as evidenced | Verdict and scope | Source |
+| --- | --- | --- | --- |
+| designreview | OpenAI GPT-6.1 Sol via Codex B; planner Anthropic Claude Fable 5.2 | REJECTED plan F1–F4; lead accepted into build brief, with assumptions under L-1228. | LOG-S6-2-evidence.md, 2026-11-20 09:59 and 10:05; RULINGS-S6-2.md L-1228. |
+| lensA, methods | Requested Google Gemini 4 Carbon via Abacus; return self-names Abacus.AI, Abacus AI Agent (RouteLLM), underlying runtime model not exposed | APPROVED 561756c8, no findings; pin-note correction requested. Do not assert that the requested Google model actually served this review. | S6-T27.lensA.md; log, 2026-11-20 11:03 launch and 11:19 result. |
+| lensB initial relay attempt | Requested Moonshot Kimi K3.1 Pro | No review and no verdict: HTTP 429, flag=limit. | LOG-S6-2-evidence.md, 2026-11-20 11:05. |
+| lensB completed review | Requested Moonshot Kimi K3.1 Pro through Abacus; self-named Google Gemini 2.5 Pro | REJECTED 561756c8 on direct library imports in the independent test oracle. | S6-T27.lensB.md; log, 2026-11-20 11:11 launch and 11:42 result. |
+| Lead ruling | Lead; runtime model not specified by the ruling | L-1241: sole lens-B finding “not a defect”; independent test oracle should remain separate, core/product boundary holds. Permits train inclusion with lens A APPROVED and records-only 8743439f. This is not a replacement APPROVED verdict from lens B. | RULINGS-S6-2.md L-1241, 2026-11-20 11:42; matching log result. |
+
+Both completed review returns state that tests were not executed in those reviews. This log does not elevate their attributed builder counts to independently reproduced results. No production promotion, Public-history acceptance or zero-shot challenger success is asserted. Sources: S6-T27.lensA.md Checks and evidence; S6-T27.lensB.md Checks with evidence and Record notes; TASKS.md S6-T27.
+
+## Lead fix of the train (ledger try 1, 2026-11-20)
+
+The lead's first ledger of this train (base c2b5910c, head ef283f54, seed 2314696094) ran every row and the whole test, and the whole test failed in suite python-guards: the five S6-T27 spike test files failed at collection with "No module named 'evals'" (the suite's pytest does not put the working directory on the import path; the per-file rows, run with `python -m pytest`, passed). Running that suite alone then showed `test_pin_rulings.py`: "statsforecast: expected exactly one pin ruling". Lead commit dfd5d70c6dac9635c770db13f18fe5a4f220b949 (Anthropic Claude Opus 5.5): each of the five files puts the repository root on sys.path before importing evals, as `scripts/tests/test_requalify.py` does; the statsforecast row of pins.toml gains its single "confirmed by use:" ruling and its PROGRESS.md heading. Six files, 21 insertions and one changed note; no assertion, bound or test weakened. Suite python-guards then passed except two `test_clean_environment.py` cases that ran out of space because the lead's direct run used the in-memory temporary folder; with TMPDIR on disk, as the ledger runs it, that file passed (16 passed). The train was then moved onto main a0e01df3 (PR 109, TASKS.md and OPEN_ITEMS.md only) with no conflict. This code/test difference needs S6-T27's confirmation by a maker other than the lead and other than OpenAI (rule 33); the train confirmation covers the move.
+
+## Forced join differences and proof
+
+`identity-proof.json` is produced by `make_spec.py` from the original/pick Git pairs above. Commit messages are equal except each pick's exact `(cherry picked from commit SOURCE)` trailer; the script verifies the trailer against the full original hash and refuses any other message difference. Every changed file has its status, full source/pick hashes, result blob hashes, signed changed-line equality and a reason. `preparation.json` pins BASE, WORK, actual subjects and exact name-status scope. The script refuses any difference outside the following cases; it never applies a general whitespace ignore.
+
+| Case | Scope | Required proof | Source |
+| --- | --- | --- | --- |
+| a | First 464393bf pick, OPEN_ITEMS.md and PROGRESS.md | Every differing signed patch line is literally `+` or `-`, an empty separator. Exact delta offsets and lines retained. | BRIEF.md FORCED DIFFERENCES (a); FORCED-S6-2.txt first row; Git pairs. |
+| b | README.md, core/tests/test_calculation_purity.py, docs/03, docs/07, docs/08, docs/09, only where computed | Equal task changed lines and exactly equal source-parent→pick-parent versus source→pick signed deltas. Each actual row is computed, not hand-enumerated. | BRIEF.md FORCED DIFFERENCES (b); Git pairs. |
+| c | First 464393bf pick, docs/03_DATA_CONTRACTS.md and docs/04_PUBLIC_DATA_PACK.md | Task changed lines equal; every inherited added line appears in order in both the picked result and WORK, with exact lines and matched positions recorded. | BRIEF.md FORCED DIFFERENCES (c); FORCED-S6-2.txt first row; Git pairs. |
+| d | cd4ed344 and 561756c8 picks, AGENTS.md and CLAUDE.md | Exact rule-44 signed lines recorded; the only source-to-pick difference is the data-tests command's inherited `-q`→`-vv`. Both rule files at WORK equal each other and the c2b5910c base blobs. | BRIEF.md FORCED DIFFERENCES (d); FORCED-S6-2.txt final rows; Git pairs. |
+| record base history | PROGRESS.md, OPEN_ITEMS.md, TASKS.md when signed task lines are equal | Result blobs may retain different base histories; record-only reason recorded per file. | Decision 0032 item 2; Git pairs. |
+
+The ordered append proof does not grant a general documentation exception. Rule-44 insertion and removal remain distinct intermediate changes even though their net result is zero. There is no lead test-relocation commit and no reviewed-F01 carry proof in this train. The program removed both template-specific mechanisms. Source: BRIEF.md TEMPLATE and INTENT.
+
+## Records commit and proposed ledger replacements
+
+Records commit 1fe1846e5d33b1833f84359febaa240ba1f647a2 is the final commit at WORK. `git diff --name-only` against its parent contains only TASKS.md. Its patch changes exactly the Delivery/status lines of S6-T14, S6-T25 and S6-T27; no acceptance checkbox changes. The script checks the exact signed lines against the supplied records commit. Source: Git object ef283f541a60b23c1b43ecc07f2217b5629185d3, subject “chore(records): train S6-2 records: S6-T14 step one, S6-T25 and S6-T27 in review”. The brief attributes it to the lead; its commit trailer names Anthropic Claude Opus 5.5 without separately establishing the serving model.
+
+Two further record replacements are necessary, proposed in `tasks_md.json` for the later ledger: S6-T14's contradictory queued clause, and S6-T25's lens-A commit attribution described above. Neither is applied in this workspace. No open item is closed, original evidence rewritten, acceptance ticked or task marked done.
+
+All changed test files under core/tests, custodian/tests, product/tests and scripts/tests receive one pytest row using `uv run --locked python -m pytest FILE -q -p no:cacheprovider`, with AST-derived test-function anchors. Source: scripts/run_tests.py SUITES and BRIEF.md TASK item 1. AST function totals are not pytest case counts. Shared rows include ruff, format, mypy, docs, tree, cmp, scope, commits, uv lock --check, versions, reference notes and the runtime-seeded whole test. No command in commands.json has been executed by this preparation.
+
+Preparation adaptation notes: the first draft refused the template's byte-identical commit-message condition (exit 1); all supplied picks have the exact Git cherry-pick trailer, now checked narrowly. The second draft refused the template's blanket subTest restriction (exit 1); the supplied repository runner uses pytest for scripts/tests too, so these files keep the required pytest rows. AST anchors and function counts are descriptive only; pytest's actual summary is the later ledger count. No test was run to make either adjustment.
+
+Final output audit correction: files containing unittest subTest use the ledger's documented `regex` kind with the same required pytest command. The anchored pattern admits only positive passed tests and optional positive passed subtests, followed by pytest's duration; failed, error, skipped and deselected counts cannot match. The complete summary is preserved as Counts. Sources: LEDGER-TASK-USAGE.txt “regex”; PROGRESS.md command-output records “91 passed, 34 subtests passed in 8.51s” and “111 passed, 65 subtests passed in 15.15s”; pyproject.toml pins pytest 9.2.0; scripts/run_tests.py SUITES selects pytest for scripts/tests. The earlier successful draft preceded this parser correction and is superseded by the final draft run, not treated as execution evidence.
+
+#### Evidence for the work commit `1fe1846e5d33b1833f84359febaa240ba1f647a2`
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_calculation_facts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    53 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_source_hash_date_and_closed_units; test_supported_numeric_units. Source: core/tests/test_calculation_facts.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 18 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_calculation_purity.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_calls_and_imports_need_no_io_clock_or_random; test_purity_guard_and_planted_io_helper. Source: core/tests/test_calculation_purity.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    128 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one; S6-T25. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_admission_and_pre_fit_refusals; test_bad_periods; test_constructor_order_and_release_ids; test_direct_fact_fractional_count_is_rejected; test_each_missing_or_mismatched_companion; test_every_released_key_and_wrong_bindings; test_exact_point_text; test_exact_series_text; test_forecast_entry_is_available; test_fractional_count_has_exact_value_and_target_companions; test_gap_suffix_keeps_window_identity_and_flags; test_hostile_decimal_context_and_halfway; test_hotels_and_licences_keep_separate_measures_and_bulk_flags; test_independent_clamps; test_investment_units_notes_and_running_year; test_iterables_and_immutability; test_malformed_point_construction; test_malformed_series_construction; test_municipal_stayer_and_resident_bindings; test_negative_point_before_rounding_and_exact_zero; test_periods; test_point_numeric_type; test_process_decimal_defaults; test_property_fact_unit_and_unknown_unit; test_property_geography_counts_and_categories; test_property_reliability_boundary; test_public_splits_never_move_or_relabel; test_ratio_family_binding_plants; test_result_constructor_plants; test_result_interval_count_guards; test_result_metadata_exact_text; test_short_distinct_from_decline_and_carried_before_gap; test_stayer_pair_chain_and_no_finer_level; test_wrong_table_even_when_source_chain_matches. Source: core/tests/test_forecast.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 34 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast_admission.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one; S6-T25. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_admission_digest_plants; test_conditional_establishment_history_is_public_and_not_backfilled; test_every_forecast_fact_has_derived_lineage_beside_original_sources; test_forecast_qualifiers_cannot_be_mutated_after_validation; test_foreign_release_table_grain_or_source_fails_before_fitting; test_invalid_count_history_is_not_forecast; test_municipal_series_cannot_be_relabelled_as_another_geography; test_open_source_reason_survives_without_fitting; test_public_split_never_becomes_ranking_criterion; test_published_hotel_adr_and_capex_units_are_not_renamed; test_release_evidence_required_before_fitting; test_released_generator_metadata_is_mandatory; test_released_geography_binding_keeps_valid_routes; test_released_municipal_label_cannot_admit_district_geography; test_released_series_cannot_use_user_scenario_geography; test_source_less_request_needs_no_invented_series_chain_or_history; test_source_pipeline_version_survives_forecast_derivation; test_unpublished_input_never_reaches_fitting. Source: core/tests/test_forecast_admission.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 18 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast_backtest.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_backtest_rejects_invalid_inputs; test_c30_worked_example; test_each_fit_sees_its_origin_prefix_only; test_frequency_history_minimum_boundaries; test_horizons_and_seasonal_scale; test_minimum_ties_zero_scale_and_iterables; test_residual_columns_never_borrow_from_another_horizon. Source: core/tests/test_forecast_backtest.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 7 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast_generated.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    168 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T25. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_admission_feed_names_are_typed_and_unique; test_carry_and_unpublished_points_never_reach_fitting; test_closed_occupation_definitions_name_inputs_and_history; test_entire_computation_is_recomputed_even_with_consistent_facts; test_exact_confirmed_feed_set_reaches_facts_regardless_of_order; test_generated_forecasts_reproduce_on_cpu_under_hostile_decimal_context; test_generated_inputs_use_one_contract_and_own_backtest; test_generated_provenance_caveats_and_backend_markers_cannot_be_dropped; test_generated_short_and_gapped_history_has_no_numeric_output; test_invented_confirmed_feed_refuses_before_fitting; test_malformed_manifest_span_is_rejected; test_missing_confirmed_feeds_refuse_before_fitting; test_occupation_binding_plants_refuse_before_fitting; test_occupation_geographies_and_both_pay_measures; test_protected_window_binding_precedes_fitting; test_public_admission_with_feed_names_refuses_before_fitting; test_released_series_without_admission_is_an_error; test_replacement_history_reaches_backtesting_and_final_cpu_fit; test_retired_flows_remain_off_the_list_before_fitting; test_stale_computation_with_updated_companions_and_release_metadata_is_rejected; test_unavailable_is_no_data_with_source_reason_and_no_fitting; test_wrong_or_extra_confirmed_feeds_refuse_before_fitting. Source: core/tests/test_forecast_generated.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 22 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast_models.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_each_formula_and_prefix; test_exact_finite_history; test_invalid_alpha; test_invalid_model_inputs. Source: core/tests/test_forecast_models.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest core/tests/test_forecast_mutation.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    66 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_backtest_candidates_before_short_history; test_backtest_dimensions_even_with_short_history; test_binding_variants_and_project_count_unit; test_empty_series_still_validates_frequency_and_family_snapshot; test_exact_diagnostic; test_fact_names_scales_versions_zero_error_unit_and_counts; test_family_exact_text; test_leave_one_out_keeps_every_other_origin; test_point_diagnostics; test_predict_boundary_last_level_and_own_decimal_context; test_result_exact_diagnostics; test_result_exact_identity_text; test_result_independent_companion_fields_and_qualifier_snapshot; test_result_interval_and_property_diagnostics; test_result_refusals_before_companion_comparison; test_series_diagnostics; test_series_geography_text_diagnostic; test_series_order_pair_and_release_diagnostics. Source: core/tests/test_forecast_mutation.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 18 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest custodian/tests/test_forecast_generated_agreement.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T25. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_every_generated_definition_has_an_audited_source_and_history; test_generated_catalogue_plants_are_detected; test_generated_definitions_match_pack_table_contract; test_generated_grain_rename_is_detected. Source: custodian/tests/test_forecast_generated_agreement.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest custodian/tests/test_forecast_list_agreement.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_metadata_plants; test_open_key_promotion_and_construction_substitution; test_public_keys_states_tables_agree. Source: custodian/tests/test_forecast_list_agreement.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 3 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest product/tests/test_catalogue_foundations.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    53 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_four_catalogue_files_load. Source: product/tests/test_catalogue_foundations.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 53 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest product/tests/test_series_forecast_bindings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    26 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_each_forecast_companion_and_clamp_required_at_catalogue_load; test_forecast_declarations_reject_raw_values_duplicates_and_extra_slots; test_forecast_layout_rejects_swapped_metric_or_foreign_companion; test_no_claim_or_http_route_impersonates_missing_release_reader. Source: product/tests/test_series_forecast_bindings.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest product/tests/test_series_forecast_template.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T14 step one. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_component_plants; test_components_load_and_match_contract; test_exact_templates_and_placeholders; test_wording_plants. Source: product/tests/test_series_forecast_template.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_forecast_spike.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T27. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_challenger_needs_unambiguous_baseline_stage_first; test_changed_preregistration_cannot_reuse_old_hash; test_conformal_uses_exact_order_statistic_and_previous_errors; test_coverage_uses_original_target_instead_of_rounded_error_reconstruction; test_cross_candidate_pooling_cannot_rescue_failed_coverage; test_empty_evaluation_cannot_pass; test_empty_series_cannot_hide_inside_nonempty_family; test_equal_series_weights_not_origin_weights; test_f1_scale_and_weights_do_not_use_evaluation_values; test_f2_f3_suffix_change_preserves_earlier_policy_and_interval; test_family_strata_cannot_be_stitched; test_frozen_candidates_combination_and_prefix_only_fits; test_initial_prefix_zero_scale_is_never_pooled_with_another_series; test_invalid_contracts_refuse; test_invented_real_shaped_swap_reuses_same_calculation_path; test_late_missing_prediction_is_not_an_outcome_dependent_exclusion; test_lossless_float_conversion_and_context_independence; test_minimum_twelve_is_separate_from_c30_minimum; test_missing_predictions_cannot_pass_or_shrink_denominator; test_mutable_contract_collections_refuse; test_nested_selection_uses_matured_errors_and_own_residuals; test_nonfinite_outputs_refuse; test_observations_require_exact_decimal_values; test_predictor_cannot_change_shared_arithmetic_context; test_preregistered_exact_levels; test_public_revision_break_cannot_be_stitched; test_registration_hash_changes_with_targets_and_membership; test_stage_requires_every_auto_and_combination_to_strictly_beat; test_strict_beat_rejects_ties; test_three_of_four_coverage_cannot_pass_four_fifths; test_zero_scale_mae_is_separate_and_never_dimensionless. Source: scripts/tests/test_forecast_spike.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 31 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_forecast_spike_adapters.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    35 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T27. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_actual_lock_has_no_challenger_dependencies; test_admission_plants_refuse; test_asset_symlink_refuses_before_read; test_complete_byte_identical_process_evidence; test_f4_training_strata_and_unknown_boundary; test_fresh_process_determinism_plants_cannot_pass; test_missing_weights_and_dependencies_are_blocked; test_offline_model_command_returns_nonzero_blocked_report; test_unknown_overlap_cannot_establish_public_comparison; test_verified_fixture_is_still_not_implemented_model_inference; test_weights_default_experiment_path_is_accepted; test_weights_root_guard_plants. Source: scripts/tests/test_forecast_spike_adapters.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 12 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_forecast_spike_process.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T27. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_fixture_bytes_across_fresh_processes_and_worker_counts. Source: scripts/tests/test_forecast_spike_process.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 1 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_forecast_spike_registration.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S6-T27. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_committed_registration_is_valid; test_registration_plants_cannot_be_silently_ignored; test_statsforecast_reference_section_is_registered_and_validated. Source: scripts/tests/test_forecast_spike_registration.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 3 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_forecast_spike_statistical.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "30 passed, 8 warnings in 3.23s" (all passed; third-party RuntimeWarnings of the pinned statsforecast ARIMA variance shown, as the whole test and hosted runs show them; failures, errors, skips and deselections refused)
+Seed:      none
+Notes:     S6-T27. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_adapter_input_plants_refuse; test_adapter_output_plants_refuse; test_callback_rejects_wrong_family_season; test_exact_library_interval_levels; test_library_pin_and_real_models_match_official_forecast_api; test_library_receives_prefix_frequency_level_and_one_cpu_thread; test_nonintegral_percentage_is_refused_without_rounding; test_real_model_suffix_plant_and_equal_weight_combination; test_real_tiny_prefix_refuses_without_substituting_test_double; test_unpinned_library_is_refused. Source: scripts/tests/test_forecast_spike_statistical.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 10 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_reference_notes_assigned.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "4 passed, 88 subtests passed in 0.25s" (Complete pytest summary including subtests; failures, errors, skips and deselections refused.)
+Seed:      none
+Notes:     S6-T27. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_assigned_section_and_opening. Source: scripts/tests/test_reference_notes_assigned.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK. Subtest summary format sourced from PROGRESS.md recorded outputs "91 passed, 34 subtests passed in 8.51s" and "111 passed, 65 subtests passed in 15.15s"; regex kind specified in LEDGER-TASK-USAGE.txt. No subtest count inferred from AST.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_reference_notes_form.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "10 passed, 106 subtests passed in 0.28s" (Complete pytest summary including subtests; failures, errors, skips and deselections refused.)
+Seed:      none
+Notes:     S6-T27. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_clean_fixture_passes; test_inputs_missing_and_malformed. Source: scripts/tests/test_reference_notes_form.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 10 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK. Subtest summary format sourced from PROGRESS.md recorded outputs "91 passed, 34 subtests passed in 8.51s" and "111 passed, 65 subtests passed in 15.15s"; regex kind specified in LEDGER-TASK-USAGE.txt. No subtest count inferred from AST.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_reference_notes_real.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "5 passed, 6 subtests passed in 0.30s" (Complete pytest summary including subtests; failures, errors, skips and deselections refused.)
+Seed:      none
+Notes:     S6-T27. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_cli_exit_codes_and_streams; test_cli_independent_of_working_folder; test_real_notes_pass; test_tables_have_their_sizes. Source: scripts/tests/test_reference_notes_real.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 5 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK. Subtest summary format sourced from PROGRESS.md recorded outputs "91 passed, 34 subtests passed in 8.51s" and "111 passed, 65 subtests passed in 15.15s"; regex kind specified in LEDGER-TASK-USAGE.txt. No subtest count inferred from AST.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python -m pytest scripts/tests/test_reference_notes_rows.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "12 passed, 109 subtests passed in 0.38s" (Complete pytest summary including subtests; failures, errors, skips and deselections refused.)
+Seed:      none
+Notes:     S6-T27. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_output_order_and_summary. Source: scripts/tests/test_reference_notes_rows.py at 1fe1846e5d33b1833f84359febaa240ba1f647a2; runner: scripts/run_tests.py SUITES and task brief. 12 functions by AST, not a pytest case count. unittest subtests, if present, are not counted by this inventory. Actual pytest exit and summary count owed to the lead run at WORK. Subtest summary format sourced from PROGRESS.md recorded outputs "91 passed, 34 subtests passed in 8.51s" and "111 passed, 65 subtests passed in 15.15s"; regex kind specified in LEDGER-TASK-USAGE.txt. No subtest count inferred from AST.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "862 files already formatted"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 466 source files"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1173 text files, 127 Markdown files: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Rule 2 byte parity at WORK; result owed.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run. Dependency lock changed.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 71 components: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run. Pins changed.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 7 libraries, 367 rows: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run. Reference notes changed.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a0e01df3a3d05ea04351d66d7505eab11b26ea9d...1fe1846e5d33b1833f84359febaa240ba1f647a2'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:core/src/eii_core/calc/README.md A:core/src/eii_core/calc/forecast.py A:core/src/eii_core/calc/forecast_backtest.py A:core/src/eii_core/calc/forecast_list.py A:core/src/eii_core/calc/forecast_models.py A:core/tests/test_forecast.py A:core/tests/test_forecast_admission.py A:core/tests/test_forecast_backtest.py A:core/tests/test_forecast_generated.py A:core/tests/test_forecast_models.py A:core/tests/test_forecast_mutation.py A:custodian/publicdata/review/s6_t25_generated_series.md A:custodian/publicdata/review/s6_t27_forecast_audit.md A:custodian/tests/test_forecast_generated_agreement.py A:custodian/tests/test_forecast_list_agreement.py A:evals/forecast_spike/README.md A:evals/forecast_spike/__init__.py A:evals/forecast_spike/adapters.py A:evals/forecast_spike/backtest.py A:evals/forecast_spike/check_models.py A:evals/forecast_spike/contract.py A:evals/forecast_spike/evidence/invented_run.json A:evals/forecast_spike/evidence/real_statsforecast_external_tmp_run.json A:evals/forecast_spike/evidence/real_statsforecast_run.json A:evals/forecast_spike/fixture.py A:evals/forecast_spike/preregistration.json A:evals/forecast_spike/statistical.py A:product/src/eii_product/assistant/templates/series_forecast.py A:product/tests/test_series_forecast_bindings.py A:product/tests/test_series_forecast_template.py A:scripts/tests/test_forecast_spike.py A:scripts/tests/test_forecast_spike_adapters.py A:scripts/tests/test_forecast_spike_process.py A:scripts/tests/test_forecast_spike_registration.py A:scripts/tests/test_forecast_spike_statistical.py M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:core/src/eii_core/calc/__init__.py M:core/src/eii_core/calc/facts.py M:core/tests/test_calculation_facts.py M:core/tests/test_calculation_purity.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/07_ECONOMIC_METHODS.md M:docs/08_BACKEND.md M:docs/09_AI_ASSISTANT.md M:docs/12_TESTING_AND_QUALITY.md M:docs/REFERENCE_NOTES.md M:pins.toml M:product/assistant/catalogue/components.yaml M:product/src/eii_product/assistant/catalogue/brief.py M:product/src/eii_product/assistant/catalogue/entries.py M:product/tests/test_catalogue_foundations.py M:pyproject.toml M:scripts/reference_notes_tables.py M:scripts/tests/test_reference_notes_assigned.py M:scripts/tests/test_reference_notes_form.py M:scripts/tests/test_reference_notes_real.py M:scripts/tests/test_reference_notes_rows.py M:uv.lock'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "62 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK name-status inventory from Git: 62 files.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a0e01df3a3d05ea04351d66d7505eab11b26ea9d..1fe1846e5d33b1833f84359febaa240ba1f647a2'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     13 linear commits; subjects checked by make_spec.py.
+```
+
+```text
+### MERGE TRAIN S6-2 — Slice S6: task log
+Commit:    1fe1846e5d33b1833f84359febaa240ba1f647a2
+Command:   ./eii test --seed 2639551157
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    12924 passed, 0 failed, 0 skipped
+Seed:      2639551157
+Notes:     Seed supplied at run time. Lead only. Hosted checks on the actual head and a fresh-seed whole test on the exact merge result remain separate gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
