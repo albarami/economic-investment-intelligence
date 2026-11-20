@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import contextlib
 import errno
 import os
+import select
 import signal
 import subprocess
 import sys
 import tempfile
 import time
 import unittest
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from unittest.mock import patch
 
@@ -440,6 +443,213 @@ class SupervisorRules(unittest.TestCase):
             self.assertEqual(process.returncode, -signal.SIGKILL)
             self._finish(process, marker)
 
+    def test_the_index_is_not_built_after_the_deadline(self) -> None:
+        # F2 of the fourth part F review, indexing: the clock passes the whole
+        # kill bound as the third process read is placed under its parent. No
+        # process may be placed after that; the group's kill is still sent.
+        marker = "eii-index-" + os.urandom(4).hex()
+        self.addCleanup(_end, marker)
+        with tempfile.TemporaryDirectory() as tmp:
+            process, _pids = self._stalled_run(Path(tmp), marker)
+            clock = _Clock()
+            placed: list[int] = []
+            late: list[int] = []
+            real_stat = launch._stat_of
+
+            def watched(pid: int) -> launch._Stat | None:
+                found = real_stat(pid)
+                if found is None:
+                    return None
+
+                def placing() -> None:
+                    if clock.offset:
+                        late.append(pid)
+                    placed.append(pid)
+                    if len(placed) == 3:
+                        clock.offset = launch.KILL_SECONDS + 1
+
+                return _WatchedStat(found, placing)
+
+            with (
+                patch.object(launch, "_stat_of", watched),
+                patch.object(time, "monotonic", clock),
+            ):
+                ended = launch.end_stalled(process)
+            self.assertGreaterEqual(len(placed), 3)
+            self.assertEqual(late, [], "a process was indexed after the deadline")
+            self.assertFalse(ended)
+            process.wait(timeout=5)
+            self.assertEqual(process.returncode, -signal.SIGKILL)
+            self._finish(process, marker)
+
+    def test_the_frontier_stops_at_the_deadline(self) -> None:
+        # F2 of the fourth part F review, leaf-frontier processing: the clock
+        # passes the whole kill bound as the last process of the run is
+        # stopped, while the frontier still holds it. No frontier entry may be
+        # processed after that; every process already pinned is still killed.
+        marker = "eii-frontier-" + os.urandom(4).hex()
+        self.addCleanup(_end, marker)
+        with tempfile.TemporaryDirectory() as tmp:
+            process, pids = self._stalled_run(Path(tmp), marker)
+            last = pids[3]
+            clock = _Clock()
+            late: list[int] = []
+            spy = _SignalSpy()
+
+            def expire(pid: int, signum: int) -> None:
+                if pid == last and signum == signal.SIGSTOP:
+                    clock.offset = launch.KILL_SECONDS + 1
+
+            spy.after = expire
+            real_ancestor = launch._Ancestor
+
+            class Watched(real_ancestor):  # type: ignore[valid-type,misc]
+                def __getattribute__(self, name: str) -> object:
+                    if name == "pid" and clock.offset:
+                        late.append(object.__getattribute__(self, "pid"))
+                    return object.__getattribute__(self, name)
+
+            with (
+                patch.object(launch, "_Ancestor", Watched),
+                patch.object(time, "monotonic", clock),
+                spy.installed(),
+            ):
+                ended = launch.end_stalled(process)
+            self.assertTrue(clock.offset, "the last process was not stopped")
+            self.assertEqual(
+                late, [], "a frontier entry was processed after the deadline"
+            )
+            self.assertFalse(ended)
+            stopped = spy.pids(signal.SIGSTOP)
+            self.assertEqual(sorted(stopped), sorted(pids[1:]))
+            self.assertEqual(sorted(spy.pids(signal.SIGKILL)), sorted(stopped))
+            self.assertIn((process.pid, signal.SIGKILL), spy.groups)
+            process.wait(timeout=5)
+            self.assertEqual(process.returncode, -signal.SIGKILL)
+            self._finish(process, marker)
+
+    def test_the_kill_work_is_bounded_before_a_process_is_taken(self) -> None:
+        # F2 of the fourth part F review, finalization: the kill-and-close work
+        # is bounded before another process is stopped. With two target slots,
+        # the walk takes the stand-in's two children and stops before the
+        # third process; the clock then passes the whole kill bound during the
+        # kills. Every taken process and the group are still killed, no wait
+        # waits past the deadline, and the end is not confirmed.
+        marker = "eii-slots-" + os.urandom(4).hex()
+        self.addCleanup(_end, marker)
+        with tempfile.TemporaryDirectory() as tmp:
+            process, pids = self._stalled_run(Path(tmp), marker)
+            clock = _Clock()
+            spy = _SignalSpy()
+
+            def expire(_pid: int, signum: int) -> None:
+                if signum == signal.SIGKILL:
+                    clock.offset = launch.KILL_SECONDS + 1
+
+            spy.after = expire
+            waits: list[float | None] = []
+            real_wait = process.wait
+
+            def wait(timeout: float | None = None) -> int:
+                waits.append(timeout)
+                return real_wait(timeout=timeout)
+
+            closed: list[int] = []
+            real_close = os.close
+
+            def close(handle: int) -> None:
+                closed.append(handle)
+                real_close(handle)
+
+            with (
+                patch.object(launch, "TARGET_SLOTS", 2, create=True),
+                patch.object(time, "monotonic", clock),
+                patch.object(process, "wait", wait),
+                patch.object(os, "close", close),
+                spy.installed(),
+            ):
+                try:
+                    ended = launch.end_stalled(process)
+                except subprocess.TimeoutExpired:
+                    ended = False
+            stopped = spy.pids(signal.SIGSTOP)
+            self.assertEqual(sorted(stopped), sorted(pids[1:3]))
+            self.assertEqual(sorted(spy.pids(signal.SIGKILL)), sorted(stopped))
+            self.assertIn((process.pid, signal.SIGKILL), spy.groups)
+            self.assertEqual(len(closed), 2)
+            self.assertTrue(waits)
+            self.assertTrue(all(left == 0 for left in waits), waits)
+            self.assertFalse(ended)
+            # What was not taken was not reached: the unconfirmed end is true.
+            self.assertIn(pids[3], support.marker_processes(marker))
+            process.wait(timeout=5)
+            self.assertEqual(process.returncode, -signal.SIGKILL)
+            self._finish(process, marker)
+
+    def test_the_cleanup_time_is_bounded(self) -> None:
+        # F2 of the fourth part F review: the clock never moves by itself; it
+        # moves only by the cost of each read, descriptor, signal and blocking
+        # wait of the cleanup, a blocking wait costing its whole time-out. With
+        # a run that settles and one that never settles (an unreadable process),
+        # the cleanup ends within KILL_SECONDS of that clock and still kills
+        # every taken process and the group.
+        for unreadable in (False, True):
+            with self.subTest(unreadable=unreadable):
+                self._bounded_cleanup(unreadable)
+
+    def _bounded_cleanup(self, unreadable: bool) -> None:
+        """One case of ``test_the_cleanup_time_is_bounded``."""
+        marker = "eii-bound-" + os.urandom(4).hex()
+        self.addCleanup(_end, marker)
+        with tempfile.TemporaryDirectory() as tmp:
+            process, pids = self._stalled_run(Path(tmp), marker)
+            hidden = f"/proc/{pids[2]}/stat" if unreadable else ""
+            clock = _VirtualClock()
+            spy = _SignalSpy()
+            spy.after = lambda _pid, _signum: clock.spend()
+            real_read = Path.read_text
+            real_open = os.pidfd_open
+            real_wait = process.wait
+
+            def read(path: Path, *args: object, **kwargs: object) -> str:
+                name = str(path)
+                if name.startswith("/proc/") and name.endswith("/stat"):
+                    clock.spend()
+                    if name == hidden:
+                        raise PermissionError(errno.EACCES, "planted", name)
+                return real_read(path, *args, **kwargs)  # type: ignore[arg-type]
+
+            def pidfd_open(pid: int, flags: int = 0) -> int:
+                clock.spend()
+                return real_open(pid, flags)
+
+            def wait(timeout: float | None = None) -> int:
+                assert timeout is not None, "an unbounded wait"
+                clock.now += timeout
+                return real_wait(timeout=5)
+
+            with (
+                patch.object(time, "monotonic", clock),
+                patch.object(Path, "read_text", read),
+                patch.object(os, "pidfd_open", pidfd_open),
+                patch.object(process, "wait", wait),
+                patch.object(select, "poll", clock.poll),
+                spy.installed(),
+            ):
+                started = clock.now
+                ended = launch.end_stalled(process)
+                elapsed = clock.now - started
+            self.assertLessEqual(elapsed, launch.KILL_SECONDS)
+            if unreadable:
+                self.assertFalse(ended)
+            self.assertEqual(
+                sorted(spy.pids(signal.SIGKILL)), sorted(spy.pids(signal.SIGSTOP))
+            )
+            self.assertIn((process.pid, signal.SIGKILL), spy.groups)
+            process.wait(timeout=5)
+            self.assertEqual(process.returncode, -signal.SIGKILL)
+            self._finish(process, marker)
+
     def test_an_orphan_is_ended_when_the_program_ends(self) -> None:
         # The program leaves a process behind that has no parent-death signal;
         # it is re-parented to the supervisor and killed before it exits.
@@ -490,6 +700,113 @@ class SupervisorRules(unittest.TestCase):
             self.assertEqual(status, 1)
             # The supervisor ends only after it has reaped every process.
         self.assertEqual(support.marker_processes(marker), [])
+
+
+class _Clock:
+    """The real monotonic clock, moved forward by ``offset`` seconds."""
+
+    def __init__(self) -> None:
+        self.real = time.monotonic
+        self.offset = 0.0
+
+    def __call__(self) -> float:
+        return self.real() + self.offset
+
+
+class _VirtualClock:
+    """A clock that never moves by itself; only ``spend`` and waits move it.
+
+    Every value is a multiple of a power of two, so sums are exact.
+    """
+
+    STEP = 2.0**-10
+
+    def __init__(self) -> None:
+        self.now = 1024.0
+
+    def __call__(self) -> float:
+        return self.now
+
+    def spend(self) -> None:
+        self.now += self.STEP
+
+    def poll(self) -> _VirtualPoll:
+        return _VirtualPoll(self)
+
+
+REAL_POLL = select.poll
+
+
+class _VirtualPoll:
+    """``select.poll`` whose blocking wait costs its whole time-out."""
+
+    def __init__(self, clock: _VirtualClock) -> None:
+        self.clock = clock
+        self.real = REAL_POLL()
+
+    def register(self, handle: int, mask: int) -> None:
+        self.real.register(handle, mask)
+
+    def poll(self, timeout: int | None = None) -> list[tuple[int, int]]:
+        assert timeout is not None, "an unbounded poll"
+        ready = self.real.poll(0)
+        if not ready:
+            self.clock.now += timeout / 1000
+        return ready
+
+
+class _SignalSpy:
+    """Record each signal the launcher sends, and call ``after`` once it is sent."""
+
+    def __init__(self) -> None:
+        self.sent: list[tuple[int, int]] = []
+        self.groups: list[tuple[int, int]] = []
+        self.after: Callable[[int, int], None] = lambda _pid, _signum: None
+
+    def pids(self, signum: int) -> list[int]:
+        return [pid for pid, number in self.sent if number == signum]
+
+    @contextlib.contextmanager
+    def installed(self) -> Iterator[None]:
+        real_send = signal.pidfd_send_signal
+        real_killpg = os.killpg
+
+        def send(handle: int, signum: int, *args: object) -> None:
+            pid = _pid_of_handle(handle)
+            self.sent.append((pid, signum))
+            real_send(handle, signum, *args)  # type: ignore[arg-type]
+            self.after(pid, signum)
+
+        def killpg(group: int, signum: int) -> None:
+            self.groups.append((group, signum))
+            real_killpg(group, signum)
+            self.after(group, signum)
+
+        with (
+            patch.object(signal, "pidfd_send_signal", send),
+            patch.object(os, "killpg", killpg),
+        ):
+            yield
+
+
+class _WatchedStat(launch._Stat):
+    """A process's metadata that calls a hook when its parent is read."""
+
+    def __getattribute__(self, name: str) -> object:
+        if name == "parent":
+            object.__getattribute__(self, "hook")()
+        return object.__getattribute__(self, name)
+
+    def __new__(cls, found: launch._Stat, hook: Callable[[], None]) -> _WatchedStat:
+        made = object.__new__(cls)
+        object.__setattr__(made, "state", found.state)
+        object.__setattr__(made, "parent", found.parent)
+        object.__setattr__(made, "start", found.start)
+        object.__setattr__(made, "hook", hook)
+        return made
+
+    def __init__(self, found: launch._Stat, hook: Callable[[], None]) -> None:
+        """Every field is set by ``__new__``."""
 
 
 def _end(marker: str) -> None:

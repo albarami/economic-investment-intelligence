@@ -21,6 +21,7 @@ import stat
 import subprocess
 import sys
 import time
+from collections import deque
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -48,6 +49,12 @@ DRAIN_SECONDS = 1.0
 # The walk for descendants may use at most this part of KILL_SECONDS; the rest
 # is kept for the kills and the reaping (F2 of the third part F review).
 WALK_SECONDS = KILL_SECONDS / 2
+# At most this many descendants are taken (pinned and stopped), so the kills
+# and closes still to be done are bounded before another process is stopped:
+# each taken process holds one kill slot, and the supervisor's group has its
+# own. A walk that finds more stops taking, still kills what it took and the
+# group, and leaves the end unconfirmed (F2 of the fourth part F review).
+TARGET_SLOTS = 512
 # os.open flags of a mount source: a path descriptor that does not follow a
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -515,33 +522,50 @@ def _stat_of(pid: int) -> _Stat | None:
     )
 
 
-def _process_table(deadline: float) -> tuple[dict[int, _Stat], bool]:
-    """Read every process of ``/proc``, stopping at ``deadline``.
+@dataclass
+class _Table:
+    """One read of ``/proc``.
 
-    Returns:
-        The metadata by process id, and whether the table is complete: False
-        when ``/proc`` cannot be listed, the deadline passed before every
-        process was read, or the metadata of a process could not be read. A
-        process that is gone is left out and keeps the table complete.
+    Attributes:
+        stats: The metadata by process id.
+        below: The process ids read with each parent id, built as each process
+            is read, so no work on the table is left after the deadline.
+        complete: False when ``/proc`` cannot be listed, the deadline passed
+            before every process was read, or the metadata of a process could
+            not be read. A process that is gone is left out.
     """
-    table: dict[int, _Stat] = {}
-    complete = True
+
+    stats: dict[int, _Stat]
+    below: dict[int, list[int]]
+    complete: bool
+
+
+def _process_table(deadline: float) -> _Table:
+    """Read and index every process of ``/proc``, stopping at ``deadline``.
+
+    The deadline is checked before each entry is read; each process read is
+    placed under its parent at once (F2 of the fourth part F review).
+    """
+    table = _Table({}, {}, True)
     try:
         for entry in Path("/proc").iterdir():
             if time.monotonic() >= deadline:
-                return table, False
+                table.complete = False
+                return table
             if not entry.name.isdigit():
                 continue
+            pid = int(entry.name)
             try:
-                found = _stat_of(int(entry.name))
+                found = _stat_of(pid)
             except _Unread:
-                complete = False
+                table.complete = False
                 continue
             if found is not None:
-                table[int(entry.name)] = found
+                table.stats[pid] = found
+                table.below.setdefault(found.parent, []).append(pid)
     except OSError:
-        return table, False
-    return table, complete
+        table.complete = False
+    return table
 
 
 def _exited(handle: int) -> bool:
@@ -611,9 +635,25 @@ def _pin(pid: int, seen: _Stat, parent: _Ancestor) -> tuple[str, int]:
     return PINNED, handle
 
 
+@dataclass(frozen=True)
+class _Round:
+    """What one walk round found.
+
+    Attributes:
+        settled: It read every process, found the root alive and found
+            nothing new, stale or not established.
+        sent: Every stop signal was sent.
+        full: Every target slot is taken, so the walk must stop.
+    """
+
+    settled: bool
+    sent: bool
+    full: bool = False
+
+
 def _walk_round(
     root: int, pinned: dict[tuple[int, int], int], deadline: float
-) -> tuple[bool, bool]:
+) -> _Round:
     """Pin and stop every new descendant of ``root`` that one walk can establish.
 
     The walk reads ``/proc`` once and goes down from ``root`` through
@@ -623,42 +663,45 @@ def _walk_round(
     gone below (F1 of the third part F review). Each new process is stopped
     as soon as it is pinned, so it starts no other unseen.
 
-    Returns:
-        Whether the round settled, that is it read every process, found the
-        root alive and found nothing new, stale or not established; and
-        whether every stop signal was sent.
+    The deadline is checked before each process is read, before each frontier
+    entry is taken and before each candidate, and nothing is sorted; a new
+    process is taken only while a target slot is free (F2 of the fourth part
+    F review).
     """
-    table, settled = _process_table(deadline)
+    table = _process_table(deadline)
+    settled = table.complete
     sent = True
-    found = table.get(root)
+    found = table.stats.get(root)
     if found is None or found.state == "Z":
-        # The root has ended: its children have gone to another parent.
-        return False, sent
-    below: dict[int, list[int]] = {}
-    for pid, seen in table.items():
-        below.setdefault(seen.parent, []).append(pid)
-    frontier = [_Ancestor(root, found.start, None)]
+        # The root has ended, its children having gone to another parent, or
+        # the read stopped before the root.
+        return _Round(False, sent)
+    frontier = deque([_Ancestor(root, found.start, None)])
     while frontier:
-        parent = frontier.pop(0)
-        for pid in sorted(below.get(parent.pid, ())):
+        if time.monotonic() >= deadline:
+            return _Round(False, sent)
+        parent = frontier.popleft()
+        for pid in table.below.get(parent.pid, ()):
             if time.monotonic() >= deadline:
-                return False, sent
-            seen = table[pid]
+                return _Round(False, sent)
+            seen = table.stats[pid]
             key = (pid, seen.start)
             if key in pinned:
                 frontier.append(_Ancestor(pid, seen.start, pinned[key]))
                 continue
+            if len(pinned) >= TARGET_SLOTS:
+                return _Round(False, sent, full=True)
             outcome, handle = _pin(pid, seen, parent)
             if outcome == PINNED:
                 pinned[key] = handle
                 sent &= _signalled(handle, signal.SIGSTOP, group=False)
                 frontier.append(_Ancestor(pid, seen.start, handle))
                 settled = False
-            elif outcome != GONE or pid in below:
+            elif outcome != GONE or pid in table.below:
                 # A gone process with children in the table has passed them
                 # to another parent, which the next round reads.
                 settled = False
-    return settled, sent
+    return _Round(settled, sent)
 
 
 def _ended(handles: Sequence[int], deadline: float) -> bool:
@@ -706,9 +749,13 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
 
     One absolute deadline, ``KILL_SECONDS`` from the call, bounds everything:
     the walk stops at ``WALK_SECONDS`` (checked before each process is read
-    and each candidate is pinned), and the rest is kept for the kills, which
-    are one call per pinned process and are always sent, and for the bounded
-    waits. A walk that did not settle in time leaves the end unconfirmed.
+    and indexed, each frontier entry and each candidate), and the rest is kept
+    for the kills and closes, which are always sent and done, one each per
+    taken process, and for the waits, which never wait past the deadline. The
+    kill-and-close work is bounded before a process is taken: at most
+    ``TARGET_SLOTS`` are taken, and the group's kill has its own slot. A walk
+    that did not settle in time or ran out of slots leaves the end
+    unconfirmed (F2 of the fourth part F review).
 
     Returns:
         True only when the walk settled, every signal was sent, the kills were
@@ -727,8 +774,11 @@ def end_stalled(process: subprocess.Popen[str]) -> bool:
             return False
         sent &= _signalled(process.pid, signal.SIGSTOP, group=True)
         while not settled and time.monotonic() < walk_deadline:
-            settled, stopped = _walk_round(process.pid, pinned, walk_deadline)
-            sent &= stopped
+            found = _walk_round(process.pid, pinned, walk_deadline)
+            settled = found.settled
+            sent &= found.sent
+            if found.full:
+                break
         for handle in pinned.values():
             sent &= _signalled(handle, signal.SIGKILL, group=False)
         sent &= _signalled(process.pid, signal.SIGKILL, group=True)
