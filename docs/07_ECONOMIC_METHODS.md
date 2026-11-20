@@ -1650,6 +1650,16 @@ area facts (C15, C19, C20, C22) stand beside these as separate facts, never divi
 
 ### C30 Forecasts of published series
 
+**S6-T25 calculation catalogue.** `c30-series-v3` additionally admits released
+occupation earner counts on the separate residence and workplace families through
+the existing contract and backtest. It retains the candidates, history minimum,
+MASE and interval procedure below. The
+[generated-series audit](../custodian/publicdata/review/s6_t25_generated_series.md)
+names source feeds, table, geography, unit, family, history and evaluated
+exclusions. Hiring/leaving forecasts remain retired. Complete backtest
+recomputation validates a result's freshness; calculation substitution fixtures
+do not close source-to-release parity or decision 0036's real-source go-live gate.
+
 **Purpose.** Forecast each series of a closed, versioned list of published series (Public series, and the released monthly statistics of the custodian-type feeds) with a model that the series' own backtest chooses, and show every forecast with its interval from the backtest, its measured backtest error, its method and its source ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 2 to 6).
 
 **Inputs.**

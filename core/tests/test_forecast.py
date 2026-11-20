@@ -52,6 +52,12 @@ def evidence(table):
         schema_sha256="c" * 64,
         grain=module.TABLE_GRAINS[table],
         source_hashes=(("invented", "a" * 64),),
+        window_period="2020-01/2021-11"
+        if table in ("worker_pay", "resident_pay", "month_change", "occupation_pay")
+        else "",
+        window_key="e" * 64
+        if table in ("worker_pay", "resident_pay", "month_change", "occupation_pay")
+        else "",
     )
 
 
@@ -359,7 +365,7 @@ def released(key):
     )
     points = []
     period = "2020-01"
-    for i in range(16):
+    for i in range(22 if key == "stayer_index" else 23):
         earlier, later = period_step(period, "month")
         points.append(
             ForecastPoint(
@@ -375,6 +381,7 @@ def released(key):
         construction(),
         admission=evidence(table),
         window_key="e" * 64,
+        window_period="2020-01/2021-11",
         generator="invented_generator",
         generator_version="fixture-v1",
         key=key,

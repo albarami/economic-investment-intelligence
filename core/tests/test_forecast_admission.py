@@ -64,7 +64,7 @@ def test_open_source_reason_survives_without_fitting(monkeypatch, key, reason):
     assert result.state == "open"
     assert result.reason == reason
     assert result.facts == ()
-    assert result.status == "OUT_OF_SCOPE"
+    assert result.status == "NO_DATA"
 
 
 def admission(series):

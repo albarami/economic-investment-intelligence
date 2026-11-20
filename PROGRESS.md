@@ -43314,3 +43314,158 @@ error, not a source/test failure. Adding a path-start boundary to that ad hoc
 check produced exit 0 with the same report, checksum and exit records. Both
 outcomes are retained here; no baseline or test assertion changed. The patch
 and documentation check are refreshed once more after this evidence-only append.
+
+
+### S6-T25 — generated-series calculation eligibility, bounded build
+
+Date: 2026-11-20. Maker: OpenAI. Model: GPT-6 Codex. Builder persona:
+principal forecasting engineer for a provenance-bound product. Strict self-review
+persona: statistical/privacy reviewer rejecting retired flows, stale computations,
+wrong source refusals, invented thresholds and overstated integration. Independent
+different-maker implementation review remains with the lead; no approval claimed.
+
+Base and current HEAD: `cbff06dd1a079b0ffb7dc913580c484f9c7aebe9`, detached,
+with the task's working-tree changes. No new commit: `git switch -c
+feat/s6-t25-generated-eligibility` exited 128 because the Git reference lock is
+on a read-only filesystem. No staging, commit, push or merge was attempted after
+that refusal. The requested commit/trailer can only be made by the lead in a
+writable checkout. Working files remain for review.
+
+Loaded skills: project-orientation, task-standards, github-flow,
+sanad-provenance, strict-reviewer, al-muhasibi (final evidence review),
+muhasabah-gate. The requested test-driven-development, systematic-debugging and
+verification-before-completion skill files are unavailable in the installed
+catalogue. Their plain rules were applied: plants first, observed red output,
+root-cause fixes, identical guard assertions green and explicit remaining gaps.
+The supplied rejected plan and all F1 to F5 exact fixes were read; the changed
+plan rows were written first to `.overnight/OUT/PLAN-S6-T25-r2.md`.
+
+Authority: TASKS.md S6-T25; document 03 DAT-158, DAT-136 and section 8;
+document 07 C30, MTH-98 and MTH-48; TST-267; decisions 0036 item 2,
+0046 item 1 and 0064 item 20; lead ruling L-1209 F1 to F5. No network,
+real record, private calibration, data cache, secret file or forbidden folder
+was read. No new dependency, method candidate, horizon, threshold, tolerance,
+privacy rule, retry, skip or benchmark baseline was introduced.
+
+Changes and acceptance boundaries:
+
+- AC1 / F1: c30-series-v3 adds employment_by_occupation_residence and
+  employment_by_occupation_workplace, through occupation_pay and their distinct
+  op_res_quartile/op_work_quartile families, with confirmed feed metadata.
+  Key/table/grain/measure/unit/source and family-binding plants are retained.
+  Hiring/leaving keys remain absent. The audit records other evaluated tables
+  and why they are not added; generated provenance is never the refusal reason.
+- AC2 / F5: one ForecastSeries/forecast_series path handles all generated keys.
+  Two distinct invented histories reach rolling backtests and final CPU fits.
+  This is calculation evidence only. Employment parity remains owed at
+  S4-T14 commit 1f3bf12b84e17f9c25b1309f0d20b8d325aed1eb; wage parity and CPU
+  fallback at S4-T15 commit 785d09baae615c329df56f0e641281d183178b91;
+  residence generator/protection parity and origin propagation at S4-T16 commit
+  b21d900787ff05154e234d3a5c71fe119d9cf2d3. S4-T17 is pinned to
+  52ac6d842e2aacda123b3bd1f1d339d9249064d3 without claiming dated mobility
+  history. S5-T04 owns release production; its build remains a placeholder on
+  this base, with no completed implementation commit to cite. No pipeline-parity
+  or full task-completion claim is made.
+- AC3 / F2: internal ForecastOpen now requires NO_DATA, exact source reason
+  and empty facts. Wrong status/reason/facts and fail-on-fit plants pass.
+  series_too_short is only insufficient history; carry suppression stays separate.
+  L-1209 resolves this calculation path; OI-325's API/emitter mapping stays open.
+- AC4 / F3: ForecastResult compares the entire supplied Backtest against a
+  fresh backtest of admitted history. Plants substitute candidate residuals,
+  selection, scale, forecast, interval, error and caption counts with consistent
+  companions. Another stale-fit plant updates release/source/window/generator
+  metadata consistently. Original sources and backend lineage are retained.
+- AC5: the fixed CPU Decimal candidates, versions, smoothing grid and pins are
+  unchanged. Repeated and hostile-context runs match for every generated key.
+  Candidate and stale-computation plants prevent caller substitution. Validation
+  now runs a second backtest; no request-time performance claim is made.
+- AC6 / F3, F5: method-side freshness is implemented; real-source go-live
+  re-fitting/re-backtesting remains owed by the lead/go-live gate owner under
+  ARC-141, decision 0036 item 2, MTH-48 and TST-267. The lead must pin that gate's
+  implementing task and evidence. No generated fixture closes that requirement.
+- AC7 / F4: ReleaseAdmission and ForecastSeries bind the existing manifest
+  window_period/window_key; unchanged-label foreign keys/spans and out-of-span
+  history fail before fitting. Both months of stayer pairs are checked. Origin
+  ends at the admitted last month and the next forecast month is allowed. Fixture
+  capacity is the configured window, with adjacent pairs sized inside it.
+  Mounted verification remains OI-324; document 06 and privacy paths are unchanged.
+
+Environment: Linux x86_64; Python 3.14.6; uv 0.11.31; existing managed environment,
+UV_OFFLINE=1 and UV_NO_SYNC=1. UV cache and TMPDIR are under `.overnight/tmp/`;
+PYTHONDONTWRITEBYTECODE=1. All pytest runs use explicit Hypothesis seed 62525,
+the existing eii profile, and `-q -p no:cacheprovider`. No database service was
+started or stopped. No ./eii test or mutation campaign was run; the lead owns
+the whole-suite run. No new library/API documentation was required.
+
+Exact commands, actual exits and full output (local paths redacted in logs) are
+in `.overnight/OUT/checks/exits.jsonl` and the corresponding named `.log` files.
+All repeated checks followed actual fixes or new plants; none was an automatic
+retry, a refreshed baseline or a failure hidden by a wrapper. The wrapper returns
+the child command's exit unchanged.
+
+- red-generated: `uv run --locked python -m pytest core/tests/test_forecast_generated.py
+  -q -p no:cacheprovider --hypothesis-seed=62525`; exit 1, 99 failed, 20 passed.
+- green-generated-first: the same command plus `--tb=short`; exit 0, 119 passed.
+- green-importers-first: `uv run --locked python -m pytest
+  core/tests/test_forecast.py core/tests/test_forecast_admission.py
+  core/tests/test_forecast_backtest.py core/tests/test_forecast_models.py
+  core/tests/test_forecast_mutation.py core/tests/test_calculation_purity.py
+  custodian/tests/test_forecast_list_agreement.py
+  product/tests/test_series_forecast_bindings.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 --tb=short`; exit 0, 304 passed.
+- red-catalogue-audit: `uv run --locked python -m pytest
+  custodian/tests/test_forecast_generated_agreement.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 --tb=short`; exit 1, 1 failed and 8 passed, detecting
+  the absent source/history audit before it was added.
+- green-final and green-final-corrected: `uv run --locked python -m pytest
+  core/tests/test_forecast.py core/tests/test_forecast_admission.py
+  core/tests/test_forecast_backtest.py core/tests/test_forecast_models.py
+  core/tests/test_forecast_mutation.py core/tests/test_calculation_purity.py
+  core/tests/test_forecast_generated.py
+  custodian/tests/test_forecast_list_agreement.py
+  custodian/tests/test_forecast_generated_agreement.py
+  custodian/tests/test_forecast_series.py
+  product/tests/test_series_forecast_bindings.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 --tb=short`. First exit 1, 481 passed and 1 failed:
+  the audit said capitalised Month while its guard required literal month.
+  The document was corrected to spell the contract frequency explicitly; the
+  assertion was retained. Final exit 0, 482 passed, no failed/skipped tests.
+- `uv run --locked ruff check .`: first exit 1, four lint findings (tuple
+  unpacking, import order, two raw-regex literals). Those were fixed in code;
+  ruff-corrected exit 0, all checks passed.
+- `uv run --locked ruff format --check .`: format and format-corrected each
+  exit 0, 814 files already formatted.
+- `uv run --locked mypy`: mypy and mypy-corrected each exit 0, 436 source files.
+- `python3 scripts/check_docs.py`: docs and docs-corrected each exit 0,
+  1108 text files and 119 Markdown files before this evidence append.
+- `python3 scripts/check_tree.py`: exit 0, eight rules.
+- `cmp AGENTS.md CLAUDE.md`: exit 0, identical bytes.
+- `git diff --check`: exit 0.
+- Formatter application: `uv run --locked ruff format
+  core/src/eii_core/calc/forecast.py core/src/eii_core/calc/forecast_list.py
+  core/tests/test_forecast.py core/tests/test_forecast_admission.py
+  core/tests/test_forecast_generated.py
+  custodian/tests/test_forecast_generated_agreement.py`; exit 0, four reformatted,
+  two unchanged. Final application to forecast.py and test_forecast_generated.py
+  exited 0, two unchanged.
+- ownership: recorded Python assertions exited 0, proving the prior PROGRESS
+  bytes were unchanged before this append, both instruction files match their
+  base bytes, all seven acceptance boxes stay unticked and no privacy path
+  changed. The exact assertion command is retained in exits.jsonl.
+
+Test-authoring correction: the first malformed-span set included an equal-end
+single-month span, which is not inherently malformed. Before the first green
+run it was replaced by a quarterly endpoint in a monthly span. No arbitrary
+minimum window length was added. The existing released fixture helper now
+contains monthly points and adjacent pairs bounded by the manifest window;
+this is the F4 fixture correction, not a changed benchmark baseline. Two broader
+span mismatch plants were added after the first green run. No unexplained random
+failure occurred; no existing evidence row or OPEN_ITEMS.md entry was rewritten.
+
+The audit and documents 03, 07 and 12 record the implementation's actual limits;
+TASKS.md keeps every acceptance box unticked while dependencies/review are open.
+Proposed open items are only in `.overnight/RETURN.md`, per the brief. Post-append
+records checks and patch verification are recorded there and in the same checks
+folder without changing this earlier evidence. The final patch includes this
+append and every new task file. Muhasabah: PASS for the bounded, sourced handoff;
+full acceptance remains incomplete and different-maker review is still owed.

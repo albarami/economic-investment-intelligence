@@ -6,13 +6,20 @@ retained part-A assumption (OI-320), not a claim about publisher precision.
 
 from dataclasses import dataclass
 
-DEFINITION_VERSION = "c30-series-v2"
+DEFINITION_VERSION = "c30-series-v3"
 HORIZON = 1
 NONNEGATIVE = True
 ERROR_PLACES = 2
 SEASONS = (("month", 12), ("quarter", 4), ("year", 1))
 RANGE_CAVEAT = "forecast_backtest_range"
 SYNTHETIC_CAVEATS = ("synthetic_not_evidence_about_qatar", "synthetic_change")
+WORK_FEEDS = ("business_register.v1", "employment.v1", "wages.v1")
+RESIDENCE_FEEDS = (
+    "business_register.v1",
+    "employment.v1",
+    "residence.v1",
+    "wages.v1",
+)
 
 
 @dataclass(frozen=True)
@@ -29,6 +36,7 @@ class Definition:
     places: int
     caveats: tuple[str, ...]
     open_reason: str = ""
+    confirmed_sources: tuple[str, ...] = ()
 
     @property
     def season(self) -> int:
@@ -217,6 +225,7 @@ DEFINITIONS = (
         "qar_per_month",
         0,
         SYNTHETIC_CAVEATS,
+        confirmed_sources=RESIDENCE_FEEDS,
     ),
     Definition(
         "earner_count",
@@ -230,6 +239,7 @@ DEFINITIONS = (
         "count",
         0,
         SYNTHETIC_CAVEATS,
+        confirmed_sources=RESIDENCE_FEEDS,
     ),
     Definition(
         "wage_bill",
@@ -243,6 +253,7 @@ DEFINITIONS = (
         "qar",
         0,
         SYNTHETIC_CAVEATS,
+        confirmed_sources=RESIDENCE_FEEDS,
     ),
     Definition(
         "stayer_index",
@@ -256,6 +267,7 @@ DEFINITIONS = (
         "index",
         1,
         SYNTHETIC_CAVEATS,
+        confirmed_sources=RESIDENCE_FEEDS,
     ),
     Definition(
         "employment_by_area",
@@ -269,6 +281,35 @@ DEFINITIONS = (
         "count",
         0,
         SYNTHETIC_CAVEATS,
+        confirmed_sources=WORK_FEEDS,
+    ),
+    Definition(
+        "employment_by_occupation_residence",
+        "released",
+        ("occupation_pay",),
+        "synthetic",
+        "month",
+        ("area", "national"),
+        ("area",),
+        ("earner_count",),
+        "count",
+        0,
+        SYNTHETIC_CAVEATS,
+        confirmed_sources=RESIDENCE_FEEDS,
+    ),
+    Definition(
+        "employment_by_occupation_workplace",
+        "released",
+        ("occupation_pay",),
+        "synthetic",
+        "month",
+        ("area", "national"),
+        ("area",),
+        ("earner_count",),
+        "count",
+        0,
+        SYNTHETIC_CAVEATS,
+        confirmed_sources=WORK_FEEDS,
     ),
 )
 

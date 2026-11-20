@@ -150,6 +150,14 @@ TABLE_GRAINS = {
         "band_to",
     ),
     "month_change": ("unit_id", "period", "table_name", "measure"),
+    "occupation_pay": (
+        "unit_id",
+        "period",
+        "measure",
+        "basis",
+        "occupation_group",
+        "band_from",
+    ),
 }
 
 
@@ -167,6 +175,8 @@ class ReleaseAdmission:
     schema_sha256: str
     grain: tuple[str, ...]
     source_hashes: tuple[tuple[str, str], ...]
+    window_period: str = ""
+    window_key: str = ""
 
     def __post_init__(self) -> None:
         if any(
@@ -194,6 +204,23 @@ class ReleaseAdmission:
                 or re.fullmatch(r"[a-f0-9]{64}", pair[1]) is None
             ):
                 raise ValueError("invalid release admission source hash")
+        if type(self.window_key) is not str or (
+            self.window_key and re.fullmatch(r"[a-f0-9]{64}", self.window_key) is None
+        ):
+            raise ValueError("invalid release window key")
+        if type(self.window_period) is not str:
+            raise ValueError("invalid release window period")
+        if self.window_period:
+            parts = self.window_period.split("/")
+            if len(parts) != 2:
+                raise ValueError("invalid release window period")
+            try:
+                for part in parts:
+                    period_step(part, "month")
+            except ValueError:
+                raise ValueError("invalid release window period") from None
+            if parts[0] > parts[1]:
+                raise ValueError("invalid release window period")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -220,6 +247,7 @@ class ForecastSeries:
     reconciliation_open: bool = False
     admission: ReleaseAdmission | None = None
     window_key: str = ""
+    window_period: str = ""
     generator: str = ""
     generator_version: str = ""
     history_route: str = ""
@@ -243,6 +271,7 @@ class ForecastSeries:
             self.partition,
             self.protected_table,
             self.window_key,
+            self.window_period,
             self.generator,
             self.generator_version,
             self.history_route,
@@ -317,7 +346,7 @@ class ForecastOpen:
     key: str
     reason: str
     state: str = "open"
-    status: str = "OUT_OF_SCOPE"
+    status: str = "NO_DATA"
     facts: tuple[CalculationFact, ...] = ()
 
     def __post_init__(self) -> None:
@@ -327,7 +356,7 @@ class ForecastOpen:
             or spec.state != "open"
             or self.reason != spec.open_reason
             or self.state != "open"
-            or self.status != "OUT_OF_SCOPE"
+            or self.status != "NO_DATA"
             or self.facts != ()
         ):
             raise ValueError("invalid open forecast entry")
@@ -364,10 +393,26 @@ def _release_evidence(series: ForecastSeries) -> None:
         raise ValueError("unpublished series input")
     if series.input_class == "synthetic" and (
         not re.fullmatch(r"[a-f0-9]{64}", series.window_key)
+        or not series.window_period
         or not series.generator.strip()
         or not series.generator_version.strip()
     ):
         raise ValueError("released window or generator metadata required")
+    if series.input_class == "synthetic":
+        if (
+            evidence.window_key != series.window_key
+            or evidence.window_period != series.window_period
+        ):
+            raise ValueError("release window admission mismatch")
+        first, last = evidence.window_period.split("/")
+        if any(
+            month < first or month > last
+            for point in series.points
+            for month in point.period.split("/")
+        ) or (
+            series.points and period_step(series.points[-1].period, "month")[0] != last
+        ):
+            raise ValueError("history outside admitted release window")
 
 
 def _ranking(series: ForecastSeries) -> bool:
@@ -377,6 +422,33 @@ def _ranking(series: ForecastSeries) -> bool:
 
 
 def _released_binding(series: ForecastSeries) -> bool:
+    if series.key in (
+        "employment_by_occupation_residence",
+        "employment_by_occupation_workplace",
+    ):
+        basis, partition = (
+            ("residence", "op_res_quartile")
+            if series.key == "employment_by_occupation_residence"
+            else ("workplace", "op_work_quartile")
+        )
+        groups = (*(str(group) for group in range(10)), "unmapped", "other")
+        if len(series.breakdown) != 2:
+            return False
+        group = dict(series.breakdown).get("occupation_group", "")
+        return (
+            series.table == series.protected_table == "occupation_pay"
+            and series.partition == partition
+            and group in groups
+            and series.breakdown == (("basis", basis), ("occupation_group", group))
+            and len(series.families) == 1
+            and series.families[0].table == "occupation_pay"
+            and series.families[0].partition == partition
+            and series.families[0].measure in ("net", "basic")
+            and series.families[0].column == "earner_count"
+            and series.families[0].role == "single"
+            and series.families[0].breakdown
+            == f"basis={basis};occupation_group={group}"
+        )
     table = series.protected_table if series.key == "stayer_index" else series.table
     if table not in ("worker_pay", "resident_pay"):
         return False
@@ -792,6 +864,14 @@ class ForecastResult:
                 or self.computation.low[0] > self.computation.high[0]
             ):
                 raise ValueError("invalid interval counts or ends")
+            fresh = backtest(
+                (point.value for point in self.history),
+                season=spec.season,
+                horizon=spec.horizon,
+                candidates=CANDIDATES,
+            )
+            if type(self.computation) is not Backtest or self.computation != fresh:
+                raise ValueError("backtest does not match admitted history")
             if (
                 type(self.low_clamped) is not bool
                 or type(self.high_clamped) is not bool

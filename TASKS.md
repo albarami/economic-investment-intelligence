@@ -1523,7 +1523,7 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Scope: C30 series contract, closed catalogue, evaluation and tests.
 - Depends: S6-T14, S4-T14, S4-T15, S4-T16, S4-T17.
 - Requirements: DAT-158, MTH-98, MTH-48, TST-267.
-- Delivery: hard; builder persona senior statistician; strict reviewer persona independent statistical/privacy reviewer from another maker; status queued.
+- Delivery: hard; builder persona senior statistician; strict reviewer persona independent statistical/privacy reviewer from another maker; status calculation implementation built, independent review and dependency-bound acceptance pending. Source-to-release parity (S4-T14 to S4-T17 and S5-T04), mounted verification (OI-324) and the lead-owned real-source go-live re-fit/re-backtest gate remain open; all criteria stay unticked. See custodian/publicdata/review/s6_t25_generated_series.md and PROGRESS.md S6-T25.
 
 ### S6-T04 — Catalogues, template writer and accounting gate
 - Decision 0038 named sub-step — **question-factory seed rows** (inventory 7): step one audits F, S; G, D, R as relevant as defined in the decision; stop and record why if a blocking fact fails. Baseline: Existing question catalogue and prepared cases. Pass/evidence: Add taxonomy seed rows including decision 0038 item 8 national-table classes, refusals and multi-turn cases; deterministic oracle labels, no training. Later S8 tasks extend them after S8-T05, without a new gate. A pass follows decision 0036 item 2; otherwise retain baseline and record results. Existing dependencies and gate remain; fold-in only, no new task.

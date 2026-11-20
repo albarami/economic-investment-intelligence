@@ -2517,3 +2517,28 @@ retained without a false ratio or fractional displayed count. The generic fact
 schema and its qualifiers are unchanged. Document 03 section 12's
 `app.read_seat_context()` remains required before a future endpoint dispatch;
 a custodian `contracts.read_selected` is not a product reader (OI-324).
+
+## S6-T25 generated-series calculation handoff
+
+The internal catalogue `c30-series-v3` adds occupation earner counts separately
+for residence and workplace through `occupation_pay`, bound to `op_res_quartile`
+and `op_work_quartile` respectively. Confirmed feeds, units, geography, history
+and evaluated exclusions are recorded in
+[the generated-series audit](../custodian/publicdata/review/s6_t25_generated_series.md).
+Hiring/leaving forecasts remain retired under decision 0046 item 1.
+
+`ReleaseAdmission` now carries the existing manifest `window_period` and
+`window_key`. Released series carry both too: they must match the admission,
+all history months must lie within that span and the origin must be its last
+month. A stayer pair contributes both months to this check. The next forecast
+month remains allowed as a labelled projection from already released values
+(DAT-158), not a new protected statistic. This changes no manifest, window or
+privacy rule and verifies no mounted bytes; OI-324 still owns that verification.
+
+`ForecastResult` verifies its entire supplied computation against a fresh C30
+backtest of the admitted trailing history, before accepting the handoff. Under
+lead ruling L-1209 F2, a known unavailable source returns internal
+`ForecastOpen` with `status=NO_DATA`, its exact registry reason and no numeric
+facts. Absence is never relabelled `series_too_short`; this does not add a
+DAT-90 reason or close OI-325's API/emitter mapping. Source-to-release swap
+parity and the real-source go-live re-fit gate remain dependency work.
