@@ -111,11 +111,21 @@ def test_installed_review_has_metadata():
         ).read_text()
     )
     assert "owner's confirmation" in doc["status"]
+    assert doc["status"] == (
+        "reviewed: model review of 2026-11-14; the owner's confirmation of the baskets "
+        "recorded on 2026-11-20 under decision 0075"
+    )
     items = [
         item
         for activity in ("5610", "5630", "5510")
         for item in reviewed_inputs(doc, activity)
     ]
+    assert all(
+        "model review by two expert personas of different makers"
+        in item["reviewer_role"]
+        and "the owner confirmed the baskets on 2026-11-20" in item["reviewer_role"]
+        for item in items
+    )
     assert len(items) == 24
     assert sum(len(item["lines"]) for item in items) == 74
     assert sum(len(item["excluded_lines"]) for item in items) == 96

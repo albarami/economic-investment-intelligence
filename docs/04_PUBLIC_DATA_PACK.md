@@ -1588,7 +1588,7 @@ The May 2025 active table holds 4,755 codes. Of 249,622 licence-activity counts,
 1,363 codes, mostly a `20xxxxx` series) under other seven-digit codes, 26,844 (10.8%; 1,336
 codes) under six-digit legacy codes, and 225 (0.1%; 169 under 13 five-digit codes and 56 under
 eight eight-digit codes). Among the legacy codes, 138 codes (3,163 counts) have a
-prefix that only looks like an ISIC class; every mapping needs a meaning check and human sign-off.
+prefix that only looks like an ISIC class; every mapping needs a meaning check and sign-off under [decision 0075](decisions/0075-activity-mappings-signed-by-model-review.md).
 
 **The legacy trap, worked example.** The 6-digit code 561000 is named for trade in spare parts and
 561050 for electronic spare parts. A mapper that takes the first four digits would file both under
@@ -1597,9 +1597,9 @@ ISIC 5610 Restaurants. The correct result is the "not mappable" bucket. By contr
 
 | ID | Requirement |
 |---|---|
-| PUB-33 | Only 7-digit codes are candidates for an ISIC mapping. A candidate maps to the ISIC class given by its first four digits only if that class exists in `cls_isic4` and a human reviewer approves that the Arabic activity name fits the class title. |
+| PUB-33 | Only 7-digit codes are candidates for an ISIC mapping. A candidate maps to the ISIC class given by its first four digits only if that class exists in `cls_isic4` and a reviewer approves that the Arabic activity name fits the class title, either a person or an expert persona model under decision 0075 items 2 to 4, with a different-maker seeded audit at zero errors before a model-signed batch is admitted. |
 | PUB-34 | The review scope for v1 is: the 200 codes with the largest national active counts; every 7-digit code whose first two digits are 56 (food service); and every playbook code (the codes of the playbook activities and of their basket supplier activities, PUB-41). Codes outside the scope keep the status `unreviewed`. Codes that appear only in `lic_cancelled` follow the same rules. |
-| PUB-35 | Offline `spine_match` proposals may use the decision-0014 gateway only to order and pre-fill the human review queue. The provider defaults to `none`; no mapping is automatic, no gateway result is a fact, and every released mapping requires recorded human sign-off. The gateway has no run-time role and no screen presence except the Proof-room lineage line. The approved list is committed as `custodian/publicdata/review/activity_spine.csv` with `code`, `code_length`, `name_ar`, `isic_class`, `status`, `reason`, `reviewed_by_role` and `reviewed_on`; ISIC titles are joined at build time. |
+| PUB-35 | Offline `spine_match` proposals may use the decision-0014 gateway only to order and pre-fill the human review queue. The provider defaults to `none`; no mapping is automatic, no gateway result is a fact, and every released mapping requires recorded sign-off under decision 0075. Model sign-off is code by code, distinct from gateway suggestions, and requires its independent audited batch and bound audit hash (decision 0075 items 2 to 4). The gateway has no run-time role and no screen presence except the Proof-room lineage line. The approved list is committed as `custodian/publicdata/review/activity_spine.csv` with `code`, `code_length`, `name_ar`, `isic_class`, `status`, `reason`, `reviewed_by_role` and `reviewed_on`; ISIC titles are joined at build time. |
 | PUB-36 | Status values are exactly `mapped`, `unreviewed`, `not_mappable_legacy` (6-digit and other lengths), `not_mappable_invalid_prefix`, `not_mappable_rejected`. |
 | PUB-37 | ISIC-level figures include only `mapped` codes. The share of licence-activity counts in `unreviewed` and `not_mappable_*` codes is published as a coverage fact beside every ISIC-level figure, and the not-mappable bucket is visible in the spine chips. |
 | PUB-38 | Each mapped ISIC class used by a playbook links to Overture categories through a reviewed allow-list (for example ISIC 5610 to `restaurant` and its Italian subcategory). Pizza is included in "Italian" only when the label on screen says "Italian or pizza". |
@@ -1608,7 +1608,9 @@ ISIC 5610 Restaurants. The correct result is the "not mappable" bucket. By contr
 
 S2-T04 builds the offline activity spine from `custodian/publicdata/review/activity_spine.csv` and `custodian/publicdata/review/category_allowlist.csv`, with coverage method `activity_spine.v1`, and titles and mappings may enter a release under decision 0026. The publisher's terms words remain to be read and recorded (OI-204); that pending reading does not bar release (PUB-12, PUB-13).
 
-S2-T05's [offline triage command](../scripts/spine_triage.md) reuses the S2-T04 loader and refuses a stale queue before requesting evidence. Provider `none` preserves the baseline order; recorded or exactly qualified evidence may order and pre-fill only a separate suggestions file. The candidate binding is a title/version snapshot, never sign-off: a person signs every mapping through PUB-35, and the decision records stay under eval artefacts (DAT-126).
+The committed `activity_spine_audits.json` beside the spine is initially an empty audit list and admits no model decision. `activity_spine.binding.json` adds the exact audit-file SHA-256 as `audit_sha256`; the signed-row canonical hash, deterministic seed draw, closed batch schema and independent-maker requirements are fixed by decision 0075 item 4. Person-signed decisions retain their existing version/title binding path. OI-203 still owns real signing and audit.
+
+S2-T05's [offline triage command](../scripts/spine_triage.md) reuses the S2-T04 loader and refuses a stale queue before requesting evidence. Provider `none` preserves the baseline order; recorded or exactly qualified evidence may order and pre-fill only a separate suggestions file. The candidate binding is a title/version snapshot, never sign-off: a person or audited model reviewer signs every mapping through PUB-35 and decision 0075, and the decision records stay under eval artefacts (DAT-126).
 
 ## 7. Playbook activities and customs baskets
 

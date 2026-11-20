@@ -1,5 +1,5 @@
 {
- "status": "reviewed: model review of 2026-11-14; the owner's confirmation of the baskets is open",
+ "status": "reviewed: model review of 2026-11-14; the owner's confirmation of the baskets recorded on 2026-11-20 under decision 0075",
  "basis": "docs/04_PUBLIC_DATA_PACK.md section 7 (PUB-41); the tariff lines and their two descriptions are those of the customs dataset of 2025 onward, as published",
  "activities": [
   {
@@ -80,7 +80,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -111,7 +111,7 @@
      "inclusion_reason": "The lines are the subheadings of the olive oil heading: virgin, extra-virgin, other virgin and refined olive oil. The English description of each names olive oil; the Arabic of the virgin lines names the grade under that heading. It is a recurring wholesale restaurant input with catalogue import mass.",
      "excluded_lines": [],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -137,7 +137,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -187,7 +187,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -208,7 +208,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -237,7 +237,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -253,7 +253,7 @@
      "inclusion_reason": "Both descriptions name fresh or chilled tomatoes, a recurring wholesale restaurant produce input with catalogue import mass.",
      "excluded_lines": [],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -314,7 +314,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     }
@@ -356,7 +356,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -411,7 +411,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -496,7 +496,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -532,7 +532,7 @@
      "inclusion_reason": "Both descriptions name green, black or other tea; these are recurring wholesale coffee-shop inputs with catalogue import mass.",
      "excluded_lines": [],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -548,7 +548,7 @@
      "inclusion_reason": "Both descriptions name unsweetened cocoa powder, a recurring wholesale input for cocoa and chocolate drinks with catalogue import mass.",
      "excluded_lines": [],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -581,7 +581,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -617,7 +617,7 @@
      "inclusion_reason": "Both descriptions name orange juice in clear frozen, Brix and sweetening variants; it is a recurring wholesale coffee-shop input with catalogue import mass.",
      "excluded_lines": [],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -688,7 +688,7 @@
       }
      ],
      "supplier_isic": "4630",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     }
@@ -753,7 +753,7 @@
       }
      ],
      "supplier_isic": "4641",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -799,7 +799,7 @@
       }
      ],
      "supplier_isic": "4641",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -828,7 +828,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -853,7 +853,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -905,7 +905,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -959,7 +959,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -1015,7 +1015,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     },
@@ -1048,7 +1048,7 @@
       }
      ],
      "supplier_isic": "4649",
-     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner's confirmation is open",
+     "reviewer_role": "model review by two expert personas of different makers (procurement specialist; bilingual customs specialist); the owner confirmed the baskets on 2026-11-20 under decision 0075",
      "review_date": "2026-11-14",
      "source_sha256": "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0"
     }

@@ -371,12 +371,12 @@ awaits the lead's selected-cache probe, live run 3 and independent code review.
 
 ### S2-T04 — Activity spine and graph tables
 - Goal: Build the reviewed activity spine, not-mappable bucket, graph tables and human review queue.
-- Acceptance criteria: [ ] largest 200 codes, all food-service codes and all playbook codes are reviewed; [ ] every admitted mapping has human sign-off; [ ] the remainder is flagged; [x] graph edges obey the Public-or-lineage rule.
+- Acceptance criteria: [ ] largest 200 codes, all food-service codes and all playbook codes are reviewed; [ ] every admitted mapping has sign-off under decision 0075; [ ] the remainder is flagged; [x] graph edges obey the Public-or-lineage rule.
 - Scope: activity review files, spine builder, `graph_node`, `graph_edge` tests.
 - Depends: S2-T01.
 - Requirements: PUB-33, ARC-83, DAT-100.
 - Amendment ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 33): [ ] part B restores to the register snapshot the financial-centre companies and the rows without a registration number, and fills the activity code, establishment nationality, statuses and licence dates wherever the register publishes them, with the activity-code check proved by a planted mismatch (OI-186, OI-187, OI-190, OI-192, OI-193); a field the register leaves empty stays empty and no value is invented for a real company (rule 8).
-- Delivery: hard; personas Data; status in progress: graph and review-queue mechanisms merged in pull request 59; human review and register-restoration evidence remain open (OI-16, OI-203 and the decision 0064 item 33 amendment).
+- Delivery: hard; personas Data; status in progress: graph and review-queue mechanisms merged in pull request 59; signer rule decided under decision 0075 (OI-16 closed); actual queue review, signing and independent audit remain open under OI-203, alongside the decision 0064 item 33 register-restoration evidence. No acceptance box is newly ticked.
 ### S2-T05 — `spine_match` review triage
 - Goal: Use the offline gateway only to order and pre-fill the activity human-review queue.
 - Acceptance criteria: [x] provider `none` leaves a valid deterministic queue; [x] no mapping is adopted without sign-off; [x] decision records stay under eval artefacts.
