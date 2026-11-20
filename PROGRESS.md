@@ -40822,3 +40822,142 @@ Delivery: staging the ten scoped files with `git add -- ...` exited 128: the wor
 Final post-record verification: documentation exit 0 (1121 text files, 121 Markdown files), tree exit 0 (8 rules), instruction parity exit 0 and whitespace exit 0. The artifact audit exited 0: all prior PROGRESS.md bytes are intact, exactly one round-two block was added, the Git index has no staged files, the return marker is the last line, and added tracked text plus the return contain no absolute local path, e-mail address or forbidden bare identifier.
 
 Lead, 2026-11-20: the round-two tree was committed by the lead because the builder's sandbox could not stage; the lead reran the six focused tender and awards test files on that tree: exit 0, 206 passed.
+
+
+### Train S2-8 records — five-commit composition and live evidence
+
+2026-11-20. Maker: OpenAI; model: GPT-6 (Codex). Senior persona: senior release-records engineer for an evidence-ledger repository. Strict self-review persona: records auditor rejecting rewritten evidence, unsupported claims or figures, personal names, absolute local paths and weakened criteria. Skills loaded: project-orientation, task-standards, sanad-provenance, github-flow and muhasabah-gate. Verification-before-completion is applied in its plain meaning; no installed skill of that name is available. This is a records self-audit, not another-maker approval.
+
+Scope and source chain: the supplied `.overnight/BRIEF.md`, TASKS.md S2-T13/S2-T19/S2-T29, document 14 slice S2 Gate and decisions 0032 and 0069. Base ff3dd5de85a72af88343ac2bad90994865f888c8; observed five-pick HEAD 7dd51d486f2d9d092f83c96a7bcb12f34f399b58. Pull request number 105 is supplied by the brief; no hosted state was read. The lead will commit these records; no worker commit or push is authorized. The refreshed spec uses literal WORK_HEAD and WORK_SEED until the lead commits and assigns its whole-test seed. No seeded live build on the merged head or whole-test run is claimed here.
+
+| Task change | Original reviewed commit | Picked commit | Builder maker/model | Supplied approving or confirming review |
+|---|---|---|---|---|
+| S2-T19 tender intermediate pin | 0fa689540e7a82c1ae9fe6b8079a8940d78337fc | b6125f2628c478c2e8b173379d8c9328e1c987a6 | Anthropic Claude Opus 5.5, lead | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T19-pin.rev1.md`, K1 to K6 and final verdict; maker/model attribution: old-spec/log.md, Tender intermediate pin task log |
+| S2-T19 one host-scoped TLS suite | 537c0a7aebc10569a1beeb58581361635efcf05a | 2929417f094cf3bdbb00ec81b4dc597c7a6113cc | Anthropic Claude Opus 5.5, lead | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T19-suite.rev1.md`, K1 to K5 and final verdict; maker/model attribution: old-spec/log.md, Tender TLS suite task log |
+| S2-T19 English size words and empty slots | 3a5ab2aacd3e8f557898a0ed188ab67546a1b45b | 335d56db432fb6c3bb2759bacd92e81c976f048e | OpenAI GPT-6 (Codex), per picked commit body | Z.ai GLM-5.3 through the lead's relay (the served model in the job's status record; the return's own self-naming as an OpenAI model is the relay client's label, not the served model); APPROVED; `.overnight/IN/reviews/S2-T19.tsize.rev2.md`, Checks 1 to 4 and verdict |
+| S2-T29/S2-T19 awards workbook and dynamic cut-off | 0806893b5a772f78124eacb7580cf45fc801f076 | 9062fd0eaea8f4ee1f5fd70f6a4cb1df53ec99a5 | OpenAI GPT-6.1 Sol (Codex), per picked commit body | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T29W.L1.md`, Checks 1 to 6 and verdict |
+| S2-T29/S2-T19 two-page continuity check | 25e55f5cd58a95fbab92383d69ae77e5b95ba8a3 | 7dd51d486f2d9d092f83c96a7bcb12f34f399b58 | OpenAI GPT-6.1 Sol (Codex), per picked commit body | Cognition Devin SWE-2 High; CONFIRMED; `.overnight/IN/reviews/S2-T29W.conf1.md`, Checks 1 to 5 and verdict |
+
+Git source-to-pick checks compare every file's context-free changed lines and name-status inventory; all match, including PROGRESS.md. The script and each result are in `.overnight/OUT/TRAIN-S2-8-spec/make_spec.py` and `identity-proof.json`. No forced task-file difference was found. This proves changed-line identity only; another-maker confirmation of the final joined head, required hosted/head checks and the lead's fresh-seed whole test on the exact merge result remain owed under rule 33. The supplied size review names the same maker as its builder; this record preserves that attribution and does not claim it satisfies rule 35's different-maker requirement. The lead must reconcile that review requirement before merge.
+
+#### Attributed live-run evidence, not runs performed by this worker
+
+| Run | Recorded build head | Exit and outcome | Source and cause |
+|---|---|---|---|
+| LIVE-S2.r5 | 0fa689540e7a82c1ae9fe6b8079a8940d78337fc | exit 1; 241 PASS lines, one FAIL tenders_pub http_status | `.overnight/IN/facts.txt`, LIVE-S2.r5 result, and `live-r5.tail.txt`: TLS context handshake closed with SSLZeroReturnError; host accepts AES128-GCM-SHA256 RSA key exchange absent from interpreter defaults (Python 3.14.6/OpenSSL 3.5.7). Scoped suite correction preserves verification, floor and security level; OI-340 remains open. |
+| LIVE-S2.r6 | 537c0a7aebc10569a1beeb58581361635efcf05a, from old-spec/log.md live-run launch | exit 1; 4 h 13 min, from the lead's run log (result line of LIVE-S2.r6 at 06:0x on 2026-11-20) | `.overnight/IN/facts.txt`, L-1189 and L-1192, and `live-r6.tail.txt`: company_size awarded merge refused English/Arabic size strings compared as one shared value, with empty slots. The tail repeats the reason as expected/observed; L-1192 identifies diagnostic formatting, not a comparison result. The supplied facts excerpt lacks a separate r6 exit/duration row; those two fields are attributed to the brief, not inferred from a tail. OI-345 records lost page evidence. |
+| LIVE-S2.r7 | 3a5ab2aacd3e8f557898a0ed188ab67546a1b45b | exit 143; stopped at 06:22 on 2026-11-20 | `.overnight/IN/facts.txt`, launch and L-1192: the lead stopped the 06:15 launch to comply with the owner's instruction against re-fetching the awarded history; not a cost stop or a successful build. The supplied `live-r7.tail.txt` is empty and proves no completion. |
+
+The lead's L-1189 cause and the code/tests agree: `pub_tender.company_size` takes non-empty page-order English size words joined by a vertical bar, Arabic only when English carries none; all-empty slots yield null, and a conflict within either language is refused. Document 03's field description now says so. Decision 0069 and its documentation-index entry record acceptance on 2026-11-20, under the owner's already recorded decision; this is no implementation or gate approval.
+
+#### Join test and follow-up boundaries
+
+Source: `.overnight/IN/facts.txt`, L-1198, the lead's saved-page join test, without new fetching. Workbook report identifiers matched each card's report identifier. Saved page 403 has 20 cards dated 14/05/2025 inside the workbook range: 12 matched one workbook row each with the same date, 8 were absent. Newer pages 203 and 78 each matched 0 of 20. The exact-id join works; the workbook is not complete inside its date range. Decision 0069's cut-off describes its newest parsed date, not complete older coverage. OI-344 carries the owner's after-S2-gate, once-only cached older-page enrichment and whole-list order re-check. No workbook row, real saved card or data cache was read here.
+
+L-1201 accepts the incremental stop while adding the fixed two-page detector. The sample of 9 saved English pages and 180 cards supports the newest-first assumption, never proof about unread pages; decision 0069 item 3 retains that limit. The final CONFIRMED review leaves the empty-url build exit detail in OI-343; the separate FAIL line is already fixed. OI-345 is a proposed durable-failure-evidence change, not implemented recovery. OI-341 and OI-342 are reserved elsewhere and were not allocated. PO-S2-140 and PO-S2-141 remain proposals only in the spec companion.
+
+#### Records verification
+
+The worker runs the brief's docs/tree/parity/JSON checks and each test file in the refreshed command inventory with real exits and counts; results are appended below after execution. Test discovery uses all tracked test files, includes changed tests and direct AST imports of each changed production module, and excludes lead-only custodian/data_tests. No network, world seed, live source build, ./eii test, database operation, commit or push is performed. The spec's shared static checks and whole-test command are future lead obligations, not results of this preparation. TASKS.md replacement candidates update status and accepted-decision references only; every existing checkbox is preserved.
+
+
+Records-check results, 2026-11-20, on observed HEAD 7dd51d486f2d9d092f83c96a7bcb12f34f399b58 with the uncommitted records above: system Python 3.14.4; uv selected CPython 3.14.6; uv 0.11.31 (x86_64-unknown-linux-gnu). Environment: UV_OFFLINE=1, UV_PYTHON_DOWNLOADS=never, EII_DECISION_PROVIDER=none, PYTHONDONTWRITEBYTECODE=1; uv cache, temporary files and Hypothesis storage confined to `.overnight/tmp/`. No seed override; no tests reached collection and no world/figure seed was used. Network was disabled for every uv invocation. The existing externally configured cache was not read: this worker used an empty workspace-local cache to obey the workspace-only constraint.
+
+Every one of the 84 required pytest commands exited 1 before pytest could start because locked dependency bytes were absent from that offline cache. Counts: 0 tests executed; collected/passed/failed test counts unavailable, not passing or skipped tests. These are environment failures, not 84 failing test cases. No retry, skip, baseline refresh, network installation or replacement test command was used. Full per-command output is retained under `.overnight/OUT/TRAIN-S2-8-spec/checks/`; local path text in captured output is normalized to a fixed marker. `check-results.json` records the real exit, elapsed time and output location for each of 88 required checks. The spec command inventory is not reduced to hide these failures.
+
+| Command | Exit | Observed counts/result |
+|---|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_additions_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_boundaries.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_intake.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_atlas_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_baci_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_benchmark_access.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_benchmarks_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_comtrade_plants.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_feature_polygon_column.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_4.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_report_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_frame_coverage.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_layers.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_paged.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_reference_inheritance.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gravity_atlas_review.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gravity_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_intake_ceiling.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_investment_evidence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_large_intake.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_local_file_report.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_mepi_long_form.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_period_year_text_rows.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_build_date.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_production_adapters.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_property_quarter.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_data_stage.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_snapshots.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_besttime_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_licence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_listing_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_awards.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_snapshot_refusals.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_terms_attempts.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_terms_fingerprint.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_release.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `python3 scripts/check_docs.py` | 0 | checked 1126 text files, 121 Markdown files: OK |
+| `python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| `cmp AGENTS.md CLAUDE.md` | 0 | (no output) |
+| `python3 -c "import json; json.load(open('.overnight/OUT/TRAIN-S2-8-spec/spec.json'))"` | 0 | (no output) |
+
+Preparation command `python3 .overnight/OUT/TRAIN-S2-8-spec/make_spec.py` exited 0: 84 test commands, 49 source-to-pick file comparisons, WORK_HEAD/WORK_SEED retained, no merges key. A read-only evidence audit exited 0: the earlier PROGRESS.md and OPEN_ITEMS.md bytes remain prefixes unchanged; task-replacement checkbox sequences are identical. The literal old-spec draft's empty merges key was deliberately not copied. The refreshed draft anticipates five picks plus the lead's one records commit; preparation.json separately records the five actual current commits. No future sixth hash is invented.
+
+Verification remains incomplete until the lead runs the locked tests with an available pinned environment. Lead's correction before commit: the size review was served by Z.ai GLM-5.3 (another maker than the builder, OpenAI), so project rule 35 holds; and the lead runs every listed test file in the pinned environment in the train ledger. Muhasabah: PASS for source attribution, bounded edits, append-only evidence and honest failure reporting; test verification is BLOCKED by missing offline dependencies, not approved. This record makes no task, train or slice completion claim. The final post-report document/tree/parity/JSON and artifact checks are appended as a separate correction after their actual execution.
+
+Final post-report checks, 2026-11-20: python3 scripts/check_docs.py exit 0, 1126 text files and 121 Markdown files; python3 scripts/check_tree.py exit 0, 8 rules; cmp AGENTS.md CLAUDE.md exit 0; the brief's spec JSON parse command exit 0. Artifact audit exit 0: 49 equal source/pick file deltas, append-only PROGRESS.md and OPEN_ITEMS.md, no merges key, preserved WORK placeholders and task checkbox parity, all 11 changed tests included among 84 test files, generated-file forbidden-pattern scan clean, return marker last. Evidence: .overnight/OUT/TRAIN-S2-8-spec/final-checks.json. These checks followed the draft return and precede this evidence append. No test environment failure was closed.

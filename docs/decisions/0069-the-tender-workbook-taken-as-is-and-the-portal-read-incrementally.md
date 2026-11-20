@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed, 2026-11-20; the lead records acceptance after confirming the owner's already recorded decision |
+| Status | Accepted, 2026-11-20; the owner's decision of 2026-11-20 |
 | Date | 2026-11-20 |
 | Owner | The owner |
 | Decided by | The owner's decision of 2026-11-20, relayed in the S2-T29W task brief |
@@ -110,7 +110,7 @@ nor showing under decision 0026.
 The existing intake and list readers are extended rather than duplicated.
 Provenance, source-specific refusals, privacy, security, commit flags, public
 split rules, numerical methods and review gates remain required. AGENTS.md and
-CLAUDE.md need no rule amendment. This proposed record claims no live workbook
+CLAUDE.md need no rule amendment. This accepted record claims no live workbook
 read, successful portal fetch, independent implementation approval or slice gate.
 
 ## Open questions and assumptions
