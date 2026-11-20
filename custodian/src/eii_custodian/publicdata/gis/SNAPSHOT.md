@@ -53,7 +53,13 @@ and quota errors report `disk_safety_stop`, and I/O faults report `io_error`, in
 faults wrapped by immutable publication; a job-body fault is never labelled a lock fault.
 
 Only tile HTTP 404/410 and invalid successful tile bodies (empty, non-JPEG or wrong
-dimensions) become recorded gaps. Exhausted retries on HTTP 429/500/502/503/504 or an
+dimensions) on the first attempt become recorded gaps. A missing or invalid tile after
+earlier retries stops resumably with its actual status, reason and attempt count; no
+unfinished shard tar, receipt, index or selection pointer is published. Resume requests
+the same key afresh. Under L-1303's recorded-gap treatment, a fresh first-attempt 404 on
+resume is a persistent recorded gap, even when the previous run saw 503 then 404; an
+intact tile on resume is retained normally. Attempts are never rewritten to one.
+Exhausted retries on HTTP 429/500/502/503/504 or an
 unreachable transport stop with `request_failed`, publishing no unfinished shard; resume
 requests that tile key again. Other unsuccessful statuses also stop rather than become
 gaps. A wholly out-of-extent tile is a gap with `outside_extent`, no HTTP status and zero
@@ -113,6 +119,9 @@ check compares metadata, boundary and enumeration hashes and shard number with t
 verified enumeration at both resume and selection. Gap reasons also bind status and
 attempt count: request failures require HTTP 404/410 and one attempt; successful-body
 refusals require HTTP 200 and one attempt, otherwise `gap_reason_integrity`.
+The same gap eligibility validator runs before immutable shard publication as well as
+at resume and release selection. Invalid supplied gaps leave only resumable staging
+cleanup, never a published shard or pointer; existing consumer checks are unchanged.
 
 A completed shard is skipped only after its pointer, receipt, whole-body hash, member
 hashes and expected keys verify. A partially staged shard is fetched again. Changed
@@ -200,13 +209,16 @@ identities are `https://rasterio.readthedocs.io/en/stable/topics/memory-files.ht
 an offline reading on 2026-11-20, not a documentation-host request. No pin changed.
 
 
-## Fix-round-three self-review hold
+## Fix-round-four mixed-retry correction
 
-The requested gap validator now enforces one attempt. A separate invented mixed-history
-probe found that a retryable status followed by a missing or invalid tile can still produce
-a gap with multiple attempts. Publication currently precedes the new validation, so the
-shard/pointer can be retained and then refused on every resume. This producer/consumer
-mismatch is proposed PO-S2-T51-F3-01 in PROGRESS.md, **S2-T51 f3 seven-finding corrections**,
-and the worker return. It needs producer alignment and a no-publication/resume plant before
-operational acceptance. Do not weaken the gap rule or rewrite the recorded attempt count.
-No live archive was read or changed by that probe; acquisition approval remains pending.
+PO-S2-T51-F3-01 is corrected by the pre-publication eligibility check and producer stop
+above. Permanent invented plants cover 503 then 404, 410, empty 200 and invalid 200,
+each followed by a fresh one-attempt 404 gap or intact tile on the same key. They require
+the true two-attempt failure, no tar/receipt/index/pointer, cleaned staging and successful
+resume; a subsequent resume skips the verified selection. Direct archive plants refuse
+ineligible status/attempt combinations before publication and then successfully write
+the same shard. Isolated tracked-file archives demonstrate red on the preceding code
+and red when either added call-site guard is removed alone, then restored green.
+Evidence is appended in PROGRESS.md, **S2-T51 f4 mixed-retry publication correction**.
+No live archive was read or changed; different-maker review and acquisition approval
+remain pending.

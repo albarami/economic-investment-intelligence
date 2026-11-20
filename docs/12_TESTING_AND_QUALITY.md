@@ -919,3 +919,16 @@ member and no served tile. Missing quantization opens successfully but fails the
 pixel read, so a marker or open-only substitute is caught. Guard-removal evidence uses
 separate tracked-file archives under the task's workspace temporary folder, and records
 red and restored-green exits. These fixtures supply no live source result.
+
+S2-T51 fix round four promotes the four mixed-history probes to permanent
+`test_mixed_retry_gap_stops_before_publication_and_resumes` cases: 503 then 404,
+410, empty 200 or invalid 200 must retain the actual two attempts and stop before
+publishing a shard tar, receipt, index or selection pointer, with staging cleaned.
+Each case resumes the same key successfully with either an intact tile or a fresh
+first-attempt 404 recorded as a gap under L-1303; the next resume skips the verified
+selection. `test_archive_gap_eligibility_checked_before_immutable_publication`
+also supplies ineligible status/attempt combinations directly to the archive, requires
+no published immutable shard state, and successfully writes the same shard afterward.
+The existing resume/selection gap checks retain their eligibility rules. Separate
+tracked-file archives prove the new plants red on the prior commit and each new
+producer/pre-publication guard red when removed alone, then restored green.

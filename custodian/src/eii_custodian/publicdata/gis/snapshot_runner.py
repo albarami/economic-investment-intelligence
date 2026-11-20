@@ -295,6 +295,10 @@ def acquire(
                         except SnapshotRefusal as error:
                             raise TileFailure(str(error), 200, attempts[-1]) from None
                     except TileFailure as error:
+                        if error.attempts != 1:
+                            # Mixed retry history is not an eligible persistent gap.
+                            # Retain the actual status/count and retry on resume.
+                            raise
                         missing.append(
                             {
                                 "key": [lev, row, col],

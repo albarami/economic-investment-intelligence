@@ -45270,3 +45270,81 @@ Final ledger checks after the S2-T51 evidence append: `python3 scripts/check_doc
   Detailed finding-by-finding return, exact commands/exits and proposed open items: `.overnight/RETURN.md`. This scoped
   self-review does not qualify a merge or live acquisition; different-maker confirmation,
   existing suite holds and lead-owned live/integration evidence remain pending.
+
+
+## S2-T51 f4 mixed-retry publication correction — 2026-11-20
+
+- Authority: fix-round-four brief; prior return PO-S2-T51-F3-01; L-1303 recorded-gap
+  ruling; decision 0079 items 2–4; document 04 **3.1 Registry and sidecar record**.
+- Plan: plant the four mixed histories and direct archive refusals red first; stop
+  the producer before publication with real attempts intact; reuse the unchanged gap
+  validator before immutable publication; prove both guards independently; run required
+  checks and compare the one full custodian run against retained failure IDs.
+- Builder: senior geospatial-acquisition and reliability engineer, test-first.
+  Strict self-review: geospatial archive integrity and resumability reviewer.
+  Maker/model: OpenAI / Codex, GPT-6; exact serving variant unavailable. Skills:
+  project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer
+  self-review rules, muhasabah-gate; unavailable superpowers workflows represented by
+  equivalent test-first, ordered execution, debugging, worktree and verification rules.
+- Starting/final commit `709e67e41f3cd690f1a958d69bfe949b10100a07`. No commit or push, as required.
+- Changed: producer re-raises ineligible multi-attempt TileFailure; archive calls
+  the extracted unchanged gap validator before immutable shard publication. No count
+  normalization or weakened consumer check. AST validation preservation proved in
+  `.overnight/tmp/f4/validator-preservation.json`.
+- L-1303 decision: a fresh one-attempt 404 on resume is an eligible persistent gap,
+  even after the previous 503/404 failed sequence; the earlier true two-attempt failure
+  is never rewritten. Both gap and intact-tile resume paths are permanent tests.
+- PO-S2-T51-F3-01 is corrected. Eight mixed-history/resume plants and seven direct
+  archive plants ran red before implementation and in a HEAD archive (15 failed),
+  then green. Both guards removed alone fail, then restored pass:
+
+- `producer-mixed-retry-stop`: red exit 1 (8 failed, 283 deselected in 0.65s); restored exit 0 (8 passed, 283 deselected, 4 warnings in 0.56s).
+- `archive-prepublication-eligibility`: red exit 1 (7 failed, 284 deselected in 0.44s); restored exit 0 (7 passed, 284 deselected, 7 warnings in 0.30s).
+
+- Final focused gap checks: exit 0, 57 passed. Product imagery: exit 0, 7 passed.
+  Broader GIS/imagery/structured/registry/binding run: exit 1, 573 passed, four failure
+  IDs already in the retained baseline (focused-comparison.json). Full custodian suite
+  run once: exit 1, 226 failed, 9576 passed, 188 warnings in 632.67s (0:10:32). Comparison against f3 (and identical f2):
+  baseline 226, final 226, new zero, absent zero. Existing failures remain open.
+- Ruff check/format, mypy, docs, tree, AGENTS/CLAUDE parity and diff whitespace:
+  exit 0. Tests use Python 3.14.6, rasterio 1.5.2, Linux x86_64 WSL2, seed 79;
+  UV_OFFLINE=1, UV_NO_SYNC=1, EII_DECISION_PROVIDER=none, PYTHONDONTWRITEBYTECODE=1,
+  workspace-local f4 TMPDIR/Ruff/mypy caches. No real source request, live snapshot,
+  external drive, secret/custodian input, dependency sync or pin change.
+- Source/test hashes unchanged after testing; implementation patch SHA-256
+  `ef5831564bd9836096dffca3f37db31bccdb6d17354a2a207d3e192eb91cc813`. Evidence, full stdout and exact argv/exits/timings:
+  `.overnight/tmp/f4/commands.jsonl`, `guard-removals.json`, `suite-comparison.json`,
+  `focused-comparison.json`, `tested-code-state.json`, `failure-ids.txt` and logs.
+  SNAPSHOT.md and document 12 updated. Full return: `.overnight/RETURN.md`.
+- Strict self-review: APPROVE for this scoped correction. This is not another maker's
+  confirmation or operational acquisition approval. No new open item; inherited suite,
+  live capacity/first-hour/coverage and both-store holds remain. Existing invalid
+  published selections are not rewritten. Muhasabah: PASS for the scoped evidence.
+- Commands with real exits (cwd root unless stated; exact argv in commands.jsonl):
+
+- `red-new-plants`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'mixed_retry_gap or archive_gap_eligibility'`.
+- `format-apply`: exit 0; `uv run --locked ruff format custodian/src/eii_custodian/publicdata/gis/snapshot_archive.py custodian/src/eii_custodian/publicdata/gis/snapshot_runner.py custodian/tests/test_gis_snapshot.py`.
+- `green-new-plants`: exit 0; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'mixed_retry_gap or archive_gap_eligibility or gap_reason_status'`.
+- `mypy`: exit 0; `uv run --locked mypy`.
+- `product-imagery`: exit 0; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 product/tests/test_released_imagery.py`.
+- `archive-head-final-plants`: exit 0; `git archive HEAD core custodian product scripts gateway contracts conftest.py pyproject.toml AGENTS.md`; cwd `.`.
+- `agents-identical`: exit 0; `cmp AGENTS.md CLAUDE.md`.
+- `diff-whitespace`: exit 0; `git diff --check`.
+- `lint`: exit 0; `uv run --locked ruff check .`.
+- `tree`: exit 0; `python3 scripts/check_tree.py`.
+- `format`: exit 0; `uv run --locked ruff format --check .`.
+- `red-final-plants-on-HEAD`: exit 1; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'mixed_retry_gap or archive_gap_eligibility' --basetemp .overnight/tmp/f4/archives/head-final-plants/.test-tmp`; cwd `.overnight/tmp/f4/archives/head-final-plants`.
+- `archive-producer-mixed-retry-stop`: exit 0; `git archive HEAD core custodian product scripts gateway contracts conftest.py pyproject.toml AGENTS.md`; cwd `.`.
+- `red-producer-mixed-retry-stop`: exit 1; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k mixed_retry_gap --basetemp .overnight/tmp/f4/archives/producer-mixed-retry-stop/.test-tmp`; cwd `.overnight/tmp/f4/archives/producer-mixed-retry-stop`.
+- `green-producer-mixed-retry-stop`: exit 0; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k mixed_retry_gap --basetemp .overnight/tmp/f4/archives/producer-mixed-retry-stop/.test-tmp`; cwd `.overnight/tmp/f4/archives/producer-mixed-retry-stop`.
+- `archive-archive-prepublication-eligibility`: exit 0; `git archive HEAD core custodian product scripts gateway contracts conftest.py pyproject.toml AGENTS.md`; cwd `.`.
+- `docs`: exit 0; `python3 scripts/check_docs.py`.
+- `red-archive-prepublication-eligibility`: exit 1; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k archive_gap_eligibility --basetemp .overnight/tmp/f4/archives/archive-prepublication-eligibility/.test-tmp`; cwd `.overnight/tmp/f4/archives/archive-prepublication-eligibility`.
+- `green-archive-prepublication-eligibility`: exit 0; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k archive_gap_eligibility --basetemp .overnight/tmp/f4/archives/archive-prepublication-eligibility/.test-tmp`; cwd `.overnight/tmp/f4/archives/archive-prepublication-eligibility`.
+- `guard-harness`: exit 0; `uv run --locked python .overnight/tmp/f4/guards.py`.
+- `environment`: exit 0; `uv run --locked python -c 'import platform; import rasterio; print(platform.platform()); print(platform.python_version()); print(rasterio.__version__)'`.
+- `gis-imagery`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py custodian/tests/test_gis_reference_inheritance.py custodian/tests/test_gis_paged.py custodian/tests/test_gis_imagery_views.py custodian/tests/test_gis_imagery_views_survivors.py custodian/tests/test_gis_layers.py custodian/tests/test_gis_layers_survivors.py custodian/tests/test_gis_layers_survivors_refusals.py custodian/tests/test_s2_t19_registry.py scripts/tests/test_gis_snapshot_binding.py product/tests/test_structured_address.py`.
+- `custodian-suite`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests`.
+
+- Final post-ledger checks: `python3 scripts/check_docs.py` exit 0; `git diff --check`
+  exit 0, recorded in `.overnight/tmp/f4/commands.jsonl`. Return marker verified.

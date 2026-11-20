@@ -170,65 +170,64 @@ def unpack(snapshot: Snapshot) -> Iterator[tuple[int, int, int, bytes]]:
         raise SnapshotRefusal("archive_integrity") from None
 
 
+def checked_gap(gap: Any) -> list[int]:
+    """Validate gap eligibility before publication and on every verified read."""
+    if not isinstance(gap, dict) or set(gap) != {
+        "key",
+        "http_status",
+        "reason",
+        "attempts",
+        "retrieved_utc",
+    }:
+        raise SnapshotRefusal("archive_integrity")
+    key = gap["key"]
+    status, attempts = gap["http_status"], gap["attempts"]
+    if gap["reason"] not in {
+        "request_failed",
+        "response_bytes_or_gap",
+        "tile_format_or_gap",
+        "tile_dimensions_refused",
+        "outside_extent",
+    }:
+        raise SnapshotRefusal("gap_reason_integrity")
+    if (
+        gap["reason"] == "request_failed"
+        and (status not in {404, 410} or attempts != 1)
+    ) or (
+        gap["reason"]
+        in {
+            "response_bytes_or_gap",
+            "tile_format_or_gap",
+            "tile_dimensions_refused",
+        }
+        and (status != 200 or attempts != 1)
+    ):
+        raise SnapshotRefusal("gap_reason_integrity")
+    if (
+        not isinstance(key, list)
+        or len(key) != 3
+        or any(type(n) is not int or n < 0 for n in key)
+        or type(attempts) is not int
+        or not 0 <= attempts <= 4
+        or (
+            status is not None and (type(status) is not int or not 100 <= status <= 599)
+        )
+        or (gap["reason"] == "outside_extent" and (attempts != 0 or status is not None))
+        or (gap["reason"] != "outside_extent" and attempts == 0)
+    ):
+        raise SnapshotRefusal("archive_integrity")
+    level_allowed(key[0])
+    utc(gap["retrieved_utc"])
+    return key
+
+
 def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str, Any]]:
     """Every enumerated key occurs once, as either a JPEG member or a fixed gap."""
     actual = [[level, row, column] for level, row, column, _ in unpack(snapshot)]
     gaps = snapshot.sidecar.get("gaps")
     if not isinstance(gaps, list) or not expected:
         raise SnapshotRefusal("archive_integrity")
-    keys = []
-    for gap in gaps:
-        if not isinstance(gap, dict) or set(gap) != {
-            "key",
-            "http_status",
-            "reason",
-            "attempts",
-            "retrieved_utc",
-        }:
-            raise SnapshotRefusal("archive_integrity")
-        key = gap["key"]
-        status, attempts = gap["http_status"], gap["attempts"]
-        if gap["reason"] not in {
-            "request_failed",
-            "response_bytes_or_gap",
-            "tile_format_or_gap",
-            "tile_dimensions_refused",
-            "outside_extent",
-        }:
-            raise SnapshotRefusal("gap_reason_integrity")
-        if (
-            gap["reason"] == "request_failed"
-            and (status not in {404, 410} or attempts != 1)
-        ) or (
-            gap["reason"]
-            in {
-                "response_bytes_or_gap",
-                "tile_format_or_gap",
-                "tile_dimensions_refused",
-            }
-            and (status != 200 or attempts != 1)
-        ):
-            raise SnapshotRefusal("gap_reason_integrity")
-        if (
-            not isinstance(key, list)
-            or len(key) != 3
-            or any(type(n) is not int or n < 0 for n in key)
-            or type(attempts) is not int
-            or not 0 <= attempts <= 4
-            or (
-                status is not None
-                and (type(status) is not int or not 100 <= status <= 599)
-            )
-            or (
-                gap["reason"] == "outside_extent"
-                and (attempts != 0 or status is not None)
-            )
-            or (gap["reason"] != "outside_extent" and attempts == 0)
-        ):
-            raise SnapshotRefusal("archive_integrity")
-        level_allowed(key[0])
-        utc(gap["retrieved_utc"])
-        keys.append(key)
+    keys = [checked_gap(gap) for gap in gaps]
     combined = actual + keys
     if (
         len(combined) > SHARD_TILES
@@ -338,9 +337,10 @@ class Archive:
                     )
                     actual.append([level, row, column])
             missing = [] if gaps is None else gaps
-            if not self.expected(shard) or sorted(
-                actual + [gap["key"] for gap in missing]
-            ) != self.expected(shard):
+            gap_keys = [checked_gap(gap) for gap in missing]
+            if not self.expected(shard) or sorted(actual + gap_keys) != self.expected(
+                shard
+            ):
                 raise SnapshotRefusal("enumeration_identity_mismatch")
             identity = digest(
                 canonical(

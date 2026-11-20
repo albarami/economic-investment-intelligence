@@ -1478,6 +1478,128 @@ def test_transient_tile_failure_stops_without_shard_and_retries_same_key(
     )
 
 
+@pytest.mark.parametrize(
+    "status,body,reason",
+    [
+        (404, b"", "request_failed"),
+        (410, b"", "request_failed"),
+        (200, b"", "response_bytes_or_gap"),
+        (200, b"not-a-jpeg", "tile_format_or_gap"),
+    ],
+    ids=["404", "410", "empty-200", "invalid-200"],
+)
+@pytest.mark.parametrize("resume_gap", [True, False], ids=["fresh-404", "intact"])
+def test_mixed_retry_gap_stops_before_publication_and_resumes(
+    tmp_path, status, body, reason, resume_gap
+):
+    from eii_custodian.publicdata.gis.snapshot_runner import TileFailure
+
+    calls = []
+
+    def transport(url):
+        if url.endswith("?f=json"):
+            return Response(url, metadata(), ())
+        calls.append(url)
+        return Response(
+            url,
+            b"" if len(calls) == 1 else body,
+            (),
+            evidence={"http_status": 503 if len(calls) == 1 else status},
+        )
+
+    with pytest.raises(TileFailure, match="^" + reason + "$") as caught:
+        small_acquisition(tmp_path, transport)
+    assert caught.value.attempts == 2
+    assert caught.value.status == status
+    key = policy.tile_url("1995-02", 10, 0, 0)
+    assert calls == [key, key]
+    level = tmp_path / "1995-02/level-10"
+    shard = level / "shards/000000"
+    assert not list(shard.rglob("*.tar"))
+    assert not list(shard.rglob("*.json"))  # no receipt, index or selection
+    assert not list(shard.glob(".staging-*"))
+    assert not (level / "completion").exists()
+    resumed = []
+
+    def restored(url):
+        resumed.append(url)
+        if url.endswith("?f=json"):
+            return Response(url, metadata(), ())
+        return Response(
+            url,
+            b"" if resume_gap else JPEG,
+            (),
+            evidence={"http_status": 404 if resume_gap else 200},
+        )
+
+    (manifest,) = small_acquisition(tmp_path, restored)
+    assert resumed == [policy.service_url("1995-02") + "?f=json", key]
+    selection = verify_selection(level, manifest)
+    if resume_gap:
+        # L-1303: a fresh first-attempt 404 is a recorded persistent gap.
+        assert selection.gaps == (
+            {
+                "key": [10, 0, 0],
+                "http_status": 404,
+                "reason": "request_failed",
+                "attempts": 1,
+                "retrieved_utc": STAMP,
+            },
+        )
+        assert tuple(selection.iter_tiles()) == ()
+    else:
+        assert selection.gaps == ()
+        assert tuple(selection.iter_tiles()) == (("1995-02", 10, 0, 0, JPEG),)
+    assert small_acquisition(tmp_path, restored) == (manifest,)
+    assert resumed[-1] == policy.service_url("1995-02") + "?f=json"
+    assert resumed.count(key) == 1  # verified selected gaps/tiles are skipped
+
+
+@pytest.mark.parametrize(
+    "reason,status,attempts",
+    [
+        ("request_failed", 404, 2),
+        ("request_failed", 410, 2),
+        ("request_failed", 503, 1),
+        ("response_bytes_or_gap", 200, 2),
+        ("tile_format_or_gap", 200, 2),
+        ("tile_dimensions_refused", 200, 2),
+        ("tile_format_or_gap", 404, 1),
+    ],
+)
+def test_archive_gap_eligibility_checked_before_immutable_publication(
+    tmp_path, reason, status, attempts
+):
+    archive = Archive(
+        tmp_path,
+        {
+            "boundary_sha256": "a" * 64,
+            "metadata_sha256": "b" * 64,
+            "date": "1995-02",
+            "level": 10,
+            "tiles": [[10, 0, 0]],
+        },
+    )
+    gaps = [
+        {
+            "key": [10, 0, 0],
+            "http_status": status,
+            "reason": reason,
+            "attempts": attempts,
+            "retrieved_utc": STAMP,
+        }
+    ]
+    with pytest.raises(policy.SnapshotRefusal, match=r"^gap_reason_integrity$"):
+        archive.write_shard_stream(0, (), STAMP, gaps=gaps)
+    assert gaps[0]["attempts"] == attempts
+    shard = tmp_path / "shards/000000"
+    assert not list(shard.rglob("*.tar"))
+    assert not list(shard.rglob("*.json"))
+    assert not list(shard.glob(".staging-*"))
+    archive.write_shard(0, {(10, 0, 0): JPEG}, STAMP)
+    assert archive.has_shard(0)
+
+
 def test_partial_service_extent_keeps_country_and_records_uncovered_geometry(tmp_path):
     from shapely.geometry import shape
 
