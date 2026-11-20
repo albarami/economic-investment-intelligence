@@ -79,6 +79,7 @@ class SelectedInput:
     publisher: str = ""
     licence_basis: str = ""
     terms_sha256: str = ""
+    pending_fetch: bool = False
 
 
 @dataclass(frozen=True)
@@ -113,6 +114,17 @@ class Selection:
     causes: tuple[dict[str, Any], ...]
     obstacles: tuple[dict[str, Any], ...]
 
+    def comparison_block_reason(self) -> str | None:
+        """Selection directives are never interpreted as source-native cells."""
+        if any(item.pending_fetch for item in self.inputs):
+            return "comparison_input_pending_fetch"
+        if any(
+            value in {"pending:all_common_partners_per_year", "pending:all_present_hs2"}
+            for value in (*self.partners, *self.scopes)
+        ):
+            return "comparison_scope_pending_review"
+        return None
+
     @classmethod
     def from_mapping(cls, data: Any) -> Selection:
         require(
@@ -146,6 +158,7 @@ class Selection:
             require(
                 item.source_id in SOURCES
                 and item.role in SOURCES[item.source_id]
+                and type(item.pending_fetch) is bool
                 and (digest_ok(item.selected_hash) or item.selected_hash == ""),
                 "selection_inputs",
             )
@@ -249,6 +262,19 @@ class Selection:
                     "price_evidence",
                 )
         for item in inputs:
+            if item.pending_fetch:
+                require(
+                    item.selected_hash == ""
+                    and not any(
+                        (b.source_id, b.role) == (item.source_id, item.role)
+                        for b in bindings
+                    )
+                    and not any(
+                        o["source_id"] == item.source_id for o in data["obstacles"]
+                    ),
+                    "pending_input_evidence",
+                )
+                continue
             if not item.selected_hash:
                 require(
                     any(o["source_id"] == item.source_id for o in data["obstacles"]),
@@ -298,6 +324,8 @@ def _materialize(
     import json
     from decimal import Decimal
 
+    reason = selection.comparison_block_reason()
+    require(reason is None, reason or "")
     result = []
     used = set()
     for item in selection.inputs:
@@ -621,6 +649,8 @@ def read_reconciliation(
 
 def owner_report(selection: Selection, pairs: tuple[PairResult, ...]) -> dict[str, Any]:
     """Recorded causes describe differences, never explain an entire numeric gap."""
+    reason = selection.comparison_block_reason()
+    require(reason is None, reason or "")
     return {
         "obstacles": list(selection.obstacles),
         "causes": list(selection.causes),

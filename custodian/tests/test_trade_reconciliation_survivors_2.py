@@ -193,7 +193,10 @@ def test_native_decimal_limits(tmp_path, monkeypatch, value, expected):
 
 
 def test_default_selection():
-    assert tr.load_selection() is None
+    selected = tr.load_selection()
+    assert selected is not None
+    assert selected.confirmed is True
+    assert selected.comparison_block_reason() == "comparison_input_pending_fetch"
 
 
 def test_utf8_selection_under_ascii_locale(tmp_path):

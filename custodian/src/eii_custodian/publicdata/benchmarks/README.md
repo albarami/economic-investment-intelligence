@@ -42,7 +42,28 @@ mapping; select OI-n1 indicators/history and OI-n2 trade coverage. Record
 registration, sign-in, robot-check and paid-tier obstacles. Do not activate a
 mapping merely because fixture tests pass. The live layout verification and terms-page acquisition remain lead work.
 
-Trade reconciliation uses an inactive selection in publicdata/trade_reconciliation.yaml.
+Trade reconciliation records the owner-confirmed selection of 2026-11-20 in
+publicdata/trade_reconciliation.yaml (PO-S2-80; S2-T26). The owner said
+"for number 4i confirm." The two portal content hashes are supplied selection
+metadata, not a claim that this task read their bytes. The reporter, mirror and
+harmonised inputs remain selected with empty hashes and `pending_fetch: true`.
+That boolean is distinct from an evidenced access obstacle: a pending input
+cannot carry a hash, a row binding or an obstacle record. It blocks all input
+reads, comparisons and comparison reports with `comparison_input_pending_fetch`;
+dispatch and assembly retain `NO_DATA` and that reason, without comparison files.
+
+The `pending:all_common_partners_per_year` and `pending:all_present_hs2`
+directives retain the selection of every common partner per year, with no size
+cut or ranking, and total goods plus every present chapter. They are not native
+partner/product cells. After fetch the lead must expand them through the reviewed
+closed country-code list and source-present chapters; an unexpanded directive
+blocks comparison with `comparison_scope_pending_review` even if inputs have
+hashes. The active years are 2019-2024 and the single comparison revision is
+HS 2017. For 2022-2024 every chapter changed by HS 2022 needs an evidenced
+classification cause. The later portal file is selected for deferred 2025 only
+when international coverage exists; partial 2026 is excluded. Native currencies
+and valuations stay separate, and every missing cell stays a gap with its reason.
+
 The lead supplies explicit selected hashes, row bindings and their evidence hashes,
 country/direction bindings, years, partners and source-native scopes. The builder
 reads portal contracts, Comtrade assemble and the BACI typed reader; the selected

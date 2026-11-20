@@ -535,7 +535,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Depends: S2-T23, S2-T24, S2-T25, S2-T03, S2-T19.
 - Requirements: decision 0040 items 1 to 4 and 8; PUB-01 to PUB-16, PUB-19; AGENTS.md rules 5, 7, 14 and 19.
 - Amendment ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 22): [ ] the lead confirms the URL and byte bound of Comtrade, World Development Indicators, UNCTAD FDI, IMF WEO and ILOSTAT from the publisher's metadata, no bound invented, and the live build reads them (OI-309); the cross-country comparison card of S7-T25 waits on these benchmarks (item 21).
-- Delivery: hard; builder persona principal public-data engineer; strict reviewer persona independent public-data/security reviewer from another maker; status in progress: benchmark and trade-comparison mechanisms merged in pull request 82; live activation, owner-reviewed trade selection and comparison remain open (OI-309, PO-S2-79 and PO-S2-80).
+- Delivery: hard; builder persona principal public-data engineer; strict reviewer persona independent public-data/security reviewer from another maker; status in progress: benchmark and trade-comparison mechanisms merged in pull request 82; trade selection confirmed by the owner on 2026-11-20 (PO-S2-80 UPDATE, S2-P29), with selected international inputs pending the lead's fetch; live activation and comparison remain open (OI-309, PO-S2-79 and PO-S2-80).
 
 ### S2-T30 — Announced-project evidence tracker (decision 0047)
 - Goal: Retain every revision of the announced-project records loaded by S2-T12 and attach independently sourced milestones without turning announcements or observed investment into one another.

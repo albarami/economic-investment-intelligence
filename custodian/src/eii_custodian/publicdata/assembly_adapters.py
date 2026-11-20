@@ -734,6 +734,11 @@ class Production:
                 "trade_reconciliation",
                 {"state": "NO_DATA", "reason": "comparison_selection_absent"},
             )
+        reason = selection.comparison_block_reason()
+        if reason is not None:
+            return self.record(
+                "trade_reconciliation", {"state": "NO_DATA", "reason": reason}
+            )
         from .comtrade.policy import Policy
 
         policy = next(

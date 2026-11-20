@@ -335,7 +335,10 @@ def test_native_comtrade_retains_unit_not_api_price(tmp_path, monkeypatch):
 def test_pending_selection_and_dispatch(tmp_path, monkeypatch):
     from eii_custodian.publicdata.fetch.build import run_build
 
-    assert tr.load_selection() is None
+    pending = tr.load_selection()
+    assert pending is not None
+    assert pending.confirmed is True
+    assert pending.comparison_block_reason() == "comparison_input_pending_fetch"
     monkeypatch.setattr(tr, "read_portal", portal)
     outcome = run_build(
         (),

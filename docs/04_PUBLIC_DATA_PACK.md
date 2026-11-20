@@ -2024,8 +2024,11 @@ date read, licence basis, licence id, terms URL and licence URL). That kind is
 not the visible-text page digest of section 3.1, whose kind is `visible_text`.
 A benchmark receipt whose `terms_fingerprint` is `visible_text` or any other
 kind fails. The reconciliation
-selection remains inactive; an explicit reviewed selection produces cache-only
-input/comparison tables and a replay-verified manifest with owner obstacles. These
+selection is owner-confirmed on 2026-11-20 (PO-S2-80), with supplied portal hashes
+and the other selected inputs explicitly pending fetch. Confirmation alone
+produces no comparison: pending inputs or unresolved coverage directives block
+it with a named reason. A fetched, explicitly bound reviewed selection produces
+cache-only input/comparison tables and a replay-verified manifest with owner obstacles. These
 technical fixture paths do not establish a successful live fetch (PUB-19).
 
 

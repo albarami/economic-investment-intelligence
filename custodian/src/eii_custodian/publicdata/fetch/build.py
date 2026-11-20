@@ -1138,7 +1138,14 @@ def run_build(
 
         try:
             selected_comparison = reconciliation_selection or load_selection()
-            if selected_comparison is not None:
+            comparison_block = (
+                selected_comparison.comparison_block_reason()
+                if selected_comparison is not None
+                else None
+            )
+            if comparison_block is not None:
+                lines.append("NO_DATA trade_reconciliation " + comparison_block)
+            elif selected_comparison is not None:
                 from eii_custodian.publicdata.comtrade.policy import (
                     Policy as TradePolicy,
                 )
