@@ -1096,9 +1096,12 @@ basis of use under [decision 0026](decisions/0026-public-sources-used-in-full-lo
 ### Investment acquisition and identifier review (S2-T39 part A)
 
 `investment_pages.v2` declares each agency page's language and its extraction bounds.
-The existing inventory records English pages only; the Arabic inventory, confirmed shapes,
-reading date and live comparison remain for the lead under decision 0064 item 32 and OI-181.
-No Arabic URL, bound or confirmation is inferred from an English page. The gate requires
+The inventory lists the English pages, confirmed by the lead, and the Arabic pages at the
+site's own Arabic language path, one for each English page; the Arabic list stays unconfirmed
+(every `language_confirmation.ar` field false) until the lead's reading date, confirmed shapes
+and live comparison under decision 0064 item 32 and OI-181. No Arabic bound, shape or
+confirmation is inferred from an English page, and a listed page whose language path segment
+differs from its declared language is refused (`page_language`). The gate requires
 separate Arabic evidence covering every page family. Offline invented bilingual fixtures
 exercise the normal publisher, including refusal without replacing an earlier batch.
 
