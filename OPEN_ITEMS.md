@@ -1604,6 +1604,9 @@
 - OPTIONS: **Recommendation:** task S2-T08 adopts the frame's names file for the licence series and drops the task's own alias file, with the test that an unmapped spelling fails the build.
 - NEEDED BY: task S2-T08 (the Public pack assembly), whose build joins the series with the frame; before the slice S2 gate.
 
+- UPDATE: 2026-11-20, package P11 finishing pass: the implementation adopts only the frame names and `municipality_names.csv`; the legacy review parameter, alias reader, supporting-review hash and tracked `custodian/publicdata/review/municipality_aliases.json` are removed. `test_r3_planted_legacy_alias_is_never_read` trips on any attempt to open a planted legacy file and requires `unmapped_municipality_spelling`; `test_municipality_names_read_the_frame_and_reviewed_csv_only` requires the exact frame/crosswalk mapping. Reverting only `series/parse.py` to HEAD gives exit 1, 2 failed; restoring the production fix gives exit 0, both passed in the six-case deciding run (seed 3164829750). The reference-review absence assertion now passes after the authorised deletion. Implementation complete; this item stays OPEN for the package's OI-262 live-confirmation dependency, which fixture tests cannot close. Evidence: PROGRESS.md, "S2-P11 finishing pass".
+
+
 ## OI-175 — PUB-67 incomplete by design on this task's inputs
 
 - ID: OI-175
@@ -4381,6 +4384,8 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: At approved 4d2d845, an empty table with multiple sources is excluded with assembly_draw_lineage_ambiguous although it is simply empty. No figure is lost. The same fix5 blob is present at a2fdab1. Sources: S2-T08B/review.cf5A.md, N1; forced/JOIN-PROOF-fix5.txt; read-only Git blob comparison recorded in CHECK.md.
 - NEEDED: Consider skipping empty tables before ambiguity checks, or recording a separate empty-table reason. Add an empty multi-source fixture and keep the untagged nonempty exclusion, partially tagged refusal and exact exclusion-metadata plants unchanged.
 
+- CLOSED: 2026-11-20, package P13 finishing pass: an empty multi-source draw table now records `assembly_draw_table_empty`, retaining exclusion and every nonempty lineage refusal. The planted empty-table test `test_empty_multisource_table_is_excluded_as_empty` covers direct and series envelopes and asserts the exact source keys, reason and retained figure table. Reverting only `assembly_reports.py` to HEAD gives exit 1, 2 failed; restoring the fix gives exit 0, both passed in the six-case deciding run (seed 3164829750). The original untagged-nonempty, partially tagged and exact exclusion-metadata assertions remain unchanged. Evidence: PROGRESS.md, "S2-P11 finishing pass"; independent review remains the lead's gate work.
+
 Record points retained without further new numbers:
 
 - PO-S2-90 holds duplicate terms4 launches and train-lv1 core relocation. OI-227 and PO-S2-06 keep the unknown and specifically explained interrupt occurrences separate. OI-308 holds the dated source-file list; OI-275/OI-277 hold the live profile/count evidence.
@@ -4769,6 +4774,10 @@ Proposals from the supplied two reviews, preserved without inventing a defect or
 - Scope: S2-T31; decision 0053, Consequences; lead ruling L-902.
 - The lead's measurements of 2026-11-18 found that no check watched the custodian suite's time as the source registry grew from 171,402 to 479,638 bytes; the suite took 834.6 seconds against its 600-second limit, and only the train's ledger run and the hosted tests job found the overrun.
 - Decision 0053 removes the measured parsing waste (the whole custodian suite then took 209.4 seconds) and keeps the 600-second limit. It builds no monitor of suite time; this item stays open for the decision on how to watch suite-time growth before another overrun.
+
+- Package P16 lead ruling, supplied by `.overnight/IN/PACKAGE.md`: every ledger and hosted run records each part's time; every existing suite limit stays unchanged.
+- CLOSED: 2026-11-20, package P16 finishing pass: `scripts/run_tests.py` prints each suite's elapsed seconds measured with its injected `now` clock, including unavailable counts and caught internal errors. Fake-clock tests `test_each_suite_prints_its_own_duration` and `test_unavailable_counts_and_internal_error_print_duration` assert exact lines, counts, failure details and exit status. Reverting only `run_tests.py` to HEAD gives exit 1, 2 failed; restoring the fix gives exit 0, both passed in the six-case deciding run (seed 3164829750). The inherited monotonic-clock implementation separately failed both injected-clock tests and was corrected. No timeout, retry, skip or limit changed. Evidence: PROGRESS.md, "S2-P11 finishing pass".
+
 
 ### S2-T29 build holds — 2026-11-17
 
@@ -5386,3 +5395,8 @@ The dated closing lines added under PO-S2-74, PO-S2-91, PO-S2-104 and PO-S2-114 
 
 - CLOSED (package S2-P19; decision 0064 item 29; document 03 DR5): the ten families each name `pub_<source_id>` in the registry, fetch receipt and data contracts; declared portal columns only reach the release table through `parse_family_rows`; deciding tests `test_s2_t19_family_tables.py` and `test_s2_t19_registry.py` release-table assertions. Red: empty `release_tables` and planted undeclared column; green: pytest 52 passed, hypothesis seed 3847291056.
 - CORRECTION (S2-P19 independent review): the CLOSED statement above establishes neither a successful live family-table build nor receipts and hashes for all ten tables; decision 0064 item 29 remains open pending parser fixes, independent verification and the lead's live-build evidence.
+### S2-P11 finishing pass — verification holds (2026-11-20)
+
+- Full scripts unittest discovery under the package's offline workspace environment exited 1: 950 tests ran in 367.345 seconds, with eight failure entries. Seven entries are the clean-environment installation/import/package-set checks: their isolated install reports the locked YAML wheel unavailable offline, followed by four missing workspace-package imports and the installed-set failure. No download or install repair was attempted.
+- One entry is `test_sandbox_argv.ArgvRules.test_run_starts_bubblewrap_with_nothing_inherited`: its descriptor destination assertion compared the workspace UV cache path with the string `15`. Its cause is not established by this pass. Keep the failure for lead investigation; no security assertion, sandbox enforcement, descriptor policy or bound was changed, and no successful rerun is offered as closure.
+- Evidence: `.overnight/tmp/finish-p11/scripts-unittest.log`, `results.jsonl`; full HEAD `d5ab31319669ea9b557043ca866099c67b69cc48`, pytest seed for the separate focused run 3164829750. Unittest discovery has no Hypothesis-seed argument. The brief explicitly permits the runner-module subset when full discovery cannot pass in this sandbox; that subset is recorded separately in PROGRESS.md and is not a green full-discovery claim. These verification holds do not reopen the fixture-proved empty-table or suite-print fixes.

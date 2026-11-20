@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import os
+import re
 import shutil
 import sys
 import time
@@ -88,7 +89,7 @@ def call(
 
 
 def visible(lines: list[str]) -> list[str]:
-    """Drop output blocks, including their header and footer lines."""
+    """Drop output blocks and each suite's measured duration."""
     kept: list[str] = []
     skipping = False
     for line in lines:
@@ -100,7 +101,17 @@ def visible(lines: list[str]) -> list[str]:
                 skipping = False
             continue
         kept.append(line)
-    return kept
+    return untimed(kept)
+
+
+DURATION = re.compile(r" in [0-9]+\.[0-9] s$")
+
+
+def untimed(lines: list[str]) -> list[str]:
+    """Drop the measured duration suffix from suite result lines."""
+    return [
+        DURATION.sub("", line) if line.startswith("suite ") else line for line in lines
+    ]
 
 
 def fx_suite(

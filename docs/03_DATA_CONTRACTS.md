@@ -1825,7 +1825,7 @@ refuses admission; portal validation is unchanged (DAT-105, DAT-106).
 - `frame`: `output` literal `frame_s2_t02/municipalities.json`, its `sha256`,
   `method` literal `frame.v1`, `upstream` (ordered `SupportSource` objects for
   `bnd_hdx` and `bnd_zone_2020`) and `review_sha256` (exactly
-  `municipality_names.csv` and `municipality_aliases.json`, each a SHA-256).
+  `municipality_names.csv`, a SHA-256).
 - Each `SupportSource` has exactly nonempty string fields `key`, `source_id`,
   `dataset` (the registry/receipt title), `publisher`, `licence_id`,
   `licence_basis`, `retrieved_utc` (valid UTC timestamp in

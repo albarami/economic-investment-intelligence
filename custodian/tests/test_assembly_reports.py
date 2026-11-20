@@ -261,6 +261,31 @@ def test_untagged_multisource_table_is_excluded_and_recorded(tmp_path: Path) -> 
 
 
 @pytest.mark.parametrize("series", [False, True])
+def test_empty_multisource_table_is_excluded_as_empty(
+    tmp_path: Path, series: bool
+) -> None:
+    state = _multisource_build(tmp_path, series=series)
+    state.tables["pub_invented"] = []
+    state.table("pub_checkable", [{"value": i} for i in range(25)], ("invented",))
+    state.record(
+        "series_stage" if series else "gis_property_singles",
+        {"tables": state.tables, "row_sources": {"pub_invented": []}},
+    )
+    assert set(draw_tables(state)) == {"pub_checkable"}
+    write_record(tmp_path, "assembly/build.json", {})
+    state.draw()
+    record = json.loads((tmp_path / "assembly/draw.json").read_text())
+    assert record["excluded_tables"] == [
+        {
+            "table": "pub_invented",
+            "sources": ["invented", "second/key" if series else "second"],
+            "reason": "assembly_draw_table_empty",
+        }
+    ]
+    assert all(key.startswith("pub_checkable:") for key in record["figure_ids"])
+
+
+@pytest.mark.parametrize("series", [False, True])
 def test_partly_tagged_multisource_table_refuses(tmp_path: Path, series: bool) -> None:
     state = _multisource_build(tmp_path, series=series)
     if series:

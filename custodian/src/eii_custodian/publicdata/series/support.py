@@ -26,7 +26,7 @@ from eii_custodian.publicdata.series.parse import Municipality, selected_body
 SUPPORT_KEYS = ("cls_isic4", "bnd_hdx", "bnd_zone_2020")
 FRAME_METHOD = "frame.v1"
 _REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
-REVIEW_FILES = ("municipality_names.csv", "municipality_aliases.json")
+REVIEW_FILES = ("municipality_names.csv",)
 
 
 class SupportSource(TypedDict):

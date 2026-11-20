@@ -687,12 +687,18 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
         if len(build.table_sources.get(table, set())) <= 1:
             continue
         bound_files(build.cache, {name: digest})
-        if _draw_row_sources(build, table, read_object(build.cache, name)) is None:
+        data = read_object(build.cache, name)
+        if _draw_row_sources(build, table, data) is None:
+            stored = data.get("row_sources", {}).get(table, [])
             build.draw_exclusions.append(
                 {
                     "table": table,
                     "sources": sorted(build.table_sources[table]),
-                    "reason": "assembly_draw_lineage_ambiguous",
+                    "reason": (
+                        "assembly_draw_table_empty"
+                        if not data["tables"][table] and not stored
+                        else "assembly_draw_lineage_ambiguous"
+                    ),
                 }
             )
     excluded = {item["table"] for item in build.draw_exclusions}
