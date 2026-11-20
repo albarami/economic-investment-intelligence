@@ -2,6 +2,7 @@
 
 import json
 import socket
+import sys
 import tempfile
 from dataclasses import replace
 from datetime import date
@@ -10,6 +11,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 from evals.forecast_spike.adapters import (
     CPU,
     Admission,

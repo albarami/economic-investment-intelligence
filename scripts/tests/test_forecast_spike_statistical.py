@@ -2,13 +2,18 @@
 
 import importlib.metadata
 import socket
+import sys
 from dataclasses import replace
 from decimal import Decimal, localcontext
 from fractions import Fraction
+from pathlib import Path
 from typing import Protocol, cast
 from unittest.mock import patch
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 from evals.forecast_spike.backtest import run
 from evals.forecast_spike.contract import (
     AUTOS,

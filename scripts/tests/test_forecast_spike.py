@@ -1,11 +1,16 @@
 """S6-T27 plants: invented values only; no Public cache; prefix-last functions here are named test doubles."""
 
+import sys
 from dataclasses import replace
 from decimal import Decimal, getcontext, localcontext
 from fractions import Fraction
+from pathlib import Path
 from typing import cast
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 from evals.forecast_spike.backtest import (
     Predictor,
     Run,

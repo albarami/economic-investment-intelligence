@@ -8,6 +8,8 @@ import sys
 from hashlib import sha256
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
 from evals.forecast_spike.adapters import ProcessOutput, determinism
 
 
