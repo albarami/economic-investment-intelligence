@@ -283,6 +283,12 @@ def test_comtrade_partial_budgets_do_not_claim_api_tiers():
         "per_call_limit_tier_unstated",
         "per_call_scope_tier_unstated",
     } <= facts.keys()
+    assert facts["registered_download_records_per_call"]["value"] == "100K"
+    assert facts["registered_api_calls_per_day"]["value"] == "500"
+    assert facts["per_call_limit_tier_unstated"]["value"] == "500"
+    assert facts["per_call_scope_tier_unstated"]["value"] == (
+        "one period and one product per call"
+    )
     assert any("tier binding" in pending for pending in record["pending"])
     entry = next(e for e in load_registry() if e.key == "un_comtrade")
     assert entry.comtrade_policy.confirmed is False
