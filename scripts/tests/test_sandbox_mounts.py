@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import signal
@@ -256,7 +257,7 @@ class MountRules(unittest.TestCase):
             self.assertLess(time.monotonic() - started, 10)
             self.assertEqual(
                 str(caught.exception),
-                "sandbox build-world timed out after 1 s; the process group was killed",
+                "sandbox build-world timed out after 1 s; every process of the sandbox was killed",
             )
             deadline = time.monotonic() + 5
             while time.monotonic() < deadline and support.marker_processes(marker):
@@ -310,6 +311,122 @@ class MountRules(unittest.TestCase):
                     return
                 time.sleep(0.05)
             self.fail("a sandboxed process outlived its driver")
+
+    def _start_driver(
+        self, source: str, payload: dict[str, str], marker: str
+    ) -> subprocess.Popen[bytes]:
+        """Start a driver that launches a sandbox and ends survivors after the test."""
+        driver = subprocess.Popen(
+            [
+                sys.executable,
+                "-I",
+                "-c",
+                source,
+                str(support.ROOT / "scripts"),
+                json.dumps(payload),
+                marker,
+            ],
+            env={"PATH": os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+
+        def end_survivors() -> None:
+            # Only after the assertion: a survivor of a failed run is ended here
+            # so that it does not sleep on; the test has already judged it.
+            for pid in support.marker_processes(marker):
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(pid, signal.SIGKILL)
+
+        self.addCleanup(end_survivors)
+        return driver
+
+    def _assert_none_outlives(
+        self, driver: subprocess.Popen[bytes], marker: str, message: str
+    ) -> None:
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            if not [
+                pid for pid in support.marker_processes(marker) if pid != driver.pid
+            ]:
+                return
+            time.sleep(0.05)
+        self.fail(message)
+
+    def test_driver_killed_while_a_layer_is_unarmed(self) -> None:
+        # OI-129, made deterministic: the stand-in's inner layer never arms a
+        # parent-death signal, as bubblewrap's inner layer has not yet during
+        # its start-up. Killing the driver must still end every layer.
+        marker = "eii-unarmed-" + os.urandom(4).hex()
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = support.make_fixture(tmp)
+            standin = Path(tmp) / "standin" / "bwrap"
+            standin.parent.mkdir()
+            standin.write_text(
+                support.STANDIN_BWRAP.format(
+                    python=launch.current_venv() / "bin" / "python"
+                ),
+                encoding="utf-8",
+            )
+            standin.chmod(0o700)
+            ready = standin.with_name("inner.pid")
+            driver = self._start_driver(
+                support.STANDIN_DIE_DRIVER,
+                {
+                    "root": str(fx.root),
+                    "scenario": str(fx.scenario),
+                    "venv": str(launch.current_venv()),
+                    "bwrap": str(standin),
+                },
+                marker,
+            )
+            try:
+                deadline = time.monotonic() + 10
+                while time.monotonic() < deadline and not ready.exists():
+                    time.sleep(0.01)
+                if not ready.exists():
+                    self.fail("the stand-in's inner layer did not start")
+                self.assertIn(int(ready.read_text()), support.marker_processes(marker))
+                os.kill(driver.pid, signal.SIGKILL)
+            finally:
+                driver.wait(timeout=5)
+            self._assert_none_outlives(
+                driver,
+                marker,
+                "a layer without a parent-death signal outlived its driver",
+            )
+
+    def test_driver_killed_at_the_first_sandbox_process(self) -> None:
+        # OI-129 with the real bubblewrap: the driver is killed as soon as any
+        # process of the launch exists, without a pause, so inside bubblewrap's
+        # start-up window. No sandboxed process may outlive it.
+        marker = "eii-first-" + os.urandom(4).hex()
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = support.make_fixture(tmp)
+            driver = self._start_driver(
+                support.DIE_DRIVER,
+                {
+                    "root": str(fx.root),
+                    "scenario": str(fx.scenario),
+                    "venv": str(launch.current_venv()),
+                },
+                marker,
+            )
+            try:
+                deadline = time.monotonic() + 10
+                while time.monotonic() < deadline:
+                    if any(
+                        pid != driver.pid for pid in support.marker_processes(marker)
+                    ):
+                        break
+                else:
+                    self.fail("sandbox did not start")
+                os.kill(driver.pid, signal.SIGKILL)
+            finally:
+                driver.wait(timeout=5)
+            self._assert_none_outlives(
+                driver,
+                marker,
+                "a sandboxed process outlived a driver killed during start-up",
+            )
 
     def test_check_commands_have_teeth(self) -> None:
         self.assertEqual(sandbox_check.check_bubblewrap(), [])

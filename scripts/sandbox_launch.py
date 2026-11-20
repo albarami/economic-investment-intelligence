@@ -6,15 +6,15 @@ descriptor and handed to bubblewrap by descriptor, so the object that was
 checked is the object that is mounted. The extension folder is an in-memory
 mount of its own: its files are opened and hashed through descriptors
 (``extension_tree``) and bound one by one into it, and the mount is then made
-read-only, so nothing else of the host folder is visible. The proofs are in
-``sandbox_check``.
+read-only, so nothing else of the host folder is visible. Bubblewrap is
+started under ``sandbox_supervisor``, which ends every process of the run when
+the launcher ends, also during bubblewrap's start-up (OI-129). The proofs are
+in ``sandbox_check``.
 """
 
 from __future__ import annotations
 
-import contextlib
 import os
-import signal
 import stat
 import subprocess
 import sys
@@ -27,6 +27,12 @@ import sandbox_profiles as tables
 
 ROOT = Path(__file__).resolve().parents[1]
 BWRAP_PREFIX = "bwrap: "
+# The supervisor that starts bubblewrap and ends the run with the launcher; its
+# refusals start with SUPERVISOR_PREFIX and exit with status 1, as bubblewrap's
+# own setup failures do.
+SUPERVISOR = Path(__file__).resolve().with_name("sandbox_supervisor.py")
+SUPERVISOR_PREFIX = "sandbox supervisor: "
+SETUP_PREFIXES = (BWRAP_PREFIX, SUPERVISOR_PREFIX)
 # os.open flags of a mount source: a path descriptor that does not follow a
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -408,37 +414,83 @@ def profile_named(name: str) -> tables.Profile:
     raise SandboxError(f"unknown profile: {name}")
 
 
+def supervisor_command(
+    control: int, passed: tuple[int, ...], argv: Sequence[str]
+) -> list[str]:
+    """Return the command that runs bubblewrap's ``argv`` under the supervisor.
+
+    Args:
+        control: The read end of the control pipe, kept open in the supervisor.
+        passed: The mount descriptors, which bubblewrap receives.
+        argv: The bubblewrap command line (``build_argv``).
+
+    Raises:
+        SandboxError: The launcher's interpreter is not known.
+    """
+    if not sys.executable:
+        raise SandboxError(
+            "the interpreter of the launcher is not known: the sandbox supervisor cannot start"
+        )
+    return [
+        sys.executable,
+        "-I",
+        "-B",
+        str(SUPERVISOR),
+        str(os.getpid()),
+        str(control),
+        ",".join(str(number) for number in passed),
+        "--",
+        *argv,
+    ]
+
+
 def _start(
     profile: tables.Profile, argv: list[str], passed: tuple[int, ...], timeout: float
 ) -> SandboxResult:
-    """Start bubblewrap with the mount descriptors and wait for it."""
-    process = subprocess.Popen(
-        argv,
-        env={},
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        close_fds=True,
-        pass_fds=passed,
-        start_new_session=True,
-    )
+    """Start bubblewrap under the supervisor with the mount descriptors and wait.
+
+    The launcher keeps the write end of a control pipe and never writes to it;
+    the supervisor holds the read end. When the launcher ends in any way, or
+    closes the write end at the time limit, the supervisor kills bubblewrap and
+    every process that bubblewrap leaves behind (``sandbox_supervisor``).
+    """
+    # Both ends are closed in every started program unless passed by number.
+    control, keep = os.pipe()
     try:
-        stdout, stderr = process.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        # The child can end after the time limit and be reaped (SIGCHLD ignored)
-        # before the signal: only a group that is gone is ignored. Any other
-        # error is raised, and a group that cannot be signalled is not waited for.
-        with contextlib.suppress(ProcessLookupError):
-            os.killpg(process.pid, signal.SIGKILL)
-        process.communicate()
-        raise SandboxTimeout(
-            f"sandbox {profile.name} timed out after {timeout:g} s; the process group was killed"
-        ) from None
+        try:
+            command = supervisor_command(control, passed, argv)
+            process = subprocess.Popen(
+                command,
+                env={},
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                close_fds=True,
+                pass_fds=tuple(sorted((*passed, control))),
+                start_new_session=True,
+            )
+        finally:
+            os.close(control)
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            # Closing the write end makes the supervisor kill and reap every
+            # process of the run; then it ends and is waited for.
+            os.close(keep)
+            keep = -1
+            process.communicate()
+            raise SandboxTimeout(
+                f"sandbox {profile.name} timed out after {timeout:g} s; "
+                "every process of the sandbox was killed"
+            ) from None
+    finally:
+        if keep >= 0:
+            os.close(keep)
     for line in stderr.splitlines():
-        if process.returncode == 1 and line.startswith(BWRAP_PREFIX):
+        if process.returncode == 1 and line.startswith(SETUP_PREFIXES):
             raise SandboxSetupError(
                 f"could not enter the sandbox {profile.name}: {line}"
             )
@@ -472,14 +524,18 @@ def run_in_sandbox(
     Raises:
         SandboxError: Bubblewrap is missing, or the layout does not fit.
         SandboxSetupError: Bubblewrap failed to build the sandbox.
-        SandboxTimeout: The command ran longer than ``timeout``.
-        OSError: The signal that ends the group failed for a reason other than a
-            group that is already gone; the child is not waited for.
+        SandboxTimeout: The command ran longer than ``timeout``; the
+            supervisor killed every process of the run.
 
-    Known limit: a sandboxed program that prints a line starting ``bwrap: `` to
-    standard error and exits with status 1 is raised as ``SandboxSetupError``,
-    because bubblewrap's own lines cannot be told from the program's (no status
-    descriptor is used).
+    Every process of the run ends when the launcher ends, however it ends and
+    at any moment, bubblewrap's start-up included: bubblewrap runs under
+    ``sandbox_supervisor``, which refuses the run when it cannot guarantee
+    that (OI-129).
+
+    Known limit: a sandboxed program that prints a line starting ``bwrap: `` or
+    ``sandbox supervisor: `` to standard error and exits with status 1 is
+    raised as ``SandboxSetupError``, because bubblewrap's and the supervisor's
+    own lines cannot be told from the program's (no status descriptor is used).
     """
     profile = profile_named(profile_name)
     if not os.access(tables.BWRAP, os.X_OK):

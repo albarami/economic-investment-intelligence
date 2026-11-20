@@ -5,7 +5,7 @@ from __future__ import annotations
 import errno
 import io
 import os
-import signal
+import select
 import subprocess
 import sys
 import tempfile
@@ -129,7 +129,9 @@ class ArgvRules(unittest.TestCase):
         profiles_text = (support.ROOT / "scripts" / "sandbox_profiles.py").read_text(
             encoding="utf-8"
         )
+        supervisor_text = launch.SUPERVISOR.read_text(encoding="utf-8")
         self.assertEqual(contains_forbidden(launch_text), [])
+        self.assertEqual(contains_forbidden(supervisor_text), [])
         self.assertEqual(contains_forbidden(profiles_text), [])
         self.assertEqual(
             contains_forbidden(profiles_text + '"--share-net",'), ["--share-net"]
@@ -572,14 +574,39 @@ class ArgvRules(unittest.TestCase):
             self.assertEqual(kwargs["errors"], "replace")
             self.assertEqual(kwargs["close_fds"], True)
             self.assertEqual(kwargs["start_new_session"], True)
-            passed = kwargs["pass_fds"]
-            assert isinstance(passed, tuple)
-            self.assertEqual(passed, tuple(sorted(passed)))
+            given = kwargs["pass_fds"]
+            assert isinstance(given, tuple)
+            self.assertEqual(given, tuple(sorted(given)))
+            self.assertEqual(len(given), 15)
+            # The supervisor (OI-129) is started, never bubblewrap itself; it
+            # gets the read end of the control pipe and the mount descriptors,
+            # and passes bubblewrap the mount descriptors only.
+            control = int(argv[5])
+            passed = tuple(number for number in given if number != control)
             self.assertEqual(len(passed), 14)
+            self.assertEqual(
+                argv[:8],
+                [
+                    sys.executable,
+                    "-I",
+                    "-B",
+                    str(launch.SUPERVISOR),
+                    str(os.getpid()),
+                    str(control),
+                    ",".join(str(number) for number in passed),
+                    "--",
+                ],
+            )
+            self.assertEqual(argv[8], tables.BWRAP)
             during = seen["during"]
             assert isinstance(during, dict)
+            self.assertTrue(during[str(control)].startswith("pipe:"))
             new = {name for name in during if name not in before}
-            self.assertEqual(new, {str(number) for number in passed})
+            # The launcher holds the write end of the control pipe, unpassed.
+            kept = new - {str(number) for number in given}
+            self.assertEqual(len(kept), 1)
+            self.assertEqual(during[kept.pop()], during[str(control)])
+            self.assertTrue(new >= {str(number) for number in given})
             self.assertNotIn(
                 str(tree.extensions), [during[str(number)] for number in passed]
             )
@@ -595,32 +622,42 @@ class ArgvRules(unittest.TestCase):
                 with self.assertRaises(OSError) as caught:
                     os.fstat(number)
                 self.assertEqual(caught.exception.errno, errno.EBADF)
+            self.assertEqual(support.descriptor_snapshot(), before)
             self.assertEqual(len(opened), 14)
 
     def test_setup_failure_exit_and_timeout(self) -> None:
         labels: list[str] = []
+        # The read end of the control pipe as the supervisor would hold it,
+        # copied at the start so that the test can see when the launcher
+        # closes the write end (OI-129).
+        held: list[int] = []
 
-        def run(
-            communicate: object, returncode: int = 0, kill: object | None = None
-        ) -> object:
+        def control_closed() -> bool:
+            events = select.poll()
+            events.register(held[-1], select.POLLIN)
+            return bool(events.poll(0))
+
+        def run(communicate: object, returncode: int = 0) -> object:
             def recorder(argv: list[str], **kwargs: object) -> _Process:
+                held.append(os.dup(int(argv[5])))
                 return _Process(communicate, returncode)
 
-            with (
-                tempfile_tree() as tree,
-                patch.object(support.exposed(launch, "subprocess"), "Popen", recorder),
-                patch.object(
-                    support.exposed(launch, "os"), "access", return_value=True
-                ),
-            ):
-                context = (
-                    patch.object(support.exposed(launch, "os"), "killpg", kill)
-                    if kill is not None
-                    else patch.object(
-                        support.exposed(launch, "os"), "killpg", lambda *args: None
-                    )
-                )
-                with context:
+            def no_group_kill(*args: object) -> None:
+                raise AssertionError("the launcher signalled a process group")
+
+            try:
+                with (
+                    tempfile_tree() as tree,
+                    patch.object(
+                        support.exposed(launch, "subprocess"), "Popen", recorder
+                    ),
+                    patch.object(
+                        support.exposed(launch, "os"), "access", return_value=True
+                    ),
+                    patch.object(
+                        support.exposed(launch, "os"), "killpg", no_group_kill
+                    ),
+                ):
                     return launch.run_in_sandbox(
                         "build-world",
                         tree.layout("build-world"),
@@ -628,6 +665,10 @@ class ArgvRules(unittest.TestCase):
                         venv=tree.venv,
                         timeout=3,
                     )
+            finally:
+                # Whatever the outcome, the launcher has closed the write end.
+                self.assertTrue(control_closed())
+                os.close(held[-1])
 
         labels.append("a")
         stderr = "ERROR: ld.so: object 'x' cannot be preloaded\nbwrap: Can't find source path /x: No such file or directory\n"
@@ -660,21 +701,21 @@ class ArgvRules(unittest.TestCase):
         calls: list[object] = []
 
         def expire(timeout: object = None) -> tuple[str, str]:
-            calls.append(timeout)
+            # The write end is open while the time runs and closed before the
+            # launcher waits for the supervisor to end the run.
+            calls.append((timeout, control_closed()))
             if len(calls) == 1:
                 limit = float(timeout) if isinstance(timeout, int | float) else 0.0
                 raise subprocess.TimeoutExpired("bwrap", limit)
             return "", ""
 
-        killed: list[tuple[int, int]] = []
         with self.assertRaises(launch.SandboxTimeout) as timed:
-            run(expire, kill=lambda pid, sig: killed.append((pid, sig)))
+            run(expire)
         self.assertEqual(
             str(timed.exception),
-            "sandbox build-world timed out after 3 s; the process group was killed",
+            "sandbox build-world timed out after 3 s; every process of the sandbox was killed",
         )
-        self.assertEqual(killed, [(4242, signal_kill())])
-        self.assertEqual(calls, [3, None])
+        self.assertEqual(calls, [(3, False), (None, True)])
         labels.append("g")
         with self.assertRaises(launch.SandboxSetupError) as setup:
             run(lambda timeout=None: ("", "bwrap: fake\n"), 1)
@@ -683,34 +724,65 @@ class ArgvRules(unittest.TestCase):
             "could not enter the sandbox build-world: bwrap: fake",
         )
         labels.append("h")
-        calls.clear()
-        killed.clear()
-
-        def gone(pid: int, sig: int) -> None:
-            killed.append((pid, sig))
-            raise ProcessLookupError(3, "No such process")
-
-        with self.assertRaises(launch.SandboxTimeout) as timed_again:
-            run(expire, kill=gone)
+        refused = "sandbox supervisor: the launcher ended before the sandbox started\n"
+        with self.assertRaises(launch.SandboxSetupError) as setup_h:
+            run(lambda timeout=None: ("", refused), 1)
         self.assertEqual(
-            str(timed_again.exception),
-            "sandbox build-world timed out after 3 s; the process group was killed",
+            str(setup_h.exception),
+            "could not enter the sandbox build-world: " + refused.strip(),
         )
-        self.assertEqual(killed, [(4242, signal_kill())])
-        self.assertEqual(calls, [3, None])
+        self.assertEqual(
+            run(lambda timeout=None: ("", refused), 3),
+            launch.SandboxResult(3, "", refused),
+        )
         labels.append("i")
-        calls.clear()
-        killed.clear()
 
-        def denied(pid: int, sig: int) -> None:
-            killed.append((pid, sig))
-            raise PermissionError(1, "Operation not permitted")
+        def broken(timeout: object = None) -> tuple[str, str]:
+            raise KeyboardInterrupt
 
-        with self.assertRaises(PermissionError):
-            run(expire, kill=denied)
-        self.assertEqual(killed, [(4242, signal_kill())])
-        self.assertEqual(calls, [3])
+        with self.assertRaises(KeyboardInterrupt):
+            run(broken)
         self.assertEqual(labels, ["a", "b", "c", "d", "e", "f", "g", "h", "i"])
+
+    def test_start_failure_closes_the_control_pipe(self) -> None:
+        def failing(argv: list[str], **kwargs: object) -> _Process:
+            raise OSError(errno.ENOMEM, "Cannot allocate memory")
+
+        with tempfile_tree() as tree:
+            before = support.descriptor_snapshot()
+            with (
+                patch.object(support.exposed(launch, "subprocess"), "Popen", failing),
+                patch.object(
+                    support.exposed(launch, "os"), "access", return_value=True
+                ),
+                self.assertRaises(OSError),
+            ):
+                launch.run_in_sandbox(
+                    "build-world", tree.layout("build-world"), COMMAND, venv=tree.venv
+                )
+            self.assertEqual(support.descriptor_snapshot(), before)
+
+    def test_no_interpreter_refuses(self) -> None:
+        started: list[object] = []
+        with (
+            tempfile_tree() as tree,
+            patch.object(sys, "executable", ""),
+            patch.object(
+                support.exposed(launch, "subprocess"),
+                "Popen",
+                lambda *args, **kwargs: started.append(args),
+            ),
+            patch.object(support.exposed(launch, "os"), "access", return_value=True),
+            self.assertRaises(launch.SandboxError) as caught,
+        ):
+            launch.run_in_sandbox(
+                "build-world", tree.layout("build-world"), COMMAND, venv=tree.venv
+            )
+        self.assertEqual(
+            str(caught.exception),
+            "the interpreter of the launcher is not known: the sandbox supervisor cannot start",
+        )
+        self.assertEqual(started, [])
 
     def test_missing_bubblewrap_is_reported(self) -> None:
         message = "bubblewrap is not installed at /nonexistent/bwrap: install the distribution package bubblewrap"
@@ -813,10 +885,6 @@ class ArgvRules(unittest.TestCase):
             self.assertGreaterEqual(number, 3)
             self.assertEqual(os.readlink(f"/proc/self/fd/{number}"), str(path))
             os.fstat(number)
-
-
-def signal_kill() -> int:
-    return signal.SIGKILL
 
 
 def streams(main: Callable[[list[str]], int], argv: list[str]) -> tuple[int, str, str]:

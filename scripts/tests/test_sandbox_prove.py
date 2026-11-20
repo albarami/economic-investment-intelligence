@@ -227,7 +227,7 @@ class ProveRules(unittest.TestCase):
             self.addCleanup(os.remove, foreign)
             out = self._prove(root, foreign)
             self.assertIn("RESULT: FAILED", out)
-            self.assertEqual(out.count("required test case missing:"), 19)
+            self.assertEqual(out.count("required test case missing:"), len(GOOD))
             self.assertEqual(out.count("test case not in the required list:"), 19)
             labels.append("i")
             marked = _script(

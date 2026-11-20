@@ -33,6 +33,8 @@ REQUIRED = {
         "test_exit_statuses_and_setup_failure",
         "test_timeout_kills_the_process_group",
         "test_die_with_parent",
+        "test_driver_killed_while_a_layer_is_unarmed",
+        "test_driver_killed_at_the_first_sandbox_process",
         "test_check_commands_have_teeth",
         "test_swapped_source_is_not_mounted",
     ),
