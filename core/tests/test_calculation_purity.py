@@ -20,6 +20,7 @@ from types import ModuleType
 import pytest
 from method_rows import energy, measure, trade
 
+from eii_core import classification
 from eii_core.calc import (
     facts,
     public_methods,
@@ -27,10 +28,13 @@ from eii_core.calc import (
     sector_economics,
 )
 
-MODULES = tuple(
-    importlib.import_module("eii_core.calc." + path.stem)
-    for path in sorted(Path(facts.__file__).parent.glob("*.py"))
-    if path.stem != "__init__"
+MODULES = (
+    *(
+        importlib.import_module("eii_core.calc." + path.stem)
+        for path in sorted(Path(facts.__file__).parent.glob("*.py"))
+        if path.stem != "__init__"
+    ),
+    classification,
 )
 ALLOWED_IMPORTS = {
     "__future__",
@@ -143,6 +147,7 @@ def test_unlisted_calculation_module_is_checked(tmp_path, name, source):
 
 def test_purity_guard_and_planted_io_helper():
     assert_calculation_directory(Path(facts.__file__).parent)
+    assert_pure(Path(classification.__file__).read_text())
     for plant in [
         'def helper():\n return open("invented")',
         "import os",

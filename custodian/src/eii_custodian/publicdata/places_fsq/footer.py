@@ -31,6 +31,8 @@ _SET = 10
 _MAP = 11
 _STRUCT = 12
 _SHORT_LIST = 14
+_TYPE_INT96 = 3
+_TYPE_FLOAT = 4
 _TYPE_DOUBLE = 5
 _REP_REQUIRED = 0
 _REP_OPTIONAL = 1
@@ -49,6 +51,32 @@ class ChunkStat:
     geo_bbox: tuple[float, float, float, float] | None
     deprecated_minimum: float | None = None
     deprecated_maximum: float | None = None
+    physical_type: int | None = None
+    column_order: int | None = None
+    num_values: int | None = None
+    null_count: int | None = None
+    nan_count: int | None = None
+    has_nan_bound: bool = False
+
+
+@dataclass(frozen=True)
+class _Statistics:
+    minimum: bytes | None = None
+    maximum: bytes | None = None
+    deprecated_minimum: bytes | None = None
+    deprecated_maximum: bytes | None = None
+    null_count: int | None = None
+    nan_count: int | None = None
+
+    def bounds(
+        self, physical_type: int | None
+    ) -> tuple[float | None, float | None, float | None, float | None]:
+        return (
+            _float(self.minimum, physical_type),
+            _float(self.maximum, physical_type),
+            _float(self.deprecated_minimum, physical_type),
+            _float(self.deprecated_maximum, physical_type),
+        )
 
 
 @dataclass(frozen=True)
@@ -358,7 +386,7 @@ class _FileReader:
     def file_metadata(self) -> SummaryFooter:
         self._begin()
         groups: list[tuple[ChunkStat | None, ...]] = []
-        orders: tuple[bool, ...] | None = None
+        orders: tuple[int | None, ...] | None = None
         dataset: tuple[float, float, float, float] | None = None
         while True:
             kind, field_id = self._header()
@@ -378,17 +406,16 @@ class _FileReader:
             for index, chunk in enumerate(group):
                 if chunk is None:
                     continue
-                if orders is None or len(orders) != len(group) or not orders[index]:
-                    chunk = replace(
-                        chunk,
-                        minimum=chunk.deprecated_minimum,
-                        maximum=chunk.deprecated_maximum,
-                    )
-                columns.append(chunk)
+                order = (
+                    orders[index]
+                    if orders is not None and len(orders) == len(group)
+                    else None
+                )
+                columns.append(_resolve_order(chunk, order))
             resolved.append(tuple(columns))
         return SummaryFooter(tuple(resolved), dataset)
 
-    def _column_orders(self) -> tuple[bool, ...]:
+    def _column_orders(self) -> tuple[int | None, ...]:
         self._enter_container()
         try:
             size, element = self._list_header()
@@ -405,7 +432,12 @@ class _FileReader:
                         self._skip(kind)
                 else:
                     self._skip_element(element)
-                orders.append(members == [(1, _STRUCT)])
+                orders.append(
+                    members[0][0]
+                    if len(members) == 1
+                    and members[0] in ((1, _STRUCT), (2, _STRUCT), (3, _STRUCT))
+                    else 0
+                )
             return tuple(orders)
         finally:
             self._container_depth -= 1
@@ -455,17 +487,7 @@ class _FileReader:
     def _chunk(self) -> ChunkStat | None:
         self._begin()
         file_path = ""
-        meta: (
-            tuple[
-                tuple[str, ...],
-                float | None,
-                float | None,
-                tuple[float, float, float, float] | None,
-                float | None,
-                float | None,
-            ]
-            | None
-        ) = None
+        meta: ChunkStat | None = None
         while True:
             kind, field_id = self._header()
             if kind is None:
@@ -473,13 +495,12 @@ class _FileReader:
             if field_id == 1 and kind == _BINARY:
                 file_path = self._bytes().decode("utf-8", "replace")
             elif field_id == 3 and kind == _STRUCT:
-                meta = self._column()
+                meta = self._column_metadata()
             else:
                 self._skip(kind)
         if meta is None:
             return None
-        path, low, high, geo, plain_low, plain_high = meta
-        return ChunkStat(file_path, path, low, high, geo, plain_low, plain_high)
+        return replace(meta, file_path=file_path)
 
     def _column(
         self,
@@ -491,14 +512,23 @@ class _FileReader:
         float | None,
         float | None,
     ]:
+        meta = self._column_metadata()
+        return (
+            meta.path,
+            meta.minimum,
+            meta.maximum,
+            meta.geo_bbox,
+            meta.deprecated_minimum,
+            meta.deprecated_maximum,
+        )
+
+    def _column_metadata(self) -> ChunkStat:
         self._begin()
         path: tuple[str, ...] = ()
         kind_code: int | None = None
         geo: tuple[float, float, float, float] | None = None
-        low: float | None = None
-        high: float | None = None
-        plain_low: float | None = None
-        plain_high: float | None = None
+        num_values: int | None = None
+        statistics = _Statistics()
         while True:
             kind, field_id = self._header()
             if kind is None:
@@ -507,13 +537,35 @@ class _FileReader:
                 kind_code = _unzigzag(self._varint())
             elif field_id == 3 and kind == _LIST:
                 path = self._path()
+            elif field_id == 5 and kind == _I64:
+                num_values = _unzigzag(self._varint())
             elif field_id == 8 and kind == _LIST:
                 geo = self._geo_pairs()
             elif field_id == 12 and kind == _STRUCT:
-                low, high, plain_low, plain_high = self._statistics(kind_code)
+                statistics = self._read_statistics()
             else:
                 self._skip(kind)
-        return path, low, high, geo, plain_low, plain_high
+        low, high, plain_low, plain_high = statistics.bounds(kind_code)
+        return ChunkStat(
+            "",
+            path,
+            low,
+            high,
+            geo,
+            plain_low,
+            plain_high,
+            physical_type=kind_code,
+            num_values=num_values,
+            null_count=statistics.null_count,
+            nan_count=statistics.nan_count,
+            has_nan_bound=any(
+                value is not None and math.isnan(value)
+                for value in (
+                    _floating_value(statistics.minimum, kind_code),
+                    _floating_value(statistics.maximum, kind_code),
+                )
+            ),
+        )
 
     def _path(self) -> tuple[str, ...]:
         self._enter_container()
@@ -569,11 +621,16 @@ class _FileReader:
     def _statistics(
         self, kind_code: int | None
     ) -> tuple[float | None, float | None, float | None, float | None]:
+        return self._read_statistics().bounds(kind_code)
+
+    def _read_statistics(self) -> _Statistics:
         self._begin()
         plain_min: bytes | None = None
         plain_max: bytes | None = None
         value_min: bytes | None = None
         value_max: bytes | None = None
+        null_count: int | None = None
+        nan_count: int | None = None
         while True:
             kind, field_id = self._header()
             if kind is None:
@@ -586,16 +643,15 @@ class _FileReader:
                 value_max = self._bytes()
             elif kind == _BINARY and field_id == 6:
                 value_min = self._bytes()
+            elif kind == _I64 and field_id == 3:
+                null_count = _unzigzag(self._varint())
+            elif kind == _I64 and field_id == 9:
+                nan_count = _unzigzag(self._varint())
             else:
                 self._skip(kind)
         low = value_min if value_min is not None else plain_min
         high = value_max if value_max is not None else plain_max
-        return (
-            _float(low, kind_code),
-            _float(high, kind_code),
-            _float(plain_min, kind_code),
-            _float(plain_max, kind_code),
-        )
+        return _Statistics(low, high, plain_min, plain_max, null_count, nan_count)
 
     def _begin(self) -> None:
         if len(self._last) + self._container_depth >= MAX_METADATA_DEPTH:
@@ -718,10 +774,44 @@ class _FileReader:
 
 
 def _float(payload: bytes | None, kind_code: int | None) -> float | None:
-    if payload is None or kind_code != _TYPE_DOUBLE or len(payload) != 8:
+    value = _floating_value(payload, kind_code)
+    return None if value is not None and math.isnan(value) else value
+
+
+def _floating_value(payload: bytes | None, kind_code: int | None) -> float | None:
+    if payload is None:
         return None
-    value = float(struct.unpack("<d", payload)[0])
-    return None if math.isnan(value) else value
+    if kind_code == _TYPE_DOUBLE and len(payload) == 8:
+        return float(struct.unpack("<d", payload)[0])
+    if kind_code == _TYPE_FLOAT and len(payload) == 4:
+        return float(struct.unpack("<f", payload)[0])
+    return None
+
+
+def _resolve_order(chunk: ChunkStat, order: int | None) -> ChunkStat:
+    """Resolve union members before coordinate use; timestamps are never degrees."""
+    if (order == 2 and chunk.physical_type not in (_TYPE_FLOAT, _TYPE_DOUBLE)) or (
+        order == 3 and chunk.physical_type != _TYPE_INT96
+    ):
+        raise PlacesFsqError("statistics_missing")
+    low, high = chunk.minimum, chunk.maximum
+    if not order:
+        low, high = chunk.deprecated_minimum, chunk.deprecated_maximum
+    if chunk.physical_type == _TYPE_INT96:
+        low, high = None, None
+    if (
+        chunk.nan_count is not None
+        and chunk.null_count is not None
+        and chunk.num_values is not None
+        and chunk.nan_count + chunk.null_count == chunk.num_values
+    ) or (order == 2 and chunk.has_nan_bound):
+        low, high = None, None
+    if order in (None, 0, 1):
+        # Widen ambiguous TYPE_ORDER zeros; inclusive frame comparisons admit
+        # either sign. IEEE total order retains the original sign of each bound.
+        low = -0.0 if low == 0.0 else low
+        high = 0.0 if high == 0.0 else high
+    return replace(chunk, minimum=low, maximum=high, column_order=order or None)
 
 
 def _unzigzag(number: int) -> int:

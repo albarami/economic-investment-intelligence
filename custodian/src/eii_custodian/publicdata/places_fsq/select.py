@@ -6,13 +6,12 @@ used. A point on the frame edge counts as inside.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.footer import ChunkStat, read_summary
+from eii_custodian.publicdata.places_fsq.releases import validate_release_path
 
-_RELEASE_IN_PATH = re.compile(r"(?:^|/)(\d{4}-\d{2}-\d{2})(?:/|$)")
 _LONGITUDE = ("longitude",)
 _LATITUDE = ("latitude",)
 
@@ -103,9 +102,7 @@ def _meets(minx: float, maxx: float, miny: float, maxy: float, frame: FrameBox) 
 
 
 def _release_of(file_path: str, release: str) -> None:
-    match = _RELEASE_IN_PATH.search(file_path)
-    if match is not None and match.group(1) != release:
-        raise PlacesFsqError("release_mismatch")
+    validate_release_path(file_path, release)
 
 
 def coordinate_bounds(

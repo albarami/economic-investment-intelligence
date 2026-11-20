@@ -1,0 +1,430 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mapping_revision",
+    "mode",
+    "evidence",
+    "groups"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "product_activity_occupation.v1"
+    },
+    "mapping_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "production",
+        "invented_fixture"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "minItems": 0
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/group"
+      },
+      "minItems": 0
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eii:product_activity_occupation:v1",
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "version",
+        "level",
+        "code"
+      ],
+      "properties": {
+        "system": {
+          "enum": [
+            "customs_tariff",
+            "manufacturing_industry",
+            "isic_class",
+            "occupation_group"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "enum": [
+            "tariff8",
+            "tariff12",
+            "industry",
+            "class",
+            "major_group"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "weight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "scope",
+        "denominator",
+        "evidence_ref"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "pattern": "^(?:0(?:\\.[0-9]+)?|1(?:\\.0+)?)$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "denominator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "link_id",
+        "target",
+        "basis_kind",
+        "basis_ref",
+        "source_refs",
+        "rationale",
+        "configuration_sha256",
+        "reviewed_by_role",
+        "reviewed_on",
+        "weight"
+      ],
+      "properties": {
+        "link_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "basis_kind": {
+          "enum": [
+            "official",
+            "editorial_reviewed"
+          ]
+        },
+        "basis_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "configuration_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewed_by_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_on": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/weight"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "link_kind",
+        "source",
+        "status",
+        "reason",
+        "reviewed_by_role",
+        "reviewed_on",
+        "links"
+      ],
+      "properties": {
+        "link_kind": {
+          "enum": [
+            "product_to_activity",
+            "activity_to_occupation"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "status": {
+          "enum": [
+            "mapped",
+            "unmapped",
+            "ambiguous",
+            "unreviewed"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "reviewer_approved",
+            "reviewer_rejected_no_target",
+            "reviewer_undecided",
+            "multi_link_no_published_weight",
+            "awaiting_human_review",
+            "outside_review_scope"
+          ]
+        },
+        "reviewed_by_role": {
+          "type": "string"
+        },
+        "reviewed_on": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/link"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "registry_key",
+        "snapshot_sha256",
+        "locator"
+      ],
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registry_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_key",
+        "snapshot_sha256",
+        "publisher",
+        "title",
+        "licence",
+        "retrieved_on",
+        "url"
+      ],
+      "properties": {
+        "registry_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "licence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retrieved_on": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "meaning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "meaning_sha256"
+      ],
+      "properties": {
+        "endpoint": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "meaning_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parent",
+        "children",
+        "registry_key",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "parent": {
+          "$ref": "#/$defs/endpoint"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/endpoint"
+          },
+          "minItems": 1
+        },
+        "registry_key": {
+          "const": "cus_imp_2025"
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "snapshots",
+        "endpoint_meanings",
+        "tariff_families"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "production",
+            "invented_fixture"
+          ]
+        },
+        "snapshots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/snapshot"
+          },
+          "minItems": 0
+        },
+        "endpoint_meanings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/meaning"
+          },
+          "minItems": 0
+        },
+        "tariff_families": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/family"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "review_sha256",
+        "schema_sha256",
+        "context_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "product_activity_occupation.binding.v1"
+        },
+        "review_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "schema_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "context_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  }
+}

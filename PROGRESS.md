@@ -39501,6 +39501,264 @@ Seed:      3587189981
 Notes:     The whole test at WORK with the seed given at run time; lead only, never run by this preparation. The hosted checks on the joined head and the fresh-seed run on the exact merge result stay separate.
 ```
 
+Maker: OpenAI; model: GPT-6 (Codex; exact served variant not exposed). This identity describes preparation of these ledger inputs only.
+
+### MERGE TRAIN S2-10 — Slice S2: task log (pull request 108)
+
+Persona: senior release coordinator writing script-checked ledger inputs. Strict self-review persona: records reviewer rejecting claims without a source. Skills loaded: project-orientation, task-standards, sanad-provenance and muhasabah-gate. Verification-before-completion was not available in the installed catalogue or workspace skill files; the brief's plain-meaning verification rules apply. This self-check is not another-maker review.
+
+Base: 32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef. WORK: bb9357549396610a3841353302e79b01820f78f0. The initial base is e5292de5b1b553a7399391ca9c00b80a5bfd5daa, the head of PR 107, not its squash merge. The supplied brief and lead log at 2026-11-20 11:55 require the eventual move onto that squash merge. The initial joined head is b57b7b75f55a46903f881e23ead42cea5aa8e708. Git's BASE..WORK log and name-status inventory supply the commit and file counts in preparation.json; these are not test counts.
+
+Sources: `Log` below means `.overnight/IN/LOG-S2-10-evidence.md`, cited by date/time and job or ruling. All times without another date are on 2026-11-20. `Return` means the exact `.overnight/IN/` file named. Commit hashes resolve to local Git objects, inspected with git show. Builder returns describe their own checks; they are not new executions by this preparation. Launch/result identities are kept separate from returns that self-name another model. Requested routing is not proof of the model actually served.
+
+#### S2-T47 — reviewed classification crosswalk
+
+| Stage | Original full commit | Pick at WORK | Builder and source |
+|---|---|---|---|
+| Initial build | 809392bacf1a4703e1e5e9b5b38385fe5f22500b | 214393b4cbcd02047ea4f7f0ccfbea93a36b51a3 | OpenAI GPT-6.1 Sol via Codex A: Log 09:33 launch and 09:58 result; original commit Builder line. Return S2-T47.b1.return.md self-names OpenAI GPT-6. |
+| Fix A to G | a6acb9b1cbf61cb821ecd6290176cbd973936b98 | c13170f389eb3c6da4f639bbd2bcb4b5affad20b | OpenAI GPT-6.1 Sol via Codex B: Log 10:09 launch and 10:25 result; original commit Builder line. Return S2-T47.fix1.return.md self-names OpenAI GPT-6. |
+| Fix H, test plants | 1d698a491a426ace75126b589af147b935e7f845 | 964f07057946f3e562911139ed64e602c4bfb54a | OpenAI GPT-6.1 Sol via Codex B: Log 10:38 launch and 10:48 result; original commit Builder line. Return S2-T47.f2.return.md self-names OpenAI GPT-6. |
+
+Initial picks on the initial base were respectively 4afbdc6c4d32e900c542480e0b0a000df8872c55, d30d6380bae7d69142838a882dbcc72a5622a36a and 0641d71e9c310482465934369c36624b4214576b (Log 11:55; git show). The lead committed the work because the builders could not commit, as each original's Builder line states.
+
+| Review or confirmation | Maker/model as evidenced | Verdict and bounded meaning | Source |
+|---|---|---|---|
+| S2-T47.designreview | Anthropic Claude Fable 5.2 via login C | REJECTED; findings F1 to F8 bound into build brief by L-1223. No separate design approval is supplied. | Log 09:19 launch, 09:29 result/ruling, 09:33 correction; detailed design return not supplied. |
+| S2-T47.revB on 809392ba | Zhipu GLM-5.3 via relay per lead log; return self-names OpenAI GPT-6.2-Astra | REJECTED solely because command execution exited 2 in the read-only reviewer environment; its four substantive checks say PASS. L-1227 accepts this as a substantive pass with the lead's command evidence, not a reviewer APPROVED. | Log 09:58 launch and both 10:01 entries; Return S2-T47.revB.md, Checks and Findings. |
+| S2-T47.revA on 809392ba | Anthropic Claude Fable 5.2 | REJECTED: A, direct tariff8 bypass; B, non-deciding guard plants; C to G also accepted by L-1230. | Log 10:09; Return S2-T47.revA.md, Verdict and Findings A to G. |
+| S2-T47.revA2 on a6acb9b1 | Anthropic Claude Fable 5.2 | REJECTED on H only. A to G closed; further guard plants required. L-1234 orders their repair. | Log 10:38; Return S2-T47.revA2.md, Check 1 and Findings H. |
+| S2-T47.cf2 | Requested Anthropic Claude Opus 5.5 | No verdict: launch stopped by governor, then rerouted. | Log 10:48 launch and 10:49 gate. |
+| S2-T47.cf2k on 1d698a49 | Served Moonshot Kimi K3.1 Pro via relay per lead log; return self-names OpenAI Codex with no exact model | CONFIRMED: H closed on source inspection and recorded single-removal evidence. No independent pytest or removal run by this reviewer. | Log 10:49 launch and 10:52 result; Return S2-T47.cf2k.md, Verdict, Checks 3/4 and Findings. |
+
+The lead explicitly records “S2-T47 APPROVED at 1d698a49 (L-1234)” at Log 10:52. This is the lead's disposition after the review chain, not an invented APPROVED from cf2k or revA2. The final recorded focused result is 241 passed, from the lead at Log 10:48 and the builder's S2-T47.f2.return.md; no such result is claimed at the joined WORK by this preparation.
+
+The first review's correction about permissive-baseline evidence is in Return S2-T47.revA.md, Record Notes; the wider-sweep correction is in Return S2-T47.revA2.md, Record Notes. The follow-up commits append their evidence (git show a6acb9b1 and 1d698a49). Proposed items R1 to R4 in the first review and R5/R6 in the re-review are not disposed of by the H confirmation. Log 10:09 says R1 to R4 go to the records commit, but b57b7b75 changes TASKS.md only; do not claim those items were serialized there. Lead disposition/serialization remains to be checked. The committed production review is empty and supplies no real mapping approval (Return S2-T47.b1.return.md, Modules, contracts and tests).
+
+#### S2-T10 part F — F01 round 2
+
+- Reviewed original: 2c7ebaa9e7297aa0fb8c926f36164f8377f76b5d. Carry used for the train: 6f8a16bb4cbbdb39bf696b8cb4a4745d8a1e78e7. Pick at WORK: 237e64624b3259494077ab4cd9a25cfe791858c0. Initial pick: f2b051c565782e5c4b7c41a5d3dd967366fc7938. Sources: git show of each; Log 10:52 live-run diagnosis and 11:55 join.
+- Builder: OpenAI GPT-6.1 Sol via Codex, per Log 2026-11-19 23:36 launch, Log 00:06 and the original Builder line. Return S2-T10F.A2.return.md self-names OpenAI Codex / GPT-6-based Codex with exact deployment unknown. The lead replaced a workspace path in the README with a plain description before committing; source: Log 00:06 and original commit body.
+- Work: L-1178's later column-order and floating-bound rules, and the all-dates release-path validation. Sources: original commit; Return S2-T10F.A2.return.md, PO-S2-36 and PO-S2-123 sections. No source file was fetched by this preparation.
+- Reviewer S2-T10F.A2.rev1: Z.ai/Zhipu GLM-5.3 via Droid according to Log 00:06/00:33; the return self-names GLM 4.7. Verdict APPROVED on 2c7ebaa9, no rejecting findings. Sources: Log 00:33 and Return S2-T10F.A2.rev1.return.md, Verdict and Findings.
+- Reviewer-recorded evidence: both targeted plants reproduced red (4 failed and 8 failed); full custodian suite 8539 passed. These are historical results at the reviewed commit, not at WORK. Source: Return S2-T10F.A2.rev1.return.md, R3/R4, corroborated by Log 00:33. Its C1 scope note distinguishes the builder's 790 from the review's 779; neither is relabelled as a joined-head count.
+- The lead reports equal patch IDs between the reviewed original and carry at Log 11:55. `reviewed-f01-proof.json` independently compares the changed-line sequences, commit messages and resulting blobs of all affected files between those two commits; it does not purport to compute a patch ID. `identity-proof.json` compares the carry to the train pick. Both use Git objects only.
+- Record notes 1 to 4 remain as stated in Return S2-T10F.A2.rev1.return.md: source hash retained by the lead, differing command scopes, open-item closing text awaiting lead serialization, and the builder-model naming disclosure. `OPEN_ITEMS.md` at WORK still labels PO-S2-36 and PO-S2-123 OPEN. This draft writes no closure. S2-T10's status at WORK omits this F01 round; tasks_md.json supplies one bounded addition without ticking criteria or closing items.
+
+#### S2-T37 — live-run follow-up S2-LR5
+
+| Stage | Original full commit | Pick at WORK | Builder and source |
+|---|---|---|---|
+| XML listing repair | 9a3b97fde21533b2de6ac97b7b514d920aae646c | c548e9487907cda79891f069eaa4560b2156aaab | OpenAI GPT-6.1 Sol via Codex B: Log 10:52 launch, 11:05 result and original Builder line. Return S2-LR5.b1.return.md self-names OpenAI GPT-6, exact variant unknown. |
+| F1 deciding root-tag plants | d4a8dd4cc4eb6c22dfac8662e34f624994d9ddd6 | 081bc5a838b3a6b7f84110a07edbff0c3e16fd70 | Lead-authored fix: Log 11:37. Commit trailer names Claude Opus 5.5 (Anthropic); the log does not independently state the lead's model for that action. |
+
+Initial picks were 51c17aa11908fb3f00aa385d2ce9e881d6cb8a5b and 099c07422ab0b34f0743c6e388d1ea7b695959fb (Log 11:55; git show). The source repair followed the lead's failed live build: Log 10:52 records rc 1 and `places_fsq/copy release_missing`; the copy listing was XML while discovery expected HTML. That live diagnosis is lead-supplied evidence, not a network check by this preparation.
+
+| Review or confirmation | Maker/model as evidenced | Verdict and bounded meaning | Source |
+|---|---|---|---|
+| Initial lens A route | Requested Anthropic Claude Opus via login C | No verdict: stopped by governor. | Log 11:09. |
+| Initial lens B route | Requested Moonshot Kimi K3.1 Pro via Droid | No verdict: invalid model; the alternative custom route was not used. | Log 11:09. |
+| S2-LR5.lensA on 9a3b97fd | Requested Google Gemini 4 Carbon through Abacus; result served as RouteLLM, exact backend maker/model not established | APPROVED, no findings, parser/provenance inspection and reported plant probes. Tests not run under the read-only constraint. Do not upgrade the requested model to a verified served identity. | Log 11:11 launch and 11:35 result; Return S2-LR5.lensA.md, Verdict, Tests run and Record Notes. |
+| S2-LR5.lensB on 9a3b97fd | Moonshot AI Kimi K3.1 Pro High via Devin | REJECTED on F1: wrong-namespace plant also triggers the scalar guard, so does not decide the root guard. No shell/tests; carry preservation and historical PROGRESS preservation not independently checked by this reviewer. | Log 11:13; L-1237 (11:12); Return S2-LR5.lensB.md. |
+| S2-LR5.cf1 on d4a8dd4c | Moonshot AI Kimi K3.1 Pro High via Devin | CONFIRMED; F1 closed, no findings, static deciding-path inspection. No independent execution. | Log 11:37 launch and 11:39 result; Return S2-LR5.cf1.md. |
+
+The 11:37 launch log uses the phrase “Cognition Devin Kimi K3.1 Pro”; the result at 11:39 and cf1 return identify Moonshot as the model maker. Devin is the route here, not evidence that the model maker is Cognition. The lead's “ready for train S2-10” statement at 11:39 follows lens A APPROVED and lens B F1 CONFIRMED; no separate whole-train verdict is supplied.
+
+Historical checks: Log 11:05 records 256 places tests passed on the repair. Log 11:36 and Return S2-LR5.cf1.md record the lead's root-guard removal as 2 failed / 59 passed; Log 11:37 records restored 84 passed. The figures refer to their stated selections, not an identical command or a joined-head run. The original and pick comparisons in identity-proof.json cover every file; no assertion that the later repair leaves the whole releases.py unchanged is made, since that file implements the new XML discovery.
+
+#### Lead fix: the S2-T47 resolver tests move to the custodian side
+
+| Stage | Commit at WORK | Author and confirmation |
+|---|---|---|
+| Test module relocation | b28a3753496c8bb9c24af5c388db2d9ec31bbae4 | Lead (trailer Claude Opus 5.5, Anthropic), Log 12:52. Cause: the lead's ledger try 1 (Log 12:45) stopped python-core at collection because `core/tests/test_classification.py` imported custodian test fixtures and the custodian reader, which the runner's `python -P` start does not put on the path. The module moves unchanged to `custodian/tests/test_classification_resolver.py` with one docstring sentence; docs/03 names the new path. Rule 33 forced-difference confirmation: S2-T47.mv1, Zhipu GLM-5.3 through the relay (another maker), CONFIRMED, Log 12:57. Runner evidence on the fix, seed 2547224853: python-core 749 passed, custodian-1 4743, custodian-2 4167, each exit 0. make_spec.py checks the commit's four-file inventory and that the moved module differs from the original only by the inserted docstring lines. |
+
+#### Records commit
+
+- Commit at WORK: bb9357549396610a3841353302e79b01820f78f0. Initial commit: b57b7b75f55a46903f881e23ead42cea5aa8e708.
+- Subject: `chore(records): train S2-10 records: S2-T47 and the S2-T37 live-run follow-up in review`.
+- Authoring role: lead, per Log 11:55. Commit trailer: Claude Opus 5.5 (Anthropic); this is trailer attribution, not separate served-model telemetry.
+- git show of the initial records commit changes only TASKS.md, two additions and two deletions: S2-T47's delivery line and S2-T37's delivery line. It neither closes an open item nor adds an F01 round-two status sentence. make_spec.py checks the record-file inventory at run time.
+- No review or confirmation of this records commit, or of the complete joined head, is supplied. `tasks_md.json` adds only S2-T10's F01 round-two status through the ledger; no replacement is needed for the two status lines already present. The S2-T37 line names the requested Google model; the review table above preserves the narrower served-identity evidence without silently rewriting a lead record.
+
+#### Identity proof and remaining lead gates
+
+`identity-proof.json` is generated file by file from each original and pick. Commit messages and file inventories must match. All code and test resulting blobs must match their originals at each pick. The only unequal patch lines allowed are literally empty separators in PROGRESS.md: the initial S2-T47 pick omits two added blank lines and the initial S2-T37 repair pick omits one (Git deltas; Log 11:55). Every such difference is enumerated, never hidden by ignoring arbitrary whitespace. Whole PROGRESS/TASKS files also contain different base histories.
+
+Document 03 differs in full-file bytes for the initial crosswalk and A-to-G fix, but its task patch lines match. Its `pub_tender` company_size wording difference already exists between the respective parents; make_spec.py requires the parent-to-parent delta to equal the resulting-file delta exactly. This inherited wording is not an altered crosswalk hunk and not a code/test change. The proof records both ranges and blob IDs. Any other non-record file difference or nonblank patch change refuses preparation and needs lead resolution under decision 0032 item 2.
+
+The generator prepares one pytest row for every changed test file under custodian/tests, core/tests or scripts/tests, using the brief's exact runner form. The AST inventory gives named changed-test anchors, including decorator edits; function counts are syntax counts, not parametrized test results. The two changed fixture modules are helpers, not standalone test suites. Shared check rows and the whole-test seed are runtime inputs for the lead; none is executed here.
+
+Still owed: review-note dispositions/serialization where not already recorded; another-maker confirmation of the joined head under rule 33 and decision 0032; required hosted checks on the actual head; the records-only move's attached diff after PR 107 merges, with new task confirmation if code/tests change; rerun hosted checks on that moved head and the lead's fresh-seed whole test on the exact squash-merge result under decision 0039. This preparation grants no task, train, live-run or slice-gate approval and runs no ledger or tests.
+
+#### Evidence for the work commit `bb9357549396610a3841353302e79b01820f78f0`
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest core/tests/test_calculation_purity.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_purity_guard_and_planted_io_helper. Source: core/tests/test_calculation_purity.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_classification_resolver.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    55 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_ac3_many_to_many_keeps_paths_without_numeric_input_duplication; test_ac3_two_hop_trace_and_missing_link; test_ac4_typed_consumer_rejects_prohibited_output; test_ac5_consumer_imports_no_custodian_and_uses_no_arithmetic; test_ac5_stable_order_from_shuffled_inputs; test_b_c13_requires_a_manufacturing_industry; test_b_direct_tariff8_requires_a_bound_family; test_b_resolver_refuses_a_non_tariff_source; test_d_reason_types_and_selection_contract_are_closed; test_f1_absent_endpoint_is_unreviewed_not_unmapped; test_f2_composition_cannot_upgrade_worse_hop; test_f2_two_hop_weights_stay_side_by_side_never_multiplied; test_f2_worst_status_over_multiple_branches; test_f3_c13_has_only_mapped_and_not_mapped_buckets; test_f3_c13_multi_target_has_no_allocation_rule; test_f3_c13_parent_requires_every_bound_child; test_f3_c13_single_published_weight_has_no_allocation_rule; test_f3_c13_t1_t2_t3_worked_example_selection_inputs; test_f3_direct_parent_mapping_cannot_bypass_complete_family; test_f4_middle_endpoint_identity_has_no_bridge; test_h_c13_refuses_a_non_tariff_source; test_h_c13_requires_a_crosswalk; test_h_endpoint_identity_guards; test_h_resolver_requires_a_crosswalk. Source: custodian/tests/test_classification_resolver.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 24 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_classification_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    181 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_ac1_absent_basis_or_review_plant; test_ac1_review_basis_and_binding; test_ac1_source_chain_plant; test_ac1_stale_binding_plant; test_ac1_valid_sha256_is_not_a_bare_identifier; test_ac2_mapping_status_and_multiplicity; test_ac2_silent_status_upgrade_plant; test_ac4_classification_only_boundary_plant; test_ac5_additional_closed_admission_guards; test_ac5_closed_schema_and_endpoint_plants; test_ac5_malformed_json_or_duplicate_property; test_ac5_missing_binding; test_b_bare_digit_guard_isolated_in_locator; test_b_child_in_two_distinct_families; test_b_date_only_unreviewed_signature; test_b_duplicate_property_in_otherwise_valid_document; test_b_isolated_endpoint_guards; test_b_official_basis_is_not_production_admission; test_b_production_registry_metadata_guard; test_b_production_registry_positive_control; test_b_public_source_url_guard; test_b_review_context_mode_mismatch; test_b_synthetic_tariff_is_not_production_admission; test_f1_unsigned_group_decision_plant; test_f2_changed_published_weight_requires_renewed_review; test_f2_unweighted_and_published_multi_link_controls; test_f2_weight_guard_plants; test_f3_bound_tariff_inventory_guards; test_f3_method_contract_keeps_every_nonmapped_status_in_one_bucket; test_f4_isic_endpoint_control_and_no_implicit_bridge; test_f5_fixture_mode_cannot_be_admitted_as_production; test_f6_empty_committed_review_has_no_approval_or_carriage; test_f6_f8_contract_names_task_modules_and_deferred_carriage; test_h_duplicate_parent_with_disjoint_children_is_refused; test_h_duplicate_source_with_distinct_link_is_refused; test_h_duplicate_target_with_valid_weights_is_refused; test_h_editorial_rationale_cannot_be_null; test_h_empty_decision_requires_a_pending_reason; test_h_industry_code_requires_canonical_slug; test_h_isic_endpoint_guards; test_h_missing_schema_has_fixed_diagnostic; test_h_nonbasis_source_ref_must_resolve; test_h_occupation_level_requires_major_group; test_h_public_source_url_guards; test_h_review_date_requires_dashed_calendar_shape; test_h_tariff_level_requires_matching_grain. Source: custodian/tests/test_classification_review.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 46 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_format.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    74 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T10 part F F01 round 2. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_fsq_deprecated_bounds_used_when_order_unknown; test_fsq_float_all_non_null_nan_has_no_bounds; test_fsq_float_order_nan_bound_refuses_with_control; test_fsq_float_orders_use_non_nan_bounds_with_control; test_fsq_hand_encoded_unknown_order_still_refuses; test_fsq_ieee_order_uses_modern_bounds_instead_of_deprecated; test_fsq_int96_timestamp_order_is_recognised_without_coordinate_coercion; test_fsq_order_on_wrong_physical_type_refuses; test_fsq_orders_missing_or_unknown_refuse; test_fsq_type_order_zero_widens_but_total_order_keeps_sign; test_fsq_writer_emits_orders_and_optional_deprecated_pair. Source: custodian/tests/test_places_fsq_format.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 29 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    61 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T10 part F F01 round 2 and S2-T37 follow-up. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_bad_dated_candidates_fail_closed; test_build_public_reports_listing_reason_and_never_uses_cached_release; test_equal_release_dates_and_undated_paths_remain_valid; test_every_date_in_receipt_and_selection_paths_must_match; test_fetch_follows_listing_to_newest_metadata_partitions_and_data; test_observed_bucket_shape_selects_metadata_backed_newest_release; test_plant_bucket_shape_failures; test_plant_dated_folder_without_metadata_is_not_a_release; test_plant_processing_instruction_anywhere_is_refused; test_plant_root_alone_wrong_with_s3_children_is_refused; test_plant_truncated_listing_is_never_read_in_part; test_plant_xml_declarations_are_refused; test_unordered_listing_selects_greatest_valid_calendar_date. Source: custodian/tests/test_places_fsq_releases.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 21 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "835 files already formatted"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 449 source files"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1138 text files, 123 Markdown files: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Rule 2 byte parity at WORK; result owed.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef...bb9357549396610a3841353302e79b01820f78f0'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:core/src/eii_core/classification.py A:custodian/publicdata/review/product_activity_occupation.v1.binding.json A:custodian/publicdata/review/product_activity_occupation.v1.json A:custodian/publicdata/review/product_activity_occupation.v1.schema.json A:custodian/src/eii_custodian/publicdata/review/classification.py A:custodian/tests/fixtures/classification.py A:custodian/tests/test_classification_resolver.py A:custodian/tests/test_classification_review.py M:PROGRESS.md M:TASKS.md M:core/tests/test_calculation_purity.py M:custodian/src/eii_custodian/publicdata/places_fsq/README.md M:custodian/src/eii_custodian/publicdata/places_fsq/errors.py M:custodian/src/eii_custodian/publicdata/places_fsq/fetch.py M:custodian/src/eii_custodian/publicdata/places_fsq/footer.py M:custodian/src/eii_custodian/publicdata/places_fsq/releases.py M:custodian/src/eii_custodian/publicdata/places_fsq/select.py M:custodian/tests/fixtures/places_fsq/invented.py M:custodian/tests/test_places_fsq_format.py M:custodian/tests/test_places_fsq_releases.py M:docs/03_DATA_CONTRACTS.md M:docs/07_ECONOMIC_METHODS.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "22 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK name-status inventory from Git: 22 files.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef..bb9357549396610a3841353302e79b01820f78f0'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     8 linear commits; subjects checked by make_spec.py.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   ./eii test --seed 2845535193
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    12297 passed, 0 failed, 0 skipped
+Seed:      2845535193
+Notes:     Seed supplied at run time. Lead only. Hosted checks on the actual head and a fresh-seed whole test on the exact merge result remain separate gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -42473,3 +42731,308 @@ Checks on the final tree: the four sandbox test files `-q -p no:cacheprovider` e
 - Confirmation of both fix rounds (55bd07ad and 1a2f4f2f) against review 1, ruling L-1217 and ruling L-1219: CONFIRMED, no finding, by Anthropic Claude Fable 5.2 (reviewer; builder OpenAI). It ran `python3 scripts/check_docs.py` (exit 0) and `python3 scripts/check_tree.py` (exit 0) at 1a2f4f2f.
 - The lead applied its seven wording-only record notes in this records commit: OI-346 TYPE line; OI-348 EVIDENCE line; decision 0071 item 6 and the OI-346 resolution on what ARC-41 and the glossary **Release** entry each define; decision 0071 Decided by row and Context; decision 0070 Consequences names both operations tasks; document 14 slice S3 Parallel work places T28. OI-353 records the confirmation's proposed question on protected releases before S11-T09.
 - Correction to DOCS-0070-FIX1 and DOCS-0070-FIX2 (appended; earlier rows unchanged): the builder's maker is OpenAI, model as the lead's ledger records it, through Codex. The lead committed the two rounds as 55bd07ad56698e8ed79b1d62d5b27ac42c047dbf and 1a2f4f2f7080b24be23e55a43d7af1dc8eb7069d. The dependency and scope audit scripts were scratch files outside the repository.
+## S2-T47 — Reviewed classification crosswalk, local build (2026-11-20)
+
+- Maker/model: OpenAI, GPT-6 (Codex). Builder persona: principal economic-statistics engineer specialising in classification correspondences. Strict self-review persona: methods reviewer rejecting invented links, unsigned decisions, unstated splits, multiplied weights, prefix/name matches and weakened assertions. Independent implementation review by another maker is pending; this block grants no mapping approval or slice gate approval.
+- Authority: TASKS.md S2-T47; decision 0070 item B3; document 07 C13/MTH-68; the supplied design review F1 to F8 and ruling L-1223. The supplied plan's earlier identifier is interpreted as S2-T47, as the ruling directs. No source, graph type, release table, downstream calculation or registry row was added. The committed production review is empty.
+- Skills loaded: project-orientation, task-standards, sanad-provenance, domain-modeling, github-flow, strict-reviewer, muhasabah-gate. Test-driven-development and verification-before-completion are unavailable in the installed catalogue; their plain-meaning rules were used: tests and named violation inputs first, permissive-baseline red proof, implementation, restored-code green proof, exact checks and explicit limitations. No delegation or network use. No public-data cache, private data, vault or environment-secret file was read.
+- Delivered modules: custodian/src/eii_custodian/publicdata/review/classification.py and core/src/eii_core/classification.py. Invented dictionaries: custodian/tests/fixtures/classification.py. Tests: custodian/tests/test_classification_review.py, core/tests/test_classification.py and the extended core/tests/test_calculation_purity.py. The latter applies the existing import/call allowlist and isolated runtime guard to the classification module; the calculation directory remains recursively checked, with no widened allowlist.
+- Contract/method: document 03 **Reviewed classification crosswalk (S2-T47)** specifies every shape, input trust boundary, binding digest, status, endpoint version and deferred S7-T11 carriage. Document 07 C13 keeps every non-mapped status in its existing not-mapped bucket and requires every bound child to map to the identical industry before a parent is selected. TASKS.md changes only S2-T47's delivery status; all five criterion boxes remain unticked. OPEN_ITEMS.md, AGENTS.md, CLAUDE.md and the source registry are unchanged.
+- Fixture tariff codes are visibly synthetic, with SYN-TARIFF- followed by canonical dotted groups; fixture classes use SYN-ISIC-, industries use mfg_industry/syn-, and occupation codes are the closed major groups. Invented inputs require both fixture mode and explicit fixture admission. Production admits editorial links or explicit gaps; official links/weights are exercised only on invented fixtures. The resolver returns both hop weights unchanged and has no allocation field.
+
+### Red/green and check commands
+
+Every uv command below used UV_OFFLINE=1 except the read-only version probe. Test seed: 47, supplied explicitly by --hypothesis-seed=47; Hypothesis profile eii, unchanged. Commands ran from the repository root, with the prepared workspace environment, Python 3.14.6 and uv 0.11.31 on Linux x86_64. Tests use repository temporary paths supplied by TMPDIR; no service starts or stops, new packages, live keys, live feeds, bound increases, retries, skips or golden-baseline refreshes. Gateway is unused and its default provider remains none.
+
+Let F be the exact focused file arguments `custodian/tests/test_classification_review.py core/tests/test_classification.py core/tests/test_calculation_purity.py`; let P be the first two of F. These abbreviations only shorten this command ledger.
+
+| Command and stage | Exit | Actual result |
+|---|---|---|
+| uv run --locked python -m pytest P -q -p no:cacheprovider --hypothesis-seed=47, tests first against temporary permissive API baseline | 1 | 128 failed, 5 passed; named refusal plants executed before validation existed |
+| Same command P, first implementation | 1 | 1 failed, 132 passed; AST arithmetic test also counted type-union annotations, corrected to permit their BitOr node while retaining the arithmetic ban |
+| uv run --locked python -m pytest custodian/tests/test_classification_review.py -k 'contract_names or method_contract' -q -p no:cacheprovider --hypothesis-seed=47, before contract/method additions | 1 | 2 failed, 103 deselected |
+| uv run --locked python -m pytest F -q -p no:cacheprovider --hypothesis-seed=47, before documentation fixes | 1 | 2 failed, 138 passed; the same two documentation guards |
+| Same command F, after documentation fixes | 0 | 140 passed |
+| Same command F, added edge-case plants | 1 | 1 failed, 176 passed; malformed URL escaped the fixed-error boundary |
+| uv run --locked python -m pytest custodian/tests/test_classification_review.py -k 'valid_sha256 or malformed_url' -q -p no:cacheprovider --hypothesis-seed=47 | 1 | 2 failed, 132 deselected; malformed URL and valid hexadecimal digest misclassified as an identifier |
+| Same command F, after the two fixes | 0 | 178 passed |
+| Same command F, with the validator deliberately replaced by its permissive baseline after all current plants were collected | 1 | 176 failed, 8 passed; the eight controls were two documentation tests, five existing purity cases and the consumer AST check |
+| Same command F, validator restored byte-for-byte | 0 | 184 passed |
+| uv run --locked python -m pytest core/tests/test_calculation_purity.py -k purity_guard -q -p no:cacheprovider --hypothesis-seed=47, socket import deliberately planted in classification module | 1 | 1 failed, 4 deselected |
+| Same purity command, classification module restored byte-for-byte | 0 | 1 passed, 4 deselected |
+| uv run --locked ruff check ., initial authored tests | 1 | 39 style findings; formatting/import cleanup followed |
+| Same lint check after first formatting | 1 | 4 remaining style findings; fixed explicitly |
+| Same lint check after cleanup | 0 | All checks passed |
+| uv run --locked ruff format ., formatter application runs | 0 each | First run: 5 reformatted, 827 unchanged; subsequent runs: 2/830, 2/830 and 1/831; no unrelated file changed |
+| uv run --locked ruff format --check . | 0 | 832 files already formatted |
+| uv run --locked mypy, both checks | 0 each | No issues in 447 source files |
+| python3 scripts/check_docs.py, initial new-fixture scan | 1 | 1134 text files, 122 Markdown files; one e-mail-shaped substring in an invented URL credential plant, changed to runtime construction with the same invalid URL semantics |
+| python3 scripts/check_tree.py | 0 | 8 rules OK |
+| cmp AGENTS.md CLAUDE.md | 0 | Byte-identical |
+| git diff --check | 0 | No whitespace errors |
+| uv --version; uv run --locked python --version | 0 | uv 0.11.31, Python 3.14.6 |
+| git switch -c feat/s2-t47-crosswalk | 128 | Shared Git metadata is read-only; no branch, stage, commit or push was made |
+
+Read-only orientation used cat/rg/sed/tail on the brief, supplied plan/review/ruling, task/pack anchors, applicable skills, existing spine, calculation purity guard and repository configuration; no data cache or prohibited file was inspected. A glob search for absent spine-test/conftest filenames reported missing files, and the optional-environment probe returned 1 for unset variables; these are deterministic inspection outcomes, not hidden test failures. Workspace-edit and fixture/schema/binding generation commands were python3 heredocs and apply_patch; successful writes exited 0. One malformed apply_patch request was rejected before applying and then corrected. Result logs under .overnight/tmp retain actual pytest result lines with traceback paths and source excerpts omitted. Earlier PROGRESS bytes were checked against HEAD before this append.
+
+### Acceptance and design-review evidence map
+
+All named reader/resolver plants below are red in the permissive replay and green in the 184-case restored run, except the explicit documentation and purity plants, whose separate red/green runs are recorded above. The first 133 cases also have their original tests-first baseline run. No failure is described as an independent approval.
+
+| Requirement | Named tests and planted violation |
+|---|---|
+| AC1 | test_ac1_review_basis_and_binding; test_ac1_absent_basis_or_review_plant; test_ac1_source_chain_plant; test_ac1_stale_binding_plant: remove basis, reviewer/date or source-chain field, corrupt calendar date, change meaning/version/evidence/review/schema/binding |
+| AC2 | test_ac2_mapping_status_and_multiplicity; test_ac2_silent_status_upgrade_plant; test_f2_weight_guard_plants: prefix/name/model basis, missing decision, false mapped status, invented editorial/equal split, mixed weights, differing evidence/scope/denominator; all statuses preserved |
+| AC3 | test_ac3_two_hop_trace_and_missing_link; test_ac3_many_to_many_keeps_paths_without_numeric_input_duplication; test_f4_middle_endpoint_identity_has_no_bridge: different evidence chains retained for the two hops, absent branch and changed middle system/version/level/code expose no occupation association |
+| AC4 | test_ac4_classification_only_boundary_plant and test_ac4_typed_consumer_rejects_prohibited_output: worker attribute, qualification, person key and protected statistic, each separately refused on schema inputs and typed outputs |
+| AC5 | test_ac5_closed_schema_and_endpoint_plants; test_ac5_additional_closed_admission_guards; test_ac5_malformed_json_or_duplicate_property; test_ac5_missing_binding; test_ac5_stable_order_from_shuffled_inputs: unknown schema/fields/status/kind, invalid/duplicate identities, absent/stale sidecar and malformed JSON refused; fixture parsing stays offline |
+| F1 | test_f1_unsigned_group_decision_plant and test_f1_absent_endpoint_is_unreviewed_not_unmapped: unsigned unmapped/ambiguous/mapped decisions refused; missing endpoint is unreviewed/outside_review_scope, never a signed rejection; unknown/inconsistent reasons refused |
+| F2 | test_f2_unweighted_and_published_multi_link_controls; test_f2_weight_guard_plants; test_f2_composition_cannot_upgrade_worse_hop; test_f2_worst_status_over_multiple_branches; test_f2_two_hop_weights_stay_side_by_side_never_multiplied; test_f2_changed_published_weight_requires_renewed_review: no mixed/editorial/unpublished split, no status promotion, no composed weight field, exact decimal text retained and altered value refused under its old binding |
+| F3 | test_f3_c13_parent_requires_every_bound_child; test_f3_bound_tariff_inventory_guards; test_f3_direct_parent_mapping_cannot_bypass_complete_family; test_f3_c13_has_only_mapped_and_not_mapped_buckets; test_f3_c13_multi_target_has_no_allocation_rule: split/partly mapped/absent/ambiguous child, invalid child inventory, and direct-parent bypass never enter the mapped bucket. test_f3_c13_t1_t2_t3_worked_example_selection_inputs proves two lines selected and one gap; the QAR arithmetic remains S7-T11's. The separate test_f3_method_contract_keeps_every_nonmapped_status_in_one_bucket was red before document 07 wording, green after |
+| F4 | test_ac5_closed_schema_and_endpoint_plants; test_f4_isic_endpoint_control_and_no_implicit_bridge; test_f4_middle_endpoint_identity_has_no_bridge: HS revision assertion, unsupported system/level/version, other/unmapped occupation, dotted collision and bridge kind refused; exact middle identity required |
+| F5 | test_f5_fixture_mode_cannot_be_admitted_as_production and test_f6_empty_committed_review_has_no_approval_or_carriage: fixture material cannot become production approval; committed review empty, registry unchanged |
+| F6 | test_f6_empty_committed_review_has_no_approval_or_carriage and test_f6_f8_contract_names_task_modules_and_deferred_carriage: no release table in result; modules, typed input shape, purity handling and S7-T11 carriage explicit. Contract omission was red, then green; forbidden socket import red, then restored purity green |
+| F7 | test_ac1_absent_basis_or_review_plant[published]: old basis vocabulary refused; official/editorial_reviewed controls pass |
+| F8 | test_f6_f8_contract_names_task_modules_and_deferred_carriage: missing S2-T47 contract, module paths, deferred carriage or exact registered manufacturing-products title/slug fails. Red before contract addition, green after |
+
+- Corrections above are deterministic local defects, repaired with their original tests retained. No random failure was observed. Proposed open items are in .overnight/RETURN.md, not OPEN_ITEMS.md: another-maker implementation review and lead whole-suite evidence; human source/mapping review; verified context and release carriage in S7-T11.
+- Base/full commit identity: 55bd07ad56698e8ed79b1d62d5b27ac42c047dbf. Git cannot write the shared metadata, so no new commit exists; the scoped tree is left changed for the lead. The brief's requested Conventional Commit and co-author trailer must be applied by the lead when committing. No push.
+
+
+### S2-T47 final verification and scope-audit correction
+
+- Final focused command: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_classification_review.py core/tests/test_classification.py core/tests/test_calculation_purity.py -q -p no:cacheprovider --hypothesis-seed=47` exited 0: 184 passed, no failures or skips.
+- Final `UV_OFFLINE=1 uv run --locked ruff check .` exited 0, all checks passed; `UV_OFFLINE=1 uv run --locked ruff format --check .` exited 0, 832 files formatted; `UV_OFFLINE=1 uv run --locked mypy` exited 0, 447 source files; `python3 scripts/check_docs.py` exited 0, 1134 text files and 122 Markdown files; `python3 scripts/check_tree.py` exited 0, 8 rules; `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0.
+- Read-only `python3` scope audit initially exited 1 because its extra identifier scan included pre-existing append-only PROGRESS history. No earlier evidence was changed. The corrected audit checks new text while proving earlier bytes unchanged; it exited 0, proving exactly 13 intended changed/new files, untouched registry/rules/open items, unchanged criterion boxes, the exact S2-T47 status-only task change and additions confined to the owned contract and C13 method sentences. This correction changes no production or repository guard.
+- Strict builder self-review: APPROVE for the local brief's implementation scope; another maker's implementation review remains pending and is not replaced by this verdict. Muhasabah: PASS for sourced scope, actual command evidence, preserved boundaries and explicit pending work. `./eii test` was not run, as directed; no hosted checks or real mapping approval are claimed.
+
+- Post-return checks: documentation scan exited 0 (1134 text files, 122 Markdown files); whitespace and rules parity exited 0. The extra return audit first exited 1 because it treated a relative temporary-directory reference as an absolute path; its corrected path-boundary check exited 0, confirming the report marker, maker/model, absence of prohibited paths/contact tokens/identifiers, preserved progress history and unchanged open items. No repository guard changed.
+Correction (S2-T47 review): the permissive-baseline run shows that the plants fail when no validation exists; it does not show one deciding plant per guard. Removing single guards left 184 passing for the guards listed in review finding B.
+
+## S2-T47 — Fix round one under ruling L-1230 (2026-11-20)
+
+- Maker/model: OpenAI, GPT-6 (Codex). Builder persona: principal economic-statistics engineer for classification correspondences, signed editorial decisions and closed contracts. Strict self-review persona: methods reviewer rejecting bypassed family rules, non-deciding plants, open reasons, silent allocation, weakened assertions, skips and raised bounds. Another-maker re-review remains pending; this is no independent approval.
+- Authority: the complete workspace brief, accepted review A findings A to G, ruling L-1230, and ruling L-1223 F1 to F8; TASKS.md S2-T47, decision 0070 item B3, document 03 **Reviewed classification crosswalk (S2-T47)** and document 07 C13/MTH-68. Scope is this repair round only.
+- Skills loaded: project-orientation, task-standards, sanad-provenance, domain-modeling, strict-reviewer, github-flow and muhasabah-gate. Test-driven-development and verification-before-completion are unavailable in the installed catalogue and applied in plain meaning: author tests first, record real red outcomes, repair, restore each individually removed guard and record green, inspect the final scoped diff and run every requested check.
+- A/C: one shared first-hop helper derives a tariff8 parent from every bound child, never from a direct parent decision. Missing family stays unreviewed/missing_bound_tariff_family; any non-mapped child preserves the worst child's status/reason. The derived first hop retains original child links. Tests now cover direct-parent bypass, all absent/pending/rejected children and exact status/reason for every family case. The split-family fixture explicitly supplies both second hops, isolating family disagreement from an independently missing occupation hop; no earlier assertion was weakened.
+- B: isolated plants assert each listed guard's own diagnostic. Bad endpoints are declared, bare digit strings are built at runtime in a locator or context title, and the duplicate property is in an otherwise valid body. Duplicate-property diagnostics now survive the JSON error boundary. Production controls and refusals use committed cus_imp_2025 and mfg_industry/manufacture-of-basic-metals registry metadata with invented association/snapshot/meaning fixtures only. No actual source correspondence is approved.
+- D/E/F/G: Reason has the six closed file/resolver reasons and SelectionReason the four selection reasons, with a closed union on all three result shapes; document 03 lists the four. Non-mapped resolutions expose no paths. C13 refuses every weighted decision, including a single partial published weight. The ISIC test now proves both exact-endpoint composition and refusal of an implicit industry-to-ISIC bridge.
+- Environment: existing prepared engine-group environment, Python 3.14.6, uv 0.11.31, Linux x86_64. Installed engine versions were probed: duckdb 2.0.0, h3 4.5.0, h5py 3.16.0, psycopg 3.3.8, pyshp 3.1.6, pyvalhalla 3.9.1, rasterio 1.5.2, shapely 2.2.0. No sync or install was needed. All uv work used UV_OFFLINE=1; pytest used repository-local TMPDIR and PYTEST_ADDOPTS=--hypothesis-seed=47 with the unchanged eii profile. No network, secret, public-data cache, private data or vault read; no service operation, retry, skip, raised bound or baseline refresh. No ./eii test.
+
+Let F be `custodian/tests/test_classification_review.py core/tests/test_classification.py core/tests/test_calculation_purity.py` in the command rows below. The focused command includes exactly those files, `-q -p no:cacheprovider` and the environment above.
+
+| Stage and command | Exit | Actual result |
+|---|---|---|
+| Tests first: uv run --locked python -m pytest F -q -p no:cacheprovider | 1 | 17 failed, 200 passed; includes the extended parent-bypass assertion, status words, path leak, weighted selection, closed types and duplicate diagnostic |
+| Same focused command, code repaired before document 03 update | 1 | 1 failed, 216 passed; only the four missing selection reasons in the contract |
+| Same focused command, contract fixed and context bare-digit plants added | 0 | 219 passed; no failure or skip |
+| uv run --locked python .overnight/tmp/fix1_prove_guards.py | 0 | 33 single-removal cases in a disposable copy; each baseline exit 0/4 passed, removed guard exit 1/exactly the selected plant failed with 3 controls passing, restored exit 0/4 passed |
+| uv run --locked ruff check ., before import cleanup | 1 | 2 import-order findings, fixed explicitly |
+| uv run --locked ruff format . | 0 | 4 files reformatted, 828 unchanged; scoped files only |
+| uv run --locked ruff check ., after cleanup | 0 | All checks passed |
+| uv run --locked ruff format --check . | 0 | 832 files already formatted |
+| uv run --locked mypy | 0 | No issues in 447 source files |
+| python3 scripts/check_docs.py | 0 | 1134 text files, 122 Markdown files checked |
+| python3 scripts/check_tree.py | 0 | 8 rules checked |
+| cmp AGENTS.md CLAUDE.md | 0 | Byte-identical |
+| git diff --check | 0 | No whitespace errors |
+| git switch -c fix/s2-t47-review-fix1 | 128 | Shared Git metadata is read-only; no branch, stage, commit or push |
+
+- Guard proof: .overnight/tmp/fix1_prove_guards.py copies only selected tracked code, test, configuration and committed public-registry/review files into a workspace-local disposable copy. Each run asserts the imported classification modules came from that copy. Every reader removal must yield DID NOT RAISE, never a different guard's message; core removals must fail the expected result assertion. Exactly the selected plant fails among that plant and three controls. Both mutated modules are restored after every red run; all copied source hashes match the workspace and the disposable copy is deleted on success. This is a focused deciding-plant proof, not a claim that a full-suite removal yields just one failure.
+- The three controls in every removal case are test_ac1_review_basis_and_binding, test_b_production_registry_positive_control and test_ac3_two_hop_trace_and_missing_link. Every guard, its exact selected test node, removal and restoration outcome is listed in .overnight/RETURN.md; machine-readable evidence is .overnight/tmp/fix1-guard-results.json. Red focused outcomes and the environment probe are in the adjacent fix1-tests-first.json, fix1-before-contract.json and fix1-environment.json records.
+- Proposed open items remain proposals in .overnight/RETURN.md: allocation of family-membership verification, review-date ordering, S7-T11 production refusal of fixture-mode Crosswalk objects, and independent re-review/lead whole-suite evidence. The engine environment question is answered by the probe and commands above. OPEN_ITEMS.md, TASKS.md, AGENTS.md, CLAUDE.md, source registry, review/schema/binding files and existing purity policy are unchanged.
+- Full base commit: 809392bacf1a4703e1e5e9b5b38385fe5f22500b. No new commit was possible. The lead must commit the workspace repair with the brief's requested Conventional Commit title and co-author trailer; nothing was pushed. All previous PROGRESS bytes were verified identical before this append.
+- Strict builder self-review: APPROVE for the local repair scope, pending another maker's re-review. Muhasabah: PASS for sourced evidence, exact scope and explicit limits. No production mapping, release carriage, hosted check, full-suite result or independent approval is claimed.
+
+- Final verification after records: all seven brief checks and git diff --check exited 0: focused 219 passed; lint clean; format 832 files; mypy 447 source files; documentation 1134 text files/122 Markdown files; tree 8 rules; rules byte-identical. Exact commands, exits and outputs are in .overnight/tmp/fix1-final-checks.json.
+- The extra scope audit initially exited 1 because its spacing assertion expected three newlines between the appended correction and round heading; the writer correctly inserted two. The corrected audit checks the exact correction and heading with that actual spacing, then checks preserved history, exact scoped files, unchanged protected files, identifier/path hygiene, all recorded exits and the return marker. This fixes the audit expectation only; no repository guard, test assertion or earlier evidence row changed.
+- Corrected scope audit: python3 .overnight/tmp/fix1_scope_audit.py exited 0; 7 changed tracked files, 33 deciding removals, 8 green checks including whitespace, no staged files, prior progress bytes preserved, contract confined to its task section, clean new-text identifier/path scan and correct return marker.
+
+Correction (S2-T47 re-review): the 33 removal proofs of fix round one cover the guards listed in review finding B and findings A, C, E, F and G only. A wider sweep of 133 single removals at a6acb9b1 left 22 further guard clauses surviving with 219 passing; they are review finding H.
+
+## S2-T47 — Fix round two, finding H (2026-11-20)
+
+- Maker/model: OpenAI Codex, GPT-6. Builder persona: senior test engineer for validated classification crosswalks, closed schemas, guard clauses and single-removal proofs. Strict self-review persona: reviewer rejecting masked plants, a match on another guard's message, production changes, weakened assertions, skips and raised bounds.
+- Authority/source: complete `.overnight/BRIEF.md`; `.overnight/IN/REREVIEW-A2.md`, finding H and its three numbered tables; TASKS.md S2-T47 criterion 5; AGENTS.md rule 37. Findings A to G are outside this repair and unchanged.
+- Skills read and applied: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. Test-driven-development and verification-before-completion applied in plain meaning where unavailable: add the plants, remove one clause only in the copy to get red, restore it to get green, inspect scope and run the requested checks. No independent reviewer is impersonated; another-maker re-review remains pending.
+- Tracked scope: only `custodian/tests/test_classification_review.py`, `core/tests/test_classification.py` and this appended PROGRESS block. Sixteen reader and six core plants were added, each asserting the guard's own `pytest.raises(..., match=...)` diagnostic. Every earlier test and assertion is retained. No production line, schema, fixture, threshold, bound, skip, baseline or rule was changed.
+- Full base commit: `a6acb9b1cbf61cb821ecd6290176cbd973936b98`. This is the tested HEAD plus the scoped uncommitted additions. `git switch -c test/s2-t47-fix2` exited 128: shared Git metadata is read-only. No new branch or commit was possible; the tree is left changed for the lead to apply the brief's requested commit title and trailer. No push.
+- Environment: existing prepared engine-group environment; Python 3.14.6, uv 0.11.31, Linux x86_64, pytest 9.2.0, ruff 0.17.4, mypy 2.4.1. All uv commands used `UV_OFFLINE=1` and `UV_CACHE_DIR=.overnight/tmp/uv-cache`; proof and final checks used workspace-local TMPDIR, `PYTEST_ADDOPTS=--hypothesis-seed=47`, and the unchanged eii profile. The initial baseline and first added-test run used the bootstrap's automatic seed, which was not captured; these files contain no property-generated test. The decisive copy runs and final check are explicitly seeded. Exact environment probe: `.overnight/tmp/fix2-environment.json`.
+- Initial focused baseline (the same three-file pytest command below) exited 0, 219 passed. After the additions it exited 0, 241 passed. Initial lint, mypy, documentation and parity checks exited 0 with the same counts as below. Initial `uv run --locked ruff format --check .` exited 1: two files would be reformatted, 830 already formatted. `uv run --locked ruff format .` exited 0: two files reformatted, 830 unchanged. The final checks below followed those whitespace-only changes; no assertion changed.
+- No network or service operation, secret/private/vault/public-data-cache read, retry, skip, raised bound or baseline refresh. No whole-suite, hosted-check, release, real-mapping approval or independent approval is claimed. No new unresolved choice or random failure was observed; the review's proposed open items remain for the lead, and OPEN_ITEMS.md is unchanged.
+
+The reader is `custodian/src/eii_custodian/publicdata/review/classification.py`; the core is `core/src/eii_core/classification.py`. Reader test names below resolve in `custodian/tests/test_classification_review.py`, core names in `core/tests/test_classification.py`. Guard locations reproduce review H's identifiers against the unchanged base.
+
+| # | Isolating plant | Required diagnostic |
+|---|---|---|
+| 1 | group reviewed_on = 2026-W47-5 | `review or retrieval date is not ISO` |
+| 2 | source URL = https:///syn-source | `source URL is not a public uncredentialed address` |
+| 3 | tariff12 source code = SYN-TARIFF-1000.0001; declared | `tariff code is not canonical dotted source grain` |
+| 4 | target code = mfg_industry/syn-A_B; matching snapshot/version; declared | `manufacturing endpoint is not its source industry` |
+| 5 | declared ISIC target level = industry | `ISIC endpoint differs from the pinned spine class` |
+| 6 | declared ISIC target code = SYN-ISIC-10A1 | `ISIC endpoint differs from the pinned spine class` |
+| 7 | declared occupation target level = class | `occupation endpoint is not a released major group` |
+| 8 | empty unreviewed decision reason = outside_review_scope | `empty decision cannot claim a mapping` |
+| 9 | reader _SCHEMA points to absent.schema.json in tmp_path | `crosswalk schema is missing` |
+| 10 | source URL with username only; chr(64) separator | `source URL is not a public uncredentialed address` |
+| 11 | source URL with password only and empty username; chr(64) separator | `source URL is not a public uncredentialed address` |
+| 12 | source_refs retains syn-basis and appends syn-absent | `link basis or source chain is unresolved` |
+| 13 | editorial rationale = null; configuration hash retained | `editorial basis lacks rationale or configuration hash` |
+| 14 | same source in another group with target industry b and fresh syn-link-z | `duplicate source decision` |
+| 15 | same industry target, distinct syn-l/syn-r link ids, official weights 0.4/0.6 | `duplicate link or target identity` |
+| 16 | same parent, disjoint declared third child SYN-TARIFF-1000.0001.0003 | `tariff family has no unique bound parent` |
+| 17 | C13 receives validated Crosswalk and industry identity | `C13 requires a validated crosswalk and a tariff identity` |
+| 18 | resolver receives {} and tariff identity | `resolver requires a validated crosswalk and a tariff identity` |
+| 19 | C13 receives {} and tariff identity | `C13 requires a validated crosswalk and a tariff identity` |
+| 20 | endpoint_from_parts system = hs; otherwise valid identity | `unknown classification system` |
+| 21 | endpoint_from_parts level = heading; otherwise valid identity | `unknown classification level` |
+| 22 | endpoint_from_parts version = empty text; otherwise valid identity | `classification identity is empty` |
+
+The proof command `UV_OFFLINE=1 UV_CACHE_DIR=.overnight/tmp/uv-cache uv run --locked python .overnight/tmp/fix2_prove_guards.py` exited 0. It ran `git archive HEAD` (exit 0), extracted into a newly created disposable folder under `.overnight/tmp/`, and overlaid only the two new test files. Each child Python process checked the reader, core and fixture imports against that copy before running pytest. The archived baseline and restored final focused suite each exited 0 with 241 passed. Each numbered mutation below removed only that guard clause, leaving the other clauses in place; its selected new plant failed in the call phase while all three controls passed. Restoring the clause then gave four passes. Both production module hashes matched before and after; the disposable copy was deleted. Exact function-scoped removals, exits and counts are in `.overnight/tmp/fix2-guard-results.json`; child reports are `.overnight/tmp/fix2-proof-*.json`, with local paths redacted.
+
+| # | Guard in review H | New test name | Red count / exit | Restored green / exit |
+|---|---|---|---|---|
+| 1 | reader:127 dashed date shape | `test_h_review_date_requires_dashed_calendar_shape` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 2 | reader:160 URL host | `test_h_public_source_url_guards[hostname]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 3 | reader:200-206 tariff grain by level | `test_h_tariff_level_requires_matching_grain` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 4 | reader:215-217 industry code pattern | `test_h_industry_code_requires_canonical_slug` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 5 | reader:236 ISIC level | `test_h_isic_endpoint_guards[level-industry]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 6 | reader:238 ISIC code pattern | `test_h_isic_endpoint_guards[code-SYN-ISIC-10A1]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 7 | reader:242 occupation level | `test_h_occupation_level_requires_major_group` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 8 | reader:326 empty decision with another reason | `test_h_empty_decision_requires_a_pending_reason` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 9 | reader:357-358 missing schema | `test_h_missing_schema_has_fixed_diagnostic` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 10 | reader:161 URL username | `test_h_public_source_url_guards[username]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 11 | reader:162 URL password | `test_h_public_source_url_guards[password]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 12 | reader:276 unresolved non-basis source ref | `test_h_nonbasis_source_ref_must_resolve` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 13 | reader:287 editorial rationale null | `test_h_editorial_rationale_cannot_be_null` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 14 | reader:409-410 duplicate source decision | `test_h_duplicate_source_with_distinct_link_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 15 | reader:422 repeated target in a group | `test_h_duplicate_target_with_valid_weights_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 16 | reader:455 repeated family parent | `test_h_duplicate_parent_with_disjoint_children_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 17 | core:302 C13 non-tariff source | `test_h_c13_refuses_a_non_tariff_source` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 18 | core:244 resolver given a non-Crosswalk | `test_h_resolver_requires_a_crosswalk` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 19 | core:302 C13 given a non-Crosswalk | `test_h_c13_requires_a_crosswalk` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 20 | core:56 unknown system | `test_h_endpoint_identity_guards[system]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 21 | core:58 unknown level | `test_h_endpoint_identity_guards[level]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 22 | core:60 empty identity | `test_h_endpoint_identity_guards[empty_identity]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+
+The controls in every row were `test_ac1_review_basis_and_binding`, `test_b_production_registry_positive_control` and `test_ac3_two_hop_trace_and_missing_link`. These are focused deciding-plant proofs, not a claim that only one test fails in a whole-suite mutant run. Exact-message assertions also detect a changed diagnostic: removing guard 8 reaches the unsigned-decision refusal, 9 exposes FileNotFoundError, 12 exposes KeyError, and 18/19 expose AttributeError. With each guard present, the planted input reaches that guard's own diagnostic.
+
+| Command | Exit | Actual result |
+|---|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_classification_review.py core/tests/test_classification.py core/tests/test_calculation_purity.py -q -p no:cacheprovider` | 0 | 241 passed, no failures or skips |
+| `uv run --locked ruff check .` | 0 | All checks passed |
+| `uv run --locked ruff format --check .` | 0 | 832 files already formatted |
+| `uv run --locked mypy` | 0 | No issues in 447 source files |
+| `python3 scripts/check_docs.py` | 0 | 1134 text files and 122 Markdown files checked |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical |
+| `git diff --check` | 0 | No whitespace errors |
+
+- Check evidence: `.overnight/tmp/fix2-final-checks.json`; preliminary checker outputs: `.overnight/tmp/fix2-initial-checks.json`. The proof script itself records each selected node and all process exit codes. Generated evidence contains relative source references only.
+- Strict builder self-review: APPROVE for this tests-only finding-H repair; another-maker review is pending. Muhasabah: PASS for sourced evidence, unchanged production, append-only history, exact scope and explicit limits.
+
+- Post-record verification: `python3 .overnight/tmp/fix2_scope_audit.py` exited 0: exactly three tracked files changed, prior tests and progress bytes retained, production hashes unchanged, 22 unique red/green proofs, disposable copy deleted, all seven recorded checks green, marker and new-text hygiene verified, no staged files. `python3 scripts/check_docs.py` exited 0: 1134 text files and 122 Markdown files. `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0. Final diff: 264 insertions and zero deletions before this evidence line.
+## S2-LR5 — S2-T37 bucket-listing discovery repair, 2026-11-20
+
+Maker: OpenAI Codex. Model: GPT-6 (system identity; the exact served variant is not exposed).
+Builder persona: senior public-source data engineer. Strict self-review persona:
+provenance reviewer rejecting unsafe XML, partial listings, guessed releases and
+cached or pinned fallbacks. Loaded skills: project-orientation, task-standards,
+github-flow, sanad-provenance, strict-reviewer and muhasabah-gate.
+Test-driven-development, systematic-debugging and verification-before-completion
+were unavailable as installed skills and followed in their plain meaning, as
+the brief permits. No independent-maker approval is claimed.
+
+Starting commit: `6f8a16bb4cbbdb39bf696b8cb4a4745d8a1e78e7`.
+Environment: Linux workspace sandbox, Python 3.14.6, uv 0.11.31, locked prepared
+environment. All uv commands used `UV_OFFLINE=1` and
+`UV_CACHE_DIR=.overnight/tmp/uv-cache`. Final individual test runs additionally
+used `PYTEST_ADDOPTS=--hypothesis-seed=73105`; these files contain no randomized
+or property tests. Earlier red and green runs used pytest's automatic seed,
+which quiet output did not expose; none is invented here.
+
+Cause and source: `.overnight/IN/LIVE-RUN-places-lines.txt` records the lead's
+`release_missing` failure. `.overnight/IN/LISTING-SHAPE.md` records a complete,
+namespaced S3 XML listing. The selector read HTML anchors. These supplied
+documents establish the defect and format only; no live fetch was run here.
+
+Fix: standard-library XML parsing rejects DOCTYPEs (including entity declarations)
+and processing instructions. Exact prefix, complete-listing flag, real ISO dates,
+unique object keys and the exact dated `places/_metadata` key are required.
+The greatest qualifying date wins; the invented observed-shape test returns
+`2025-02-06`. Only other objects under dated `places/` folders and root files
+are ignored. Other nested shapes refuse. Closed discovery reasons are in
+`errors.py`; invented `run_build` cases verify the printed reasons and no cached
+fallback. Listing receipts now archive XML. The package README states these rules.
+
+Named plants: `plant-doctype`, `plant-entity-declaration`,
+`plant-processing-instruction` (UTF-8 and UTF-16), processing instructions inside
+and after the root, `plant-prefix`, `plant-key-prefix`, `plant-namespace`,
+`plant-double-prefix`, `plant-missing-truncation`, `plant-truncation-case`,
+`plant-double-key`, `plant-html`, `test_plant_truncated_listing_is_never_read_in_part`
+and `test_plant_dated_folder_without_metadata_is_not_a_release`. Existing
+invalid-date, duplicate and foreign-link plants were translated into bucket keys;
+no assertion was loosened. Four reporting plants exercise the build-public seam.
+
+Red then green: `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_places_fsq_releases.py`
+first exited 1 (26 failed, 29 passed); after adding report and archive assertions,
+before implementation, it exited 1 (30 failed, 29 passed). The same final tests
+then exited 0 (59 passed). The first combined package run,
+`uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_places_fsq*.py`,
+exited 0 (256 passed, no skips). The red log in `.overnight/tmp/releases-red.txt`
+has workspace paths redacted and retains failure counts.
+
+Final per-file checks use `uv run --locked python -m pytest -q -p no:cacheprovider`
+followed by the path below, each exit 0 and no skips:
+
+- `custodian/tests/test_places_fsq.py`: 23 passed.
+- `custodian/tests/test_places_fsq_binary.py`: 51 passed.
+- `custodian/tests/test_places_fsq_breaks.py`: 5 passed.
+- `custodian/tests/test_places_fsq_fetch_checks.py`: 33 passed.
+- `custodian/tests/test_places_fsq_format.py`: 74 passed.
+- `custodian/tests/test_places_fsq_join.py`: 5 passed.
+- `custodian/tests/test_places_fsq_kills.py`: 6 passed.
+- `custodian/tests/test_places_fsq_releases.py`: 59 passed.
+
+Other checks and real results:
+
+- `uv run --locked ruff check .`: initial exit 1, one I001 import-order finding;
+  after correcting that import, exit 0, all checks passed.
+- `uv run --locked ruff format --check .`: exit 0, 828 files already formatted.
+- `uv run --locked mypy`: exit 0, 445 source files, no issues.
+- `python3 scripts/check_docs.py`: exit 0, 1126 text files and 121 Markdown files.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules.
+- `cmp AGENTS.md CLAUDE.md`: exit 0, byte-identical.
+- `git diff --check`: exit 0, no whitespace defects.
+- Read-only source audit: exit 0; both approved date-validator bodies, the
+  column-order reader, partition-selection module, unrelated assembly selector,
+  OPEN_ITEMS.md and the agent-rule files match the starting commit exactly.
+
+Search found only the places fetcher's use of this selector; the HTML path was
+removed. The unrelated investment selector and `assembly_native.py` were left
+unchanged. No limits, tolerances, retries, skips or baselines changed. Neither
+`./eii test` nor a live build-public command was run.
+
+`git switch -c fix/s2-lr5-bucket-listing` exited 128 because Git refs are mounted
+read-only. No commit or push was possible; the task changes remain in the working
+tree. The brief's authorized commit subject and coauthor trailer remain for the
+lead's writable checkout. PROPOSED OPEN ITEM, not written to OPEN_ITEMS.md:
+S2-LR5 needs another maker's review and the lead's seeded live build on the patch,
+with selected release, listing hash and metadata receipt recorded before closing
+the live-run defect. Muhasabah: PASS for the bounded patch, sourced statements and
+reported checks; independent review and live confirmation remain the lead's work.
+
+### S2-LR5 — lens B finding F1: a plant that only the root guard refuses (2026-11-20)
+
+- Finding (lens B, review of 9a3b97fd): the namespace plant changed the namespace of every element, so it was refused by
+  the child lookups as well and did not decide the root-tag guard of `releases.py`.
+- Fix (test only, by the lead): `test_plant_root_alone_wrong_with_s3_children_is_refused`, two cases, a root in another
+  namespace and a root of another name, each with every child left in the S3 namespace.
+- Red then green: with the root-tag check removed in a disposable copy, the two cases fail (2 failed, 59 passed); on
+  this head, `uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py custodian/tests/test_places_fsq.py -q -p no:cacheprovider`
+  gives 84 passed, exit 0; ruff check and ruff format --check clean.
+
+#### MERGE TRAIN S2-10 — S2-T47 test module moved to the custodian side (lead, 2026-11-20)
+
+- Finding: the lead's ledger try 1 (seed 2547224853) whole test stopped the python-core suite at collection: `core/tests/test_classification.py` imported `custodian.tests.fixtures.classification` and, through `parse`, the custodian reader; the runner starts pytest with `python -P`, so the import failed with `No module named 'custodian'`. Focused runs from the repository root put the working folder on the import path and hid it.
+- Fix: the module moves unchanged to `custodian/tests/test_classification_resolver.py` (custodian tests may import core; core tests import no custodian code), with one docstring sentence saying why; `docs/03_DATA_CONTRACTS.md` names the new path among the focused tests.
+- Evidence (project runner, seed 2547224853): python-core exit 0, 749 passed; python-custodian-1 exit 0, 4743 passed; python-custodian-2 exit 0, 4167 passed. Before the fix: python-core interrupted, 1 error.

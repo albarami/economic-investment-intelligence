@@ -1,5 +1,6 @@
 """Invented compact footers for the second format fix pass."""
 
+import math
 import struct
 import time
 
@@ -14,6 +15,198 @@ from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partiti
 
 def envelope(payload):
     return b"PAR1" + payload + struct.pack("<I", len(payload)) + b"PAR1"
+
+
+def ordered_footer(
+    order, physical=5, low=51.0, high=51.5, *, nan=None, null=0, extra_int96=False
+):
+    """Hand-encode two compact ColumnChunks, independently of the footer writer.
+
+    Fields: ColumnMetaData type/path/num_values/statistics; Statistics
+    null_count/max_value/min_value/nan_count. All invented counts fit one byte.
+    """
+
+    def bound(value):
+        if isinstance(value, bytes):
+            return value
+        if physical == 3:
+            return struct.pack("<qi", int(value), 1)
+        return struct.pack("<f" if physical == 4 else "<d", value)
+
+    chunks = []
+    for name, minimum, maximum in [
+        (b"longitude", low, high),
+        (b"latitude", 25.0, 25.5),
+    ]:
+        lower, upper = bound(minimum), bound(maximum)
+        statistics = (
+            b"\x36"
+            + bytes([null << 1])
+            + b"\x28"
+            + bytes([len(upper)])
+            + upper
+            + b"\x18"
+            + bytes([len(lower)])
+            + lower
+        )
+        if nan is not None:
+            statistics += b"\x36" + bytes([nan << 1])
+        column = (
+            b"\x15"
+            + bytes([physical << 1])
+            + b"\x29\x18"
+            + bytes([len(name)])
+            + name
+            + b"\x26\x06\x7c"
+            + statistics
+            + b"\x00\x00"
+        )
+        chunks.append(b"\x18\x0cnear.parquet\x2c" + column + b"\x00")
+    if extra_int96:
+        # A valid third, non-coordinate INT96 column uses member 3.
+        statistics = (
+            b"\x36\x00\x28\x0c"
+            + struct.pack("<qi", 2, 1)
+            + b"\x18\x0c"
+            + struct.pack("<qi", 1, 1)
+            + b"\x00"
+        )
+        column = b"\x15\x06\x29\x18\x09timestamp\x26\x06\x7c" + statistics + b"\x00"
+        chunks.append(b"\x18\x0cnear.parquet\x2c" + column + b"\x00")
+    # FileMetaData row_groups followed by column_orders; each union is empty.
+    union = bytes([(order << 4) | 12]) + b"\x00\x00"
+    orders = union * 2 + (b"\x3c\x00\x00" if extra_int96 else b"")
+    list_header = bytes([(len(chunks) << 4) | 12])
+    return envelope(
+        b"\x49\x1c\x19"
+        + list_header
+        + b"".join(chunks)
+        + b"\x00"
+        + b"\x39"
+        + list_header
+        + orders
+        + b"\x00"
+    )
+
+
+@pytest.mark.parametrize("physical", [4, 5])
+@pytest.mark.parametrize("order", [1, 2])
+def test_fsq_float_orders_use_non_nan_bounds_with_control(order, physical):
+    body = ordered_footer(order, physical, nan=0)
+    chunks = f.read_summary(body).row_groups[0]
+    assert [(c.minimum, c.maximum) for c in chunks] == [(51.0, 51.5), (25.0, 25.5)]
+    assert select_partitions(body, "2032-04-05", FRAME_BOX).files == ("near.parquet",)
+
+
+@pytest.mark.parametrize("physical", [4, 5])
+@pytest.mark.parametrize("order", [1, 2])
+@pytest.mark.parametrize("side", ["low", "high"])
+def test_fsq_float_order_nan_bound_refuses_with_control(order, physical, side):
+    body = ordered_footer(order, physical, **{side: float("nan")}, nan=1)
+    chunk = f.read_summary(body).row_groups[0][0]
+    if order == 2:
+        assert (chunk.minimum, chunk.maximum) == (None, None)
+    elif side == "low":
+        assert (chunk.minimum, chunk.maximum) == (None, 51.5)
+    else:
+        assert (chunk.minimum, chunk.maximum) == (51.0, None)
+    with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
+        select_partitions(body, "2032-04-05", FRAME_BOX)
+    assert select_partitions(
+        ordered_footer(order, physical, nan=1), "2032-04-05", FRAME_BOX
+    ).files == ("near.parquet",)
+
+
+@pytest.mark.parametrize("physical", [4, 5])
+@pytest.mark.parametrize("order", [1, 2])
+@pytest.mark.parametrize("null", [0, 1])
+def test_fsq_float_all_non_null_nan_has_no_bounds(order, physical, null):
+    # num_values is three. Finite-looking stale bounds cannot contradict counts.
+    with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
+        select_partitions(
+            ordered_footer(order, physical, nan=3 - null, null=null),
+            "2032-04-05",
+            FRAME_BOX,
+        )
+    assert select_partitions(
+        ordered_footer(order, physical, nan=2 - null, null=null),
+        "2032-04-05",
+        FRAME_BOX,
+    ).files == ("near.parquet",)
+
+
+@pytest.mark.parametrize("physical", [4, 5])
+@pytest.mark.parametrize("side,value,sign", [("low", 0.0, -1), ("high", -0.0, 1)])
+def test_fsq_type_order_zero_widens_but_total_order_keeps_sign(
+    physical, side, value, sign
+):
+    changes = {"low": -1.0, "high": 1.0, side: value}
+    chunk = f.read_summary(ordered_footer(1, physical, **changes)).row_groups[0][0]
+    bound = chunk.minimum if side == "low" else chunk.maximum
+    assert bound == 0.0 and math.copysign(1, bound) == sign
+    control = f.read_summary(ordered_footer(2, physical, **changes, nan=0)).row_groups[
+        0
+    ][0]
+    bound = control.minimum if side == "low" else control.maximum
+    assert bound == 0.0 and math.copysign(1, bound) == -sign
+
+
+@pytest.mark.parametrize(
+    "order,physical",
+    [
+        (2, 0),
+        (2, 1),
+        (2, 2),
+        (2, 3),
+        (2, 6),
+        (2, 7),
+        (3, 0),
+        (3, 1),
+        (3, 2),
+        (3, 4),
+        (3, 5),
+        (3, 6),
+        (3, 7),
+    ],
+)
+def test_fsq_order_on_wrong_physical_type_refuses(order, physical):
+    with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
+        f.read_summary(ordered_footer(order, physical))
+    assert select_partitions(
+        ordered_footer(2, 5, nan=0), "2032-04-05", FRAME_BOX
+    ).files == ("near.parquet",)
+
+
+def test_fsq_int96_timestamp_order_is_recognised_without_coordinate_coercion():
+    # INT96 timestamp bytes cannot become geographic degrees. The order is valid.
+    chunk = f.read_summary(
+        ordered_footer(3, 3, low=bytes(12), high=b"\x01" + bytes(11))
+    ).row_groups[0][0]
+    assert chunk.column_order == 3
+    assert (chunk.minimum, chunk.maximum) == (None, None)
+    with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
+        select_partitions(ordered_footer(3, 3), "2032-04-05", FRAME_BOX)
+    body = ordered_footer(2, nan=0, extra_int96=True)
+    assert f.read_summary(body).row_groups[0][2].column_order == 3
+    assert select_partitions(body, "2032-04-05", FRAME_BOX).files == ("near.parquet",)
+
+
+@pytest.mark.parametrize("order", [4, 9])
+def test_fsq_hand_encoded_unknown_order_still_refuses(order):
+    with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
+        select_partitions(ordered_footer(order), "2032-04-05", FRAME_BOX)
+    assert select_partitions(
+        ordered_footer(2, nan=0), "2032-04-05", FRAME_BOX
+    ).files == ("near.parquet",)
+
+
+@pytest.mark.parametrize("before", [False, True])
+def test_fsq_ieee_order_uses_modern_bounds_instead_of_deprecated(before):
+    chunks = f.read_summary(summary(2, (10.0, 11.0), before=before)).row_groups[0]
+    assert [(c.minimum, c.maximum) for c in chunks] == [(51.0, 51.5), (25.0, 25.5)]
+    assert select_partitions(
+        summary(2, (10.0, 11.0), before=before), "2032-04-05", FRAME_BOX
+    ).files == ("near.parquet",)
 
 
 def summary(
@@ -78,13 +271,13 @@ def summary(
     return envelope(bytes(w.buffer))
 
 
-@pytest.mark.parametrize("order", [None, 2, 9])
+@pytest.mark.parametrize("order", [None, 4, 9])
 def test_fsq_orders_missing_or_unknown_refuse(order):
     with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
         select_partitions(summary(order), "2025-01-10", FRAME_BOX)
 
 
-@pytest.mark.parametrize("order", [None, 2, 9])
+@pytest.mark.parametrize("order", [None, 4, 9])
 def test_fsq_deprecated_bounds_used_when_order_unknown(order):
     chunks = f.read_summary(summary(order, (10.0, 11.0))).row_groups[0]
     assert [(c.minimum, c.maximum) for c in chunks] == [(10.0, 11.0), (10.0, 11.0)]
@@ -353,7 +546,7 @@ def test_fsq_writer_emits_orders_and_optional_deprecated_pair():
     groups = [
         dict(file_path="near.parquet", longitude=(51.0, 51.5), latitude=(25.0, 25.5))
     ]
-    for orders in [None, (9, 9), (2, 2)]:
+    for orders in [None, (9, 9), (4, 4)]:
         with pytest.raises(PlacesFsqError, match=r"^statistics_missing$"):
             select_partitions(
                 f.metadata_bytes(groups, dataset_geo_bbox=None, column_orders=orders),
@@ -370,6 +563,12 @@ def test_fsq_writer_emits_orders_and_optional_deprecated_pair():
             "2025-01-10",
             FRAME_BOX,
         ).files == ("near.parquet",)
+
+    assert select_partitions(
+        f.metadata_bytes(groups, dataset_geo_bbox=None, column_orders=(2, 2)),
+        "2025-01-10",
+        FRAME_BOX,
+    ).files == ("near.parquet",)
 
 
 def test_fsq_list_header_refuses_huge_size_at_read_site():

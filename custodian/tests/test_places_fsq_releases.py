@@ -8,10 +8,16 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from custodian.tests.fixtures.places_fsq.invented import listing, place, write_places
+from custodian.tests.fixtures.places_fsq.invented import (
+    bucket_listing,
+    listing,
+    place,
+    write_places,
+)
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_places_fsq import _grid, _release_entry
 
+from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response
@@ -27,21 +33,64 @@ from eii_custodian.publicdata.places_fsq.policy import (
 from eii_custodian.publicdata.places_fsq.releases import (
     select_release,
     validate_release,
+    validate_release_path,
 )
-from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
+from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partitions
 
 _OLD = "2031-02-03"
 _NEW = "2032-04-05"
 _STABLE_KEY = "places_fsq/copy"
 
 
+@pytest.mark.parametrize("validator", ["receipt", "selection"])
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        f"{_NEW}/places/part-{_OLD}.parquet",
+        f"{_OLD}/places/part-{_NEW}.parquet",
+        f"{_NEW}/places/part-2033-06-07.parquet",
+        f"part-{_NEW}-copied-{_OLD}.parquet",
+        f"{_NEW}/{_OLD}/places/part.parquet",
+    ],
+)
+def test_every_date_in_receipt_and_selection_paths_must_match(
+    file_path: str, validator: str
+) -> None:
+    body = metadata_bytes(
+        [dict(file_path=file_path, longitude=(51.0, 51.5), latitude=(25.0, 25.5))],
+        dataset_geo_bbox=None,
+    )
+    with pytest.raises(PlacesFsqError, match=r"^release_mismatch$"):
+        if validator == "receipt":
+            validate_release_path(file_path, _NEW)
+        else:
+            select_partitions(body, _NEW, FRAME_BOX)
+
+
+@pytest.mark.parametrize(
+    "file_path",
+    [
+        f"{_NEW}/places/part-{_NEW}.parquet",
+        f"{_NEW}/{_NEW}/part.parquet",
+        "part.parquet",
+    ],
+)
+def test_equal_release_dates_and_undated_paths_remain_valid(file_path: str) -> None:
+    validate_release_path(file_path, _NEW)
+    body = metadata_bytes(
+        [dict(file_path=file_path, longitude=(51.0, 51.5), latitude=(25.0, 25.5))],
+        dataset_geo_bbox=None,
+    )
+    assert select_partitions(body, _NEW, FRAME_BOX).files == (file_path,)
+
+
 def test_unordered_listing_selects_greatest_valid_calendar_date() -> None:
-    body = listing(
-        "README.md",
-        f"{_OLD}/",
-        f"{_NEW}/",
-        "2030-12-31/",
-        "notes/release-dates",
+    body = bucket_listing(
+        "fsq-os-places/README.md",
+        f"fsq-os-places/{_NEW}/places/SYN-new.parquet",
+        f"fsq-os-places/{_OLD}/places/_metadata",
+        f"fsq-os-places/{_NEW}/places/_metadata",
+        "fsq-os-places/2030-12-31/places/_metadata",
     )
     assert select_release(body) == _NEW
     assert validate_release(_NEW) == _NEW
@@ -66,21 +115,165 @@ def test_release_validation_refuses_a_non_string() -> None:
 
 
 @pytest.mark.parametrize(
-    "hrefs,reason",
+    "keys,reason",
     [
-        (("README.md", "notes/"), "release_missing"),
-        ((_NEW, "2032-04-06/"), "release_link"),
-        ((f"{_NEW}/", f"{_NEW}/"), "release_duplicate"),
-        ((f"{COPY_ROOT}{_NEW}/", f"{_NEW}/"), "release_duplicate"),
-        (("2032-02-30/",), "release_invalid"),
-        (("2032-4-05/",), "release_invalid"),
-        ((f"https://invented.invalid/{_NEW}/",), "release_link"),
-        ((f"https://data.source.coop/other/{_NEW}/",), "release_link"),
+        (("README.md",), "release_missing"),
+        ((f"{_NEW}/SYN-other.parquet",), "release_key"),
+        ((f"{_NEW}/places/_metadata",) * 2, "release_duplicate"),
+        ((f"{_NEW}/places/SYN-part.parquet",) * 2, "release_duplicate"),
+        (("2032-02-30/places/_metadata",), "release_invalid"),
+        (("2032-4-05/places/_metadata",), "release_invalid"),
+        ((f"https://invented.invalid/{_NEW}/",), "release_key"),
+        ((f"https://data.source.coop/other/{_NEW}/",), "release_key"),
     ],
 )
-def test_bad_dated_candidates_fail_closed(hrefs: tuple[str, ...], reason: str) -> None:
+def test_bad_dated_candidates_fail_closed(keys: tuple[str, ...], reason: str) -> None:
     with pytest.raises(PlacesFsqError, match=rf"^{reason}$"):
-        select_release(listing(*hrefs))
+        select_release(bucket_listing(*(f"fsq-os-places/{key}" for key in keys)))
+
+
+def test_observed_bucket_shape_selects_metadata_backed_newest_release() -> None:
+    # Lead's LISTING-SHAPE.md: same dated segments, invented keys and sizes.
+    dates = ("2024-11-19", "2024-12-03", "2025-01-10", "2025-02-06")
+    keys = ["fsq-os-places/README.md"]
+    for release in reversed(dates):
+        keys.extend(
+            f"fsq-os-places/{release}/places/{name}"
+            for name in ("SYN-part.parquet", "_metadata", "SYN-extra.txt")
+        )
+    assert select_release(bucket_listing(*keys)) == "2025-02-06"
+
+
+@pytest.mark.parametrize("has_older", [False, True])
+def test_plant_dated_folder_without_metadata_is_not_a_release(has_older: bool) -> None:
+    keys = [f"fsq-os-places/{_NEW}/places/SYN-part.parquet"]
+    if has_older:
+        keys.append(f"fsq-os-places/{_OLD}/places/_metadata")
+        assert select_release(bucket_listing(*keys)) == _OLD
+    else:
+        with pytest.raises(PlacesFsqError, match=r"^release_missing$"):
+            select_release(bucket_listing(*keys))
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    [
+        '<!DOCTYPE ListBucketResult SYSTEM "https://invented.invalid/SYN-dtd">',
+        '<!DOCTYPE ListBucketResult [<!ENTITY SYN "fsq-os-places/">]>',
+        '<?SYN-instruction reject="yes"?>',
+    ],
+    ids=["plant-doctype", "plant-entity-declaration", "plant-processing-instruction"],
+)
+@pytest.mark.parametrize("encoding", ["utf-8", "utf-16"])
+def test_plant_xml_declarations_are_refused(declaration: str, encoding: str) -> None:
+    text = listing(f"{_NEW}/").decode().split("?>", 1)[1]
+    body = (declaration + text).encode(encoding)
+    with pytest.raises(PlacesFsqError, match=r"^release_listing$"):
+        select_release(body)
+
+
+@pytest.mark.parametrize("position", ["inside", "after"])
+def test_plant_processing_instruction_anywhere_is_refused(position: str) -> None:
+    body = listing(f"{_NEW}/")
+    instruction = b"<?SYN-instruction?>"
+    if position == "inside":
+        body = body.replace(b"<Marker/>", b"<Marker/>" + instruction)
+    else:
+        body += instruction
+    with pytest.raises(PlacesFsqError, match=r"^release_listing$"):
+        select_release(body)
+
+
+@pytest.mark.parametrize(
+    "body,reason",
+    [
+        (bucket_listing(prefix="SYN-wrong/"), "release_prefix"),
+        (bucket_listing("other/SYN-file"), "release_prefix"),
+        (
+            bucket_listing(namespace="https://invented.invalid/SYN-namespace"),
+            "release_listing",
+        ),
+        (
+            listing(f"{_NEW}/").replace(b"<Prefix>", b"<Prefix/><Prefix>"),
+            "release_listing",
+        ),
+        (
+            listing(f"{_NEW}/").replace(b"<IsTruncated>false</IsTruncated>", b""),
+            "release_listing",
+        ),
+        (bucket_listing(truncated="False"), "release_listing"),
+        (listing(f"{_NEW}/").replace(b"<Key>", b"<Key/><Key>"), "release_listing"),
+        (b'<html><a href="2032-04-05/">SYN-release</a></html>', "release_listing"),
+    ],
+    ids=[
+        "plant-prefix",
+        "plant-key-prefix",
+        "plant-namespace",
+        "plant-double-prefix",
+        "plant-missing-truncation",
+        "plant-truncation-case",
+        "plant-double-key",
+        "plant-html",
+    ],
+)
+def test_plant_bucket_shape_failures(body: bytes, reason: str) -> None:
+    with pytest.raises(PlacesFsqError, match=rf"^{reason}$"):
+        select_release(body)
+
+
+def test_plant_truncated_listing_is_never_read_in_part() -> None:
+    body = bucket_listing(
+        f"fsq-os-places/{_NEW}/places/_metadata",
+        "other/SYN-file",
+        truncated="true",
+    )
+    with pytest.raises(PlacesFsqError, match=r"^release_truncated$"):
+        select_release(body)
+
+
+@pytest.mark.parametrize(
+    "body,reason",
+    [
+        (bucket_listing(prefix="SYN-other/"), "release_prefix"),
+        (bucket_listing(truncated="true"), "release_truncated"),
+        (bucket_listing(f"fsq-os-places/{_NEW}/other/SYN-file"), "release_key"),
+        (b"<?SYN-instruction?>" + listing(f"{_NEW}/"), "release_listing"),
+    ],
+    ids=[
+        "plant-prefix-report",
+        "plant-truncated-report",
+        "plant-key-report",
+        "plant-xml-report",
+    ],
+)
+def test_build_public_reports_listing_reason_and_never_uses_cached_release(
+    body: bytes, reason: str, tmp_path: Path
+) -> None:
+    entry = replace(_release_entry(), url=COPY_ROOT, terms_url="")
+    cache = tmp_path / "cache"
+    sentinel = cache / _STABLE_KEY / _OLD / "SYN-retained"
+    sentinel.parent.mkdir(parents=True)
+    sentinel.write_bytes(b"SYN-unchanged")
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        return Response(url, body, ())
+
+    result = run_build(
+        (entry,), transport, cache, lambda: "2091-01-01T00:00:00Z", lambda _: None
+    )
+    assert result.failure is not None
+    assert result.failure.check == reason
+    assert any(
+        line
+        == f"FAIL {_STABLE_KEY} {COPY_ROOT} {reason} expected=newest dated release observed=none"
+        for line in result.lines
+    )
+    assert f" {reason} " in result.failure.detail
+    assert seen == [COPY_ROOT]
+    assert sentinel.read_bytes() == b"SYN-unchanged"
+    assert not (cache / _STABLE_KEY / _NEW).exists()
 
 
 def test_fetch_follows_listing_to_newest_metadata_partitions_and_data(
@@ -128,6 +321,10 @@ def test_fetch_follows_listing_to_newest_metadata_partitions_and_data(
     assert manifest["listing_sha256"]
     assert manifest["metadata_sha256"]
     assert result.digest
+    archived = list((directory / "listings").glob("*.xml"))
+    assert len(archived) == 1
+    assert archived[0].read_bytes() == bodies[COPY_ROOT]
+    assert not list((directory / "listings").glob("*.html"))
     for role in ("listings", "metadata", "files", "manifests"):
         receipt = json.loads(next((directory / role).glob("*.meta.json")).read_bytes())
         assert receipt["source_modified"] == _NEW
@@ -280,3 +477,33 @@ def test_second_release_propagates_and_receipt_date_mismatch_refuses(
     }
     with pytest.raises(PlacesFsqError, match=r"^source_release$"):
         build_places(**mismatched)
+
+
+@pytest.mark.parametrize(
+    "root",
+    [
+        (
+            "SYN:ListBucketResult",
+            ' xmlns:SYN="https://invented.invalid/SYN-namespace"'
+            ' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"',
+        ),
+        ("ListAllMyBucketsResult", ' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"'),
+    ],
+    ids=["plant-root-namespace-only", "plant-root-name-only"],
+)
+def test_plant_root_alone_wrong_with_s3_children_is_refused(
+    root: tuple[str, str],
+) -> None:
+    """Only the root guard refuses: every child stays in the S3 namespace."""
+    tag, declarations = root
+    body = (
+        listing(f"{_NEW}/")
+        .replace(
+            b'<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            f"<{tag}{declarations}>".encode(),
+        )
+        .replace(b"</ListBucketResult>", f"</{tag}>".encode())
+    )
+    assert f"<{tag}".encode() in body
+    with pytest.raises(PlacesFsqError, match=r"^release_listing$"):
+        select_release(body)
