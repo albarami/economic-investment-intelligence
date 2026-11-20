@@ -217,3 +217,50 @@ def test_store_adapters_share_results_and_embedded_index_is_real():
         assert not any(
             word in seen[0][0].upper() for word in ("INSERT", "UPDATE", "DELETE")
         )
+
+
+def test_five_candidate_cap_is_exact_and_stably_ordered():
+    result = AddressIndex(
+        tuple(row(f"fea-invented-{i}") for i in reversed(range(7)))
+    ).search(AddressQuery("71", "802", "9"))
+    assert result.truncated is True
+    assert len(result.candidates) == 5
+    assert [candidate.feature_key for candidate in result.candidates] == [
+        f"fea-invented-{i}" for i in range(5)
+    ]
+
+
+def test_store_reader_refuses_seven_rows_before_result_selection():
+    from dataclasses import asdict
+
+    from eii_product.api.address_search import StoredAddressSearch
+
+    fields = {
+        "source_id",
+        "source_sha256",
+        "retrieved_on",
+        "licence_basis",
+        "decision_record",
+        "publisher",
+        "terms_words",
+    }
+    lineage = {key: value for key, value in asdict(row()).items() if key in fields}
+
+    def reader(sql, values):
+        return [
+            (
+                f"fea-invented-{i}",
+                "71",
+                "802",
+                "9",
+                None,
+                Decimal("51.1"),
+                Decimal("25.1"),
+            )
+            for i in range(7)
+        ]
+
+    with pytest.raises(AddressRefusal, match=r"^store_bound_refused$"):
+        StoredAddressSearch("postgres", reader, lineage).search(
+            AddressQuery("71", "802", "9")
+        )

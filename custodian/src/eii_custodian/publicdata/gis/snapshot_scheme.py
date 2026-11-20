@@ -117,9 +117,7 @@ def enumerate_tiles(
         or land_qng.geom_type not in {"Polygon", "MultiPolygon"}
     ):
         raise SnapshotRefusal("boundary_invalid")
-    # Reject missing national coverage instead of silently clipping islands.
-    if not box(*scheme.extent).covers(land_qng):
-        raise SnapshotRefusal("metadata_extent_coverage")
+    # Enumerate the whole country; extent differences are recorded as coverage gaps.
     xmin, ymin, xmax, ymax = land_qng.bounds
     if scheme.x > xmin or scheme.y < ymax:
         raise SnapshotRefusal("metadata_origin_coverage")

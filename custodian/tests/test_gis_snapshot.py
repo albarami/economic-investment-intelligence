@@ -19,6 +19,17 @@ from eii_custodian.publicdata.gis.snapshot_runner import acquire
 from eii_custodian.publicdata.gis.snapshot_scheme import enumerate_tiles, read_scheme
 
 STAMP = "2026-11-20T00:00:00Z"
+BOUNDARY_RECEIPT = {
+    "source_id": "invented_boundary",
+    "key": "invented_boundary",
+    "publisher": "Invented boundary publisher",
+    "url": "https://www.data.gov.qa/invented-boundary",
+    "licence_basis": "dataset",
+    "licence_id": "CC-BY-4.0",
+    "decision_record": "",
+    "terms_words": "Invented terms",
+    "terms_read_on": "2026-11-20",
+}
 JPEG = b"\xff\xd8\xff\xc0\x00\x11\x08\x02\x00\x02\x00\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00invented-tile\xff\xd9"
 
 
@@ -145,6 +156,56 @@ def test_lock_is_global_and_nonblocking(tmp_path):
         pass
 
 
+def test_machine_lock_refuses_two_different_roots(tmp_path):
+    with policy.run_lock(tmp_path / "first"):
+        with pytest.raises(policy.SnapshotRefusal, match=r"^run_locked$"):
+            with policy.run_lock(tmp_path / "second"):
+                pytest.fail("second root admitted")
+    with policy.run_lock(tmp_path / "second"):
+        pass
+
+
+def test_lock_does_not_relabel_body_io_errors(tmp_path):
+    import errno
+
+    for code in (errno.ENOSPC, errno.EIO):
+        with pytest.raises(OSError) as caught:
+            with policy.run_lock(tmp_path):
+                raise OSError(code, "invented disk fault")
+        assert caught.value.errno == code
+
+
+@pytest.mark.parametrize(
+    "code,reason",
+    [(28, "disk_safety_stop"), (122, "disk_safety_stop"), (5, "io_error")],
+)
+@pytest.mark.parametrize("wrapped", [False, True])
+def test_run_reports_disk_and_io_errors_without_paths(
+    tmp_path, capsys, code, reason, wrapped
+):
+    from eii_custodian.publicdata.gis import snapshot_runner as runner
+    from eii_custodian.publicdata.gis.snapshot_archive import _immutable
+
+    def fail():
+        if wrapped:
+            _immutable(tmp_path / "invented-object", b"invented")
+        else:
+            raise OSError(code, "secret-path")
+
+    with (
+        patch.object(runner, "configured_root", return_value=tmp_path),
+        patch.object(runner, "lower_priority", fail),
+        patch(
+            "eii_custodian.publicdata.fetch.snapshots._publish",
+            side_effect=OSError(code, "secret-path"),
+        ),
+    ):
+        assert runner.run({}) == 1
+    output = capsys.readouterr().out
+    assert reason in output and "lock_unavailable" not in output
+    assert "secret-path" not in output
+
+
 def test_priority_and_disk_are_fail_closed():
     calls = []
     policy.lower_priority(lambda: calls.append("nice"), lambda: calls.append("ionice"))
@@ -256,6 +317,7 @@ def test_acquire_resumes_and_paces_metadata_and_tiles(tmp_path):
         lambda: STAMP,
         lambda: None,
         levels=(10,),
+        boundary_receipt=BOUNDARY_RECEIPT,
     )
     again = acquire(
         tmp_path,
@@ -267,6 +329,7 @@ def test_acquire_resumes_and_paces_metadata_and_tiles(tmp_path):
         lambda: STAMP,
         lambda: None,
         levels=(10,),
+        boundary_receipt=BOUNDARY_RECEIPT,
     )
     assert first == again
     assert len(calls) == 3  # metadata again; no tile skipped without verification
@@ -288,6 +351,7 @@ def test_acquire_resumes_and_paces_metadata_and_tiles(tmp_path):
             lambda: STAMP,
             lambda: None,
             levels=(10,),
+            boundary_receipt=BOUNDARY_RECEIPT,
         )
 
 
@@ -309,6 +373,7 @@ def test_redirect_is_not_followed_and_retries_are_bounded(tmp_path):
             lambda: STAMP,
             lambda: None,
             levels=(10,),
+            boundary_receipt=BOUNDARY_RECEIPT,
         )
     calls = []
 
@@ -327,6 +392,7 @@ def test_redirect_is_not_followed_and_retries_are_bounded(tmp_path):
             lambda: STAMP,
             lambda: None,
             levels=(10,),
+            boundary_receipt=BOUNDARY_RECEIPT,
         )
     assert len(calls) == 4
     assert clock.waits[-3:] == pytest.approx([1, 2, 4], abs=1e-12)
@@ -410,8 +476,27 @@ def test_command_root_unset_refuses_without_any_connection(tmp_path):
         assert run(tmp_path, {}, ("--gis-imagery-snapshot", "--seed", "9")) == 2
 
 
+@pytest.mark.parametrize(
+    "plant",
+    [None, "gap", "partial"]
+    + [
+        (field, stage)
+        for field in (
+            "publisher",
+            "url",
+            "licence_basis",
+            "decision_record",
+            "terms_read_on",
+            "retrieved_utc",
+            "bytes",
+            "sha256",
+            "foreign_url",
+        )
+        for stage in ("resume", "selection")
+    ],
+)
 def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, plant
 ):
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
     from eii_custodian.publicdata.gis import snapshot_release as release
@@ -478,7 +563,14 @@ def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
             called.append("disk")
 
     def transport(url):
-        return Response(url, metadata() if url.endswith("?f=json") else JPEG, ())
+        meta = json.loads(metadata())
+        if plant == "partial":
+            meta["fullExtent"]["xmax"] = 1.5
+        if plant == "gap" and not url.endswith("?f=json"):
+            return Response(url, b"", (), evidence={"http_status": 404})
+        return Response(
+            url, json.dumps(meta).encode() if url.endswith("?f=json") else JPEG, ()
+        )
 
     monkeypatch.setattr(runner, "configured_root", lambda env: root)
     monkeypatch.setattr(release, "configured_root", lambda env: root)
@@ -503,6 +595,45 @@ def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
     assert selected_root == root and len(selections) == 121
     assert all(path != root and path.is_file() for path, _ in files)
     assert all(path.name != "selection.json" for path, _ in files)
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    level_root = root / "1995-02/level-10"
+    enumeration = json.loads(
+        read_checked(level_root / "completion", complete["dates"]["1995-02"]["10"]).body
+    )["enumeration"]
+    projected = read_checked(
+        level_root / "inputs/boundary", enumeration["inputs"]["boundary"]
+    )
+    assert projected.sidecar["publisher"] == "Invented boundary publisher"
+    assert projected.sidecar["url"] == "https://www.data.gov.qa/invented-boundary"
+    assert projected.sidecar["upstream_sha256"] == digest(boundary)
+    if plant in ("gap", "partial"):
+        coverage = complete["coverage"]["1995-02"]["10"]
+        if plant == "gap":
+            assert (
+                coverage["gaps"][0]["http_status"] == 404 and coverage["gap_count"] == 1
+            )
+        else:
+            from shapely.geometry import shape
+
+            assert not shape(coverage["uncovered"]).is_empty
+        return
+    if isinstance(plant, tuple):
+        field, stage = plant
+
+        def damage(side):
+            if field == "foreign_url":
+                side["url"] = "https://foreign.invalid/"
+            else:
+                side.pop(field)
+
+        rewrite_sidecar(root / "all-dates", identity, damage)
+        if stage == "resume":
+            assert runner.run({}) == 1
+        else:
+            with pytest.raises(policy.SnapshotRefusal, match=r"receipt|integrity"):
+                release.reviewed_inputs({})
+        return
     from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
     from eii_custodian.publicdata.gis.snapshot_archive import canonical
 
@@ -514,11 +645,7 @@ def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
         root / "all-dates",
         "json",
         incomplete_body,
-        {
-            "source_id": "gis_imagery_history",
-            "key": "gis_imagery_history",
-            "retrieved_utc": STAMP,
-        },
+        runner.public_chain("all-dates", "all-dates", STAMP),
         identity=incomplete_id,
     )
     (root / "release-selection.json").write_text(
@@ -623,11 +750,11 @@ def test_interruption_retains_complete_shards_and_resumes_only_the_gap(tmp_path)
         if url.endswith("?f=json"):
             return Response(url, body, ())
         if url.endswith("/0/" + str(policy.SHARD_TILES)):
-            raise TransportFault("http", url, 503)
+            raise OSError("invented interruption")
         return Response(url, JPEG, ())
 
     land = box(1, 1800, 512 * 0.53 * policy.SHARD_TILES + 1, 1801)
-    with pytest.raises(policy.SnapshotRefusal, match="request_failed"):
+    with pytest.raises(OSError, match="invented interruption"):
         acquire(
             tmp_path,
             "1995-02",
@@ -638,6 +765,7 @@ def test_interruption_retains_complete_shards_and_resumes_only_the_gap(tmp_path)
             lambda: STAMP,
             lambda: None,
             levels=(10,),
+            boundary_receipt=BOUNDARY_RECEIPT,
         )
     assert not (tmp_path / "1995-02/level-10/completion").exists()
     completed = []
@@ -656,6 +784,7 @@ def test_interruption_retains_complete_shards_and_resumes_only_the_gap(tmp_path)
         lambda: STAMP,
         lambda: None,
         levels=(10,),
+        boundary_receipt=BOUNDARY_RECEIPT,
     )
     assert len(result) == 1 and len(completed) == 2
     assert completed[-1].endswith("/0/" + str(policy.SHARD_TILES))
@@ -695,6 +824,7 @@ def test_level_eleven_refused_before_send_with_or_without_keys_and_offline_contr
                     lambda: STAMP,
                     lambda: None,
                     levels=(11,),
+                    boundary_receipt=BOUNDARY_RECEIPT,
                 )
 
 
@@ -799,6 +929,7 @@ def test_dated_extents_may_differ_but_grid_origins_may_not(tmp_path):
             lambda: None,
             levels=(10,),
             expected_scheme=replace(wider, x=-1),
+            boundary_receipt=BOUNDARY_RECEIPT,
         )
 
 
@@ -836,6 +967,7 @@ def test_only_declared_levels_through_the_cap_are_required(tmp_path):
         policy.Pacer(clock.time, clock.sleep),
         lambda: STAMP,
         lambda: None,
+        boundary_receipt=BOUNDARY_RECEIPT,
     )
     assert len(manifests) == 1 and len(calls) == 2
 
@@ -862,3 +994,238 @@ def test_ionice_failure_is_blocking_and_priority_children_receive_no_keys(monkey
         call[1]["env"] == {"PATH": "/usr/bin:/bin", "LANG": "C"} for call in calls
     )
     assert "invented-priority-canary" not in repr(calls)
+
+
+def rewrite_sidecar(directory, identity, transform):
+    """Keep envelope hashes consistent, so tests reach semantic lineage checks."""
+    from eii_custodian.publicdata.gis.snapshot_archive import (
+        canonical,
+        digest,
+        read_checked,
+    )
+
+    snap = read_checked(directory, identity)
+    side = dict(snap.sidecar)
+    transform(side)
+    snap.receipt_path.write_bytes(canonical(side))
+    index = directory / "index" / (identity + ".json")
+    row = json.loads(index.read_bytes())
+    row["receipt_sha256"] = digest(snap.receipt_path.read_bytes())
+    index.write_bytes(canonical(row))
+
+
+def small_acquisition(root, transport=None):
+    clock = Clock()
+
+    def default(url):
+        return Response(url, metadata() if url.endswith("?f=json") else JPEG, ())
+
+    return acquire(
+        root,
+        "1995-02",
+        box(1, 1800, 2, 1801),
+        "a" * 64,
+        transport or default,
+        policy.Pacer(clock.time, clock.sleep),
+        lambda: STAMP,
+        lambda: None,
+        levels=(10,),
+        boundary_receipt=BOUNDARY_RECEIPT,
+    )
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "publisher",
+        "url",
+        "licence_basis",
+        "decision_record",
+        "terms_words",
+        "terms_read_on",
+        "generator_version",
+        "retrieved_utc",
+        "sha256",
+        "bytes",
+        "licence_id",
+        "kind",
+        "imagery_date",
+        "source_id",
+        "key",
+    ],
+)
+@pytest.mark.parametrize("kind", ["metadata", "boundary", "completion"])
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+def test_incomplete_public_receipt_refuses_semantically(tmp_path, field, kind, stage):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (manifest,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    snap = read_checked(level / "completion", manifest)
+    enumeration = json.loads(snap.body)["enumeration"]
+    folder, identity = (
+        (level / "completion", manifest)
+        if kind == "completion"
+        else (level / "inputs" / kind, enumeration["inputs"][kind])
+    )
+    rewrite_sidecar(folder, identity, lambda side: side.pop(field, None))
+    with pytest.raises(policy.SnapshotRefusal, match=r"receipt|integrity"):
+        if stage == "resume":
+            small_acquisition(tmp_path)
+        else:
+            verify_selection(level, manifest)
+
+
+@pytest.mark.parametrize("kind", ["metadata", "boundary", "completion"])
+def test_foreign_public_receipt_refuses(tmp_path, kind):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (manifest,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    enumeration = json.loads(read_checked(level / "completion", manifest).body)[
+        "enumeration"
+    ]
+    folder, identity = (
+        (level / "completion", manifest)
+        if kind == "completion"
+        else (level / "inputs" / kind, enumeration["inputs"][kind])
+    )
+    rewrite_sidecar(
+        folder, identity, lambda side: side.update(url="https://foreign.invalid/")
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"receipt|integrity"):
+        verify_selection(level, manifest)
+
+
+@pytest.mark.parametrize("failure", ["404", "503", "empty", "non-jpeg", "dimensions"])
+def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, failure):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+    from eii_custodian.publicdata.gis.snapshot_release import assemble
+    from eii_product.api.gis_imagery import ReleasedImagery, imagery_router
+
+    calls = []
+
+    def transport(url):
+        calls.append(url)
+        if url.endswith("?f=json"):
+            return Response(url, metadata(), ())
+        body = {
+            "empty": b"",
+            "non-jpeg": b"not-a-jpeg",
+            "dimensions": JPEG.replace(b"\x02\x00\x02\x00", b"\x01\x00\x02\x00"),
+        }.get(failure, b"")
+        return Response(
+            url,
+            body,
+            (),
+            evidence={"http_status": int(failure) if failure.isdigit() else 200},
+        )
+
+    (manifest,) = small_acquisition(tmp_path, transport)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", manifest).body)
+    (gap,) = completion["gaps"]
+    assert gap["key"] == [10, 0, 0]
+    assert gap["attempts"] == (4 if failure == "503" else 1)
+    if failure == "404":
+        assert gap["http_status"] == 404
+    selection = verify_selection(level, manifest)
+    assert tuple(selection.iter_tiles()) == ()
+    assert selection.shards[0].sidecar["members"] == []
+    assert selection.shards[0].sidecar["gaps"] == [gap]
+    tile_calls = len(calls)
+    assert small_acquisition(tmp_path, transport) == (manifest,)
+    assert len(calls) == tile_calls + 1  # metadata only, recorded gap is immutable
+    output = tmp_path / "release"
+    identity = assemble((selection,), output)
+    reader = ReleasedImagery(output, identity)
+    assert reader.tile("1995-02", 10, 0, 0) is None
+    assert reader.coverage["gaps"][0]["key"] == [10, 0, 0]
+    credit_route = next(
+        route.endpoint
+        for route in imagery_router(reader).routes
+        if route.path.endswith("/credit")
+    )
+    assert credit_route()["coverage"] == reader.coverage
+    shard = selection.shards[0]
+    shard_folder = level / "shards/000000"
+    pointer = json.loads((shard_folder / "selection.json").read_bytes())["identity"]
+    rewrite_sidecar(
+        shard_folder, pointer, lambda side: side["gaps"][0].update(key=[10, 9, 9])
+    )
+    with pytest.raises(policy.SnapshotRefusal, match="integrity"):
+        verify_selection(level, manifest)
+    assert shard.path.is_file()
+
+
+def test_partial_service_extent_keeps_country_and_records_uncovered_geometry(tmp_path):
+    from shapely.geometry import shape
+
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+    from eii_custodian.publicdata.gis.snapshot_release import assemble
+    from eii_product.api.gis_imagery import ReleasedImagery
+
+    meta = json.loads(metadata())
+    meta["fullExtent"]["xmax"] = 1.5
+
+    def transport(url):
+        return Response(
+            url, json.dumps(meta).encode() if url.endswith("?f=json") else JPEG, ()
+        )
+
+    (manifest,) = small_acquisition(tmp_path, transport)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", manifest).body)
+    uncovered = shape(completion["uncovered"])
+    assert uncovered.equals(box(1.5, 1800, 2, 1801))
+    assert completion["enumeration"]["tiles"] == [[10, 0, 0]]
+    output = tmp_path / "release"
+    reader = ReleasedImagery(
+        output, assemble((verify_selection(level, manifest),), output)
+    )
+    assert reader.coverage["uncovered"][0]["geometry"] == completion["uncovered"]
+
+
+def test_acquire_checks_finished_shard_before_completion_or_any_tile_request(tmp_path):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (manifest,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", manifest).body)
+    shard = completion["shards"][0]
+    snap = read_checked(level / "shards/000000", shard["identity"])
+    snap.path.write_bytes(b"planted completed-shard corruption")
+
+    def metadata_only(url):
+        assert url.endswith("?f=json"), "tile requested before verifying finished shard"
+        return Response(url, metadata(), ())
+
+    with patch.object(
+        Archive, "complete", side_effect=AssertionError("reached completion")
+    ):
+        with pytest.raises(policy.SnapshotRefusal, match="archive_integrity"):
+            small_acquisition(tmp_path, metadata_only)
+
+
+def test_safe_child_refuses_symlink_whose_target_is_inside_root(tmp_path):
+    target = tmp_path / "real"
+    target.mkdir()
+    (tmp_path / "link").symlink_to(target, target_is_directory=True)
+    with pytest.raises(policy.SnapshotRefusal, match=r"^root_escape$"):
+        policy.safe_child(tmp_path, "link/file.json")
+
+
+def test_ordinary_registry_has_no_unenforced_snapshot_switches():
+    from pathlib import Path
+
+    import yaml
+    from custodian.tests.repository_root import repository_root
+
+    path = (
+        repository_root(Path(__file__))
+        / "custodian/publicdata/review/s2_t29_sources.yaml"
+    )
+    rows = yaml.load(path.read_text(), Loader=yaml.CSafeLoader)["gis_confirmation"]
+    assert "snapshot_tiles_allowed" not in rows
+    assert "snapshot_contract" not in rows
+    assert rows["export_tiles_allowed"] is False

@@ -45,25 +45,102 @@ def test_selected_files_are_the_only_new_read_only_mounts() -> None:
 
 
 def test_world_profile_cannot_select_imagery() -> None:
-    profile, layout, interpreter, descriptors = golden_layout("build-world")
+    profile, layout, _, _ = golden_layout("build-world")
     layout = replace(
         layout,
         imagery_root=Path("/invented"),
-        imagery=((Path("/invented/a.tar"), "a" * 64),),
+        imagery=(
+            (Path("/invented/1995-02/2026-11-20") / ("a" * 64 + ".tar"), "a" * 64),
+        ),
     )
-    with pytest.raises(launch.SandboxError, match="imagery"):
-        launch.build_argv(profile, layout, interpreter, COMMAND, descriptors)
+    with pytest.raises(launch.SandboxError, match="build-release only"):
+        launch.check_profile(profile, layout)
 
 
 @pytest.mark.parametrize(
     "relative", ["../outside.tar", "selection.json", ".env", "nested/link.tar"]
 )
-def test_unverified_paths_and_nonobjects_cannot_be_selected(relative: str) -> None:
+def test_unverified_paths_and_nonobjects_cannot_be_selected(
+    relative: str, tmp_path: Path
+) -> None:
     profile, layout, _, _ = golden_layout("build-release")
     root = Path("/invented-gis-root")
-    layout = replace(layout, imagery_root=root, imagery=((root / relative, "a" * 64),))
-    with pytest.raises(launch.SandboxError, match="imagery"):
+    path = root / relative
+    reason = "imagery"
+    if relative == "nested/link.tar":
+        root = tmp_path
+        folder = root / "1995-02/real/2026-11-20"
+        folder.mkdir(parents=True)
+        target = folder / ("a" * 64 + ".tar")
+        target.write_bytes(b"invented object")
+        (root / "1995-02/link").symlink_to(folder.parent, target_is_directory=True)
+        path = root / "1995-02/link/2026-11-20" / target.name
+        reason = "invalid selected object"
+    layout = replace(layout, imagery_root=root, imagery=((path, "a" * 64),))
+    with pytest.raises(launch.SandboxError, match=reason):
         launch.check_profile(profile, layout)
+
+
+@pytest.mark.parametrize("ancestor", ["filesystem", "parent", "repository"])
+def test_imagery_root_cannot_contain_repository(ancestor: str) -> None:
+    profile, layout, _, _ = golden_layout("build-release")
+    root = {
+        "filesystem": Path("/"),
+        "parent": layout.code_root.parent,
+        "repository": layout.code_root,
+    }[ancestor]
+    path = root / "1995-02/2026-11-20" / ("a" * 64 + ".json")
+    with pytest.raises(launch.SandboxError, match="repository overlap"):
+        launch.check_profile(
+            profile, replace(layout, imagery_root=root, imagery=((path, "a" * 64),))
+        )
+
+
+@pytest.mark.parametrize(
+    "role", ["cache", "vault", "extensions", "staging", "scenario"]
+)
+@pytest.mark.parametrize("relation", ["equal", "inside", "ancestor"])
+def test_imagery_root_cannot_overlap_other_roles(role: str, relation: str) -> None:
+    profile, layout, _, _ = golden_layout("build-release")
+    protected = Path("/invented-protected") / role
+    root = {
+        "equal": protected,
+        "inside": protected / "snapshot",
+        "ancestor": protected.parent,
+    }[relation]
+    path = root / "1995-02/2026-11-20" / ("a" * 64 + ".json")
+    chosen = replace(
+        layout, **{role: protected}, imagery_root=root, imagery=((path, "a" * 64),)
+    )
+    with pytest.raises(launch.SandboxError, match="role overlap"):
+        launch.check_profile(profile, chosen)
+
+
+def test_valid_object_requires_registered_top_folder() -> None:
+    profile, layout, _, _ = golden_layout("build-release")
+    root = Path("/invented-gis-root")
+    path = root / "foreign/2026-11-20" / ("a" * 64 + ".json")
+    with pytest.raises(launch.SandboxError, match="unregistered folder"):
+        launch.check_profile(
+            profile, replace(layout, imagery_root=root, imagery=((path, "a" * 64),))
+        )
+
+
+def test_valid_object_through_in_root_symlink_refuses_for_symlink(
+    tmp_path: Path,
+) -> None:
+    profile, layout, _, _ = golden_layout("build-release")
+    folder = tmp_path / "1995-02/real/2026-11-20"
+    folder.mkdir(parents=True)
+    path = folder / ("a" * 64 + ".json")
+    path.write_bytes(b"invented")
+    (tmp_path / "1995-02/link").symlink_to(folder.parent, target_is_directory=True)
+    linked = tmp_path / "1995-02/link/2026-11-20" / path.name
+    with pytest.raises(launch.SandboxError, match="invalid selected object"):
+        launch.check_profile(
+            profile,
+            replace(layout, imagery_root=tmp_path, imagery=((linked, "a" * 64),)),
+        )
 
 
 def test_no_selection_needs_no_external_root_and_selected_unset_refuses() -> None:

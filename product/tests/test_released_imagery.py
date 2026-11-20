@@ -38,3 +38,57 @@ def test_manifest_is_explicit_and_cannot_escape_or_be_mutated(tmp_path):
         ReleasedImagery(tmp_path, "../x")
     with pytest.raises(ValueError):
         ReleasedImagery(tmp_path, "a" * 64)
+
+
+def released_fixture(tmp_path):
+    archive, _ = fixture_archive(tmp_path / "acquisition")
+    selection = verify_selection(archive.root, archive.complete([0], STAMP))
+    output = tmp_path / "release"
+    identity = assemble((selection,), output)
+    return output, identity
+
+
+def test_object_hash_checks_bytes_outside_requested_member(tmp_path):
+    import json
+
+    output, identity = released_fixture(tmp_path)
+    manifest = json.loads((output / (identity + ".json")).read_bytes())
+    tile = manifest["tiles"]["1995-02/10/0/0"]
+    path = output / "objects" / (tile["object_sha256"] + ".tar")
+    body = bytearray(path.read_bytes())
+    body[-1] ^= 1
+    path.write_bytes(body)
+    assert body[tile["offset"] : tile["offset"] + tile["bytes"]] == JPEG
+    with pytest.raises(ValueError, match=r"^imagery_integrity$"):
+        ReleasedImagery(output, identity).tile("1995-02", 10, 0, 0)
+
+
+def test_member_hash_checks_intact_object_with_wrong_manifest_hash(tmp_path):
+    import hashlib
+    import json
+
+    output, identity = released_fixture(tmp_path)
+    manifest = json.loads((output / (identity + ".json")).read_bytes())
+    manifest["tiles"]["1995-02/10/0/0"]["member_sha256"] = "0" * 64
+    body = json.dumps(manifest).encode()
+    identity = hashlib.sha256(body).hexdigest()
+    (output / (identity + ".json")).write_bytes(body)
+    with pytest.raises(ValueError, match=r"^imagery_integrity$"):
+        ReleasedImagery(output, identity).tile("1995-02", 10, 0, 0)
+
+
+def test_shard_hash_is_cached_and_file_change_invalidates_it(tmp_path):
+    import hashlib
+    import os
+
+    output, identity = released_fixture(tmp_path)
+    reader = ReleasedImagery(output, identity)
+    path = next((output / "objects").glob("*.tar"))
+    with patch("hashlib.file_digest", wraps=hashlib.file_digest) as hashed:
+        assert reader.tile("1995-02", 10, 0, 0) == JPEG
+        assert reader.tile("1995-02", 10, 0, 0) == JPEG
+        assert hashed.call_count == 1
+        stamp = path.stat().st_mtime_ns
+        os.utime(path, ns=(stamp + 1, stamp + 1))
+        assert reader.tile("1995-02", 10, 0, 0) == JPEG
+        assert hashed.call_count == 2

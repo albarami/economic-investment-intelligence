@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +19,8 @@ _DATE = re.compile(r"[0-9]{4}-[0-9]{2}")
 class ReleasedImagery:
     def __init__(self, directory: Path, manifest_sha256: str) -> None:
         self.directory = directory
+        self._verified: set[tuple[str, int, int, int, int, int]] = set()
+        self._hash_lock = threading.Lock()
         if _HASH.fullmatch(manifest_sha256) is None:
             raise ValueError("imagery_manifest_integrity")
         try:
@@ -33,6 +37,7 @@ class ReleasedImagery:
             self.tiles: dict[str, Any] = data["tiles"]
             self.sources: tuple[dict[str, Any], ...] = tuple(data["sources"])
             self.credit = self.sources[0]
+            self.coverage: dict[str, Any] = data["coverage"]
         except (OSError, KeyError, TypeError, json.JSONDecodeError):
             raise ValueError("imagery_manifest_integrity") from None
 
@@ -74,8 +79,23 @@ class ReleasedImagery:
                 raise ValueError("imagery_integrity")
             path = self._path("objects/" + sha + ".tar")
             with path.open("rb") as stream:
-                if hashlib.file_digest(stream, "sha256").hexdigest() != sha:
-                    raise ValueError("imagery_integrity")
+                with self._hash_lock:
+                    status = os.fstat(stream.fileno())
+                    token = (
+                        sha,
+                        status.st_dev,
+                        status.st_ino,
+                        status.st_size,
+                        status.st_mtime_ns,
+                        status.st_ctime_ns,
+                    )
+                    if token not in self._verified:
+                        if (
+                            hashlib.file_digest(stream, "sha256").hexdigest() != sha
+                            or os.fstat(stream.fileno()) != status
+                        ):
+                            raise ValueError("imagery_integrity")
+                        self._verified.add(token)
                 stream.seek(offset)
                 body = stream.read(size)
             if (
@@ -113,7 +133,11 @@ def imagery_router(imagery: ReleasedImagery | None) -> APIRouter:
         return (
             {"status": "missing-source"}
             if imagery is None
-            else {"sources": imagery.sources, "numerical_evidence": False}
+            else {
+                "sources": imagery.sources,
+                "coverage": imagery.coverage,
+                "numerical_evidence": False,
+            }
         )
 
     return router

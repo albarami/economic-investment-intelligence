@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import json
 import re
 import shutil
@@ -13,11 +14,11 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any
 
-from shapely.geometry import mapping, shape
+from shapely.geometry import box, mapping, shape
 from shapely.geometry.base import BaseGeometry
 
 from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.snapshots import publish_snapshot, utc
+from eii_custodian.publicdata.fetch.snapshots import utc
 from eii_custodian.publicdata.fetch.transport import (
     BACKOFF_S,
     Response,
@@ -26,7 +27,7 @@ from eii_custodian.publicdata.fetch.transport import (
     open_gis_snapshot,
 )
 
-from .snapshot_archive import Archive, canonical, digest
+from .snapshot_archive import Archive, canonical, digest, jpeg, read_checked
 from .snapshot_policy import (
     GENERATOR,
     SERVICES,
@@ -44,11 +45,34 @@ from .snapshot_policy import (
     service_url,
     tile_url,
 )
+from .snapshot_receipt import public_chain, publish_public
 from .snapshot_scheme import Scheme, enumerate_tiles, read_scheme
 
 Clock = Callable[[], str]
 Watch = Callable[[], None]
 GIB = 1024**3
+
+
+def _io_reason(error: BaseException) -> str | None:
+    """Keep disk faults visible through the immutable publisher's fixed refusals."""
+    seen: set[int] = set()
+    pending = [error]
+    while pending:
+        current = pending.pop()
+        if id(current) in seen:
+            continue
+        seen.add(id(current))
+        if isinstance(current, OSError):
+            if current.errno in {errno.ENOSPC, errno.EDQUOT}:
+                return "disk_safety_stop"
+            if current.errno == errno.EIO:
+                return "io_error"
+        pending.extend(
+            item
+            for item in (current.__cause__, current.__context__)
+            if item is not None
+        )
+    return None
 
 
 def _retry_wait(value: str, now: str) -> float:
@@ -68,11 +92,26 @@ def _retry_wait(value: str, now: str) -> float:
         raise SnapshotRefusal("retry_wait_invalid") from None
 
 
+class TileFailure(SnapshotRefusal):
+    def __init__(self, reason: str, status: int, attempts: int) -> None:
+        super().__init__(reason)
+        self.status, self.attempts = status, attempts
+
+
 def request(
-    url: str, transport: Transport, pace: Pacer, now: Clock, watch: Watch
+    url: str,
+    transport: Transport,
+    pace: Pacer,
+    now: Clock,
+    watch: Watch,
+    *,
+    tile: bool = False,
+    attempts: list[int] | None = None,
 ) -> bytes:
     check_url(url)
     for attempt in range(4):
+        if attempts is not None:
+            attempts[:] = [attempt + 1]
         watch()
         pace.wait()
         watch()
@@ -88,11 +127,17 @@ def request(
             raise SnapshotRefusal("redirect_refused")
         check_url(response.final_url)
         status = response.evidence.get("http_status", 200)
+        if type(status) is not int or not 100 <= status <= 599:
+            raise SnapshotRefusal("response_status_invalid")
         if status == 200:
             if not response.body or len(response.body) > 4 * 1024 * 1024:
+                if tile:
+                    raise TileFailure("response_bytes_or_gap", 200, attempt + 1)
                 raise SnapshotRefusal("response_bytes_or_gap")
             return response.body
         if status not in {429, 500, 502, 503, 504} or attempt == 3:
+            if tile:
+                raise TileFailure("request_failed", status, attempt + 1)
             raise SnapshotRefusal("request_failed " + url)
         wait = max(
             BACKOFF_S[attempt],
@@ -102,17 +147,34 @@ def request(
     raise SnapshotRefusal("request_failed " + url)
 
 
-def _input(archive: Path, name: str, body: bytes, now: str) -> str:
+def _input(
+    archive: Path,
+    name: str,
+    body: bytes,
+    now: str,
+    date: str,
+    boundary_sha256: str,
+    boundary_receipt: Mapping[str, Any],
+) -> str:
     identity = digest(body)
-    side: dict[str, object] = {
-        "source_id": "gis_imagery_history",
-        "key": "gis_imagery_history",
-        "retrieved_utc": now,
-        "generator_version": GENERATOR,
-    }
-    publish_snapshot(
-        safe_child(archive, f"inputs/{name}"), "json", body, side, identity=identity
-    )
+    side = public_chain(name, date, now)
+    if name == "boundary":
+        for key in (
+            "source_id",
+            "key",
+            "publisher",
+            "url",
+            "licence_basis",
+            "licence_id",
+            "decision_record",
+            "terms_words",
+            "terms_read_on",
+        ):
+            side[key] = boundary_receipt[key]
+        side.update(
+            upstream_sha256=boundary_sha256, method_version="gis-boundary-project-v1"
+        )
+    publish_public(safe_child(archive, f"inputs/{name}"), body, side, identity)
     return identity
 
 
@@ -126,6 +188,7 @@ def acquire(
     now: Clock,
     watch: Watch,
     *,
+    boundary_receipt: Mapping[str, Any],
     levels: tuple[int, ...] | None = None,
     expected_scheme: Scheme | None = None,
 ) -> tuple[str, ...]:
@@ -148,6 +211,7 @@ def acquire(
             "metadata_sha256": digest(metadata),
             "boundary_sha256": boundary_sha256,
             "tiles": selected,
+            "uncovered": mapping(land_qng.difference(box(*scheme.extent))),
             "generator_version": GENERATOR,
             "inputs": {
                 "metadata": digest(metadata),
@@ -155,24 +219,89 @@ def acquire(
             },
         }
         archive = Archive(directory, enumeration)
-        _input(directory, "metadata", metadata, now())
-        _input(directory, "boundary", canonical(mapping(land_qng)), now())
+        _input(
+            directory,
+            "metadata",
+            metadata,
+            now(),
+            date,
+            boundary_sha256,
+            boundary_receipt,
+        )
+        _input(
+            directory,
+            "boundary",
+            canonical(mapping(land_qng)),
+            now(),
+            date,
+            boundary_sha256,
+            boundary_receipt,
+        )
         count = (len(selected) + SHARD_TILES - 1) // SHARD_TILES
         for shard in range(count):
             watch()
             if archive.has_shard(shard):
                 continue
 
+            gaps: list[dict[str, Any]] = []
+
             def bodies(
                 keys: list[list[int]],
+                missing: list[dict[str, Any]],
             ) -> Iterator[tuple[tuple[int, int, int], bytes]]:
                 for lev, row, col in keys:
-                    body = request(
-                        tile_url(date, lev, row, col), transport, pace, now, watch
+                    attempts: list[int] = []
+                    resolution = scheme.resolutions[lev]
+                    if resolution is None:
+                        raise SnapshotRefusal("metadata_level_missing")
+                    span = 512 * resolution
+                    cell = box(
+                        scheme.x + col * span,
+                        scheme.y - (row + 1) * span,
+                        scheme.x + (col + 1) * span,
+                        scheme.y - row * span,
                     )
+                    try:
+                        if not cell.intersects(box(*scheme.extent)):
+                            missing.append(
+                                {
+                                    "key": [lev, row, col],
+                                    "http_status": None,
+                                    "reason": "outside_extent",
+                                    "attempts": 0,
+                                    "retrieved_utc": now(),
+                                }
+                            )
+                            continue
+                        body = request(
+                            tile_url(date, lev, row, col),
+                            transport,
+                            pace,
+                            now,
+                            watch,
+                            tile=True,
+                            attempts=attempts,
+                        )
+                        try:
+                            jpeg(body)
+                        except SnapshotRefusal as error:
+                            raise TileFailure(str(error), 200, attempts[-1]) from None
+                    except TileFailure as error:
+                        missing.append(
+                            {
+                                "key": [lev, row, col],
+                                "http_status": error.status,
+                                "reason": str(error),
+                                "attempts": error.attempts,
+                                "retrieved_utc": now(),
+                            }
+                        )
+                        continue
                     yield (lev, row, col), body
 
-            archive.write_shard_stream(shard, bodies(archive.expected(shard)), now)
+            archive.write_shard_stream(
+                shard, bodies(archive.expected(shard), gaps), now, gaps=gaps
+            )
         manifests.append(archive.complete(list(range(count)), now()))
     return tuple(manifests)
 
@@ -325,9 +454,13 @@ def pin_boundary(root: Path, body: bytes, expected: str) -> str:
         utc(side["retrieved_utc"])
         if side["terms_read_on"] != "pending":
             datetime.fromisoformat(side["terms_read_on"])
-        publish_snapshot(
-            safe_child(root, "boundary-source"), "json", body, side, identity=expected
+        side["url"] = side.pop("fetch_url")
+        side.update(
+            kind="boundary-source",
+            imagery_date="boundary-source",
+            generator_version=GENERATOR,
         )
+        publish_public(safe_child(root, "boundary-source"), body, side, expected)
         return expected
     except (OSError, ValueError, TypeError, KeyError):
         raise SnapshotRefusal("boundary_lineage_invalid") from None
@@ -374,6 +507,9 @@ def run(environ: Mapping[str, str]) -> int:
             if digest(boundary) != job["boundary_sha256"]:
                 raise SnapshotRefusal("boundary_identity_changed")
             boundary_source = pin_boundary(root, boundary, job["boundary_sha256"])
+            boundary_receipt = read_checked(
+                safe_child(root, "boundary-source"), boundary_source
+            ).sidecar
             document = json.loads(boundary)
             transform_geom = import_module("rasterio.warp").transform_geom
             land = shape(transform_geom("EPSG:4326", "EPSG:2932", document))
@@ -409,6 +545,7 @@ def run(environ: Mapping[str, str]) -> int:
             for scheme in schemes:
                 enumerate_tiles(scheme, land, levels=(scheme.levels[0],))
             complete = {}
+            coverage: dict[str, dict[str, Any]] = {}
             for date in SERVICES:
                 manifests = acquire(
                     root,
@@ -420,7 +557,20 @@ def run(environ: Mapping[str, str]) -> int:
                     now,
                     checkpoint,
                     expected_scheme=schemes[0],
+                    boundary_receipt=boundary_receipt,
                 )
+                coverage[date] = {}
+                for level, identity in zip(schemes[0].levels, manifests, strict=True):
+                    completion = json.loads(
+                        read_checked(
+                            safe_child(root, f"{date}/level-{level:02d}/completion"),
+                            identity,
+                        ).body
+                    )
+                    coverage[date][str(level)] = {
+                        name: completion[name]
+                        for name in ("gaps", "gap_count", "uncovered")
+                    }
                 complete[date] = {
                     str(level): identity
                     for level, identity in zip(
@@ -431,34 +581,45 @@ def run(environ: Mapping[str, str]) -> int:
                 {
                     "version": GENERATOR,
                     "dates": complete,
+                    "coverage": coverage,
                     "complete": True,
                     "boundary_sha256": job["boundary_sha256"],
                     "boundary_source": boundary_source,
                 }
             )
-            publish_snapshot(
+            publish_public(
                 safe_child(root, "all-dates"),
-                "json",
                 body,
-                {
-                    "source_id": "gis_imagery_history",
-                    "key": "gis_imagery_history",
-                    "retrieved_utc": now(),
-                },
-                identity=digest(body),
+                public_chain("all-dates", "all-dates", now()),
+                digest(body),
             )
             print("gis_imagery_history complete_manifest=" + digest(body), flush=True)
         return 0
     except SnapshotRefusal as error:
         print(
-            "gis_imagery_history " + str(error) + "; resumable state retained",
+            "gis_imagery_history "
+            + (_io_reason(error) or str(error))
+            + "; resumable state retained",
             flush=True,
         )
         return 1
-    except (OSError, ValueError, KeyError, TypeError, ImportError):
+    except OSError as error:
+        reason = (
+            "disk_safety_stop"
+            if error.errno in {errno.ENOSPC, errno.EDQUOT}
+            else "io_error"
+        )
+        print(
+            "gis_imagery_history " + reason + "; resumable state retained", flush=True
+        )
+        return 1
+    except (ValueError, KeyError, TypeError, ImportError) as error:
         # Fixed diagnostic. Never include a path, configuration body or upstream error.
         print(
-            "gis_imagery_history snapshot_refused; resumable state retained", flush=True
+            "gis_imagery_history "
+            + (_io_reason(error) or "snapshot_refused")
+            + "; resumable state retained",
+            flush=True,
         )
         return 1
     finally:

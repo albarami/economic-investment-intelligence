@@ -18,8 +18,8 @@ from eii_custodian.publicdata.fetch.snapshots import (
     Snapshot,
     SnapshotError,
     publish_file,
-    publish_snapshot,
     read_snapshot,
+    utc,
 )
 
 from .snapshot_policy import (
@@ -31,6 +31,7 @@ from .snapshot_policy import (
     safe_child,
     service_url,
 )
+from .snapshot_receipt import public_chain, publish_public, validate_receipt
 
 
 def canonical(row: object) -> bytes:
@@ -120,7 +121,7 @@ def jpeg(body: bytes) -> None:
 def unpack(snapshot: Snapshot) -> Iterator[tuple[int, int, int, bytes]]:
     try:
         members = snapshot.sidecar["members"]
-        if not isinstance(members, list) or not 1 <= len(members) <= SHARD_TILES:
+        if not isinstance(members, list) or not 0 <= len(members) <= SHARD_TILES:
             raise SnapshotRefusal("archive_integrity")
         if file_hash(snapshot.path) != snapshot.sha256:
             raise SnapshotRefusal("archive_integrity")
@@ -159,6 +160,62 @@ def unpack(snapshot: Snapshot) -> Iterator[tuple[int, int, int, bytes]]:
         raise SnapshotRefusal("archive_integrity") from None
 
 
+def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str, Any]]:
+    """Every enumerated key occurs once, as either a JPEG member or a fixed gap."""
+    actual = [[level, row, column] for level, row, column, _ in unpack(snapshot)]
+    gaps = snapshot.sidecar.get("gaps")
+    if not isinstance(gaps, list) or not expected:
+        raise SnapshotRefusal("archive_integrity")
+    keys = []
+    for gap in gaps:
+        if not isinstance(gap, dict) or set(gap) != {
+            "key",
+            "http_status",
+            "reason",
+            "attempts",
+            "retrieved_utc",
+        }:
+            raise SnapshotRefusal("archive_integrity")
+        key = gap["key"]
+        status, attempts = gap["http_status"], gap["attempts"]
+        if (
+            not isinstance(key, list)
+            or len(key) != 3
+            or any(type(n) is not int or n < 0 for n in key)
+            or type(attempts) is not int
+            or not 0 <= attempts <= 4
+            or gap["reason"]
+            not in {
+                "request_failed",
+                "response_bytes_or_gap",
+                "tile_format_or_gap",
+                "tile_dimensions_refused",
+                "outside_extent",
+            }
+            or (
+                status is not None
+                and (type(status) is not int or not 100 <= status <= 599)
+            )
+            or (
+                gap["reason"] == "outside_extent"
+                and (attempts != 0 or status is not None)
+            )
+            or (gap["reason"] != "outside_extent" and attempts == 0)
+        ):
+            raise SnapshotRefusal("archive_integrity")
+        level_allowed(key[0])
+        utc(gap["retrieved_utc"])
+        keys.append(key)
+    combined = actual + keys
+    if (
+        len(combined) > SHARD_TILES
+        or sorted(combined) != expected
+        or len({tuple(key) for key in combined}) != len(combined)
+    ):
+        raise SnapshotRefusal("archive_integrity")
+    return gaps
+
+
 class Archive:
     def __init__(self, root: Path, enumeration: dict[str, Any]) -> None:
         self.root = root
@@ -190,14 +247,13 @@ class Archive:
             ]
             snap = read_checked(folder, identity)
             side = snap.sidecar
+            validate_receipt(snap, "shard", self.enumeration["date"])
             if (
                 side.get("enumeration_sha256") != self.identity
                 or side.get("shard") != shard
             ):
                 raise SnapshotRefusal("archive_integrity")
-            actual = [[level, row, column] for level, row, column, _ in unpack(snap)]
-            if actual != self.expected(shard) or not actual:
-                raise SnapshotRefusal("archive_integrity")
+            checked_gaps(snap, self.expected(shard))
             return snap
         except (OSError, ValueError, KeyError, TypeError, SnapshotError):
             raise SnapshotRefusal("archive_integrity") from None
@@ -223,6 +279,8 @@ class Archive:
         shard: int,
         tiles: Iterable[tuple[tuple[int, int, int], bytes]],
         retrieved_utc: str | Callable[[], str],
+        *,
+        gaps: list[dict[str, Any]] | None = None,
     ) -> str:
         folder = self._folder(shard)
         folder.mkdir(parents=True, exist_ok=True)
@@ -246,7 +304,10 @@ class Archive:
                         {"name": name, "sha256": digest(body), "bytes": len(body)}
                     )
                     actual.append([level, row, column])
-            if not actual or actual != self.expected(shard):
+            missing = [] if gaps is None else gaps
+            if not self.expected(shard) or sorted(
+                actual + [gap["key"] for gap in missing]
+            ) != self.expected(shard):
                 raise SnapshotRefusal("enumeration_identity_mismatch")
             identity = digest(
                 canonical(
@@ -254,11 +315,14 @@ class Archive:
                         "enumeration": self.identity,
                         "shard": shard,
                         "sha256": file_hash(staged),
+                        "gaps": missing,
                     }
                 )
             )
             stamp = retrieved_utc() if callable(retrieved_utc) else retrieved_utc
-            return self._publish_shard(shard, folder, staged, members, stamp, identity)
+            return self._publish_shard(
+                shard, folder, staged, members, missing, stamp, identity
+            )
 
     def _publish_shard(
         self,
@@ -266,25 +330,17 @@ class Archive:
         folder: Path,
         staged: Path,
         members: list[dict[str, object]],
+        gaps: list[dict[str, Any]],
         retrieved_utc: str,
         identity: str,
     ) -> str:
         side: dict[str, object] = {
-            "source_id": "gis_imagery_history",
-            "key": "gis_imagery_history",
-            "publisher": "national GIS centre",
-            "licence_basis": "owner_decision",
-            "decision_record": "0026",
-            "terms_words": "terms to be read",
-            "terms_read_on": "pending",
-            "url": service_url(self.enumeration["date"]),
-            "retrieved_utc": retrieved_utc,
-            "imagery_date": self.enumeration["date"],
+            **public_chain("shard", self.enumeration["date"], retrieved_utc),
             "metadata_sha256": self.enumeration["metadata_sha256"],
             "boundary_sha256": self.enumeration["boundary_sha256"],
             "enumeration_sha256": self.identity,
-            "generator_version": GENERATOR,
             "members": members,
+            "gaps": gaps,
             "shard": shard,
         }
         try:
@@ -302,8 +358,10 @@ class Archive:
         if not count or shards != list(range(count)):
             raise SnapshotRefusal("completion_gaps")
         records = []
+        gaps = []
         for shard in shards:
             snap = self.read_shard(shard)
+            gaps.extend(checked_gaps(snap, self.expected(shard)))
             records.append(
                 {
                     "shard": shard,
@@ -321,24 +379,16 @@ class Archive:
                 "version": GENERATOR,
                 "enumeration": self.enumeration,
                 "shards": records,
+                "gaps": gaps,
+                "gap_count": len(gaps),
+                "uncovered": self.enumeration.get("uncovered"),
                 "complete": True,
             }
         )
         identity = digest(body)
-        side: dict[str, object] = {
-            "source_id": "gis_imagery_history",
-            "key": "gis_imagery_history",
-            "retrieved_utc": retrieved_utc,
-            "generator_version": GENERATOR,
-        }
+        side = public_chain("completion", self.enumeration["date"], retrieved_utc)
         try:
-            publish_snapshot(
-                safe_child(self.root, "completion"),
-                "json",
-                body,
-                side,
-                identity=identity,
-            )
+            publish_public(safe_child(self.root, "completion"), body, side, identity)
         except SnapshotError:
             raise SnapshotRefusal("completion_integrity") from None
         return identity
@@ -349,6 +399,8 @@ class Selection:
     files: tuple[tuple[Path, str], ...]
     date: str
     shards: tuple[Snapshot, ...]
+    gaps: tuple[dict[str, Any], ...] = ()
+    uncovered: dict[str, Any] | None = None
 
     def iter_tiles(self) -> Iterator[tuple[str, int, int, int, bytes]]:
         for shard in self.shards:
@@ -365,6 +417,7 @@ def verify_selection(root: Path, manifest: str) -> Selection:
             raise SnapshotRefusal("completion_incomplete")
         archive = Archive.__new__(Archive)
         archive.root, archive.enumeration = root, data["enumeration"]
+        validate_receipt(completion, "completion", archive.enumeration["date"])
         archive.identity = digest(canonical(archive.enumeration))
         if safe_child(root, "enumeration.json").read_bytes() != canonical(
             archive.enumeration
@@ -382,17 +435,16 @@ def verify_selection(root: Path, manifest: str) -> Selection:
             (completion.receipt_path, digest(completion.receipt_path.read_bytes())),
         ]
         snapshots = []
+        gaps = []
         for row in data["shards"]:
             snap = read_checked(archive._folder(row["shard"]), row["identity"])
+            validate_receipt(snap, "shard", archive.enumeration["date"])
             if (
                 snap.sha256 != row["sha256"]
                 or snap.sidecar.get("enumeration_sha256") != archive.identity
             ):
                 raise SnapshotRefusal("completion_integrity")
-            if [[a, b, c] for a, b, c, _ in unpack(snap)] != archive.expected(
-                row["shard"]
-            ):
-                raise SnapshotRefusal("completion_integrity")
+            gaps.extend(checked_gaps(snap, archive.expected(row["shard"])))
             snapshots.append(snap)
             files.extend(
                 (
@@ -400,10 +452,23 @@ def verify_selection(root: Path, manifest: str) -> Selection:
                     (snap.receipt_path, digest(snap.receipt_path.read_bytes())),
                 )
             )
+        if (
+            data.get("gaps") != gaps
+            or data.get("gap_count") != len(gaps)
+            or data.get("uncovered") != archive.enumeration.get("uncovered")
+        ):
+            raise SnapshotRefusal("completion_integrity")
         for name, identity in archive.enumeration.get("inputs", {}).items():
             if name not in {"metadata", "boundary"}:
                 raise SnapshotRefusal("completion_integrity")
             item = read_checked(safe_child(root, "inputs/" + name), identity)
+            validate_receipt(item, name, archive.enumeration["date"])
+            if (
+                name == "boundary"
+                and item.sidecar["upstream_sha256"]
+                != archive.enumeration["boundary_sha256"]
+            ):
+                raise SnapshotRefusal("completion_integrity")
             if item.sha256 != identity:
                 raise SnapshotRefusal("completion_integrity")
             if (
@@ -419,6 +484,12 @@ def verify_selection(root: Path, manifest: str) -> Selection:
             )
         for path, _ in files:
             safe_child(root, str(path.relative_to(root)))
-        return Selection(tuple(files), archive.enumeration["date"], tuple(snapshots))
+        return Selection(
+            tuple(files),
+            archive.enumeration["date"],
+            tuple(snapshots),
+            tuple(gaps),
+            data.get("uncovered"),
+        )
     except (OSError, ValueError, KeyError, TypeError, SnapshotError):
         raise SnapshotRefusal("completion_integrity_or_incomplete") from None

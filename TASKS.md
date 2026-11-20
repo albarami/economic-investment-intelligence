@@ -842,6 +842,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: source registry and dedicated snapshot tooling, immutable archive and release-input seams, fixed offline Public address reader and typed API, invented tests, decision 0079 and affected pack documents. BE-135, BE-136 and the keyed imagery provider are unchanged.
 - Depends for implementation: existing S2-T01, S2-T19 and S2-T27 seams and the released-address/store interfaces. Queued behind S2/S3 work on free seats; no fixed seat or core reserved. No S2/S3 gate, test, whole test, story or task before go live depends on the background snapshot or its completion; S2-T10's blanket dependency excludes it.
 - Delivery: principal geospatial data engineer; strict self-review public-data provenance and operations reviewer; OpenAI / Codex (GPT-6 family; exact serving variant unavailable). Build evidence in PROGRESS.md; different-maker confirmation and live fetch pending.
+- Fix round f1: lens A and B corrections follow ruling L-1303's recorded-gap treatment, with machine-global locking, closed Public-chain receipts, narrower sandbox selection, independent integrity/candidate plants and a proposed live file-count measurement. Evidence: PROGRESS.md, **S2-T51 f1 review corrections — 2026-11-20**. Different-maker confirmation and the lead's operation remain pending.
 - Requirements: [decision 0079](docs/decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 1 to 6; OI-311; document 04 PUB-105; document 13 OPS-65.
 
 ### S2-T10 — Review follow-up for slice S2

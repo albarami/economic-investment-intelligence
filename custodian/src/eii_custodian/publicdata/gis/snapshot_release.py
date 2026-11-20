@@ -13,6 +13,7 @@ import tempfile
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError
 
@@ -31,6 +32,7 @@ from .snapshot_policy import (
     configured_root,
     safe_child,
 )
+from .snapshot_receipt import validate_receipt
 from .snapshot_scheme import read_scheme
 
 
@@ -49,10 +51,18 @@ def reviewed_inputs(
         manifest = read_checked(
             safe_child(root, "all-dates"), selected["manifest_sha256"]
         )
+        validate_receipt(manifest, "all-dates", "all-dates")
         body = json.loads(manifest.body)
         if (
             set(body)
-            != {"version", "dates", "complete", "boundary_sha256", "boundary_source"}
+            != {
+                "version",
+                "dates",
+                "complete",
+                "boundary_sha256",
+                "boundary_source",
+                "coverage",
+            }
             or body.get("complete") is not True
             or body.get("version") != GENERATOR
             or set(body.get("dates", {})) != set(SERVICES)
@@ -74,12 +84,18 @@ def reviewed_inputs(
                 )
                 if selection.date != date:
                     raise SnapshotRefusal("release_selection_identity")
-                enumeration = json.loads(
+                completion = json.loads(
                     read_checked(
                         safe_child(root, f"{date}/level-{level:02d}/completion"),
                         identity,
                     ).body
-                )["enumeration"]
+                )
+                if body["coverage"][date][str(level)] != {
+                    name: completion[name]
+                    for name in ("gaps", "gap_count", "uncovered")
+                }:
+                    raise SnapshotRefusal("release_selection_identity")
+                enumeration = completion["enumeration"]
                 if (
                     set(enumeration.get("inputs", {})) != {"metadata", "boundary"}
                     or enumeration["level"] != level
@@ -96,6 +112,7 @@ def reviewed_inputs(
         boundary = read_checked(
             safe_child(root, "boundary-source"), body["boundary_source"]
         )
+        validate_receipt(boundary, "boundary-source", "boundary-source")
         if boundary.sha256 != body["boundary_sha256"]:
             raise SnapshotRefusal("release_selection_identity")
         boundary_files = (
@@ -129,7 +146,14 @@ def assemble(selections: Sequence[Selection], output: Path) -> str:
     objects.mkdir(exist_ok=True)
     tiles: dict[str, object] = {}
     sources = []
+    gaps: list[dict[str, Any]] = []
+    uncovered: list[dict[str, Any]] = []
     for selection in selections:
+        gaps.extend({"date": selection.date, **gap} for gap in selection.gaps)
+        if selection.uncovered is not None:
+            uncovered_area = {"date": selection.date, "geometry": selection.uncovered}
+            if uncovered_area not in uncovered:
+                uncovered.append(uncovered_area)
         for path, sha in selection.files:
             if file_hash(path) != sha:
                 raise SnapshotRefusal("release_selection_integrity")
@@ -190,14 +214,22 @@ def assemble(selections: Sequence[Selection], output: Path) -> str:
                     )
                 }
             )
-    if not tiles:
+    if not tiles and not gaps:
         raise SnapshotRefusal("release_selection_empty")
     body = canonical(
         {
             "version": GENERATOR,
             "tiles": tiles,
             "sources": sources,
-            "coverage": "selected_complete_manifests",
+            "coverage": {
+                "status": "missing-coverage"
+                if gaps
+                or any(item["geometry"].get("coordinates") for item in uncovered)
+                else "selected_complete_manifests",
+                "gaps": gaps,
+                "gap_count": len(gaps),
+                "uncovered": uncovered,
+            },
             "numerical_evidence": False,
         }
     )

@@ -40,12 +40,17 @@ source chain. A missing or mismatching boundary receipt refuses activation.
 These are operational safety floors, not sample-derived source facts. The lead records
 actual capacity on both filesystems and the chosen reserves before launch. The process
 sets nice to nineteen and ionice to idle and refuses if either fails. One nonblocking
-root lock spans all dates; a second process fails immediately. No seat/core is reserved.
+machine-global abstract Unix socket lock spans the entire run, followed by the root's
+nonblocking filesystem lock. A second run, including one configured with a different
+folder, refuses as `run_locked`. No seat/core is reserved.
 Every request attempt, including metadata/retries, passes through one sequential pacer.
 During longer waits the process checks disk and first-hour measurements every second; it
 checks again immediately before each send.
 Redirects never send a second request. Three retries use the existing back-off with a
-longer Retry-After honored; failures preserve completed shards and exit nonzero.
+longer Retry-After honored. Persistent tile failures become recorded gaps; metadata,
+redirect or safety refusals preserve completed shards and exit nonzero. Disk exhaustion
+and quota errors report `disk_safety_stop`, and I/O faults report `io_error`, including
+faults wrapped by immutable publication; a job-body fault is never labelled a lock fault.
 
 Metadata activation checks QNG EPSG:2932, origin, extent, every declared level through the cap and
 decreasing resolutions, approximately 0.53 m at level ten, 512-pixel JPEG. Each tile's JPEG frame header must also
@@ -53,8 +58,11 @@ declare those dimensions; the reader checks the header and hashes without decodi
 have a compatible scheme. Old export scales are not tile levels. The boundary is projected
 with the installed rasterio adapter and every intersecting tile is enumerated, including
 coastal/island intersections. Actual metadata, coverage and disk sufficiency remain
-unverified until the lead's live run. Missing/error/non-JPEG tiles stop with gaps; nothing
-is filled. Upstream changes require review and a new namespace, never editing a receipt.
+unverified until the lead's live run. Missing/error/non-JPEG tiles remain explicit gaps;
+nothing is filled. A date's smaller service extent does not clip country enumeration or
+refuse the date: the uncovered land geometry is retained, and wholly uncovered tiles are
+recorded without requests. Upstream changes require review and a new namespace, never
+editing a receipt.
 
 The disk watch runs before each request and shard. It reserves remaining estimated bytes,
 staging and the safety margins; only this acquisition's existing tar objects and transferred
@@ -73,6 +81,20 @@ hundred twelve JPEG members. Their body, receipt and index reuse `fetch/snapshot
 `shards/<shard>/<UTC-day>/<body-sha>.tar`, the immutable identity receipt beside it, and
 `index/<identity>.json` published last. The receipt binds publisher, service, imagery date,
 terms/basis, UTC retrieval, byte size, generator version and every member hash/key.
+It also lists gaps by tile key, fixed reason, HTTP status (when available), attempts and
+UTC retrieval. Members and gaps must cover exactly the enumerated keys, without overlap
+or duplicates. An all-gap shard is valid. Resume verifies recorded gaps and never requests
+them again; changing that selection requires the lead's explicit review.
+
+`snapshot_receipt.py` owns the closed Public-chain schema used for metadata, projected
+boundary, original boundary, shard, level completion and all-date receipts. Every stored
+receipt has source/key, publisher, URL, licence basis/licence and decision record, terms
+words/read date, UTC retrieval, generator version, SHA-256, byte count, kind and imagery
+date; each kind has a closed set of additional fields. Unread terms retain the explicit
+pending record under decision 0059. The projected boundary preserves its original
+publisher, URL and licence chain and binds the original boundary hash and projection
+method. Resume and release selection validate the same schema and refuse incomplete or
+foreign lineage, even when the envelope hashes agree.
 
 A completed shard is skipped only after its pointer, receipt, whole-body hash, member
 hashes and expected keys verify. A partially staged shard is fetched again. Changed
@@ -80,6 +102,10 @@ metadata or boundary refuses the old enumeration. Changed bodies create new hash
 an existing selection is never overwritten. A level completion manifest is published only
 after every enumerated shard verifies. The all-date manifest is published only after all
 eleven dates and capped levels complete; fixtures are not evidence that this happened live.
+Completion means every key is accounted for, including recorded gaps. Level and all-date
+manifests carry the gap keys/count and uncovered geometry. Assembly carries that coverage
+to the release, including releases whose selected tiles are all gaps; the product credit
+route reports it as missing coverage.
 
 Release review writes `release-selection.json` with exactly `manifest_sha256`, selecting
 the reviewed all-date manifest's hash explicitly. `snapshot_release.reviewed_inputs`
@@ -102,6 +128,9 @@ its eventual integration and UI display remain with the tasks that own those sur
 `api/gis_imagery.py` imports no custodian module and reads an explicitly named, hashed
 release manifest and its objects only. It refuses a bad manifest, corrupt member/object,
 unsafe path or level above ten, and shows missing-source/missing-coverage when appropriate.
+The whole-shard hash is cached for the reader's process lifetime by content identity and
+opened-file device, inode, size and modification/change timestamps. A changed file is
+hashed again, and the requested member hash is checked on every request.
 The same-origin tile route supplies a picture only. The credit route supplies publisher,
 service, retrieval date, imagery date, terms and basis for the UI's always-visible credit;
 it supplies no numerical evidence. A release without imagery stays usable.
@@ -139,3 +168,5 @@ no documentation site or source host was contacted. API reference identities:
 `https://shapely.readthedocs.io/en/stable/manual.html#shapely.geometry.mapping`.
 These are reference identifiers, not claims of an online reading. The local reading confirms
 GeoJSON input/output and source/target CRS parameters; exact installed pins stay unchanged.
+The installed official `BaseGeometry.difference` docstring was also read offline for the
+uncovered-land operation in fix round f1; it returns the difference of the geometries.

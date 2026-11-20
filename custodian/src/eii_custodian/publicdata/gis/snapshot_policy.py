@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import errno
 import fcntl
 import json
 import math
 import os
 import re
+import socket
 import subprocess
 import time
 from collections.abc import Callable, Iterator, Mapping
@@ -138,20 +140,37 @@ def safe_child(root: Path, relative: str) -> Path:
 
 @contextmanager
 def run_lock(root: Path) -> Iterator[None]:
-    root.mkdir(parents=True, exist_ok=True)
-    path = safe_child(root, ".run.lock")
     try:
-        fd = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        machine = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    except OSError:
+        raise SnapshotRefusal("lock_unavailable") from None
+    try:
+        try:
+            machine.bind("\0eii-gis-imagery-snapshot")
+        except OSError as error:
+            raise SnapshotRefusal(
+                "run_locked" if error.errno == errno.EADDRINUSE else "lock_unavailable"
+            ) from None
+        root.mkdir(parents=True, exist_ok=True)
+        path = safe_child(root, ".run.lock")
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        except OSError:
+            raise SnapshotRefusal("lock_unavailable") from None
         try:
             try:
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                raise SnapshotRefusal("run_locked") from None
+            except OSError as error:
+                raise SnapshotRefusal(
+                    "run_locked"
+                    if error.errno in {errno.EAGAIN, errno.EACCES}
+                    else "lock_unavailable"
+                ) from None
             yield
         finally:
             os.close(fd)
-    except OSError:
-        raise SnapshotRefusal("lock_unavailable") from None
+    finally:
+        machine.close()
 
 
 class Pacer:

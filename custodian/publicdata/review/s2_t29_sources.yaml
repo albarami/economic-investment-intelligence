@@ -1093,7 +1093,5 @@ gis_confirmation:
     QatarOrtho: [4000000, 500]
     QatarSatelitte2024: [4000000, 500]
     QatarSatelitte: [4000000, 500]
-  # Decision 0079: true only in the dedicated --gis-imagery-snapshot mode.
+  # Decision 0079: the separate closed gis_snapshot.json governs snapshot acquisition.
   export_tiles_allowed: false
-  snapshot_contract: gis_snapshot.json
-  snapshot_tiles_allowed: true

@@ -69,6 +69,23 @@ CLOSE_SECONDS = KILL_SECONDS / 16
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
 FIRST_FREE_DESCRIPTOR = 3
 MAX_IMAGERY_FILES = 10_000
+IMAGERY_FOLDERS = frozenset(
+    {
+        "1995-02",
+        "2003-05",
+        "2004-07",
+        "2010-01",
+        "2012-08",
+        "2017-04",
+        "2019-12",
+        "2021-09",
+        "2022-04",
+        "2024-10",
+        "2025-07",
+        "all-dates",
+        "boundary-source",
+    }
+)
 DESCRIPTOR_LINK = "/proc/self/fd/{}"
 
 
@@ -192,17 +209,34 @@ def check_profile(profile: tables.Profile, layout: Layout) -> None:
         ):
             raise SandboxError("imagery: selected input exceeds descriptor budget")
         root = layout.imagery_root
+        if profile.name != "build-release":
+            raise SandboxError(
+                "imagery: selected verified files required in build-release only"
+            )
         if (
-            profile.name != "build-release"
-            or root is None
+            root is None
             or not layout.imagery
             or not root.is_absolute()
-            or root.is_relative_to(layout.code_root)
             or root.resolve() != root
         ):
             raise SandboxError(
                 "imagery: selected verified files required in build-release only"
             )
+        if root.is_relative_to(layout.code_root) or layout.code_root.is_relative_to(
+            root
+        ):
+            raise SandboxError("imagery: repository overlap")
+        for protected in (
+            layout.cache,
+            layout.vault,
+            layout.extensions,
+            layout.staging,
+            layout.scenario,
+        ):
+            if protected is not None and (
+                root.is_relative_to(protected) or protected.is_relative_to(root)
+            ):
+                raise SandboxError("imagery: role overlap")
         seen: set[str] = set()
         for path, digest in layout.imagery:
             if (
@@ -213,6 +247,9 @@ def check_profile(profile: tables.Profile, layout: Layout) -> None:
                 or digest in seen
             ):
                 raise SandboxError("imagery: invalid selected object")
+            parts = path.relative_to(root).parts
+            if not parts or parts[0] not in IMAGERY_FOLDERS:
+                raise SandboxError("imagery: unregistered folder")
             if (
                 re.fullmatch(r"[a-f0-9]{64}\.(?:tar|json|meta\.json)", path.name)
                 is None
