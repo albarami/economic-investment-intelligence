@@ -225,7 +225,8 @@ The slice numbers of the earlier plan are kept, so that slice references across 
 | Public asking-rent context from a property listing source, never calculator prefill (decision 0070 item B2) | slice S6 | S6-T40 |
 | Awards and supplier release with its card family (decision 0070 item B1) | slice S7 | S7-T35 |
 | Typed reference to an earlier answer item in the chain slot (decision 0070 item C) | slice S8 | S8-T19 |
-| Frozen live/staging runbook, promotion and rollback with freeze/build/load implementation (decision 0071) | slice S3, after its gate | S3-T28 |
+| Live/staging setup, promotion and rollback with public_only build/load; the first map must not wait for setup (decision 0071 items 5 and 6; L-1219) | slice S3, before its gate | S3-T28 |
+| Protected-release two-run freeze, register, exit-7 install/start and promotion operations (decision 0071 items 5 and 6; L-1219) | slice S11, before its gate | S11-T09 |
 | The snapshot archive, explicit reviewed snapshot references, re-fetch cadence and dated price inputs ([decision 0045](decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md)) | slice S2 | S2-T27; amendments to S2-T19 and S2-T08 |
 | Three-site sensitivity, staffing geography, the Qatari day and time-dependent reach (capabilities 1, 2, 3 and 6) | slices S3, S6 and S7 | S3-T16, S6-T03, S6-T07, S6-T13, S6-T20, S6-T21, S7-T05 |
 | Visitor opportunity through permitted movement splits and separate Public hotel and venue evidence (capability 4) | slices S3, S6 and S7 | S3-T14; amendments to S6-T03 and S7-T08 |
@@ -497,7 +498,8 @@ and live receipt remain required; tests use invented shapes only.
 - S3-T26 — Preserve the chosen Public area in site_check (decision 0068 item 3). Depends: S3-T22, S3-T08, S3-T13; S3-T24 supplies final live parity evidence and S3-T25 supplies named-place HTTP selection when used.
 - S3-T27 — Same-origin offline basemap and glyph assets (decision 0068 item 4). Depends: S1-T04, S3-T02, S3-T09, S3-T22; reuse released map artefacts and font pins. These four tasks have status queued; full criteria and plants are in TASKS.md.
 - S3-T10 — Deliver the bilingual opening scene, end-to-end tests and design audit. S3-T24 to S3-T27 precede its end-to-end step only; its other parts may be built ahead after the S3 re-cut head exists (decision 0068 item 5).
-- S3-T11 — Close every proposed open item of the slice's reviews before the gate (REV-41).
+- S3-T28 — Live and staging setup with continuous promotion, in slice S3, before its gate, so the first map does not wait for its own setup (decision 0071 items 5 and 6; L-1219). Depends: S3-T02; build/test on loopback, then use S3-T20's entry when it opens after gate approval. Owns the public_only build-release/load-release path; protected freeze/promotion belongs to S11-T09.
+- S3-T11 — Close every proposed open item of the slice's reviews before the gate (REV-41); includes S3-T28 and excludes only the post-gate S3-T20.
 
 **Parallel work.** T03–T06 may run after T01 on separate tool modules and each supplies a parity case. T07 owns catalogue files. T08 follows T03–T07. T09 may run beside backend tools in `web/`. T12 follows T02 and T09 and owns the map layer registry; T13 follows T04 and T12 and owns the area-drawing components. T14 follows T07, T12 and T13 and owns the components of cards C36 to C38. T16 follows T12, S2-T14, S2-T19 and S2-T20 and owns the 3D, clock and map-mode components; T17 follows T12 and S2-T06 and owns the firms-by-tower layer. T24 to T27 fill the integration gaps assigned by [decision 0068](decisions/0068-public-map-integration-follow-ons.md) items 1 to 4, without widening a built task; S3-T22 is a plain-text dependency whose task-owned record is on its local branch, not a linked file on this base. T25 and T26 supply their query cases to T24 before its final live evidence is closed; this is an evidence join, not a circular build dependency. T27 reuses T09's shell and fonts. T09 keeps its own phone-bottom-sheet fix and review (decision 0068 item 7). T10 integrates every output, including T16, T17 and T24 to T27, and its joined end-to-end proof runs alone; its other parts may be built ahead after the S3 re-cut head exists (decision 0068 item 5). T11 runs last. No value is cut and no gate is weakened.
 
@@ -515,28 +517,38 @@ and live receipt remain required; tests use invented shapes only.
 
 **Cut first.** No public-only capability is cut. Non-essential opening animation is removed first.
 
-### Post-gate frozen live service — decision 0071
+### Live/staging setup before the gate and after-go-live promotion — decision 0071
 
 [Decision 0071](decisions/0071-after-go-live-operations-and-continuous-promotion.md) records the owner's decision
-of 2026-11-20: the live site starts with the first map when the slice S3 gate is approved. S3-T28 owns the runbook
-to start live, start staging, promote and roll back using the existing commands, and implements the freeze,
-build-release and load-release commands that rule 44 still describes as placeholders. This is the first-release
-and entry layer of S3-T02 and S3-T20, with S0-T09's command skeleton; S11-T01 and S11-T06 retain later hardening
-and all their acceptance checks. Depends: the approved slice S3 gate, S3-T02 and S3-T20. S3-T28 is excluded from
-S3-T11's pre-gate blanket dependency, so neither post-gate operation holds up that gate.
+of 2026-11-20 and placement under L-1219: S3-T28 is in slice S3, before its gate, because the first map must not
+wait on its own live/staging setup. It owns the start-live, start-staging, promote, roll-back and log steps and
+the `public_only` build-release/load-release commands the first map needs, using S0-T09's command skeleton and
+S3-T02's first-release loader. Depends: S3-T02, not the approved gate or S3-T20. S3-T11 includes this setup in its
+pre-gate blanket dependency. Build and test on loopback before approval; public startup refuses without recorded
+S3 gate approval, and the lead uses S3-T20's entry when that opens after the gate. Decision 0041 and S3-T20's
+post-gate placement stay unchanged; local setup completion does not wait for the actual public opening.
 
-Serve a FROZEN RELEASE through the owner's public route, a tunnel to a fixed loopback port, without naming its
-domain or provider. Live has its own release folder, database and loopback port, simulated traffic
-(`EII_TRAFFIC_PROVIDER=simulated`) and only the keys it needs. Development and staging run on other ports and
-never touch it. From the first map on, the lead promotes each ready visible slice, card family or enhancement
-when all hold: merged on main with six required hosted checks green; another maker's APPROVED; whole-test exit 0
-on the release; staging smoke and health checks pass; previous release folder kept for instant rollback;
-unfinished features absent. Switch the route's served release and port and log every promotion's release id and
-checklist result. Full testable criteria and plants: TASKS.md, S3-T28.
+The first map serves a fixed content-addressed `public_only` release through the owner's public route, a tunnel
+to a fixed loopback port, without naming its domain or provider. Live has its own release folder, database and
+loopback port, simulated traffic (`EII_TRAFFIC_PROVIDER=simulated`) and only the keys it needs. Development and
+staging run on other ports and never touch it. From the first map on, the lead promotes each ready visible slice,
+card family or enhancement when all hold: merged on main with six required hosted checks green; another maker's
+APPROVED; whole-test exit 0 on the release; staging smoke and health checks pass; previous release folder kept for
+instant rollback; unfinished features absent. Switch the route's served release and port and log every promotion's
+release id and checklist result. OI-347 retains reconciliation of the fixed entry and port switch before
+implementation, under rule 46. Full testable criteria and plants: TASKS.md, S3-T28.
 
-All slice gates, rule 12's freeze/window_key/register/exit-7 rules and rule 24 remain. S3-T28 must explicitly
-reconcile the current S3-T02 Public-only freeze refusal through its reviewed plan and contract amendments;
-this note supplies no fabricated protected window or register entry and claims no working frozen release.
+S11-T09 owns the protected-release portion split from S3-T28: both no-flag `./eii freeze` runs, the export-register
+line, frozen install/start exit-7 refusal and protected-release promotion. Depends: S11-T06 and S3-T28; S11-T01
+and S11-T06 keep all hardening and acceptance criteria. S11-T07 includes it before the slice S11 gate.
+
+Rule 12 binds every release as written, including its **"For a frozen release only"** install/start condition.
+DAT-133 and OPS-63 say `public_only` is never frozen or registered; ARC-41 excludes Protected and Simulated tables
+and protected-window fields. Both stores load with parity and no fallback and a complete matching receipt
+(OPS-64, ARC-22); no privacy parameter set, custodian product import or vault read is introduced. Retain the fixed
+content-addressed release for rollback. L-1219 closes OI-346 on these anchors, without exemption or invented
+protected data. Every security check, slice gate and rule-24 claim guard remains; rule 44's placeholder descriptions
+change only when implementation actually works. This note claims no working command, live service or gate approval.
 
 ## 12. slice S4 — Synthetic world, months, presence and traffic
 
@@ -1025,9 +1037,10 @@ S8-T14 is a go-live step after this slice's gate and is excluded from the gate's
 - S11-T04 — Complete final evidence, security, design and independent reviews.
 - S11-T05 — Record the owner's go or no-go and hand over the frozen bundle.
 - S11-T06 — On the first `./eii freeze` run, append the export-register line with `window_key`, `protected_sha256`, `world_seed`, `rules_version_id`, `parameter_set`, `release_id` and `code_version` in that order; enforce one `protected_sha256` per `window_key` and one `window_key` per `world_seed`; then, on the second no-flag run from the containing base-branch commit, build and verify the application archive, write its checksum and mark `freeze.json` complete. For a frozen release, installation and `./eii up` exit 7 unless the descriptor is complete and the installed application's register holds the line (PRV-120).
-- S11-T07 — Close every proposed open item of the slice's reviews before the gate (REV-41).
+- S11-T09 — Protected-release freeze and promotion operations split from S3-T28 (decision 0071 items 5 and 6; L-1219): integrate both no-flag freeze runs, export-register line, frozen install/start exit-7 checks and the complete promotion/rollback checklist. Depends: S11-T06, S3-T28; all S11-T01/S11-T06 criteria remain. Full testable criteria and plants: TASKS.md, S11-T09.
+- S11-T07 — Close every proposed open item of the slice's reviews before the gate (REV-41), depending on every other task of slice S11, including S11-T09.
 
-**Parallel work.** T01 and T02 may proceed on disjoint operational and documentation scopes. T06 follows T01 and owns the export register and its continuous-integration check. T03 follows T01 and T02. T04 reviews the frozen candidate. T05 follows `APPROVED`. T07 runs last. These coarse tasks are refined at the slice S10 gate.
+**Parallel work.** T01 and T02 may proceed on disjoint operational and documentation scopes. T06 follows T01 and owns the export register and its continuous-integration check. T09 follows T06 and S3-T28 and integrates protected operations without changing those contracts. T03 follows T01 and T02. T04 reviews the frozen candidate. T05 follows `APPROVED`. T07 runs last. These coarse tasks are refined at the slice S10 gate.
 
 **Gate: all statements must be true.**
 - Three rehearsals are complete, including one with PostgreSQL stopped and one offline.
