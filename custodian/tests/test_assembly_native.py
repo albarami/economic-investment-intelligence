@@ -20,6 +20,8 @@ from custodian.tests.test_production_adapters import context
 def test_reviewed_native_manifest_runs_real_reader(
     tmp_path: Path, family: str, option: str
 ) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     fixture = importlib.import_module(
         "custodian.tests.fixtures." + family + ".invented"
     )
@@ -31,28 +33,28 @@ def test_reviewed_native_manifest_runs_real_reader(
     fetched = run_build(
         (row,),
         fixture.metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda seconds: None,
         **options,
     )
     assert fetched.failure is None
     identity = fetched.manifests[row.source_id]
-    (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: identity}))
-    build = context(tmp_path, (row,))
+    (fixture_cache / "snapshot_pins.json").write_text(json.dumps({row.key: identity}))
+    build = context(fixture_cache, (row,))
     build.reviewed_selections()
     assert set(build.tables) == set(row.release_tables)
     assert build.receipts[row.key]["source_id"] == row.source_id
     assert build.tables
     # A manifest substitution must reach the native reader's own hash guard.
-    path = tmp_path / row.source_id / (identity + ".manifest.json")
+    path = fixture_cache / row.source_id / (identity + ".manifest.json")
     path.write_text("{}")
     error = getattr(
         importlib.import_module("eii_custodian.publicdata." + family + ".config"),
         family.title() + "Error",
     )
     with pytest.raises(error, match="manifest_hash"):
-        context(tmp_path, (row,)).reviewed_selections()
+        context(fixture_cache, (row,)).reviewed_selections()
 
 
 def test_investment_tables_use_reviewed_evidence_manifest_and_older_raw_page(
@@ -80,6 +82,8 @@ def test_investment_tables_use_reviewed_evidence_manifest_and_older_raw_page(
 
 
 def test_gravity_numeric_measures_are_not_omitted_from_the_draw(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.gravity.invented import (
         configuration,
         entry,
@@ -94,16 +98,16 @@ def test_gravity_numeric_measures_are_not_omitted_from_the_draw(tmp_path: Path) 
     outcome = run_build(
         (row,),
         metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda seconds: None,
         gravity_stream=stream,
         gravity_config=Config.from_mapping(configuration()),
     )
-    (tmp_path / "snapshot_pins.json").write_text(
+    (fixture_cache / "snapshot_pins.json").write_text(
         json.dumps({row.key: outcome.manifests[row.source_id]})
     )
-    state = context(tmp_path, (row,))
+    state = context(fixture_cache, (row,))
     state.reviewed_selections()
     figures = draw_tables(state)["pub_gravity_bilateral"]()
     ids = {figure.figure_id for figure in figures}

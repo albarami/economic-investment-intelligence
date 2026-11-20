@@ -231,6 +231,8 @@ def test_pending_terms_fields_still_fetch_and_read(tmp_path):
 
 
 def test_build_dispatch_pending_no_transport(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.fetch.registry import load_registry
@@ -246,7 +248,7 @@ def test_build_dispatch_pending_no_transport(tmp_path):
         pytest.fail("pending dispatch contacted a source")
 
     outcome = run_build(
-        entries, forbidden, tmp_path, lambda: "2026-11-16T00:00:00Z", forbidden
+        entries, forbidden, fixture_cache, lambda: "2026-11-16T00:00:00Z", forbidden
     )
     assert outcome.failure is None
     assert not outcome.manifests

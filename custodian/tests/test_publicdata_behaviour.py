@@ -437,14 +437,18 @@ def test_dataset_portal_without_a_licence_is_fetched_and_used(
     """Ruling L-1016 (applying L-1001): a dataset row whose portal states no
     licence fetches and is used; the licence is recorded pending with the date
     read, and the build lines carry the advisory."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata import completeness
     from eii_custodian.publicdata.fetch.report import licence_unstated_line
 
     entry = replace(_entry(), kind="portal_dataset", extension="json", url=PORTAL)
-    outcome = run_build((entry,), _portal_without_licence, tmp_path, _clock, _sleep)
+    outcome = run_build(
+        (entry,), _portal_without_licence, fixture_cache, _clock, _sleep
+    )
     assert outcome.failure is None
     assert licence_unstated_line(entry.key, entry.licence_id, _clock()) in outcome.lines
-    side = _sidecar(tmp_path)
+    side = _sidecar(fixture_cache)
     assert side["portal_licence"] is None
     assert side["licence_review"] == "pending"
     assert side["retrieved_utc"] == _clock()
@@ -455,6 +459,8 @@ def test_owner_decision_portal_licence_difference_is_recorded_pending(
     tmp_path: Path,
 ) -> None:
     """Ruling L-1001: a differing licence is recorded pending on every basis."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="portal_dataset",
@@ -475,19 +481,21 @@ def test_owner_decision_portal_licence_difference_is_recorded_pending(
 
     from eii_custodian.publicdata.fetch.report import licence_pending_line
 
-    outcome = run_build((entry,), licence, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), licence, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert (
         licence_pending_line(entry.key, entry.licence_id, "closed", _clock())
         in outcome.lines
     )
-    side = _sidecar(tmp_path)
+    side = _sidecar(fixture_cache)
     assert side["licence_id"] == "CC-BY-4.0"
     assert side["portal_licence"] == "closed"
 
 
 def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) -> None:
     """A terms page that forbids the use still stores the source, with no OWNER line."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         key="planted_page",
@@ -508,12 +516,12 @@ def test_forbidding_terms_leave_the_source_fetched_and_stored(tmp_path: Path) ->
             return _ok(url, b"The page forbids the use made here.")
         return _ok(url, page)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert not any("OWNER" in line for line in outcome.lines)
-    stored = _stored_page(tmp_path, entry.key)
+    stored = _stored_page(fixture_cache, entry.key)
     assert stored.read_bytes() == page
-    log = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    log = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert not any("OWNER" in line for line in log["lines"])
 
 
@@ -557,6 +565,8 @@ def test_watched_row_with_the_old_forbidding_words_is_fetched(
     tmp_path: Path,
 ) -> None:
     """A watched row is stored when the terms page still holds the old words."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _watched_entry()
     page = b"<html>invented dashboard</html>"
     seen: list[str] = []
@@ -569,14 +579,14 @@ def test_watched_row_with_the_old_forbidding_words_is_fetched(
             return _ok(url, page)
         raise AssertionError(url)
 
-    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((watched,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert not any(line.startswith("OWNER ") for line in outcome.lines)
     assert not any(line.startswith("TERMS ") for line in outcome.lines)
     assert seen == [watched.url, watched.terms_url]
-    stored = _stored_page(tmp_path, watched.key)
+    stored = _stored_page(fixture_cache, watched.key)
     assert stored.read_bytes() == page
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert loaded["terms"] == [
         {
             "key": watched.key,
@@ -594,6 +604,8 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
     tmp_path: Path,
 ) -> None:
     """A terms hash that differs from the previous build log is named, and stored."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _watched_entry()
     page = b"<html>invented dashboard</html>"
     terms_body = b"Invented terms page for a watched row."
@@ -609,7 +621,9 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
             }
         ],
     }
-    (tmp_path / "build-log.json").write_text(json.dumps(previous), encoding="utf-8")
+    (fixture_cache / "build-log.json").write_text(
+        json.dumps(previous), encoding="utf-8"
+    )
     seen: list[str] = []
 
     def transport(url: str) -> Response:
@@ -620,14 +634,14 @@ def test_changed_terms_hash_is_logged_and_the_row_is_still_fetched(
             return _ok(url, page)
         raise AssertionError(url)
 
-    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((watched,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
     assert outcome.failure is None
     assert notice in outcome.lines
     assert not any(line.startswith("OWNER ") for line in outcome.lines)
     assert seen == [watched.url, watched.terms_url]
-    assert _stored_page(tmp_path, watched.key).read_bytes() == page
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert _stored_page(fixture_cache, watched.key).read_bytes() == page
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert notice in loaded["lines"]
     assert loaded["terms"] == [
         {
@@ -646,6 +660,8 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     tmp_path: Path,
 ) -> None:
     """An unconfirmed watched row is still hashed, named on a change, and left off."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _unconfirmed_watched()
     assert watched.terms_watch is True
     assert watched.decision_record == "0026"
@@ -664,7 +680,9 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
             }
         ],
     }
-    (tmp_path / "build-log.json").write_text(json.dumps(previous), encoding="utf-8")
+    (fixture_cache / "build-log.json").write_text(
+        json.dumps(previous), encoding="utf-8"
+    )
     seen: list[str] = []
 
     def transport(url: str) -> Response:
@@ -673,7 +691,7 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
             return _ok(url, OLD_FORBIDDING_WORDS)
         raise AssertionError(url)
 
-    outcome = run_build((watched,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((watched,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
     assert outcome.failure is None
     assert notice in outcome.lines
@@ -682,13 +700,13 @@ def test_skipped_watched_row_hashes_terms_and_does_not_switch_off(
     assert seen == [watched.terms_url]
     stored = [
         path
-        for path in tmp_path.rglob("*")
+        for path in fixture_cache.rglob("*")
         if path.is_file()
         and path.name != "build-log.json"
         and "terms" not in path.parts
     ]
     assert stored == []
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert notice in loaded["lines"]
     assert loaded["terms"] == [
         {
@@ -770,6 +788,8 @@ def test_changed_terms_on_an_unwatched_file_are_stored_both_times(
     tmp_path: Path,
 ) -> None:
     """A changed terms page prints TERMS and the file is stored on both builds."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = _file_with_terms()
     assert entry.terms_watch is False
     bodies = {"terms": _TERMS_ONE}
@@ -783,22 +803,24 @@ def test_changed_terms_on_an_unwatched_file_are_stored_both_times(
             return _ok(url, b"invented-bytes")
         raise AssertionError(url)
 
-    first = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    first = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert first.failure is None
     assert not any(line.startswith("TERMS ") for line in first.lines)
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
     bodies["terms"] = _TERMS_TWO
-    second = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    second = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {entry.key} changed since the last build ({_FILE_TERMS})"
     assert second.failure is None
     assert notice in second.lines
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
     assert seen.count(FILE_URL) == 2
     assert not any(line.startswith("OWNER ") for line in second.lines)
 
 
 def test_changed_terms_on_a_skipped_row_store_nothing(tmp_path: Path) -> None:
     """A skipped row is fingerprinted, named on a change, and stores nothing."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _file_with_terms(),
         skip_reason="publisher_or_schema_unconfirmed",
@@ -812,19 +834,19 @@ def test_changed_terms_on_a_skipped_row_store_nothing(tmp_path: Path) -> None:
             return _ok(url, bodies["terms"])
         raise AssertionError(url)
 
-    first = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    first = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert first.failure is None
     assert any(line.startswith("SKIP ") for line in first.lines)
     assert not any(line.startswith("TERMS ") for line in first.lines)
     bodies["terms"] = _TERMS_TWO
-    second = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    second = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {entry.key} changed since the last build ({_FILE_TERMS})"
     assert second.failure is None
     assert notice in second.lines
     assert any(line.startswith(f"SKIP {entry.key} ") for line in second.lines)
     stored = [
         path
-        for path in tmp_path.rglob("*")
+        for path in fixture_cache.rglob("*")
         if path.is_file()
         and path.name != "build-log.json"
         and "terms" not in path.parts
@@ -854,6 +876,8 @@ def test_terms_watch_changes_nothing(tmp_path: Path) -> None:
 
 def test_terms_host_off_the_allow_list_is_not_contacted(tmp_path: Path) -> None:
     """An unlisted terms host is not passed to the transport, and the file is stored."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     terms_url = "https://evil.example/planted-terms"
     entry = replace(_entry(), terms_url=terms_url)
     seen: list[str] = []
@@ -862,7 +886,7 @@ def test_terms_host_off_the_allow_list_is_not_contacted(tmp_path: Path) -> None:
         seen.append(url)
         return _ok(url, b"invented-bytes")
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = (
         f"TERMS {entry.key} not read: host evil.example is not on the allow-list"
         f" ({terms_url})"
@@ -870,11 +894,13 @@ def test_terms_host_off_the_allow_list_is_not_contacted(tmp_path: Path) -> None:
     assert outcome.failure is None
     assert notice in outcome.lines
     assert seen == [FILE_URL]
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
 
 
 def test_terms_page_host_off_the_list_is_not_contacted(tmp_path: Path) -> None:
     """A terms_page row does not pass an unlisted terms host to the transport."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     terms_url = "https://evil.example/planted-terms"
     entry = replace(
         _entry(),
@@ -891,7 +917,7 @@ def test_terms_page_host_off_the_list_is_not_contacted(tmp_path: Path) -> None:
         seen.append(url)
         return _ok(url, b"<html>invented</html>")
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = (
         f"TERMS {entry.key} not read: host evil.example is not on the allow-list"
         f" ({terms_url})"
@@ -899,12 +925,16 @@ def test_terms_page_host_off_the_list_is_not_contacted(tmp_path: Path) -> None:
     assert outcome.failure is None
     assert notice in outcome.lines
     assert seen == [PAGE]
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
-    assert _sidecar(tmp_path)["terms_sha256"] is None
+    assert (
+        _stored_page(fixture_cache, entry.key).read_bytes() == b"<html>invented</html>"
+    )
+    assert _sidecar(fixture_cache)["terms_sha256"] is None
 
 
 def test_terms_redirect_off_the_list_does_not_fail_the_row(tmp_path: Path) -> None:
     """A terms redirect to an unlisted host is named and does not fail the data."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = _file_with_terms()
     landed = "https://evil.example/landed"
 
@@ -915,17 +945,19 @@ def test_terms_redirect_off_the_list_does_not_fail_the_row(tmp_path: Path) -> No
             return _ok(url, b"invented-bytes")
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {entry.key} not read: blocked_host ({_FILE_TERMS})"
     assert outcome.failure is None
     assert notice in outcome.lines
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert loaded["terms"] == []
 
 
 def test_terms_page_without_a_terms_url_stores_no_fingerprint(tmp_path: Path) -> None:
     """A terms page with no terms address stores the page and an empty fingerprint."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="terms_page",
@@ -940,11 +972,13 @@ def test_terms_page_without_a_terms_url_stores_no_fingerprint(tmp_path: Path) ->
         assert url == PAGE
         return _ok(url, b"<html>invented</html>")
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert not any(line.startswith("TERMS ") for line in outcome.lines)
-    assert _sidecar(tmp_path)["terms_sha256"] is None
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
+    assert _sidecar(fixture_cache)["terms_sha256"] is None
+    assert (
+        _stored_page(fixture_cache, entry.key).read_bytes() == b"<html>invented</html>"
+    )
 
 
 def test_terms_page_without_a_terms_url_has_no_unread_reason() -> None:
@@ -971,6 +1005,8 @@ def test_terms_page_without_a_terms_url_has_no_unread_reason() -> None:
 
 def test_terms_page_unread_names_the_check_and_stores_no_hash(tmp_path: Path) -> None:
     """An allow-listed terms address that cannot be read names that check."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="terms_page",
@@ -988,12 +1024,14 @@ def test_terms_page_unread_names_the_check_and_stores_no_hash(tmp_path: Path) ->
             raise TransportFault("unreachable", url)
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {entry.key} not read: unreachable ({_FILE_TERMS})"
     assert outcome.failure is None
     assert notice in outcome.lines
-    assert _sidecar(tmp_path)["terms_sha256"] is None
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"<html>invented</html>"
+    assert _sidecar(fixture_cache)["terms_sha256"] is None
+    assert (
+        _stored_page(fixture_cache, entry.key).read_bytes() == b"<html>invented</html>"
+    )
 
 
 def test_unread_terms_page_returns_an_empty_fingerprint() -> None:
@@ -1030,6 +1068,8 @@ def test_missing_terms_response_names_check_failed() -> None:
 
 def test_skipped_row_retries_its_terms_page(tmp_path: Path) -> None:
     """A skipped row still reads its terms page, and a failed attempt waits."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         skip_reason="publisher_or_schema_unconfirmed",
@@ -1048,17 +1088,19 @@ def test_skipped_row_retries_its_terms_page(tmp_path: Path) -> None:
     def sleeper(seconds: float) -> None:
         slept.append(seconds)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, sleeper)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, sleeper)
     assert outcome.failure is None
     assert slept == [1.0]
     assert f"SKIP {entry.key} {entry.skip_reason}" in outcome.lines
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert loaded["terms"][0]["terms_sha256"] == terms_text_sha256(_TERMS_ONE)
-    assert list(tmp_path.rglob("citation.json")) == []
+    assert list(fixture_cache.rglob("citation.json")) == []
 
 
 def test_unread_terms_page_does_not_fail_the_row(tmp_path: Path) -> None:
     """A terms page that cannot be reached leaves the data stored and records no hash."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = _file_with_terms()
 
     def transport(url: str) -> Response:
@@ -1068,17 +1110,19 @@ def test_unread_terms_page_does_not_fail_the_row(tmp_path: Path) -> None:
             return _ok(url, b"invented-bytes")
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     notice = f"TERMS {entry.key} not read: unreachable ({_FILE_TERMS})"
     assert outcome.failure is None
     assert notice in outcome.lines
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert loaded["terms"] == []
 
 
 def test_citation_only_with_a_terms_url_calls_nothing(tmp_path: Path) -> None:
     """A citation row with a terms address makes no network call."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="citation_only",
@@ -1091,9 +1135,9 @@ def test_citation_only_with_a_terms_url_calls_nothing(tmp_path: Path) -> None:
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
-    side = _sidecar(tmp_path)
+    side = _sidecar(fixture_cache)
     assert side["sha256"] == "CITATION_ONLY"
     assert side["switched_off"] is False
     assert side["terms_words"] == entry.terms_words
@@ -1102,6 +1146,8 @@ def test_citation_only_with_a_terms_url_calls_nothing(tmp_path: Path) -> None:
 
 def test_failed_check_records_the_reason_and_stores_nothing(tmp_path: Path) -> None:
     """A failed check leaves no usable file and names the check in the lines and the log."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="portal_dataset",
@@ -1117,17 +1163,17 @@ def test_failed_check_records_the_reason_and_stores_nothing(tmp_path: Path) -> N
             return _ok(url, json.dumps(payload).encode("utf-8"))
         return _ok(url, b"[{}]")
 
-    outcome = run_build((entry,), one_row, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), one_row, fixture_cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "row_count"
     assert any(
         line.startswith("FAIL ") and "row_count" in line for line in outcome.lines
     )
-    loaded = json.loads((tmp_path / "build-log.json").read_text(encoding="utf-8"))
+    loaded = json.loads((fixture_cache / "build-log.json").read_text(encoding="utf-8"))
     assert any("row_count" in line for line in loaded["lines"])
     stored = [
         path
-        for path in tmp_path.rglob("*")
+        for path in fixture_cache.rglob("*")
         if path.is_file()
         and path.name != "build-log.json"
         and "terms" not in path.parts
@@ -1303,12 +1349,14 @@ def test_interrupted_write_leaves_no_partial_file(
 
 def test_a_skipped_row_and_unreadable_metadata(tmp_path: Path) -> None:
     """A named skip does not call the transport. Unreadable portal metadata fails."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     skipped = replace(_entry(), skip_reason="publisher_or_licence_unconfirmed")
 
     def unused(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((skipped,), unused, tmp_path, _clock, _sleep)
+    outcome = run_build((skipped,), unused, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert outcome.lines[0].startswith("SKIP planted ")
 
@@ -1317,13 +1365,15 @@ def test_a_skipped_row_and_unreadable_metadata(tmp_path: Path) -> None:
     def broken(url: str) -> Response:
         return _ok(url, b"not-json")
 
-    failure = fetch_entry(portal, broken, tmp_path, _clock, _sleep)
+    failure = fetch_entry(portal, broken, fixture_cache, _clock, _sleep)
     assert failure is not None
     assert failure.check == "metadata_unreadable"
 
 
 def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> None:
     """A citation row writes sha256 CITATION_ONLY and never calls the transport."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         kind="citation_only",
@@ -1335,35 +1385,35 @@ def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> Non
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
-    side = _sidecar(tmp_path)
+    side = _sidecar(fixture_cache)
     assert side["sha256"] == "CITATION_ONLY"
     assert side["bytes"] == 0
     assert side["terms_words"] == entry.terms_words
     assert side["terms_read_on"] == entry.terms_read_on
     assert side["switched_off"] is False
-    assert (tmp_path / "planted" / "citation.json").is_file()
+    assert (fixture_cache / "planted" / "citation.json").is_file()
 
 
 _BUILD_WRITE_ALLOWLIST = frozenset(
     {
-        BUILDINGS_RELATIVE,
-        f"{HEIGHTS_RELATIVE}/{HEIGHTS_FILE}",
-        f"{HEIGHTS_RELATIVE}/{MANIFEST_FILE}",
+        f"data/{BUILDINGS_RELATIVE}",
+        f"data/{HEIGHTS_RELATIVE}/{HEIGHTS_FILE}",
+        f"data/{HEIGHTS_RELATIVE}/{MANIFEST_FILE}",
     }
 )
 
 
 def _assert_files_under_build_contract(
-    data_root: Path, *, extra: Path | None = None
+    fixture_root: Path, *, extra: Path | None = None
 ) -> None:
-    """Every file under the data root matches the fetch and heights write contract."""
-    for path in data_root.rglob("*"):
+    """Every file in the owned fixture matches the fetch and heights write contract."""
+    for path in fixture_root.rglob("*"):
         if not path.is_file() or path == extra:
             continue
-        rel = path.relative_to(data_root).as_posix()
-        if rel.startswith("public_cache/") or rel == "public_cache":
+        rel = path.relative_to(fixture_root).as_posix()
+        if rel.startswith("data/public_cache/"):
             continue
         assert rel in _BUILD_WRITE_ALLOWLIST, rel
 
@@ -1382,7 +1432,7 @@ def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
     outcome = run_build((_entry(),), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert marker.read_text(encoding="utf-8") == "keep"
-    _assert_files_under_build_contract(cache.parent)
+    _assert_files_under_build_contract(tmp_path, extra=marker)
 
 
 def test_undeclared_asset_write_fails_build_boundary_guard(tmp_path: Path) -> None:
@@ -1397,12 +1447,12 @@ def test_undeclared_asset_write_fails_build_boundary_guard(tmp_path: Path) -> No
     outcome = run_build((_entry(),), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     data_root = cache.parent
-    _assert_files_under_build_contract(data_root)
+    _assert_files_under_build_contract(tmp_path)
     (data_root / "assets" / "unrelated-output.txt").write_text(
         "planted", encoding="utf-8"
     )
     with pytest.raises(AssertionError, match="unrelated-output"):
-        _assert_files_under_build_contract(data_root)
+        _assert_files_under_build_contract(tmp_path)
 
 
 def key_offenders(root: Path) -> tuple[str, ...]:
@@ -1492,3 +1542,19 @@ def test_cdse_name_in_unrelated_fetcher_refused(tmp_path: Path) -> None:
         assert key_offenders(tmp_path) == (
             f"custodian/src/eii_custodian/publicdata/unrelated.py:{name}",
         )
+
+
+def test_undeclared_write_outside_data_fails_build_boundary_guard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The positive build guard rejects a producer writing beside the data root."""
+    original = run_build
+
+    def planted(*args, **kwargs):
+        outcome = original(*args, **kwargs)
+        (tmp_path / "undeclared-output.txt").write_text("planted", encoding="utf-8")
+        return outcome
+
+    monkeypatch.setattr(__name__ + ".run_build", planted)
+    with pytest.raises(AssertionError, match="undeclared-output"):
+        test_build_writes_only_under_the_cache(tmp_path)

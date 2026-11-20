@@ -433,11 +433,13 @@ def test_owned_missing_check_blocks_success(tmp_path: Path) -> None:
 
 @pytest.mark.public_data
 def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.report import pass_line
     from eii_custodian.publicdata.series.figures import finish_build
 
-    entry, digest = series_cache(tmp_path, "sec_hr_ind", [])
+    entry, digest = series_cache(fixture_cache, "sec_hr_ind", [])
     observed = []
 
     def fetched(*args, registry_entries=None):
@@ -454,7 +456,7 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     result = build.run_build(
         [entry],
         lambda url: None,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-14T00:00:00Z",
         lambda n: None,
     )

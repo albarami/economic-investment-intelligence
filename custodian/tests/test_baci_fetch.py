@@ -8,6 +8,8 @@ from custodian.tests.support.fetch_build import run_build
 
 
 def test_baci_complete_archive(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.baci.invented import configuration
 
     from eii_custodian.publicdata.baci.config import Config
@@ -16,7 +18,7 @@ def test_baci_complete_archive(tmp_path: Path) -> None:
     outcome = run_build(
         [entry()],
         metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         stream_transport=stream,
@@ -24,7 +26,7 @@ def test_baci_complete_archive(tmp_path: Path) -> None:
     )
     assert outcome.failure is None
     assert outcome.manifests["cepii_baci"]
-    release = read_selected(tmp_path, outcome.manifests["cepii_baci"])
+    release = read_selected(fixture_cache, outcome.manifests["cepii_baci"])
     assert len(release.trade) == 3
     assert len(release.country) == 2
     assert len(release.product) == 1
@@ -50,7 +52,7 @@ def test_baci_stream_hosts():
 
 
 def build(
-    tmp_path,
+    cache,
     *,
     config=None,
     source=None,
@@ -64,7 +66,7 @@ def build(
     return run_build(
         [entry() if source is None else source],
         byte_transport,
-        tmp_path,
+        cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         stream_transport=stream_transport,
@@ -73,6 +75,8 @@ def build(
 
 
 def test_baci_pending_state(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     pending = next(e for e in load_registry() if e.source_id == "cepii_baci")
@@ -81,13 +85,19 @@ def test_baci_pending_state(tmp_path):
         raise AssertionError("pending source requested")
 
     result = run_build(
-        [pending], forbidden, tmp_path, lambda: "2026-11-16T00:00:00Z", lambda _: None
+        [pending],
+        forbidden,
+        fixture_cache,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
     )
     assert not result.manifests
     assert any("baci_metadata_unconfirmed" in line for line in result.lines)
 
 
 def test_baci_transport_failure(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from types import SimpleNamespace
 
@@ -110,31 +120,36 @@ def test_baci_transport_failure(tmp_path):
         finally:
             closes.append(True)
 
-    result = build(tmp_path, stream_transport=broken)
+    result = build(fixture_cache, stream_transport=broken)
     assert result.failure.check == "network_exhausted"
     assert len(calls) == len(closes) == ATTEMPT_LIMIT
-    assert not list((tmp_path / "cepii_baci").glob("*.manifest.json"))
-    assert not list((tmp_path / "cepii_baci").glob(".stage-*"))
+    assert not list((fixture_cache / "cepii_baci").glob("*.manifest.json"))
+    assert not list((fixture_cache / "cepii_baci").glob(".stage-*"))
     assert "invented-response-marker" not in repr(result)
 
 
 def test_baci_safe_failure(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+
     def broken(_):
         raise RuntimeError("invented-response-marker")
 
-    result = build(tmp_path, byte_transport=broken)
+    result = build(fixture_cache, byte_transport=broken)
     assert result.failure is not None
     assert "invented-response-marker" not in repr(result)
 
 
 def test_baci_manifest_atomicity(tmp_path, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci import fetch
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    first = build(tmp_path)
+    first = build(fixture_cache)
     digest = first.manifests["cepii_baci"]
-    manifest = read_selected(tmp_path, digest).manifest
-    directory = tmp_path / "cepii_baci"
+    manifest = read_selected(fixture_cache, digest).manifest
+    directory = fixture_cache / "cepii_baci"
     expected = [directory / f"{manifest['archive_sha256']}.zip"]
     expected.extend(
         directory / f"{manifest['outputs'][table]['sha256']}.jsonl"
@@ -153,7 +168,7 @@ def test_baci_manifest_atomicity(tmp_path, monkeypatch):
 
         with monkeypatch.context() as patch:
             patch.setattr(fetch, "_publish", interrupted)
-            result = build(tmp_path)
+            result = build(fixture_cache)
         assert len(calls) == boundary
         assert calls == expected[:boundary]
         assert len(list((directory / "index").glob("*.json"))) == 5
@@ -161,9 +176,9 @@ def test_baci_manifest_atomicity(tmp_path, monkeypatch):
         assert result.failure.check == "write_or_stream_failed"
         assert "invented-interruption" not in repr(result)
         assert result.manifests == {}
-        assert len(read_selected(tmp_path, digest).trade) == 3
-        assert list((tmp_path / "cepii_baci").glob("*.manifest.json")) == [
-            tmp_path / "cepii_baci" / f"{digest}.manifest.json"
+        assert len(read_selected(fixture_cache, digest).trade) == 3
+        assert list((fixture_cache / "cepii_baci").glob("*.manifest.json")) == [
+            fixture_cache / "cepii_baci" / f"{digest}.manifest.json"
         ]
 
 
@@ -401,15 +416,19 @@ def test_baci_dispatch_isolated(tmp_path):
     ],
 )
 def test_baci_entry_plants(tmp_path, field, value, reason):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
-    result = build(tmp_path, source=replace(entry(), **{field: value}))
+    result = build(fixture_cache, source=replace(entry(), **{field: value}))
     assert result.failure.check == reason
     assert not result.manifests
 
 
 def test_baci_pending_terms_state_still_fetches_and_reads(tmp_path):
     """Ruling L-1001: pending terms fields never refuse the fetch or the release."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     from eii_custodian.publicdata.baci.contracts import read_selected
@@ -421,10 +440,10 @@ def test_baci_pending_terms_state_still_fetches_and_reads(tmp_path):
         licence_basis="pending",
         decision_record="",
     )
-    result = build(tmp_path, source=source)
+    result = build(fixture_cache, source=source)
     assert result.failure is None
     assert result.manifests["cepii_baci"]
-    release = read_selected(tmp_path, result.manifests["cepii_baci"])
+    release = read_selected(fixture_cache, result.manifests["cepii_baci"])
     assert len(release.trade) == 3
     assert release.manifest["receipt"]["terms_read_on"] == "pending"
     assert release.manifest["receipt"]["licence_basis"] == "pending"
@@ -438,6 +457,8 @@ def test_baci_empty_userinfo_rejected():
 
 
 def test_baci_stream_stops_at_upper_bound(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from types import SimpleNamespace
 
@@ -456,7 +477,7 @@ def test_baci_stream_stops_at_upper_bound(tmp_path):
             final_url=url, hops=(), declared_length=None, chunks=chunks()
         )
 
-    result = build(tmp_path, config=config, stream_transport=supplied)
+    result = build(fixture_cache, config=config, stream_transport=supplied)
     assert result.failure.check == "archive_bytes"
 
 
@@ -517,6 +538,8 @@ def test_baci_production_transports_bind_reviewed_urls(tmp_path, monkeypatch):
 
 
 def test_baci_incomplete_http_read_is_bounded(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from http.client import IncompleteRead
     from types import SimpleNamespace
@@ -536,12 +559,14 @@ def test_baci_incomplete_http_read_is_bounded(tmp_path):
             final_url=url, hops=(), declared_length=None, chunks=chunks()
         )
 
-    result = build(tmp_path, stream_transport=incomplete)
+    result = build(fixture_cache, stream_transport=incomplete)
     assert result.failure.check == "network_exhausted"
     assert len(attempts) == ATTEMPT_LIMIT
 
 
 def test_baci_cache_creation_failure_is_safe(tmp_path, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     original = Path.mkdir
 
     def refuse(path, *args, **kwargs):
@@ -550,13 +575,15 @@ def test_baci_cache_creation_failure_is_safe(tmp_path, monkeypatch):
         return original(path, *args, **kwargs)
 
     monkeypatch.setattr(Path, "mkdir", refuse)
-    result = build(tmp_path)
+    result = build(fixture_cache)
     assert result.failure.check == "write_or_stream_failed"
     assert "invented-write-error" not in repr(result)
 
 
 @pytest.mark.parametrize("phase", ["metadata", "archive"])
 def test_baci_transport_refusal_is_not_retried(tmp_path, phase):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch.transport import TransportFault
 
     calls = []
@@ -566,7 +593,7 @@ def test_baci_transport_refusal_is_not_retried(tmp_path, phase):
         raise TransportFault("blocked_host", "")
 
     result = build(
-        tmp_path,
+        fixture_cache,
         byte_transport=blocked if phase == "metadata" else metadata,
         stream_transport=blocked if phase == "archive" else stream,
     )
@@ -575,7 +602,7 @@ def test_baci_transport_refusal_is_not_retried(tmp_path, phase):
 
 
 def _baci_refused_fetch(
-    tmp_path,
+    cache,
     reason,
     *,
     source=None,
@@ -592,7 +619,7 @@ def _baci_refused_fetch(
 
     source = entry() if source is None else source
     config = Config.from_mapping(configuration() if config is None else config)
-    directory = tmp_path / "cepii_baci"
+    directory = cache / "cepii_baci"
     before = {p.name: p.read_bytes() for p in directory.glob("*.manifest.json")}
     with pytest.raises(BaciError, match=f"^{reason}$") as caught:
         fetch_baci(
@@ -600,7 +627,7 @@ def _baci_refused_fetch(
             config,
             byte_transport,
             stream_transport,
-            tmp_path,
+            cache,
             clock,
             lambda _: None,
         )
@@ -623,7 +650,7 @@ def _baci_refused_fetch(
         result = run_build(
             [source],
             byte_transport,
-            tmp_path,
+            cache,
             build_clock,
             lambda _: None,
             stream_transport=stream_transport,
@@ -642,24 +669,30 @@ def _baci_refused_fetch(
 
 @pytest.mark.parametrize("field", ["source_id", "key"])
 def test_baci_entry_source_id_guard(tmp_path, field):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     source = replace(entry(), **{field: "invented-other"})
-    _baci_refused_fetch(tmp_path, "source_id", source=source)
+    _baci_refused_fetch(fixture_cache, "source_id", source=source)
 
 
 @pytest.mark.parametrize("basis,record", [("owner_decision", ""), ("dataset", "0026")])
 def test_baci_entry_decision_record_guard(tmp_path, basis, record):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     _baci_refused_fetch(
-        tmp_path,
+        fixture_cache,
         "licence_basis",
         source=replace(entry(), licence_basis=basis, decision_record=record),
     )
 
 
 def test_baci_entry_terms_url_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     source = replace(entry(), terms_url=entry().url + "-unreviewed")
@@ -668,11 +701,13 @@ def test_baci_entry_terms_url_guard(tmp_path):
         raise AssertionError("metadata requested before terms URL approval")
 
     _baci_refused_fetch(
-        tmp_path, "blocked_host", source=source, byte_transport=forbidden
+        fixture_cache, "blocked_host", source=source, byte_transport=forbidden
     )
 
 
 def test_baci_metadata_bytes_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.baci.invented import configuration
 
     from eii_custodian.publicdata.fetch.transport import Response
@@ -680,7 +715,7 @@ def test_baci_metadata_bytes_guard(tmp_path):
     config = configuration()
     payload = b"invented-secret-marker " + b"x" * config["archive_bytes"][1]
     _baci_refused_fetch(
-        tmp_path,
+        fixture_cache,
         "metadata_bytes",
         byte_transport=lambda url: Response(url, payload, ()),
         payload=payload,
@@ -691,6 +726,8 @@ def test_baci_metadata_bytes_guard(tmp_path):
     "marker", ["registration required", "sign in", "robot check", "paid tier"]
 )
 def test_baci_metadata_response_obstacle_guard(tmp_path, marker):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from hashlib import sha256
 
     from custodian.tests.fixtures.baci.invented import configuration
@@ -701,7 +738,7 @@ def test_baci_metadata_response_obstacle_guard(tmp_path, marker):
     payload = f"Invented {marker.upper()} invented-secret-marker".encode()
     config["page_sha256"] = sha256(payload).hexdigest()
     _baci_refused_fetch(
-        tmp_path,
+        fixture_cache,
         "access_obstacle",
         config=config,
         byte_transport=lambda url: Response(url, payload, ()),
@@ -711,6 +748,8 @@ def test_baci_metadata_response_obstacle_guard(tmp_path, marker):
 
 @pytest.mark.parametrize("length", [True, "invented-secret-marker"])
 def test_baci_declared_length_type_guard(tmp_path, length):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from types import SimpleNamespace
 
@@ -722,11 +761,13 @@ def test_baci_declared_length_type_guard(tmp_path, length):
             final_url=url, hops=(), declared_length=length, chunks=iter([archive()])
         )
 
-    _baci_refused_fetch(tmp_path, "declared_length", stream_transport=supplied)
+    _baci_refused_fetch(fixture_cache, "declared_length", stream_transport=supplied)
 
 
 @pytest.mark.parametrize("kind", ["text", "bytearray", "oversized"])
 def test_baci_stream_chunk_guard(tmp_path, kind):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from types import SimpleNamespace
 
@@ -748,7 +789,7 @@ def test_baci_stream_chunk_guard(tmp_path, kind):
         )
 
     _baci_refused_fetch(
-        tmp_path,
+        fixture_cache,
         "stream_chunk",
         config=config,
         stream_transport=supplied,
@@ -757,37 +798,45 @@ def test_baci_stream_chunk_guard(tmp_path, kind):
 
 
 def test_baci_publish_cache_integrity_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import json
 
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    original = build(tmp_path)
+    original = build(fixture_cache)
     assert original.failure is None
     selected = original.manifests["cepii_baci"]
-    assert len(read_selected(tmp_path, selected).trade) == 3
-    directory = tmp_path / "cepii_baci"
+    assert len(read_selected(fixture_cache, selected).trade) == 3
+    directory = fixture_cache / "cepii_baci"
     manifest = json.loads((directory / f"{selected}.manifest.json").read_text())
     cached = directory / f"{manifest['archive_sha256']}.zip"
     payload = b"invented-secret-marker invented-cache-payload"
     cached.write_bytes(payload)
-    _baci_refused_fetch(tmp_path, "cache_integrity", payload=payload)
+    _baci_refused_fetch(fixture_cache, "cache_integrity", payload=payload)
     assert cached.read_bytes() == payload
 
 
 @pytest.mark.parametrize("clock", ["2026-1-16T00:00:00Z", "invented-secret-marker"])
 def test_baci_retrieval_clock_guard(tmp_path, clock):
-    _baci_refused_fetch(tmp_path, "retrieval_date", clock=lambda: clock)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    _baci_refused_fetch(fixture_cache, "retrieval_date", clock=lambda: clock)
 
 
 def test_baci_publisher_archive_checksum_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.baci.invented import configuration
 
     config = configuration()
     config["publisher_sha256"] = "f" * 64
-    _baci_refused_fetch(tmp_path, "archive_checksum", config=config)
+    _baci_refused_fetch(fixture_cache, "archive_checksum", config=config)
 
 
 def test_baci_terms_unread_network_path(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import json
     from dataclasses import replace
 
@@ -808,23 +857,25 @@ def test_baci_terms_unread_network_path(tmp_path):
             raise OSError(payload)
         return metadata(url)
 
-    result = build(tmp_path, source=source, config=config, byte_transport=unread)
+    result = build(fixture_cache, source=source, config=config, byte_transport=unread)
     assert result.failure is None
     assert len(attempts) == ATTEMPT_LIMIT
     selected = result.manifests["cepii_baci"]
-    release = read_selected(tmp_path, selected)
+    release = read_selected(fixture_cache, selected)
     assert release.manifest["terms_unread"] == "network_exhausted"
     assert release.manifest["receipt"]["terms_sha256"] is None
     assert any("network_exhausted" in line for line in result.lines)
     assert "invented-secret-marker" not in repr(result)
     assert payload not in repr(result)
     assert payload not in json.dumps(release.manifest)
-    assert list((tmp_path / "cepii_baci").glob("*.manifest.json")) == [
-        tmp_path / "cepii_baci" / f"{selected}.manifest.json"
+    assert list((fixture_cache / "cepii_baci").glob("*.manifest.json")) == [
+        fixture_cache / "cepii_baci" / f"{selected}.manifest.json"
     ]
 
 
 def test_baci_terms_unread_refuses_other_errors(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     from custodian.tests.fixtures.baci.invented import configuration
@@ -840,7 +891,7 @@ def test_baci_terms_unread_refuses_other_errors(tmp_path):
         return Response(url, payload, ()) if url == source.terms_url else metadata(url)
 
     _baci_refused_fetch(
-        tmp_path,
+        fixture_cache,
         "access_obstacle",
         source=source,
         config=config,

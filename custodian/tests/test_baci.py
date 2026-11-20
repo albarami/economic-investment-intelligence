@@ -127,6 +127,8 @@ def test_baci_archive_rejections(tmp_path, change, reason):
 
 
 def test_baci_selected_manifest_tampering(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import json
     from hashlib import sha256
 
@@ -135,9 +137,9 @@ def test_baci_selected_manifest_tampering(tmp_path):
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    result = build(tmp_path)
+    result = build(fixture_cache)
     selected = result.manifests["cepii_baci"]
-    directory = tmp_path / "cepii_baci"
+    directory = fixture_cache / "cepii_baci"
     original = json.loads((directory / f"{selected}.manifest.json").read_text())
     for key in (
         "attribution",
@@ -155,11 +157,11 @@ def test_baci_selected_manifest_tampering(tmp_path):
         digest = sha256(payload).hexdigest()
         (directory / f"{digest}.manifest.json").write_bytes(payload)
         with pytest.raises(BaciError):
-            read_selected(tmp_path, digest)
+            read_selected(fixture_cache, digest)
     output = directory / f"{original['outputs']['pub_baci_trade']['sha256']}.jsonl"
     output.write_text("invented changed bytes")
     with pytest.raises(BaciError, match="output_hash"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 def test_baci_count_bounds(tmp_path):
@@ -592,18 +594,18 @@ def test_baci_config_year_coverage_guard(change):
         Config.from_mapping(raw)
 
 
-def _baci_selected_fixture(tmp_path):
+def _baci_selected_fixture(cache):
     import json
 
     from custodian.tests.test_baci_fetch import build
 
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    result = build(tmp_path)
+    result = build(cache)
     assert result.failure is None
     selected = result.manifests["cepii_baci"]
-    assert len(read_selected(tmp_path, selected).trade) == 3
-    directory = tmp_path / "cepii_baci"
+    assert len(read_selected(cache, selected).trade) == 3
+    directory = cache / "cepii_baci"
     manifest = json.loads((directory / f"{selected}.manifest.json").read_text())
     return directory, selected, manifest
 
@@ -619,75 +621,87 @@ def _baci_write_manifest(directory, manifest):
 
 
 def test_baci_selected_manifest_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, selected, _ = _baci_selected_fixture(tmp_path)
+    directory, selected, _ = _baci_selected_fixture(fixture_cache)
     invalid = "invented-selection"
     (directory / f"{invalid}.manifest.json").write_bytes(
         (directory / f"{selected}.manifest.json").read_bytes()
     )
     with pytest.raises(BaciError, match=r"^selected_manifest$"):
-        read_selected(tmp_path, invalid)
+        read_selected(fixture_cache, invalid)
 
 
 def test_baci_manifest_hash_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, selected, _ = _baci_selected_fixture(tmp_path)
+    directory, selected, _ = _baci_selected_fixture(fixture_cache)
     path = directory / f"{selected}.manifest.json"
     path.write_bytes(path.read_bytes() + b" ")
     with pytest.raises(BaciError, match=r"^manifest_hash$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 @pytest.mark.parametrize(
     "field,value", [("confirmed", False), ("access", "registration")]
 )
 def test_baci_manifest_configuration_guard(tmp_path, field, value):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     manifest["config"][field] = value
     selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^manifest_configuration$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 @pytest.mark.parametrize("field", ["kind", "digest"])
 def test_baci_terms_fingerprint_guard(tmp_path, field):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     if field == "kind":
         manifest["terms_fingerprint_kind"] = "invented-kind"
     else:
         manifest["receipt"]["terms_sha256"] = "invented-digest"
     selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^terms_fingerprint$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 def test_baci_manifest_retrieval_date_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     manifest["receipt"]["retrieved_utc"] = "2026-1-16T00:00:00Z"
     selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^retrieval_date$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 @pytest.mark.parametrize("change", ["format", "cache", "receipt"])
 def test_baci_archive_hash_guard(tmp_path, change):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, selected, manifest = _baci_selected_fixture(tmp_path)
+    directory, selected, manifest = _baci_selected_fixture(fixture_cache)
     if change == "cache":
         archive_path = directory / f"{manifest['archive_sha256']}.zip"
         archive_path.write_bytes(archive_path.read_bytes() + b"invented-tamper")
@@ -698,7 +712,7 @@ def test_baci_archive_hash_guard(tmp_path, change):
             manifest["receipt"]["sha256"] = "f" * 64
         selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^archive_hash$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 @pytest.mark.parametrize(
@@ -714,11 +728,13 @@ def test_baci_archive_hash_guard(tmp_path, change):
     ],
 )
 def test_baci_source_chain_guard(tmp_path, monkeypatch, field, value):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci import contracts
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     manifest["receipt"][field] = value
     selected = _baci_write_manifest(directory, manifest)
     if field != "bytes":
@@ -728,28 +744,32 @@ def test_baci_source_chain_guard(tmp_path, monkeypatch, field, value):
 
         monkeypatch.setattr(contracts, "sidecar_for", forbidden)
     with pytest.raises(BaciError, match=r"^source_chain$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 def test_baci_manifest_archive_checksum_guard(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     manifest["config"]["publisher_sha256"] = "f" * 64
     selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^archive_checksum$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 @pytest.mark.parametrize(
     "field", ["members", "outputs", "raw", "selected", "excluded", "coverage"]
 )
 def test_baci_manifest_content_guard(tmp_path, field):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.baci.config import BaciError
     from eii_custodian.publicdata.baci.contracts import read_selected
 
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     if field == "members":
         manifest[field][0]["bytes"] += 1
     elif field == "outputs":
@@ -762,4 +782,4 @@ def test_baci_manifest_content_guard(tmp_path, field):
             manifest["receipt"]["row_count"] = manifest[field]
     selected = _baci_write_manifest(directory, manifest)
     with pytest.raises(BaciError, match=r"^manifest_content$"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)

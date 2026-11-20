@@ -92,10 +92,12 @@ def test_pub71_present_figure_without_record_fails_the_build(
     tmp_path: Path,
 ) -> None:
     """A produced figure with no local record fails the build, named by row."""
-    folder = tmp_path / "figures"
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    folder = fixture_cache / "figures"
     folder.mkdir()
     (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
-    result = run_stage(tmp_path)
+    result = run_stage(fixture_cache)
     assert result.unrecorded == "PUB-71"
     assert "PUB-71" in result.missing
 
@@ -103,7 +105,7 @@ def test_pub71_present_figure_without_record_fails_the_build(
         raise AssertionError(url)
 
     outcome = run_build(
-        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+        (), unused, fixture_cache, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
     )
     assert outcome.failure is not None
     assert outcome.failure.check == "public_data"
@@ -116,8 +118,10 @@ def test_pub71_present_figure_without_record_fails_the_build(
 @pytest.mark.public_data
 def test_pub71_matching_record_passes_the_build(tmp_path: Path) -> None:
     """The same figure with a matching local record leaves the build unfailed."""
-    _local_record(tmp_path, json.dumps(INVENTED_PUB_71))
-    folder = tmp_path / "figures"
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    _local_record(fixture_cache, json.dumps(INVENTED_PUB_71))
+    folder = fixture_cache / "figures"
     folder.mkdir()
     (folder / "PUB-71.json").write_text(json.dumps(INVENTED_PUB_71), encoding="utf-8")
 
@@ -125,7 +129,7 @@ def test_pub71_matching_record_passes_the_build(tmp_path: Path) -> None:
         raise AssertionError(url)
 
     outcome = run_build(
-        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+        (), unused, fixture_cache, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
     )
     assert outcome.failure is None
     assert coverage_line("PUB-71") not in outcome.lines
@@ -135,11 +139,14 @@ def test_pub71_matching_record_passes_the_build(tmp_path: Path) -> None:
 def test_pub71_no_figure_leaves_the_build_unfailed(tmp_path: Path) -> None:
     """No produced figure: the absent local record fails nothing."""
 
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+
     def unused(url: str) -> Response:
         raise AssertionError(url)
 
     outcome = run_build(
-        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+        (), unused, fixture_cache, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
     )
     assert outcome.failure is None
     assert coverage_line("PUB-71") in outcome.lines
@@ -167,7 +174,9 @@ def test_pub71_malformed_local_record_refused(tmp_path: Path, record: str) -> No
 @pytest.mark.public_data
 def test_planted_wrong_figure_fails_the_stage(tmp_path: Path) -> None:
     """A figure file that disagrees with the published anchor fails the build."""
-    folder = tmp_path / "figures"
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    folder = fixture_cache / "figures"
     folder.mkdir()
     planted = {
         "zone_69_2021": "429964072",
@@ -182,7 +191,7 @@ def test_planted_wrong_figure_fails_the_stage(tmp_path: Path) -> None:
         raise AssertionError(url)
 
     outcome = run_build(
-        (), unused, tmp_path, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
+        (), unused, fixture_cache, lambda: "2026-11-13T08:00:00Z", lambda _seconds: None
     )
     assert outcome.failure is not None
     assert outcome.failure.check == "public_data"

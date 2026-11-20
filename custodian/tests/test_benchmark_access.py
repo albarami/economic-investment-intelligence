@@ -119,6 +119,8 @@ def test_response_obstacle_source_named(tmp_path, marker):
 
 
 def test_dispatch_records_owner_obstacle(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import json
 
     from eii_custodian.publicdata.fetch.build import run_build
@@ -130,13 +132,13 @@ def test_dispatch_records_owner_obstacle(tmp_path):
     result = run_build(
         (entry,),
         lambda _: pytest.fail("no network"),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         benchmark_policies={p.source_id: p},
     )
     assert result.failure is not None
-    report = json.loads((tmp_path / "benchmark_owner_report.json").read_text())
+    report = json.loads((fixture_cache / "benchmark_owner_report.json").read_text())
     assert report[0]["reason"] == "paid_tier"
 
 

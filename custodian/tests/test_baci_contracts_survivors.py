@@ -24,10 +24,12 @@ def refusal(message):
 
 
 def test_baci_registry_and_lineage(tmp_path):
-    outcome = build(tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    outcome = build(fixture_cache)
     assert outcome.failure is None
     selected = outcome.manifests["cepii_baci"]
-    release = read_selected(tmp_path, selected)
+    release = read_selected(fixture_cache, selected)
     assert release.source_registry == {
         "source_id": "cepii_baci",
         "kind": "public_dataset",
@@ -68,11 +70,13 @@ def test_baci_registry_and_lineage(tmp_path):
     ],
 )
 def test_baci_manifest_messages(tmp_path, field, value, reason):
-    directory, _, manifest = _baci_selected_fixture(tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    directory, _, manifest = _baci_selected_fixture(fixture_cache)
     manifest[field] = value
     selected = _baci_write_manifest(directory, manifest)
     with refusal(reason):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 def test_baci_missing_selected_message(tmp_path):
@@ -81,26 +85,32 @@ def test_baci_missing_selected_message(tmp_path):
 
 
 def test_baci_output_corruption_message(tmp_path):
-    directory, selected, manifest = _baci_selected_fixture(tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    directory, selected, manifest = _baci_selected_fixture(fixture_cache)
     digest = manifest["outputs"]["pub_baci_trade"]["sha256"]
     (directory / f"{digest}.jsonl").write_text("invented")
     with refusal("output_hash"):
-        read_selected(tmp_path, selected)
+        read_selected(fixture_cache, selected)
 
 
 def test_baci_terms_receipt_present(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     source = replace(entry(), terms_url=entry().url + "-terms")
     raw = configuration()
     raw["reviewed_urls"].append(source.terms_url)
-    result = build(tmp_path, source=source, config=raw, byte_transport=metadata)
+    result = build(fixture_cache, source=source, config=raw, byte_transport=metadata)
     assert result.failure is None
-    release = read_selected(tmp_path, result.manifests["cepii_baci"])
+    release = read_selected(fixture_cache, result.manifests["cepii_baci"])
     assert release.manifest["terms_unread"] == ""
     assert release.manifest["receipt"]["terms_sha256"] is not None
 
 
 def test_baci_verification_stays_in_cache(tmp_path, monkeypatch):
-    directory, selected, _ = _baci_selected_fixture(tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    directory, selected, _ = _baci_selected_fixture(fixture_cache)
     original = contracts.parse_archive
     observed = []
 
@@ -112,19 +122,24 @@ def test_baci_verification_stays_in_cache(tmp_path, monkeypatch):
         return original(archive, config, output)
 
     monkeypatch.setattr(contracts, "parse_archive", checked)
-    read_selected(tmp_path, selected)
+    read_selected(fixture_cache, selected)
     assert len(observed) == 1
     assert not observed[0].exists()
 
 
 def test_baci_selected_explicit_encoding(tmp_path):
-    class OtherDefaultPath(type(tmp_path)):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+
+    class OtherDefaultPath(type(fixture_cache)):
         def read_text(self, encoding=None, errors=None, newline=None):
             return super().read_text(
                 encoding=encoding or "cp037", errors=errors, newline=newline
             )
 
-    result = build(tmp_path)
+    result = build(fixture_cache)
     assert result.failure is None
-    release = read_selected(OtherDefaultPath(tmp_path), result.manifests["cepii_baci"])
+    release = read_selected(
+        OtherDefaultPath(fixture_cache), result.manifests["cepii_baci"]
+    )
     assert release.country[0].source_name == "Invented target"

@@ -56,6 +56,8 @@ def test_only_reviewed_page_pin_hosts_remain():
 
 @pytest.mark.parametrize("host", ["icv.qa", "syn-refusal.invalid"])
 def test_off_list_refusal_loads_and_normal_dispatch_never_fetches(tmp_path, host):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     row = next(r for r in load_registry() if r.source_id == "suppliers_tawteen")
     dec = deepcopy(load_declaration(row.source_id))
     url = "https://" + host + "/SYN-refusal"
@@ -73,13 +75,15 @@ def test_off_list_refusal_loads_and_normal_dispatch_never_fetches(tmp_path, host
     with patch(
         "eii_custodian.publicdata.fetch.page_records.load_declaration", return_value=dec
     ):
-        outcome = run_build((row,), transport, tmp_path, lambda: STAMP, lambda _: None)
+        outcome = run_build(
+            (row,), transport, fixture_cache, lambda: STAMP, lambda _: None
+        )
     assert outcome.failure is None
     assert any(line.startswith(f"SKIP {row.key}") for line in outcome.lines)
-    receipts = list((tmp_path / row.key / "failures" / "index").glob("*.json"))
+    receipts = list((fixture_cache / row.key / "failures" / "index").glob("*.json"))
     assert len(receipts) == 1
     recorded = b"".join(
-        p.read_bytes() for p in (tmp_path / row.key / "failures").rglob("*.json")
+        p.read_bytes() for p in (fixture_cache / row.key / "failures").rglob("*.json")
     )
     assert dec["shape"]["observed_utc"].encode() in recorded
     assert dec["shape"]["reason"].encode() in recorded
@@ -87,12 +91,19 @@ def test_off_list_refusal_loads_and_normal_dispatch_never_fetches(tmp_path, host
     # Clearing the dispatch hold still records the refusal without a connection.
     with pytest.raises(ValueError, match=r"^anonymous_access_not_approved$"):
         fetch_page(
-            row, transport, tmp_path, lambda: STAMP, lambda _: None, declaration=dec
+            row,
+            transport,
+            fixture_cache,
+            lambda: STAMP,
+            lambda _: None,
+            declaration=dec,
         )
     assert calls == []
 
 
 def test_off_list_fetching_row_refuses_without_transport(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     dec, _, _ = embedded()
     url = "https://syn-refusal.invalid/SYN-fetch"
     dec.update(url=url, reviewed_urls=[url])
@@ -102,11 +113,15 @@ def test_off_list_fetching_row_refuses_without_transport(tmp_path):
         "eii_custodian.publicdata.fetch.page_records.load_declaration", return_value=dec
     ):
         outcome = run_build(
-            (row,), lambda u: calls.append(u), tmp_path, lambda: STAMP, lambda _: None
+            (row,),
+            lambda u: calls.append(u),
+            fixture_cache,
+            lambda: STAMP,
+            lambda _: None,
         )
     assert outcome.failure is not None and outcome.failure.check == "blocked_host"
     assert calls == []
-    assert not (tmp_path / row.key).exists()
+    assert not (fixture_cache / row.key).exists()
 
 
 @pytest.mark.parametrize(

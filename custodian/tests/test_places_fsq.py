@@ -100,6 +100,8 @@ def test_selects_only_files_whose_row_groups_meet_the_frame() -> None:
 
 def test_metadata_with_no_file_for_the_frame_fetches_nothing(tmp_path: Path) -> None:
     """A summary that misses the frame refuses before any data file is requested."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     body = metadata_bytes((_FAR,), dataset_geo_bbox=(50.7, 24.4, 51.7, 26.2))
     with pytest.raises(PlacesFsqError, match=r"^no_file_for_frame$"):
         select_partitions(body, release=_RELEASE, frame=FRAME_BOX)
@@ -111,11 +113,11 @@ def test_metadata_with_no_file_for_the_frame_fetches_nothing(tmp_path: Path) -> 
         response = listing(f"{_RELEASE}/") if url == entry.url else body
         return Response(final_url=url, body=response, hops=())
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "no_file_for_frame"
     assert seen == [entry.url, f"{COPY_ROOT}{_RELEASE}/places/_metadata"]
-    assert not (tmp_path / RELEASE_KEY / "manifest.json").exists()
+    assert not (fixture_cache / RELEASE_KEY / "manifest.json").exists()
 
 
 def test_a_different_release_in_the_summary_is_refused() -> None:

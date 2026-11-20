@@ -61,6 +61,8 @@ def offline(monkeypatch):
 @pytest.mark.parametrize("source", ["baci", "gravity", "atlas"])
 @pytest.mark.parametrize("phase", ["conversion", "metadata", "stream"])
 def test_traceback_redaction(source, phase, tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     m = modules(source)
     secret = "invented-secret-token"
     address = "https://" + "invented-user:invented-password" + "@invented.invalid/file"
@@ -86,7 +88,7 @@ def test_traceback_redaction(source, phase, tmp_path):
     with pytest.raises(error) as caught:
         acquire(
             source,
-            tmp_path,
+            fixture_cache,
             metadata=metadata if phase != "stream" else None,
             stream=stream if phase == "stream" else None,
         )
@@ -107,18 +109,18 @@ def test_traceback_redaction(source, phase, tmp_path):
     result = run_build(
         [m.fixture.entry()],
         metadata if phase != "stream" else m.fixture.metadata,
-        tmp_path,
+        fixture_cache,
         lambda: CLOCK,
         lambda _: None,
         **options,
     )
     assert secret not in repr(result)
     assert address not in repr(result)
-    for path in tmp_path.rglob("*"):
+    for path in fixture_cache.rglob("*"):
         if path.is_file():
             assert secret.encode() not in path.read_bytes()
             assert address.encode() not in path.read_bytes()
-    assert not list(tmp_path.rglob("*.manifest.json"))
+    assert not list(fixture_cache.rglob("*.manifest.json"))
 
 
 @pytest.mark.parametrize("source,grain", [("gravity", 0), ("atlas", 0), ("atlas", 1)])

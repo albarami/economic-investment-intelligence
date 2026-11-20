@@ -26,7 +26,7 @@ def test_run_build_leaves_unrelated_assets_in_non_pytest_named_dir(
 ) -> None:
     """Unrelated assets survive when the cache sits in a non-temporary ``pytest-*`` folder."""
     workspace = tmp_path / "pytest-not-temporary"
-    cache = workspace / "data" / "public_cache"
+    cache = workspace / "cache"
     cache.mkdir(parents=True)
     marker = workspace / "assets" / "unrelated-marker.txt"
     marker.parent.mkdir(parents=True, exist_ok=True)
@@ -42,7 +42,7 @@ def test_run_build_leaves_unrelated_assets_in_non_pytest_named_dir(
         atlas_config=Config.from_mapping(configuration()),
     )
     assert outcome.failure is None
-    assert marker.is_file()
+    assert marker.is_file(), "cleanup deleted an unrelated asset"
     assert marker.read_text(encoding="utf-8") == "keep"
 
 
@@ -89,3 +89,25 @@ def test_minimal_building_table_satisfies_run_build(tmp_path: Path) -> None:
     )
     assert refused_again.failure is not None
     assert refused_again.failure.check == "building_table_absent"
+
+
+def test_atlas_fixture_contains_its_height_outputs(tmp_path: Path) -> None:
+    """The real Atlas fixture must keep both height files inside its own directory."""
+    from custodian.tests.test_atlas_fetch import test_atlas_complete_archive
+
+    from eii_custodian.publicdata.heights.model import (
+        HEIGHTS_FILE,
+        HEIGHTS_RELATIVE,
+        MANIFEST_FILE,
+    )
+
+    fixture_root = tmp_path / "atlas-fixture"
+    fixture_root.mkdir()
+    test_atlas_complete_archive(fixture_root)
+    for filename in (HEIGHTS_FILE, MANIFEST_FILE):
+        outputs = list(tmp_path.rglob(filename))
+        assert outputs, f"missing height output: {filename}"
+        assert all(path.is_relative_to(fixture_root) for path in outputs), (
+            "height output escaped its fixture tmp_path"
+        )
+        assert outputs == [fixture_root / "data" / HEIGHTS_RELATIVE / filename]

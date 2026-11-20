@@ -123,14 +123,16 @@ def _build(cache: Path, terms: bytes) -> tuple[object, dict[str, object]]:
 
 def test_token_nonce_and_whitespace_keep_one_fingerprint(tmp_path: Path) -> None:
     """A meta token, a script nonce or white space does not print TERMS."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     noisy = _page(
         token="token-one",
         nonce="nonce-one",
         sentence="  Invented   terms&nbsp;sentence for a cafe\u0301.  ",
     )
     quiet = _page(token="token-two", nonce="nonce-two", sentence=VISIBLE)
-    first, first_log = _build(tmp_path, noisy)
-    second, second_log = _build(tmp_path, quiet)
+    first, first_log = _build(fixture_cache, noisy)
+    second, second_log = _build(fixture_cache, quiet)
     expected = _visible_sha256(VISIBLE)
     assert first.failure is None
     assert second.failure is None
@@ -144,10 +146,12 @@ def test_token_nonce_and_whitespace_keep_one_fingerprint(tmp_path: Path) -> None
 
 def test_changed_terms_sentence_prints_the_terms_line(tmp_path: Path) -> None:
     """A changed terms sentence has a new fingerprint and prints TERMS."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _watched()
-    _build(tmp_path, _page(token="token-one", nonce="nonce-one", sentence=VISIBLE))
+    _build(fixture_cache, _page(token="token-one", nonce="nonce-one", sentence=VISIBLE))
     outcome, loaded = _build(
-        tmp_path, _page(token="token-one", nonce="nonce-one", sentence=CHANGED)
+        fixture_cache, _page(token="token-one", nonce="nonce-one", sentence=CHANGED)
     )
     notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
     assert outcome.failure is None
@@ -248,6 +252,8 @@ def test_raw_byte_previous_log_does_not_print_a_false_terms_line(
     tmp_path: Path,
 ) -> None:
     """A raw-byte previous digest is another kind, so it is not compared."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _watched()
     earlier = _page(token="token-one", nonce="nonce-one", sentence=VISIBLE)
     later = _page(token="token-two", nonce="nonce-two", sentence=VISIBLE)
@@ -262,8 +268,10 @@ def test_raw_byte_previous_log_does_not_print_a_false_terms_line(
             }
         ],
     }
-    (tmp_path / "build-log.json").write_text(json.dumps(previous), encoding="utf-8")
-    outcome, loaded = _build(tmp_path, later)
+    (fixture_cache / "build-log.json").write_text(
+        json.dumps(previous), encoding="utf-8"
+    )
+    outcome, loaded = _build(fixture_cache, later)
     assert outcome.failure is None
     assert not any(line.startswith("TERMS ") for line in outcome.lines)
     assert loaded["terms"][0]["terms_sha256"] == _visible_sha256(VISIBLE)
@@ -276,16 +284,18 @@ def test_failed_build_keeps_terms_baseline_and_local_statuses(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure_mode: str
 ) -> None:
     """A later failed run cannot hide changed terms from the next build."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     watched = _watched()
     _, earlier = _build(
-        tmp_path, _page(token="token-one", nonce="nonce-one", sentence=VISIBLE)
+        fixture_cache, _page(token="token-one", nonce="nonce-one", sentence=VISIBLE)
     )
     # Preserve complete historical rows, including metadata and legacy kinds.
     earlier["terms"][0]["planted_metadata"] = "SYN-preserve-verbatim"
     earlier["terms"].append(
         {"key": "legacy_source", "terms_sha256": "SYN-raw-byte-digest"}
     )
-    log_path = tmp_path / "build-log.json"
+    log_path = fixture_cache / "build-log.json"
     log_path.write_text(json.dumps(earlier), encoding="utf-8")
     expected_hashes = {watched.key: _visible_sha256(VISIBLE)}
     changed = _page(token="token-two", nonce="nonce-two", sentence=CHANGED)
@@ -301,11 +311,11 @@ def test_failed_build_keeps_terms_baseline_and_local_statuses(
         for _ in range(2):
             if failure_mode == "raise":
                 with pytest.raises(ValueError, match="SYN-planted-stage-refusal"):
-                    _build(tmp_path, changed)
+                    _build(fixture_cache, changed)
             else:
-                outcome, _ = _build(tmp_path, changed)
+                outcome, _ = _build(fixture_cache, changed)
                 assert outcome.failure == failure
-            assert _previous_term_hashes(tmp_path) == expected_hashes
+            assert _previous_term_hashes(fixture_cache) == expected_hashes
             report = json.loads(log_path.read_text(encoding="utf-8"))
             assert report["terms"] == earlier["terms"]
             assert report["local_files"] == {
@@ -313,7 +323,7 @@ def test_failed_build_keeps_terms_baseline_and_local_statuses(
                 "review/district_layer_aliases.csv": "absent",
             }
 
-    outcome, completed = _build(tmp_path, changed)
+    outcome, completed = _build(fixture_cache, changed)
     assert outcome.failure is None
     assert (
         f"TERMS {watched.key} changed since the last build ({watched.terms_url})"

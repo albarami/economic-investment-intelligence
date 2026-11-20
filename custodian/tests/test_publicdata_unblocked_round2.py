@@ -321,6 +321,8 @@ def test_listing_refuses(tmp_path, monkeypatch, plant):
 
 
 def test_listing_build_keeps_existing_part_fetch(tmp_path, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.fetch import registry
@@ -336,10 +338,12 @@ def test_listing_build_keeps_existing_part_fetch(tmp_path, monkeypatch):
             return _ok(url, listing_body())
         return Response(url, b"SYN!", (), '"syn-etag"')
 
-    outcome = run_build(entries, transport, tmp_path, _clock, _sleep)
+    outcome = run_build(entries, transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert seen == [parent.url, entries[1].url]
-    assert next((tmp_path / entries[1].key).glob("*.parquet")).read_bytes() == b"SYN!"
+    assert (
+        next((fixture_cache / entries[1].key).glob("*.parquet")).read_bytes() == b"SYN!"
+    )
 
 
 def test_municipality_publisher_change_refused(tmp_path):
@@ -407,6 +411,8 @@ def test_activated_portal_fetches_with_declared_schema(tmp_path, key):
 
 
 def test_accident_awaits_byte_bound_without_fetching(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.support.fetch_build import run_build
 
     entry = next(e for e in load_registry() if e.key == "accident")
@@ -414,10 +420,10 @@ def test_accident_awaits_byte_bound_without_fetching(tmp_path):
     def transport(url):
         pytest.fail("accident must await the lead's byte bound")
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is None
     assert any("partition_byte_bound_unconfirmed" in line for line in outcome.lines)
-    assert not (tmp_path / "accident").exists()
+    assert not (fixture_cache / "accident").exists()
 
 
 @pytest.mark.parametrize(

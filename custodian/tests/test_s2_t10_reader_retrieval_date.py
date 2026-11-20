@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 
-def _read_unparseable(source: str, tmp_path: Path) -> None:
+def _read_unparseable(source: str, cache: Path) -> None:
     if source == "baci":
         from custodian.tests.test_baci import (
             _baci_selected_fixture,
@@ -17,25 +17,25 @@ def _read_unparseable(source: str, tmp_path: Path) -> None:
         from eii_custodian.publicdata.baci.config import BaciError
         from eii_custodian.publicdata.baci.contracts import read_selected
 
-        directory, _selected, manifest = _baci_selected_fixture(tmp_path)
+        directory, _selected, manifest = _baci_selected_fixture(cache)
         manifest["receipt"]["retrieved_utc"] = "not-a-date"
         selected = _baci_write_manifest(directory, manifest)
         with pytest.raises(BaciError) as caught:
-            read_selected(tmp_path, selected)
+            read_selected(cache, selected)
     else:
         from custodian.tests.test_gravity_atlas_review import acquire, modules, rewrite
 
         reader = modules(source)
-        result = acquire(source, tmp_path)
+        result = acquire(source, cache)
         selected = rewrite(
-            tmp_path,
+            cache,
             source,
             result.digest,
             lambda manifest: manifest["receipt"].update(retrieved_utc="not-a-date"),
         )
         error = getattr(reader.config, source.capitalize() + "Error")
         with pytest.raises(error) as caught:
-            reader.contracts.read_selected(tmp_path, selected)
+            reader.contracts.read_selected(cache, selected)
     assert str(caught.value) == "retrieval_date"
     assert "format" not in str(caught.value)
 
@@ -44,4 +44,6 @@ def _read_unparseable(source: str, tmp_path: Path) -> None:
 def test_unparseable_retrieval_date_names_the_field(
     tmp_path: Path, source: str
 ) -> None:
-    _read_unparseable(source, tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    _read_unparseable(source, fixture_cache)

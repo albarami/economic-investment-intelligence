@@ -519,6 +519,8 @@ def test_off_list_request_and_short_family_file_store_nothing(tmp_path):
 
 def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
 
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     for kind in ("paged_layer", "https_file", "terms_page"):
         entry = replace(
             _fixture_entry(),
@@ -546,16 +548,16 @@ def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
             fetch_entry(
                 entry,
                 transport,
-                tmp_path,
+                fixture_cache,
                 lambda: "2026-11-15T00:00:00Z",
                 lambda _: None,
             )
             is None
         )
         receipt = json.loads(
-            next((tmp_path / entry.key).glob("*.meta.json")).read_text()
+            next((fixture_cache / entry.key).glob("*.meta.json")).read_text()
         )
-        body = tmp_path / entry.key / (receipt["sha256"] + ".json")
+        body = fixture_cache / entry.key / (receipt["sha256"] + ".json")
         assert receipt["sha256"] == hashlib.sha256(body.read_bytes()).hexdigest()
         assert receipt["retrieved_utc"] == "2026-11-15T00:00:00Z"
     citation = replace(entry, kind="citation_only", key="invented-citation")
@@ -565,11 +567,15 @@ def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
 
     assert (
         run_build(
-            [citation], never, tmp_path, lambda: "2026-11-15T00:00:00Z", lambda _: None
+            [citation],
+            never,
+            fixture_cache,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
         ).failure
         is None
     )
-    receipt = json.loads((tmp_path / citation.key / "citation.json").read_text())
+    receipt = json.loads((fixture_cache / citation.key / "citation.json").read_text())
     assert receipt["sha256"] == "CITATION_ONLY"
     assert receipt["retrieved_utc"] == "2026-11-15T00:00:00Z"
 
@@ -1243,6 +1249,8 @@ def test_no_period_field_cannot_inherit_stale_registry_bounds(tmp_path):
 
 
 def test_build_orchestration_collects_families_without_tables(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     original = _fixture_entry()
     entries = tuple(
         replace(
@@ -1257,12 +1265,12 @@ def test_build_orchestration_collects_families_without_tables(tmp_path):
     outcome = run_build(
         entries,
         _transport(original, records),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-15T00:00:00Z",
         lambda _: None,
     )
     assert outcome.failure is None
-    indexes = sorted(tmp_path.glob("**/index/*.json"))
+    indexes = sorted(fixture_cache.glob("**/index/*.json"))
     snapshots = [read_snapshot(path.parent.parent, path.stem) for path in indexes]
     receipts = [snapshot.receipt_path for snapshot in snapshots]
     assert len(receipts) == len(FAMILIES)
