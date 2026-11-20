@@ -135,7 +135,7 @@ fields is refused as a fragment, including when its hashes are recomputed. The
 fragment never replaces the archived full body; its hash is distinct from the
 full-page hash.
 
-HTML fragment validation checks the joined text and every contiguous span of adjacent text runs up to a bounded window, so a contact or personal word is refused whether neighbouring elements render fused or apart and whether or not the word is split across tags. Both microdata and reviewed selectors receive these checks at extraction.
+HTML fragment validation checks the joined text and every contiguous span of adjacent text runs up to a bounded window, with each long run cut to twice that window at its far edge and the cut character replaced by a neutral character of the same class, so a contact or personal word is refused whether neighbouring elements render fused or apart and whether or not the word is split across tags. Both microdata and reviewed selectors receive these checks at extraction.
 
 A declared block with a telephone, fax or e-mail property is refused in full at
 extraction, even when that property would not become a candidate. A reviewed

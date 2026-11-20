@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import unicodedata
 from collections.abc import Mapping
 from html import escape
 from typing import Any
@@ -108,6 +109,30 @@ def _source_values(value: object) -> None:
 
 
 _RUN_WINDOW = 128
+_RUN_CONTEXT = 2 * _RUN_WINDOW
+
+
+def _stand_in(char: str, *, left: bool) -> str:
+    """One neutral character of the matching class of a cut-off neighbour."""
+    folded = unicodedata.normalize("NFKC", char)
+    edge = folded[-1:] if left else folded[:1]
+    if edge.isdecimal():
+        return "0" * 12
+    if edge.isalnum() or edge == "_":
+        return "a"
+    return " "
+
+
+def _tail(run: str) -> str:
+    if len(run) <= _RUN_CONTEXT:
+        return run
+    return _stand_in(run[-_RUN_CONTEXT - 1], left=True) + run[-_RUN_CONTEXT:]
+
+
+def _head(run: str) -> str:
+    if len(run) <= _RUN_CONTEXT:
+        return run
+    return run[:_RUN_CONTEXT] + _stand_in(run[_RUN_CONTEXT], left=False)
 
 
 def _runs(node: Node) -> list[str]:
@@ -143,12 +168,13 @@ def validate_fragment(fragment: bytes) -> None:
                     _source_values(value)
             _source_values(root.text())
             runs = _runs(root)
+            for run in runs:
+                _source_values(run)
             for i, first in enumerate(runs):
-                span, inner = first, 0
-                _source_values(span)
+                span, inner = _tail(first), 0
                 for run in runs[i + 1 :]:
+                    _source_values(span + _head(run))
                     span += run
-                    _source_values(span)
                     inner += len(run)
                     if inner > _RUN_WINDOW:
                         break

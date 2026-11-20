@@ -487,3 +487,83 @@ def test_malformed_manifest_has_only_fixed_diagnostic(tmp_path: Path, capsys, ta
         )
     assert sent == []
     assert capsys.readouterr().out == "company_web refused; lead_review_required\n"
+
+
+T = 256
+
+
+def enc(char, depth=50):
+    """Nested percent-encoding of one character; unquote to a fixpoint returns it."""
+    return "%" + "25" * (depth - 1) + format(ord(char), "02X")
+
+
+FILL = "y " * 300
+REFUSED = {
+    # split word at the end of a long first run (beyond T); right edge fused in the page
+    "long-first": f"<i>{FILL}Fa<u>x</u></i><b>z: none</b>",
+    "long-first-digits": f"<i>{FILL}1234<u>5678</u>9 z</i>",
+    # split word at the start of a long last run, left edge fused in the page
+    "long-last": f"<i>Chi</i>ef Executive {FILL}",
+    # percent-encoded word whose raw extent (~200 chars) lies within 2 x window
+    "encoded-first": f"<i>{enc('F')}{enc('a')}<u>x</u>: none</i>",
+    # a 10-letter word whose extent in the long run (9 chars) exceeds a short context
+    "word-first": f"<i>{FILL}chairwoma<u>n</u></i><b>z</b>",
+    "word-last": f"<i>c</i>hairwoman {FILL}",
+    "encoded-last": f"<i>Fa</i>{enc('x')}: none {FILL}",
+}
+
+
+def tail_control(word_tail, before, digits=False):
+    # A long run cut T chars from its end lands right after `before` and right
+    # before `word_tail`; a plain cut would make the cut a word boundary.
+    rest = ("y " * T)[: T - len(word_tail)]
+    return f"<i>{FILL}{before}{word_tail}{rest}</i><u>z</u>"
+
+
+def head_control(word, after):
+    lead = ("y " * T)[: T - len(word)]
+    return f"<u>z</u><i>{lead}{word}{after}{FILL}</i>"
+
+
+BENIGN = {
+    "tail-suffix-ms": tail_control("ms ", "ite"),
+    "tail-suffix-tel": tail_control("tel ", "ho"),
+    "tail-digits": tail_control("1234" + "5678 ", "9"),
+    "head-prefix-dr": head_control(" dr", "ying"),
+    "head-prefix-fax": head_control(" fax", "ed"),
+    "head-digits": head_control(" 1234" + "5678", "9"),
+}
+
+
+def _check_cut(extra):
+    # guard: the cut really lands where intended in the long run
+    return extra
+
+
+@pytest.mark.parametrize("key", sorted(REFUSED))
+def test_cf4_long_run_refused_micro(key):
+    data = MICRO.format(n=NAME, x=REFUSED[key]).encode()
+    with pytest.raises(WebError):
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+
+
+@pytest.mark.parametrize("key", sorted(REFUSED))
+def test_cf4_long_run_refused_selected(key):
+    data = f'<section id="company"><b>{NAME}</b><p>SYN activity</p>{REFUSED[key]}</section>'.encode()
+    with pytest.raises(WebError):
+        extract(
+            data,
+            Company("syn-a", NAME, "register", {}),
+            receipt(data),
+            selectors=SELECTION,
+            selectors_reviewed=True,
+        )
+
+
+@pytest.mark.parametrize("key", sorted(BENIGN))
+def test_cf4_cut_control_matches(key):
+    data = MICRO.format(n=NAME, x=BENIGN[key]).encode()
+    assert (
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data)).status
+        == "matched"
+    )
