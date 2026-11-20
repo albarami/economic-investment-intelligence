@@ -2873,6 +2873,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED BY: the slice S2 gate's record of random failures.
 - UPDATE 2026-11-20: a third occurrence in the lead's ledger run S2-7.ledger2 on the same head 33df1963 (2026-11-20): the ledger row `cd web && npm run test:checks` exited 1 with one failure, the browser test "roads full street load draws every link and carries the Simulated mark" stopping at its readiness wait after about 170 seconds while the machine's load average stood near 60; the other 16 rows passed, the whole test among them (11846 passed, 0 failed). The rerun S2-7.ledger3 with a fresh seed passed every row; under rule 39 that rerun does not close this item.
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4603,6 +4605,28 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 
 - Source: TRAIN-S2-7.conf1.md, source line 52: - (record) The S2-T44 task section lands at a different line offset in the joined TASKS.md than in its approved parent (insertions above shifted it); content identical — noted for the ledger only.
   Disposition: This is the same placement/offset note, explicitly for the ledger only. Content equality is in Q2. Recorded here and in log.md; no second OPEN item or implementation fix.
+
+Maker: OpenAI. Model: GPT-6 (Codex).
+
+Proposals from the supplied two reviews, preserved without inventing a defect or a closure. References use review check and proposal anchors. No existing proposal is renumbered.
+
+### PO-S2-140 — Assert the reviewed intermediate digest, beyond its shape
+
+- ID: PO-S2-140
+- TYPE: OPEN
+- RAISED BY: .overnight/IN/reviews/S2-T19-pin.rev1.md final proposed hardening item; review APPROVED recorded by the lead at 20:35 on 2026-11-19.
+- EVIDENCE: the reviewer proposes supplementing test_the_registry_holds_the_reviewed_pin’s lowercase-hex/length test with equality to the reviewed digest, so a future wrong-but-well-formed pin fails at test time. The reviewer explicitly says this is not a finding under its brief.
+- NEEDED: evaluate and route the hardening proposal under the slice’s proposal process; any adopted test must have its wrong-but-well-formed plant. No implementation or closure is claimed by this draft.
+- COMPARISON: OI-340 concerns the host’s cipher limitation, not the shape of its intermediate hash. Current hash/verification guards remain in force.
+
+### PO-S2-141 — Correct the credential-refusal explanation for the tender path
+
+- ID: PO-S2-141
+- TYPE: OPEN
+- RAISED BY: .overnight/IN/reviews/S2-T19-suite.rev1.md, final record proposal; lead RESULT at 21:11 on 2026-11-19 directs it to OI-340’s pull request.
+- EVIDENCE: document 04 section 2 says the page transport refuses credentials, but the page-scoped refusal is not invoked on the tender path. The reviewer identifies the actual guarantee as passing no token and sending only Accept-Language. Its verdict remains APPROVED and it labels this a non-rejecting record item.
+- NEEDED: reword that parenthetical to the actual tender path and attach the exact documentation correction and source inspection in OI-340’s pull request. The proposed wording is information for the lead, not a tracked edit made by this preparation.
+- COMPARISON: this explanation correction does not broaden transport behavior or resolve the lack of forward secrecy recorded by OI-340.
 
 ## Sources
 

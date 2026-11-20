@@ -38119,6 +38119,1136 @@ Seed:      1604699100
 Notes:     Required lead whole-test row at WORK: provider none, no network and unchanged limits; the real run requires a fresh seed. Historical whole tests belong to their recorded heads. Current moved-head, hosted/head and exact merge-result results remain separate required lead evidence; draft placeholder values are not a fresh-seed run.
 ```
 
+### MERGE TRAIN S2-8 — Slice S2: task log (pull request 105)
+
+Maker: OpenAI; model: GPT-6 (Codex). Senior release-records engineer; strict records-auditor self-review. Loaded skills and source attributions are recorded in PROGRESS.md, “Train S2-8 records — five-commit composition and live evidence”.
+
+Base ff3dd5de85a72af88343ac2bad90994865f888c8; 97c0f914addc393e079b3e7b6fb3afcb31335e0a is the lead's containing records commit; seed 1880996636 is the lead's whole-test seed of ledger try 4 (try 3 ran its whole test with the try-2 seed because the lead's hand patch of the spec left the suite row's command unchanged, and the ledger's seed check refused the row; try 2, seed 3112504094, found the failure below). The five source/pick identities and supplied verdicts are in identity-proof.json and that PROGRESS block. This companion does not manufacture a new review or repeat the already appended open items.
+
+Live r5/r6 exited 1; r7 exited 143 when stopped to comply with the owner's decision. The join test and workbook gaps are attributed to facts.txt L-1198; OI-340 and OI-343 to OI-345 remain open. items.md mirrors the four items already appended: verify exact content and never insert them twice. po_items.md contains proposals only. All TASKS checkboxes remain unchanged; future status/reference substitutions are exact pairs in tasks_md.json.
+
+Preparation is non-executable until 97c0f914addc393e079b3e7b6fb3afcb31335e0a and 1880996636 are resolved by make_spec.py after the lead commits records. Future WORK checks, another-maker joined-head approval, the size-review maker reconciliation, hosted/head checks, the seeded live run on the merged head and the fresh-seed whole test on the exact merge result remain owed. No current source approval is represented as final joined-head approval.
+
+Forced difference of the join (ruling L-1208): ledger try 2 (seed 3112504094) failed five cases of custodian/tests/test_trade_reconciliation_release.py on 97c0f914, in the row of that file and in the whole test (python-custodian-2: 5 failed, 3900 passed). Cause: the approved continuity fix 7dd51d48 makes fail_line drop the empty address slot, and two expectations of that test, merged before this train, still held the old double space; neither the builder's checks nor the confirmation ran that file. The lead's commit 9b7980ee836e4926924086d847bf1882bc095580 changes only those two expected strings to the single space, each still an exact match; it is the one forced test difference of this train and carries another maker's confirmation before the push. The row of custodian/tests/test_page_workbook_survivors_1.py is pinned as "14 passed, 1 warning": the warning is the UserWarning that its duplicate-entry test plants on purpose.
+
+#### Evidence for the work commit `9b7980ee836e4926924086d847bf1882bc095580`
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_additions_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_boundaries.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_atlas_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    61 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    53 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmark_access.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    39 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmarks_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    106 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_comtrade_plants.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_feature_polygon_column.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_4.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_report_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_coverage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_layers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_paged.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_reference_inheritance.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_atlas_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_intake_ceiling.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    64 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_large_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_local_file_report.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_mepi_long_form.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    41 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed, 1 warning in 0.04s" (the one warning is the UserWarning 'Duplicate name' that test_read_sheet_duplicate_zip_entries_refused plants on purpose (lead ruling L-1208); the count of passes and warnings is pinned)
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_period_year_text_rows.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build_date.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    23 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_production_adapters.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_property_quarter.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    28 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_data_stage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    118 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_snapshots.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_besttime_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    52 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    76 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_licence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_listing_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    25 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    50 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    91 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    26 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_snapshot_refusals.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    57 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    33 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    67 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_attempts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_fingerprint.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_release.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    62 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "828 files already formatted"
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 445 source files"
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1126 text files, 121 Markdown files: OK"
+Seed:      none
+Notes:     Repeat at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repeat at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte parity at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','ff3dd5de85a72af88343ac2bad90994865f888c8...9b7980ee836e4926924086d847bf1882bc095580'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/test_awards_incremental.py A:docs/decisions/0069-the-tender-workbook-taken-as-is-and-the-portal-read-incrementally.md M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/review/s2_t29_sources.yaml M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/assembly_adapters.py M:custodian/src/eii_custodian/publicdata/assembly_intake.py M:custodian/src/eii_custodian/publicdata/assembly_tenders.py M:custodian/src/eii_custodian/publicdata/fetch/awards.py M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py M:custodian/src/eii_custodian/publicdata/fetch/kinds.py M:custodian/src/eii_custodian/publicdata/fetch/page_workbook.py M:custodian/src/eii_custodian/publicdata/fetch/report.py M:custodian/src/eii_custodian/publicdata/singles/tenders.py M:custodian/src/eii_custodian/publicdata/singles/tenders_html.py M:custodian/tests/test_assembly_intake.py M:custodian/tests/test_assembly_tenders.py M:custodian/tests/test_awards_survivors_1.py M:custodian/tests/test_fetch_kinds_survivors_3.py M:custodian/tests/test_s2_t29_awards.py M:custodian/tests/test_s2_t29_fix.py M:custodian/tests/test_s2_t29_fix10.py M:custodian/tests/test_s2_t29_pages.py M:custodian/tests/test_tender_chain.py M:custodian/tests/test_tenders.py M:custodian/tests/test_trade_reconciliation_release.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/README.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "33 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK scope.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','ff3dd5de85a72af88343ac2bad90994865f888c8..9b7980ee836e4926924086d847bf1882bc095580'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Five picks, the lead records commit and the lead forced-difference test commit (L-1208); linear.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   ./eii test --seed 1880996636
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11958 passed, 0 failed, 0 skipped
+Seed:      1880996636
+Notes:     Lead only, owed; never executed by this preparation. Hosted/head checks and fresh-seed exact merge-result run remain separate.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
