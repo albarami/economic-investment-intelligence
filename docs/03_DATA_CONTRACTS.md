@@ -2535,6 +2535,16 @@ month remains allowed as a labelled projection from already released values
 (DAT-158), not a new protected statistic. This changes no manifest, window or
 privacy rule and verifies no mounted bytes; OI-324 still owns that verification.
 
+Released-series admission also requires the unique, typed
+`ReleaseAdmission.feed_names` set to equal its catalogue definition's
+`confirmed_sources` exactly; a wrong, extra or missing feed returns the closed
+`forecast_not_offered` refusal before fitting. The names are the existing
+rule 12 feed identities selected for that series, separate from the existing
+source-chain hash binding. Mounted manifest verification and its feed-to-table
+source-chain mapping remain OI-324 work. Occupation family markers explicitly
+end in `band=ALL`, binding the group's total rather than one band row (PRV-38;
+section 7.3 `occupation_pay` grain).
+
 `ForecastResult` verifies its entire supplied computation against a fresh C30
 backtest of the admitted trailing history, before accepting the handoff. Under
 lead ruling L-1209 F2, a known unavailable source returns internal

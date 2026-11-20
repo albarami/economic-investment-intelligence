@@ -37,7 +37,9 @@ def occupation(key):
         base,
         key=key,
         table="occupation_pay",
-        admission=evidence("occupation_pay"),
+        admission=replace(
+            evidence("occupation_pay"), feed_names=definition(key).confirmed_sources
+        ),
         sources=(chain("occupation_pay"),),
         partition=partition,
         protected_table="occupation_pay",
@@ -48,7 +50,7 @@ def occupation(key):
                 "occupation_pay",
                 partition,
                 "net",
-                f"basis={basis};occupation_group=2",
+                f"basis={basis};occupation_group=2;band=ALL",
                 "earner_count",
                 "single",
             ),
@@ -163,6 +165,8 @@ def test_occupation_geographies_and_both_pay_measures(
         "family_column",
         "family_role",
         "family_breakdown",
+        "missing_band",
+        "band_row",
         "basis",
         "group",
         "extra_split",
@@ -188,6 +192,22 @@ def test_occupation_binding_plants_refuse_before_fitting(
         "group": {"breakdown": (("basis", basis), ("occupation_group", "invented"))},
         "extra_split": {"breakdown": (*series.breakdown, ("gender", "invented"))},
         "missing_split": {"breakdown": ()},
+        "missing_band": {
+            "families": (
+                replace(
+                    series.families[0],
+                    breakdown=f"basis={basis};occupation_group=2",
+                ),
+            )
+        },
+        "band_row": {
+            "families": (
+                replace(
+                    series.families[0],
+                    breakdown=f"basis={basis};occupation_group=2;band=B03",
+                ),
+            )
+        },
         "public": {"input_class": "public"},
         "named_subject": {"subject": "register_company"},
         "municipality": {
@@ -207,6 +227,69 @@ def test_occupation_binding_plants_refuse_before_fitting(
     assert isinstance(
         f.forecast_series(replace(series, **changes[change])), f.ForecastNotOffered
     )
+
+
+@pytest.mark.parametrize("key", GENERATED_KEYS)
+@pytest.mark.parametrize("plant", ["missing", "absent"])
+def test_missing_confirmed_feeds_refuse_before_fitting(monkeypatch, key, plant):
+    series = generated(key)
+    feeds = definition(key).confirmed_sources
+    admission = replace(
+        series.admission, feed_names=feeds[:-1] if plant == "missing" else ()
+    )
+    monkeypatch.setattr(
+        f, "backtest", lambda *a, **k: pytest.fail("unconfirmed feeds fitted")
+    )
+    assert f.forecast_series(replace(series, admission=admission)) == (
+        f.ForecastNotOffered("forecast_not_offered")
+    )
+
+
+@pytest.mark.parametrize(
+    "key", ["employment_by_area", "employment_by_occupation_workplace"]
+)
+@pytest.mark.parametrize("plant", ["wrong", "extra"])
+def test_wrong_or_extra_confirmed_feeds_refuse_before_fitting(monkeypatch, key, plant):
+    series = generated(key)
+    feeds = definition(key).confirmed_sources
+    # All names already exist in the window's feed universe (rule 12).
+    planted = (
+        (feeds[0], "residence.v1", feeds[-1])
+        if plant == "wrong"
+        else (*feeds, "residence.v1")
+    )
+    admission = replace(series.admission, feed_names=planted)
+    assert admission.source_hashes == tuple(
+        (source.lineage_ref, source.sha256) for source in series.sources
+    )  # A self-consistent source chain cannot legitimise the wrong feed set.
+    monkeypatch.setattr(
+        f, "backtest", lambda *a, **k: pytest.fail("unconfirmed feeds fitted")
+    )
+    assert f.forecast_series(replace(series, admission=admission)) == (
+        f.ForecastNotOffered("forecast_not_offered")
+    )
+
+
+@pytest.mark.parametrize("key", GENERATED_KEYS)
+def test_exact_confirmed_feed_set_reaches_facts_regardless_of_order(key):
+    series = generated(key)
+    feeds = definition(key).confirmed_sources
+    result = f.forecast_series(
+        replace(series, admission=replace(series.admission, feed_names=feeds[::-1]))
+    )
+    assert isinstance(result, f.ForecastResult)
+    for fact in result.facts:
+        assert fact.derivation.admission.feed_names == feeds[::-1]
+        assert fact.sources == series.sources
+
+
+@pytest.mark.parametrize(
+    "feeds",
+    [None, "employment.v1", ["employment.v1"], (1,), ("",), ("employment.v1",) * 2],
+)
+def test_admission_feed_names_are_typed_and_unique(feeds):
+    with pytest.raises(ValueError, match="release admission feeds"):
+        replace(evidence("worker_pay"), feed_names=feeds)
 
 
 @pytest.mark.parametrize("key", [r.key for r in DEFINITIONS if r.state == "open"])

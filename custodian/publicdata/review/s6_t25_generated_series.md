@@ -17,6 +17,18 @@ The proposed `custodian/src/eii_custodian/conformance/release_registry.json`
 does not exist on this base. Agreement tests use the tracked document 03
 catalogue and column definitions; this is not release-registry validation.
 
+Released-series admission reads `Definition.confirmed_sources` and requires
+exact set equality with the typed `ReleaseAdmission.feed_names` evidence before
+any fit, returning the closed `forecast_not_offered` refusal on a wrong, extra
+or missing feed. These are the existing feed identities of rule 12, selected
+for the series, rather than the full four-feed window universe on every route.
+The field requires unique, nonempty text names; ordering does not change the
+admitted set. Source-chain hashes remain bound to `source_hashes` separately.
+All forecast companions retain this admission evidence in their lineage.
+This checks in-memory feed identities only: mounted manifest verification,
+including the mapping from those feeds to the selected table's source chains,
+stays with OI-324. No new feed or manifest/window rule is introduced.
+
 Every admitted generated series uses Synthetic inputs, subject `area`, Inferred
 facts, the two Synthetic caveats and `forecast_backtest_range`. The unit set,
 family and breakdown stay fixed through the admitted history; this layer reads
@@ -78,7 +90,8 @@ Added. Feeds: business_register.v1, employment.v1, residence.v1, wages.v1.
 Table occupation_pay. Monthly (`month`) history as above. Unit count; levels area, national.
 Single earner_count in op_res_quartile, measure net or basic. The ordered
 breakdown is basis=residence then occupation_group; the family marker is
-`basis=residence;occupation_group=<group>`. Groups use the source contract's
+`basis=residence;occupation_group=<group>;band=ALL`, the group's `ALL` band
+total (PRV-38). Groups use the source contract's
 major groups, unmapped and other. These are the released count primitives of
 the occupation family, never an unprotected person count or a new finer split.
 
@@ -88,7 +101,8 @@ Added. Feeds: business_register.v1, employment.v1, wages.v1. Table occupation_pa
 Monthly (`month`) history as above. Unit count; levels area, national. Single earner_count
 in op_work_quartile, measure net or basic. The ordered breakdown is
 basis=workplace then occupation_group; the family marker is
-`basis=workplace;occupation_group=<group>`. The same closed groups apply.
+`basis=workplace;occupation_group=<group>;band=ALL`, the group's `ALL` band
+total (PRV-38). The same closed groups apply.
 Residence and workplace families are never interchanged or combined.
 
 ### Evaluated entries not added

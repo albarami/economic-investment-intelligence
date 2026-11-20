@@ -379,7 +379,7 @@ def released(key):
         period = later
     return replace(
         construction(),
-        admission=evidence(table),
+        admission=replace(evidence(table), feed_names=spec.confirmed_sources),
         window_key="e" * 64,
         window_period="2020-01/2021-11",
         generator="invented_generator",
@@ -891,7 +891,7 @@ def test_municipal_stayer_and_resident_bindings():
         table = "month_change" if key == "stayer_index" else "resident_pay"
         series = replace(
             series,
-            admission=evidence(table),
+            admission=replace(evidence(table), feed_names=series.admission.feed_names),
             table=table,
             partition=partition,
             protected_table="resident_pay",

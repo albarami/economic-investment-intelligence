@@ -43469,3 +43469,121 @@ records checks and patch verification are recorded there and in the same checks
 folder without changing this earlier evidence. The final patch includes this
 append and every new task file. Muhasabah: PASS for the bounded, sourced handoff;
 full acceptance remains incomplete and different-maker review is still owed.
+
+
+## S6-T25 fix round one — occupation band and confirmed-source admission
+
+Maker: OpenAI. Model: GPT-6 Codex. Builder persona: senior forecasting and
+provenance engineer. Strict self-review persona: numeric-provenance reviewer,
+rejecting ambiguous row lineage, inert catalogue fields, weakened assertions,
+skips and raised bounds. Skills: project-orientation, task-standards,
+github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. The brief's
+unavailable test-driven-development, systematic-debugging and
+verification-before-completion skills were applied in their plain meaning:
+reproduce each defect, isolate its cause, plant violations before the guard,
+then verify the final files with actual exits. No independent approval is
+claimed; the lead must obtain confirmation from the original two lenses.
+
+Base and current HEAD: 1491ff73014194504a70710caa6be2d797a4a047, whose parent is
+cbff06dd1a079b0ffb7dc913580c484f9c7aebe9. Correction to the preceding S6-T25
+record: the lead committed those original changes as the current HEAD.
+The earlier .overnight evidence references are untracked local files, not
+repository-resolving evidence; the ledger's commands, exits and counts are the
+evidence of record. Earlier ledger bytes are preserved exactly.
+
+Scope and authority: the accepted fixes of Lens A R1 and Lens B F1 in the
+fix-round brief; document 03 section 7.3 occupation_pay grain, document 06
+PRV-38, AGENTS.md rule 12 and Definition.confirmed_sources. Occupation home
+families now require basis=<basis>;occupation_group=<group>;band=ALL. The
+fixture and both audit markers name the group's ALL total. Both missing-band
+and B03 markers are planted before fitting. ReleaseAdmission now carries typed,
+unique feed_names, and admission reads confirmed_sources for every released
+key, requiring exact set equality before fitting with the existing closed
+forecast_not_offered refusal. Wrong and extra residence.v1 feeds on workplace
+routes and missing feeds on every generated route are actual series/admission
+plants, with otherwise matching source hashes. Only existing rule 12 feed names
+are used. Valid reordered evidence survives in every companion's lineage.
+The audit and document 03 state that mounted manifest verification and its
+feed-to-table source-chain mapping remain OI-324 work.
+
+Environment: Linux x86_64, Python 3.14.6, uv 0.11.31; existing environment used
+without synchronisation. Every uv invocation below used UV_OFFLINE=1,
+UV_NO_SYNC=1 and UV_CACHE_DIR=.overnight/tmp/uv-cache. Pytest used the existing
+profile, no cache provider, seed 62525 and unchanged bounds; no random draw was
+added by the fixes. No network, source data, private calibration, data cache or
+vault read was performed. No ./eii test, dependency change, skip, retry, time
+limit increase or baseline refresh was performed.
+
+Test commands and actual results:
+
+- Band reproduction: uv run --locked python -m pytest
+  core/tests/test_forecast_generated.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 -k 'occupation_binding and (missing_band or band_row)'.
+  Before the binding fix: exit 1, 2 failed, 2 passed, 152 deselected. Both missing
+  markers reached the fail-on-fit spy. B03 was already refused by the old exact
+  unbanded marker; its independent guard proof is recorded below. After the fix:
+  same command exit 0, 4 passed, 152 deselected.
+- Feed reproduction, after adding the typed evidence/fixtures but before the
+  admission guard: uv run --locked python -m pytest
+  core/tests/test_forecast_generated.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 --tb=short
+  -k 'missing_confirmed_feeds or wrong_or_extra_confirmed_feeds'. Exit 1,
+  18 failed, 138 deselected; every failure was the fail-on-fit spy. After the
+  set-equality guard: same command exit 0, 18 passed, 138 deselected.
+- Additional planted-guard proof: uv run --locked python - with an in-memory
+  heredoc used inspect.getsource/exec to replace only the occupation marker
+  equality by a self-equality and only the feed-shape exception by pass. No
+  workspace source was changed. pytest.main ran the same generated test file
+  with -q -p no:cacheprovider --hypothesis-seed=62525 --tb=short and
+  -k '(occupation_binding and band_row) or admission_feed_names_are_typed_and_unique'.
+  Exit 1, 8 failed, 148 deselected: both B03 markers reached fitting and all six
+  malformed/duplicate feed-evidence plants failed to raise. Fresh-process green:
+  uv run --locked python -m pytest core/tests/test_forecast_generated.py with
+  the identical options/selector; exit 0, 8 passed, 148 deselected.
+- Required regression command: uv run --locked python -m pytest
+  core/tests/test_forecast.py core/tests/test_forecast_admission.py
+  core/tests/test_forecast_backtest.py core/tests/test_forecast_models.py
+  core/tests/test_forecast_mutation.py core/tests/test_calculation_purity.py
+  core/tests/test_forecast_generated.py
+  custodian/tests/test_forecast_list_agreement.py
+  custodian/tests/test_forecast_generated_agreement.py
+  custodian/tests/test_forecast_series.py
+  product/tests/test_series_forecast_bindings.py -q -p no:cacheprovider
+  --hypothesis-seed=62525 --tb=short.
+  First exit 1, 516 passed, 1 failed: test_municipal_stayer_and_resident_bindings
+  rebuilt residence admission without the new feed evidence. Its fixture now
+  preserves that evidence; the assertion was unchanged. Final same command:
+  exit 0, 517 passed, no failures or skipped tests.
+
+Repository checks and actual results:
+
+- uv run --locked ruff check .: both runs exit 0, all checks passed.
+- uv run --locked ruff format --check .: first exit 1, one file required
+  formatting and 813 were already formatted. Applied uv run --locked ruff format
+  core/src/eii_core/calc/forecast.py core/tests/test_forecast.py
+  core/tests/test_forecast_generated.py: exit 0, one reformatted, two unchanged.
+  Final format check exit 0, 814 files already formatted.
+- uv run --locked mypy: both runs exit 0, 436 source files checked.
+- python3 scripts/check_docs.py: both pre-append runs exit 0, 1108 text files,
+  119 Markdown files checked. The same check is run again after this append;
+  its actual result is recorded in the return report.
+- python3 scripts/check_tree.py: both runs exit 0, eight rules checked.
+- cmp AGENTS.md CLAUDE.md: exit 0, identical bytes; neither file changed.
+- git diff --check: exit 0, no whitespace defects.
+- Python ownership assertions: exit 0, previous ledger bytes unchanged,
+  instruction files identical, exactly the five implementation/test/document
+  paths above changed before this append. No privacy file or task status changed.
+- Runtime probe: uv run --locked python -c with platform.python_version(),
+  platform.system() and platform.machine(): exit 0, the environment above.
+- git switch -c fix/s6-t25-fix1: exit 128, shared Git refs are read-only.
+  git add of the five task paths: exit 128, shared worktree index is read-only.
+  No commit or push was possible. All changes are left in the workspace under
+  the brief's explicit fallback; no approval or sandbox bypass was attempted.
+
+Proposed open items: original-lens confirmation; existing OI-324 mounted and
+feed-mapping verification; existing S4/S5 source-to-release parity and lead-owned
+real-source go-live re-fit/re-backtest evidence. OI-325's stale external-status
+wording and S6-T05's request-time backtest cost remain lead follow-ups already
+raised by Lens A. No new policy decision, feed or privacy rule is proposed.
+Self-review and muhasabah: PASS for these bounded fixes and their evidence;
+full task acceptance and different-maker approval remain pending.

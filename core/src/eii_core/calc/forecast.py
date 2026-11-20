@@ -175,6 +175,7 @@ class ReleaseAdmission:
     schema_sha256: str
     grain: tuple[str, ...]
     source_hashes: tuple[tuple[str, str], ...]
+    feed_names: tuple[str, ...] = ()
     window_period: str = ""
     window_key: str = ""
 
@@ -204,6 +205,14 @@ class ReleaseAdmission:
                 or re.fullmatch(r"[a-f0-9]{64}", pair[1]) is None
             ):
                 raise ValueError("invalid release admission source hash")
+        if (
+            type(self.feed_names) is not tuple
+            or any(
+                type(name) is not str or not name.strip() for name in self.feed_names
+            )
+            or len(set(self.feed_names)) != len(self.feed_names)
+        ):
+            raise ValueError("invalid release admission feeds")
         if type(self.window_key) is not str or (
             self.window_key and re.fullmatch(r"[a-f0-9]{64}", self.window_key) is None
         ):
@@ -447,7 +456,7 @@ def _released_binding(series: ForecastSeries) -> bool:
             and series.families[0].column == "earner_count"
             and series.families[0].role == "single"
             and series.families[0].breakdown
-            == f"basis={basis};occupation_group={group}"
+            == f"basis={basis};occupation_group={group};band=ALL"
         )
     table = series.protected_table if series.key == "stayer_index" else series.table
     if table not in ("worker_pay", "resident_pay"):
@@ -543,7 +552,14 @@ def _admitted(series: ForecastSeries, spec: Definition) -> bool:
         and (
             series.key != "establishments_by_area" or series.history_route == "snapshot"
         )
-        and (spec.state != "released" or _released_binding(series))
+        and (
+            spec.state != "released"
+            or (
+                _released_binding(series)
+                and type(series.admission) is ReleaseAdmission
+                and set(series.admission.feed_names) == set(spec.confirmed_sources)
+            )
+        )
     )
 
 
