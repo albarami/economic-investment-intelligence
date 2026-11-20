@@ -708,7 +708,7 @@ def test_tender_path_wording_matches_accept_language_only_guarantee() -> None:
     pack = (ROOT / "docs/04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
     assert "credential or cookie (the page transport refuses them)" not in pack
     tender = pack.split("### Award workbook intake", 1)[0]
-    assert "Accept-Language" in tender
+    assert "Arabic requests add none" in tender
     assert "no token" in tender or "passes no token" in tender
 
 

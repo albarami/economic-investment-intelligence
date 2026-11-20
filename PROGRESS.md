@@ -43073,3 +43073,12 @@ The two ledger files retain their complete earlier byte prefixes. `.overnight/RE
 - Hypothesis seed: 8472936150.
 - Red/green: PUB-04/README/tender doc tests failed on old flat-path, pinned-release and credential parenthetical text, then passed after edits; fc_register continuation plants green on existing guard; fsq_exclusions docstring plant red then green.
 - Checks: `uv run --locked python -m pytest` on touched custodian test files — exit 0, 239 passed; `uv run --locked python -m unittest scripts.tests.test_fsq_exclusions.ExclusionTests.test_module_docstring_names_explicit_release_not_pinned_copy` — exit 0, 1 passed; `uv run --locked ruff check .` — exit 0; `uv run --locked ruff format --check .` — exit 0, 835 files formatted; `uv run --locked mypy` — exit 0, 449 sources; `python3 scripts/check_docs.py` — exit 0, 1138 text files; `python3 scripts/check_tree.py` — exit 0, 8 rules; `uv run --locked python scripts/check_reference_notes.py` — exit 0, 359 rows; `cmp AGENTS.md CLAUDE.md` — exit 0. No commit or push.
+- Correction (append): the sweep was committed as 74bddd3f18f0dabb7fb042c6f7810c88b8737bc1 on base d5ab3131; no push.
+
+## S2-P01-FIX1 review remediation — 2026-11-20
+
+- Maker/model: Cursor Composer 2.5 (agent); strict self-review persona: independent contract-text reviewer whose findings F1–F4 are applied. Skills: sanad-provenance, test-driven-development, verification-before-completion.
+- Package: remediate REJECT on commit 74bddd3f per `.overnight/IN/REVIEW-1.md`; no commit or push.
+- Hypothesis seed: 5829103746.
+- Red/green: PUB-04 plant failed on "when the build records one" before F1; README plant failed on "keeping the stated pipeline limits" before F4; tender plant failed without "Arabic requests add none" before F3; PO-S2-110 returned to gate hold; PO-S2-83 partial close for archive wording only.
+- Checks: `uv run --locked python -m pytest custodian/tests/test_fc_register.py custodian/tests/test_gate_records_survivors.py custodian/tests/test_places_fsq_releases.py custodian/tests/test_public_snapshots.py custodian/tests/test_tenders.py -q -p no:cacheprovider --hypothesis-seed=5829103746` — exit 0, 238 passed; `uv run --locked python -m unittest scripts.tests.test_fsq_exclusions -v` — exit 0, 12 passed; `uv run --locked ruff check .` — exit 0; `uv run --locked ruff format --check .` — exit 0, 835 files; `python3 scripts/check_docs.py` — exit 0, 1138 text files; `cmp AGENTS.md CLAUDE.md` — exit 0.

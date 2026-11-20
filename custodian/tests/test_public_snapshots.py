@@ -660,6 +660,8 @@ def test_pub04_row_describes_s2_t27_dated_archive_and_citation_snapshots():
     assert "0045" in row
     assert "0064" in row
     assert "citation_only" in row
+    assert "when the build records one" not in row
+    assert "no such snapshot is written yet" in row
     assert "data/public_cache/<source_id>/<sha256>.<ext>" not in row
 
 
