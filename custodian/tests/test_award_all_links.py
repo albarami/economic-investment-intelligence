@@ -4,6 +4,7 @@ import copy
 import json
 import random
 from collections import Counter
+from dataclasses import replace
 
 import pytest
 from custodian.tests.test_s2_t29_awards import STAMP, profile, row
@@ -22,7 +23,7 @@ from eii_custodian.publicdata.fetch.award_links import (
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
-from eii_custodian.publicdata.fetch.transport import TransportFault
+from eii_custodian.publicdata.fetch.transport import ATTEMPT_LIMIT, TransportFault
 
 
 def intake(tmp_path, monkeypatch, count=40):
@@ -89,7 +90,11 @@ def test_awards_build_checks_all_links_once_and_labels_the_sample(
         ],
     }
     evidence = awards_evidence(snapshot.sidecar, 73)
-    assert evidence["award_links"] == all_links
+    assert evidence["award_links"] == {
+        key: value
+        for key, value in all_links.items()
+        if key not in {"results", "report_urls"}
+    }
     assert evidence["award_check_scope"] == "sample"
     sample = evidence["award_check"]
     assert sample["selected_count"] == 30
@@ -117,7 +122,9 @@ def test_awards_failure_outside_sample_is_counted_once_with_reason(
         return proof(url)
 
     snapshot = built(tmp_path, entry, send)
-    assert Counter(calls) == Counter(dict.fromkeys(urls, 1))
+    expected_calls = Counter(dict.fromkeys(urls, 1))
+    expected_calls[failed] = ATTEMPT_LIMIT
+    assert Counter(calls) == expected_calls
     check = snapshot.sidecar["award_links"]
     assert (check["checked_count"], check["matched"], check["failed_fetches"]) == (
         40,
@@ -135,6 +142,53 @@ def test_awards_failure_outside_sample_is_counted_once_with_reason(
         awards_evidence(snapshot.sidecar, 73)
 
 
+def test_awards_transient_failure_recovers_before_recording_outcome(
+    tmp_path, monkeypatch
+):
+    entry, declaration, proof = intake(tmp_path, monkeypatch)
+    urls = sorted(declaration["reviewed_urls"])
+    calls = Counter()
+
+    def send(url):
+        calls[url] += 1
+        if url == urls[0] and calls[url] == 1:
+            raise TransportFault("unreachable", url)
+        return proof(url)
+
+    snapshot = built(tmp_path, entry, send)
+    expected = Counter(dict.fromkeys(urls, 1))
+    expected[urls[0]] = 2
+    assert calls == expected
+    check = snapshot.sidecar["award_links"]
+    assert check["checked_count"] == check["matched"] == 40
+    assert check["failed_fetches"] == 0
+    assert check["incomplete"] is False
+    assert awards_evidence(snapshot.sidecar, 73)["award_links"]["match_rate"] == "1"
+
+
+@pytest.mark.parametrize("location", ["hops", "final_url"])
+def test_awards_refuses_unlisted_response_url_even_in_reviewed_scope(
+    tmp_path, monkeypatch, location
+):
+    entry, declaration, proof = intake(tmp_path, monkeypatch)
+    unlisted = "https://example.invalid/syn-proof"
+    declaration["reviewed_urls"].append(unlisted)
+    calls = []
+
+    def send(url):
+        calls.append(url)
+        response = proof(url)
+        return replace(
+            response, **{location: (unlisted,) if location == "hops" else unlisted}
+        )
+
+    outcome = run_build((entry,), send, tmp_path, lambda: STAMP, lambda _: None)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "blocked_host"
+    assert len(calls) == 1
+    assert not (tmp_path / entry.key).exists()
+
+
 def test_awards_mismatch_outside_sample_changes_full_match_rate(tmp_path, monkeypatch):
     entry, declaration, proof = intake(tmp_path, monkeypatch)
     urls = sorted(declaration["reviewed_urls"])
@@ -150,13 +204,15 @@ def test_awards_mismatch_outside_sample_changes_full_match_rate(tmp_path, monkey
         return response
 
     snapshot = built(tmp_path, entry, send)
-    check = awards_evidence(snapshot.sidecar, 73)["award_links"]
+    check = snapshot.sidecar["award_links"]
+    evidence = awards_evidence(snapshot.sidecar, 73)["award_links"]
     assert (check["checked_count"], check["matched"], check["mismatched"]) == (
         40,
         39,
         1,
     )
     assert check["match_rate"] == "0.975"
+    assert evidence["match_rate"] == check["match_rate"]
     assert {
         "report_url": mismatched,
         "result": "mismatched",
@@ -165,7 +221,7 @@ def test_awards_mismatch_outside_sample_changes_full_match_rate(tmp_path, monkey
     assert snapshot.sidecar["award_check"]["match_rate"] == "1"
 
 
-def test_awards_full_evidence_is_written_to_the_existing_final_audit(
+def test_awards_final_audit_excludes_report_urls_and_retains_receipt_details(
     tmp_path, monkeypatch
 ):
     from custodian.tests.test_production_adapters import context
@@ -185,7 +241,19 @@ def test_awards_full_evidence_is_written_to_the_existing_final_audit(
     audit = json.loads((tmp_path / "assembly/final_audit.json").read_text())
     award = next(item for item in audit["t29"] if item["key"] == entry.key)
     assert award["sha256"] == snapshot.sha256
-    assert award["award_links"] == snapshot.sidecar["award_links"]
+    assert '"report_url' not in json.dumps(audit)
+    assert "results" not in award["award_links"]
+    assert award["award_links"] == {
+        key: value
+        for key, value in snapshot.sidecar["award_links"].items()
+        if key not in {"results", "report_urls"}
+    }
+    receipt = read_snapshot(tmp_path / entry.key, snapshot.sha256).sidecar
+    assert len(receipt["award_links"]["report_urls"]) == 40
+    assert receipt["award_links"]["results"] == [
+        {"report_url": url, "result": "matched", "reason": "matched"}
+        for url in receipt["award_links"]["report_urls"]
+    ]
     assert award["award_links"]["checked_count"] == 40
     assert award["award_links"]["match_rate"] == "1"
     assert award["award_check_scope"] == "sample"
@@ -278,6 +346,24 @@ def test_awards_publication_refuses_a_planted_skipped_link(tmp_path, monkeypatch
     assert outcome.failure is not None
     assert outcome.failure.check == "award_links_metadata_missing"
     assert not (tmp_path / entry.key).exists()
+
+
+def test_awards_publication_rejects_invalid_seed_before_any_proof_read(
+    tmp_path, monkeypatch
+):
+    entry, declaration, _ = intake(tmp_path, monkeypatch)
+    batch, _, _ = awards.read_intake(tmp_path, declaration, STAMP)
+    calls = []
+
+    def reader(url):
+        calls.append(url)
+        return row()
+
+    with pytest.raises(AwardError, match=r"^award_seed_pending$"):
+        awards._publish_awards(
+            entry, tmp_path, batch, profile(), STAMP, "73", reader, [], []
+        )
+    assert calls == []
 
 
 @pytest.mark.parametrize("count", [0, 1, 29, 30, 31, 40])

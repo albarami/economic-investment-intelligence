@@ -2564,6 +2564,8 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 
 - 2026-11-20 P12b disposition: **NARROWED, LEFT OPEN** for the lead's live all-link match rate, live registration-match evidence and independent review. The normal award build path now checks every distinct nonblank proof link once through the existing transport, retains per-link closed outcomes and matched/checked totals in `award_links`, and derives the explicitly labelled seeded sample without another fetch. `assembly/final_audit.json` retains the full record under `t29`; publication and assembly reject a planted skipped link and inconsistent evidence. `custodian/tests/test_award_all_links.py` proves the offline mechanism on invented links and a stub transport; the final focused run exited 0 with 317 passed, seed 7392516048. No live run or existing data-cache read is claimed, and no task box is ticked. The appended S2-P12b block in PROGRESS.md records every check and the retained deterministic fixture/format corrections.
 
+- 2026-11-20 P12b review correction (F1/F3): the normal award proof reader retains its approved bounded retries and post-response allow-list checks. The final audit carries the validated `award_links` summary without `results` or `report_urls`; full per-link outcomes and URLs remain on the source receipt. This supersedes the earlier P12b full-record audit description. OI-277 remains **LEFT OPEN** for the lead's live rates, registration-match evidence and independent review; no acceptance box is changed.
+
 ## OI-278 — Remaining S2-T29 pin conditions and review-note disposition
 
 - ID: OI-278

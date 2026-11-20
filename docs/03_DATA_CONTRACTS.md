@@ -1156,9 +1156,7 @@ The shared `open_https` transport classifies a response-body `HTTPException`
 (including `IncompleteRead`) as `TransportFault("unreachable")`, with no upstream
 diagnostic text; keyed requests retain the same closed fault. Existing registry
 sources now retry this mid-body failure and record `unreachable` after the
-existing attempt limit, instead of letting it crash the build. Award proofs make
-one attempt per distinct link, count a failed read with its closed reason and mark
-the check incomplete; they do not retry. Certificate refusals retain their exact closed reason even when
+existing attempt limit, instead of letting it crash the build. Award proofs use the same retries, count an exhausted read as a failed fetch with its closed reason and mark the check incomplete. Certificate refusals retain their exact closed reason even when
 raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
@@ -1176,17 +1174,18 @@ Under decision 0064 item 41, the same receipt also carries `award_links`, with
 `method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
 `report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
 `failed_fetches`, `match_rate`, `incomplete`, `status` and `results`. Every link is
-checked once in URL order through the existing transport and reviewed proof scope.
+checked once in URL order through the existing bounded retry reader and reviewed proof scope.
 Each result has `report_url`, `result` and `reason`: a match uses `matched`, a
 mismatch uses `proof_mismatch`, and fetch failures use only `proof_fetch_failed`,
-`unreachable`, `http_status` or `body_bytes`. Failed attempts stay in the checked
+`unreachable`, `http_status` or `body_bytes`. Links whose bounded read fails stay in the checked
 denominator; `match_rate` is matched divided by checked, null for an empty frame.
 Empty frames or any failed fetch set `incomplete` and `award_links_incomplete`;
 otherwise the status is `all_links_recorded`. Publication compares this complete
 frame with the intake, validates every result and recomputes the totals and the
 seeded sample. Missing, skipped, duplicated or inconsistent evidence refuses
-publication. `assembly/final_audit.json` retains the full-link record under `t29`
-and explicitly labels the separate sample; assembly refuses absent or incomplete
+publication. `assembly/final_audit.json` retains the full-link summary under `t29`,
+excluding `results` and `report_urls`; the full per-link record stays on the source
+receipt. The audit explicitly labels the separate sample; assembly refuses absent or incomplete
 full-link evidence even when its sample passed. OI-277's live evidence remains
 the lead's work; invented-response tests do not establish a live match rate.
 

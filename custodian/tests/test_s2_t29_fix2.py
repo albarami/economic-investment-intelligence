@@ -115,10 +115,10 @@ def test_real_incomplete_awards_proof(tmp_path, monkeypatch, capsys):
     assert check["incomplete"] is True
     assert check["match_rate"] == "0"
     assert all(item["result"] == "fetch_failed" for item in check["results"])
-    # S2-T29 full-link re-check: each failed link is recorded on its first attempt.
-    assert len(calls) == 2
+    # Each distinct proof link retains the approved bounded retry contract.
+    assert len(calls) == 2 * ATTEMPT_LIMIT
     assert len(set(calls)) == 2
-    assert sleeps == []
+    assert sleeps == list(BACKOFF_S) * 2
     assert not (tmp_path / entry.key / "proofs").exists()
     diagnostics = repr(outcome) + repr(capsys.readouterr())
     assert "SYN-private-upstream-body" not in diagnostics

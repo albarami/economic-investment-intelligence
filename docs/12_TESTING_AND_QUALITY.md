@@ -795,14 +795,18 @@ staging plant fails when its specific guard is removed and passes with it restor
 
 `test_award_all_links.py` exercises decision 0064 item 41 through the existing
 award build dispatch with invented links and a stub transport. It asserts every
-distinct nonblank link is visited exactly once, including failures; a failure or
+distinct nonblank link is checked through the existing bounded retry reader; a failure or
 mismatch outside the seeded sample changes the full-check rate. It plants a
 skipped link at publication and missing, duplicated or inconsistent receipt fields
 at assembly, verifies exact sample parity at the frame boundaries, retains all
 winners of a shared proof link and keeps hard trust/archive/schema refusals fatal.
-Full-link evidence reaches `assembly/final_audit.json` under `t29`; the sample
-remains explicitly labelled. The award-specific incomplete-read test now requires
-one attempt and no retry sleeps; unrelated registry-source retries stay covered.
+The durable audit test rejects any `report_url` in `assembly/final_audit.json`,
+retains the full-link summary under `t29` without `results` or `report_urls`, and
+re-reads the source receipt to verify its full per-link details remain. The sample
+remains explicitly labelled. A planted invalid seed refuses before any proof read;
+removing the early guard makes the request-count assertion fail. A transient fault
+recovers within the approved retry bound, and an unlisted response hop or final URL
+refuses even if it appears in the CSV declaration's reviewed scope. The award-specific incomplete-read test retains the existing attempt limit and backoff for each failed link.
 These tests supply no live source result or acceptance of OI-277.
 
 The accident and population-grid test files add bounded acquisition and explicit

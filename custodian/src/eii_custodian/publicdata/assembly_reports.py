@@ -269,8 +269,8 @@ def _optional(build: Production, name: str) -> dict[str, Any]:
 def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
     """Validate complete T29 link evidence and retain labelled sample statistics.
 
-    Per-link outcomes and their denominator reach the gate report; no report
-    rows or firm names are returned. OI-277 live acceptance stays with the lead.
+    The gate report retains summary counts, status and rates; per-link URLs and
+    outcomes stay on the source receipt. OI-277 live acceptance stays with the lead.
     """
     from .fetch.award_checks import AwardError, validate_check_receipt
     from .fetch.award_links import validate_links_receipt
@@ -295,7 +295,11 @@ def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
         "sha256": receipt["sha256"],
         "award_check": {key: value for key, value in check.items() if key != "results"},
         "award_check_scope": "sample",
-        "award_links": receipt["award_links"],
+        "award_links": {
+            key: value
+            for key, value in receipt["award_links"].items()
+            if key not in {"results", "report_urls"}
+        },
         "registration_double_space_only": count,
     }
 

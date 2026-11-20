@@ -188,17 +188,6 @@ def read_bounded(
     return _call_url(url, _reader(transport, sleep))
 
 
-def read_once(
-    transport: Transport, url: str
-) -> tuple[Response | None, AttemptFailure | None]:
-    """One transport attempt with the same URL, redirect and body refusals.
-
-    The awards all-link check records each failure instead of retrying it.
-    Transport timeouts, size limits and host/pin scopes remain unchanged.
-    """
-    return _call_url(url, transport)
-
-
 def _call(
     entry: Entry, url: str, reader: Read
 ) -> tuple[Response | None, AttemptFailure | None]:
