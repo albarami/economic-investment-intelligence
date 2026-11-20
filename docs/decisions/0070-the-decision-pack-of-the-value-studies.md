@@ -8,7 +8,7 @@
 | Decided by | The owner's decision of 2026-11-20 |
 | Amends | [TASKS.md](../../TASKS.md), priority order and task ownership as listed below; [14_IMPLEMENTATION_PLAN.md](../14_IMPLEMENTATION_PLAN.md), slices S2, S6, S7 and S8 and ENHANCEMENT BACKLOG; [docs/README.md](../README.md), decision index. The assistant chain-slot extension is assigned against document 09 AI-17; task-owned contract and catalogue amendments follow in its implementation. |
 | Purpose | Put the existing high-value answers first, assign the agreed additions and keep the remaining value-study work after go-live. |
-| Read first | TASKS.md Queue rules, S2-T04, S2-T19, S2-T29, S6-T10, S6-T11, S6-T12, S6-T20, S6-T21, S7-T01, S7-T03, S7-T05, S7-T09, S7-T11 and S8-T06; document 07 cards C4, C7, C10, C11, C13, C16, C39, C40 and C41; document 09 AI-17 and sections 5, 6 and 9; AGENTS.md rules 3, 5, 7, 8, 12 and 16 to 25. |
+| Read first | TASKS.md Queue rules, S2-T04, S2-T19, S2-T29, S6-T10, S6-T11, S6-T12, S6-T20, S6-T21, S7-T01, S7-T03, S7-T05, S7-T09, S7-T11, S8-T01, S8-T03 and S8-T06; document 07 cards C4, C7, C10, C11, C13, C16, C39, C40 and C41; document 09 AI-17 and sections 5, 6 and 9; AGENTS.md rules 3, 5, 7, 8, 12 and 16 to 25. |
 
 ## Context
 
@@ -37,6 +37,7 @@ This is order only. It adds no data, changes no criterion and bypasses no depend
 shared reach is never lost sales, parcel evidence never establishes approval or availability, the imports screen
 never establishes an opportunity, and rent in the workbench remains the user's own input. Document 09's existing
 playbook and claim families carry the answers; this priority note creates no new calculation or claim family.
+The guided demo is S10-T03's guided story (DES-113); its existing in-order criterion for the golden conversation (decision 0045 item 2) is unchanged, and whether item A reorders its scenes is raised under AGENTS.md rule 46 rather than decided here.
 
 ### B1 — Awards and supplier release with its card family
 
@@ -57,14 +58,14 @@ Add S6-T40 for asking-rent context from **a property listing source**. The lead 
 terms in the source registry row at build time, with the normal publisher, retrieval and hash chain. Show Public
 facts labelled **"asking rents from listings"**, with the date and listing count per area and property type.
 Listings describe asking rents, not completed tenancies or vacancy. Calculators keep the user's own rent and are
-never prefilled from this context.
+never prefilled.
 
 This belongs to slice S6 beside S6-T10's property context and S6-T12's site-fit context. It is a new Public context
 task, not permission to reinterpret a sale or guide price as rent. Existing own-rent calculator criteria remain.
 
 ### B3 — Reviewed product-to-activity-to-occupation crosswalk
 
-Add S2-T45 for a reviewed product-to-activity-to-occupation crosswalk. Record both links, their source or editorial
+Add S2-T47 for a reviewed product-to-activity-to-occupation crosswalk. Record both links, their source or editorial
 basis, versions and review, and keep unmapped and ambiguous entries explicit. No unreviewed relation becomes a
 fact. It belongs to slice S2 because S2-T04 owns the reviewed activity spine and graph relationships and S2-T07
 owns the calculation inputs that consume reviewed mappings; document 07 C13 already requires a reviewed product
@@ -102,7 +103,7 @@ additional work only; existing approved weather inputs, forecasts and print/expo
 
 ## Consequences and change triggers
 
-The task additions are S2-T45 and S2-T46, S6-T40, S7-T35 and S8-T19. Each needs its own plan, tests, planted
+The task additions are S2-T46, S2-T47, S6-T40, S7-T35 and S8-T19. Each needs its own plan, tests, planted
 violations, evidence and independent review. The companion operations task is assigned by decision 0071.
 AGENTS.md and CLAUDE.md need no change for this documents-only record. No source was fetched, workbook read,
 crosswalk approved or implementation criterion ticked by this change. Further data, a changed calculation,
@@ -113,7 +114,7 @@ weakened guard or changed accepted scope needs its own decision under AGENTS.md 
 - The owner's decision of 2026-11-20, items A, B1, B2, B3, C and E and the enhancement-backlog direction, supplied
   in the task brief. This is the authority for the additions, not evidence of source contents or implementation.
 - [TASKS.md](../../TASKS.md), the task IDs cited above and Queue rules; [14_IMPLEMENTATION_PLAN.md](../14_IMPLEMENTATION_PLAN.md),
-  sections 10, 14, 15 and 16.
+  sections 10, 14, 15 and 16 and **ENHANCEMENT BACKLOG**.
 - [07_ECONOMIC_METHODS.md](../07_ECONOMIC_METHODS.md), the named cards in item A and C13's reviewed mapping;
   [09_AI_ASSISTANT.md](../09_AI_ASSISTANT.md), AI-17, AI-36, AI-42, AI-63 and AI-67 and section 3 Playbooks.
 - [03_DATA_CONTRACTS.md](../03_DATA_CONTRACTS.md), **S2-T29 cached page and awards contracts** and `pub_tender` in

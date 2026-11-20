@@ -2875,6 +2875,35 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - UPDATE 2026-11-20: a third occurrence in the lead's ledger run S2-7.ledger2 on the same head 33df1963 (2026-11-20): the ledger row `cd web && npm run test:checks` exited 1 with one failure, the browser test "roads full street load draws every link and carries the Simulated mark" stopping at its readiness wait after about 170 seconds while the machine's load average stood near 60; the other 16 rows passed, the whole test among them (11846 passed, 0 failed). The rerun S2-7.ledger3 with a fresh seed passed every row; under rule 39 that rerun does not close this item.
 
 
+## OI-346 — How the Public-only first-map release meets rule 12
+
+- ID: OI-346
+- TYPE: OPEN (owner)
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 1.
+- CONCERNS: [decision 0071](docs/decisions/0071-after-go-live-operations-and-continuous-promotion.md) items 5 and 6; S3-T02 and S3-T28; AGENTS.md rules 12 and 46.
+- EVIDENCE: Rule 12's `window_key` hashes the four protected feeds. A `public_only` first-map release at the S3 gate has none of them, and S3-T02 refuses freeze for that kind. The owner should rule how the first-map release is frozen.
+- NEEDED: The owner's ruling and reviewed contract reconciliation establish how the first-map release meets rule 12, which binds every release. No exemption, invented protected window, dummy register entry or synthetic table is authorized.
+- NEEDED BY: S3-T28's reviewed plan and contract amendments, before first service.
+
+## OI-347 — Fixed loopback entry and promotion's port switch
+
+- ID: OI-347
+- TYPE: OPEN (owner)
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 2.
+- CONCERNS: [decision 0071](docs/decisions/0071-after-go-live-operations-and-continuous-promotion.md) items 1, 2 and 4; [decision 0041](docs/decisions/0041-remote-mode-through-the-owners-own-host.md) item 1; S3-T20 and S3-T28.
+- EVIDENCE: Decision 0071 says both "a tunnel to a fixed loopback port" and "promotion switches which … port the route serves". S3-T20 has a single entry on port 8088 and refuses a second public port. These need to be reconciled.
+- NEEDED: The owner and lead reconcile the fixed entry with promotion's release and port switch under AGENTS.md rule 46 before implementation. This item chooses no routing design and authorizes no second public port.
+- NEEDED BY: S3-T28's reviewed operational plan, before first service or promotion.
+
+## OI-348 — Priority answers and the guided story's existing scene order
+
+- ID: OI-348
+- TYPE: OPEN (owner)
+- RAISED BY: the lead under ruling L-1217, accepting the independent review of decisions 0070 and 0071, proposed open item 3.
+- CONCERNS: [decision 0070](docs/decisions/0070-the-decision-pack-of-the-value-studies.md) item A; [decision 0045](docs/decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 2; S10-T03 (DES-113); document 14 **Priority before go-live — decision 0070**.
+- EVIDENCE: Whether item A reorders the scenes of S10-T03's guided story (see finding 2).
+- NEEDED: The owner rules whether item A reorders the scenes under AGENTS.md rule 46. S10-T03's existing in-order golden-conversation criterion and its out-of-order plant remain unchanged; this item decides no replacement sequence or new check.
+- NEEDED BY: S10-T03's guided-story plan before any scene-order change.
 
 ## Change control
 

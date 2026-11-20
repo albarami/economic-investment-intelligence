@@ -220,7 +220,7 @@ The slice numbers of the earlier plan are kept, so that slice references across 
 | The data rule's amendments to existing tasks (item 12) | slices S4 to S9 | S4-T02, S4-T03, S4-T08, S5-T02, S5-T03, S5-T10, S6-T11, S6-T12, S6-T14, S6-T15, S6-T17, S7-T10, S9-T03 |
 | A product for companies only, designed for its three personas: the oversight seat, its read functions and every ministry-only view leave version 1, the ledger stays as the internal question log with no screen, and scene 7 of the guided story becomes the international entrant's headquarters evidence pack (item 15) | slices S9 and S10 | S9-T01, S9-T03, S9-T04 (withdrawn), S10-T03 |
 | Optional free CDSE backup cache; no analytical or display output (proposed decision 0066) | slice S2 | S2-T41 |
-| Reviewed product-to-activity-to-occupation crosswalk (decision 0070 item B3) | slice S2 | S2-T45 |
+| Reviewed product-to-activity-to-occupation crosswalk (decision 0070 item B3) | slice S2 | S2-T47 |
 | Older awarded pages, one-time cached enrichment after the slice S2 gate (decision 0070 item E) | slice S2, after its gate | S2-T46 |
 | Public asking-rent context from a property listing source, never calculator prefill (decision 0070 item B2) | slice S6 | S6-T40 |
 | Awards and supplier release with its card family (decision 0070 item B1) | slice S7 | S7-T35 |
@@ -412,7 +412,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S2-T37 — Read the newest dated release of the places copy at each refresh, with its date recorded and shown ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 14).
 - S2-T38 — Load employed people by municipality as a Public fact on the source's own geography ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 15).
 - S2-T39 — Read the agency's Arabic pages, add the full-page column once decision record 0029 settles it, and fill the FDI crosswalk by lead review ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 32).
-- S2-T45 — Build the reviewed product-to-activity-to-occupation crosswalk beside S2-T04's spine and S2-T07's calculation inputs. Depends: S2-T04, S2-T07. Full criteria and planted guards: TASKS.md, S2-T45; decision 0070 item B3. Runs before the slice S2 review follow-up and gate.
+- S2-T47 — Build the reviewed product-to-activity-to-occupation crosswalk beside S2-T04's spine and S2-T07's calculation inputs. Depends: S2-T04, S2-T07. Full criteria and planted guards: TASKS.md, S2-T47; decision 0070 item B3. Runs before the slice S2 review follow-up and gate.
 - S2-T08 — Assemble the public pack, record the publisher's terms in its own words with the date read and the basis of use for every source, a missing field recorded as pending ([decision 0059](decisions/0059-publisher-terms-are-a-record-not-a-gate.md)), with no terms-based release exclusion, confirm the coverage bar uses the finest geography available from a visitor-readable source (PUB-82), and complete the twenty-figure source review, the slice S2 confirmations (PLN-25) and OI-03 closure evidence.
 - S2-T09 — After the reviewer has checked them against the source, write the values listed by MTH-03 into the method cards.
 - S2-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
@@ -681,8 +681,7 @@ The card definitions are in document 07; document 09 section 3 owns their playbo
 no new data, changed criterion, dependency bypass or weakened gate. The priority list does not cut other existing
 tasks or reorder the blocks within an answer. In particular it preserves the people-working/people-living opening,
 rank stability, protected staffing controls, the Public-only imports screen, shared-reach wording, parcel limits
-and the user's own rent. The guided-demo implementation retains its existing criteria and checks this priority
-sequence when it assembles the available capabilities.
+and the user's own rent. The guided demo is S10-T03's guided story (DES-113); its existing in-order criterion for the golden conversation (decision 0045 item 2) is unchanged, and whether item A reorders its scenes is raised under AGENTS.md rule 46 rather than decided here.
 
 S6-T40 adds the separate Public asking-rent context of decision 0070 item B2 beside S6-T10/S6-T12 property context.
 It uses a property listing source whose actual identity and terms the lead records in the registry at build time.

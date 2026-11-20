@@ -65,9 +65,10 @@ the release contracts and command implementations; it cannot be claimed from the
    freeze. No changed `window_key`, register, two-run freeze or exit-7 rule is authorized. Any material choice not
    settled by this decision goes through AGENTS.md rule 46 before implementation.
 
-6. **Every release stays bound by the existing rules.** Slice gates are unchanged. AGENTS.md rule 12 binds every
-   applicable freeze and release: its `window_key` and export-register invariants, both no-flag freeze runs and
-   frozen install/start refusal with exit 7 remain. Rule 24's prohibited claims bind every release, including the
+6. **Every release stays bound by the existing rules.** Slice gates are unchanged. AGENTS.md rule 12 binds every release:
+   its `window_key` and export-register invariants, both no-flag freeze runs and frozen install/start refusal with
+   exit 7 remain. How a `public_only` first-map release meets it is the open question of item 5, settled under AGENTS.md rule 46 before first service and never by exempting the release.
+   Rule 24's prohibited claims bind every release, including the
    first map and every enhancement. Preflight only probes; only the database commands start or stop the database;
    start never reloads over a mismatched schema (rules 44 and 45). Offline tests and gates need no tunnel, key or
    network. No command permission or working-command claim is added by this documents-only record.
