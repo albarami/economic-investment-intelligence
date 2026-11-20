@@ -18,14 +18,18 @@ from custodian.tests.fixtures.classification import (
     industry,
     isic,
     link,
+    occupation,
     parse,
     product,
+    production_documents,
     weight,
 )
 
+from eii_core.classification import endpoint_from_parts, resolve_occupations
 from eii_custodian.publicdata.review.classification import (
     CrosswalkError,
     load_crosswalk,
+    parse_crosswalk,
 )
 
 
@@ -342,10 +346,19 @@ def test_f4_isic_endpoint_control_and_no_implicit_bridge():
     review, context = documents()
     review["groups"][0]["links"][0]["target"] = isic()
     review["groups"][1]["source"] = isic()
-    assert parse(review, context).groups[0].source.system in {
-        "customs_tariff",
-        "isic_class",
-    }
+    crosswalk = parse(review, context)
+    first = next(g for g in crosswalk.groups if g.link_kind == "product_to_activity")
+    assert first.links[0].target.system == "isic_class"
+    result = resolve_occupations(crosswalk, endpoint_from_parts(**product()))
+    assert result.status == "mapped"
+    assert result.occupations == (endpoint_from_parts(**occupation()),)
+    review["groups"][0]["links"][0]["target"] = industry()
+    result = resolve_occupations(
+        parse(review, context), endpoint_from_parts(**product())
+    )
+    assert result.status == "unreviewed"
+    assert result.reason == "outside_review_scope"
+    assert result.occupations == result.paths == ()
 
 
 def test_f5_fixture_mode_cannot_be_admitted_as_production():
@@ -581,3 +594,168 @@ def test_f2_changed_published_weight_requires_renewed_review():
     review["groups"][0]["links"][0]["weight"]["value"] = "0.500"
     with pytest.raises(CrosswalkError, match="binding is stale"):
         parse(review, context, binding_body=recorded_binding)
+
+
+@pytest.mark.parametrize(
+    "plant,message",
+    [
+        ("tariff_synthetic", "fixture tariff code is not visibly synthetic"),
+        ("industry_synthetic", "fixture industry is not visibly synthetic"),
+        ("isic_synthetic", "fixture ISIC code is not visibly synthetic"),
+        ("tariff_level", "tariff endpoint has an incompatible level"),
+        ("tariff_version", "tariff version is not the reviewed registry snapshot"),
+        ("industry_version", "industry version is not the reviewed registry snapshot"),
+        ("occupation_code", "occupation endpoint is not a released major group"),
+        ("occupation_version", "occupation endpoint is not a released major group"),
+    ],
+)
+def test_b_isolated_endpoint_guards(plant, message):
+    review, context = documents()
+    if plant.startswith("tariff_"):
+        target = review["groups"][0]["source"]
+    elif plant.startswith("occupation_"):
+        target = review["groups"][1]["links"][0]["target"]
+    else:
+        target = review["groups"][0]["links"][0]["target"]
+    if plant == "tariff_synthetic":
+        target["code"] = target["code"].removeprefix("SYN-TARIFF-")
+    elif plant == "industry_synthetic":
+        key = "mfg_industry/example"
+        context["snapshots"].append({**context["snapshots"][2], "registry_key": key})
+        target.update(code=key, version=key + ":" + "a" * 64)
+    elif plant == "isic_synthetic":
+        target.clear()
+        target.update(isic())
+        target["code"] = target["code"].removeprefix("SYN-ISIC-")
+    elif plant == "tariff_level":
+        target["level"] = "class"
+    elif plant == "tariff_version":
+        target["version"] = "HS-2022"
+    elif plant in {"industry_version", "occupation_version"}:
+        target["version"] = "syn-other-version"
+    elif plant == "occupation_code":
+        target["code"] = "other"
+    # A declared bad endpoint cannot be masked by the missing-meaning guard.
+    declare(context, target)
+    with pytest.raises(CrosswalkError, match=message):
+        parse(review, context)
+
+
+@pytest.mark.parametrize("width", [8, 11])
+@pytest.mark.parametrize("location", ["document", "context"])
+def test_b_bare_digit_guard_isolated_in_locator(width, location):
+    review, context = documents()
+    if location == "document":
+        review["evidence"][0]["locator"] = "1" * width
+    else:
+        context["snapshots"][0]["title"] = "1" * width
+    with pytest.raises(CrosswalkError, match="prohibited bare digit run"):
+        parse(review, context)
+
+
+def test_b_duplicate_property_in_otherwise_valid_document():
+    review, context = documents()
+    body = encoded(review).replace(
+        b'"mapping_revision":"syn-review-a"',
+        b'"mapping_revision":"syn-review-a","mapping_revision":"syn-review-a"',
+        1,
+    )
+    assert body != encoded(review)
+    with pytest.raises(CrosswalkError, match="duplicate JSON property"):
+        parse_crosswalk(
+            body, binding(body, context), context=context, allow_invented=True
+        )
+
+
+@pytest.mark.parametrize("plant", ["non_https", "fragment"])
+def test_b_public_source_url_guard(plant):
+    review, context = documents()
+    context["snapshots"][0]["url"] = (
+        "http://example.invalid/syn-source"
+        if plant == "non_https"
+        else "https://example.invalid/syn-source#syn-fragment"
+    )
+    with pytest.raises(
+        CrosswalkError, match="source URL is not a public uncredentialed address"
+    ):
+        parse(review, context)
+
+
+def test_b_date_only_unreviewed_signature():
+    review, context = documents()
+    review["groups"] = [group(product(), status="unreviewed")]
+    review["groups"][0]["reviewed_on"] = "2026-11-20"
+    with pytest.raises(
+        CrosswalkError, match="unreviewed decision cannot carry a signature"
+    ):
+        parse(review, context)
+
+
+def test_b_child_in_two_distinct_families():
+    review, context, _ = family_documents()
+    second = deepcopy(context["tariff_families"][0])
+    second["parent"] = product("1000.0002", parent=True)
+    declare(context, second["parent"])
+    context["tariff_families"].append(second)
+    with pytest.raises(CrosswalkError, match="tariff child is duplicated"):
+        parse(review, context)
+
+
+@pytest.mark.parametrize("mode", ["production", "invented_fixture"])
+def test_b_review_context_mode_mismatch(mode):
+    review, context = production_documents() if mode == "production" else documents()
+    context["mode"] = "invented_fixture" if mode == "production" else "production"
+    with pytest.raises(
+        CrosswalkError, match="fixture evidence is not production admission"
+    ):
+        parse(review, context)
+
+
+def test_b_production_registry_positive_control():
+    """Prepared engine group required; committed registry metadata only."""
+    review, context = production_documents()
+    result = parse(review, context, allow_invented=False)
+    assert result.mode == "production"
+    assert len(result.groups) == 1
+    assert result.groups[0].status == "mapped"
+    assert result.groups[0].links[0].basis_kind == "editorial_reviewed"
+
+
+@pytest.mark.parametrize("field", ["publisher", "title", "licence", "registry_key"])
+def test_b_production_registry_metadata_guard(field):
+    review, context = production_documents()
+    if field == "registry_key":
+        key = "mfg_industry/syn-unregistered"
+        context["snapshots"][1][field] = key
+        target = review["groups"][0]["links"][0]["target"]
+        target.update(code=key, version=key + ":" + "a" * 64)
+        # Replace the old meaning too, so only the registry guard can decide.
+        context["endpoint_meanings"][1]["endpoint"] = deepcopy(target)
+    else:
+        context["snapshots"][0][field] = "syn-different"
+    with pytest.raises(
+        CrosswalkError, match="source metadata differs from the existing registry"
+    ):
+        parse(review, context, allow_invented=False)
+
+
+def test_b_official_basis_is_not_production_admission():
+    review, context = production_documents()
+    edge = review["groups"][0]["links"][0]
+    edge.update(basis_kind="official", rationale=None, configuration_sha256=None)
+    with pytest.raises(
+        CrosswalkError,
+        match="official correspondences require a separate source decision",
+    ):
+        parse(review, context, allow_invented=False)
+
+
+def test_b_synthetic_tariff_is_not_production_admission():
+    review, context = production_documents()
+    source = review["groups"][0]["source"]
+    source["code"] = "SYN-TARIFF-" + source["code"]
+    declare(context, source)
+    with pytest.raises(
+        CrosswalkError, match="tariff code is not canonical dotted source grain"
+    ):
+        parse(review, context, allow_invented=False)

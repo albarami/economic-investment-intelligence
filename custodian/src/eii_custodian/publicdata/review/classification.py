@@ -27,6 +27,7 @@ from eii_core.classification import (
     LinkKind,
     Mode,
     PublishedWeight,
+    Reason,
     Snapshot,
     Status,
     TariffFamily,
@@ -57,6 +58,8 @@ def _json(body: bytes) -> dict[str, Any]:
 
     try:
         result = json.loads(body, object_pairs_hook=unique)
+    except CrosswalkError:
+        raise
     except (ValueError, UnicodeError) as error:
         raise CrosswalkError("unreadable crosswalk JSON") from error
     if not isinstance(result, dict):
@@ -308,7 +311,7 @@ def _link(
     )
 
 
-def _derive(row: Mapping[str, Any], links: tuple[Link, ...]) -> tuple[Status, str]:
+def _derive(row: Mapping[str, Any], links: tuple[Link, ...]) -> tuple[Status, Reason]:
     if not links:
         if row["reason"] == "reviewer_rejected_no_target":
             _signoff(row)

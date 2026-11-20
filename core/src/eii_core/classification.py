@@ -11,6 +11,20 @@ from dataclasses import dataclass
 from typing import Literal, cast
 
 Status = Literal["mapped", "unmapped", "ambiguous", "unreviewed"]
+Reason = Literal[
+    "reviewer_approved",
+    "reviewer_rejected_no_target",
+    "reviewer_undecided",
+    "multi_link_no_published_weight",
+    "awaiting_human_review",
+    "outside_review_scope",
+]
+SelectionReason = Literal[
+    "all_bound_children_agree",
+    "bound_children_not_unanimous",
+    "missing_bound_tariff_family",
+    "no_single_manufacturing_industry",
+]
 LinkKind = Literal["product_to_activity", "activity_to_occupation"]
 System = Literal[
     "customs_tariff", "manufacturing_industry", "isic_class", "occupation_group"
@@ -94,7 +108,7 @@ class GroupDecision:
     link_kind: LinkKind
     source: Endpoint
     status: Status
-    reason: str
+    reason: Reason | SelectionReason
     reviewed_by_role: str
     reviewed_on: str
     links: tuple[Link, ...]
@@ -130,7 +144,7 @@ class ClassificationPath:
 @dataclass(frozen=True, slots=True)
 class OccupationResolution:
     status: Status
-    reason: str
+    reason: Reason | SelectionReason
     source: Endpoint
     first_hop: GroupDecision
     second_hops: tuple[GroupDecision, ...]
@@ -148,7 +162,7 @@ class C13Selection:
 
     source: Endpoint
     status: Status
-    reason: str
+    reason: Reason | SelectionReason
     bucket: Literal["mapped", "not_mapped"]
     industry: Endpoint | None
     decisions: tuple[GroupDecision, ...]
@@ -166,12 +180,58 @@ def _decision(crosswalk: Crosswalk, kind: LinkKind, source: Endpoint) -> GroupDe
     return GroupDecision(kind, source, "unreviewed", "outside_review_scope", "", "", ())
 
 
-def _worst(decisions: tuple[GroupDecision, ...]) -> tuple[Status, str]:
+def _worst(
+    decisions: tuple[GroupDecision, ...],
+) -> tuple[Status, Reason | SelectionReason]:
     for status in ("unreviewed", "unmapped", "ambiguous", "mapped"):
         for decision in decisions:
             if decision.status == status:
                 return decision.status, decision.reason
     raise ValueError("no classification decision")
+
+
+def _first_hop(
+    crosswalk: Crosswalk, source: Endpoint
+) -> tuple[GroupDecision, tuple[GroupDecision, ...], TariffFamily | None]:
+    """Derive a parent only from its complete bound family, for both consumers.
+
+    The derived decision carries the children's original links as evidence.
+    Blank sign-off fields distinguish this summary from a signed file group.
+    A direct parent decision never substitutes for the inventory or a child.
+    """
+    if source.level != "tariff8":
+        direct = _decision(crosswalk, "product_to_activity", source)
+        return direct, (direct,), None
+    family = next(
+        (item for item in crosswalk.tariff_families if item.parent == source), None
+    )
+    if family is None:
+        return (
+            GroupDecision(
+                "product_to_activity",
+                source,
+                "unreviewed",
+                "missing_bound_tariff_family",
+                "",
+                "",
+                (),
+            ),
+            (),
+            None,
+        )
+    decisions = tuple(
+        _decision(crosswalk, "product_to_activity", child) for child in family.children
+    )
+    status, reason = _worst(decisions)
+    links = tuple(edge for decision in decisions for edge in decision.links)
+    if status == "mapped":
+        targets = {edge.target for edge in links}
+        if all(decision.links for decision in decisions) and len(targets) == 1:
+            reason = "all_bound_children_agree"
+        else:
+            status, reason = "ambiguous", "bound_children_not_unanimous"
+    first = GroupDecision("product_to_activity", source, status, reason, "", "", links)
+    return first, decisions, family
 
 
 def resolve_occupations(crosswalk: Crosswalk, source: Endpoint) -> OccupationResolution:
@@ -185,17 +245,21 @@ def resolve_occupations(crosswalk: Crosswalk, source: Endpoint) -> OccupationRes
         raise ValueError(
             "resolver requires a validated crosswalk and a tariff identity"
         )
-    first = _decision(crosswalk, "product_to_activity", source)
+    first, _, _ = _first_hop(crosswalk, source)
     seconds = tuple(
         _decision(crosswalk, "activity_to_occupation", edge.target)
         for edge in first.links
     )
     decisions = (first, *seconds)
     status, reason = _worst(decisions)
-    paths = tuple(
-        ClassificationPath(product_edge, occupation_edge)
-        for product_edge, second in zip(first.links, seconds, strict=True)
-        for occupation_edge in second.links
+    paths = (
+        tuple(
+            ClassificationPath(product_edge, occupation_edge)
+            for product_edge, second in zip(first.links, seconds, strict=True)
+            for occupation_edge in second.links
+        )
+        if status == "mapped"
+        else ()
     )
     occupations = (
         tuple(sorted({path.occupation_link.target for path in paths}))
@@ -218,7 +282,9 @@ def resolve_occupations(crosswalk: Crosswalk, source: Endpoint) -> OccupationRes
 
 
 def _industry(decision: GroupDecision) -> Endpoint | None:
-    if decision.status != "mapped":
+    if decision.status != "mapped" or any(
+        edge.weight is not None for edge in decision.links
+    ):
         return None
     targets = {edge.target for edge in decision.links}
     if len(targets) != 1:
@@ -235,36 +301,11 @@ def c13_selection(crosswalk: Crosswalk, source: Endpoint) -> C13Selection:
     """
     if not isinstance(crosswalk, Crosswalk) or source.system != "customs_tariff":
         raise ValueError("C13 requires a validated crosswalk and a tariff identity")
-    family = None
-    status: Status
-    if source.level == "tariff8":
-        family = next(
-            (item for item in crosswalk.tariff_families if item.parent == source), None
-        )
-        decisions = (
-            tuple(
-                _decision(crosswalk, "product_to_activity", child)
-                for child in family.children
-            )
-            if family
-            else ()
-        )
-        industries = {_industry(decision) for decision in decisions}
-        if family and decisions and None not in industries and len(industries) == 1:
-            industry = next(iter(industries))
-            status, reason = "mapped", "all_bound_children_agree"
-        else:
-            industry = None
-            status, reason = "ambiguous", "bound_children_not_unanimous"
-            if not family:
-                status, reason = "unreviewed", "missing_bound_tariff_family"
-    else:
-        decision = _decision(crosswalk, "product_to_activity", source)
-        decisions = (decision,)
-        industry = _industry(decision)
-        status, reason = decision.status, decision.reason
-        if status == "mapped" and industry is None:
-            status, reason = "ambiguous", "no_single_manufacturing_industry"
+    first, decisions, family = _first_hop(crosswalk, source)
+    industry = _industry(first)
+    status, reason = first.status, first.reason
+    if status == "mapped" and industry is None:
+        status, reason = "ambiguous", "no_single_manufacturing_industry"
     return C13Selection(
         source,
         status,

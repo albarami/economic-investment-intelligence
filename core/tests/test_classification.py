@@ -1,6 +1,7 @@
 """S2-T47 AC3/5, F1/2/3/4: classification association, never allocation."""
 
 from dataclasses import fields, replace
+from typing import get_args, get_type_hints
 
 import pytest
 from custodian.tests.fixtures.classification import (
@@ -158,10 +159,9 @@ def test_ac3_many_to_many_keeps_paths_without_numeric_input_duplication():
     assert "value" not in {field.name for field in fields(result)}
     # Losing one branch cannot silently preserve the other branch as a mapped result.
     review["groups"].pop()
-    assert (
-        resolve_occupations(parse(review, context), endpoint(product())).occupations
-        == ()
-    )
+    result = resolve_occupations(parse(review, context), endpoint(product()))
+    assert result.occupations == ()
+    assert result.paths == ()
 
 
 def test_ac5_stable_order_from_shuffled_inputs():
@@ -184,12 +184,22 @@ def test_ac5_stable_order_from_shuffled_inputs():
         "ambiguous_child",
         "all_children_agree",
         "missing_family",
+        "all_children_absent",
+        "all_children_unreviewed",
+        "all_children_unmapped",
     ],
 )
 def test_f3_c13_parent_requires_every_bound_child(plant):
     review, context, parent = family_documents()
     if plant == "split_parent":
         review["groups"][-1]["links"][0]["target"] = industry("b")
+        review["groups"].append(
+            group(
+                industry("b"),
+                [link(occupation(), "syn-split-second")],
+                kind="activity_to_occupation",
+            )
+        )
     elif plant == "partly_mapped_parent":
         review["groups"][-1] = group(product("1000.0001.0002"), status="unmapped")
     elif plant == "missing_child":
@@ -200,12 +210,38 @@ def test_f3_c13_parent_requires_every_bound_child(plant):
         review["groups"][-1] = group(product("1000.0001.0002"), status="ambiguous")
     elif plant == "missing_family":
         context["tariff_families"] = []
+    elif plant == "all_children_absent":
+        review["groups"] = [review["groups"][1]]
+    elif plant in {"all_children_unreviewed", "all_children_unmapped"}:
+        status = plant.removeprefix("all_children_")
+        for index in (0, 2):
+            review["groups"][index] = group(
+                review["groups"][index]["source"], status=status
+            )
     result = c13_selection(parse(review, context), endpoint(parent))
     assert result.bucket == (
         "mapped" if plant == "all_children_agree" else "not_mapped"
     )
     assert result.industry == (
         endpoint(industry()) if plant == "all_children_agree" else None
+    )
+    expected = {
+        "split_parent": ("ambiguous", "bound_children_not_unanimous"),
+        "partly_mapped_parent": ("unmapped", "reviewer_rejected_no_target"),
+        "missing_child": ("unreviewed", "outside_review_scope"),
+        "unreviewed_child": ("unreviewed", "awaiting_human_review"),
+        "ambiguous_child": ("ambiguous", "reviewer_undecided"),
+        "all_children_agree": ("mapped", "all_bound_children_agree"),
+        "missing_family": ("unreviewed", "missing_bound_tariff_family"),
+        "all_children_absent": ("unreviewed", "outside_review_scope"),
+        "all_children_unreviewed": ("unreviewed", "awaiting_human_review"),
+        "all_children_unmapped": ("unmapped", "reviewer_rejected_no_target"),
+    }[plant]
+    assert (result.status, result.reason) == expected
+    resolved = resolve_occupations(parse(review, context), endpoint(parent))
+    assert (resolved.status, resolved.reason) == expected
+    assert resolved.occupations == (
+        (endpoint(occupation()),) if plant == "all_children_agree" else ()
     )
 
 
@@ -227,6 +263,101 @@ def test_f3_c13_multi_target_has_no_allocation_rule():
     ]
     result = c13_selection(parse(review, context), endpoint(product()))
     assert (result.bucket, result.industry) == ("not_mapped", None)
+
+
+@pytest.mark.parametrize("parent", [False, True])
+def test_f3_c13_single_published_weight_has_no_allocation_rule(parent):
+    if parent:
+        review, context, source = family_documents()
+    else:
+        review, context = documents()
+        source = product()
+    review["groups"][0]["links"][0] = link(industry(), official=True, split=weight())
+    result = c13_selection(parse(review, context), endpoint(source))
+    assert (result.status, result.reason, result.bucket, result.industry) == (
+        "ambiguous",
+        "no_single_manufacturing_industry",
+        "not_mapped",
+        None,
+    )
+
+
+def test_b_c13_requires_a_manufacturing_industry():
+    review, context = documents()
+    review["groups"][0]["links"][0]["target"] = isic()
+    result = c13_selection(parse(review, context), endpoint(product()))
+    assert (result.status, result.reason, result.bucket, result.industry) == (
+        "ambiguous",
+        "no_single_manufacturing_industry",
+        "not_mapped",
+        None,
+    )
+
+
+def test_b_direct_tariff8_requires_a_bound_family():
+    review, context, parent = family_documents()
+    context["tariff_families"] = []
+    review["groups"].append(group(parent, [link(industry(), "syn-parent")]))
+    crosswalk = parse(review, context)
+    selected = c13_selection(crosswalk, endpoint(parent))
+    resolved = resolve_occupations(crosswalk, endpoint(parent))
+    assert (selected.status, selected.reason, selected.bucket) == (
+        "unreviewed",
+        "missing_bound_tariff_family",
+        "not_mapped",
+    )
+    assert selected.industry is None
+    assert (resolved.status, resolved.reason) == (
+        "unreviewed",
+        "missing_bound_tariff_family",
+    )
+    assert resolved.occupations == resolved.paths == ()
+
+
+def test_b_resolver_refuses_a_non_tariff_source():
+    review, context = documents()
+    with pytest.raises(
+        ValueError,
+        match="resolver requires a validated crosswalk and a tariff identity",
+    ):
+        resolve_occupations(parse(review, context), endpoint(industry()))
+
+
+def test_d_reason_types_and_selection_contract_are_closed():
+    from pathlib import Path
+
+    import eii_core.classification as module
+
+    reasons = {
+        "reviewer_approved",
+        "reviewer_rejected_no_target",
+        "reviewer_undecided",
+        "multi_link_no_published_weight",
+        "awaiting_human_review",
+        "outside_review_scope",
+    }
+    selection_reasons = {
+        "all_bound_children_agree",
+        "bound_children_not_unanimous",
+        "missing_bound_tariff_family",
+        "no_single_manufacturing_industry",
+    }
+    assert set(get_args(getattr(module, "Reason", None))) == reasons
+    assert set(get_args(getattr(module, "SelectionReason", None))) == selection_reasons
+    for shape in (
+        module.GroupDecision,
+        module.OccupationResolution,
+        module.C13Selection,
+    ):
+        assert get_type_hints(shape)["reason"] == module.Reason | module.SelectionReason
+    contract = (
+        Path("docs/03_DATA_CONTRACTS.md")
+        .read_text()
+        .split("### Reviewed classification crosswalk (S2-T47)", 1)[1]
+        .split("\n### ", 1)[0]
+    )
+    paragraph = contract.split("`C13Selection` is a typed input shape", 1)[1]
+    assert all(f"`{reason}`" in paragraph for reason in selection_reasons)
 
 
 @pytest.mark.parametrize(
@@ -330,3 +461,7 @@ def test_f3_direct_parent_mapping_cannot_bypass_complete_family():
     result = c13_selection(parse(review, context), endpoint(parent))
     assert result.bucket == "not_mapped"
     assert result.industry is None
+    resolved = resolve_occupations(parse(review, context), endpoint(parent))
+    assert resolved.occupations == ()
+    assert resolved.status == "unreviewed"
+    assert resolved.paths == ()

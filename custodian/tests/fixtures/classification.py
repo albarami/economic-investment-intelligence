@@ -189,3 +189,48 @@ def family_documents():
     ]
     review["groups"].append(group(children[1], [link(industry(), "syn-link-c")]))
     return review, context, parent
+
+
+def production_documents():
+    """Invented associations against committed metadata, never actual approval.
+
+    Requires the documented engine group: load_registry validates the full
+    committed registry through its existing engine-dependent readers. No data
+    cache, receipt or network is read; the hashes and meanings are invented.
+    """
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    registry = {entry.key: entry for entry in load_registry()}
+    key = "mfg_industry/manufacture-of-basic-metals"
+    p = product()
+    p["code"] = p["code"].removeprefix("SYN-TARIFF-")
+    a = {
+        "system": "manufacturing_industry",
+        "level": "industry",
+        "code": key,
+        "version": key + ":" + DIGEST,
+    }
+    review, _ = documents()
+    review.update(mode="production", groups=[group(p, [link(a)])])
+    context = {
+        "mode": "production",
+        "snapshots": [],
+        "endpoint_meanings": [],
+        "tariff_families": [],
+    }
+    for source in ("cus_imp_2025", key):
+        entry = registry[source]
+        context["snapshots"].append(
+            {
+                "registry_key": source,
+                "snapshot_sha256": DIGEST,
+                "publisher": entry.publisher,
+                "title": entry.title_en,
+                "licence": entry.licence_id,
+                "retrieved_on": "2026-11-19",
+                "url": entry.url,
+            }
+        )
+    for item in (p, a):
+        declare(context, item)
+    return review, context

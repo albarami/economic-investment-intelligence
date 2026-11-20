@@ -1725,12 +1725,19 @@ complete child inventory requires a newly reviewed binding.
 `core/src/eii_core/classification.py` is the pure typed consumer contract:
 immutable `Crosswalk`, `GroupDecision`, `Link`, `Evidence`, `Snapshot`,
 `TariffFamily`, `OccupationResolution` and `C13Selection` shapes. Its resolver
-returns both links and their original weights side by side, all paths and
+returns both links and their original weights side by side, admitted paths and
 distinct occupation codes; there is no numeric input or allocation output.
 The worst participating hop determines composed status, in order
 `unreviewed`, `unmapped`, `ambiguous`, `mapped`. A missing branch cannot be
-discarded to promote another; only a fully mapped result exposes admitted
-occupation associations. These associations establish no worker attribute,
+discarded to promote another; only a fully mapped result exposes paths or
+occupation associations. For an eight-digit parent, both consumers derive
+the first hop from every bound child and require mapped children with one
+identical single target. A direct parent decision never substitutes. The
+derived first-hop summary retains the children's original links; its blank
+sign-off fields are not a new review approval. A non-mapped child supplies
+the worst status and reason; only mapped children with differing targets
+produce `ambiguous` / `bound_children_not_unanimous`.
+These associations establish no worker attribute,
 qualification, staffing demand, readiness or person-level join, and accept
 no protected statistic. `core/tests/test_calculation_purity.py` applies its
 unchanged import/call policy and isolated runtime guard to this module in
@@ -1742,7 +1749,16 @@ addition to the calculation directory. Focused tests are
 `C13Selection` is a typed input shape, not a calculation adapter. It has source,
 status, reason, the `mapped`/`not_mapped` bucket, nullable industry, original
 decisions, nullable bound family, method version, mapping revision and review
-and context digests. A tariff family carries its explicit eight-digit parent,
+and context digests.
+The closed `Reason` type contains the six group/resolver reasons listed above;
+the additional `SelectionReason` values are `all_bound_children_agree`,
+`bound_children_not_unanimous`, `missing_bound_tariff_family`, and
+`no_single_manufacturing_industry`. Group decisions (including a derived
+first-hop summary), occupation resolutions and C13 selections use this closed
+union. A missing family is `unreviewed` / `missing_bound_tariff_family`.
+C13 refuses every weighted link, including a single published partial weight,
+as `ambiguous` / `no_single_manufacturing_industry`; it has no allocation rule.
+A tariff family carries its explicit eight-digit parent,
 every twelve-digit child in the selected `cus_imp_2025` snapshot and that
 snapshot's identity. The caller's verified inventory, never a guessed prefix,
 establishes family membership. Missing, repeated or incompatible children
