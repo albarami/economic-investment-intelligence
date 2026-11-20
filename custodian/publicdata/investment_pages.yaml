@@ -80,7 +80,7 @@ sources:
       fixture_comparison_recorded: true
       live_page_compared: true
   investqa_pages:
-    # Arabic pages and their reading evidence are supplied by the lead.
+    # The Arabic page list stands below; its reading evidence is the lead's.
     language_confirmation:
       ar:
         inventory_recorded: false
@@ -220,6 +220,94 @@ sources:
         kind: law
       - url: https://www.invest.qa/en/resources/laws-and-regulations/types-of-companies
         language: en
+        kind: law
+      # OI-181: the Arabic list mirrors the confirmed English list by the site's
+      # own language path segment; the lead's live comparison reads it through
+      # the normal seam and supplies the language_confirmation.ar evidence.
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/agriculture
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/education
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/energy
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/financial-services
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/healthcare-and-life-sciences
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/logistics-and-transport
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/manufacturing
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/media
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/professional-services
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/real-estate
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/sports
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/technology
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/tourism
+        language: ar
+        kind: sector
+      - url: https://www.invest.qa/ar/sectors-and-opportunities/opportunities
+        language: ar
+        kind: opportunity
+      - url: https://www.invest.qa/ar/incentives
+        language: ar
+        kind: incentive
+        minimum_blocks: 0
+        minimum_paragraphs: 0
+      - url: https://www.invest.qa/ar/incentives/advanced-industries
+        language: ar
+        kind: incentive
+      - url: https://www.invest.qa/ar/incentives/financial-services
+        language: ar
+        kind: incentive
+      - url: https://www.invest.qa/ar/incentives/logistics
+        language: ar
+        kind: incentive
+      - url: https://www.invest.qa/ar/incentives/technology
+        language: ar
+        kind: incentive
+      - url: https://www.invest.qa/ar/why-Qatar/establish-business-in-qatar
+        language: ar
+        kind: setup
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations
+        language: ar
+        kind: law
+        minimum_blocks: 0
+        minimum_paragraphs: 0
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/customs
+        language: ar
+        kind: law
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/foreign-ownership
+        language: ar
+        kind: law
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/investment-laws
+        language: ar
+        kind: law
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/labour-law-practices
+        language: ar
+        kind: law
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/tax-regime
+        language: ar
+        kind: law
+      - url: https://www.invest.qa/ar/resources/laws-and-regulations/types-of-companies
+        language: ar
         kind: law
     confirmation:
       inventory_recorded: true

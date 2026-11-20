@@ -970,6 +970,8 @@ def _agency_spec(row: Mapping[str, object], url: str) -> SourceSpec | Investment
 def _pages(
     value: object, url: str, rules: Mapping[str, KindRule]
 ) -> tuple[PageSpec, ...] | InvestmentFailure:
+    from urllib.parse import urlsplit
+
     if not isinstance(value, list) or not value:
         return InvestmentFailure(
             1, "investqa_pages", url, "missing_page", "page family", "missing"
@@ -1011,6 +1013,11 @@ def _pages(
                 "page_language",
                 "en or ar",
                 "missing or unknown",
+            )
+        segment = urlsplit(page_url).path.strip("/").split("/", 1)[0].casefold()
+        if segment in {"en", "ar"} and segment != language:
+            return InvestmentFailure(
+                1, "investqa_pages", url, "page_language", language, segment
             )
         found.append(PageSpec(kind, page_url, blocks, paragraphs, language))
     return tuple(found)
