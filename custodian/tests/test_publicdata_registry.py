@@ -978,7 +978,7 @@ def test_registry_counts_follow_decision_0026() -> None:
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
-    # S2-P29 round B: the publisher confirms BACI's dataset licence.
+    # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
     assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1
     assert {
         entry.key
@@ -1144,18 +1144,26 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
     assert baci.licence_id == "Etalab-2.0"
     assert baci.licence_basis == "dataset"
     assert baci.licence_url == (
-        "https://www.etalab.gouv.fr/licence-ouverte-open-licence/"
+        "https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf"
     )
     assert baci.decision_record == ""
     assert baci.terms_words == "Licence: Etalab 2.0"
     assert baci.terms_read_on == "2026-11-20"
     assert baci.extension == "zip"
     assert (baci.period_first, baci.period_last) == ("2017", "2024")
-    # The page supplies no header, native year-column name or row counts.
-    assert baci.columns == ()
+    # Supplied archive reading confirms the native header, but no row counts.
+    assert baci.columns == (
+        ("t", "integer"),
+        ("i", "string"),
+        ("j", "string"),
+        ("k", "string"),
+        ("v", "number"),
+        ("q", "number"),
+    )
     assert baci.row_count_min is baci.row_count_max is None
-    assert baci.period_field == ""
-    assert "columns and row counts remain pending" in baci.basis_note
+    assert baci.period_field == "t"
+    assert "row counts remain pending" in baci.basis_note
+    assert "publisher-link target" in baci.basis_note
     assert nightly_blocked([replace(baci, skip_reason="")], ("cepii_baci",)) == ()
 
     def exclusions(rows):

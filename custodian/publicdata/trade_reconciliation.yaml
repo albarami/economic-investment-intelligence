@@ -21,12 +21,6 @@ inputs:
   - source_id: cus_imp_2019
     role: portal
     selected_hash: 4bc253946b41f065d33e0d8431a36dd27251353aa1d35987b6985a432258924b
-  # Input 2: supplied content hash, retrieved 2026-11-20; not read by this task.
-  # Deferred: 2025 joins only when the international releases carry it.
-  # Exclude 2026, whose published year is partial. Neither year is active above.
-  - source_id: cus_imp_2025
-    role: portal
-    selected_hash: 69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0
   # Input 3: selected reporter and partner mirror, NOT YET FETCHED.
   - source_id: un_comtrade
     role: reporter
@@ -45,3 +39,12 @@ inputs:
 bindings: []
 causes: []
 obstacles: []
+# Input 2 is retained separately and never materialised or paired. Activation
+# requires 2025 in years, international coverage and reviewed native bindings.
+# Partial 2026 stays excluded. The supplied hash is not read by this task.
+deferred_inputs:
+  - source_id: cus_imp_2025
+    role: portal
+    selected_hash: 69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0
+    year: 2025
+    reason: international_coverage_and_reviewed_bindings_required

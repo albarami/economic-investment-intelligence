@@ -9,10 +9,11 @@ from typing import Any, cast
 
 import yaml
 
-from eii_custodian.publicdata.fetch.allowlist import reviewed_url
+from eii_custodian.publicdata.fetch.allowlist import approve, reviewed_url
 
 METHOD = "eii_custodian.publicdata.baci.parse.parse_archive@v1"
 TABLES = ("pub_baci_trade", "pub_baci_country", "pub_baci_product")
+BACI_PAGE_URL = "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
 SCHEMAS = {
     "trade": {
         "year",
@@ -25,6 +26,24 @@ SCHEMAS = {
     },
     "country": {"country_code", "source_name", "iso3"},
     "product": {"hs_code", "source_description", "hs_revision"},
+}
+# Exact native headers read by the lead, not a permissive missing-column rule.
+NATIVE_COLUMNS = {
+    "trade": dict(
+        zip(
+            ("t", "i", "j", "k", "v", "q"),
+            ("year", "exporter_code", "importer_code", "hs_code", "value", "quantity"),
+            strict=True,
+        )
+    ),
+    "country": {
+        "country_code": "country_code",
+        "country_name": "source_name",
+        "country_iso2": "iso2",
+        "country_iso3": "iso3",
+    },
+    "product": {"code": "hs_code", "description": "source_description"},
+    "text": {},
 }
 
 
@@ -42,8 +61,8 @@ def digest_ok(value: str) -> bool:
 
 
 def safe_url(url: str) -> bool:
-    """BACI addresses carry no credentials, query, fragment or control text."""
-    return reviewed_url(url)
+    """The reviewed BACI page alone admits its one literal publisher selector."""
+    return (url == BACI_PAGE_URL and approve(url).ok) or reviewed_url(url)
 
 
 def mapping(value: object, keys: set[str]) -> dict[str, object]:
@@ -82,17 +101,28 @@ class Member:
     kind: str
     year: int | None
     bytes: tuple[int, int]
-    rows: tuple[int, int]
+    rows: tuple[int, int] | None
     sha256: str
     columns: dict[str, str]
     header: tuple[str, ...]
+    compressed_bytes: tuple[int, int] | None = None
 
     @classmethod
     def load(cls, value: object) -> Member:
-        row = mapping(value, {field.name for field in fields(cls)})
+        require(isinstance(value, dict), "configuration_fields")
+        row = cast(dict[str, object], value)
+        keys = {field.name for field in fields(cls)}
+        require(set(row) in (keys, keys - {"compressed_bytes"}), "configuration_fields")
         name, kind = text(row["name"]), text(row["kind"])
-        require(re.fullmatch(r"[A-Za-z0-9_-]+\.csv", name) is not None, "member_name")
-        require(kind in SCHEMAS, "member_kind")
+        require(
+            (kind == "text" and name == "Readme.txt")
+            or (
+                kind != "text"
+                and re.fullmatch(r"[A-Za-z0-9_-]+\.csv", name) is not None
+            ),
+            "member_name",
+        )
+        require(kind in NATIVE_COLUMNS, "member_kind")
         year = None if row["year"] is None else integer(row["year"])
         require((kind == "trade") == (year is not None), "member_year")
         columns = row["columns"]
@@ -101,8 +131,12 @@ class Member:
             text(k): text(v) for k, v in cast(dict[object, object], columns).items()
         }
         require(
-            set(columns.values()) == SCHEMAS[kind]
-            and len(columns) == len(SCHEMAS[kind]),
+            (
+                kind in SCHEMAS
+                and set(columns.values()) == SCHEMAS[kind]
+                and len(columns) == len(SCHEMAS[kind])
+            )
+            or columns == NATIVE_COLUMNS[kind],
             "member_schema",
         )
         header = strings(row["header"])
@@ -111,15 +145,19 @@ class Member:
         )
         checksum = text(row["sha256"], empty=True)
         require(not checksum or digest_ok(checksum), "member_checksum")
+        require(kind != "text" or row["rows"] is None, "member_schema")
         return cls(
             name,
             kind,
             year,
             bounds(row["bytes"]),
-            bounds(row["rows"]),
+            None if row["rows"] is None else bounds(row["rows"]),
             checksum,
             columns,
             header,
+            None
+            if row.get("compressed_bytes") is None
+            else bounds(row["compressed_bytes"]),
         )
 
 
@@ -149,7 +187,7 @@ class Config:
     period_first: int
     period_last: int
     archive_bytes: tuple[int, int]
-    raw_rows: tuple[int, int]
+    raw_rows: tuple[int, int] | None
     total_digits: int
     fractional_digits: int
     publisher_sha256: str
@@ -172,6 +210,8 @@ class Config:
             name, item = field.name, row[field.name]
             if name in numbers:
                 kw[name] = integer(item)
+            elif name == "raw_rows" and item is None:
+                kw[name] = None
             elif name in {"archive_bytes", "raw_rows"}:
                 kw[name] = bounds(item)
             elif name in {"reviewed_urls", "missing_quantity"}:
@@ -213,6 +253,11 @@ class Config:
         require(1 <= result.country_width and 1 <= result.product_width, "code_width")
         require(1 <= result.period_first <= result.period_last <= 9999, "period_bounds")
         if result.confirmed:
+            require(
+                result.raw_rows is not None
+                and all(m.rows is not None for m in result.members if m.kind != "text"),
+                "rows_unconfirmed",
+            )
             require(result.access != "unconfirmed", "access_state")
             require(digest_ok(result.page_sha256), "page_hash")
             require(

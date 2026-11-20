@@ -114,10 +114,6 @@ def test_owner_selection_is_confirmed_but_pending():
             "4bc253946b41f065d33e0d8431a36dd27251353aa1d35987b6985a432258924b",
             False,
         ),
-        ("cus_imp_2025", "portal"): (
-            "69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0",
-            False,
-        ),
         ("un_comtrade", "reporter"): ("", True),
         ("un_comtrade", "mirror"): ("", True),
         ("cepii_baci", "baci"): ("", True),

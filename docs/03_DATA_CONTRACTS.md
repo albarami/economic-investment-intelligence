@@ -936,6 +936,7 @@ decimal string), `value_unit`, `quantity_unit`, `currency`, `valuation_basis`
 hold `source_id`, `source_name` and nullable `iso3`, only where published.
 Product columns additionally hold `source_id` and `source_description`.
 Leading code zeros and accepted decimal text are preserved unchanged.
+For the exact native BACI headers recorded under document 04 **BACI pending identity and coverage (S2-T24)**, trade/product HS revision comes from the reviewed configuration. The native country ISO2 column is validated but not added to the release columns. The closed text member `Readme.txt` is byte-checked and hashed, without a row count. Unknown row counts stay null in pending configuration and cannot activate parsing; the first-fetch accounting path remains pending.
 
 ASSUMPTION pending the lead's dictionary reading: `total_digits: 18` and
 `fractional_digits: 6` for both value and quantity. Count every written digit,
@@ -2503,6 +2504,7 @@ zero-padded months `YYYY-MM` of one year and orders them by parsed month. For
 that form, text order and chronological order match. An unpadded month is not
 a native period: text order would place `2020-10` before `2020-2`, and the
 sum is refused.
+A closed `deferred_inputs` selection record retains the supplied 2025 portal hash, year and activation reason outside active inputs. Materialisation and pair enumeration use active inputs only. A deferred source cannot also be active, have a binding or appear as an active-year input; activation requires 2025 in the reviewed years, international coverage and reviewed bindings.
 The composite comparison key is the requested cell and both source-role identities.
 The cache manifest pins the selection hash, method, output hash and counts; its
 reader reopens selected native readers and recomputes both collections. An absent

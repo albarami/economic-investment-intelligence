@@ -43,6 +43,8 @@ ALLOWED_HOSTS = frozenset(
         "www.edu.gov.qa",
         "myschool.edu.gov.qa",
         "myschools.edu.gov.qa",
+        # S2-P29: reviewed BACI page and HS17 archive, PUB-03 registry change.
+        "www.cepii.fr",
     }
 )
 

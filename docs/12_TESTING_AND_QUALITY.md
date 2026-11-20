@@ -696,7 +696,7 @@ The BACI suites exercise the separate typed trade/dictionary series through
 injected metadata and stream transports, pending metadata refusal, exact decimal
 text and limits, excluded-row validation, schema/inventory/revision/key refusal,
 access obstacles, byte bounds, interrupted streams, immutable publication,
-selected-manifest tampering and command injection. These are invented fixtures,
+selected-manifest tampering and command injection. S2-P29 adds exact native-header/text-member fixtures, compressed-byte and null-count plants, the exact reviewed BACI page selector with alternate/extra-selector and unreviewed-redirect plants, and a resolved-selection regression whose nonempty deferred reader fails if called and whose pairs exclude the deferred source. These are invented fixtures,
 not publisher verification. Full guard-by-guard red evidence and the manual break
 inventory belong to the task return and independent review; this paragraph makes
 no completion claim. TST-50, TST-52 and TST-237 are unchanged.

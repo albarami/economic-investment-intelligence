@@ -515,7 +515,7 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Depends: S2-T01, S2-T21.
 - Requirements: decision 0040 items 1 to 4 and 8; PUB-01 to PUB-16, PUB-19; AGENTS.md rules 5, 7, 14 and 19.
 - Amendment ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 22): [ ] the lead confirms the URL and byte bound of BACI from the publisher's metadata, no bound invented, and the live build reads it (OI-309).
-- Delivery: hard; builder persona principal public-data engineer; strict reviewer persona independent public-data/security reviewer from another maker; status in progress: BACI contracts and malformed-response guards merged in pull request 82; publisher-version/licence confirmation and live URL/bound/receipt evidence remain open (OI-309).
+- Delivery: hard; builder persona principal public-data engineer; strict reviewer persona independent public-data/security reviewer from another maker; status in progress: BACI contracts and malformed-response guards merged in pull request 82; the supplied 2026-11-20 publisher-page and archive readings record release 202601, "Licence: Etalab 2.0", its publisher-linked licence URL, native headers and exact member byte bounds (S2-P29 fix round 1). Deferred-input isolation, closed page-URL handling and reviewed PUB-03 host admission are implemented offline; target/country representation, missing-quantity tokens, decimal limits, access configuration, bounded first-fetch row accounting and live receipt/comparison evidence remain open (OI-309 and PO-S2-80).
 
 ### S2-T25 — Gravity and finished Atlas downloads
 - Goal: Register CEPII Gravity and Harvard Growth Lab Atlas finished datasets for method inputs.

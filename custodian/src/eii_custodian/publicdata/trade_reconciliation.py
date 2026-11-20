@@ -83,6 +83,15 @@ class SelectedInput:
 
 
 @dataclass(frozen=True)
+class DeferredInput:
+    source_id: str
+    role: str
+    selected_hash: str
+    year: int
+    reason: str
+
+
+@dataclass(frozen=True)
 class Binding:
     source_id: str
     role: str
@@ -113,6 +122,7 @@ class Selection:
     bindings: tuple[Binding, ...]
     causes: tuple[dict[str, Any], ...]
     obstacles: tuple[dict[str, Any], ...]
+    deferred_inputs: tuple[DeferredInput, ...] = ()
 
     def comparison_block_reason(self) -> str | None:
         """Selection directives are never interpreted as source-native cells."""
@@ -128,7 +138,12 @@ class Selection:
     @classmethod
     def from_mapping(cls, data: Any) -> Selection:
         require(
-            isinstance(data, dict) and set(data) == {f.name for f in fields(cls)},
+            isinstance(data, dict)
+            and set(data)
+            in (
+                {f.name for f in fields(cls)},
+                {f.name for f in fields(cls)} - {"deferred_inputs"},
+            ),
             "selection_schema",
         )
         require(data["confirmed"] is True, "selection_pending")
@@ -161,6 +176,32 @@ class Selection:
                 and type(item.pending_fetch) is bool
                 and (digest_ok(item.selected_hash) or item.selected_hash == ""),
                 "selection_inputs",
+            )
+        deferred = data.get("deferred_inputs", ())
+        require(isinstance(deferred, (list, tuple)), "deferred_input_schema")
+        try:
+            deferred_inputs = tuple(DeferredInput(**v) for v in deferred)
+        except TypeError:
+            raise ValueError("deferred_input_schema") from None
+        require(
+            len({(i.source_id, i.role) for i in deferred_inputs})
+            == len(deferred_inputs),
+            "deferred_input_schema",
+        )
+        for item_deferred in deferred_inputs:
+            require(
+                item_deferred.source_id == "cus_imp_2025"
+                and item_deferred.role == "portal"
+                and type(item_deferred.year) is int
+                and item_deferred.year == 2025
+                and item_deferred.year not in data["years"]
+                and isinstance(item_deferred.selected_hash, str)
+                and digest_ok(item_deferred.selected_hash)
+                and item_deferred.reason
+                == "international_coverage_and_reviewed_bindings_required"
+                and (item_deferred.source_id, item_deferred.role)
+                not in {(i.source_id, i.role) for i in inputs},
+                "deferred_input_schema",
             )
         require(
             len({(b.source_id, b.role, b.row_key) for b in bindings}) == len(bindings),
@@ -297,6 +338,7 @@ class Selection:
             bindings,
             tuple(data["causes"]),
             tuple(data["obstacles"]),
+            deferred_inputs,
         )
 
 
