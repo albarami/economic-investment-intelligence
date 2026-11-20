@@ -1,4 +1,4 @@
-"""Owner tile inputs and deterministic fixture contracts; no provider constants."""
+"""Owner tile inputs, documented unrounded units and separate fixture budgets."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import math
 from dataclasses import asdict, dataclass
 from datetime import date
 from decimal import ROUND_CEILING, Decimal
+from fractions import Fraction
 from urllib.parse import urlsplit
 
 from shapely.geometry import shape
@@ -19,6 +20,35 @@ CRS = "EPSG:32639"
 RESOLUTION_M = 10
 TARGET_M = 22000
 EDGE_CAP = 2500
+
+# Official Quotas and Processing Unit pages read 2026-11-20; see README hashes.
+# General-user ceilings are not the remaining amount in any particular account.
+GENERAL_FREE_REQUESTS = 10000
+GENERAL_FREE_UNITS = Decimal(10000)
+GENERAL_REQUESTS_PER_MINUTE = 300
+GENERAL_UNITS_PER_MINUTE = 300
+BILLING_QUANTUM: Decimal | None = None
+
+
+def documented_units(pixels: int, bands: tuple[str, ...], samples: int) -> Fraction:
+    """Unrounded Process PU for 8-bit TIFF, without fusion or extra processing.
+
+    Exact rational factors avoid inventing a billing quantum. TILE sample count
+    must be supplied, never assumed to be one. This is not a bulk authorization.
+    """
+    if (
+        type(pixels) is not int
+        or pixels <= 0
+        or type(samples) is not int
+        or samples <= 0
+        or not bands
+        or len(set(bands)) != len(bands)
+        or set(bands) - {"B04", "B03", "B02", "SCL", "dataMask"}
+    ):
+        raise CdseError("quota_inputs_refused")
+    counted_bands = len(set(bands) - {"dataMask"}) or 1
+    area = max(Fraction(pixels, 512 * 512), Fraction(1, 100))
+    return max(Fraction(1, 200), area * Fraction(counted_bands, 3) * samples)
 
 
 @dataclass(frozen=True)
@@ -118,12 +148,23 @@ class Metadata:
     bands: tuple[str, ...]
     factor: Decimal
     method: str
+    auxiliary_bands: tuple[str, ...] = ()
 
 
 def request_sha256(meta: Metadata) -> str:
     """Hash sanitized request inputs, excluding response dates and coverage."""
     from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
+    if meta.method == "cdse-process.v1":
+        from eii_custodian.publicdata.cdse.wire import ProcessSpec, process_body
+
+        return sha256_hex(
+            json.dumps(
+                process_body(ProcessSpec(meta.tile, meta.start, meta.end)),
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        )
     inputs = asdict(meta)
     del inputs["dates"]
     del inputs["coverage"]
@@ -157,7 +198,8 @@ def validate_metadata(meta: Metadata, boundary: BaseGeometry) -> None:
         or meta.collection != "sentinel-2-l2a"
         or meta.bands != ("B04", "B03", "B02")
         or meta.factor != Decimal("2.5")
-        or meta.method != "cdse-cache.v1"
+        or (meta.method, meta.auxiliary_bands)
+        not in {("cdse-cache.v1", ()), ("cdse-process.v1", ("SCL", "dataMask"))}
     ):
         raise CdseError("tile_metadata_refused")
 

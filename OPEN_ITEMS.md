@@ -1879,6 +1879,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - OPTIONS: **Recommendation:** the lead enters the rows from the format check of 2026-11-14 in a documents change of its own after this task merges, and runs `uv run --locked python scripts/check_reference_notes.py`. Alternative: one line here says why the README's citation is the record and the rows are not entered.
 - NEEDED BY: the slice S2 gate.
 
+- **P24 closure, 2026-11-20 — CLOSED LOCALLY:** the corrected brief authorizes the named official-page GETs. `docs/REFERENCE_NOTES.md`, DuckDB Pages P13/P14 and READ statements S29–S32 now record the current official Parquet overview/metadata readings, publisher, exact words, date and fetched-body SHA-256. The missing reading rows were the cause; R10/S28 remain OBSERVED. `RealNotes.test_parquet_official_readings` failed first on all four absent statements (exit 1), then passed with the notes change (exit 0). `check_reference_notes.py` exits 0, two files, six libraries, 367 rows. This supersedes the earlier carried hold for this reading only; independent another-maker confirmation remains with the lead. OI-202 is unchanged.
+
 ## OI-201 — Timeouts of the mutation campaigns of `places_fsq`: five to replay, two with no proven cause (rule 39)
 
 - ID: OI-201
@@ -2138,6 +2140,8 @@ S2-T10 part A — NOT CLOSED: No supplied lead disposition of ARC-88 was found. 
 - DONE SO FAR: read.py names enable_geoparquet_conversion and “configuration overview, read 2026-11-14”. The three Part A verdicts carry P2; the supplied evidence does not provide the requested page/read confirmation.
 - OPTIONS: **Default:** Read the official setting page and record publisher, page and retrieval date beside the code in Part B, keeping the invented-file run apart from the real-file check that is still owed; no reading is claimed here.
 - NEEDED BY: S2-T06 evidence record before the slice gate.
+
+- **P24 closure, 2026-11-20 — CLOSED LOCALLY:** the current official Configuration page was read under the corrected network authority. The comment beside `_GEOPARQUET` now names its publisher, exact page URL and retrieval date; DuckDB P15/S33 in `docs/REFERENCE_NOTES.md` record the setting quotation and fetched-body SHA-256. `RealNotes.test_geoparquet_setting_official_reading` failed first for the absent READ statement (exit 1), then passed with the comment/notes change (exit 0). The notes checker exits 0, two files, six libraries, 367 rows. This supplies the attributable reading requested by P2, not the separate real-file check or OI-202. Independent another-maker confirmation remains with the lead.
 
 ## OI-225 — Native review of the Arabic caveat
 
@@ -4972,6 +4976,8 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - TEXT: Whether a `pub_property_quarter` row shared by `prop_sales` and `prop_resi_units` snapshots of different retrieval dates refuses the build (`price_as_of_mismatch`, current) or carries the later or both dates; decision 0045 item 4 and DR2
 
 ## S2-T41 — Optional unread CDSE backup, build open points
+
+- **P24 disposition, 2026-11-20 — PARTIAL, LEFT OPEN:** the corrected brief authorizes official-page GETs. The package README now records the actual OAuth/Process, imagery, metadata, quota, rate and legal readings with exact words, dates, publishers and fetched-body hashes. `wire.py` replaces the Process placeholder with closed JSON and a fixed script, pairs raster and contributing dates, and records auxiliary bands and the complete request hash; an unverified extra metadata endpoint refuses before send. `test_pending_envelope_is_not_a_provider_request` failed on the accepted legacy envelope (exit 1), then passes (exit 0); documented-factor and request-lineage tests also have recorded red/green evidence in the new PROGRESS block. S2-T41 boxes three, four and five remain unticked: the empty live admission map, omitted command path, real-frame/live-response proof, sample-count bound, account remainder, complete billing rounding/ancillary costs and pacing still need lead evidence. The published general-user ceiling is not an account balance. No private credential, processing endpoint or live cache was accessed, and no owner-approved narrowing is assumed.
 
 - **Provider contract and evidence pending (lead):** verify current official Authentication, Process API, Sentinel-2 L2A, acquisition-date metadata, quota/rate/processing-unit and legal pages. Record exact publisher wording, public URL, read date and page SHA-256. No page was fetched by this offline build. Registry publisher, endpoints, schema and costs are pending; the command deliberately omits bulk acquisition successfully. Internal `pending.v1` Process/metadata envelopes and the linear cost fixture are not provider contracts. Replace them only through reviewed official evidence, including any minima and unit rounding; no remembered host or free allowance is activated.
 - **Terms and attribution pending (lead):** record imagery notice, interface terms and complete attribution separately, in the provider’s words or with each missing field/reason/check date under decision 0059. Pending terms remain usable; they waive no publisher, schema, integrity or quota guard. No quotation or hash of an unread page is invented.

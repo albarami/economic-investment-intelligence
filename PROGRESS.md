@@ -43932,3 +43932,205 @@ Local handoff-integrity audit: initial `python3 .overnight/tmp/finish-p11/audit_
 - Correction (2026-11-20, review of package P11): the partial tree was built by Moonshot Kimi via Abacus and finished by OpenAI GPT-6.1 Sol via Codex (lead's brief); the commit of this package is 4891a69ff2bf1615d17bc4f5cea03e12968caecd.
 - P06 joined by cherry-pick (-x) of 01b5cbd3, 9fe79608, a2b70dff and b604163b; APPROVED: review S2-P06-rv (OpenAI) rejected 01b5cbd3, confirmations 1 and 2 did not confirm, confirmation 3 (OpenAI GPT-6.1 Sol via Codex, the rejecting maker) CONFIRMED b604163b (fix 3 built by Anthropic Claude Opus 5.5). The fix 3 run results in its PROGRESS line were the builder's; the lead's ledger run on the joined head is the evidence of record. OI-282 stays OPEN (live pinning and the per-value check of S2-T09 criterion 2).
 - Records: PO-S2-106 and OI-264 closed after the reconciliation snapshot at a0e01df3 and their gate table rows reconciled; OI-174 holds only its live half.
+## S2-P24 — Official readings blocked by offline authority (2026-11-20)
+
+- Maker/model: OpenAI Codex, GPT-6; exact served variant is not exposed.
+  Expert persona: senior engineer for official-documentation readings and
+  provider contracts. Strict self-review persona: reviewer rejecting claims
+  without evidence, guards without deciding plants, weakened assertions, skips
+  and raised bounds. No different-maker approval or package completion is claimed.
+- Skills loaded: project-orientation, task-standards, github-flow,
+  sanad-provenance, strict-reviewer and muhasabah-gate. Named TDD and
+  verification-before-completion skills are unavailable; their plain meaning
+  applies. No unavailable skill is claimed loaded.
+- Full inspected/base commit: `d5ab31319669ea9b557043ca866099c67b69cc48`.
+  Authority: complete `.overnight/BRIEF.md` and `.overnight/IN/PACKAGE.md`.
+  The INTENT requests current official readings, but the final AUTHORITY says
+  no network. This run follows that restriction. No official page, credential,
+  processing endpoint, live cache or private input was accessed. No fetched-page
+  hash, quotation, endpoint or free allowance was invented.
+- OI-200 stays OPEN: the current R10/S28 rows are observations, not the missing
+  official READ records. OI-224 stays PENDING: historical P9/source-comment
+  evidence does not establish this worker's fresh page reading. Dated carrying
+  lines are appended under both entries in OPEN_ITEMS.md. The lead's authorized
+  page readings with quotations and fetched-body hashes remain required; OI-202
+  and the real-file check are untouched.
+- S2-T41 boxes three, four and five stay unticked. Its existing build open points
+  now record the offline blocker. The empty reviewed-endpoint map, internal
+  `pending.v1` envelopes, invented cost fixture and existing guards are unchanged.
+  No reviewed provider contract, actual acquisition mapping, boundary confirmation
+  or recorded free allowance is claimed from offline fixture results.
+- Change scope: OPEN_ITEMS.md dispositions and this single appended block,
+  plus the requested `.overnight/RETURN.md`. No implementation, test, task box,
+  reference note, prior evidence row, rule, bound, assertion or baseline changed.
+  No red/green closure exists: red not run; green for official-evidence closure
+  not established. Existing regression checks below are distinct from closure.
+- Environment: existing Linux/bash workspace and locked uv environment;
+  `UV_OFFLINE=1`, workspace-local `UV_CACHE_DIR` at `.overnight/tmp/uv-cache`
+  and existing TMPDIR under `.overnight/tmp`. No dependency install, commit,
+  push, service operation, whole-suite run, build-public or live data test.
+  Hypothesis seed: `5729461830`; no world or figure draw.
+- `uv run --locked python scripts/check_reference_notes.py`: exit 0;
+  two files, six libraries, 359 rows, OK. This checks structure, not page truth.
+- `uv run --locked python -m pytest scripts/tests/test_reference_notes_real.py scripts/tests/test_cdse_key.py scripts/tests/test_cdse_isolation.py custodian/tests/test_cdse_transport.py custodian/tests/test_cdse_cache.py -q -p no:cacheprovider --hypothesis-seed=5729461830`:
+  exit 0; 27 passed, 24 subtests passed, no failures or skips reported.
+  No test was touched; these are existing offline regression tests.
+- `python3 scripts/check_docs.py`: exit 0, 1138 text files and 123 Markdown files.
+- `python3 scripts/check_tree.py`: exit 0, eight rules.
+- `git diff --check`: exit 0, no whitespace findings.
+- PROPOSED OPEN ITEM: resolve official-reading versus no-network authority in
+  the next brief or supply the lead's authorized page evidence. No new numbered
+  item was created; the existing entries retain the substantive holds. No new
+  technical defect or random failure was observed in these checks.
+- Strict self-review: REJECT package closure for missing official evidence.
+  Muhasabah: PASS for this bounded report and explicit limits; no slice gate
+  verdict is granted. Final records and return report are verified again after
+  this append; all earlier PROGRESS.md bytes must remain intact.
+- Final records checks repeated after writing the report: documentation exit 0
+  (1138 text files, 123 Markdown files), tree exit 0 (eight rules), guidance cmp
+  exit 0 and whitespace exit 0. The inline records audit initially exited 1
+  because its digit-only boundaries matched a numeric substring inside the
+  required hexadecimal commit hash. Correcting that local audit to require
+  boundaries outside letters and digits gave exit 0: exactly two tracked record
+  files, intact historical progress prefix, one appended block, correct return
+  marker and new-text path/bare-identifier hygiene. No repository guard changed.
+
+
+## S2-P24 — Official readings and closed Process contract, corrected-authority follow-up
+
+- Date: 2026-11-20. Maker: OpenAI; model: GPT-6-based Codex (exact serving variant
+  not exposed). Builder persona: senior engineer for official-documentation
+  readings and provider contracts. Strict self-review persona: reviewer rejecting
+  unsupported facts, unplanted guards, weakened assertions, skips and raised bounds.
+- Base/inspected commit: `d5ab31319669ea9b557043ca866099c67b69cc48`; changes are
+  uncommitted. No branch, index, commit, push or service operation was performed.
+  Authority: full `.overnight/BRIEF.md` and `.overnight/IN/PACKAGE.md`. This block
+  supersedes this worker's earlier no-network disposition; all earlier PROGRESS
+  bytes, including that disposition and its failures, remain intact.
+- Loaded skills: project-orientation, task-standards, github-flow,
+  sanad-provenance, strict-reviewer, muhasabah-gate and pdf (the imagery notice).
+  test-driven-development and verification-before-completion are unavailable as
+  installed skills; their plain meanings were applied as the brief requests.
+  No independent maker review is represented by the strict self-review.
+- Environment: Linux x86_64; Python 3.14.6; uv 0.11.31; Node v22.22.3. Checks used
+  `UV_OFFLINE=1 UV_CACHE_DIR=.overnight/tmp/uv-cache`; the existing TMPDIR resolves
+  inside this workspace. No install, dependency/pin change, world/figure draw,
+  whole-suite run, build-public or custodian/data_tests run. Hypothesis seed for
+  every pytest command below: `6813952074`.
+- Reading evidence: DuckDB P13/P14/P15 and S29–S33 in docs/REFERENCE_NOTES.md;
+  CDSE README **Official pages read for P24**, D1–D15. Every successful reading
+  records URL, publisher, date and fetched-body SHA-256. Network requests were
+  read-only official-document GETs; examples, sign-in, account queries, OAuth and
+  processing requests were not executed. No private input or data cache was read.
+- Initial unqualified engine GETs returned HTTP 403 (error 1010); stable addresses
+  with a conventional documentation-reader user agent returned redirect pages.
+  The versioned official addresses supplied the documentation. This is recorded
+  retrieval evidence, not a changed transport retry rule. No source or test was
+  substituted. The local PDF extraction command failed with exit 1 because
+  pdftotext is absent; the official notice was then read using the PDF reader,
+  with its independently fetched body hash retained in the reading table.
+- OI-200 CLOSED LOCALLY: four missing READ statements added with the two Parquet
+  page records; R10/S28 stay OBSERVED. OI-224 CLOSED LOCALLY: the setting's fresh
+  READ record and publisher/URL/date comment beside `_GEOPARQUET` now exist.
+  The dated closures under each original item supersede their carried reading
+  holds. OI-202 and real-file evidence remain separate; another-maker confirmation
+  remains for the lead. No task box is ticked by either reading.
+- S2-T41 PARTIAL / LEFT OPEN: `wire.py` builds the closed documented Process JSON,
+  fixed TILE/leastCC script, mask and same-response TIFF/userdata handling. The
+  script records only dates of samples that contribute pixels. Internal half-open
+  second-precision windows map to the API's inclusive endpoint. The new method
+  records auxiliary bands and hashes the entire canonical request, including its
+  script; the legacy fixture method is separate. `pending.v1` is refused and an
+  extra unverified metadata endpoint refuses before send. Tests keep socket denial,
+  redaction, stop-on-refusal, request-budget, immutable-cache and product boundaries.
+- `documented_units` implements exact unrounded factors, including area/request
+  minima, the dataMask exception, SCL and explicit sample count. Nominal general-user
+  monthly/minute ceilings are recorded and exercised by invented sizing tests.
+  `BILLING_QUANTUM` remains null: rounded examples are no billing-rounding rule.
+  The fixture CostModel is not activated as a provider formula. Boxes three, four
+  and five remain unticked: live admission/command wiring, the reviewed real frame
+  and response, sample-count reservation, account remainder, complete ancillary
+  charges, billing quantization and pacing are not established by these readings.
+  The empty live admission map and successful command omission remain in force.
+- Documents: provider reading/terms/attribution records in the CDSE README and
+  document 04, accurate S2-T41 status in TASKS.md, and dated item dispositions in
+  OPEN_ITEMS.md. The adapted-data notice is quoted from the official notice;
+  additional service-specific credit stays pending with its reason. No live
+  registry/sidecar activation, receipt or on-screen attribution is claimed.
+- Test-first evidence, all using `uv run --locked python -m pytest` plus
+  `-q -p no:cacheprovider --hypothesis-seed=6813952074`:
+  - `scripts/tests/test_reference_notes_real.py`: red exit 1, exactly reported
+    6 failed, 5 passed, 6 subtests passed (missing setting and four absent READ
+    rows); green exit 0, 7 passed, 10 subtests passed.
+  - `custodian/tests/test_cdse_transport.py -k pending_envelope`: red exit 1,
+    1 failed, 9 deselected: the old guard accepted the planted pending envelope.
+    The full transport file then passed, exit 0, 10 passed. The later typed-input
+    plant is included in the final joined run below.
+  - `custodian/tests/test_cdse_cache.py -k documented_unrounded`: red exit 1,
+    1 failed, 8 deselected (documented arithmetic absent); implemented and green
+    in the joined transport/cache run, exit 0, 19 passed.
+  - `custodian/tests/test_cdse_cache.py -k process_reply`: red exit 1,
+    1 failed, 8 deselected (auxiliary-band/method lineage absent); green full
+    cache file exit 0, 9 passed, including full-request hash and script-change plant.
+  - No test was skipped. `-k` deselection selected each explicit red proof; it is
+    not an exclusion from the final full-file check. No assertion, bound, attack
+    size or baseline was weakened or refreshed.
+- Final pytest command: `uv run --locked python -m pytest scripts/tests/test_reference_notes_real.py scripts/tests/test_cdse_key.py scripts/tests/test_cdse_isolation.py custodian/tests/test_cdse_transport.py custodian/tests/test_cdse_cache.py -q -p no:cacheprovider --hypothesis-seed=6813952074`:
+  exit 0; 35 passed, 28 subtests passed; no failed or skipped tests. The preceding
+  joined run before the last typed-input plant was added reported exit 0,
+  34 passed, 28 subtests passed; it is not substituted for the final count.
+- `uv run --locked ruff check .`: final exit 0, all checks passed. An earlier
+  focused invocation exited 1 with two import-order diagnostics; those imports
+  were corrected. The first combined lint/mypy shell returned the last command's
+  exit 0, so it is not used as lint evidence; the separate lint exit 1 is retained.
+- `uv run --locked ruff format .`: exit 0, three files reformatted and 833 unchanged;
+  subsequent application exit 0, 836 unchanged. `uv run --locked ruff format --check .`:
+  final exit 0, 836 files already formatted.
+- `uv run --locked mypy`: exit 0, no issues in 450 source files.
+- `python3 scripts/check_docs.py`: exit 0, 1139 text files, 123 Markdown files.
+- `python3 scripts/check_tree.py`: exit 0, eight rules.
+- `uv run --locked python scripts/check_reference_notes.py`: exit 0, two files,
+  six libraries, 367 rows.
+- `cmp AGENTS.md CLAUDE.md`: exit 0, byte-identical. `git diff --check`: exit 0.
+- `python3 .overnight/tmp/p24_verify_readings.py`: exit 0; eighteen official body
+  hashes and five engine quotations verified; no CDSE HTML quotation mismatch.
+  The two legal-notice quotations were checked through the PDF reader. Earlier
+  inline audit attempts exited 1 for a section-selection error, then an explicitly
+  refused same-publisher redirect, then three false quotation mismatches caused
+  by inserting whitespace between inline HTML tags. Scoping to the engine section,
+  permitting only same-host HTTPS redirects, and preserving inline text boundaries
+  corrected the audit. No page hash, quotation or repository guard was changed to
+  satisfy those audit errors; the final reusable audit script is in the workspace.
+- PROPOSED OPEN ITEMS: no new numbered item. Carry S2-T41's existing provider/live
+  holds with the specific missing fields above, its additional interface credit,
+  and independent maker review. The old authority-conflict proposal is superseded
+  by the corrected brief. No unexplained random failure is closed by a green run.
+- Strict self-review: REJECT full P24/three-box closure for the explicit remaining
+  evidence; local checks support only the recorded changes. Muhasabah: PASS for
+  this bounded handoff and its sourced claims; no slice-gate verdict is given.
+- Final self-review added malformed-userdata and unsafe tar-header plants to the
+  existing response test, including a planted extractfile failure proving that
+  rejected links, empty members and traversal names are refused before opening a
+  member. The full five-file pytest command was repeated after this addition:
+  exit 0, 35 passed, 28 subtests passed, no failed/skipped tests. Formatter
+  application exit 0 (one file reformatted, 835 unchanged), lint exit 0,
+  format-check exit 0 (836 files), and whitespace check exit 0. These are additions
+  to the same task block, preserving every earlier evidence line.
+- Final records verification after writing RETURN.md: documentation exit 0
+  (1139 text files, 123 Markdown files), tree exit 0 (eight rules), notes exit 0
+  (two files, six libraries, 367 rows), guidance cmp exit 0 and whitespace exit 0.
+  The records audit exits 0: exactly one appended task block, preserved historical
+  prefix, correct final return marker and no new private path or bare identifier
+  pattern; twelve changed tracked paths and one new source path. The return
+  report distinguishes private credential access from reading public examples.
+- Final plant-isolation correction: URL and payload plants now supply the valid
+  required headers, so an unrelated header refusal cannot satisfy them. With
+  `wire.validate_process_body` disabled only inside an isolated pytest process,
+  `test_pending_envelope_is_not_a_provider_request` exits 1 (one failed, ten
+  deselected). The exact command was `uv run --locked python -` calling
+  `pytest.main` for `custodian/tests/test_cdse_transport.py -q -p no:cacheprovider
+  --hypothesis-seed=6813952074 -k pending_envelope` after the in-memory knockout;
+  no source file or baseline was changed for that proof. The normal full five-file
+  command then exits 0, 35 passed, 28 subtests passed. Lint, format-check
+  (836 files), mypy (450 source files), notes (367 rows), tree (eight rules),
+  guidance cmp and whitespace checks all exit 0 on this final test state.

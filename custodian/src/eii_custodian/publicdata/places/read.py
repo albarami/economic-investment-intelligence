@@ -32,7 +32,10 @@ _SIX = Decimal("0.000001")
 _STORED_CONTEXT = Context()
 _STORED_CONTEXT.rounding = ROUND_CEILING
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
-# DuckDB configuration overview, read 2026-11-14. Set off before any read.
+# DuckDB Foundation, Configuration, retrieved 2026-11-20:
+# https://duckdb.org/docs/2.0/configuration/overview.html
+# Reading/quote/body hash: docs/REFERENCE_NOTES.md, DuckDB S33/P15.
+# Set off before any read; this citation establishes no real-file check.
 _GEOPARQUET = "enable_geoparquet_conversion"
 _PLACE_COLUMNS = (
     "id",

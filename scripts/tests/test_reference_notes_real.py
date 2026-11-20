@@ -29,6 +29,58 @@ REAL_NOTE_PATHS = (
 
 
 class RealNotes(unittest.TestCase):
+    def test_parquet_official_readings(self) -> None:
+        """OI-200: observations cannot stand in for the four owed READ rows."""
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        for ident, source, subject in (
+            ("S29", "P13", "reading and writing Parquet"),
+            ("S30", "P14", "parquet_metadata"),
+            ("S31", "P14", "parquet_kv_metadata"),
+            ("S32", "P14", "geo key"),
+        ):
+            with self.subTest(ident=ident):
+                rows = [
+                    line
+                    for line in block.splitlines()
+                    if line.startswith(f"| {ident} |")
+                ]
+                self.assertEqual(len(rows), 1, ident)
+                self.assertIn(f"| READ | {source} |", rows[0])
+                self.assertIn(subject, rows[0])
+        for digest in (
+            "86eb8f97b400242d4a7682cf5a8f9d5cbdaafb0da18a117319a7cf86a805a51e",
+            "931be889d0d0c0e9305e172246bb68bfbb4e56e3a5630fa0f9bd0c59abe11c11",
+        ):
+            self.assertIn(digest, block)
+
+    def test_geoparquet_setting_official_reading(self) -> None:
+        """OI-224: require attributable setting evidence, separate from R10."""
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        self.assertRegex(
+            block,
+            r"\| S33 \| [^\n]*enable_geoparquet_conversion[^\n]*\| READ \| P15 \|",
+        )
+        self.assertIn(
+            "50e69320eb7def5d284ba29b92b2082c679d97c1532a7c7413c2663012b8f86f",
+            block,
+        )
+        code = (
+            REPO / "custodian/src/eii_custodian/publicdata/places/read.py"
+        ).read_text()
+        comment = code.split('_GEOPARQUET = "enable_geoparquet_conversion"')[
+            0
+        ].splitlines()[-4:]
+        for attribution in (
+            "DuckDB Foundation",
+            "https://duckdb.org/docs/2.0/configuration/overview.html",
+            "2026-11-20",
+        ):
+            self.assertIn(attribution, "\n".join(comment))
+
     def test_real_notes_pass(self) -> None:
         lines = sup.run(REPO)
         self.assertEqual(len(lines), 1)

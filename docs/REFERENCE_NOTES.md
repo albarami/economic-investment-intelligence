@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft written by task S0-T13 on 2026-11-12; every row is as true as the page or run it names, on the date it names |
-| Date | 2026-11-14 |
+| Date | 2026-11-20 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
 | Purpose | Record the official pages read and the idioms that changed from earlier versions for DuckDB 2.0, PostgreSQL 18 and the current Claude API, the libraries and services that the pack calls newer than most model training data. |
 | Read first | [02_ARCHITECTURE.md](02_ARCHITECTURE.md) section 7, [the notes for the map libraries](../web/REFERENCE_NOTES.md) |
@@ -36,6 +36,9 @@ Used here as the build engine for the public pack, the synthetic world and the r
 | P10 | https://duckdb.org/docs/2.0/sql/functions/numeric | Numeric Functions - DuckDB | 2026-11-12 |
 | P11 | https://duckdb.org/docs/2.0/sql/query_syntax/orderby | ORDER BY Clause - DuckDB | 2026-11-12 |
 | P12 | https://duckdb.org/docs/2.0/core_extensions/spatial/overview | Spatial Extension - DuckDB | 2026-11-12 |
+| P13 | https://duckdb.org/docs/2.0/data/parquet/overview.html | DuckDB Foundation: Reading and Writing Parquet Files; fetched-body SHA-256 86eb8f97b400242d4a7682cf5a8f9d5cbdaafb0da18a117319a7cf86a805a51e | 2026-11-20 |
+| P14 | https://duckdb.org/docs/2.0/data/parquet/metadata.html | DuckDB Foundation: Parquet Metadata; fetched-body SHA-256 931be889d0d0c0e9305e172246bb68bfbb4e56e3a5630fa0f9bd0c59abe11c11 | 2026-11-20 |
+| P15 | https://duckdb.org/docs/2.0/configuration/overview.html | DuckDB Foundation: Configuration; fetched-body SHA-256 50e69320eb7def5d284ba29b92b2082c679d97c1532a7c7413c2663012b8f86f | 2026-11-20 |
 
 ### Runs
 
@@ -95,6 +98,11 @@ Setup, in an empty folder: `uv venv --python 3.14 venv`, then `uv pip install --
 | S26 | The pack records that a DuckDB GEOMETRY column arrives as a PostGIS geometry column through the PostgreSQL extension with no conversion (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence"); that was measured by the architecture research and not repeated here: not verified. | PACK | docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Evidence" | - |
 | S27 | The pack lists byte-order sorting of text as an assumption to be confirmed with the parity query of slice S1 (docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)"); the page read (S19) names the default for DuckDB only, and no parity query has been run: not verified. | PACK | docs/02_ARCHITECTURE.md section "The portable SQL subset (minimum rules)" | - |
 | S28 | In duckdb 2.0.0, parquet_metadata of a local file returns stats_min and stats_max for a DOUBLE column named longitude. | OBSERVED | R10 | - |
+| S29 | DuckDB documents reading and writing Parquet files. | READ | P13 | "DuckDB provides support for both reading and writing Parquet files in an efficient manner, as well as support for pushing filters and projections into the Parquet file scans." |
+| S30 | parquet_metadata exposes Parquet metadata, including column statistics. | READ | P14 | "The parquet_metadata function can be used to query the metadata contained within a Parquet file, which reveals various internal details of the Parquet file such as the statistics of the different columns." |
+| S31 | parquet_kv_metadata exposes custom key-value metadata. | READ | P14 | "The parquet_kv_metadata function can be used to query custom metadata defined as key-value pairs:" |
+| S32 | GeoParquet stores geometry metadata under the geo key of Parquet key-value metadata. | READ | P14 | "GeoParquet files store their geospatial metadata (the primary geometry column, its encoding, the coordinate reference system, and more) under the geo key of the Parquet key-value metadata." |
+| S33 | enable_geoparquet_conversion controls attempted GeoParquet geometry conversion when the spatial extension is present; this reading does not establish a real-file check. | READ | P15 | "Attempt to decode/encode geometry data in/as GeoParquet files if the spatial extension is present." |
 
 ### Slice S1 confirmation
 
