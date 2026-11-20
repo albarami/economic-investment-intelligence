@@ -39,6 +39,11 @@ from eii_custodian.publicdata.fetch.kinds import Prepared, prepare
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.heights.landmarks import (
+    LANDMARK_HEIGHTS_PATH,
+    apply_landmark_heights,
+    load_landmark_heights,
+)
 from eii_custodian.publicdata.heights.manifest import (
     ESTIMATE_LABEL,
     check_row,
@@ -202,7 +207,10 @@ def test_the_real_doc04_credit_is_the_real_manifest_credit(tmp_path: Path) -> No
             template = quoted[1:-1]
     assert template == load_rules(RULES_PATH).credit_3dglobfp
     for entry in _heights_entries(load_registry()):
-        assert entry.licence_id == "CC-BY-4.0"
+        if entry.source_id == "bldg_gba":
+            assert entry.licence_id == "CC-BY-NC-4.0"
+        else:
+            assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
     globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
     cache = tmp_path / "cache"
@@ -376,6 +384,12 @@ def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
     assert wsf.scale == "0.1"
     assert wsf.crs == "EPSG:4326"
     assert wsf.dtype == "int16"
+    gba = rules.structures["bldg_gba"]
+    assert gba.format == "shapefile_zip"
+    assert gba.field == "Height"
+    assert gba.class_field == "SYN_class"
+    assert gba.unit == "m"
+    assert gba.crs == "EPSG:4326"
 
 
 def test_input_contract_refusals(tmp_path: Path) -> None:
@@ -673,7 +687,9 @@ def test_another_declared_format_is_absent_not_refused(tmp_path: Path) -> None:
 
 def _heights_entries(loaded: tuple[Entry, ...]) -> list[Entry]:
     return [
-        entry for entry in loaded if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
+        entry
+        for entry in loaded
+        if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
     ]
 
 
@@ -684,10 +700,17 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
         "bldg_3dglobfp/1636",
         "bldg_3dglobfp/1639",
         "bldg_wsf3d",
+        "bldg_gba",
     ]
     for entry in entries:
-        assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
-        assert entry.licence_id == "CC-BY-4.0"
+        assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
+        if entry.source_id == "bldg_gba":
+            assert entry.licence_id == "CC-BY-NC-4.0"
+            assert entry.fetch_host == "data.source.coop"
+            assert entry.terms_read_on == "2026-11-14"
+            assert entry.terms_words
+        else:
+            assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
         assert entry.decision_record == ""
         assert "credit" not in vars(entry)
@@ -704,6 +727,9 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
     wsf = entries[2]
     assert wsf.fetch_host == "download.geoservice.dlr.de"
     assert wsf.extension == "tif"
+    gba = entries[3]
+    assert gba.fetch_host == "data.source.coop"
+    assert gba.extension == "zip"
     pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text()
     assert '"Che et al. 2024"' in pack
     document = yaml.safe_load(
@@ -712,7 +738,7 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
     rows = [
         row
         for row in document["sources"]
-        if row["source_id"] in {"bldg_3dglobfp", "bldg_wsf3d"}
+        if row["source_id"] in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
     ]
     assert all("credit" not in row for row in rows)
 
@@ -2676,6 +2702,223 @@ def test_the_height_hosts_join_the_allow_list() -> None:
     assert not approve(
         "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.r2.cloudflarestorage.com/x"
     ).ok
+
+
+def test_the_committed_landmark_hand_list_carries_a_citation() -> None:
+    """Decision 0064 item 25: each landmark height cites page, publisher and date."""
+    rows = load_landmark_heights(LANDMARK_HEIGHTS_PATH)
+    assert len(rows) == 1
+    row = rows[0]
+    assert row.building_id == "SYN-B-LM01"
+    assert row.citation.page_url.startswith("https://")
+    assert row.citation.publisher == "SYN-publisher"
+    assert row.citation.retrieved_on == "2026-11-14"
+
+
+def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
+    tmp_path: Path,
+) -> None:
+    """The hand list sets recorded height; the manifest keeps the citation."""
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0.1, 0.1, 0.5), None, None
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "99")]),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[200]], 1, 1),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    build_heights(
+        cache,
+        (globfp_row, wsf_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    rows = {row["building_id"]: row for row in _rows(out_dir)}
+    assert rows["SYN-B-LM01"]["height_m"] == "200.00"
+    assert rows["SYN-B-LM01"]["height_source"] == "recorded"
+    block = _manifest(out_dir)
+    assert len(block["landmark_heights"]) == 1
+    citation = block["landmark_heights"][0]["citation"]
+    assert citation["retrieved_on"] == "2026-11-14"
+    assert any("PASS heights" in line for line in lines)
+
+
+def test_a_landmark_recorded_conflict_is_refused(tmp_path: Path) -> None:
+    """A building that already holds recorded height cannot take a landmark height."""
+    path = tmp_path / "bad.geojson"
+    path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0, 0, 1), 30, None
+                )
+            ]
+        )
+    )
+    buildings = load_buildings(path)
+    with pytest.raises(HeightError, match="landmark_height_conflict"):
+        apply_landmark_heights(buildings, load_landmark_heights())
+
+
+def test_gba_fetches_through_the_allow_list(tmp_path: Path) -> None:
+    """The GBA registry row is read from an invented zip on an allow-listed host."""
+    row = invented.entry(
+        "bldg_gba",
+        extension="zip",
+        fetch_host="data.source.coop",
+        licence_id="CC-BY-NC-4.0",
+        url="https://data.source.coop/SYN/invented-gba.zip",
+    )
+    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
+    results = _sources(tmp_path, (row,), bodies=((row, body),))
+    assert results["bldg_gba"].state == "read"
+    assert len(results["bldg_gba"].gba) == 1
+    _geometry, height, class_name = results["bldg_gba"].gba[0][1][0]
+    assert height == Decimal("90")
+    assert class_name == "tower"
+    assert approve(row.url).ok
+
+
+def test_gba_calibration_measures_error_by_class_in_the_manifest(
+    tmp_path: Path,
+) -> None:
+    """GBA error is computed by class in tested code, not stated in prose."""
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-G01", invented.square(0.1, 0.1, 0.5), 100, None
+                ),
+                invented.building_feature(
+                    "SYN-B-G02", invented.square(2.1, 0.1, 0.5), 50, None
+                ),
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    gba_row = invented.entry(
+        "bldg_gba",
+        extension="zip",
+        fetch_host="data.source.coop",
+        licence_id="CC-BY-NC-4.0",
+        url="https://data.source.coop/SYN/invented-gba.zip",
+    )
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip(
+            [
+                (invented.square(0.05, 0.05, 0.6), "1"),
+                (invented.square(2.05, 0.05, 0.6), "1"),
+            ]
+        ),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[100, 100, 100, 100]], 4, 1),
+    )
+    invented.store(
+        cache,
+        gba_row,
+        invented.gba_zip(
+            [
+                (invented.square(0.05, 0.05, 0.6), "90", "tower"),
+                (invented.square(2.05, 0.05, 0.6), "55", "lowrise"),
+            ]
+        ),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    build_heights(
+        cache,
+        (globfp_row, wsf_row, gba_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    calibration = _manifest(out_dir)["gba_calibration"]
+    assert calibration["state"] == "measured"
+    assert calibration["order_status"] == "pending_owner_decision"
+    assert calibration["overall"]["count"] == 2
+    assert calibration["overall"]["mean_signed_error_m"] == "-2.50"
+    by_class = calibration["by_class"]
+    assert by_class["lowrise"]["count"] == 1
+    assert by_class["lowrise"]["mean_signed_error_m"] == "5.00"
+    assert by_class["tower"]["count"] == 1
+    assert by_class["tower"]["mean_signed_error_m"] == "-10.00"
+    assert any("PASS heights" in line for line in lines)
+
+
+def test_a_planted_skip_on_gba_does_not_skip_the_heights_step(
+    tmp_path: Path,
+) -> None:
+    """A skipped GBA row is absent; the step still passes when the table is present."""
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-0001", invented.square(0.1, 0.1, 0.5), 30, 8
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    gba_row = replace(
+        invented.entry("bldg_gba", extension="zip"),
+        skip_reason="direct_url_unconfirmed",
+    )
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[180]], 1, 1),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    build_heights(
+        cache,
+        (globfp_row, wsf_row, gba_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    assert _manifest(out_dir)["sources"]["bldg_gba"]["reason"] == (
+        "direct_url_unconfirmed"
+    )
+    assert any("PASS heights" in line for line in lines)
+    assert not any(line.startswith("SKIP heights") for line in lines)
 
 
 def test_the_writer_refusal_output_row_is_planted() -> None:

@@ -23,6 +23,8 @@ from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import skip_line
 
+from .calibration import gba_calibration
+from .landmarks import apply_landmark_heights, load_landmark_heights
 from .manifest import (
     dump_sorted,
     manifest_block,
@@ -149,7 +151,9 @@ def build_heights(
         lines.append(skip_line("heights", "building_table_absent"))
         return
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
-    buildings = load_buildings(buildings_path)
+    buildings, landmark_citations = apply_landmark_heights(
+        load_buildings(buildings_path), load_landmark_heights()
+    )
     results = read_sources(cache, entries, rules, bounds=_table_bounds(buildings))
     index = globfp_index(results["bldg_3dglobfp"].globfp)
     rows, candidates, choices, globfp_matches = _resolve(
@@ -182,6 +186,8 @@ def build_heights(
         errors,
         input_files,
         terms_attempts=terms_attempts,
+        landmark_citations=landmark_citations,
+        gba_calibration=gba_calibration(buildings, results["bldg_gba"]),
     )
     write_outputs(
         out_dir,

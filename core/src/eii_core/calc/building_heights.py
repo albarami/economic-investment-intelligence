@@ -234,6 +234,38 @@ def fallback_errors(
     return result
 
 
+def errors_by_class(
+    pairs: Iterable[tuple[Decimal, Decimal, str]],
+) -> dict[str, FallbackError]:
+    """One fallback's error statistics within each named class."""
+    grouped: dict[str, list[tuple[Decimal, Decimal]]] = {}
+    for fallback, recorded, class_name in pairs:
+        if not class_name:
+            raise ValueError("class name required")
+        grouped.setdefault(class_name, []).append((fallback, recorded))
+    result: dict[str, FallbackError] = {}
+    with localcontext(CALC_CONTEXT):
+        for class_name in sorted(grouped):
+            found = grouped[class_name]
+            errors = [fallback - recorded for fallback, recorded in found]
+            absolutes = sorted(abs(error) for error in errors)
+            total = len(errors)
+            middle = total // 2
+            median = (
+                absolutes[middle]
+                if total % 2
+                else (absolutes[middle - 1] + absolutes[middle]) / 2
+            )
+            result[class_name] = FallbackError(
+                total,
+                metres(sum(errors, ZERO) / total),
+                metres(sum(absolutes, ZERO) / total),
+                metres(median),
+                "",
+            )
+    return result
+
+
 def height_counts(
     choices: Iterable[HeightChoice],
     globfp_matches: Iterable[Iterable[tuple[Decimal, str, int, Decimal]]],

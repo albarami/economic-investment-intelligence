@@ -12002,6 +12002,33 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "tif"
+  - key: "bldg_gba"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "bldg_gba"
+    slug: ""
+    kind: "https_file"
+    title_en: "GlobalBuildingAtlas height tiles (open global building-height dataset)"
+    publisher: "SYN-publisher"
+    licence_id: "CC-BY-NC-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: "data.source.coop"
+    url: "https://data.source.coop/fused/global-building-atlas/SYN-qatar-height.zip"
+    terms_url: "https://data.source.coop/fused/global-building-atlas/README.md"
+    terms_words: "\"CC BY-NC 4.0\" recorded for calibration only; not in the PUB-106 height order pending owner decision (OI-310)."
+    terms_read_on: "2026-11-14"
+    landing_url: "https://data.source.coop/fused/global-building-atlas/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "zip"
 
   - key: "cepii_baci"
     refetch: {value: none, reason: frequency_unconfirmed}

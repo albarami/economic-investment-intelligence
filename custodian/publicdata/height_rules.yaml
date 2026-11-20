@@ -13,6 +13,7 @@ sources:
   bldg_3dglobfp:
     format: "shapefile_zip"
     field: "Height"
+    class_field: ""
     unit: "m"
     nodata: ""
     crs: "EPSG:4326"
@@ -24,3 +25,11 @@ sources:
     scale: "0.1"
     crs: "EPSG:4326"
     dtype: "int16"
+    class_field: ""
+  bldg_gba:
+    format: "shapefile_zip"
+    field: "Height"
+    class_field: "SYN_class"
+    unit: "m"
+    nodata: ""
+    crs: "EPSG:4326"

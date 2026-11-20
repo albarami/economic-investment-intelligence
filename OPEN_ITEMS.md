@@ -2780,6 +2780,7 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - WHY: GlobalBuildingAtlas is measured against the recorded heights, but the height order of decision 0023 item A2 does not hold it.
 - NEEDED: S2-T20 records its measured error beside those of the other height sources; its place in the order is then put to the owner, and a change of the order takes its own decision record (AGENTS.md rule 46).
 - NEEDED BY: before S3-T16 draws a height from it.
+- CLOSING 2026-11-20 (package P21, partial): Cause — decision 0064 item 25 required GBA calibration before order placement. Fix — registry row `bldg_gba`, fetch/read seam, `gba_calibration` in the asset manifest with overall and `by_class` errors from `errors_by_class`, terms recorded on the row; height order unchanged. Deciding tests — `test_gba_calibration_measures_error_by_class_in_the_manifest`, `core/tests/test_building_heights.py::test_errors_by_class_splits_one_fallbacks_pairs_by_class_name`. Red before `errors_by_class` and calibration wiring; green after. This line does not close OI-310: owner order decision still open (`order_status` `pending_owner_decision`).
 
 ## OI-311 — Free imagery dates and the GIS locator within OPS-65 and ARC-35
 

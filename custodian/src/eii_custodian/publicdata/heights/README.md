@@ -7,7 +7,10 @@ Every building of the basemap building table
 (`data/assets/buildings/buildings.geojson`) receives a height in the order of
 decision 0023 item A2:
 
-1. `recorded` — the building's own recorded height (`Public`, observed);
+1. `recorded` — the building's own recorded height (`Public`, observed),
+   including heights from the committed hand list
+   (`custodian/publicdata/review/landmark_heights.yaml`), each with its cited
+   public page, publisher and retrieval date in the asset manifest;
 2. `floor_count` — the floor count times the stated storey height;
 3. `3dglobfp` — the open heights of 3D-GloBFP, `bldg_3dglobfp`
    (CC BY 4.0, credit "Che et al. 2024");
@@ -27,8 +30,11 @@ Written under `data/assets/heights/` (uncommitted):
   hashes, retrieval metadata, licences and basis, terms, credits, the matching
   rules, the source order, the counts per source, the `none` reasons, the tied-height count, the error
   block of each fallback against the recorded heights, the storey-height
-  assumption, and the label `Heights are estimates.` Both files are sorted and
-  byte-stable: identical inputs give identical bytes (FE-98).
+  assumption, the label `Heights are estimates.`, the `landmark_heights`
+  citation block and the `gba_calibration` block (GlobalBuildingAtlas measured
+  against recorded heights overall and by class, with `order_status`
+  `pending_owner_decision` until OI-310). Both files are sorted and byte-stable:
+  identical inputs give identical bytes (FE-98).
 
 The error block of each fallback holds `count`, `mean_signed_error_m`
 (fallback minus recorded), `mean_absolute_error_m` and
@@ -43,22 +49,25 @@ text `"3.0"` with the label `ASSUMPTION` (the lead's stated assumption of
 2026-11-14; the owner replaces it). It is parsed to `Decimal` — never a float —
 and no Python file may repeat the literal. The same file declares the structure
 each height source must match, in the form confirmed in pass five:
-`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, and `bldg_wsf3d`
-is a `GTiff` band `1` of the declared sample type `int16` with nodata
-`-32767` and scale `"0.1"`, both in metres and EPSG:4326; the reader refuses
-another driver or another sample type by name (`structure_mismatch`); the
-value `to be confirmed` marks a source whose structure is not yet confirmed
-and that source is absent with reason `structure_unconfirmed`, never a
-failure.
+`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, `bldg_gba` is
+`shapefile_zip` with `Height` and class field `SYN_class` (calibration only,
+not in the PUB-106 order pending OI-310), and `bldg_wsf3d` is a `GTiff` band
+`1` of the declared sample type `int16` with nodata `-32767` and scale
+`"0.1"`, both in metres and EPSG:4326; the reader refuses another driver or
+another sample type by name (`structure_mismatch`); the value `to be confirmed`
+marks a source whose structure is not yet confirmed and that source is absent
+with reason `structure_unconfirmed`, never a failure.
 
 ## Sources
 
-The two height sources are the registry rows of
+The height and calibration sources are the registry rows of
 `custodian/publicdata/sources.yaml`: `bldg_3dglobfp/1636` and
 `bldg_3dglobfp/1639`, the two tile files holding Qatar (CC BY 4.0, credit
-"Che et al. 2024", from `ndownloader.figshare.com`), and `bldg_wsf3d`, the
+"Che et al. 2024", from `ndownloader.figshare.com`); `bldg_wsf3d`, the
 global file of `download.geoservice.dlr.de` (CC BY 4.0, credit "Copyright DLR
-(year of production)"). Each 3D-GloBFP file is one flat zip of exactly five
+(year of production)"); and `bldg_gba`, the GlobalBuildingAtlas height tiles
+from `data.source.coop` (CC BY-NC 4.0, terms recorded, calibration only). Each
+3D-GloBFP or GBA file is one flat zip of exactly five
 members — `cpg`, `dbf`, `prj`, `shp`, `shx` — of one stem: the `cpg` text must
 read `ISO-8859-1`, the `prj` well-known text must resolve to EPSG:4326 through
 `to_epsg`, and the named `Height` field is read as the `dbf` record's own

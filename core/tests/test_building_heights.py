@@ -18,6 +18,7 @@ from eii_core.calc.building_heights import (
     ORDER_EXHAUSTED,
     HeightChoice,
     choose_height,
+    errors_by_class,
     fallback_errors,
     floor_height,
     height_counts,
@@ -129,6 +130,23 @@ def test_fallback_errors_come_from_the_candidate_rows_not_the_chosen_height():
     assert wsf3d.mean_signed == Decimal(-10)
     assert wsf3d.mean_absolute == Decimal(10)
     assert wsf3d.median_absolute == Decimal(10)
+
+
+def test_errors_by_class_splits_one_fallbacks_pairs_by_class_name():
+    """GlobalBuildingAtlas calibration groups error statistics by class."""
+    pairs = [
+        (Decimal("90"), Decimal("100"), "tower"),
+        (Decimal("55"), Decimal("50"), "lowrise"),
+    ]
+    found = errors_by_class(pairs)
+    tower = found["tower"]
+    assert tower.count == 1
+    assert tower.mean_signed == Decimal("-10.00")
+    assert tower.mean_absolute == Decimal("10.00")
+    lowrise = found["lowrise"]
+    assert lowrise.count == 1
+    assert lowrise.mean_signed == Decimal("5.00")
+    assert lowrise.mean_absolute == Decimal("5.00")
 
 
 def test_errors_over_chosen_heights_alone_lose_the_fallbacks_of_recorded_wins():
