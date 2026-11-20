@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from custodian.tests.building_fixture import (
@@ -27,6 +28,76 @@ def refusal(prepared, name, **kwargs):
         prepared.produce(**kwargs)
     assert error.value.name == name
     assert not (prepared.output / "manifest.buildings.json").exists()
+
+
+def test_staged_table_validation_refuses_by_name_before_publication(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.buildings import BuildingError
+    from eii_custodian.publicdata.heights.model import HeightError
+
+    prepared = world(tmp_path)
+    prepared.produce()
+
+    def invalid(_path):
+        raise HeightError("bad_footprint")
+
+    monkeypatch.setattr("eii_custodian.publicdata.buildings.load_buildings", invalid)
+    with pytest.raises(BuildingError) as error:
+        prepared.produce()
+    assert error.value.name == "building_table_invalid"
+    assert error.value.detail == "bad_footprint"
+    assert not (prepared.output / "buildings.geojson").exists()
+    assert not (prepared.output / "manifest.buildings.json").exists()
+
+
+def test_table_replace_failure_never_publishes_manifest(tmp_path, monkeypatch):
+    prepared = world(tmp_path)
+    prepared.produce()
+    original = Path.replace
+
+    def fail_table(source, target):
+        if Path(target).name == "buildings.geojson":
+            raise OSError("SYN table replacement failure")
+        return original(source, target)
+
+    monkeypatch.setattr(Path, "replace", fail_table)
+    with pytest.raises(OSError, match="SYN table replacement failure"):
+        prepared.produce()
+    assert not (prepared.output / "manifest.buildings.json").exists()
+
+
+def test_optional_field_counts_separate_kept_rows_from_all_read(tmp_path):
+    prepared = world(
+        tmp_path,
+        rows=[
+            [
+                footprint("SYN-kept", height=23.5, num_floors=6),
+                footprint(
+                    "SYN-outside-box",
+                    box(52, 25, 52.1, 25.1).wkb,
+                    height=10.0,
+                    num_floors=2,
+                ),
+            ],
+            [],
+            [],
+        ],
+    )
+    prepared.produce()
+    block = manifest(prepared)
+    for name in ("height", "num_floors"):
+        assert block["optional_fields"][name]["present"] == 1
+        assert block["optional_fields"][name]["source_value_present_unmapped"] == 1
+        assert block["optional_fields_all_read"][name]["present"] == 2
+        assert (
+            block["optional_fields_all_read"][name]["source_value_present_unmapped"]
+            == 2
+        )
+    assert block["optional_field_scope"] == {
+        "optional_fields": "kept table rows after spatial and footprint exclusions",
+        "optional_fields_all_read": "all source rows before spatial and footprint exclusions",
+    }
 
 
 def test_explicit_pin_wins_over_cache_review(tmp_path):

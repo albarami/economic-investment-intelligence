@@ -14,6 +14,13 @@ building artifacts before the attempt; inventory errors retain their own
 `FAIL buildings` name. Heights then verifies the table's completion manifest
 against the same pins before reading it. National live coverage is unconfirmed.
 
+Staged table validation translates a height-contract refusal to
+`building_table_invalid`, retaining its name in the error detail and publishing
+neither artifact. The table is replaced before its completion manifest. The
+manifest's `optional_fields` counts only kept table rows;
+`optional_fields_all_read` preserves counts over all source rows before spatial
+and footprint exclusions. `optional_field_scope` describes both populations.
+
 For nonzero in-box-outside-boundary counts the manifest defaults to
 `pending_lead_review`. The lead may write the closed local record
 `cache/review/building_boundary.json`: exactly `version` (integer one),

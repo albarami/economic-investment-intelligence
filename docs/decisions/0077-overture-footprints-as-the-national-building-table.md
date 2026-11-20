@@ -26,7 +26,10 @@
    possible reclaimed land and a boundary amendment.
 3. `height` and `num_floors` mapping is off. Both output slots remain null with
    reason `recorded_field_unconfirmed`; counts preserve absent, present, usable,
-   unusable and present-unmapped source values. Activation requires the official
+   unusable and present-unmapped source values. `optional_fields` counts kept
+   table rows; `optional_fields_all_read` separately counts every source row
+   before spatial and footprint exclusions. `optional_field_scope` names both
+   populations. Activation requires the official
    schema reading, a committed closed list of recorded-origin datasets for each
    property, and live counts, as finding F4 requires. No estimate or default is
    recorded height. C47's whole-table numeric refusals remain unchanged; any
@@ -56,8 +59,7 @@
   “Extruded buildings”, FE-143; section 7 Attribution and FE-139 contributor
   credits; section 14 asset-pipeline producer location, new Building table row
   and corrected Landmark heights row (cited recorded heights keyed by building ID).
-- The source registry's matching titles and reviewed STAC rows; the heights
-  and assembly module documentation; TASKS.md S2-T20 delivery status.
+- The source registry's matching titles and reviewed STAC rows; the heights and frame module documentation; TASKS.md S2-T20 delivery status.
 
 ## Evidence and remaining confirmation
 

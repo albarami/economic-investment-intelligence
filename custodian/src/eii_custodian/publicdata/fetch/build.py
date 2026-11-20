@@ -533,6 +533,7 @@ def run_build(
                 "snapshot_selection_invalid",
                 "assembly_gate_pending",
                 "assembly_frame_incomplete",
+                "assembly_buildings_incomplete",
                 "assembly_places_incomplete",
                 "assembly_membership_invalid",
                 "assembly_regression_refused",

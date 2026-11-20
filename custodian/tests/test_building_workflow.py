@@ -143,13 +143,26 @@ def test_omitted_inventory_over_valid_old_artifacts_fails(tmp_path, monkeypatch,
 
 
 @pytest.mark.parametrize("path", ["legacy", "assembly"])
-def test_named_inventory_failure_stops_both_callers(tmp_path, monkeypatch, path):
+@pytest.mark.parametrize("plant", ["missing_pin", "invalid_table"])
+def test_named_inventory_failure_stops_both_callers(tmp_path, monkeypatch, path, plant):
     from eii_custodian.publicdata.buildings import BuildingError
+    from eii_custodian.publicdata.heights.model import HeightError
     from eii_custodian.publicdata.places.integrate import frame_when_ready
 
     prepared, state = prepared_frame(tmp_path, monkeypatch)
-    del prepared.selected[PARTS[0]]
-    with pytest.raises(BuildingError, match="building_part_unpinned"):
+    if plant == "missing_pin":
+        del prepared.selected[PARTS[0]]
+        name = "building_part_unpinned"
+    else:
+        name = "building_table_invalid"
+
+        def invalid(_path):
+            raise HeightError("bad_footprint")
+
+        monkeypatch.setattr(
+            "eii_custodian.publicdata.buildings.load_buildings", invalid
+        )
+    with pytest.raises(BuildingError, match=name):
         if path == "legacy":
             frame_when_ready(
                 prepared.cache,
@@ -159,7 +172,37 @@ def test_named_inventory_failure_stops_both_callers(tmp_path, monkeypatch, path)
             )
         else:
             state.frame()
-    assert "FAIL buildings check=building_part_unpinned" in state.lines
+    assert f"FAIL buildings check={name}" in state.lines
+
+
+def test_frame_refuses_missing_places_after_inventory(tmp_path, monkeypatch):
+    prepared, state = prepared_frame(tmp_path, monkeypatch)
+    (prepared.cache / "places_s2_t06/place_points.json").unlink()
+    with pytest.raises(AssemblyError, match="assembly_places_incomplete"):
+        state.frame()
+    assert state.frame_result.tables["grid_cell"]
+    assert not (prepared.cache / "assembly/frame.json").exists()
+
+
+def test_assembly_build_outcome_preserves_missing_inventory_refusal(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.assembly_adapters import Production
+    from eii_custodian.publicdata.fetch.build import run_build
+
+    def refused(_state):
+        raise AssemblyError("assembly_buildings_incomplete")
+
+    monkeypatch.setattr(Production, "run", refused)
+    outcome = run_build(
+        (),
+        lambda _url: pytest.fail("network called"),
+        tmp_path / "cache",
+        lambda: "2026-11-20T00:00:00Z",
+        lambda _delay: None,
+        seed=17,
+    )
+    assert outcome.failure.check == "assembly_buildings_incomplete"
 
 
 def test_legacy_build_outcome_preserves_inventory_refusal(tmp_path, monkeypatch):

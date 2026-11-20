@@ -60,10 +60,6 @@
 
 ## Decision records
 
-[0077 — Overture footprints as the national building table](decisions/0077-overture-footprints-as-the-national-building-table.md)
-is proposed with S2-T20; it records the canonical footprint producer, counted
-unmapped fields, national-coverage guards and building-layer attribution.
-
 | Record | Decision | Status |
 |---|---|---|
 | [0001](decisions/0001-fully-synthetic-records-real-public-data.md) | Fully synthetic custodian-type records; cited real public data | Accepted, 2026-11-11; its consequences amended by decision 0022 on 2026-11-13 |
@@ -132,6 +128,7 @@ unmapped fields, national-coverage guards and building-layer attribution.
 | [0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) | District subject of Public series on district geography; venue-visits note cells stay reviewed missing values without a status column; one recorded S2-T44 node-test assertion exception from pull request 104 | Accepted, 2026-11-20; the owner's decision of 2026-11-20 |
 | [0074](decisions/0074-company-level-fields-of-the-owners-company-workbook.md) | Company-level columns of the owner's company workbook; rule 3 exception; OI-186, OI-187 and OI-190 closed; S2-T48 company web pages approved | Accepted, 2026-11-20; the owner's decisions of 2026-11-20 |
 | [0075](decisions/0075-activity-mappings-signed-by-model-review.md) | Individually signed model activity reviews with another-maker seeded batch audit at zero errors; owner confirms the reviewed customs baskets; OI-203 review remains open | Accepted, 2026-11-20; the owner's decision of 2026-11-20 |
+| [0077](decisions/0077-overture-footprints-as-the-national-building-table.md) | Overture footprints as the national building table: the pinned parts as the canonical national inventory in the shared public frame, counted unmapped optional fields, STAC and frame-box completeness guards, and building-layer attribution | Proposed, 2026-11-20; task-owned under rule 33 and lead ruling L-1285 |
 | [0078](decisions/0078-c2-bulk-months-by-the-centred-median.md) | C2 bulk months use the centred, end-cut thirteen-month median; superseded global rule retained | Accepted, 2026-11-20; the owner on the advisor's answer to S2 gate item 8 (OI-207) |
 
 ## Identifiers and change control

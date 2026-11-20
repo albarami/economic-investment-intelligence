@@ -36,7 +36,7 @@ from .building_inputs import (
 )
 from .fetch.receipts import sha256_hex
 from .fetch.registry import Entry
-from .heights.model import load_buildings
+from .heights.model import HeightError, load_buildings
 from .places import PlacesError
 from .places.read import (
     SOURCE_RELEASE,
@@ -142,6 +142,7 @@ def build_buildings(
         }
     )
     fields = {name: _field_counts() for name in ("height", "num_floors")}
+    fields_all_read = {name: _field_counts() for name in ("height", "num_floors")}
     contributors: Counter[str] = Counter()
     part_counts: dict[str, Any] = {}
     frame = bounds_polygon(FRAME_BOUNDS)
@@ -160,8 +161,8 @@ def build_buildings(
                 if building_id in seen:
                     raise BuildingError("building_duplicate")
                 seen.add(building_id)
-                _count_field(fields["height"], row["height"], False)
-                _count_field(fields["num_floors"], row["num_floors"], True)
+                _count_field(fields_all_read["height"], row["height"], False)
+                _count_field(fields_all_read["num_floors"], row["num_floors"], True)
                 underground = row["is_underground"]
                 if underground is not None and not isinstance(underground, bool):
                     raise BuildingError("building_underground_flag")
@@ -191,6 +192,8 @@ def build_buildings(
                     local["inside_box_outside_boundary"] += 1
                 else:
                     counts["kept"] += 1
+                    _count_field(fields["height"], row["height"], False)
+                    _count_field(fields["num_floors"], row["num_floors"], True)
                     local["kept"] += 1
                     kept.append(building_id)
                     _contributors(row["sources"], contributors)
@@ -231,11 +234,15 @@ def build_buildings(
         "counts": dict(counts),
         "parts": part_counts,
         "optional_fields": fields,
+        "optional_fields_all_read": fields_all_read,
         "excluded": sorted(excluded, key=lambda row: (row["part"], row["building_id"])),
         "boundary_review": boundary_review(
             cache, chain, counts["inside_box_outside_boundary"]
         ),
-        "optional_field_scope": "all source rows before spatial and footprint exclusions",
+        "optional_field_scope": {
+            "optional_fields": "kept table rows after spatial and footprint exclusions",
+            "optional_fields_all_read": "all source rows before spatial and footprint exclusions",
+        },
         "footprint_contributors": dict(sorted(contributors.items())),
         "footprint_contributor_rule": "record-level sources with absent or empty property; each dataset once per kept footprint",
         "attribution_notices": notices,
@@ -245,7 +252,10 @@ def build_buildings(
     with tempfile.TemporaryDirectory(prefix=".buildings-", dir=target) as folder:
         staged = Path(folder) / "buildings.geojson"
         staged.write_bytes(table_body)
-        load_buildings(staged)
+        try:
+            load_buildings(staged)
+        except HeightError as error:
+            raise BuildingError("building_table_invalid", error.name) from None
         staged.replace(target / "buildings.geojson")
         marker = Path(folder) / BUILDING_MANIFEST
         marker.write_bytes(dump(block))
