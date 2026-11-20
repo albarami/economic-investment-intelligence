@@ -1562,7 +1562,7 @@ validator reads it from the resolved subject and the fact's fields, never from w
 | `register_company` | one real company of the public business register or of the financial centre's public register, a row of `pub_register_company` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | `registration_number`, which the application resolves and never sends to the model or writes to an egress record, a ledger row or a log | Public facts of `pub_register_company` (the fields the register publishes, person names excluded); the Synthetic fact `employee_count` of its row in `register_company_list`; and, in a list, the rank and fit facts that tested code computes over the card fields, the employee count, Public inputs such as free-flow drive time and the user's typed criteria and weights, with the stability facts of DAT-134. Never a Simulated fact, an estimate, share or score, or a wage, wage bill or other labour or residence fact of the company: those appear only in released aggregates of `area` subjects, and in the company's own seat only as its design provides (rule 8 of AGENTS.md; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15 removes the oversight seat). |
 | `fdi_project` | one published investment announcement of `fdi_projects` | `project_key` | Public facts only, read from `fdi_projects` and its source; never a fact computed with a synthetic, protected or simulated input |
 
-The `district` subject accepts Public slots only, identified by the publisher's own district label with its municipality, never a drawn area, never apportioned and never an `area` subject (S2-T17; lead assumption, OI-102).
+The `district` subject accepts Public slots only, identified by the publisher's own district label with its municipality, never a drawn area, never apportioned and never an `area` subject (S2-T17; [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1).
 
 The other subjects of the claim catalogue accept Public facts only, including, for `scenario`, the
 user-input facts of DAT-92 whose provenance is Public; a scenario fact that draws on a Simulated or
@@ -2379,7 +2379,7 @@ the quality measure of DAT-24.
   open, and it is not on the list of card C30 until a table is held (decision 0019, open questions).
 - OPEN: the Public source of the survival base rate, which the Public licence tables cannot give
   (DAT-159); until then it returns `NO_DATA` with `no_denominator`.
-- ASSUMPTION (S2-T17, OI-102): district price series use the Public-only `district` subject of section 9.1, pending owner confirmation.
+- DECIDED (S2-T17, [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1): district price series use the Public-only `district` subject of section 9.1, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject.
 - OPEN (decision 0022): how the attachment by registration number treats a registration that covers
   several establishments in the register (DAT-01). The legal-entity and employer-group structure is
   settled by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12: the register's main-and-branch structure, otherwise one

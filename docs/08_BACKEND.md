@@ -1088,7 +1088,7 @@ OPEN items raised by decisions 0016 and 0017 that touch this document:
 OPEN items raised by [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) that touch this document:
 
 - OPEN: the Public source of each series of the owner's list (decision 0019 item 2) for which the public data pack holds no table yet; such a series is listed in document 04 as open and is not on the list of method card C30 until a table exists.
-- ASSUMPTION (S2-T17, OI-102): Public property-price series use `district`, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject, pending owner confirmation.
+- DECIDED (S2-T17, [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1): Public property-price series use `district`, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject.
 - OPEN: the apportioning weight for drawn shapes (first item of the list above) is not closed by the grid of `worldpop_qat_agesex`, which is a displayed population and not a weight; document 07 confirms the weight at slice S2.
 
 OPEN items raised by [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) that touch this document:
