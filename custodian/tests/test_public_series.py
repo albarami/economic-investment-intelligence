@@ -504,7 +504,8 @@ def test_independent_checks_and_contract_values() -> None:
             ("2025", "71", 10),
         ]
     ]
-    # Median=3, strict threshold=9. Dated=59+2+62*3=247; 59/247*100 -> 24.
+    # Each named month has local median 3, strict threshold 9.
+    # Dated=59+2+62*3=247; 59/247*100 -> 24.
     from eii_core.calc.public_series import C2_CALENDAR
 
     from .test_series_exact_regressions import cancellation
@@ -516,9 +517,17 @@ def test_independent_checks_and_contract_values() -> None:
         cancellation("2020", 1, 2),
         cancellation(None, None, 9),
     ]
-    other = [
-        m for m in C2_CALENDAR if m not in {"2020-07", "2022-06", "2024-09", "2020-01"}
-    ][:62]
+    # Keep 62 baseline rows, now around the named months so this fixture
+    # still checks strict equality (June) and just below it (September).
+    neighbours = {
+        month
+        for peak in ("2020-07", "2022-06", "2024-09")
+        for month in C2_CALENDAR[
+            C2_CALENDAR.index(peak) - 6 : C2_CALENDAR.index(peak) + 7
+        ]
+    } - {"2020-07", "2022-06", "2024-09", "2020-01"}
+    other = sorted(neighbours | set(C2_CALENDAR[:27]))
+    assert len(other) == 62
     fixtures["lic_cancelled"].extend(cancellation(m[:4], int(m[5:]), 3) for m in other)
     assert compute_checks(
         {
@@ -1932,3 +1941,27 @@ def test_real_stage_names_the_figure_of_a_blocked_source(
     assert build["mismatch"] == figure
     assert failure is not None and failure.source_id == figure
     assert lines[-1] == "FAIL " + figure + " public_data selected-cache check"
+
+
+def test_c2_method_version_is_bumped_without_changing_other_cards():
+    from eii_custodian.publicdata.series.figures import _envelope
+
+    receipt = {
+        key: "INVENTED"
+        for key in (
+            "source_id",
+            "publisher",
+            "slug",
+            "licence_id",
+            "licence_basis",
+            "retrieved_utc",
+            "sha256",
+            "fetch_url",
+        )
+    }
+    assert (
+        _envelope(["lic_cancelled"], {"lic_cancelled": receipt})["method_version"]
+        == "C2-v2"
+    )
+    assert _envelope(["lic_active"], {"lic_active": receipt})["method_version"] == "1"
+    assert _envelope(["util_elec"], {"util_elec": receipt})["method_version"] == "1"

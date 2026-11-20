@@ -5506,3 +5506,10 @@ The original unnumbered review-disposition section records S2-T44 placement afte
   an assertion that the real files exclude personal names. The lead must confirm
   this interpretation before the real-file run; no real trade name was read.
 - OPEN — S2-T49 confirmation K1: under L-1288, a licence number equal to another company's registration key refuses the whole build with `registration_egress` (fails safe); the lead's real-file run decides. Source: `.overnight/IN/CONFIRM-cf1.md`, note K1; this round reads no real files and changes no rule.
+
+## OI-207 — Method-choice closure by decision 0078 (2026-11-20)
+
+- ID: OI-207
+- TYPE: CLOSED
+- CLOSED: 2026-11-20, by [decision 0078](docs/decisions/0078-c2-bulk-months-by-the-centred-median.md) items 1 to 3, the owner's approval on the advisor's answer to S2 gate item 8. C2 now specifies the centred, end-cut thirteen-month median with factor 3 and strict comparison; the superseded global rule, 42-month list and 89.7 percent share remain in its method note.
+- EVIDENCE AND LIMIT: This append closes the method choice, preserving the original OI-207 and reconciliation history. S2-T50 records implementation and invented-fixture checks in PROGRESS.md. Another-maker review and the lead's real-cache pinned data-test run remain required by TASKS.md S2-T50; this closure does not assert either has happened or that a slice gate passed.

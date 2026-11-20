@@ -209,6 +209,8 @@ Of the May 2025 active licence-activity count of 249,622 (master design section 
 
 **Inputs.** `pub_licence_cancelled` (dated monthly cancellations by municipality and activity, 2015 to May 2025, plus an undated remainder); `pub_licence_active`.
 
+**Method version.** `C2-v2`, amended by [decision 0078](decisions/0078-c2-bulk-months-by-the-centred-median.md) item 1.
+
 **Formula.**
 
 ```
@@ -216,7 +218,10 @@ calendar   = every month from January 2015 through May 2025 (125 months)
 T_m        = national dated cancellations, all activities, in month m
              a calendar month with no dated rows has T_m = 0
              undated rows are excluded from every T_m
-bulk(m)    = T_m > 3 * median(T over those 125 months)
+window(m)  = months m-6 through m+6, intersected with calendar (7 to 13 months)
+bulk(m)    = T_m > 3 * median(T over window(m))
+             for an even window, median = mean of the two middle sorted counts
+             equality to 3 * median is not bulk
 churn_ijy  = C_ijy / A_ij        C = cancellations in year y; A = active stock, May 2025
 reported twice: including and excluding flagged months
 ```
@@ -231,10 +236,25 @@ Undated cancellations are shown as a separate count. A Wilson interval is shown 
 | Months that must be flagged | July 2020 (40,791), June 2022 (14,212), September 2024 (11,232) |
 | Share of dated cancellations in those three months | 43.1% |
 | Restaurants (5610101), 2024, Doha: 318 / 2,109 active | 15.1% (including flagged months) |
+| Restaurants (5610101), 2024, Doha: 283 / 2,109 active | 13.4% (excluding flagged months) |
 | Restaurants (5610101), 2024, Al Daayen: 49 / 361 active | 13.6% (including flagged months) |
+| Restaurants (5610101), 2024, Al Daayen: 48 / 361 active | 13.3% (excluding flagged months) |
+| All bulk months under C2-v2 | 2015-12, 2017-06, 2020-07, 2020-11, 2021-02, 2021-04, 2021-06, 2022-06, 2024-09 |
+| Share of dated cancellations in all nine bulk months | 54.3% |
 | ISIC 5610, cancellations 2022–2024 / active May 2025 | 2,510 / 7,878 = 0.32 |
 
-Tolerance: counts exact; shares ± 0.1 percentage point. The rule may flag other months as well; the data test lists every flagged month and the method note in the release records them.
+Tolerance: counts exact; shares ± 0.1 percentage point. The complete list and revised excluding figures above are from the lead's pinned-file comparison of 2026-11-20, recorded in decision 0078 item 2. The lead's data test pins every flagged month; the release method note records them. The three-month share of 43.1% continues to describe only the three named spikes.
+
+**Method note — superseded global rule.** Before decision 0078, C2 used
+`bulk(m) = T_m > 3 * median(T over all 125 calendar months)`. The lead's pinned-file
+comparison gives median 305, threshold 915, and 42 flagged months holding 89.7% of dated
+cancellations. Every month of 2023 and 2024 was flagged. This is retained historical
+method evidence; C2-v2 uses the centred rule above. The superseded 42-month list is:
+
+2017-06, 2020-07, 2020-11, 2021-02, 2021-04, 2021-05, 2021-06, 2021-12, 2022-01, 2022-02, 2022-03,
+2022-04, 2022-06, 2022-12, 2023-01, 2023-02, 2023-03, 2023-04, 2023-05, 2023-06, 2023-07, 2023-08,
+2023-09, 2023-10, 2023-11, 2023-12, 2024-01, 2024-02, 2024-03, 2024-04, 2024-05, 2024-06, 2024-07,
+2024-08, 2024-09, 2024-10, 2024-11, 2024-12, 2025-01, 2025-02, 2025-03, 2025-04
 
 **Provenance and status.** Rates are Public, `observed`, caveat `calculated`. The bulk flag is `observed` (it is a rule); the statement that bulk months are administrative is `inferred`. **Compute cost.** Trivial (feasibility review; no time recorded).
 

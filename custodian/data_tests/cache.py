@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from eii_core.calc.facts import SourceChain
+from eii_core.calc.public_series import C2_METHOD_VERSION
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.mapping import POP_FIELDS, fields
 from eii_custodian.publicdata.series.parse import confirmed_rows, selected_source
@@ -36,7 +37,7 @@ def cached(cache: Path, source: str, digest: str):
         source,
         entry.release_tables[0],
         "method-card",
-        "S2-T07-v1",
+        C2_METHOD_VERSION if source == "lic_cancelled" else "S2-T07-v1",
         str(receipt["publisher"]),
         entry.slug,
         str(receipt["fetch_url"]),

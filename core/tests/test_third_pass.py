@@ -121,7 +121,7 @@ def test_c2_refuses_national_totals_under_municipal_geography(
         )
 
 
-INVENTED_42_BULK_MONTHS = (
+INVENTED_ELEVATED_MONTHS = (
     "2017-06",
     "2020-07",
     "2020-11",
@@ -167,9 +167,9 @@ INVENTED_42_BULK_MONTHS = (
 )
 
 
-def test_c2_invented_125_month_series_mirrors_national_data_test():
+def test_c2_invented_125_month_series_uses_local_baselines():
     named_peaks = {"2020-07": 2000, "2022-06": 1200, "2024-09": 1070}
-    flagged_set = set(INVENTED_42_BULK_MONTHS)
+    flagged_set = set(INVENTED_ELEVATED_MONTHS)
     counts: dict[str, int] = {}
     for month in _calendar():
         if month in named_peaks:
@@ -201,9 +201,25 @@ def test_c2_invented_125_month_series_mirrors_national_data_test():
     three_total = D(counts["2020-07"] + counts["2022-06"] + counts["2024-09"])
     three_share = D(rounded(ratio(three_total * 100, dated), 1))
     assert three_share == D("47.4")
-    assert result["bulk_share_percent"].value == D("90.8")
-    assert len(INVENTED_42_BULK_MONTHS) == 42
-    assert result["bulk_months_unrounded"] == INVENTED_42_BULK_MONTHS
+    # Ten moderate peaks and the three named spikes total 5,270 of 9,000.
+    # Moderate peaks have local median 10; the last two spikes have median 100.
+    assert result["bulk_share_percent"].value == D("58.6")
+    assert len(INVENTED_ELEVATED_MONTHS) == 42
+    assert result["bulk_months_unrounded"] == (
+        "2017-06",
+        "2020-07",
+        "2020-11",
+        "2021-02",
+        "2021-04",
+        "2021-05",
+        "2021-06",
+        "2022-01",
+        "2022-02",
+        "2022-03",
+        "2022-04",
+        "2022-06",
+        "2024-09",
+    )
 
 
 def test_c2_refuses_consistently_mislabelled_national_totals():

@@ -193,3 +193,17 @@ def test_c1_card_prints_both_missing_denominators():
     )
     assert "| All licence-activities, Al Daayen | 13,600 |" in card
     assert "| Coffee shops (5630112), national | 1,042 |" in card
+
+
+def test_c2_cancelled_chain_uses_the_current_card_version(tmp_path):
+    from custodian.tests.test_series_exact_regressions import cancellation
+
+    row = {
+        **cancellation("2020", 1, 7),
+        "lbldy": "INVENTED municipality",
+        "rmz_lnsht_ltjry": "5610101",
+        "sm_lnsht_ltjry": "INVENTED activity",
+    }
+    digest = _write_cached_source(tmp_path, "lic_cancelled", [row])
+    _, chain = cache.cached(tmp_path, "lic_cancelled", digest)
+    assert chain.version == "C2-v2"

@@ -872,6 +872,14 @@ Open question to settle in your plan with options: where the archive persists so
 - Requirements: ARC-131, DAT-164, DAT-83, TST-196; [decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1; AGENTS.md rules 7, 9 and 19.
 - Delivery: hard; personas Data; status built offline; lead real-file verification and independent review waiting (S2-T49 return report).
 
+### S2-T50 — Card C2 bulk months by the centred 13-month median
+- Goal: implement decision 0078's C2 amendment with exact Decimal arithmetic and complete method lineage.
+- Acceptance criteria: [ ] C2's centred, end-cut window, zero months, strict factor and even median agree in code, document 07 and the pinned test, with decision 0078 Accepted and indexed; [ ] every new guard has planted red then green evidence, core calculation tests pass and ruff, format, mypy, check_docs and check_tree pass; [ ] the lead's pinned data-test run on the real cache exits 0 for the nine months, 54.3 percent bulk share, Doha 283 of 2,109 (13.4 percent) and Al Daayen 48 of 361 (13.3 percent) excluding, with including figures unchanged; [ ] another-maker reviewer independently recomputes the nine months from the lead's 125 national monthly totals.
+- Scope: C2 only: `eii_core.calc.public_series.bulk_months`, its method version and tests, pinned expectations and task-owned documentation; the superseded global rule and its complete 42-month list remain in C2's method note.
+- Depends: none.
+- Requirements: document 07 C2, MTH-18 and MTH-20; [decision 0078](docs/decisions/0078-c2-bulk-months-by-the-centred-median.md) items 1 to 4; AGENTS.md rules 16 to 19 and 37.
+- Delivery: hard; senior statistician and numerical-code engineer; strict method-auditor reviewer; status built locally, awaiting independent review and the lead's pinned data-test run (S2-T50 evidence in PROGRESS.md). No commit or gate approval is claimed.
+
 ## slice S3 — Living map and Public-only answer
 
 ### S3-T01 — Store interface and portable query registry
