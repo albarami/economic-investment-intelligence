@@ -43952,3 +43952,19 @@ commands and open items. Lead commit and different-maker review remain pending.
 
 - The lead moved `statsforecast==2.1.1` from its own `forecast` dependency group (commit cd4ed344) into the default `dev` group, so `uv sync --locked`, the six hosted checks and `./eii test` all install it with no change to a workflow file; the rule 44 line naming `--group forecast` is removed from both rules files in the same commit. Only `evals/forecast_spike/` imports the library (unchanged).
 - Commands: `uv lock` exit 0 (91 packages); `uv lock --check` exit 0; `uv sync --managed-python --all-packages --locked --group engine` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0. Verification rows follow in the task's ledger.
+
+### S6-T27 — review records (2026-11-20)
+
+- Lens A (methods, served through a routing service as Google Gemini 4 Carbon): APPROVED `561756c8`, no findings.
+  Its record note is applied here: the `pins.toml` note of `statsforecast` no longer says "no dependency change"; it
+  names the lead's placement in the default dev group.
+- Lens B (tests and boundaries; requested Moonshot Kimi K3.1 Pro through the same routing service, which named itself
+  Google Gemini 2.5 Pro): REJECTED on one finding, that `scripts/tests/test_forecast_spike_statistical.py` imports the
+  library outside `evals/forecast_spike/`. The lead's ruling: not a defect. That module builds the expected forecasts
+  from the library's own public interface as an oracle independent of the adapter under test; moving the oracle into
+  the experiment's folder would make the adapter check itself. The boundary the plan sets is the purity guard of
+  `eii_core` and no change under `core/` or `product/`, both verified by the lens (`git diff --name-only` returns no
+  file there).
+- Correction to the earlier rows of this task that say only the experiment's folder uses the library: the experiment
+  folder `evals/forecast_spike/` and its own test module `scripts/tests/test_forecast_spike_statistical.py` import it;
+  nothing under `core/`, `custodian/` or `product/` does.
