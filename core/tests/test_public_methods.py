@@ -20,7 +20,7 @@ from eii_core.calc.public_methods import (
     wilson,
     zone_momentum,
 )
-from eii_core.calc.public_series import rounded
+from eii_core.calc.public_series import C2_METHOD_VERSION, rounded
 
 FIXTURE = Path(__file__).parent / "fixtures/methods/public_methods.json"
 
@@ -497,6 +497,7 @@ def test_committed_method_fixture_arithmetic():
         )["value"]
     ) == D(c1["lq"][1])
     c2 = published["C2"]
+    assert c2["method_version"] == C2_METHOD_VERSION
     churn = licence_churn(
         measure(7878),
         {"2024-01": month_count("2024-01", 2510)},

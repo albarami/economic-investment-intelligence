@@ -243,6 +243,8 @@ Undated cancellations are shown as a separate count. A Wilson interval is shown 
 | Share of dated cancellations in all nine bulk months | 54.3% |
 | ISIC 5610, cancellations 2022–2024 / active May 2025 | 2,510 / 7,878 = 0.32 |
 
+2015-12 holds one cancellation and is flagged because its clipped window median is 0: any positive count exceeds three times zero.
+
 Tolerance: counts exact; shares ± 0.1 percentage point. The complete list and revised excluding figures above are from the lead's pinned-file comparison of 2026-11-20, recorded in decision 0078 item 2. The lead's data test pins every flagged month; the release method note records them. The three-month share of 43.1% continues to describe only the three named spikes.
 
 **Method note — superseded global rule.** Before decision 0078, C2 used

@@ -5513,3 +5513,7 @@ The original unnumbered review-disposition section records S2-T44 placement afte
 - TYPE: CLOSED
 - CLOSED: 2026-11-20, by [decision 0078](docs/decisions/0078-c2-bulk-months-by-the-centred-median.md) items 1 to 3, the owner's approval on the advisor's answer to S2 gate item 8. C2 now specifies the centred, end-cut thirteen-month median with factor 3 and strict comparison; the superseded global rule, 42-month list and 89.7 percent share remain in its method note.
 - EVIDENCE AND LIMIT: This append closes the method choice, preserving the original OI-207 and reconciliation history. S2-T50 records implementation and invented-fixture checks in PROGRESS.md. Another-maker review and the lead's real-cache pinned data-test run remain required by TASKS.md S2-T50; this closure does not assert either has happened or that a slice gate passed.
+
+### S2-T50 — Review follow-up
+
+- OPEN before the S2 gate (review r1 finding 4): cards C22, C30 and C31 use C2's bulk months by reference and inherit decision 0078's rule; C31 applies it to the issued series, which `bulk_months` does not cover; none is in code yet.
