@@ -596,6 +596,9 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
+        if entry.kind == "register_file":
+            lines.append(skip_line(entry.key, "lead_shell_file_input"))
+            continue
         if not token and _token_file(entry):
             if not told_absent:
                 lines.append(

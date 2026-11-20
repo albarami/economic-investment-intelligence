@@ -178,7 +178,15 @@ def test_committed_registry_follows_decision_0026() -> None:
         else:
             assert entry.decision_record == ""
         assert entry.terms_words.strip()
-        assert _DATE_TEXT.fullmatch(entry.terms_read_on)
+        if entry.kind == "register_file":
+            # S2-T49: declarations contain no invented reading. Decision 0059
+            # permits pending terms; the lead supplies the actual file receipt.
+            assert entry.key in {"biz_register", "fc_register/file"}
+            assert entry.terms_words == _MARKER
+            assert entry.terms_read_on == "pending"
+            assert entry.commit_allowed is False
+        else:
+            assert _DATE_TEXT.fullmatch(entry.terms_read_on)
 
 
 def test_none_stated_basis_is_refused(tmp_path: Path) -> None:
@@ -971,15 +979,15 @@ def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
     assert (
-        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1
-    )  # S2-T41 backup; S2-T36 register; S2-T20 atlas.
+        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2
+    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
     # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
-    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1
+    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2  # S2-T49 files.
     assert {
         entry.key
         for entry in entries
@@ -1175,6 +1183,7 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
 
     expected = {
         "satellite_cdse_backup",
+        "biz_register",
         "fc_register",
         "bldg_3dglobfp",
         "bldg_wsf3d",

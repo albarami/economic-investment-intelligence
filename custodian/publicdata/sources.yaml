@@ -12745,6 +12745,112 @@ sources:
     skip_reason: "fc_activation_review_pending"
     extension: "json"
 
+  - key: "biz_register"
+    refetch: {value: none, reason: lead_shell_file_input}
+    source_id: "biz_register"
+    slug: ""
+    kind: "register_file"
+    title_en: "Public business register file"
+    publisher: "Lead receipt required for public business register publisher"
+    licence_id: "pending"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    basis_note: "Decision 0026; personal local use. Attribution and terms as read come from the lead's key-scoped file receipt."
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: [nationality]
+    commit_allowed: false
+    release_tables: [pub_register_company, pub_register_snapshot]
+    caveat_keys: []
+    columns:
+      - {name: row_key, type: string}
+      - {name: name_ar, type: string}
+      - {name: name_en, type: string}
+      - {name: establishment_type, type: string}
+      - {name: establishment_subtype, type: string}
+      - {name: legal_form, type: string}
+      - {name: business_type, type: string}
+      - {name: business_category, type: string}
+      - {name: classification, type: string}
+      - {name: registration_status, type: string}
+      - {name: registration_issue_date, type: string}
+      - {name: registration_expiry_date, type: string}
+      - {name: licence_status, type: string}
+      - {name: licence_issue_date, type: string}
+      - {name: licence_expiry_date, type: string}
+      - {name: branches, type: string}
+      - {name: municipality, type: string}
+      - {name: zone, type: string}
+      - {name: lon, type: string}
+      - {name: lat, type: string}
+      - {name: registration_number, type: string}
+      - {name: licence_number, type: string}
+      - {name: tax_registered, type: string}
+      - {name: tax_registration_number, type: string}
+      - {name: tax_classification_year, type: string}
+      - {name: tax_type, type: string}
+      - {name: capital_qar, type: string}
+      - {name: establishment_nationality, type: string}
+      - {name: street_number, type: string}
+      - {name: building_number, type: string}
+      - {name: establishment_type_ar, type: string}
+      - {name: establishment_subtype_ar, type: string}
+      - {name: legal_form_ar, type: string}
+      - {name: classification_ar, type: string}
+      - {name: registration_status_ar, type: string}
+      - {name: licence_status_ar, type: string}
+      - {name: municipality_ar, type: string}
+      - {name: district_en, type: string}
+      - {name: district_ar, type: string}
+      - {name: block_en, type: string}
+      - {name: block_ar, type: string}
+      - {name: nationality_group, type: string}
+      - {name: nationality_group_ar, type: string}
+      - {name: establishment_nationality_ar, type: string}
+      - {name: points_at_location, type: string}
+    reconciliation: "schema metadata only; registers/contracts.py declares each lexeme format; no category values inferred"
+    skip_reason: "lead_shell_file_input"
+    extension: "csv"
+
+  - key: "fc_register/file"
+    refetch: {value: none, reason: lead_shell_file_input}
+    source_id: "fc_register"
+    slug: "file"
+    kind: "register_file"
+    title_en: "Financial-centre register file capture"
+    publisher: "Lead receipt required for financial-centre register publisher"
+    licence_id: "pending"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    basis_note: "Decision 0026; personal local use. This key maps to released source_id fc_register; the public-page row remains separate."
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: [pub_register_company, pub_register_snapshot]
+    caveat_keys: []
+    columns:
+      - {name: row_key, type: string}
+      - {name: qfc_number, type: string}
+      - {name: name_en, type: string}
+      - {name: name_ar, type: string}
+      - {name: registered_address, type: string}
+      - {name: licence_status, type: string}
+      - {name: register_order, type: string}
+    reconciliation: "schema metadata only; registers/contracts.py declares companies, geocoded and events; no category values inferred"
+    skip_reason: "lead_shell_file_input"
+    extension: "csv"
+
 forecast_series:
   - key: licence_issues
     state: held

@@ -212,7 +212,7 @@ sentences), `months` (list of `{month, status}` with status `complete` or `incom
 |---|---|---|
 | DAT-09 | A feed bundle holds `feed_manifest.json`, `coverage.json` and exactly the tables its contract names; every file's SHA-256 and row count match the bundle manifest. | Extra file, missing file, hash mismatch and row-count mismatch fixtures each fail. |
 | DAT-10 | Conformance runs before any record enters the vault. One failed test stops the build. A row-level failure quarantines the row; a feed whose quarantined rows exceed 1% of any table fails (ASSUMPTION: a proposed acceptance threshold). Reports print rule names and row counts only, never record values or identifiers. | A failing fixture stops `./eii build-world`; a 2% placeholder fixture fails the feed; a log scan finds no `SYN-` token and no field value in the report. |
-| DAT-11 | A field whose crossing class is `NEVER`, `LINK` or `QC` never appears as a column, or as a value, in any release table. | The loader check DAT-83 runs over every release; the release builder test also scans every string column for the identifier pattern of section 4, with no exception since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired `firm_list.firm_key`, and checks that a `registration_number` appears only in `register_company_list` and `pub_register_company` (DAT-83, DAT-140). |
+| DAT-11 | A field whose crossing class is `NEVER`, `LINK` or `QC` never appears as a column, or as a value, in any release table. | The loader check DAT-83 runs over every release; the release builder test also scans every string column for the identifier pattern of section 4, with no exception since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired `firm_list.firm_key`, and checks that a `registration_number` appears only in `register_company_list`, `pub_register_company` and `pub_register_snapshot` (DAT-83, DAT-140, DAT-164). |
 
 ## 4. Identifiers for synthetic entities
 
@@ -788,7 +788,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `outlet_register` | `unit_id`; `period`; `activity_node_id` (an `activity_class` node); `size_band` (`no_payroll`, `s01_09`, `s10_49`, `s50_plus`; ASSUMPTION); `outlet_count` Cnt |
 | `occupation_pay` | `unit_id`; `period`; `measure`; `basis` (`residence`, `workplace`); `occupation_group` (ISCO-08 major group `0`..`9`, `unmapped`, `other`); `band_from`, `band_to`; `earner_count` Cnt; `wage_bill` (as above) |
 | `register_company_list` | `registration_number` string (the register company's registration number, the key of `pub_register_company`; never a `SYN-` value, and held only in the release and the serving stores, DAT-140); `period` (the last month of the window only); `employee_count` int (Y: null when withheld; the company's number of employees in that month from its attached records, DAT-140); `suppression_reason_code` (Y: `CARRIED_FORWARD` when PRV-125 withholds the count, null when the count is published) |
-| `pub_register_company` | `registration_number` string (the register's own key, as in `register_company_list`; never in the repository, a brief, a fixture, a log, a ledger row, an egress record or a model payload, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 8); the fields of the register's public card as the register publishes them, person names excluded (decision 0022 item 1); `registered_cell` cell (Y: the base cell of the registered location; null when it does not resolve); `establishment_nationality` (Y: the register's establishment nationality, a company attribute, decision 0022 item 6); `source_id` (the public business register or the financial centre's public register). The full column list is set with the register's registry row in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md); for a company of the financial centre's register it keeps the tower or building that the card publishes, where it gives one, from which firms per tower are counted ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 6; DAT-168) |
+| `pub_register_company` | The closed columns, types, source applicability and nulls are specified in **Register file projections (S2-T49)** below, with the input declarations in [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md), **Register file declarations (S2-T49)**. `registration_number` is the register's own string key, as in `register_company_list`, under decision 0022 item 8; person names are excluded. `registered_cell` is nullable and resolves through the S2 frame. `source_id` is `biz_register` or `fc_register`. A tower or building may be added only after confirming that the card publishes it (decision 0023 item 6; DAT-168); an inferred geocoder label is not such confirmation. |
 | `pub_register_snapshot` | `registration_number` string (as in `pub_register_company`, under the same rules); `period` (`YYYY-MM`, the month of the snapshot); `source_id`; `registered_cell` cell (source-derived). The snapshot of a register file keeps `registered_cell` beside `registration_number`, `period` and `source_id`; it may be null where the location is unresolved. One row for each register company present in that month's snapshot ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12) |
 | `month_change` | `unit_id` (for `home_area_share`, the work unit); `period` (two adjacent months, `YYYY-MM/YYYY-MM`); `table_name` (`resident_pay`, `worker_pay`, `occupation_pay`, `home_area_share`, `outlet_register`); `measure` (`net`, `basic`; `none` for `home_area_share` and `outlet_register`); `status` (`published`, `carried_forward`: the month mark of PRV-123); `stayers`, `joiners`, `leavers` Cnt (Y: only on published `resident_pay` and `worker_pay` rows, never for an empty cohort, which carries its row forward, DAT-137; on a `municipality` or `national` unit, the exact sums of the treated cohort leaves of its published units that cover the frame, which are `cell`, `merged` and `remainder` units and never a municipality unit, [06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-16); `stayer_wage_index` decimal(7,1) (Y: the fixed-composition index of PRV-55, 100 times the stayers' wage bill in the later month over their wage bill in the earlier month, computed in the release build by `eii_core.calc` from the two treated stayer wage bills and rounded half-up to half a point; only on published rows of `money` or `quartile` tier units of those two tables at municipality level or coarser (`unit_kind` `municipality`, the municipality level of `rp_all_money`, `rp_all_quartile`, `wp_all_money` and `wp_all_quartile`, so available per municipality; or `national`) whose stayers exceed `min_earners_trend` and pass every atom test, and whose non-empty joiner and leaver cohorts each have at least `min_earners_money` earners; never by sector, because wage trends by sector come from the Public series `wage_act` of `pub_wage_table` (DAT-137); otherwise null, on every `cell`, `merged` and `remainder` unit included, and a tool returns a null index on a published row as `SUPPRESSED` with `DETAIL_NEEDS_LARGER_GROUP`; the two stayer wage bills are never released); `openings`, `closures`: withdrawn by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md), because the openings and closures of register companies are the register's own dates and monthly snapshots, Public counts of DAT-164; every component is null when `carried_forward` |
 | `presence_count` | `unit_id`; `day_type` (`weekday`, `friday`, `saturday`, `national_day`, `ramadan_day`, `match_day`); `hour` int (0 to 23, local time); `summer` bool; `segment` (`resident`, `worker`, `visitor`); `status` (`published`, `withheld`); `estimate`, `low`, `high` Cnt (Y: null when `withheld`), estimated people present in the hour, never a count of devices; `suppression_reason_code` (Y: `BELOW_PANEL_MINIMUM` when `withheld`, null otherwise) |
@@ -2387,10 +2387,12 @@ the quality measure of DAT-24.
   registration alone, and no generated group (6.1). OPEN: the register fields that show the
   main-and-branch structure, the address type and the registration and cancellation dates are
   confirmed when the file is first read, without committing the file or a field value (DAT-164).
-- OPEN (decision 0022): the columns of `pub_register_company` and of the invented stand-in register,
-  and the closed lists of `nationality_group` and `establishment_nationality` in the format of the
-  real records, are fixed with the register's registry row in document 04 and with the calibration
-  table, without committing a real value (6.1, 6.2, 7.3).
+- S2-T49 fixes the register CSV schema metadata and the closed Public projection in
+  **Register file projections (S2-T49)** and document 04 **Register file declarations (S2-T49)**.
+  OPEN (decision 0022): the real-file verification, published-tower basis, missing and ambiguous
+  keys, and the closed lists of `nationality_group` and `establishment_nationality` in the format
+  of the real records remain with the lead and calibration owner; no real value is committed
+  (6.1, 6.2, 7.3). Undeclared card categories remain open text, never inferred from source rows.
 - OPEN (DAT-169): the pooled value of a movement split is named `other`, as elsewhere in the pack; the name is checked against the nationality list when that list is committed.
 - OPEN (decision 0022): whether `employee_count` is rounded or otherwise treated under document 06
   before it crosses (DAT-140).
@@ -2541,3 +2543,62 @@ filtering or deduplication. The composition entry point is
 collision. Source, selected snapshot, method, licence and retrieval lineage travel
 with the contribution. S4-T05 supplies other contributions and its configured edit
 distance; this task introduces no new collision threshold or normaliser.
+
+## Register file projections (S2-T49)
+
+This schema records the lead's column/type/format metadata, not a source value.
+The closed `pub_register_company` column list is:
+
+`row_key` is excluded. The retained commerce fields are `name_ar`, `name_en`,
+`establishment_type`, `establishment_subtype`, `legal_form`, `business_type`,
+`business_category`, `classification`, `registration_status`,
+`registration_issue_date`, `registration_expiry_date`, `licence_status`,
+`licence_issue_date`, `licence_expiry_date`, `branches`, `municipality`, `zone`,
+`lon`, `lat`, `registration_number`, `licence_number`, `tax_registered`,
+`tax_registration_number`, `tax_classification_year`, `tax_type`, `capital_qar`,
+`establishment_nationality`, `street_number`, `building_number`,
+`establishment_type_ar`, `establishment_subtype_ar`, `legal_form_ar`,
+`classification_ar`, `registration_status_ar`, `licence_status_ar`,
+`municipality_ar`, `district_en`, `district_ar`, `block_en`, `block_ar` and
+`establishment_nationality_ar`. Additional columns are `registered_address`,
+`event`, `notice_expiration_date`, `registered_cell` and `source_id`.
+
+Every column except `registered_cell` is nullable `VARCHAR` containing a source
+lexeme; key `registration_number` and `source_id` are non-null. `registered_cell`
+is nullable `UBIGINT` and must equal the existing frame resolver's result for the
+capture's coordinates. The parser validates declared required input fields before
+writing: the date columns hold only complete ISO calendar dates; decimal
+coordinates must be finite and within geographic bounds, both present or both
+null; declared integer/year lexemes remain strings. Unknown card categories stay
+open text until the pack declares their values. No category is inferred from
+observed rows. Null never means a zero or an inferred value.
+
+The commerce source fills its fields only. `branches` is null under the supplied
+empty-only declaration; a nonempty value requires a branch-structure ruling.
+Its input-only `nationality_group`, `nationality_group_ar` and
+`points_at_location` are excluded alongside `row_key`. The financial-centre
+source fills `registration_number` from `qfc_number`, `name_en`, `name_ar`,
+`licence_status`, `registered_address`, the optional `event` and
+`notice_expiration_date`, and the geocoded `lon`, `lat` and `registered_cell`.
+Other source-inapplicable columns remain null. Internal order, row keys and
+geocoder building/match labels are excluded. Publishing a tower needs a
+confirmed published-card basis; no inferred label substitutes for it.
+
+`pub_register_snapshot` has exactly `registration_number` (`VARCHAR`, non-null),
+`period` (`VARCHAR`, non-null year-month), `source_id` (`VARCHAR`, non-null) and
+`registered_cell` (`UBIGINT`, nullable). Its composite key is the registration and
+month. Each month retains its own source and cell even when the company has
+left today's card table. Missing snapshots return `snapshot_not_kept`; a valid
+empty capture is kept. Neither table invents a registration, cancellation,
+opening or closure month. Expiry and notice dates are not cancellation dates.
+
+The CSV declarations, their lexeme formats and source-specific required/null
+rules are closed in `registers/contracts.py`; a malformed notice date, missing
+registration key, duplicate source key, duplicate company-month, wrong companion
+join or ambiguous cross-source registration refuses by name. Registrations are
+never prefixed or merged. The tables bind to method `register_file_projection`,
+version `v1`, frame ownership hash and key-scoped receipts carrying attribution,
+terms, retrieval time and every input hash. Both release kinds consume the same
+validated tables. The later full-release owner must preserve this manifest
+chain and apply the rest of DAT-83; these reusable builders do not implement the
+placeholder release command or the other tables' privacy checks.

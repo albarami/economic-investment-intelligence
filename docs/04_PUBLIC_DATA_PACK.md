@@ -421,8 +421,8 @@ no table (PUB-109).
 | `places_fsq` | the newest dated release is selected from the root listing at each refresh; the release identifier of a row comes from the selected folder name, every earlier dated snapshot is retained, and the stable registry evidence is checked against that actual release; no update rhythm is assumed; size, coverage and last period are recorded from each selected release | a further source of the places layer, for competitors and typical neighbours (PUB-102); the places are shown with the actual release date | `pub_place_fsq` | each release runs de-duplication, the reviewed mapping of every non-empty source category identifier and the complete real-name inventory again; `places_ovt` already carries Foursquare-sourced records, so the de-duplication of PUB-51 applies across the two, and the newer source wins where a place of the copy disagrees with OpenStreetMap or Overture (PUB-102, decision 0064 item 14) |
 | `worldpop_qat_agesex` | 100 m grids by age band and sex; year to be recorded at the first fetch | Public population by age and sex, shown with its source and year; whole cells summed over a chosen area (card C38, PUB-99); in the site answer of journey D2, the age profile of people living here, shown as its own Public component after the two blocks ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 11, an ASSUMPTION of that record); the generator reads it only collapsed across age and sex, as weights | `pub_pop_agesex_grid` | `public_splits: [sex]`; display only: never a criterion of a ranking, never combined with or charted with a protected or Simulated figure (caveat key `grid_cells_summed`); a cell counts when its centre lies inside the area and none is split; no worker, residence or company record carries sex or age; the 2020 grid without age and sex stays `worldpop_qat_2020` |
 | `weather_openmeteo` | hourly history; place and period to be recorded at the first fetch | typical hourly profiles by season read by the generator, never a dated day ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)); the constants of the modulation are manifest entries with ranges and a sweep | none: a generator input in the public cache and the calibration manifest | non-commercial use and CC BY 4.0 attribution; heat and the summer switch (`ref_summer_work`) are kept from counting twice, as the method of 05 states; off if the demonstrator is hosted publicly or commercially until the owner decides, following document 17's single list of permissions for real use ([17](17_DEPLOYMENT_HARDENING.md)) |
-| `biz_register` | one file of the register's public establishment records, as collected; size, fields and date to be recorded when the file is first read; from 2026-11, a snapshot of the file kept each month beside it, outside the repository, and read through the same setting ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12) | the register companies ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)): the company card's published fields, the map's establishment points that open the card, firm counts and firm density, the prospect, partner and supplier lists (D3, D4, S3), the registration number that attaches the synthetic labour and residence records to each company (decision 0022 item 2), and the name-collision test of the fictional seat and case labels; the openings and closures of register companies by area and month, from the register's own dates and its monthly snapshots, never generated (decision 0023 item 12; DAT-164 in [03](03_DATA_CONTRACTS.md)) | `pub_register_company`; `pub_register_snapshot` (the monthly snapshots, decision 0023 item 12) | the file, every register row and every registration, licence and tax number stay out of the repository, briefs, fixtures, logs and model requests (decision 0022 item 8); a monthly snapshot follows the same rules as the file; person names are excluded; the employee count shown on a card comes from the attached records, which are Synthetic, never from this source; one registration may cover several establishments ([03](03_DATA_CONTRACTS.md), open questions) |
-| `fc_register` | S2-T36 company-only page snapshots feed the complete name inventory, with retrieval date and hashes on their receipts; separately, one file of the financial centre's public company records, as collected; size, fields and date to be recorded when the file is first read; its monthly snapshots as for `biz_register` | the same uses as `biz_register` for the companies of the financial centre's public register; with [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A6, a map layer beside the companies of `biz_register`, with firms counted per tower, from the geocoded file read through `EII_FC_REGISTER_FILE` | `pub_register_company`; `pub_register_snapshot` | the same rules as `biz_register`; whether their attached jobs are covered is open ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) Q19) |
+| `biz_register` | one file of the register's public establishment records, as collected; schema metadata declared under Register file declarations (S2-T49), with actual-file size, date and verification still waiting; from 2026-11, a snapshot of the file kept each month beside it, outside the repository, and read through the same setting ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12) | the register companies ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)): the company card's published fields, the map's establishment points that open the card, firm counts and firm density, the prospect, partner and supplier lists (D3, D4, S3), the registration number that attaches the synthetic labour and residence records to each company (decision 0022 item 2), and the name-collision test of the fictional seat and case labels; the openings and closures of register companies by area and month, from the register's own dates and its monthly snapshots, never generated (decision 0023 item 12; DAT-164 in [03](03_DATA_CONTRACTS.md)) | `pub_register_company`; `pub_register_snapshot` (the monthly snapshots, decision 0023 item 12) | the file, every register row and every registration, licence and tax number stay out of the repository, briefs, fixtures, logs and model requests (decision 0022 item 8); a monthly snapshot follows the same rules as the file; person names are excluded; the employee count shown on a card comes from the attached records, which are Synthetic, never from this source; one registration may cover several establishments ([03](03_DATA_CONTRACTS.md), open questions) |
+| `fc_register` | S2-T36 company-only page snapshots feed the complete name inventory, with retrieval date and hashes on their receipts; separately, one file of the financial centre's public company records, as collected; schema metadata declared under Register file declarations (S2-T49), with actual-file size, date and verification still waiting; its monthly snapshots as for `biz_register` | the same uses as `biz_register` for the companies of the financial centre's public register; with [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A6, a map layer beside the companies of `biz_register`, with firms counted per tower, from the geocoded file read through `EII_FC_REGISTER_FILE` | `pub_register_company`; `pub_register_snapshot` | the same rules as `biz_register`; whether their attached jobs are covered is open ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) Q19) |
 | `gis_land_price` | 2026 guide prices; district polygons, five text price fields; basis per_ft2 | what land costs in an area: the cost views of journeys D2 and D5 and the map; the guide price beside the recorded deal price of the same district (PUB-107) | `pub_land_price` | a guide price, never a deal price and never a rent; terms recorded in the publisher's words with the date read; used under the owner's decision for a personal, local project (PUB-12, PUB-13), every figure with its publisher, service, retrieval date and hash, nothing fetched committed; a layer that asks for a sign-in loads nothing |
 | `gis_rail` | Planned station points, track lines and protection polygons; layers 2, 0 and 1 | how near a planned station or a protection zone is: journeys D2 and D5 and the map | `pub_rail_plan` | planned stations are plans, never shown as operating; terms recorded in the publisher's words with the date read; used under the owner's decision for a personal, local project (PUB-12, PUB-13), every figure with its publisher, service, retrieval date and hash, nothing fetched committed; a layer that asks for a sign-in loads nothing |
 | `gis_phcc` | 2026 centre points and catchment polygons, each layer 1 | health centres and their catchments on the map and in the site context of D2 and D5 | `pub_health_centre` | terms recorded in the publisher's words with the date read; used under the owner's decision for a personal, local project (PUB-12, PUB-13), every figure with its publisher, service, retrieval date and hash, nothing fetched committed; a layer that asks for a sign-in loads nothing |
@@ -1929,9 +1929,10 @@ slice S2.
   and permission needs for real use go on document 17's single list.
 - OPEN (decision 0022): the retrieval date and SHA-256 of the register file are recorded in
   `source_registry` when the file is first read; the file itself never enters the repository.
-- OPEN (decision 0022): the columns of `pub_register_company` and of the invented stand-in register
-  are set when the register file is first read, without committing the file or a field value
-  ([03](03_DATA_CONTRACTS.md), open questions).
+- S2-T49 fixes metadata-only input declarations and the closed Public projection in
+  **Register file declarations (S2-T49)** and document 03 **Register file projections (S2-T49)**.
+  OPEN: the lead's actual-file verification and the named key, notice and published-tower
+  dispositions; no source file or field value is committed.
 - OPEN (decision 0022): whether the standing note "Open listings are incomplete" (PUB-50) is
   restated against the register's count of establishments once the register file is read.
 - Settled by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12: the released series "Establishments and employment by area" of section 12 is now "Employment by area"; establishments by area are register companies by their own dates and monthly snapshots, a Public count (DAT-164 in [03](03_DATA_CONTRACTS.md)), and whether their forecast joins the list of card C30 is fixed with that list (the forecast of BRF-84 in [01](01_PROJECT_BRIEF.md)).
@@ -2084,3 +2085,45 @@ No register-specific permission or later-page coverage is inferred. Terms do not
 hold the source; the technical activation evidence does. The FC adapter README
 specifies the closed transport-failure table, producer procedure, capture receipts
 and selected-snapshot name adapter. Only the lead runs the live/capture session.
+
+## Register file declarations (S2-T49)
+
+The closed file kind is `register_file`. Registry key `biz_register` maps to
+released `source_id: biz_register`; distinct key `fc_register/file` maps to
+released `source_id: fc_register`. The existing `fc_register` public-page row,
+its page-card columns and `fc_activation_review_pending` hold are unchanged.
+Receipts are key-scoped and verify `kind` as well as released source id; a page
+receipt cannot satisfy a file input. Source-wide nightly selection considers all
+declarations, with any disabled declaration preventing an ambiguous source-wide
+fetch, independently of row order.
+
+Both file declarations contain every required registry field, no fetch URL,
+fetch host, landing URL or terms URL, `nightly_live_fetch: false`,
+`commit_allowed: false`, no automatic refetch and the technical dispatch reason
+`lead_shell_file_input`. `prepare` refuses transport for this kind and the fetch
+build skips it before any network dispatch. This is not a terms-based refusal.
+The rows record the owner's local-use basis, decision 0026. Publisher placeholders
+explicitly require the lead's receipt, and terms stay pending until read; neither
+is described as a completed reading. Actual publisher, dataset/page, licence,
+retrieval timestamp, hash, terms words/date and basis note come from the complete
+file receipt, never from a guessed attribution. The lead's real-file check is
+waiting. No fetched or file-input record belongs in this repository.
+
+`custodian/publicdata/sources.yaml` declares each primary CSV column as a string
+lexeme. The schema-only type and format per column for the commerce file and all
+three financial-centre companion roles are in
+`custodian/src/eii_custodian/publicdata/registers/contracts.py`, `SCHEMAS`.
+The declarations are UTF-8, comma-separated, headered CSV. They distinguish
+text, optional text, fixed hexadecimal row key, registration shapes, ISO
+calendar date, decimal longitude/latitude, integer, year, empty-only branch and
+the declared tax flag. Undeclared categorical sets stay open text with an
+invented unseen-category test. No source values or counts supply a closed set.
+
+The resulting columns are documented in document 03 **Register file projections
+(S2-T49)**. The read-only, hash-bound sibling selection and receipt shape are
+specified in the [register adapter README](../custodian/src/eii_custodian/publicdata/registers/README.md),
+**Sibling intake protocol**. This protocol is an interface for the lead to
+prepare and verify, not evidence that monthly files already exist. It introduces
+no further environment setting. Separate lead-reviewed byte hashes pin both
+sibling indexes, so an index overwrite cannot silently change historical
+selection. Who retains future monthly files remains open.

@@ -484,3 +484,17 @@ Open items from the master design that touch this document: OI-01 (API key and s
 - Google Cloud, "Cloud SQL extensions", https://docs.cloud.google.com/sql/docs/postgres/extensions, retrieved 2026-11-11.
 - DuckDB project, "Announcing DuckDB 2.0.0", https://duckdb.org/2026/10/21/announcing-duckdb-200, retrieved 2026-11-11.
 - Protomaps, "PMTiles CLI", https://docs.protomaps.com/pmtiles/cli, retrieved 2026-11-11.
+
+## Register file verification (S2-T49)
+
+The two register settings retain the source ids and lead-only boundary specified
+in the configuration table of **2. Environments**. The offline adapter's sibling receipt protocol is
+documented in the [register adapter README](../custodian/src/eii_custodian/publicdata/registers/README.md),
+**Sibling intake protocol**. It adds no environment setting and performs no
+fetch, geocoding, snapshot creation or directory discovery. The lead prepares
+the declared sibling indexes and the exact cell ownership projection of the
+verified S2 frame, then uses the adapter's module entry point with explicit
+frame hash, both reviewed sibling-index hashes, output and release kind. Its success message and refusals contain no
+paths, row content or keys. This entry point verifies reusable register outputs;
+it is not the placeholder `build-release` command. Actual source and monthly
+retention verification remain lead-shell work.

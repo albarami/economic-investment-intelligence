@@ -870,7 +870,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: `custodian/publicdata/` register readers, release-side builders and tests.
 - Depends: S2-T02, S2-T27, S2-T36 (name inventory only).
 - Requirements: ARC-131, DAT-164, DAT-83, TST-196; [decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1; AGENTS.md rules 7, 9 and 19.
-- Delivery: hard; personas Data; status queued.
+- Delivery: hard; personas Data; status built offline; lead real-file verification and independent review waiting (S2-T49 return report).
 
 ## slice S3 — Living map and Public-only answer
 
