@@ -27,8 +27,7 @@ The owner's words of 2026-11-20 (typing kept):
 > the company name the cr nubmer the eid their adress we can use . the mapping of qfc companeis to
 > eid or cr we can use . the company size we can use .
 
-Further owner words of 2026-11-20 (typing kept), with "the financial centre" written for any
-financial-centre name in the quotation:
+Further owner words of 2026-11-20 (typing kept):
 
 > for qfc its ok if he doesnt find a cr or eid number . the name and adress and wesbsite he can
 > fetch the web and find their adress im sure we dicussed this before and even if not let him do it
@@ -58,10 +57,9 @@ The financial centre is written as "the financial centre", as the documents alre
    number does under DAT-12, normalised under DAT-02. Give a company its size band. No value is shown
    for a named company beyond what rule 8 already allows.
 
-3. **Not decided by this record (left open, cited).** The key of the rows without a registration
-   number (OI-186), the financial centre's feed treatment (OI-190), and activity (OI-187); the owner
-   has been given the counts. Match counts were relayed to the owner outside the repository; no count
-   is stated here.
+3. **Decided register open items.** The key of the rows without a registration number (OI-186), the
+   financial centre's feed treatment (OI-190), and activity (OI-187) are decided in items 5, 7 and 6;
+   the owner was given the match counts outside the repository, and no count is stated here.
 
 4. **Rule 3 amendment.** After the calibration-table exception of rule 3, the world build and the
    lead's own shell for counting may read only the company-level columns named in item 1 of this
