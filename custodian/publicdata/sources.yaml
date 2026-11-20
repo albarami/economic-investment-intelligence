@@ -11430,12 +11430,12 @@ sources:
     reconciliation: none
     skip_reason: ''
     extension: html
-    chain_intermediate_sha256: ''
+    chain_intermediate_sha256: 6601f41fceefbe7523a6a2e746938de57fc24e99426b7bea58d1867dbee1be5e
     basis_note: 'S2-T19 LR-T4, LR-T6, LR-T9 and LR-T14: list paths /TendersOnlineServices/AvailableMinistriesTenders/<n>,
       /TendersOnlineServices/ClosedTenders/<n>, /TendersOnlineServices/TechnicallyOpenedTenders/<n>, /TendersOnlineServices/FinanciallyOpenedTenders/<n>,
       /TendersOnlineServices/AwardedTenders/<n>, /TendersOnlineServices/CancelledTenders/<n>; page size 20; Arabic
       without a language header; English with Accept-Language: en-US,en;q=0.5; sequential requests at least three
-      seconds apart. Certificate pin awaits the lead; no certificate file committed. nightly_live_fetch is false because the chain file is not in the repository and a hosted nightly job could not open the connection.'
+      seconds apart. Certificate pin set from the live run of the lead on 2026-11-19: the SHA-256 of the issuing intermediate named by the CA Issuers address of the server certificate, verified against system roots, valid to 2031-03-29; no certificate file committed. nightly_live_fetch is false because the chain file is not in the repository and a hosted nightly job could not open the connection.'
   - key: trade_ext/imports-by-nature-of-items-and-year
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
@@ -12576,20 +12576,20 @@ sources:
     release_tables: []
     caveat_keys: []
     columns:
-    - name: اسم الشركة
+    - name: Company name
       type: string
-    - name: رقم السجل التجاري
+    - name: Commercial Registration Number
       type: string
-    - name: القيمة الموافق عليها
+    - name: Approved Value
       type: number
-    - name: النتيجة المالية
+    - name: Financial Result
       type: string
-    - name: البنود الموافق عليها
+    - name: Approved Items
       type: string
     row_count_min: null
     row_count_max: null
     reconciliation: none
-    skip_reason: awards_profile_pending
+    skip_reason: ''
     extension: html
 
   - key: "satellite_cdse_backup"

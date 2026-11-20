@@ -1587,3 +1587,121 @@ def test_build_stores_each_tender_page_and_no_empty_body(
     assert not any(
         path.stat().st_size == 0 for path in cache.rglob("*") if path.is_file()
     )
+
+
+def _company_size_page(
+    language: str,
+    sizes: tuple[str, str, str],
+    *,
+    list_name: str = "awarded",
+    page: int = 1,
+) -> str:
+    """Invented card with the three sibling size labels of the public shape."""
+    labels = dict(_AR_CARD) if language == "ar" else {}
+    if list_name == "closed":
+        labels["award"] = _PUBLISH_AR if language == "ar" else "Publish date"
+    card = _awarded(
+        internal=424261,
+        title="Invented size title" if language == "en" else "عنوان حجم مخترع",
+        labels=labels,
+        notice="",
+        sizes=sizes,
+        **(_arabic_values() if language == "ar" else {}),
+    )
+    return _page(
+        card,
+        lang=language,
+        path=f"/TendersOnlineServices/{dict(LIST_PATHS)[list_name]}",
+        last_page=page,
+        current=page,
+    )
+
+
+@pytest.mark.parametrize("arabic_first", [False, True])
+@pytest.mark.parametrize(
+    ("english_sizes", "arabic_sizes", "expected"),
+    [
+        (
+            ("Micro", "Small", "Medium"),
+            ("متناهية الصغر", "صغيرة", "متوسطة"),
+            "Micro|Small|Medium",
+        ),
+        (("", "", "Medium"), ("", "", "متوسطة"), "Medium"),
+        (("", "Small", ""), ("", "صغيرة", ""), "Small"),
+    ],
+)
+def test_company_size_prefers_english_words_in_either_page_order(
+    english_sizes: tuple[str, str, str],
+    arabic_sizes: tuple[str, str, str],
+    expected: str,
+    arabic_first: bool,
+) -> None:
+    pages = [
+        (_company_size_page("en", english_sizes), "awarded", "en"),
+        (_company_size_page("ar", arabic_sizes), "awarded", "ar"),
+    ]
+    if arabic_first:
+        pages.reverse()
+    assert rows_from_pages(*pages).rows[0].company_size == expected
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+@pytest.mark.parametrize(
+    ("sizes", "expected"),
+    [
+        (("", "", "Medium"), "Medium"),
+        (("", "Small", ""), "Small"),
+        (("Micro", "", "Medium"), "Micro|Medium"),
+        ((" \n ", "\t", " "), None),
+        (("", "", ""), None),
+    ],
+)
+def test_company_size_joins_only_nonempty_slots(
+    language: str, sizes: tuple[str, str, str], expected: str | None
+) -> None:
+    pages = [(_company_size_page(language, sizes), "awarded", language)]
+    if language == "ar":
+        pages.insert(0, (_company_size_page("en", ("", "", "")), "awarded", "en"))
+    assert rows_from_pages(*pages).rows[0].company_size == expected
+
+
+@pytest.mark.parametrize("arabic_first", [False, True])
+def test_company_size_uses_arabic_when_english_slots_are_all_empty(
+    arabic_first: bool,
+) -> None:
+    pages = [
+        (_company_size_page("en", ("", "", "")), "awarded", "en"),
+        (_company_size_page("ar", ("", "", "متوسطة")), "awarded", "ar"),
+    ]
+    if arabic_first:
+        pages.reverse()
+    assert rows_from_pages(*pages).rows[0].company_size == "متوسطة"
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+@pytest.mark.parametrize("other_list", ["awarded", "closed"])
+def test_company_size_still_refuses_within_language_across_lists_and_pages(
+    language: str, other_list: str
+) -> None:
+    english = ("Micro", "Small", "Medium")
+    arabic = ("متناهية الصغر", "صغيرة", "متوسطة")
+    chosen = english if language == "en" else arabic
+    pages = [
+        (_company_size_page("en", english), "awarded", "en"),
+        (_company_size_page("ar", arabic), "awarded", "ar"),
+    ]
+    duplicate = _company_size_page(language, chosen, list_name=other_list, page=2)
+    assert (
+        rows_from_pages(*pages, (duplicate, other_list, language)).rows[0].company_size
+        == "Micro|Small|Medium"
+    )
+    changed = ("", "", chosen[-1])
+    conflict = _company_size_page(language, changed, list_name=other_list, page=2)
+    with pytest.raises(TenderError) as bad:
+        rows_from_pages(*pages, (conflict, other_list, language))
+    expected = (
+        "company_size awarded"
+        if other_list == "awarded"
+        else "company_size closed awarded"
+    )
+    assert bad.value.reason == expected

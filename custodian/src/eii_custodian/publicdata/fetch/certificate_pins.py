@@ -58,6 +58,15 @@ def verified_context(
         result.load_verify_locations(cadata=ssl.DER_cert_to_PEM_cert(pin.der))
     except (ValueError, ssl.SSLError):
         raise PinError("certificate_chain_incomplete") from None
+    if host == "monaqasat.mof.gov.qa":
+        # The same host negotiates the same single added suite for its public
+        # reports and lists; reuse the tender reader's exact suite-list guard.
+        from ..singles.tenders import TenderError, _add_tender_suite
+
+        try:
+            _add_tender_suite(result)
+        except TenderError:
+            raise PinError("certificate_chain_incomplete") from None
     return result
 
 
@@ -204,7 +213,12 @@ def load_pin(cache: Path, source: str, config: object) -> Pin:
     if config["security_review"] != "APPROVED":
         raise PinError("certificate_review_pending")
     try:
-        der = path.read_bytes()
+        der = (
+            _shared_tender_der(config["host"])
+            if source == "awards_owner_scrape"
+            and config["file"] == "tenders_pub.intermediate.pem"
+            else path.read_bytes()
+        )
     except OSError:
         raise PinError("certificate_chain_incomplete") from None
     pin = Pin(config["host"], config["sha256"], der, True)
@@ -213,6 +227,36 @@ def load_pin(cache: Path, source: str, config: object) -> Pin:
         raise PinError("certificate_host_mismatch")
     inspect_intermediate(der)
     return pin
+
+
+def _shared_tender_der(host: str) -> bytes:
+    """Reuse the existing PEM only for its exact host, checking its registry pin.
+
+    The caller additionally checks the declaration's DER pin and approval. No
+    private trust store, unchecked context or second legacy transport is added.
+    """
+    from ..singles.tenders import (
+        CHAIN_PATH,
+        TENDER_HOST,
+        TenderError,
+        _single_pem_certificate,
+    )
+    from .registry import load_registry
+
+    if host != TENDER_HOST:
+        raise PinError("certificate_host_mismatch")
+    entries = [entry for entry in load_registry() if entry.key == "tenders_pub"]
+    if len(entries) != 1 or entries[0].fetch_host != host:
+        raise PinError("certificate_chain_incomplete")
+    if any(part.is_symlink() for part in (CHAIN_PATH, *CHAIN_PATH.parents)):
+        raise PinError("intake_path_refused")
+    raw = CHAIN_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != entries[0].chain_intermediate_sha256:
+        raise PinError("certificate_chain_incomplete")
+    try:
+        return _single_pem_certificate(raw)
+    except TenderError:
+        raise PinError("certificate_chain_incomplete") from None
 
 
 def inspect_intermediate(der: bytes) -> None:

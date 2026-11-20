@@ -190,6 +190,9 @@ def test_intake_counts_and_every_row_field(tmp_path):
         "date_first": "2024-02-03",
         "date_last": "2024-02-04",
         "completeness": "unknown",
+        "stored_date_cells": 0,
+        "unparsed_date_rows": [4, 5],
+        "date_reading_assumption": "stored_day_month_swapped",
     }
     assert (batch.sha256, batch.body, batch.extension) == (
         sha256_hex(body),
@@ -297,7 +300,7 @@ def test_publish_preserves_full_lineage_and_canonical_body(tmp_path):
             "period_first": "2024-02-03",
             "period_last": "2024-02-04",
             "summary": source.summary,
-            "method": "awards.ingest_awards@v1",
+            "method": "awards.ingest_awards@v2",
             "original_scrape_date": "2026-11-03",
             "registration_inputs": inputs,
             "registration_match": {
@@ -316,7 +319,7 @@ def test_publish_preserves_full_lineage_and_canonical_body(tmp_path):
         "raw_identity": raw.sha256,
         "source_sha256": source.sha256,
         "provenance": "Public",
-        "method": "awards.ingest_awards@v1",
+        "method": "awards.ingest_awards@v2",
         "label": "owner scrape of public award reports, retrieved 2026-11-03",
     }
     assert result.body == json.dumps(expected, sort_keys=True).encode()

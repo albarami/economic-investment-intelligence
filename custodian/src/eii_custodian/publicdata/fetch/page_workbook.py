@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import io
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta
+from decimal import Decimal, InvalidOperation
 from pathlib import PurePosixPath
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
@@ -23,9 +25,12 @@ class Sheet:
     part: str
     relationship: str
     sheet_id: str
+    stored_dates: dict[str, str] = field(default_factory=dict)
 
 
-def read_sheet(body: bytes, name: str, *, cached_formulas: bool = False) -> Sheet:
+def read_sheet(
+    body: bytes, name: str, *, cached_formulas: bool = False, date_cells: bool = False
+) -> Sheet:
     """Preserve physical coordinates; reject aliases, duplicate cells and externals."""
     try:
         with ZipFile(io.BytesIO(body)) as archive:
@@ -38,6 +43,12 @@ def read_sheet(body: bytes, name: str, *, cached_formulas: bool = False) -> Shee
                     for item in ET.fromstring(archive.read("xl/sharedStrings.xml"))
                 ]
             book = ET.fromstring(archive.read("xl/workbook.xml"))
+            styles = _date_styles(archive) if date_cells else set()
+            properties = book.find("s:workbookPr", NS)
+            epoch_1904 = properties is not None and properties.get("date1904") in {
+                "1",
+                "true",
+            }
             sheets = [
                 s for s in book.findall("s:sheets/s:sheet", NS) if s.get("name") == name
             ]
@@ -60,6 +71,7 @@ def read_sheet(body: bytes, name: str, *, cached_formulas: bool = False) -> Shee
             root = ET.fromstring(archive.read(part))
             cells: dict[str, str] = {}
             rows: dict[int, list[str]] = {}
+            stored_dates: dict[str, str] = {}
             previous = 0
             for node in root.findall("s:sheetData/s:row", NS):
                 row: list[str] = []
@@ -100,8 +112,19 @@ def read_sheet(body: bytes, name: str, *, cached_formulas: bool = False) -> Shee
                         value = "".join(
                             t.text or "" for t in cell.findall("s:is//s:t", NS)
                         )
+                    elif kind == "d" and date_cells:
+                        stored_dates[reference] = (
+                            datetime.fromisoformat(value).date().isoformat()
+                        )
                     elif kind not in {"n", "str"}:
                         raise ShapeError("schema_missing")
+                    if (
+                        date_cells
+                        and kind == "n"
+                        and value
+                        and int(cell.get("s", "0")) in styles
+                    ):
+                        stored_dates[reference] = _serial_date(value, epoch_1904)
                     if formula is not None and not value:
                         raise ShapeError("schema_missing")
                     cells[reference] = value
@@ -110,6 +133,49 @@ def read_sheet(body: bytes, name: str, *, cached_formulas: bool = False) -> Shee
             merges = tuple(
                 m.get("ref", "") for m in root.findall("s:mergeCells/s:mergeCell", NS)
             )
-            return Sheet(cells, rows, merges, part, rid, sheets[0].get("sheetId", ""))
+            return Sheet(
+                cells,
+                rows,
+                merges,
+                part,
+                rid,
+                sheets[0].get("sheetId", ""),
+                stored_dates,
+            )
     except (BadZipFile, KeyError, ValueError, IndexError, ET.ParseError, OSError):
+        raise ShapeError("schema_missing") from None
+
+
+def _date_styles(archive: ZipFile) -> set[int]:
+    """Recognise date storage from OOXML styles, never infer it from a number."""
+    if "xl/styles.xml" not in archive.namelist():
+        return set()
+    root = ET.fromstring(archive.read("xl/styles.xml"))
+    formats = {14, 15, 16, 17, 22}
+    for node in root.findall("s:numFmts/s:numFmt", NS):
+        code = re.sub(r'"[^"]*"|\\.|\[[^]]*\]', "", node.get("formatCode", "")).lower()
+        if all(letter in code for letter in ("y", "m", "d")):
+            formats.add(int(node.get("numFmtId", "-1")))
+    return {
+        index
+        for index, node in enumerate(root.findall("s:cellXfs/s:xf", NS))
+        if int(node.get("numFmtId", "0")) in formats
+    }
+
+
+def _serial_date(value: str, epoch_1904: bool) -> str:
+    try:
+        serial = Decimal(value)
+        if (
+            not serial.is_finite()
+            or serial < 0
+            or (not epoch_1904 and int(serial) == 60)
+        ):
+            raise ValueError
+        days = int(serial)
+        base = date(1904, 1, 1) if epoch_1904 else date(1899, 12, 31)
+        if not epoch_1904 and days > 60:
+            days -= 1
+        return (base + timedelta(days=days)).isoformat()
+    except (ValueError, OverflowError, InvalidOperation):
         raise ShapeError("schema_missing") from None

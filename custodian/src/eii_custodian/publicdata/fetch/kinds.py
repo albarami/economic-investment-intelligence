@@ -8,6 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 from io import BytesIO
 from pathlib import Path
+from typing import TypedDict
 from urllib.parse import urlencode
 from zipfile import BadZipFile, ZipFile
 
@@ -47,6 +48,12 @@ _TRADE_AUXILIARY_SOURCES = frozenset(
 )
 
 Read = Callable[[str], Response]
+
+
+class _TenderOptions(TypedDict, total=False):
+    award_cutoff: str | None
+    cutoff_reason: str
+    workbook_sha256: str | None
 
 
 @dataclass(frozen=True)
@@ -559,6 +566,18 @@ def _paged_cards(
     )
 
     page_cache = None if cache is None else cache_directory(cache, entry.key)
+    options: _TenderOptions = {}
+    if entry.source_id == "tenders_pub":
+        from .awards import intake_cutoff
+
+        cutoff, reason, digest = (
+            intake_cutoff(cache, datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"))
+            if cache is not None
+            else (None, "intake_missing", None)
+        )
+        options = dict(
+            award_cutoff=cutoff, cutoff_reason=reason, workbook_sha256=digest
+        )
     try:
         _fetched = fetch_tenders(
             tender_https(entry, chain_file=CHAIN_PATH),
@@ -568,11 +587,12 @@ def _paged_cards(
             clock=lambda: datetime.now(UTC),
             host=entry.fetch_host,
             cache=page_cache,
+            **options,
         )
     except TenderError as exc:
         return _failed(
             entry,
-            AttemptFailure(1, entry.url, exc.reason, exc.reason, exc.reason),
+            AttemptFailure(1, entry.url, exc.reason, "", ""),
         )
     return Prepared(
         b"", entry.url, entry.fetch_host, entry.publisher, "", None, "", None

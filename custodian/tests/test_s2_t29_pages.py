@@ -64,8 +64,18 @@ def test_registry_sources_and_receipts():
         assert row.row_count_min is None and row.row_count_max is None
         declaration = load_declaration(source)
         assert declaration["version"] == 2 and declaration["evidence"]
-        assert declaration["max_bytes"] is None
-        assert declaration["hold"] is not None or declaration["kind"] == "refusal"
+        if source == "awards_owner_scrape":
+            assert declaration["max_bytes"] == 4 * 1024 * 1024
+            assert declaration["hold"] is None and row.skip_reason == ""
+            assert declaration["profile"]["sheet"] == "Awarded Contracts "
+            assert declaration["profile"]["proof_columns"] == {
+                "company": "Company name",
+                "registration": "Commercial Registration Number",
+                "value": "Approved Value",
+            }
+        else:
+            assert declaration["max_bytes"] is None
+            assert declaration["hold"] is not None or declaration["kind"] == "refusal"
 
 
 @pytest.mark.parametrize(

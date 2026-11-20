@@ -2873,6 +2873,8 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED BY: the slice S2 gate's record of random failures.
 - UPDATE 2026-11-20: a third occurrence in the lead's ledger run S2-7.ledger2 on the same head 33df1963 (2026-11-20): the ledger row `cd web && npm run test:checks` exited 1 with one failure, the browser test "roads full street load draws every link and carries the Simulated mark" stopping at its readiness wait after about 170 seconds while the machine's load average stood near 60; the other 16 rows passed, the whole test among them (11846 passed, 0 failed). The rerun S2-7.ledger3 with a fresh seed passed every row; under rule 39 that rerun does not close this item.
 
+
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4604,6 +4606,28 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 - Source: TRAIN-S2-7.conf1.md, source line 52: - (record) The S2-T44 task section lands at a different line offset in the joined TASKS.md than in its approved parent (insertions above shifted it); content identical — noted for the ledger only.
   Disposition: This is the same placement/offset note, explicitly for the ledger only. Content equality is in Q2. Recorded here and in log.md; no second OPEN item or implementation fix.
 
+Maker: OpenAI. Model: GPT-6 (Codex).
+
+Proposals from the supplied two reviews, preserved without inventing a defect or a closure. References use review check and proposal anchors. No existing proposal is renumbered.
+
+### PO-S2-140 — Assert the reviewed intermediate digest, beyond its shape
+
+- ID: PO-S2-140
+- TYPE: OPEN
+- RAISED BY: .overnight/IN/reviews/S2-T19-pin.rev1.md final proposed hardening item; review APPROVED recorded by the lead at 20:35 on 2026-11-19.
+- EVIDENCE: the reviewer proposes supplementing test_the_registry_holds_the_reviewed_pin’s lowercase-hex/length test with equality to the reviewed digest, so a future wrong-but-well-formed pin fails at test time. The reviewer explicitly says this is not a finding under its brief.
+- NEEDED: evaluate and route the hardening proposal under the slice’s proposal process; any adopted test must have its wrong-but-well-formed plant. No implementation or closure is claimed by this draft.
+- COMPARISON: OI-340 concerns the host’s cipher limitation, not the shape of its intermediate hash. Current hash/verification guards remain in force.
+
+### PO-S2-141 — Correct the credential-refusal explanation for the tender path
+
+- ID: PO-S2-141
+- TYPE: OPEN
+- RAISED BY: .overnight/IN/reviews/S2-T19-suite.rev1.md, final record proposal; lead RESULT at 21:11 on 2026-11-19 directs it to OI-340’s pull request.
+- EVIDENCE: document 04 section 2 says the page transport refuses credentials, but the page-scoped refusal is not invoked on the tender path. The reviewer identifies the actual guarantee as passing no token and sending only Accept-Language. Its verdict remains APPROVED and it labels this a non-rejecting record item.
+- NEEDED: reword that parenthetical to the actual tender path and attach the exact documentation correction and source inspection in OI-340’s pull request. The proposed wording is information for the lead, not a tracked edit made by this preparation.
+- COMPARISON: this explanation correction does not broaden transport behavior or resolve the lack of forward secrecy recorded by OI-340.
+
 ## Sources
 
 - The master open-item decisions and defaults reflected in [01_PROJECT_BRIEF.md](docs/01_PROJECT_BRIEF.md), [09_AI_ASSISTANT.md](docs/09_AI_ASSISTANT.md) and [decision 0014](docs/decisions/0014-typed-decision-gateway.md).
@@ -4902,3 +4926,47 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - FIX: S2-T42 runs both requests through the same polling function and startup deadline, bounds requests and pauses by the remaining startup and outer budgets, retries only the existing not-yet errors, and names the entry URL on startup expiry. Virtual-clock plants cover delayed success, a never-answering entry, immediate 404 and wrong-content-type failures, other errors, shared-budget expiry and the outer bound. Four temporary source violations each produce exit 1 and are removed; commands and final checks are appended in PROGRESS.md under S2-T42.
 - NEEDED: Another maker confirms the task's local result; the lead supplies the hosted and exact-merge whole-test evidence before recording closure. A green rerun alone does not close this random failure. OI-323 follows the highest ID on the brief's supplied base; local main/origin tracking refs are older, and the lead may renumber at the join if needed.
 - NEEDED BY: S2-T42 review and the slice S2 gate.
+
+
+## OI-340 — The tender host requires one scoped RSA-key-exchange TLS suite
+
+- ID: OI-340
+- TYPE: OPEN
+- RAISED BY: the lead, Anthropic Claude Opus 5.5; LIVE-S2.r5 result in the supplied facts, 2026-11-19.
+- CONCERNS: S2-T19; tender-host compatibility; `singles/tenders.py::chain_context` and `_add_tender_suite`; document 04 section 2.
+- EVIDENCE: `.overnight/IN/facts.txt`, LIVE-S2.r5 result, reports exit 1, 241 PASS lines and tenders_pub http_status after SSLZeroReturnError. The host negotiates TLS 1.2 AES128-GCM-SHA256 with RSA key exchange, absent from the project interpreter defaults (Python 3.14.6, OpenSSL 3.5.7). Original 537c0a7aebc10569a1beeb58581361635efcf05a, picked as 2929417f094cf3bdbb00ec81b4dc597c7a6113cc, appends only that suite to the host-scoped verifying context. It supplies no forward secrecy.
+- REVIEW: `.overnight/IN/reviews/S2-T19-suite.rev1.md`, K1 to K5 and final verdict APPROVED; Cognition Devin SWE-2 High attribution from `.overnight/IN/old-spec/log.md`, Tender TLS suite task log. Parent-code and grown-list-guard plants were independently reproduced by that reviewer.
+- REMAINS: public pages, no credential or cookie; exact host scope, verification, hostname checking, security level, TLS floor and partial-chain refusal stay unchanged. Live success cannot close the host's lack of forward secrecy. PO-S2-141 preserves the reviewer proposal to correct the explanation of credential handling.
+- NEEDED: retain host, cipher and interpreter evidence; when the host offers a forward-secret suite, assess removal in a separately reviewed change with refusal plants. Never broaden cipher lists or disable verification to close this item.
+- NEEDED BY: slice S2 evidence review; no task, train or gate approval follows from this record.
+
+## OI-343 — The build exit detail retains an empty address slot
+
+- ID: OI-343
+- TYPE: OPEN
+- RAISED BY: `.overnight/IN/reviews/S2-T29W.conf1.md`, RECORD NOTES item 1; Cognition Devin SWE-2 High, CONFIRMED.
+- CONCERNS: S2-T29; `fetch/build.py::FetchFailure.detail`.
+- EVIDENCE: the confirmation and the current property show that an empty `url` leaves a double space between source and check. The separate FAIL log line already omits the empty slot; that fix does not fix the build exit detail.
+- NEEDED: a later scoped fix omits the empty address slot, with a planted empty-url failure proving exact single spacing and genuine expected/observed comparisons preserved. This train records the cosmetic defect only; no fix or closure is claimed.
+- NEEDED BY: the later diagnostic fix and its independent review.
+
+## OI-344 — The awards workbook is incomplete within its own date range
+
+- ID: OI-344
+- TYPE: OPEN
+- RAISED BY: the lead's join test, `.overnight/IN/facts.txt`, L-1198, 2026-11-20.
+- CONCERNS: S2-T13, S2-T19 and S2-T29; decision 0069 items 3 and 4.
+- EVIDENCE: the saved English awarded page 403 has 20 cards dated 14/05/2025, within the workbook range: 12 matched one workbook row each on the exact report identifier with the same date; 8 were absent. Saved pages 203 and 78 are newer than the workbook and each matched 0 of 20. This is attributed lead evidence, not a workbook or cache read by this worker.
+- REMAINS: the join works, but the cut-off is only the newest parsed workbook award date, never a completeness claim for earlier dates. Portal-list fields and workbook winner/value fields retain separate dated lineage; absent workbook fields are never invented.
+- NEEDED: under the owner's decision of 2026-11-20 recorded in L-1198, fetch the older awarded pages once after the S2 gate as paced, cached enrichment; re-check whole-list date ordering, retain receipts and hashes, count matches and gaps, and add available list fields for workbook gaps. Closure needs that run and independent review; the incremental cut-off alone cannot close it.
+- NEEDED BY: the post-S2-gate enrichment step; no extra pre-gate full awarded-history read is authorized here.
+
+## OI-345 — A failed tender merge leaves the fetched pages without durable evidence
+
+- ID: OI-345
+- TYPE: OPEN, proposed change; not built.
+- RAISED BY: the lead's LIVE-S2.r6 cause, `.overnight/IN/facts.txt`, L-1189, 2026-11-20.
+- CONCERNS: S2-T19 tender fetching and failure evidence.
+- EVIDENCE: L-1189 records that the fetch kept every page in memory and wrote nothing on the company-size merge failure; four hours of fetching left no page evidence and the lead's probe had to fetch again. The supplied brief records r6 duration as 4 h 13 min, exit 1; `.overnight/IN/live-r6.tail.txt` records company_size awarded.
+- NEEDED: propose and independently review durable failure evidence through the existing bounded, hash-pinned cache and receipt seam, with an invented merge-failure plant proving fetched-page evidence survives refusal. A failed build must remain failed and its pages must not masquerade as a verified release. No implementation, resume behavior or successful recovery is claimed by this train.
+- NEEDED BY: a later scoped acquisition-evidence change; do not re-fetch the full awarded history before the S2 gate against the owner's decision.

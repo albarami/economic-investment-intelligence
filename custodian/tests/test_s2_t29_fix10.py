@@ -132,6 +132,16 @@ def test_f2_tender_requires_root_chain(tmp_path, monkeypatch):
         verify_mode = ssl.CERT_REQUIRED
         check_hostname = True
         verify_flags = ssl.VERIFY_X509_PARTIAL_CHAIN
+        # The suite list a real context holds (LIVE-S2.r5 added the host's suite).
+        minimum_version = ssl.TLSVersion.TLSv1_2
+        security_level = 2
+        suites = ("ECDHE-RSA-AES128-GCM-SHA256",)
+
+        def get_ciphers(self):
+            return [{"name": n, "protocol": "TLSv1.2"} for n in self.suites]
+
+        def set_ciphers(self, spec):
+            self.suites = tuple(n for n in spec.split(":") if not n.startswith("@"))
 
         def load_verify_locations(self, *, cadata):
             # S2-T08 part B, mismatch 7: trust is added from the inspected

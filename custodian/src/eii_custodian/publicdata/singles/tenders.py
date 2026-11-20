@@ -14,7 +14,7 @@ import ssl
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass, replace
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -44,6 +44,9 @@ from eii_custodian.publicdata.singles.tenders_html import (
 )
 
 TENDER_HOST = "monaqasat.mof.gov.qa"
+# The one TLS 1.2 suite the tender host negotiates (RSA key exchange); the
+# interpreter default list holds none it accepts (LIVE-S2.r5).
+TENDER_SUITE = "AES128-GCM-SHA256"
 _TENDER_CHAIN: ContextVar[tuple[ssl.SSLContext, str] | None] = ContextVar(
     "tender_checked_chain", default=None
 )
@@ -51,6 +54,7 @@ CHAIN_PATH = Path("data/public_chain/tenders_pub.intermediate.pem")
 _PEM_BEGIN = "-----BEGIN CERTIFICATE-----"
 _PEM_END = "-----END CERTIFICATE-----"
 PAGE_SIZE = 20
+AWARD_CONTINUITY_PAGES = 2
 PACE_S = 3
 KIND = "paged_cards"
 LIST_PATHS = (
@@ -98,7 +102,7 @@ _TENDER_KEY = re.compile(r"\Atnd_[0-9a-f]{16}(?:_[1-9][0-9]*)?\Z")
 _MONEY = Decimal("0.01")
 _DATE_FIELDS = frozenset({"award_date", "publish_date", "closing_date", "cancel_date"})
 _AMOUNT_FIELDS = frozenset({"bond", "documents"})
-_SPLIT = ("buying_entity", "category", "tender_type", "cancel_reason")
+_SPLIT = ("buying_entity", "category", "tender_type", "cancel_reason", "company_size")
 _SHARED = (
     "publish_date",
     "award_date",
@@ -106,7 +110,6 @@ _SHARED = (
     "cancel_date",
     "bond",
     "documents",
-    "company_size",
 )
 _IDENTIFIER_COLUMNS = frozenset(
     {
@@ -303,6 +306,13 @@ class ListReading:
     last_stated_last: int
     first_hour: str
     last_hour: str
+    pages_read: int = 0
+    stop_page: int | None = None
+    award_cutoff: str | None = None
+    cutoff_reason: str = ""
+    workbook_sha256: str | None = None
+    continuity_pages: int = 0
+    last_page_read: int = 0
 
 
 @dataclass(frozen=True)
@@ -528,11 +538,38 @@ def chain_context(path: Path, pin: str, *, host: str = TENDER_HOST) -> ssl.SSLCo
     context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     if context.verify_mode != ssl.CERT_REQUIRED or not context.check_hostname:
         raise TenderError("certificate_chain_incomplete")
+    _add_tender_suite(context)
     try:
         context.load_verify_locations(cadata=der)
     except (ValueError, ssl.SSLError):
         raise TenderError("certificate_chain_incomplete") from None
     return context
+
+
+def _tls12_suites(context: ssl.SSLContext) -> list[str]:
+    return [c["name"] for c in context.get_ciphers() if c["protocol"] == "TLSv1.2"]
+
+
+def _add_tender_suite(context: ssl.SSLContext) -> None:
+    """Append the host's one suite to the default list, last, and change nothing else.
+
+    The default suites keep their order and the security level; the protocol
+    floor stays at TLS 1.2. A list that grew by anything but the one suite is
+    refused.
+    """
+    default = _tls12_suites(context)
+    level = context.security_level
+    if context.minimum_version < ssl.TLSVersion.TLSv1_2:
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+    try:
+        context.set_ciphers(":".join([f"@SECLEVEL={level}", *default, TENDER_SUITE]))
+    except ssl.SSLError:
+        raise TenderError("certificate_chain_incomplete") from None
+    if (
+        _tls12_suites(context) != [*default, TENDER_SUITE]
+        or context.security_level != level
+    ):
+        raise TenderError("certificate_chain_incomplete")
 
 
 def _single_pem_certificate(raw: bytes) -> bytes:
@@ -565,9 +602,18 @@ def fetch_tenders(
     only_urls: tuple[str, ...] | None = None,
     host: str = TENDER_HOST,
     cache: Path | None = None,
+    award_cutoff: str | None = None,
+    cutoff_reason: str = "",
+    workbook_sha256: str | None = None,
 ) -> FetchResult:
     """Fetch the six lists in both languages through the injected transport."""
     chosen = tuple(item[0] for item in LIST_PATHS) if lists is None else lists
+    if award_cutoff is not None:
+        try:
+            if date.fromisoformat(award_cutoff).isoformat() != award_cutoff:
+                raise ValueError
+        except ValueError:
+            raise TenderError("award_cutoff_invalid") from None
     context = chain_context(chain_file, chain_sha256, host=host)
     if only_urls is not None:
         flags = (int(context.verify_mode), bool(context.check_hostname))
@@ -603,7 +649,20 @@ def fetch_tenders(
             bound = first_raw.stated_last
             _require_count(len(first_raw.cards), is_last=bound == 1)
             pages = [(1, first_text, first_raw, first_hour)]
+            stop_page = None
+            previous_date: str | None = None
+            if list_name == "awarded" and award_cutoff is not None:
+                previous_date, stop = _award_page(
+                    first_raw, language, award_cutoff, previous_date
+                )
+                if stop:
+                    stop_page = 1
             for number in range(2, bound + 1):
+                if (
+                    stop_page is not None
+                    and number > stop_page + AWARD_CONTINUITY_PAGES
+                ):
+                    break
                 body, hour = _get(
                     transport,
                     list_page(host, slug, number),
@@ -618,6 +677,16 @@ def fetch_tenders(
                 raw = _checked_page(text, language)
                 _require_count(len(raw.cards), is_last=number == bound)
                 pages.append((number, text, raw, hour))
+                if list_name == "awarded" and award_cutoff is not None:
+                    previous_date, stop = _award_page(
+                        raw,
+                        language,
+                        award_cutoff,
+                        previous_date,
+                        after_stop=stop_page is not None,
+                    )
+                    if stop and stop_page is None:
+                        stop_page = number
             last_raw = pages[-1][2]
             readings.append(
                 ListReading(
@@ -627,6 +696,15 @@ def fetch_tenders(
                     last_raw.stated_last,
                     pages[0][3],
                     pages[-1][3],
+                    len(pages),
+                    stop_page,
+                    award_cutoff if list_name == "awarded" else None,
+                    cutoff_reason if list_name == "awarded" else "",
+                    workbook_sha256 if list_name == "awarded" else None,
+                    continuity_pages=len(pages) - stop_page
+                    if stop_page is not None
+                    else 0,
+                    last_page_read=pages[-1][0],
                 )
             )
             for _number, text, _raw, _hour in pages:
@@ -635,6 +713,30 @@ def fetch_tenders(
     if cache is not None:
         _write_pages(cache, stored, readings)
     return FetchResult(merged.rows, _coverage(merged, readings), tuple(readings))
+
+
+def _award_page(
+    raw: RawPage,
+    language: str,
+    cutoff: str,
+    previous: str | None,
+    *,
+    after_stop: bool = False,
+) -> tuple[str | None, bool]:
+    """Check newest-first order before deciding whether this whole page is covered."""
+    dates: list[str] = []
+    for card in raw.cards:
+        value = _interpret(card, "awarded", language).values.get("award_date")
+        if not isinstance(value, str):
+            # A missing date cannot establish coverage of this page.
+            raise TenderError("award_date_missing")
+        if after_stop and value > cutoff:
+            raise TenderError("award_after_stop")
+        if previous is not None and value > previous:
+            raise TenderError("award_order_invalid")
+        dates.append(value)
+        previous = value
+    return previous, bool(dates) and all(value <= cutoff for value in dates)
 
 
 def _write_pages(
@@ -648,6 +750,23 @@ def _write_pages(
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(body)
     for reading in readings:
+        if reading.stop_page is not None:
+            # These numbered files are the mutable current read, not the
+            # immutable snapshot archive. Do not hash a prior full read's tail.
+            directory = cache / reading.list_name / reading.language
+            kept = {
+                f"{number}.html"
+                for name, language, number, _body in stored
+                if name == reading.list_name and language == reading.language
+            }
+            for stale in directory.glob("*.html"):
+                if stale.name not in kept:
+                    stale.unlink()
+        pages_read = reading.pages_read or sum(
+            1
+            for name, language, _number, _body in stored
+            if name == reading.list_name and language == reading.language
+        )
         payload = {
             "list_name": reading.list_name,
             "language": reading.language,
@@ -655,6 +774,13 @@ def _write_pages(
             "last_stated_last": reading.last_stated_last,
             "first_hour": reading.first_hour,
             "last_hour": reading.last_hour,
+            "pages_read": pages_read,
+            "stop_page": reading.stop_page,
+            "continuity_pages": reading.continuity_pages,
+            "last_page_read": reading.last_page_read or pages_read,
+            "award_cutoff": reading.award_cutoff,
+            "cutoff_reason": reading.cutoff_reason,
+            "workbook_sha256": reading.workbook_sha256,
         }
         path = cache / reading.list_name / f"{reading.language}.receipt.json"
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -797,6 +923,7 @@ def _row_for(group: Sequence[_Parsed]) -> TenderRow:
     entities = _field_by_language(group, "buying_entity")
     categories = _field_by_language(group, "category")
     kinds = _field_by_language(group, "tender_type")
+    sizes = _field_by_language(group, "company_size")
     buying_entity = _as_text(entities.get("en"))
     if not buying_entity:
         raise TenderError("missing_buying_entity")
@@ -821,7 +948,7 @@ def _row_for(group: Sequence[_Parsed]) -> TenderRow:
         documents_value_qar=_as_decimal(
             _shared(group, "documents", "documents_value_qar")
         ),
-        company_size=_as_text(_shared(group, "company_size", "company_size")),
+        company_size=_as_text(sizes.get("en") or sizes.get("ar")),
         lists=_lists(group),
     )
 

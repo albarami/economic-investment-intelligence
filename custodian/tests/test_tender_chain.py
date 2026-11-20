@@ -30,6 +30,7 @@ from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.singles import tenders
 from eii_custodian.publicdata.singles.tenders import (
     TENDER_HOST,
+    TENDER_SUITE,
     TenderError,
     chain_context,
     fetch_tenders,
@@ -177,11 +178,19 @@ def test_fetch_tenders_scopes_the_chain_to_its_host(tmp_path: Path) -> None:
     assert calls == []
 
 
-def test_without_a_reviewed_chain_the_refusal_is_truthful(tmp_path: Path) -> None:
-    # The registry holds no reviewed pin: even a valid invented intermediate
-    # is refused before any request, with the truthful reason.
+def test_the_registry_holds_the_reviewed_pin() -> None:
+    # The live run of 2026-11-19 placed the intermediate and its SHA-256 was
+    # reviewed into the registry; the pin is one lowercase SHA-256, never empty.
     row = next(r for r in load_registry() if r.key == "tenders_pub")
-    assert row.chain_intermediate_sha256 == ""
+    pin = row.chain_intermediate_sha256
+    assert len(pin) == 64 and set(pin) <= set("0123456789abcdef")
+
+
+def test_without_a_reviewed_chain_the_refusal_is_truthful(tmp_path: Path) -> None:
+    # A row without a reviewed pin: even a valid invented intermediate is
+    # refused before any request, with the truthful reason.
+    committed = next(r for r in load_registry() if r.key == "tenders_pub")
+    row = replace(committed, chain_intermediate_sha256="")
     path, _pin = _file(tmp_path, intermediate_pem())
     with pytest.raises(TenderError) as refused:
         tenders.tender_https(row, chain_file=path)
@@ -202,3 +211,39 @@ def test_inspect_intermediate_is_the_load_pin_inspection() -> None:
     ):
         with pytest.raises(PinError, match=r"^certificate_chain_incomplete$"):
             inspect_intermediate(planted)
+
+
+def _tls12_suites(context: ssl.SSLContext) -> set[str]:
+    return {c["name"] for c in context.get_ciphers() if c["protocol"] == "TLSv1.2"}
+
+
+def test_the_tender_context_adds_only_the_hosts_one_suite(tmp_path: Path) -> None:
+    # LIVE-S2.r5: the tender host negotiates TLS 1.2 with RSA key exchange only
+    # (AES128-GCM-SHA256); the interpreter's default list holds no such suite, so
+    # every handshake closed. The tender context adds that one suite and keeps
+    # every default suite, the protocol floor and certificate verification.
+    default = ssl.create_default_context()
+    assert TENDER_SUITE not in _tls12_suites(default)
+    path, pin = _file(tmp_path, intermediate_pem())
+    context = chain_context(path, pin)
+    assert _tls12_suites(context) - _tls12_suites(default) == {TENDER_SUITE}
+    assert _tls12_suites(default) <= _tls12_suites(context)
+    assert context.minimum_version >= ssl.TLSVersion.TLSv1_2
+    assert context.security_level == default.security_level
+    assert context.verify_mode == ssl.CERT_REQUIRED and context.check_hostname
+
+
+def test_a_wider_suite_list_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Planted: a context whose suite list grew beyond the one named suite.
+    original = ssl.SSLContext.set_ciphers
+
+    def wide(self: ssl.SSLContext, spec: str) -> None:
+        original(self, spec + ":AES256-GCM-SHA384")
+
+    monkeypatch.setattr(tenders.ssl.SSLContext, "set_ciphers", wide)
+    path, pin = _file(tmp_path, intermediate_pem())
+    with pytest.raises(TenderError) as refused:
+        chain_context(path, pin)
+    assert refused.value.reason == INCOMPLETE

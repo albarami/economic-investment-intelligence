@@ -38119,6 +38119,1136 @@ Seed:      1604699100
 Notes:     Required lead whole-test row at WORK: provider none, no network and unchanged limits; the real run requires a fresh seed. Historical whole tests belong to their recorded heads. Current moved-head, hosted/head and exact merge-result results remain separate required lead evidence; draft placeholder values are not a fresh-seed run.
 ```
 
+### MERGE TRAIN S2-8 — Slice S2: task log (pull request 105)
+
+Maker: OpenAI; model: GPT-6 (Codex). Senior release-records engineer; strict records-auditor self-review. Loaded skills and source attributions are recorded in PROGRESS.md, “Train S2-8 records — five-commit composition and live evidence”.
+
+Base ff3dd5de85a72af88343ac2bad90994865f888c8; 97c0f914addc393e079b3e7b6fb3afcb31335e0a is the lead's containing records commit; seed 1880996636 is the lead's whole-test seed of ledger try 4 (try 3 ran its whole test with the try-2 seed because the lead's hand patch of the spec left the suite row's command unchanged, and the ledger's seed check refused the row; try 2, seed 3112504094, found the failure below). The five source/pick identities and supplied verdicts are in identity-proof.json and that PROGRESS block. This companion does not manufacture a new review or repeat the already appended open items.
+
+Live r5/r6 exited 1; r7 exited 143 when stopped to comply with the owner's decision. The join test and workbook gaps are attributed to facts.txt L-1198; OI-340 and OI-343 to OI-345 remain open. items.md mirrors the four items already appended: verify exact content and never insert them twice. po_items.md contains proposals only. All TASKS checkboxes remain unchanged; future status/reference substitutions are exact pairs in tasks_md.json.
+
+Preparation is non-executable until 97c0f914addc393e079b3e7b6fb3afcb31335e0a and 1880996636 are resolved by make_spec.py after the lead commits records. Future WORK checks, another-maker joined-head approval, the size-review maker reconciliation, hosted/head checks, the seeded live run on the merged head and the fresh-seed whole test on the exact merge result remain owed. No current source approval is represented as final joined-head approval.
+
+Forced difference of the join (ruling L-1208): ledger try 2 (seed 3112504094) failed five cases of custodian/tests/test_trade_reconciliation_release.py on 97c0f914, in the row of that file and in the whole test (python-custodian-2: 5 failed, 3900 passed). Cause: the approved continuity fix 7dd51d48 makes fail_line drop the empty address slot, and two expectations of that test, merged before this train, still held the old double space; neither the builder's checks nor the confirmation ran that file. The lead's commit 9b7980ee836e4926924086d847bf1882bc095580 changes only those two expected strings to the single space, each still an exact match; it is the one forced test difference of this train and carries another maker's confirmation before the push. The row of custodian/tests/test_page_workbook_survivors_1.py is pinned as "14 passed, 1 warning": the warning is the UserWarning that its duplicate-entry test plants on purpose.
+
+#### Evidence for the work commit `9b7980ee836e4926924086d847bf1882bc095580`
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_additions_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_boundaries.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    19 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_atlas_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    61 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    29 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    53 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmark_access.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    39 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmarks_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    106 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_comtrade_plants.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    40 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_feature_polygon_column.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    27 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    36 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_4.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_report_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_frame_coverage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    32 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_layers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_paged.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_reference_inheritance.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_atlas_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_intake_ceiling.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    64 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_evidence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    43 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_large_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_local_file_report.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_mepi_long_form.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    41 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    14 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed, 1 warning in 0.04s" (the one warning is the UserWarning 'Duplicate name' that test_read_sheet_duplicate_zip_entries_refused plants on purpose (lead ruling L-1208); the count of passes and warnings is pinned)
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_period_year_text_rows.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_build_date.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    23 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    1 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_production_adapters.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    15 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_property_quarter.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    28 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_data_stage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    118 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_public_snapshots.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_besttime_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    52 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    76 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_licence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_listing_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    25 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    17 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    42 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    46 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    50 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    44 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    91 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    81 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    65 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    37 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    51 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    26 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_snapshot_refusals.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    57 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    33 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    67 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_attempts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_fingerprint.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_release.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    62 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    20 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test or direct AST import of a changed module. Coverage anchors and import evidence: test-inventory.json. Future WORK result owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "828 files already formatted"
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 445 source files"
+Seed:      none
+Notes:     Lead check at resolved WORK owed.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1126 text files, 121 Markdown files: OK"
+Seed:      none
+Notes:     Repeat at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repeat at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte parity at resolved WORK.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','ff3dd5de85a72af88343ac2bad90994865f888c8...9b7980ee836e4926924086d847bf1882bc095580'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/test_awards_incremental.py A:docs/decisions/0069-the-tender-workbook-taken-as-is-and-the-portal-read-incrementally.md M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/review/s2_t29_sources.yaml M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/assembly_adapters.py M:custodian/src/eii_custodian/publicdata/assembly_intake.py M:custodian/src/eii_custodian/publicdata/assembly_tenders.py M:custodian/src/eii_custodian/publicdata/fetch/awards.py M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/certificate_pins.py M:custodian/src/eii_custodian/publicdata/fetch/kinds.py M:custodian/src/eii_custodian/publicdata/fetch/page_workbook.py M:custodian/src/eii_custodian/publicdata/fetch/report.py M:custodian/src/eii_custodian/publicdata/singles/tenders.py M:custodian/src/eii_custodian/publicdata/singles/tenders_html.py M:custodian/tests/test_assembly_intake.py M:custodian/tests/test_assembly_tenders.py M:custodian/tests/test_awards_survivors_1.py M:custodian/tests/test_fetch_kinds_survivors_3.py M:custodian/tests/test_s2_t29_awards.py M:custodian/tests/test_s2_t29_fix.py M:custodian/tests/test_s2_t29_fix10.py M:custodian/tests/test_s2_t29_pages.py M:custodian/tests/test_tender_chain.py M:custodian/tests/test_tenders.py M:custodian/tests/test_trade_reconciliation_release.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/README.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "33 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK scope.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','ff3dd5de85a72af88343ac2bad90994865f888c8..9b7980ee836e4926924086d847bf1882bc095580'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Five picks, the lead records commit and the lead forced-difference test commit (L-1208); linear.
+```
+
+```text
+### MERGE TRAIN S2-8 — Slice S2: task log
+Commit:    9b7980ee836e4926924086d847bf1882bc095580
+Command:   ./eii test --seed 1880996636
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11958 passed, 0 failed, 0 skipped
+Seed:      1880996636
+Notes:     Lead only, owed; never executed by this preparation. Hosted/head checks and fresh-seed exact merge-result run remain separate.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -40710,3 +41840,254 @@ Fix: the test keeps both address assertions and now asserts that the placeholder
 - planted violation: with the placeholder written back into that cell, the fixed test fails (1 failed, 21 passed); the document restored, 22 passed and the tree shows only the test change.
 - `uv run --locked ruff check` and `ruff format --check` on the file: exit 0.
 - Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, named in the ledger of the pull request of train S2-7.
+
+## S2-T19 — The tender host's intermediate pin from the live run (lead, 2026-11-19)
+
+Live run 4 of `./eii build-public` on main `260ae461f221c7ac8fd100fa8e0a044f5ed4a1eb` (cores 10 and 11, 19:48 to 20:14) exited 1 with 241 PASS lines and one failing source, `tenders_pub`, refused with `certificate_chain_incomplete`: the registry pin was still empty, as document 04 section 2 recorded ("pending the lead's real run"). From the lead's shell only, the lead read the server certificate's CA Issuers address, fetched the issuing intermediate once, converted it to one PEM certificate, verified it against the system roots (`openssl verify` exit 0, and the server certificate verified with it as the only untrusted certificate, exit 0; validity ends 2031-03-29), and placed it at the uncommitted path `data/public_chain/tenders_pub.intermediate.pem` of the live-run clone (ignored by git). The project's own `chain_context` accepted that file with its SHA-256 `6601f41fceefbe7523a6a2e746938de57fc24e99426b7bea58d1867dbee1be5e`.
+
+Changes: the registry row `tenders_pub` now holds that pin and its basis note says where it came from; document 04 section 2 states the pin is set; `custodian/tests/test_tender_chain.py` adds `test_the_registry_holds_the_reviewed_pin` and keeps the claim of `test_without_a_reviewed_chain_the_refusal_is_truthful` on an explicitly unpinned copy of the committed row. No certificate file is committed; verification and hostname checking stay on.
+
+- red first: with the pin set and the tests unchanged, `uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider` exit 1, 1 failed (`test_without_a_reviewed_chain_the_refusal_is_truthful`), 29 passed.
+- planted violation: with the registry pin blanked, the new test fails (exit 1, 1 failed); restored, 31 passed.
+- `uv run --locked python -m pytest custodian/tests/test_tender_chain.py custodian/tests/test_tenders.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_publicdata_registry.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider`: exit 0, 343 passed.
+- Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, recorded in the ledger of the pull request that carries this change.
+
+## S2-T19 — The tender host's one cipher suite, from live run 5 (lead, 2026-11-19)
+
+Live run 5 of `./eii build-public` on `0fa689540e7a82c1ae9fe6b8079a8940d78337fc` (20:22 to 20:44) exited 1 with 241 PASS lines and one failing source, `tenders_pub`, refused with `http_status` after the pinned chain was in place. The lead called the tender transport for each of the six first list pages in both languages from its own shell: every call raised the transport fault `unreachable`, and a plain handshake with the tender context closed with `SSLZeroReturnError`. The same handshake from an interpreter whose default suite list holds `AES128-GCM-SHA256` succeeded (TLS 1.2, that suite); the project interpreter (Python 3.14.6, OpenSSL 3.5.7) offers only forward-secret TLS 1.2 suites, and the host accepts none of them.
+
+Change: `chain_context` appends the one suite `TENDER_SUITE` after the default TLS 1.2 suites, keeps their order, the security level and the TLS 1.2 floor, and refuses with `certificate_chain_incomplete` when the list grew by anything else; document 04 section 2 states it. `custodian/tests/test_tender_chain.py` adds `test_the_tender_context_adds_only_the_hosts_one_suite` and the planted `test_a_wider_suite_list_is_refused`; the stand-in context of `custodian/tests/test_s2_t29_fix10.py::test_f2_tender_requires_root_chain` gains the suite-list members a real context has (its assertions unchanged).
+
+- red first: with `TENDER_SUITE` defined and `chain_context` unchanged, `uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider` exit 1, 2 failed, 31 passed.
+- planted violation: with the grown-list guard replaced by `False`, the same command exit 1, 1 failed (`test_a_wider_suite_list_is_refused`); restored, 33 passed.
+- `uv run --locked python -m pytest custodian/tests/test_tender_chain.py custodian/tests/test_tenders.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_live_transport.py custodian/tests/test_page_requests_survivors_1.py -q -p no:cacheprovider` exit 0, 217 passed; `uv run --locked ruff check .` exit 0; `uv run --locked ruff format --check .` exit 0, 822 files; `uv run --locked mypy` exit 0, 443 source files.
+- live, lead's shell: the tender transport returned status 200 for the first list pages (for example 145642 bytes for the first English list). The complete live run is live run 6, recorded in the ledger of the pull request that carries this change.
+- Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, recorded in that ledger.
+
+## S2-T19 — Tender size words by language and non-empty page slots (2026-11-20)
+
+Builder: OpenAI, GPT-6 (Codex), senior data engineer for public web sources, bilingual card parsing and strict provenance. Strict self-review persona: release-evidence reviewer rejecting weakened assertions, skips, raised bounds, invented page shapes and closure without red-then-green evidence. Independent review by another maker remains with the lead; self-review is not that approval.
+
+Loaded skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. Equivalent brief rules used where no skill was available: test-driven-development (new regression tests first), systematic-debugging (inspect supplied public shapes and trace parser/merge), verification-before-completion (actual commands and exits). The existing checkout is retained; no branch change, push or network call is authorized.
+
+Evidence basis: base commit `537c0a7aebc10569a1beeb58581361635efcf05a`; the assigned brief; the six supplied public list-page copies in the lead's input folder of page copies (not in the repository), read only to model their structure; `docs/03_DATA_CONTRACTS.md`, `pub_tender`; and `docs/04_PUBLIC_DATA_PACK.md`, S2-T19 source reading and collection boundary. The supplied copies show three sibling size labels, some empty, and language-specific words: `Micro|Small|Medium` versus `متناهية الصغر|صغيرة|متوسطة`, `||Medium` versus `||متوسطة`, and `|Small|` versus `|صغيرة|`. No live request was made here, and no page identifiers, titles or other public-page text were copied into fixtures or this record. The lead's failed full build is evidence reported by the brief, not a run performed here.
+
+Cause: `_row_for` treated `company_size` as a shared value across languages, so translated size words caused `company_size awarded`; `_pair` joined empty label slots as though they were words. Fix: compare size words with the existing per-language conflict check, evaluate both languages, then select English words or Arabic words if English has none. Drop empty normalized labels before joining; all-empty cards therefore have no size. Existing same-language conflicts still refuse with the same closed column/list reason, including an Arabic conflict when English supplies the selected words.
+
+ASSUMPTION for review: the contract's "page-order size words joined by a vertical bar" means non-empty words only; an unselected empty label is not a word, and all-empty labels yield `None`. This is the lead's reading in the brief, proposed for contest in `builder workspace/RETURN.md` under PROPOSED OPEN ITEMS. No approved contract or decision was silently amended.
+
+Environment: Linux x86_64; `uv` 0.11.31; test interpreter Python 3.14.6. Commands ran from the repository root with `UV_OFFLINE=1`, `UV_PYTHON_DOWNLOADS=never`, workspace-local `UV_CACHE_DIR` and `TMPDIR`, and `PYTHONDONTWRITEBYTECODE=1`. Tests use invented fixtures and their temporary directories; no randomized draw or explicit seed is involved in these size regressions. No timeout, retry, skip, bound, existing assertion or existing fixture was changed. A byte-prefix comparison against the base confirms every original byte of `custodian/tests/test_tenders.py` remains unchanged.
+
+Red first, production code unchanged: `uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider -k company_size` exited 1: 22 failed, 1 passed, 44 deselected. Evidence: the builder's log `company-size-red.log` (not in the repository).
+
+- `test_company_size_prefers_english_words_in_either_page_order`: 6 red cases; all three slots filled and one selected slot in two positions, both page orders. These plant translated Arabic words against English words.
+- `test_company_size_joins_only_nonempty_slots`: 10 red cases; both languages, leading/interior/trailing empties, whitespace-only slots and all-empty slots. The expected string keeps the non-empty words in page order; the empty result is `None`.
+- `test_company_size_uses_arabic_when_english_slots_are_all_empty`: 2 red cases; Arabic words reach the row in either page order when English has only empty slots.
+- `test_company_size_still_refuses_within_language_across_lists_and_pages`: 4 red cases; first prove a consistent bilingual duplicate merges, then plant a differing same-language size on another page or list and assert the exact closed reason. Both English and Arabic are covered, including the non-selected Arabic language.
+
+Green with the fix: the identical focused command exited 0: 23 passed, 44 deselected, including the unchanged `test_arabic_company_size_reaches_the_merged_row`. Evidence: the builder's log `company-size-green.log` (not in the repository). The complete required command `uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider` exited 0: 67 passed. Evidence: the builder's log `tenders-green.log` (not in the repository).
+
+Other tender and related coverage found by tracked filenames and imports/references: `uv run --locked python -m pytest custodian/tests/test_tender_chain.py custodian/tests/test_assembly_tenders.py custodian/tests/test_gate_records_survivors_tender.py custodian/tests/test_fetch_kinds_survivors_3.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_s2_t13_confirmation.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_public_cadence.py custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider` exited 0: 598 passed. Evidence: the builder's log `tender-related.log` (not in the repository).
+
+Repository checks: `uv run --locked ruff check .` exited 0, all checks passed; `uv run --locked ruff format --check .` exited 0, 822 files already formatted; `uv run --locked mypy` exited 0, 443 source files; `python3 scripts/check_tree.py` exited 0, 8 rules; `cmp AGENTS.md CLAUDE.md` exited 0, byte-identical; `git diff --check` exited 0, no whitespace errors. Applying `uv run --locked ruff format .` exited 0, 1 new-test file reformatted and 821 files unchanged. Documentation check and delivery outcome are appended below after execution. Neither `./eii test` nor `./eii build-public` was run; the lead retains those checks and the live-build confirmation.
+
+Final reference discovery used a case-insensitive search for `tender` throughout custodian and scripts test files; it found two additional adjacent card-shape files. `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_page_shapes_survivors_1.py -q -p no:cacheprovider` exited 0: 70 passed. These tests use invented fixtures despite the historical filename. Evidence: the builder's log `tender-extra-related.log` (not in the repository). All discovered tender test files have now been exercised; `custodian/tests/singles_entries.py` is a fixture helper, not a test file.
+
+`python3 scripts/check_docs.py` exited 0: 1119 text files and 120 Markdown files checked. Evidence: the builder's log `docs.log` (not in the repository). Delivery attempt: `git add` with exactly the two changed source files, the appended test file and this progress file exited 128 because the workspace's Git index is read-only. No commit was created, no permissions were changed and no push or branch change was attempted. Full base commit remains `537c0a7aebc10569a1beeb58581361635efcf05a`; the scoped edits remain in the working tree. `builder workspace/RETURN.md` records the return and proposed empty-slot assumption. Strict self-review: APPROVE for the scoped fix, not independent approval. Muhasabah PASS within this scope: claims have local evidence, the interpretation is explicit, original tests and records are preserved, and live-build and independent-review limits remain visible.
+
+Final artifact-audit correction: the first auxiliary inline audit exited 1 because its numeric pattern incorrectly treated a digit substring inside the required hexadecimal base commit hash as a bare identifier. Inspection found exactly that match in the report and no absolute-path or e-mail match. The corrected auxiliary audit uses the exact identifier-number pattern of `scripts/check_docs.py`; no product check or regression assertion was changed. The official documentation check also passed after the return was written: exit 0, 1119 text files and 120 Markdown files; evidence the builder's log `docs-final.log` (not in the repository). Final tree, parity and whitespace checks each exited 0 again. The corrected auxiliary audit's outcome is recorded in the return.
+
+
+## S2-T29W — existing awards workbook and incremental awarded list (2026-11-20)
+
+Maker/model: OpenAI Codex, GPT-6. Builder persona: principal public-data and platform engineer. Strict self-review persona: provenance reviewer rejecting invented figures, changed source columns, weakened assertions, raised bounds and committed workbook rows. Loaded skills: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer and muhasabah-gate. Test-driven-development, systematic-debugging and verification-before-completion were unavailable as installed skills and applied in their plain meaning. This self-review is not the independent other-maker approval required by AGENTS.md rule 35.
+
+Full base commit: `3a5ab2aacd3e8f557898a0ed188ab67546a1b45b`. Environment: existing locked Python workspace, managed Python 3.14, repository temporary paths; `UV_OFFLINE=1` on verification after the initial focused run. No external source request, real workbook, source-cache file, secret setup file or vault input was read. Tests use invented rows and certificates. The profile and measured size come only from the relayed aggregate task brief. The stored-day/month interpretation remains the lead's explicit assumption. Test proof seeds are fixed; the manifest example uses seed 73, and the assembly fixture seed remains 17. No whole-test seed was drawn: `./eii test` and `./eii build-public` are reserved to the lead and were not run.
+
+Changes: activate the workbook declaration and registry dispatch, preserve the original ten workbook columns and first sheet's trailing space, declare the measured-size-derived 4 MiB ceiling, use bounded/hash-verified intake, preserve blanks, count stored date cells, list unparsed physical rows and version the parser as `awards.ingest_awards@v2`. Reuse the existing same-host tender PEM with its registry hash and the declaration's DER hash both checked. Admit only workbook-delivered report links in the closed report path to the exact-URL frame. Compute the awarded cut-off from verified intake at build time, check newest-first order, stop at the first wholly covered page, retain cut-off/hash/page counts/stop page, and read the other five lists in full. An unavailable or refused intake yields a full awarded-list read with its closed reason; the intake refusal remains blocking for assembly. A partial source selection does not process an unselected workbook. Archive validation re-verifies incremental coverage rather than trusting a short receipt, and the mutable current-page tail is removed after a shorter awarded read. Closed source refusals print without invented expected/observed fields. Proposed decision 0069, unticked amendments to S2-T13/S2-T19/S2-T29, the slice S2 gate sentence and document 04 intake/source instructions record the scope. Decision 0064 item 41's background proof requirement remains unchanged and is not newly implemented by this task.
+
+Red/green evidence, actual exits: `uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider` initially exited 1 with 9 failed; after implementation the same command exited 0 with 9 passed. Adding shared-pin plants yielded exit 1 with 2 failed and 18 passed, then exit 0 with 20 passed after the shared-chain implementation. The incremental archive plant command on `custodian/tests/test_assembly_tenders.py` exited 1 with 1 failed and 1 passed, then 0 with 2 passed. The deferred-intake plant yielded 1 failed and 26 passed before its implementation. Refused report-scope and stale-page plants yielded 2 failed and 27 passed, then 29 passed after their fixes. No retry, timeout increase, skip or baseline refresh was added. Existing exact assertions were extended for new metadata; held-source tests now explicitly plant the old hold instead of relying on the activated declaration.
+
+Broader evidence: the focused eleven-file pytest command exited 0 with 332 passed. The first AST-selected direct-import/touched-file command covered 84 files and exited 1 with 13 failed, 2447 passed and one existing duplicate-ZIP warning. The failures exposed the activated declaration's effect on partial source builds and the obsolete held-declaration assertion; selected-source intake evidence and the exact activated-declaration test corrected those causes. The affected nine-file command then exited 0 with 291 passed. Added date-storage, manifest-boundary, missing-date, malformed-cut-off and full activated-workbook/proof/dispatch cases pass: the final focused new-test command exited 0 with 45 passed. The fixture uses the real declaration shape with entirely invented cells, verifies the retained original columns and measured latest date, and checks the normal tender handoff receives that date and the actual invented workbook hash.
+
+Verification commands already completed at this point: `uv run --locked ruff check .` exit 0 (all checks); `uv run --locked ruff format --check .` exit 0 (823 files); `uv run --locked mypy` exit 0 (443 source files); `python3 scripts/check_docs.py` exit 0 (1121 text files, 121 Markdown files); `python3 scripts/check_tree.py` exit 0 (8 rules); `uv run --locked python scripts/check_versions.py` exit 0 (70 components); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Earlier lint/type checks found import formatting and the tender options dictionary type; those were corrected with sorted imports, the formatter and a TypedDict, preserving every assertion. Applying `uv run --locked ruff format .` exited 0. Final comprehensive pytest, delivery and final record checks are appended below after completion.
+
+Final comprehensive verification: the exact command below ran with `UV_OFFLINE=1`, exited 0 and reported **2478 passed, 1 warning**, across 84 direct-import/touched test files. The warning is the existing planted duplicate ZIP-member fixture. No test was skipped or deselected by this command. Local sanitized evidence: the builder's sanitized test log; the explicit argv inventory is the builder's test-file inventory.
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_additions_fetch.py custodian/tests/test_assembly_boundaries.py custodian/tests/test_assembly_intake.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_producers.py custodian/tests/test_assembly_tenders.py custodian/tests/test_atlas_fetch.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_baci_fetch.py custodian/tests/test_benchmark_access.py custodian/tests/test_benchmarks_fetch.py custodian/tests/test_certificate_pins_survivors_1.py custodian/tests/test_comtrade_plants.py custodian/tests/test_fc_register_capture.py custodian/tests/test_fc_register_transport.py custodian/tests/test_feature_polygon_column.py custodian/tests/test_fetch_kinds_survivors.py custodian/tests/test_fetch_kinds_survivors_2.py custodian/tests/test_fetch_kinds_survivors_3.py custodian/tests/test_fetch_kinds_survivors_4.py custodian/tests/test_fetch_report_survivors.py custodian/tests/test_frame_coverage.py custodian/tests/test_gis_imagery_views.py custodian/tests/test_gis_layers.py custodian/tests/test_gis_paged.py custodian/tests/test_gis_reference_inheritance.py custodian/tests/test_gravity_atlas_review.py custodian/tests/test_gravity_fetch.py custodian/tests/test_intake_ceiling.py custodian/tests/test_investment_build.py custodian/tests/test_investment_evidence.py custodian/tests/test_large_intake.py custodian/tests/test_local_file_report.py custodian/tests/test_mepi_long_form.py custodian/tests/test_museum_missing_forms.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_records_survivors_2.py custodian/tests/test_page_workbook_survivors_1.py custodian/tests/test_page_workbook_survivors_2.py custodian/tests/test_period_year_text_rows.py custodian/tests/test_places_build_date.py custodian/tests/test_places_fetch.py custodian/tests/test_places_fsq.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_pass2.py custodian/tests/test_places_pass3.py custodian/tests/test_places_pass3_build.py custodian/tests/test_production_adapters.py custodian/tests/test_property_quarter.py custodian/tests/test_public_cadence.py custodian/tests/test_public_data_stage.py custodian/tests/test_public_series.py custodian/tests/test_public_snapshots.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_besttime_build.py custodian/tests/test_publicdata_fetch.py custodian/tests/test_publicdata_heights.py custodian/tests/test_publicdata_licence.py custodian/tests/test_publicdata_listing_survivors.py custodian/tests/test_publicdata_unblocked.py custodian/tests/test_publicdata_unblocked_round2.py custodian/tests/test_publicdata_unblocked_round3.py custodian/tests/test_s2_t19_registry.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_live_acquire.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_transport.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_series_figures_survivors.py custodian/tests/test_snapshot_refusals.py custodian/tests/test_tender_chain.py custodian/tests/test_tenders.py custodian/tests/test_terms_attempts.py custodian/tests/test_terms_fingerprint.py custodian/tests/test_trade_reconciliation_release.py scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider
+```
+
+Delivery: staging exactly the task files with `git add -- ...` exited 128 because the worktree Git index is read-only. No commit was created, no staged file remains, no permissions were changed and no push was attempted. The full base commit above is unchanged; task changes remain in the workspace. The requested return is the builder's return. Proposed open items there cover deployment upkeep, the lead-only real build and shared-pin verification, acceptance of proposed decision 0069, and independent other-maker review; they are proposals rather than edits to OPEN_ITEMS.md. Strict self-review: APPROVE for the scoped offline implementation, not independent approval or a slice gate. Muhasabah: PASS for the scoped claims and evidence, with the date assumption and live/review limitations explicit. A final documentation check after appending these records is recorded below.
+
+Final post-record checks: documentation exit 0 (1121 text files, 121 Markdown files); tree exit 0 (8 rules); instruction parity exit 0; whitespace exit 0; return-marker and added-text audit exit 0.
+
+
+## S2-T29W round two — awarded-list continuity tripwire (2026-11-20)
+
+Maker/model: OpenAI Codex, GPT-6. Builder persona: principal public-data and platform engineer. Strict self-review persona: provenance reviewer rejecting unfetched-margin claims, altered stop semantics, weakened guards and unsupported completeness claims. Skills applied: project-orientation, task-standards, github-flow, sanad-provenance and muhasabah-gate; test-driven-development, systematic-debugging and verification-before-completion applied in their plain meaning where those named skills are unavailable. Self-review does not replace the other-maker review of AGENTS.md rule 35.
+
+Full base commit: `0806893b5a772f78124eacb7580cf45fc801f076`. Evidence: the round-two task brief, **INTENT** items 1 to 4; L1 **Check 3** and **Record notes** 1 and 2; L2 **Findings** F1 and F2; proposed decision 0069 items 2 to 4; the source diff and invented-fixture logs below. The saved-page and workbook-coverage figures in decision 0069 are attributed to the lead's relayed evidence, not a new source read here. No source workbook, public data cache, vault input or secret file was read, and no network call was made.
+
+Finding and cause: the awarded-list fetch broke immediately at the first wholly covered page, so a newer award on a later page was never checked; archive validation encoded the same assumption as `stop_page == pages_read`. The missing wholly-covered-then-newer plant allowed that gap. The FAIL formatter always inserted the address slot, so an empty address added a second space. The stored-date and unparsed-row counts overlap by design when a stored date's swapped interpretation fails.
+
+Fix: retain the first wholly covered `stop_page`, then read the fixed `AWARD_CONTINUITY_PAGES = 2` margin per language, or the list end if sooner. Apply `award_order_invalid` across the fetched margin, `award_date_missing` for a missing date and `award_after_stop` for a margin award newer than the cut-off. Record actual `continuity_pages` and `last_page_read`; the latter equals `first_stated_last` when the list ends. Archive validation requires the exact margin count and re-parses every margin page against the verified intake. New plants cover both margin positions and languages, exact stopping and early ends, below-cut-off ordering, altered margin pages, missing/short/extra margins, modified receipt fields and absent margin files. Existing stop/mixed-page assertions now include the actual extra reads; the stale-page fixture plants its stale file beyond the margin. Other lists and absent-intake full reads remain covered. Empty addresses omit the address slot, with both closed-reason and comparison plants. Proposed decision 0069 and the document 04/task/slice amendments state the saved-page ordering assumption, detector limit, later full older-page check, incomplete workbook coverage, meaning of the cut-off, later enrichment and count overlap. No acceptance box was ticked.
+
+Red then green, real exits: before production edits, `uv run --locked python -m pytest custodian/tests/test_awards_incremental.py custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider -k 'after_wholly or continuity_margin or margin_pages or failure_without_address or rechecks_continuity'` exited 1: **34 failed, 6 passed, 47 deselected** (the builder's workspace log), sanitized). Failures include four newer-after-stop plants, the exact-margin cases, margin ordering, archive re-checks and both empty-address cases. After implementation the same selection exited 0: **40 passed, 48 deselected** (the builder's workspace log). The extra deselected case is the added zero-remaining-page archive case. The two complete focused files exited 0: **88 passed** (the builder's workspace log). No skip, retry, time limit, tolerance, source bound or baseline was added or changed.
+
+Environment: Linux x86_64, uv 0.11.31, Python 3.14.6, locked workspace. Verification used `UV_OFFLINE=1`, `UV_PYTHON_DOWNLOADS=never`, workspace-local `UV_CACHE_DIR` and `TMPDIR`, and `PYTHONDONTWRITEBYTECODE=1`. The 28-file run fixed the Hypothesis seed at 73; the focused deterministic plants use no random draw. Workbook fixture seed remains 73. No whole-test seed or live build was run.
+
+The complete required and related test command (AST import discovery plus source references and adjacent tender/awards filenames) exited 0: **1005 passed**, no warning, skip or deselection (the builder's workspace log); command and real exit also in (the builder's workspace log):
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_intake.py custodian/tests/test_assembly_tenders.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_fetch_kinds_survivors_3.py custodian/tests/test_fetch_report_survivors.py custodian/tests/test_gate_records_survivors_tender.py custodian/tests/test_gis_layers.py custodian/tests/test_investment_build.py custodian/tests/test_investment_evidence.py custodian/tests/test_large_intake.py custodian/tests/test_property_quarter.py custodian/tests/test_public_data_stage.py custodian/tests/test_public_series.py custodian/tests/test_publicdata_behaviour.py custodian/tests/test_publicdata_licence.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix10.py custodian/tests/test_s2_t29_fix6.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_pages.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_tender_chain.py custodian/tests/test_tenders.py custodian/tests/test_terms_attempts.py -q -p no:cacheprovider --hypothesis-seed=73
+```
+
+Other verification: `uv run --locked ruff check .` exit 0, all checks; `uv run --locked ruff format --check .` exit 0, 823 files; `uv run --locked mypy` exit 0, 443 source files; `python3 scripts/check_docs.py` exit 0, 1121 text files and 121 Markdown files; `python3 scripts/check_tree.py` exit 0, 8 rules; `cmp AGENTS.md CLAUDE.md` exit 0, byte-identical; `git diff --check` exit 0, no whitespace error. Applying `uv run --locked ruff format .` exited 0: 2 test files formatted, 821 files unchanged. Evidence is the corresponding (the builder's workspace log) check log and result file. The final record checks and delivery outcome are appended below. Neither `./eii test` nor `./eii build-public` was run; no push was attempted.
+
+PROPOSED OPEN ITEMS: the lead obtains other-maker review of this revision, confirms the amended proposed decision and performs the real intake/portal integration; after the S2 gate the full older-page read re-checks ordering over the whole list and supplies later enrichment for workbook gaps, under the owner's join-test decision relayed in the brief. Newest-first order beyond the margin remains an explicit assumption, not a completeness guarantee. Deployment upkeep and the stored-date interpretation remain the existing open matters; no OPEN_ITEMS.md item is silently closed. Muhasabah self-audit: PASS for this scoped offline fix, with the relayed evidence, ordering assumption and independent/live-review limits explicit.
+
+Delivery: staging the ten scoped files with `git add -- ...` exited 128: the worktree Git index is on a read-only filesystem. No commit was created, no permissions were changed, and no push was attempted. HEAD remains `0806893b5a772f78124eacb7580cf45fc801f076`; the ten scoped files remain changed in the workspace. Evidence: (the builder's workspace log) and (the builder's workspace log). The authorized commit message and trailer were not applied because staging failed.
+
+Final post-record verification: documentation exit 0 (1121 text files, 121 Markdown files), tree exit 0 (8 rules), instruction parity exit 0 and whitespace exit 0. The artifact audit exited 0: all prior PROGRESS.md bytes are intact, exactly one round-two block was added, the Git index has no staged files, the return marker is the last line, and added tracked text plus the return contain no absolute local path, e-mail address or forbidden bare identifier.
+
+Lead, 2026-11-20: the round-two tree was committed by the lead because the builder's sandbox could not stage; the lead reran the six focused tender and awards test files on that tree: exit 0, 206 passed.
+
+
+### Train S2-8 records — five-commit composition and live evidence
+
+2026-11-20. Maker: OpenAI; model: GPT-6 (Codex). Senior persona: senior release-records engineer for an evidence-ledger repository. Strict self-review persona: records auditor rejecting rewritten evidence, unsupported claims or figures, personal names, absolute local paths and weakened criteria. Skills loaded: project-orientation, task-standards, sanad-provenance, github-flow and muhasabah-gate. Verification-before-completion is applied in its plain meaning; no installed skill of that name is available. This is a records self-audit, not another-maker approval.
+
+Scope and source chain: the supplied `.overnight/BRIEF.md`, TASKS.md S2-T13/S2-T19/S2-T29, document 14 slice S2 Gate and decisions 0032 and 0069. Base ff3dd5de85a72af88343ac2bad90994865f888c8; observed five-pick HEAD 7dd51d486f2d9d092f83c96a7bcb12f34f399b58. Pull request number 105 is supplied by the brief; no hosted state was read. The lead will commit these records; no worker commit or push is authorized. The refreshed spec uses literal WORK_HEAD and WORK_SEED until the lead commits and assigns its whole-test seed. No seeded live build on the merged head or whole-test run is claimed here.
+
+| Task change | Original reviewed commit | Picked commit | Builder maker/model | Supplied approving or confirming review |
+|---|---|---|---|---|
+| S2-T19 tender intermediate pin | 0fa689540e7a82c1ae9fe6b8079a8940d78337fc | b6125f2628c478c2e8b173379d8c9328e1c987a6 | Anthropic Claude Opus 5.5, lead | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T19-pin.rev1.md`, K1 to K6 and final verdict; maker/model attribution: old-spec/log.md, Tender intermediate pin task log |
+| S2-T19 one host-scoped TLS suite | 537c0a7aebc10569a1beeb58581361635efcf05a | 2929417f094cf3bdbb00ec81b4dc597c7a6113cc | Anthropic Claude Opus 5.5, lead | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T19-suite.rev1.md`, K1 to K5 and final verdict; maker/model attribution: old-spec/log.md, Tender TLS suite task log |
+| S2-T19 English size words and empty slots | 3a5ab2aacd3e8f557898a0ed188ab67546a1b45b | 335d56db432fb6c3bb2759bacd92e81c976f048e | OpenAI GPT-6 (Codex), per picked commit body | Z.ai GLM-5.3 through the lead's relay (the served model in the job's status record; the return's own self-naming as an OpenAI model is the relay client's label, not the served model); APPROVED; `.overnight/IN/reviews/S2-T19.tsize.rev2.md`, Checks 1 to 4 and verdict |
+| S2-T29/S2-T19 awards workbook and dynamic cut-off | 0806893b5a772f78124eacb7580cf45fc801f076 | 9062fd0eaea8f4ee1f5fd70f6a4cb1df53ec99a5 | OpenAI GPT-6.1 Sol (Codex), per picked commit body | Cognition Devin SWE-2 High; APPROVED; `.overnight/IN/reviews/S2-T29W.L1.md`, Checks 1 to 6 and verdict |
+| S2-T29/S2-T19 two-page continuity check | 25e55f5cd58a95fbab92383d69ae77e5b95ba8a3 | 7dd51d486f2d9d092f83c96a7bcb12f34f399b58 | OpenAI GPT-6.1 Sol (Codex), per picked commit body | Cognition Devin SWE-2 High; CONFIRMED; `.overnight/IN/reviews/S2-T29W.conf1.md`, Checks 1 to 5 and verdict |
+
+Git source-to-pick checks compare every file's context-free changed lines and name-status inventory; all match, including PROGRESS.md. The script and each result are in `.overnight/OUT/TRAIN-S2-8-spec/make_spec.py` and `identity-proof.json`. No forced task-file difference was found. This proves changed-line identity only; another-maker confirmation of the final joined head, required hosted/head checks and the lead's fresh-seed whole test on the exact merge result remain owed under rule 33. The supplied size review names the same maker as its builder; this record preserves that attribution and does not claim it satisfies rule 35's different-maker requirement. The lead must reconcile that review requirement before merge.
+
+#### Attributed live-run evidence, not runs performed by this worker
+
+| Run | Recorded build head | Exit and outcome | Source and cause |
+|---|---|---|---|
+| LIVE-S2.r5 | 0fa689540e7a82c1ae9fe6b8079a8940d78337fc | exit 1; 241 PASS lines, one FAIL tenders_pub http_status | `.overnight/IN/facts.txt`, LIVE-S2.r5 result, and `live-r5.tail.txt`: TLS context handshake closed with SSLZeroReturnError; host accepts AES128-GCM-SHA256 RSA key exchange absent from interpreter defaults (Python 3.14.6/OpenSSL 3.5.7). Scoped suite correction preserves verification, floor and security level; OI-340 remains open. |
+| LIVE-S2.r6 | 537c0a7aebc10569a1beeb58581361635efcf05a, from old-spec/log.md live-run launch | exit 1; 4 h 13 min, from the lead's run log (result line of LIVE-S2.r6 at 06:0x on 2026-11-20) | `.overnight/IN/facts.txt`, L-1189 and L-1192, and `live-r6.tail.txt`: company_size awarded merge refused English/Arabic size strings compared as one shared value, with empty slots. The tail repeats the reason as expected/observed; L-1192 identifies diagnostic formatting, not a comparison result. The supplied facts excerpt lacks a separate r6 exit/duration row; those two fields are attributed to the brief, not inferred from a tail. OI-345 records lost page evidence. |
+| LIVE-S2.r7 | 3a5ab2aacd3e8f557898a0ed188ab67546a1b45b | exit 143; stopped at 06:22 on 2026-11-20 | `.overnight/IN/facts.txt`, launch and L-1192: the lead stopped the 06:15 launch to comply with the owner's instruction against re-fetching the awarded history; not a cost stop or a successful build. The supplied `live-r7.tail.txt` is empty and proves no completion. |
+
+The lead's L-1189 cause and the code/tests agree: `pub_tender.company_size` takes non-empty page-order English size words joined by a vertical bar, Arabic only when English carries none; all-empty slots yield null, and a conflict within either language is refused. Document 03's field description now says so. Decision 0069 and its documentation-index entry record acceptance on 2026-11-20, under the owner's already recorded decision; this is no implementation or gate approval.
+
+#### Join test and follow-up boundaries
+
+Source: `.overnight/IN/facts.txt`, L-1198, the lead's saved-page join test, without new fetching. Workbook report identifiers matched each card's report identifier. Saved page 403 has 20 cards dated 14/05/2025 inside the workbook range: 12 matched one workbook row each with the same date, 8 were absent. Newer pages 203 and 78 each matched 0 of 20. The exact-id join works; the workbook is not complete inside its date range. Decision 0069's cut-off describes its newest parsed date, not complete older coverage. OI-344 carries the owner's after-S2-gate, once-only cached older-page enrichment and whole-list order re-check. No workbook row, real saved card or data cache was read here.
+
+L-1201 accepts the incremental stop while adding the fixed two-page detector. The sample of 9 saved English pages and 180 cards supports the newest-first assumption, never proof about unread pages; decision 0069 item 3 retains that limit. The final CONFIRMED review leaves the empty-url build exit detail in OI-343; the separate FAIL line is already fixed. OI-345 is a proposed durable-failure-evidence change, not implemented recovery. OI-341 and OI-342 are reserved elsewhere and were not allocated. PO-S2-140 and PO-S2-141 remain proposals only in the spec companion.
+
+#### Records verification
+
+The worker runs the brief's docs/tree/parity/JSON checks and each test file in the refreshed command inventory with real exits and counts; results are appended below after execution. Test discovery uses all tracked test files, includes changed tests and direct AST imports of each changed production module, and excludes lead-only custodian/data_tests. No network, world seed, live source build, ./eii test, database operation, commit or push is performed. The spec's shared static checks and whole-test command are future lead obligations, not results of this preparation. TASKS.md replacement candidates update status and accepted-decision references only; every existing checkbox is preserved.
+
+
+Records-check results, 2026-11-20, on observed HEAD 7dd51d486f2d9d092f83c96a7bcb12f34f399b58 with the uncommitted records above: system Python 3.14.4; uv selected CPython 3.14.6; uv 0.11.31 (x86_64-unknown-linux-gnu). Environment: UV_OFFLINE=1, UV_PYTHON_DOWNLOADS=never, EII_DECISION_PROVIDER=none, PYTHONDONTWRITEBYTECODE=1; uv cache, temporary files and Hypothesis storage confined to `.overnight/tmp/`. No seed override; no tests reached collection and no world/figure seed was used. Network was disabled for every uv invocation. The existing externally configured cache was not read: this worker used an empty workspace-local cache to obey the workspace-only constraint.
+
+Every one of the 84 required pytest commands exited 1 before pytest could start because locked dependency bytes were absent from that offline cache. Counts: 0 tests executed; collected/passed/failed test counts unavailable, not passing or skipped tests. These are environment failures, not 84 failing test cases. No retry, skip, baseline refresh, network installation or replacement test command was used. Full per-command output is retained under `.overnight/OUT/TRAIN-S2-8-spec/checks/`; local path text in captured output is normalized to a fixed marker. `check-results.json` records the real exit, elapsed time and output location for each of 88 required checks. The spec command inventory is not reduced to hide these failures.
+
+| Command | Exit | Observed counts/result |
+|---|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_additions_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_boundaries.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_intake.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_atlas_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_baci_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_benchmark_access.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_benchmarks_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_certificate_pins_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_comtrade_plants.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fc_register_capture.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_feature_polygon_column.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_kinds_survivors_4.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_fetch_report_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_frame_coverage.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_layers.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_paged.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gis_reference_inheritance.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gravity_atlas_review.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_gravity_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_intake_ceiling.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_investment_evidence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_large_intake.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_local_file_report.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_mepi_long_form.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_records_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_1.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_page_workbook_survivors_2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_period_year_text_rows.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_build_date.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_production_adapters.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_property_quarter.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_data_stage.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_public_snapshots.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_besttime_build.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_fetch.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_licence.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_listing_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round3.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_awards.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix10.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_awards.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_live_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_series_figures_survivors.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_snapshot_refusals.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_tender_chain.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_terms_attempts.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_terms_fingerprint.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_release.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider` | 1 | 0 tests executed; dependency resolution stopped before collection |
+| `python3 scripts/check_docs.py` | 0 | checked 1126 text files, 121 Markdown files: OK |
+| `python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| `cmp AGENTS.md CLAUDE.md` | 0 | (no output) |
+| `python3 -c "import json; json.load(open('.overnight/OUT/TRAIN-S2-8-spec/spec.json'))"` | 0 | (no output) |
+
+Preparation command `python3 .overnight/OUT/TRAIN-S2-8-spec/make_spec.py` exited 0: 84 test commands, 49 source-to-pick file comparisons, WORK_HEAD/WORK_SEED retained, no merges key. A read-only evidence audit exited 0: the earlier PROGRESS.md and OPEN_ITEMS.md bytes remain prefixes unchanged; task-replacement checkbox sequences are identical. The literal old-spec draft's empty merges key was deliberately not copied. The refreshed draft anticipates five picks plus the lead's one records commit; preparation.json separately records the five actual current commits. No future sixth hash is invented.
+
+Verification remains incomplete until the lead runs the locked tests with an available pinned environment. Lead's correction before commit: the size review was served by Z.ai GLM-5.3 (another maker than the builder, OpenAI), so project rule 35 holds; and the lead runs every listed test file in the pinned environment in the train ledger. Muhasabah: PASS for source attribution, bounded edits, append-only evidence and honest failure reporting; test verification is BLOCKED by missing offline dependencies, not approved. This record makes no task, train or slice completion claim. The final post-report document/tree/parity/JSON and artifact checks are appended as a separate correction after their actual execution.
+
+Final post-report checks, 2026-11-20: python3 scripts/check_docs.py exit 0, 1126 text files and 121 Markdown files; python3 scripts/check_tree.py exit 0, 8 rules; cmp AGENTS.md CLAUDE.md exit 0; the brief's spec JSON parse command exit 0. Artifact audit exit 0: 49 equal source/pick file deltas, append-only PROGRESS.md and OPEN_ITEMS.md, no merges key, preserved WORK placeholders and task checkbox parity, all 11 changed tests included among 84 test files, generated-file forbidden-pattern scan clean, return marker last. Evidence: .overnight/OUT/TRAIN-S2-8-spec/final-checks.json. These checks followed the draft return and precede this evidence append. No test environment failure was closed.

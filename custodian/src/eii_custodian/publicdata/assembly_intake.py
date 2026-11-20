@@ -19,7 +19,12 @@ from .fetch.partitions import PartitionError, partition_spans
 
 
 def write_intake_evidence(
-    cache: Path, document: Mapping[str, Any], seed: int, stamp: str
+    cache: Path,
+    document: Mapping[str, Any],
+    seed: int,
+    stamp: str,
+    *,
+    awards_selected: bool = True,
 ) -> dict[str, str]:
     if type(seed) is not int:
         raise AssemblyError("figure_seed_invalid")
@@ -31,7 +36,9 @@ def write_intake_evidence(
         raise AssemblyError("assembly_intake_invalid")
     awards: dict[str, object]
     bound = declaration.get("max_bytes")
-    if not isinstance(declaration.get("profile"), dict) and (
+    if not awards_selected:
+        awards = {"state": "unselected", "reason": "source_not_selected"}
+    elif not isinstance(declaration.get("profile"), dict) and (
         type(bound) is not int or bound <= 0
     ):
         awards = {"state": "pending", "reason": "awards_profile_pending"}
@@ -50,7 +57,12 @@ def write_intake_evidence(
                 raise AssemblyError("assembly_intake_bound")
             if isinstance(declaration.get("profile"), dict):
                 batch = ingest_awards(
-                    cache, path, manifest["sha256"], declaration["profile"], stamp
+                    cache,
+                    path,
+                    manifest["sha256"],
+                    declaration["profile"],
+                    stamp,
+                    max_bytes=declaration["max_bytes"],
                 )
                 observed = observe_profile(
                     batch.body,

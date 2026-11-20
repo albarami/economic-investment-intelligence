@@ -68,6 +68,7 @@ class Production:
     audit: dict[str, Any] = field(default_factory=dict)
     stamp: str = ""
     draw_exclusions: list[dict[str, Any]] = field(default_factory=list)
+    intake_refusal: str = ""
 
     def adapters(self) -> dict[str, Callable[[], Mapping[str, str]]]:
         return {
@@ -111,6 +112,7 @@ class Production:
         self.selected.clear()
         self.audit.clear()
         self.frame_result = None
+        self.intake_refusal = ""
         # Persist the seed before the clock, review, cache or source reader.
         write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
         self.stamp = self.clock()
@@ -181,9 +183,36 @@ class Production:
         document = read_yaml(self.review / "s2_t29_sources.yaml")
         if not isinstance(document, dict):
             raise AssemblyError("assembly_intake_invalid")
-        return write_intake_evidence(
-            self.cache, document, self.seed, self.stamp or self.clock()
-        )
+        try:
+            return write_intake_evidence(
+                self.cache,
+                document,
+                self.seed,
+                self.stamp or self.clock(),
+                awards_selected=any(
+                    entry.source_id == "awards_owner_scrape" and not entry.skip_reason
+                    for entry in self.entries
+                ),
+            )
+        except AssemblyError as exc:
+            if str(exc) not in {
+                "assembly_input_refused",
+                "assembly_intake_invalid",
+                "assembly_intake_bound",
+                "assembly_seed_mismatch",
+            }:
+                raise
+            # Preserve the refusal; an independent portal read can still run
+            # in full. The refused workbook never enters a successful assembly.
+            self.intake_refusal = str(exc)
+            return write_record(
+                self.cache,
+                "assembly/intake_evidence.json",
+                {
+                    "method": "assembly-intake.v1",
+                    "awards": {"state": "refused", "reason": self.intake_refusal},
+                },
+            )
 
     def fetch_archive(self) -> dict[str, str]:
         if self.fetcher is None:
@@ -192,6 +221,8 @@ class Production:
         self.lines.extend(self.fetched.lines)
         if self.fetched.failure is not None:
             raise AssemblyError("assembly_fetch_refused")
+        if self.intake_refusal:
+            raise AssemblyError(self.intake_refusal)
         from .assembly_tenders import archive_pages
 
         pages = {}
