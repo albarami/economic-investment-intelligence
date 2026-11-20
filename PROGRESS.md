@@ -42772,3 +42772,9 @@ reported checks; independent review and live confirmation remain the lead's work
 - Red then green: with the root-tag check removed in a disposable copy, the two cases fail (2 failed, 59 passed); on
   this head, `uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py custodian/tests/test_places_fsq.py -q -p no:cacheprovider`
   gives 84 passed, exit 0; ruff check and ruff format --check clean.
+
+#### MERGE TRAIN S2-10 — S2-T47 test module moved to the custodian side (lead, 2026-11-20)
+
+- Finding: the lead's ledger try 1 (seed 2547224853) whole test stopped the python-core suite at collection: `core/tests/test_classification.py` imported `custodian.tests.fixtures.classification` and, through `parse`, the custodian reader; the runner starts pytest with `python -P`, so the import failed with `No module named 'custodian'`. Focused runs from the repository root put the working folder on the import path and hid it.
+- Fix: the module moves unchanged to `custodian/tests/test_classification_resolver.py` (custodian tests may import core; core tests import no custodian code), with one docstring sentence saying why; `docs/03_DATA_CONTRACTS.md` names the new path among the focused tests.
+- Evidence (project runner, seed 2547224853): python-core exit 0, 749 passed; python-custodian-1 exit 0, 4743 passed; python-custodian-2 exit 0, 4167 passed. Before the fix: python-core interrupted, 1 error.

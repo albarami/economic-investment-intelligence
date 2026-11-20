@@ -1,4 +1,8 @@
-"""S2-T47 AC3/5, F1/2/3/4: classification association, never allocation."""
+"""S2-T47 AC3/5, F1/2/3/4: classification association, never allocation.
+
+The core resolver is exercised over the custodian reader's parsed crosswalk, so
+this module lives with the custodian tests (core tests import no custodian code).
+"""
 
 from dataclasses import fields, replace
 from typing import get_args, get_type_hints

@@ -1743,7 +1743,9 @@ no protected statistic. `core/tests/test_calculation_purity.py` applies its
 unchanged import/call policy and isolated runtime guard to this module in
 addition to the calculation directory. Focused tests are
 `custodian/tests/test_classification_review.py` and
-`core/tests/test_classification.py`, with invented dictionaries in
+`custodian/tests/test_classification_resolver.py` (the core resolver over the
+reader's parsed crosswalk; it imports the custodian reader, so it runs on the
+custodian side), with invented dictionaries in
 `custodian/tests/fixtures/classification.py`.
 
 `C13Selection` is a typed input shape, not a calculation adapter. It has source,
