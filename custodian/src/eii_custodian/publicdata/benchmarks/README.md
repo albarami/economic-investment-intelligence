@@ -3,7 +3,8 @@
 All four download mappings remain inactive. S2-P18 records WDI dataset/catalogue
 and UNCTAD portal/terms readings, with body hashes and exact words in
 `custodian/publicdata/review/trade_publisher_readings.yaml`. Their successfully
-read metadata hosts enter PUB-03; this confirms no download URL or redirect.
+read metadata hosts remain outside PUB-03 (L-1270); reading a page never
+admits its fetch host. No download URL or redirect is confirmed.
 WDI catalogue metadata version is separate from a selected file vintage. Qatar
 coverage, indicator/status mappings, native schemas and count/byte bounds remain
 unverified. The attempted IMF and ILOSTAT pages returned HTTP 403; neither is

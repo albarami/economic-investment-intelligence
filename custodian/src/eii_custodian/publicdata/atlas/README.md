@@ -5,8 +5,9 @@ S2-P18 records dated publisher readings in
 `custodian/publicdata/review/trade_publisher_readings.yaml`, linked by the registry.
 The current download page and legacy index have different classification/history
 statements; neither establishes a selected file vintage or native measure mapping.
-The two dataset/index hosts are admitted under PUB-03. File-specific licence,
-Qatar key, schema and exact member/count/byte bounds remain pending; a rounded
+The two dataset/index hosts remain outside PUB-03 (L-1270); a page reading
+never admits a fetch host, and the data host has unreviewed redirects.
+File-specific licence, Qatar key, schema and exact member/count/byte bounds remain pending; a rounded
 MB label is not an exact byte bound. `confirmed: false` and `bound_origin: pending`
 keep downloads inactive for missing technical metadata. Pending terms alone
 refuse nothing under decision 0059.

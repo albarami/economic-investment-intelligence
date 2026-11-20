@@ -1,6 +1,6 @@
 # UN Comtrade fetch
 
-This adapter is the keyed provider interface of decision 0040 item 2. The download policy remains unconfirmed with `skip_reason: metadata_unconfirmed`. S2-P18 records the publisher's documentation, current licence words and free per-call/daily limits in `custodian/publicdata/review/trade_publisher_readings.yaml`, linked by the registry row's `basis_note`. Its documentation and licence hosts are reviewed; API source/redirect hosts, schema, quota reset/scope, selected bounds and owner selection remain pending. No data request or key was used.
+This adapter is the keyed provider interface of decision 0040 item 2. The download policy remains unconfirmed with `skip_reason: metadata_unconfirmed`. S2-P18 records the publisher's documentation, licence-agreement words and partial subscription statements in `custodian/publicdata/review/trade_publisher_readings.yaml`, linked by the registry row's `basis_note`. Its documentation and licence hosts remain reading-only, outside the fetch allow-list (L-1270); per-call tier binding, API source/redirect hosts, schema, quota reset/scope, selected bounds and owner selection remain pending; S2-T23 criterion 4 stays open. No data request or key was used.
 
 ## What the lead checks before any fetch
 

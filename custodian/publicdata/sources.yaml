@@ -12124,8 +12124,8 @@ sources:
     fetch_host: ""
     url: ""
     terms_url: "https://comtradeplus.un.org/en/license-agreement"
-    terms_words: "Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations."
-    terms_read_on: "2026-11-20"
+    terms_words: "\"any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation\" [...] \"is strictly prohibited without the prior written permission of the United Nations.\" [...] \"Internal use, including the use of UN Comtrade data for the AI model\""
+    terms_read_on: "2026-11-19"
     landing_url: "https://uncomtrade.org/docs/un-comtrade-tools/"
     nightly_live_fetch: false
     public_splits: []
@@ -12162,7 +12162,7 @@ sources:
     reconciliation: "open"
     skip_reason: "metadata_unconfirmed"
     extension: "json"
-    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#un_comtrade. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://uncomtrade.org/docs/un-comtrade-tools/ body SHA-256 6bb66dc8e65d79c24b57ad00fbe31a71949f77929e2817fb28e1dd200540b2c5. Exact words: The bilateral data comparison tool puts the reported data and its mirror data side-by-side, allowing the analysis of bilateral trade asymmetries https://uncomtrade.org/docs/un-comtrade-api/ body SHA-256 5ba69b23be248a928ceb2552832bf4e8e3e1343b13b86b5e17069203ab371692. Exact words: There is no need to create an account nor having API subscription key, the preview APIs would work as is. https://uncomtrade.org/docs/api-subscription-keys/ body SHA-256 27ae45c86f57d7e39016badd602d4fce48a9c1af4e8572e9df430f41e1645027. Exact words: You must be a registered UN Comtrade user before requesting an API subscription key. https://uncomtrade.org/docs/subscriptions/ body SHA-256 65ec76f8be19aeea2cdb465e88bc65373c900785bc97f92717381c12d1a701f3. Exact words: Registration is free, and users can unlock a range of features with a registered UN Comtrade account. These features include data preview, data download of 100K records per call, and data API access for up to 500 calls/day. Limited to 500 records and 1 single period and product per call https://uncomtrade.org/docs/how-to-access/ body SHA-256 867c1d9de7aa143932643abb3ed321d403129b1b5cb1786d62d4acfcf75c7ae7. Exact words: There are two kinds of registration: free and premium. https://comtradeplus.un.org/en/license-agreement body SHA-256 f8266dc77ad64d95ba2f0a7d39e04984f00e70cca816646076bc638e4f896e9d. Exact words: Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations. The rights and obligations concerning the use of United Nations COMTRADE in accordance with this Usage Agreement are not transferable. Publisher free limits: 100K records/keyed call; 500 calls/day; public preview 500 records, one period and product/call. Owner selection remains PO-S2-80."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#un_comtrade. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://uncomtrade.org/docs/un-comtrade-tools/ body SHA-256 6bb66dc8e65d79c24b57ad00fbe31a71949f77929e2817fb28e1dd200540b2c5. Exact words: The bilateral data comparison tool puts the reported data and its mirror data side-by-side, allowing the analysis of bilateral trade asymmetries https://uncomtrade.org/docs/un-comtrade-api/ body SHA-256 5ba69b23be248a928ceb2552832bf4e8e3e1343b13b86b5e17069203ab371692. Exact words: There is no need to create an account nor having API subscription key, the preview APIs would work as is. https://uncomtrade.org/docs/api-subscription-keys/ body SHA-256 27ae45c86f57d7e39016badd602d4fce48a9c1af4e8572e9df430f41e1645027. Exact words: You must be a registered UN Comtrade user before requesting an API subscription key. https://uncomtrade.org/docs/subscriptions/ body SHA-256 65ec76f8be19aeea2cdb465e88bc65373c900785bc97f92717381c12d1a701f3. Exact words: Registration is free, and users can unlock a range of features with a registered UN Comtrade account. These features include data preview, data download of 100K records per call, and data API access for up to 500 calls/day. Limited to 500 records and 1 single period and product per call https://uncomtrade.org/docs/how-to-access/ body SHA-256 867c1d9de7aa143932643abb3ed321d403129b1b5cb1786d62d4acfcf75c7ae7. Exact words: There are two kinds of registration: free and premium. https://comtradeplus.un.org/en/license-agreement body SHA-256 f8266dc77ad64d95ba2f0a7d39e04984f00e70cca816646076bc638e4f896e9d. Exact words: Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations. The rights and obligations concerning the use of United Nations COMTRADE in accordance with this Usage Agreement are not transferable. Partial subscription reading: 100K records per registered data download and up to 500 API calls/day; a separate statement limits a call to 500 records, one period and product. Per-call tier binding, reset rule and quota scope remain unverified; no keyed API or public preview cap is confirmed. Owner selection remains PO-S2-80."
     comtrade_policy:
       confirmed: false
 
@@ -12178,7 +12178,7 @@ sources:
     fetch_host: ""
     terms_url: "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
     licence_url: ""
-    licence_id: "CC BY 4.0; indicator-specific exceptions apply"
+    licence_id: "CC-BY-4.0"
     licence_basis: "portal_terms"
     decision_record: ""
     terms_words: "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below."
@@ -12212,7 +12212,7 @@ sources:
     fetch_host: ""
     terms_url: "https://unctadstat.unctad.org/EN/About.html#TERMS_OF_USE"
     licence_url: ""
-    licence_id: "CC BY 3.0 IGO; portal materials"
+    licence_id: "cc-by-igo"
     licence_basis: "portal_terms"
     decision_record: ""
     terms_words: "All materials provided on this website are copyrighted under the Creative Commons Attribution 3.0 IGO license. All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source."

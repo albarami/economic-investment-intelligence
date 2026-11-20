@@ -288,7 +288,7 @@ of the live traffic provider, it is listed for its terms, price and attribution,
 | `places_fsq` | Foursquare Open Source Places (public copy on Source Cooperative) | Foursquare | inside `./eii build-public`, from the public copy on Source Cooperative, `https://data.source.coop/fused/fsq-os-places/` (host `data.source.coop`, PUB-03), geospatially partitioned GeoParquet, read without an account; each refresh selects the newest dated release through the root listing, then only the files that cover Qatar are fetched from its `places/_metadata` file by the row-group statistics of longitude and latitude against the frame box; a file's own geographic bounding box is not the extent and is not used; the whole of each file found is fetched; runtime registry evidence records the actual release date and the places are shown with it; the copy's README `https://data.source.coop/fused/fsq-os-places/README.md` and the access page `https://docs.foursquare.com/data-products/docs/access-fsq-os-places`, read 2026-11-12 | Apache License, Version 2.0, with the publisher's copyright line, as the copy's README states them (read 2026-11-14); the release identifier of a row comes from the selected folder name, and every earlier dated snapshot is retained (decision 0064 item 14) |
 | `worldpop_qat_agesex` | WorldPop age and sex structures, 100 m grids, Qatar | WorldPop | inside `./eii build-public`; pages `https://hub.worldpop.org/project/categories?id=8` and `https://hub.worldpop.org/geodata/listing?id=138`, read 2026-11-12; host data.worldpop.org (S2-T14) | CC BY 4.0 (DOI 10.5258/SOTON/WP00841) |
 | `weather_openmeteo` | Open-Meteo historical weather, hourly | Open-Meteo | inside `./eii build-public`, into the public cache as a hashed file; documentation `https://open-meteo.com/en/docs/historical-weather-api`, terms `https://open-meteo.com/en/terms` and licence page `https://open-meteo.com/en/licence`, read 2026-11-12; host archive-api.open-meteo.com (S2-T14); location and variables to be recorded at the first fetch | free interface for non-commercial use (`licence_basis: provider_terms`); data CC BY 4.0, with the attribution the publisher asks for |
-| `un_comtrade` | UN Comtrade reporter imports and exports, and partner-mirror tables | United Nations Statistics Division | registry row `un_comtrade`; landing lead `https://uncomtrade.org/docs/un-comtrade-tools/`; source and redirect hosts stay off the PUB-03 allow-list until the lead reviews them | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model"; read 2026-11-19; basis `provider_terms`; per-key evidence and hash in section 4, "S2-T21 part B terms readings". |
+| `un_comtrade` | UN Comtrade reporter imports and exports, and partner-mirror tables | United Nations Statistics Division | registry row `un_comtrade`; landing lead `https://uncomtrade.org/docs/un-comtrade-tools/`; documentation host uncomtrade.org and licence host comtradeplus.un.org remain reading-only under L-1270; API source and redirect hosts stay off PUB-03 pending a reviewed fetch configuration | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model"; read 2026-11-19; basis `provider_terms`; per-key evidence and hash in section 4, "S2-T21 part B terms readings". |
 | `biz_register` | Public establishment records of the public business register: each field its public card shows, person names excluded ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | to be recorded in `source_registry` when the file is first read | not fetched: one file collected by the owner's advisor as a visitor's browser receives it, kept outside the repository and read only through `EII_REGISTER_FILE`; no fetcher for the register's site is in the repository (decision 0022 item 1) | publisher's terms in its own words with the date read, recorded when the file is first read; basis of use: the owner's decision for a personal, local project; permission needs for real use go on document 17's list (PUB-12) |
 | `fc_register` | Public company records of the financial centre's public register (S2-T36) | Qatar Financial Centre Authority (QFCA), READ-T36 R5 | `https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx`, company-only cards through `./eii build-public`; reviewed pin, byte bound and live activation pending. The separate geocoded file still enters through `EII_FC_REGISTER_FILE` | Main-site terms `https://www.qfc.qa/en/terms-of-use/`, read 2026-11-19: “may only be used for personal viewing purposes”; “Any rights not expressly granted in these Terms are reserved.” The Site definition does not name the register host. `licence_id: none-stated`, basis `owner_decision`, decision 0026; terms are records under decision 0059; nothing fetched is committed |
 | `gis_land_price` | Land pricing by district, 2026 guide prices (`LandPricing2026`: residential, city-centre residential, flats, villas and commercial) | national GIS centre | `https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer`; layer `0`; additional layers and fields in the S2-T19 reading below | `terms to be read`, checked 2026-11-15; `owner_decision`, decision 0026 (PUB-12) |
@@ -499,7 +499,9 @@ available history, access tier and units are NOT READ. This date is not
 page-reading evidence. The row names two finished downloads,
 country-product-year and country-partner-product-year. A rebuild input is
 refused. Terms remain `terms to be read` on basis `owner_decision`, decision
-0026. No Atlas host is admitted under PUB-03 yet. Registration or a paid tier
+0026. No Atlas host is admitted under PUB-03. The S2-P18 metadata readings
+do not admit atlas.hks.harvard.edu or intl-atlas-downloads.s3.amazonaws.com;
+no data URL or redirect is confirmed (L-1270). Registration or a paid tier
 fetches nothing. A narrower year selection records the excluded coverage and
 infers no concordance.
 
@@ -515,12 +517,21 @@ hash. Confirmed metadata facts are distinct from a confirmed download policy.
 This dated record supersedes the earlier NOT READ descriptions only for the
 individual facts it confirms; every source's download policy remains unconfirmed.
 
-- Comtrade: the subscription page states a free keyed download of 100K records
-  per call and up to 500 API calls/day. The public preview table states 500
-  records, one period and one product per call. Registration is required for
-  the keyed route; no account or key was used for this reading. The documentation
-  and licence hosts are admitted under PUB-03. The attempted API documentation
-  path returned HTTP 404; the API host and redirects remain unreviewed. No data
+L-1270 separates reading evidence from fetch admission. All eight P18 host
+admissions are withdrawn: none has a configured fetch in these registry rows or
+policies, and the Atlas data host has unreviewed redirects. PUB-03 retains its
+pre-P18 hosts. The exact host-set guard derives read hosts from this review and
+fetch hosts from the registry and policies, with extra-host and read-only-host
+plants; reading a page alone never admits its host.
+
+- Comtrade: the subscription page states "data download of 100K records per call,
+  and data API access for up to 500 calls/day" for a registered free account,
+  and "Limited to 500 records and 1 single period and product per call"; the
+  tier of each per-call limit, the reset rule and the quota scope remain
+  unverified. S2-T23 criterion 4 stays open. Registration is required for the
+  keyed route; no account or key was used for this reading. The documentation
+  and licence hosts remain reading-only, outside PUB-03 (L-1270). The attempted
+  API documentation path returned HTTP 404; the API host and redirects remain unreviewed. No data
   request, measured gap, schema confirmation or owner selection is claimed.
 - BACI: the named dataset page exceeded the fixed metadata intake ceiling.
   Alternative documentation paths returned HTTP 404. No complete page hash,
@@ -537,27 +548,35 @@ individual facts it confirms; every source's download policy remains unconfirmed
   statements do not establish a selected file's vintage, native measure schema,
   country key or coverage. The terms route returned an application shell and
   Dataverse returned an empty HTTP 202; file-specific licence and citation
-  remain pending. Only the two successfully read dataset/index hosts are added.
+  remain pending. The two read dataset/index hosts remain outside PUB-03;
+  the data host has no reviewed download redirects (L-1270).
 - WDI: DataBank and the dataset catalogue identify World Development Indicators.
   The catalogue labels its metadata version and update date and states CC BY 4.0;
   the general dataset terms retain indicator-specific third-party exceptions.
   A catalogue metadata version is not a selected file vintage. The Qatar page
   returned HTTP 403, so selected indicator histories, Qatar keys, status fields,
   native schema and bounds remain pending. The successful dataset/catalogue and
-  terms hosts are added; the denied country-page host is not added.
+  terms hosts remain reading-only, outside PUB-03; the denied country-page
+  host is also absent (L-1270).
 - UNCTAD: the portal terms state CC BY 3.0 IGO and its attribution requirement;
   the FAQ states free access with no registration and defines inward/outward FDI
   flows. This establishes neither Qatar FDI coverage nor a dataset vintage,
-  period/status mapping, schema or bound. The successfully read portal host is
-  added. Flows stay separate from announced projects.
+  period/status mapping, schema or bound. The read portal host remains outside
+  PUB-03 until a registry row or policy fetches from it with reviewed redirects
+  (L-1270). Flows stay separate from announced projects.
 - IMF WEO and ILOSTAT: the attempted dataset/documentation pages returned
   HTTP 403. The original ILO address also attempted an unreviewed redirect,
   which was not followed. No access challenge was bypassed, no new host is
   admitted and neither source's metadata or Qatar coverage is confirmed.
 
+The Comtrade registry retains the two-page terms words and date of 2026-11-19
+from **S2-T21 part B terms readings**, including the re-dissemination excerpt.
+The 2026-11-20 licence-agreement reading remains supplementary evidence in the
+review and registry basis note; it does not replace the two-page record.
+Document 17 retains that record and its application/re-dissemination distinction.
+
 Current registry terms, read 2026-11-20 (body hashes and URLs in the linked review):
 
-- `un_comtrade`, United Nations Statistics Division: "Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations."
 - `wb_wdi`, World Bank: "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below."
 - `unctad_fdi`, UNCTAD: "All materials provided on this website are copyrighted under the Creative Commons Attribution 3.0 IGO license. All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source."
 

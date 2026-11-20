@@ -43,16 +43,6 @@ ALLOWED_HOSTS = frozenset(
         "www.edu.gov.qa",
         "myschool.edu.gov.qa",
         "myschools.edu.gov.qa",
-        # S2-P18: metadata pages and body hashes in the publisher review record.
-        # These hosts do not confirm a data URL, redirect or download policy.
-        "uncomtrade.org",
-        "comtradeplus.un.org",
-        "atlas.hks.harvard.edu",
-        "intl-atlas-downloads.s3.amazonaws.com",
-        "databank.worldbank.org",
-        "datacatalog.worldbank.org",
-        "www.worldbank.org",
-        "unctadstat.unctad.org",
     }
 )
 

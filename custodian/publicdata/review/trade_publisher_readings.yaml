@@ -77,26 +77,26 @@ sources:
       reading: http_error
       sentences: []
     facts:
-      keyed_records_per_call:
+      registered_download_records_per_call:
         confirmed: true
         value: 100K
         page: comtrade_subscriptions
         sentence: Registration is free, and users can unlock a range of features with a registered UN
           Comtrade account. These features include data preview, data download of 100K records per call,
           and data API access for up to 500 calls/day.
-      daily_calls:
+      registered_api_calls_per_day:
         confirmed: true
         value: '500'
         page: comtrade_subscriptions
         sentence: Registration is free, and users can unlock a range of features with a registered UN
           Comtrade account. These features include data preview, data download of 100K records per call,
           and data API access for up to 500 calls/day.
-      public_records_per_call:
+      per_call_limit_tier_unstated:
         confirmed: true
         value: '500'
         page: comtrade_subscriptions
         sentence: Limited to 500 records and 1 single period and product per call
-      preview_scope:
+      per_call_scope_tier_unstated:
         confirmed: true
         value: one period and one product per call
         page: comtrade_subscriptions
@@ -121,8 +121,9 @@ sources:
     pending:
     - 'API source/redirect host review: attempted Swagger documentation returned HTTP 404; no API request
       was made.'
-    - Schema, API version, Qatar reporter/mirror keys, reset/quota scope and selected count/byte bounds
-      remain unverified.
+    - Per-call tier binding, reset rule and quota scope remain unverified; no keyed API or public preview
+      cap is confirmed.
+    - Schema, API version, Qatar reporter/mirror keys and selected count/byte bounds remain unverified.
     - Owner years/partners/product scopes and manifests remain PO-S2-80; no coverage gap or paid-plan
       price measured.
     activation: false
