@@ -244,7 +244,7 @@ def _fetch_stage(
                                 clock(),
                             )
                     except WebError:
-                        status = "field_refused"
+                        status, proposed, bundle_identity = "field_refused", (), ""
                 except ArchivedObstacle as error:
                     status, selected = "obstacle", error.page.identity
                 except WebError as error:
@@ -311,6 +311,11 @@ def _review_stage(
                         selectors=selectors,
                         selectors_reviewed=selectors is not None,
                     )
+                    bundle = (
+                        sha256_hex(dump(reviewer_bundle(company.name, result)))
+                        if result.status == "matched"
+                        else ""
+                    )
                 except WebError:
                     if p["status"] != "field_refused":
                         raise
@@ -318,9 +323,7 @@ def _review_stage(
                     if result.status != p["status"]:
                         raise WebError("extraction_binding_refused")
                     proposed = result.candidates
-                    if result.status == "matched" and p[
-                        "reviewer_bundle"
-                    ] != sha256_hex(dump(reviewer_bundle(company.name, result))):
+                    if bundle and p["reviewer_bundle"] != bundle:
                         raise WebError("bundle_binding_refused")
             if [c.digest for c in proposed] != p["proposed"] or p[
                 "fields"

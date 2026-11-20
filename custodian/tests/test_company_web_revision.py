@@ -166,13 +166,34 @@ def test_extracted_fields_redump_is_refused_as_reviewer_fragment(rehash):
         )
 
 
+def test_one_candidate_with_foreign_fragment_hash_is_refused():
+    data = body()
+    result = extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+    assert len(result.candidates) > 1
+    last = replace(result.candidates[-1], fragment_sha256="0" * 64)
+    with pytest.raises(WebError, match="review_bundle_refused"):
+        reviewer_bundle(
+            NAME, replace(result, candidates=(*result.candidates[:-1], last))
+        )
+
+
+@pytest.mark.parametrize(
+    "contact",
+    [{"telephone": "+0 000 0000"}, {"email": "info" + "@" + "zorvella.example.test"}],
+)
+def test_contact_property_refuses_fragment_at_extraction(contact):
+    data = body(**contact)
+    with pytest.raises(WebError):
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+
+
 @pytest.mark.parametrize(
     "name",
     [
-        "Qatar Mobile Phones Trading",
-        "Doha Phone Centre",
-        "Asset Manager Holding",
-        "Dr Pharma",
+        "Qelvan Mobile Phones Trading",
+        "Zorvanda Phone Centre",
+        "Velquorra Asset Manager Holding",
+        "Dr Qelmarine Pharma",
     ],
 )
 def test_register_name_uses_input_checks_only(name):
@@ -213,6 +234,33 @@ def test_refused_input_name_is_counted_without_aborting_other_companies(
     assert reviewed["counts"]["input_refused"] == 1
 
 
+def test_refused_bundle_name_is_counted_without_aborting_review(tmp_path):
+    inputs = (Company("syn-a", "Smart-Phone Zorvex Trading", "register", {}),)
+    data = body(name="SmartPhone Zorvex Trading")
+    access = access_for(
+        tmp_path,
+        manifest(),
+        [],
+        lambda address: (
+            f'<a class="result" href="{URL}">invented</a>'.encode()
+            if "search.example.test" in address
+            else data
+        ),
+    )
+    searched = _search_stage(inputs, access.manifest, access, lambda: STAMP)
+    assert searched["rows"][0]["status"] == "searched"
+    fetched = _fetch_stage(
+        inputs, access.manifest, access, searched, tmp_path, lambda: STAMP
+    )
+    page = fetched["outcomes"][0]["pages"][0]
+    assert page["status"] == "field_refused"
+    assert page["proposed"] == []
+    assert page["reviewer_bundle"] == ""
+    reviewed = _review_stage(inputs, access.manifest, fetched, searched, access, {})
+    assert reviewed["counts"]["field_refused"] == 1
+    assert reviewed["counts"]["proposed"] == 0
+
+
 @pytest.mark.parametrize(
     "url",
     [
@@ -224,6 +272,10 @@ def test_refused_input_name_is_counted_without_aborting_other_companies(
         "https://intranet/",
         "https://localhost./",
         "https://build.localhost/",
+        "https://127.1/",
+        "https://0177.0.0.1/",
+        "https://0x7f.0.0.1/",
+        "https://10.1/",
     ],
 )
 def test_nonpublic_address_hosts_refused_before_manifest_admission(url):

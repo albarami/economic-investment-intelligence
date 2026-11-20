@@ -94,7 +94,9 @@ frame and always reset on exit. Redirects, final addresses and injected response
 are checked too. Static `allowlist.approve` is unchanged and streams cannot use
 the company scope. Credentials, headers and postbacks are refused in that scope.
 IP-literal, localhost (including its subdomains) and single-label hosts are refused
-before manifest admission. Selector lookup uses the parsed, lowercase host,
+before manifest admission. The final host label must be alphabetic or punycode;
+legacy shortened, octal and hexadecimal numeric IPv4 spellings are refused too.
+Selector lookup uses the parsed, lowercase host,
 including when a URL spells an explicit default HTTPS port. Manifest containers
 are type-checked before their properties are read; malformed inputs use the fixed
 refusal diagnostic.
@@ -132,6 +134,14 @@ bind exactly without receiving a register key. A re-dump of assembled candidate
 fields is refused as a fragment, including when its hashes are recomputed. The
 fragment never replaces the archived full body; its hash is distinct from the
 full-page hash.
+
+A declared block with a telephone, fax or e-mail property is refused in full at
+extraction, even when that property would not become a candidate. A reviewed
+per-host selector can narrow the source block; live coverage remains for the lead
+to measure. If a reviewer bundle is refused, fetch records `field_refused` with
+no candidate digests or bundle identity. Review repeats extraction and bundle
+validation inside the same refusal boundary, preserving the counted refusal
+without aborting the batch.
 
 The reviewer returns records keyed by `candidate_digest`. Each record has exactly
 `candidate_digest`, `field`, `value_sha256`, `page_sha256`, `fragment_sha256`,

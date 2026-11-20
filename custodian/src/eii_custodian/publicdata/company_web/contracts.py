@@ -78,6 +78,10 @@ def checked_url(url: str, *, query: bool = False) -> str:
         host = (parts.hostname or "").rstrip(".")
         if "." not in host or host == "localhost" or host.endswith(".localhost"):
             raise WebError("url_refused")
+        if not re.fullmatch(
+            r"[a-z]{2,63}|xn--[a-z0-9-]{1,59}", host.rsplit(".", 1)[-1].lower()
+        ):
+            raise WebError("url_refused")
         try:
             ip_address(host)
         except ValueError:
