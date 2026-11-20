@@ -2861,6 +2861,18 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 
 
 
+## OI-341 — Two performance-spike readiness timeouts in the moved train S2-7 whole test
+
+- ID: OI-341
+- TYPE: OPEN
+- RAISED BY: the lead's whole test S2-7.mv1 of train S2-7 (pull request 104) on its moved head 33df1963, seed 1663203784, 2026-11-19.
+- CONCERNS: `web/spikes/performance/tests/performance.spec.ts`, the tests "roads paused playback plant is refused by name" and "roads full street load draws every link and carries the Simulated mark"; the readiness wait of the performance spike.
+- EVIDENCE: exit 1, 11845 passed, 1 failed, 0 skipped; the one failed node test is the browser suite of the performance spike, inside which two browser tests stopped at `spike readiness timed out` (53 passed, 2 failed). The machine's load average stood near 122 with eight whole tests in flight. The same spike code passed in the lead's whole test S2-7.lv2 on the old base, seed 2297442108, and the move onto main changed only records. Cause not established; load is a hypothesis only.
+- NEEDED: attach this occurrence to OI-319's investigation with its seed and revision; establish the cause or the evidence rule 39 requires. A green rerun alone does not close it. No timeout, assertion, baseline or gate is relaxed by this record.
+- COMPARISON: OI-319 records the full-street-load timeout seen during S2-T35; this item adds the paused-playback test and a second occurrence of full street load. OI-160 is closed history.
+- NEEDED BY: the slice S2 gate's record of random failures.
+- UPDATE 2026-11-20: a third occurrence in the lead's ledger run S2-7.ledger2 on the same head 33df1963 (2026-11-20): the ledger row `cd web && npm run test:checks` exited 1 with one failure, the browser test "roads full street load draws every link and carries the Simulated mark" stopping at its readiness wait after about 170 seconds while the machine's load average stood near 60; the other 16 rows passed, the whole test among them (11846 passed, 0 failed). The rerun S2-7.ledger3 with a fresh seed passed every row; under rule 39 that rerun does not close this item.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4441,6 +4453,156 @@ Revision-2 record points without extra numbers:
 - EVIDENCE: The supplied carry-back return notes that the docstring still says the pinned copy's excluded file footers although the fixed-release constant is retired. The same wording remains at WORK. L-1095 sends the note to the next fix touching that file.
 - NEEDED: Correct the description in that scoped follow-up, preserving the explicit release argument and every existing validation. This is a wording note, not a rejected code or test change.
 - COMPARISON: PO-S2-122 concerns README.md; this item is the helper's own description. No matching proposed-item entry was found at WORK.
+
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant not exposed).
+
+Proposed review follow-ups only; no new reproduction or closure is claimed. Source line numbers below identify review evidence, not pack requirements. All source files are under `.overnight/IN/reviews/`. L-1162 retains all seven S2-T39B proposals.
+
+### PO-S2-125 — Restore the absent source bodies for independent rehash
+
+- ID: PO-S2-125
+- TYPE: OPEN
+- RAISED BY: S2-T21B.rev1.review.md, PROPOSED OPEN ITEMS, source line 108.
+- EVIDENCE: P1 (record; REV-10, rule 19) Three saved bodies are absent from the review handoff: worldpop_faq.html, overture_attribution.html and investqa_terms.html (and its .read.txt view). The 104 portal metadata JSON bodies are absent too. 51 quotation segments and the portal "CC BY" values could be traced only to validation_detail.json's hash MATCH and EXACT records, not rehashed by the reviewer. Restore these bodies to the evidence store the lead keeps, rehash them and repeat the quotation check. No defect in the commit.
+- NEEDED: Restore the three saved bodies and portal metadata bodies to the lead-held evidence store, rehash and repeat the quotation checks. Existing OI-209 remains open; this is its review-handoff repair.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-126 — Make the terms evidence reproducible
+
+- ID: PO-S2-126
+- TYPE: OPEN
+- RAISED BY: S2-T21B.rev1.review.md, PROPOSED OPEN ITEMS, source line 109.
+- EVIDENCE: P2 (record; REV-17, rule 44) PROGRESS.md records runs of untracked helper scripts (.overnight/tmp/apply_terms.py, check_apply.py, proposed-url-repairs.patch) that are not commands of rule 44 and cannot be reproduced from the repository. Documents 04 and 17 also cite rows of untracked evidence tables (rows_map.tsv, terms_pages.tsv and the rest) and say bodies are absent "from this workspace". Record where the evidence tables are kept, or reword those references to the terms URL, date and SHA-256 the rows already carry. The reviewer verified the applied result independently (K1, K5).
+- NEEDED: Record repository-relative evidence locations or reword document references to the already recorded terms URL, date and SHA-256. Append corrections; no new reading or helper command is authorized.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-127 — Pin terms-guard plants to their intended failures
+
+- ID: PO-S2-127
+- TYPE: OPEN
+- RAISED BY: S2-T21B.rev1.review.md, PROPOSED OPEN ITEMS, source line 110.
+- EVIDENCE: P3 (hardening: document 17) The guard's plants accept either AssertionError or RegistryError. A planted row could therefore be "detected" by an unrelated loader refusal. The reviewer's control run shows this is not happening now. Asserting the expected failure key or message per plant would pin it.
+- NEEDED: Send this hardening point to document 17 with its origin. Preserve the positive control and existing guards; a scoped follow-up should assert the intended failure key or message for each plant.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-128 — Complete the current-head whole-test record
+
+- ID: PO-S2-128
+- TYPE: OPEN
+- RAISED BY: S2-T21B.rev1.review.md, PROPOSED OPEN ITEMS, source line 111.
+- EVIDENCE: P4 (record; REV-11) PROGRESS.md holds no green `./eii test` run on 86f7ed1d yet. The builder's seeded run (exit 1) predates the corrected expectations and L-1159. The lead's whole-test run on the commit or merge result is still owed, as the brief notes.
+- NEEDED: Attach actual moved-head and eventual exact merge-result evidence. Retain the old-base failure, deterministic correction and later old-base pass. The supplied moved-head mv1 has launch evidence only.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-129 — Retain the measured readiness margin for follow-up
+
+- ID: PO-S2-129
+- TYPE: OPEN
+- RAISED BY: S2-T44.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 24.
+- EVIDENCE: - hardening: recorded full-street readiness under the same four busy loops is 154371.4 ms against the unchanged 170000 ms bound. The first idle, both 256-point samples, and the orbit still grow with CPU contention. The criterion can be met by the suite passing under that load; this review did not run the suite.
+- NEEDED: Carry these measurements to the owning hardening review without raising bounds, timeouts or retries. Log 19:31 and rev1b retain this proposal; PO-S2-118 is not closed.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-130 — Assert listener removal on the error path
+
+- ID: PO-S2-130
+- TYPE: OPEN
+- RAISED BY: S2-T44.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 27.
+- EVIDENCE: - hardening: the failure test asserts rejection and does not read `observed.removed`, so idle-listener removal on the error path is implemented in `whenIdle` and not asserted.
+- NEEDED: Record this hardening point in document 17. A scoped follow-up should retain rejection and pin listener removal on the error path with a planted failure.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-131 — Inventory the consumed page-table snapshot
+
+- ID: PO-S2-131
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 27.
+- EVIDENCE: - (hardening) `read_investment` records the manifest and record-table snapshots in `build.files` but not the page-table snapshot it reads and hash-verifies (assembly_native.py:235-237); add it for a complete consumed-artifact inventory.
+- NEEDED: Record the hardening point in document 17; the scoped follow-up should inventory the consumed page-table snapshot while preserving hash and re-extraction checks.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-132 — Confirm pairing against live Arabic page tags
+
+- ID: PO-S2-132
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 28.
+- EVIDENCE: - (hardening) the declared-pairing match is literal `hreflang="en"`; `en-US`/case variants silently fall back to own-path keys. Decision-compliant (reviewed list is the fallback), but worth confirming against the live Arabic pages.
+- NEEDED: Confirm actual language tags in the owning live inventory task. Keep the reviewed own-path fallback; infer no counterpart. Any variant handling requires its own reviewed change.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-133 — Resolve the absent receipt charset field
+
+- ID: PO-S2-133
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 29.
+- EVIDENCE: - (record) the fetch receipt format carries no `charset` field, so the receipt-charset step of the decision's decode order is vacuous today; code honours it when present. Lead to confirm or wire it.
+- NEEDED: Have the lead confirm or wire the charset source in its owning task. Preserve the declared decode order and named refusals; infer no schema amendment.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-134 — Flag ISO-date refusal in the live inventory review
+
+- ID: PO-S2-134
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 30.
+- EVIDENCE: - (record) the tender-parity phone regex scores an ISO date (`2024-06-15`, 8 digits) as a contact shape, so a real page containing one is refused per page — identical to the tender scan the decision mandates; flag for the live Arabic inventory review.
+- NEEDED: Keep the mandated tender-parity scan and refusals; flag this behavior for the live Arabic inventory reviewer. This draft reads no live page and changes no policy.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-135 — Confirm whether the page list supplies site order
+
+- ID: PO-S2-135
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 31.
+- EVIDENCE: - (record) `sequence` is always null; confirm the `investment_pages.yaml` order is not "the site's own page list" (choice recorded in doc 03:859-861).
+- NEEDED: Confirm the source status of the list order in the owning task. Keep sequence null until evidence supports a change, retaining document 03 wording.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-136 — Record where release byte equality is enforced
+
+- ID: PO-S2-136
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 32.
+- EVIDENCE: - (record) `validate_page_rows(page_rows, page_rows)` at write time is intentionally vacuous for re-extraction; the real byte-equality gate runs at release read. Correct as built — noted for the lead.
+- NEEDED: Retain the distinction in the owning ledger: write-time self-comparison is structural validation; release re-extraction is the byte-equality gate. Preserve that real gate and its plants; the reviewer calls the current behavior correct.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-137 — Compare the complete contract rows with the decision appendix
+
+- ID: PO-S2-137
+- TYPE: OPEN
+- RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 33.
+- EVIDENCE: - (record) verify byte-equality of the two >2000-char doc-03 rows against decision 0029's appendix during merge checks; verified identical over all readable characters here.
+- NEEDED: During owning merge checks, compare both full document 03 investment rows with decision 0029 appendix, accounting only for code-block indentation. Attach real proof rather than the truncated reading view.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-138 — Clarify the retained join-proof script location
+
+- ID: PO-S2-138
+- TYPE: OPEN
+- RAISED BY: TRAIN-S2-7.conf1.md, PROPOSED OPEN ITEMS, source line 51.
+- EVIDENCE: - (record) The forced-diff script's generated header names `tmp/forced_diff_s27.py` while the reviewed copy sits under `.overnight/IN/`; a records-only path naming nit, no content difference.
+- NEEDED: Append the actual retained relative location and keep the original generated header/report. The confirmer found no proof-content difference.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+### PO-S2-139 — Record the supported restoration method in read-only reviews
+
+- ID: PO-S2-139
+- TYPE: OPEN
+- RAISED BY: TRAIN-S2-7.conf2.md, PROPOSED OPEN ITEMS, source line 54.
+- EVIDENCE: - (record) The requested Git-checkout restoration is unavailable with read-only Git metadata; direct restoration from the committed blob achieved identical bytes and a clean tree. No product or test fix requested.
+- NEEDED: Retain the exit-128 deviation and committed-blob restoration, byte equality and clean tree. Future read-only briefs should name a supported restoration method; no product or test fix is requested.
+- COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
+
+#### Review proposals with an existing item or a satisfied record disposition
+
+- Source: S2-T44.rev1.stdout.md, source line 25: - record: this snapshot places S2-T44 after S2-T41 because S2-T43 is absent. Put the entry after S2-T43 when joining newer records.
+  Disposition: TASKS.md at HEAD places S2-T44 after S2-T43. TRAIN-S2-7.conf1.md Q2 confirms identical content with an offset shift. Record the satisfied join instruction here, without a duplicate OPEN item.
+
+- Source: S2-T44.rev1.stdout.md, source line 26: - PO-S2-118 stays open. The builder’s proposed closing line is in the build return. This review does not adopt it.
+  Disposition: Retain this already assigned label and the reviewer's refusal to adopt the closing line. Log 19:31 carries it forward; this draft closes nothing and allocates no replacement. The original label is not an ID at HEAD; see log.md M05.
+
+- Source: TRAIN-S2-7.conf1.md, source line 52: - (record) The S2-T44 task section lands at a different line offset in the joined TASKS.md than in its approved parent (insertions above shifted it); content identical — noted for the ledger only.
+  Disposition: This is the same placement/offset note, explicitly for the ledger only. Content equality is in Q2. Recorded here and in log.md; no second OPEN item or implementation fix.
 
 ## Sources
 
