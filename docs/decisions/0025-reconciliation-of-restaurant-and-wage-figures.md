@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed, awaiting sign-off |
+| Status | Accepted, 2026-11-20; signed off by the owner-delegated advisor under the owner's delegation of 2026-11-20 (OI-03) |
 | Date | 2026-11-14 |
 | Task | S2-T03 |
 | Basis | Document 04, PUB-64 and PUB-74 to PUB-77; document 07, MTH-22; OI-03; ruling L-216 |

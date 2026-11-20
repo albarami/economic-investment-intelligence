@@ -278,7 +278,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_goods"
@@ -324,7 +324,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_serv"
@@ -370,7 +370,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_size"
@@ -417,7 +417,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_comp_occ"
@@ -487,7 +487,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "wage_act"
@@ -529,7 +529,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "wage_sector"
