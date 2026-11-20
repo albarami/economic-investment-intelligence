@@ -178,13 +178,6 @@ def build_layers(build: Production) -> None:
             for entry in build.entries
             if entry.key in deal_sources
         }
-        build.table(
-            "pub_property_quarter",
-            quarter_aggregates(deals, as_of_by_source=as_of_by_source),
-            tuple(deal_sources),
-        )
-    for table in sorted(family_rows):
-        build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
         quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
         expected = expected_as_of(deals, as_of_by_source)
         for row in quarter_rows:
@@ -198,6 +191,8 @@ def build_layers(build: Production) -> None:
                 )
                 require_price_as_of(row, expected[key])
         build.table("pub_property_quarter", list(quarter_rows), tuple(deal_sources))
+    for table in sorted(family_rows):
+        build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
 
 
 def _features(layers: list[dict[str, Any]]) -> list[dict[str, Any]]:

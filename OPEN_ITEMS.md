@@ -4625,13 +4625,15 @@ Proposed review follow-ups only; no new reproduction or closure is claimed. Sour
 ### PO-S2-133 — Resolve the absent receipt charset field
 
 - ID: PO-S2-133
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: S2-T39B.rev1.stdout.md, PROPOSED OPEN ITEMS, source line 29.
 - EVIDENCE: - (record) the fetch receipt format carries no `charset` field, so the receipt-charset step of the decision's decode order is vacuous today; code honours it when present. Lead to confirm or wire it.
 - NEEDED: Have the lead confirm or wire the charset source in its owning task. Preserve the declared decode order and named refusals; infer no schema amendment.
 - COMPARISON: This carries the supplied proposal only; no independent defect, new severity or blocking verdict is asserted.
 - PARTIAL 2026-11-20 (package P15, lead ruling: a header charset wins over a differing meta charset, an absent header falls through to meta, neither refuses): investment_build._fetch_page writes the Content-Type charset to the snapshot receipt when the transport supplies it, but fetch.transport.open_https does not yet pass Content-Type, so production receipts still carry none; open until the transport carries it under a test (review S2-P15-rv F1).
 - Update 2026-11-20 (fix cad38d49, review S2-P15-rv confirmation): fetch.transport.open_https passes Content-Type under test_open_https_passes_content_type_charset; the item stays open until an end-to-end test shows a served header charset winning over a differing meta charset through the build (review finding F2).
+- Update 2026-11-20 (fix 93fec708, review S2-P15-rv confirmation 2): test_investment_page_header_charset_beats_meta shows a served header charset winning over an invalid meta charset through the build, and its absence refusing with page_decode.
+- CLOSED: 2026-11-20, by the lead on the confirmation of package P15 (S2-P15.cf2, CONFIRMED at 93fec708): the receipt carries the served header charset, the decode order is header, then meta, then a named refusal, and the end-to-end test above decides it.
 
 ### PO-S2-134 — Flag ISO-date refusal in the live inventory review
 
@@ -5345,7 +5347,7 @@ Inspected 257 existing relevant/linked items. Dispositions: 90 carried — gate 
 | PO-S2-130 | **CARRIED — GATE HOLD**. Record this hardening point in document 17. A scoped follow-up should retain rejection and pin listener removal on the error path with a planted failure. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-130 evidence/needed-by record. |
 | PO-S2-131 | **CARRIED — GATE HOLD**. Record the hardening point in document 17; the scoped follow-up should inventory the consumed page-table snapshot while preserving hash and re-extraction checks. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-131 evidence/needed-by record. |
 | PO-S2-132 | **CARRIED — LIVE EVIDENCE**. Confirm actual language tags in the owning live inventory task. Keep the reviewed own-path fallback; infer no counterpart. Any variant handling requires its own reviewed change. A completed merged-head run and the item-specific review/handoff remain required; no live cache is read here. Source: original PO-S2-132 evidence/needed-by record. |
-| PO-S2-133 | **CARRIED — GATE HOLD**. The absent receipt charset field remains a consumer/inventory question; no schema change or guessed charset source is supplied. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-133 evidence/needed-by record. |
+| PO-S2-133 | **CLOSED 2026-11-20** by package S2-P15 (see the item's dated closing line; this row reconciled to it by the lead the same day). |
 | PO-S2-134 | **CARRIED — LIVE EVIDENCE**. Keep the mandated tender-parity scan and refusals; flag this behavior for the live Arabic inventory reviewer. This draft reads no live page and changes no policy. A completed merged-head run and the item-specific review/handoff remain required; no live cache is read here. Source: original PO-S2-134 evidence/needed-by record. |
 | PO-S2-135 | **CARRIED — LIVE EVIDENCE**. Confirm the source status of the list order in the owning task. Keep sequence null until evidence supports a change, retaining document 03 wording. A completed merged-head run and the item-specific review/handoff remain required; no live cache is read here. Source: original PO-S2-135 evidence/needed-by record. |
 | PO-S2-136 | **CARRIED — GATE HOLD**. Retain the original correct distinction: write-time self-comparison is structural validation; verified snapshot re-extraction is the byte-equality gate. No new verification result is invented. No completing fix/review/disposition is established by this tree; retain for the S2 gate owner. Source: original PO-S2-136 evidence/needed-by record. |

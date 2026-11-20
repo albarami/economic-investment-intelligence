@@ -43870,3 +43870,10 @@ and the requested scope. The prior temporary-root cleanup warning remains open.
 - `uv run --locked mypy`: exit 0, 450 source files.
 - `python3 scripts/check_docs.py`: exit 0, 1141 text files, 123 Markdown.
 - `python3 scripts/check_tree.py`: exit 0, 8 rules. No commit.
+
+## S2 join: package P15 (lead) — 2026-11-20
+
+- Joined into the S2 join branch by cherry-pick (-x) of 99c6dfea, cad38d49 and 93fec708; package P15 is APPROVED: review S2-P15-rv rejected 99c6dfea, confirmation 1 did not confirm cad38d49, confirmation 2 (Anthropic Claude Opus 5.5, the rejecting maker; builders OpenAI and Cursor) CONFIRMED 93fec708c5efb1ac82336f487cc3929acba95dcc.
+- Join resolution: in `assembly_layers.py` the quarter-row as_of check of P15 and the family tables of P19 are both kept, each byte-equal to its approved head in its own lines; in TASKS.md the decision 0064 item 46 line is P15's approved line, once.
+- Correction 2026-11-20 (review S2-P15-rv confirmation 2): the fix 2 section above is duplicated; it is commit 93fec708c5efb1ac82336f487cc3929acba95dcc on cad38d49, not "No commit".
+- Records: PO-S2-133 closed and its gate table row reconciled; the decision 0045 item 4 box of S2-T19 ticked with its reason.
