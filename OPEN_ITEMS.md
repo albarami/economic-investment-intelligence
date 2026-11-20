@@ -1489,12 +1489,13 @@
 ## OI-129 — One sandbox timing test failed once under machine load
 
 - ID: OI-129
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN), 2026-11-20, by the fix of task S2-T10 part F in merge train S2-9.
 - NEEDED: The cause of one failure of `test_die_with_parent` in `scripts/tests/test_sandbox_mounts.py`, or a record that it did not recur over a stated number of runs.
 - WHY: AGENTS.md rule 39: a random failure is recorded, and a green re-run alone does not close it.
 - DONE SO FAR: During task S2-T01 (2026-11-13), the builder's whole test run at seed 2026111377 failed this test once with "a sandboxed process outlived its driver", while the machine was loaded (a load average of 74 on 32 processors, ruling L-106 of the run). The same test passed in the lead's whole runs at seeds 2026111378 and 2026111382, which ran at lower priority and finished with 0 failed. In the same builder run, two tests of the version check failed because that tool's shell had Node 24 first on its path instead of the pinned 22; that is an environment fault and not a random failure, and the lead's runs with Node 22 passed. No code was changed because of either.
 - OPTIONS: **Recommendation:** count the failures of this test over the next ten local runs and record the count here; if it recurs, make the test wait for the process group to end for a stated time before it judges, never loosen the assertion that the process does not outlive its driver.
 - NEEDED BY: the slice S2 gate.
+- CLOSED BY: the cause was found and fixed, not a re-run. When the driver was killed while bubblewrap was starting, the inner bubblewrap had not yet armed its parent-death signal and outlived the driver with the sandboxed process; under CPU contention `test_die_with_parent` failed 5 to 7 of 30 runs. Task S2-T10 part F adds a child subreaper between the launcher and bubblewrap (`scripts/sandbox_supervisor.py`) and bounds the stalled-run cleanup by one deadline; a deterministic reproduction fails on the base and passes on the fix, and `test_die_with_parent` is unchanged. Five commits, each reviewed or confirmed by another maker; the evidence and verdicts are in PROGRESS.md under the headings "S2-T10 part F". The assumptions the reviews left open are OI-351 and OI-352.
 
 ## OI-130 — Showing the live traffic layer outside internal evaluation
 
@@ -4970,3 +4971,24 @@ file-level preservation evidence are in `.overnight/join-checks.jsonl` and
 - EVIDENCE: L-1189 records that the fetch kept every page in memory and wrote nothing on the company-size merge failure; four hours of fetching left no page evidence and the lead's probe had to fetch again. The supplied brief records r6 duration as 4 h 13 min, exit 1; `.overnight/IN/live-r6.tail.txt` records company_size awarded.
 - NEEDED: propose and independently review durable failure evidence through the existing bounded, hash-pinned cache and receipt seam, with an invented merge-failure plant proving fetched-page evidence survives refusal. A failed build must remain failed and its pages must not masquerade as a verified release. No implementation, resume behavior or successful recovery is claimed by this train.
 - NEEDED BY: a later scoped acquisition-evidence change; do not re-fetch the full awarded history before the S2 gate against the owner's decision.
+
+## OI-351 — The stalled-run cleanup's target count of 512 is chosen, not measured
+
+- ID: OI-351
+- TYPE: OPEN
+- RAISED BY: the builder's and the confirming reviewer's proposed items of S2-T10 part F (fourth round and its confirmation), ruling L-1214 of the run, 2026-11-20.
+- CONCERNS: `scripts/sandbox_launch.py`, `TARGET_SLOTS = 512`.
+- EVIDENCE: the bound limits the kill-and-close work of a stalled run; a sandboxed tree with more than 512 processes outside the supervisor's group leaves the rest untaken, the result is still reported unconfirmed and the group is still killed. The value sits below the usual soft limit of 1024 descriptors; no tree size of a real build was measured.
+- NEEDED: measure the process-tree sizes of `./eii build-world` and `./eii build-release` once they run, and the descriptor headroom on the build machine; record whether 512 covers them, or change the bound by a reviewed fix (never a raised time limit).
+- NEEDED BY: the first sandboxed run of `./eii build-world`.
+
+## OI-352 — The cleanup deadline assumes fast host operations; three walk edge cases stay unproved
+
+- ID: OI-352
+- TYPE: OPEN
+- RAISED BY: the confirming reviews of S2-T10 part F (fourth round, and the fourth review it carries forward), 2026-11-20.
+- CONCERNS: `scripts/sandbox_launch.py`, the stalled-run cleanup.
+- EVIDENCE: the escalation is bounded by count (at most `TARGET_SLOTS + 1` non-blocking kills and `TARGET_SLOTS` closes after the walk deadline, with a reserve kept for the closes); reads of `/proc`, descriptor acquisition and signals have no interrupting timeout, so the elapsed bound holds only while each operation is fast (512 closes measured at 0.102 ms on the build machine). Carried unchanged: (1) a parent that exits and reparents a process out of the discoverable ancestry; (2) process-identifier reuse within one clock tick on the `(pid, start)` cache path, which needs a deterministic collision plant; (3) the walk budget running out on a busy process table.
+- NEEDED: measure the per-operation cost on the build machine under load and state the assumption beside the bound; a deterministic plant for each of the three cases, or a line saying why it is out of scope under REV-42.
+- NEEDED BY: task S2-T10's closure of slice S2 items.
+
