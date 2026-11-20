@@ -698,3 +698,19 @@ S8-T01's named catalogue-retrieval sub-step starts in process and must lower rou
 - GeoBenchX, arXiv 2503.18129, version 2, 22 October 2025, https://arxiv.org/abs/2503.18129 (research, retrieved 2026-11-11).
 - Arabic judge-leniency study, arXiv 2607.00139, June 2026, https://arxiv.org/abs/2607.00139 (research, retrieved 2026-11-11).
 - US Office of the Director of National Intelligence, Intelligence Community Directive 203 (separating information from assumptions and judgements), https://archive.dni.gov/files/documents/ICD/ICD-203.pdf (research, retrieved 2026-11-11).
+
+## S6-T14 step-one catalogue bindings
+
+The C30 Public and released-series English sentences and method line are pinned
+in application templates; the released form ends with the required limitation
+about showing the format, not Qatar. No audience Synthetic label is restored.
+Both forecast component declarations require the seven DAT-158 companions and
+independent endpoint clamp booleans. Catalogue load rejects missing, duplicate,
+extra or wrongly typed slots. Layout validation binds each companion to its
+metric and unit and requires matching period, geography kind, provenance and
+lineage reference, with Inferred evidence. Those available fields cannot prove
+release/series/model/horizon identity or actual clamp values: `ReturnedFact`
+lacks them. No new forecast claim or invented Arabic translation is published.
+Canonical metadata/history bindings and rendering wait on the emitter and shared
+Fact family (OI-320, OI-322, OI-323, OI-324). Existing repair/fallback behaviour
+is unchanged; this is not S6-T04 accounting-gate completion.

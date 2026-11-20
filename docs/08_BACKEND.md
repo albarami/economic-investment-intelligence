@@ -1134,3 +1134,23 @@ Every timing and size in this document that is attributed to the design research
 - FastAPI documentation, Server-Sent Events, https://fastapi.tiangolo.com/tutorial/server-sent-events/, retrieved 2026-11-11.
 - Python Software Foundation, `uuid` module documentation for Python 3.14, https://docs.python.org/3.14/library/uuid.html, retrieved 2026-11-11.
 - Valhalla project, Isochrone API, https://valhalla.github.io/valhalla/api/isochrone/, as cited in the EII tech-stack research of 2026-11-11.
+
+## S6-T14 step-one request boundary
+
+The `series_forecast` contract and BE-07 remain binding. This base has no product
+release store, forecast `QueryName`, verified mounted-series reader, authenticated
+seat-context integration or canonical forecast fact emitter. Step one therefore
+supplies the pure in-memory C30 handoff and tests that the tile application's
+schema exposes no forecast route. It creates no conditional API module, direct
+SQL or custodian import. Internal admission evidence is not an invented store
+reader or proof of parity. OI-324 names the missing integration.
+
+The pure `forecast_source_refusal(key)` can decline before any series or reader
+is constructed; source-less requests need no invented chain or history.
+A known open entry returns internal `ForecastOpen`, preserving S2-T17's reason
+and no numeric facts. Its proposed tool status is `OUT_OF_SCOPE` for an entry
+outside the executable list; its reason is registry metadata, not a new DAT-90
+NO_DATA key. OI-325 keeps final external mapping open. Only admitted short
+history uses `series_too_short`; off-list/prohibited requests retain
+`forecast_not_offered`. Missing release evidence fails validation before fitting.
+The required two-store forecast parity cases remain unproved.

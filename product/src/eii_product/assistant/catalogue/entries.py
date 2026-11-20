@@ -34,6 +34,10 @@ from eii_product.assistant.catalogue.slots import (
     mixed_breakdown_index,
     subject_refusal,
 )
+from eii_product.assistant.templates.series_forecast import (
+    CLAMP_BINDINGS,
+    FACT_BINDINGS,
+)
 
 
 def _claims(value: object) -> tuple[Claim, ...] | Refusal:
@@ -116,6 +120,16 @@ def _components(value: object) -> tuple[Component, ...] | Refusal:
         props = _component_props(row["props"], f"{path}.props")
         if isinstance(props, Refusal):
             return props
+        if key in ("series_forecast_card", "series_forecast_chart"):
+            expected = {name: "fact_id" for name, _ in FACT_BINDINGS} | {
+                name: "boolean" for name in CLAMP_BINDINGS
+            }
+            if (
+                maximum != 1
+                or len(props) != len(expected)
+                or {prop.name: prop.kind for prop in props} != expected
+            ):
+                return Refusal("FORECAST_COMPONENT", path)
         components.append(Component(key, maximum, props))
     return tuple(components)
 

@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | Status | Draft written by task S0-T13 on 2026-11-12; every row is as true as the page or run it names, on the date it names |
-| Date | 2026-11-14 |
+| Date | 2026-11-20 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
-| Purpose | Record the official pages read and the idioms that changed from earlier versions for DuckDB 2.0, PostgreSQL 18 and the current Claude API, the libraries and services that the pack calls newer than most model training data. |
+| Purpose | Record the official pages read and the idioms that changed from earlier versions for DuckDB 2.0, PostgreSQL 18, the current Claude API and the S6-T27 StatsForecast experiment, the libraries and services that the pack calls newer than most model training data. |
 | Read first | [02_ARCHITECTURE.md](02_ARCHITECTURE.md) section 7, [the notes for the map libraries](../web/REFERENCE_NOTES.md) |
 
 ## How to read these notes
@@ -245,6 +245,42 @@ Used here behind one provider adapter for the router and the writer, with the te
 | inference geographies | not yet confirmed | - | docs/09_AI_ASSISTANT.md section "Model settings" row "Inference geography"; TASKS.md S8-T02 |
 | minimum cacheable prefix | not yet confirmed | - | docs/09_AI_ASSISTANT.md AI-58; TASKS.md S8-T02 |
 
+## StatsForecast 2.1
+
+Used here only by the offline S6-T27 experiment (TASKS.md S6-T27), with exact pin 2.1.1 supplied and locked by the lead and written retreat 2.1.0, not tried; pins.toml row `statsforecast`. P1 was read through the lead-supplied official API extract of 2026-11-20, supplied in the fix brief, with installed signatures and docstrings inspected offline on that date. No page was fetched by this worker. The historical slice S1 confirmation remains unrecorded; the current pin is exercised by R1. The statistical API's point key is `mean`; the zero-shot median requirement is still blocked.
+
+### Pages read
+
+| Id | Address | Page title | Date read |
+|---|---|---|---|
+| P1 | https://nixtlaverse.nixtla.io/statsforecast/src/core/models.html | Models - StatsForecast; lead-supplied API extract | 2026-11-20 |
+
+### Runs
+
+| Id | Package and version | Date | Command | Output |
+|---|---|---|---|---|
+| R1 | statsforecast 2.1.1 | 2026-11-20 | `uv run --locked python -m pytest scripts/tests/test_forecast_spike_statistical.py -q -p no:cacheprovider --hypothesis-seed=27` | 30 passed, 8 warnings; installed version 2.1.1 asserted |
+
+### Idioms that changed
+
+| Id | Earlier form | Current form | Kind | Source | Quote |
+|---|---|---|---|---|---|
+| I1 | Auto-labelled invented prefix-last test doubles | Real AutoETS, AutoTheta and AutoARIMA prefix callbacks, CPU thread limits and finite lossless Decimal conversion | OBSERVED | R1 | - |
+
+### Statements
+
+| Id | Statement | Kind | Source | Quote |
+|---|---|---|---|---|
+| S1 | Each model's forecast call accepts the training array, horizon and requested interval levels; the constructor takes the family's season length. | READ | P1 | "forecast(y, h, X=None, X_future=None, level=None, fitted=False)" |
+| S2 | The installed models return mean, lo-80 and hi-80 arrays for the invented quarterly fixture; adapters equal their direct outputs. The thread/prefix and suffix-change tests exercise the real callbacks. | OBSERVED | R1 | - |
+| S3 | Public-series acceptance, production promotion and zero-shot inference are not verified; the experiment stops at its decision record. | PACK | docs/07_ECONOMIC_METHODS.md section "S6-T27 spike-only score and procedure" | - |
+
+### Slice S1 confirmation
+
+| Field | Value | Rows in pins.toml | Pack source |
+|---|---|---|---|
+| exact pin and written retreat pin | not yet confirmed | statsforecast | TASKS.md S6-T27 |
+
 ## Pack statements and where each stands
 
 | Pack claim | Pack source | Where |
@@ -299,3 +335,4 @@ Used here behind one provider adapter for the router and the writer, with the te
 | Server-side refusal fallbacks are recommended by default | docs/09_AI_ASSISTANT.md AI-60 | Claude API S26 |
 | A failed tool is returned as a result with is_error: true | docs/09_AI_ASSISTANT.md AI-61 | Claude API S33 |
 | All parallel tool results are returned in one user message | docs/09_AI_ASSISTANT.md AI-61 | Claude API S34 |
+| S6-T27's Auto models run only in the experiment and retain the production boundary | docs/07_ECONOMIC_METHODS.md section "S6-T27 spike-only score and procedure" | StatsForecast 2.1 I1; StatsForecast 2.1 S3 |

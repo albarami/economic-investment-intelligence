@@ -24,6 +24,17 @@ Only figures marked Public describe Qatar. Synthetic and Simulated figures demon
 
 ## Current status
 
+S6-T14 step one carries the C30 calculation handoff onto the current base:
+rolling-origin selection, empirical ranges, seven typed companions, preserved input
+pipelines and explicit release-admission bindings. Known open source reasons are
+retained. Genuine Public establishment snapshot histories are conditionally
+eligible; no history is manufactured. These are offline invented-fixture checks,
+not mounted-release eligibility. The product has no forecast store reader or
+canonical forecast emitter yet; no forecast HTTP route or live claim is exposed.
+The shared Fact family, card, stepped band and rendered states belong to step two.
+See [the calculation handoff](core/src/eii_core/calc/README.md) and
+[the task evidence](PROGRESS.md#s6-t14-step-one--published-series-calculation-handoff).
+
 S2-T05 adds [offline spine triage](scripts/spine_triage.md): `uv run --locked python scripts/spine_triage.py` takes the cached inputs and recomputed review queue, keeps its deterministic order with provider `none`, and writes unsigned suggestions separately. Recorded answers may order human review; every mapping still requires individual sign-off through S2-T04 (PUB-35). Decision records remain under eval artefacts.
 
 S2-T07 adds pure Decimal arithmetic in `eii_core.calc` for licence density and churn, wage decomposition, published sector shares, supplier metrics, coverage, utility momentum and typed Public comparisons. Arithmetic tests and invented-row parser tests exercise these APIs offline. The comparison boundary supplies numeric results and source-chain metadata; canonical fact IDs and release validation remain with the release/API owner. Selected source receipts and several worked-example input rows are still absent, so these tests do not establish real-file regression agreement or close OI-03.

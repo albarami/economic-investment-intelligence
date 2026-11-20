@@ -3,6 +3,48 @@ components:
   - component_key: foundation_note
     max_count: 1
     props: []
+  - component_key: series_forecast_card
+    max_count: 1
+    props:
+      - name: value
+        kind: fact_id
+      - name: low
+        kind: fact_id
+      - name: high
+        kind: fact_id
+      - name: error
+        kind: fact_id
+      - name: points
+        kind: fact_id
+      - name: inside
+        kind: fact_id
+      - name: tested
+        kind: fact_id
+      - name: low_clamped
+        kind: boolean
+      - name: high_clamped
+        kind: boolean
+  - component_key: series_forecast_chart
+    max_count: 1
+    props:
+      - name: value
+        kind: fact_id
+      - name: low
+        kind: fact_id
+      - name: high
+        kind: fact_id
+      - name: error
+        kind: fact_id
+      - name: points
+        kind: fact_id
+      - name: inside
+        kind: fact_id
+      - name: tested
+        kind: fact_id
+      - name: low_clamped
+        kind: boolean
+      - name: high_clamped
+        kind: boolean
 stage_directives:
   fly:
     fields:

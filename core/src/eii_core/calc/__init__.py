@@ -1,6 +1,7 @@
 """Deterministic calculations; no import-time I/O (MTH-01)."""
 
 from .facts import compare_public_facts, least_real, order_changes
+from .forecast import forecast_series
 from .public_methods import (
     coverage_share,
     licence_churn,
@@ -18,6 +19,7 @@ __all__ = [
     "compare_public_facts",
     "coverage_share",
     "decomposition",
+    "forecast_series",
     "least_real",
     "licence_churn",
     "licence_density",

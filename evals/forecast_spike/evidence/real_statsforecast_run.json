@@ -1,0 +1,639 @@
+{
+  "adapter_kind": "statsforecast_prefix_callbacks",
+  "challengers": {
+    "chronos_2": "blocked",
+    "timesfm_2_5": "blocked"
+  },
+  "check_environment": "tmpdir_unset",
+  "determinism": "pass",
+  "family_summaries": [
+    {
+      "candidate": "seasonal_naive",
+      "covered": 40,
+      "evaluated": 40,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.65151515151515151515151515151515151515151515151515",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "drift",
+      "covered": 40,
+      "evaluated": 40,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.46241922321068541653717683771893931098032959289215",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "simple_exponential_smoothing",
+      "covered": 29,
+      "evaluated": 40,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "coverage_below_level",
+      "score": "0.7264082202292078835288711865909090909090909090909",
+      "status": "fail",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_ets",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_theta",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_arima",
+      "covered": 40,
+      "evaluated": 40,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.39070254605890531644397293709795483033665101536195",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "equal_weight",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "nested_policy",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 40,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "year",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "seasonal_naive",
+      "covered": 19,
+      "evaluated": 19,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.87719298245614035087719298245614035087719298245614",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "drift",
+      "covered": 19,
+      "evaluated": 19,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.15543095193471386342850236127648260753941903916046",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "simple_exponential_smoothing",
+      "covered": 13,
+      "evaluated": 19,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "coverage_below_level",
+      "score": "0.23584988497054559432727074052631578947368421052631",
+      "status": "fail",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_ets",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_theta",
+      "covered": 19,
+      "evaluated": 19,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.090190820038574753857707218076401983785350420321638",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_arima",
+      "covered": 19,
+      "evaluated": 19,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "",
+      "score": "0.10587197858717781915210683732048461311741879111842",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "equal_weight",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "nested_policy",
+      "covered": 0,
+      "evaluated": 0,
+      "expected": 19,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "quarter",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 5,
+      "level_numerator": 4,
+      "reason": "missing_prediction_or_interval",
+      "score": null,
+      "status": "blocked",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "seasonal_naive",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "1",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "drift",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.053906269212835547958851040300285859127473831100604",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "simple_exponential_smoothing",
+      "covered": 9,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "coverage_below_level",
+      "score": "0.098223223223223223223223113987002875892857142857142",
+      "status": "fail",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_ets",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.00068303813542342204473676420526490325019473121279763",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_theta",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.030059198887877843934087910123967698642185756138393",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "auto_arima",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.0076330862234665579941455299766468150275094168526788",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "equal_weight",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.012357877897738953197945409642887257394336518787196",
+      "status": "pass",
+      "zero_scale_mae": []
+    },
+    {
+      "candidate": "nested_policy",
+      "covered": 14,
+      "evaluated": 14,
+      "expected": 14,
+      "family": {
+        "classification": "none",
+        "currency": "none",
+        "frequency": "month",
+        "measure": "count",
+        "provenance": "generated",
+        "source": "invented-trend-cycle-v1",
+        "unit": "count",
+        "valuation": "none"
+      },
+      "horizon": 1,
+      "level_denominator": 10,
+      "level_numerator": 9,
+      "reason": "",
+      "score": "0.00068303813542342204473676420526490325019473121279763",
+      "status": "pass",
+      "zero_scale_mae": []
+    }
+  ],
+  "fixture_measurements": [
+    {
+      "batch_seconds": "13.706974",
+      "fixture_only": true,
+      "largest_worker_peak_kib": 232424,
+      "library_warnings": [
+        "divide by zero encountered in scalar divide"
+      ],
+      "workers": 1
+    },
+    {
+      "batch_seconds": "13.683077",
+      "fixture_only": true,
+      "largest_worker_peak_kib": 233136,
+      "library_warnings": [
+        "divide by zero encountered in scalar divide"
+      ],
+      "workers": 1
+    },
+    {
+      "batch_seconds": "11.120540",
+      "fixture_only": true,
+      "largest_worker_peak_kib": 231384,
+      "library_warnings": [
+        "divide by zero encountered in scalar divide"
+      ],
+      "workers": 2
+    },
+    {
+      "batch_seconds": "10.839839",
+      "fixture_only": true,
+      "largest_worker_peak_kib": 233332,
+      "library_warnings": [
+        "divide by zero encountered in scalar divide"
+      ],
+      "workers": 2
+    }
+  ],
+  "fixture_only": true,
+  "fixture_output_sha256": "24cac80aa9c244008584cfdf3e3c5c17e4bfbada3344f24e7067802f7e8f1160",
+  "generator_seed": 27,
+  "hypothesis_seed": 27,
+  "input_commit": "cd4ed344f5009f470aace646dacd9e630099b707",
+  "lock_sha256": "a52942b7065dbe4bc33f714ec1d9192150b2417c4193d4d9fef8338a064e1dda",
+  "machine": "x86_64",
+  "model_inference": "statsforecast_auto_models",
+  "numerical_versions": {
+    "coreforecast": "0.0.20",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "statsforecast": "2.1.1",
+    "threadpoolctl": "3.8.0"
+  },
+  "platform": "Linux",
+  "preregistration_file_sha256": "6825c77b6dc5087f5a3e06ff52910f23b86e0a1b0ad4dc767e58272b8699a14c",
+  "python": "3.14.6",
+  "registration_sha256": "e6c7133625aa22dfd229264753834d9749c31131c393228e7753cf340a0430b3",
+  "statistical_library": {
+    "name": "statsforecast",
+    "version": "2.1.1"
+  },
+  "statistical_stage_verdicts": [
+    {
+      "frequency": "year",
+      "verdict": "blocked"
+    },
+    {
+      "frequency": "quarter",
+      "verdict": "blocked"
+    },
+    {
+      "frequency": "month",
+      "verdict": "pass"
+    }
+  ],
+  "threads": 1
+}

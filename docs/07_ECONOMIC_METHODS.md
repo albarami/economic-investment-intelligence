@@ -1650,6 +1650,16 @@ area facts (C15, C19, C20, C22) stand beside these as separate facts, never divi
 
 ### C30 Forecasts of published series
 
+**S6-T25 calculation catalogue.** `c30-series-v3` additionally admits released
+occupation earner counts on the separate residence and workplace families through
+the existing contract and backtest. It retains the candidates, history minimum,
+MASE and interval procedure below. The
+[generated-series audit](../custodian/publicdata/review/s6_t25_generated_series.md)
+names source feeds, table, geography, unit, family, history and evaluated
+exclusions. Hiring/leaving forecasts remain retired. Complete backtest
+recomputation validates a result's freshness; calculation substitution fixtures
+do not close source-to-release parity or decision 0036's real-source go-live gate.
+
 **Purpose.** Forecast each series of a closed, versioned list of published series (Public series, and the released monthly statistics of the custodian-type feeds) with a model that the series' own backtest chooses, and show every forecast with its interval from the backtest, its measured backtest error, its method and its source ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 2 to 6).
 
 **Inputs.**
@@ -1718,6 +1728,26 @@ each forecast is computed at request time from release tables and is never writt
 | MTH-98 | Decision 0036: eligibility is based on confirmed source, held release table and backtest history, never generated provenance alone; S6-T25 specifies any additional series in the closed list.  C30 forecasts only a series of the closed, versioned list: a Public series whose source table the public data pack holds, a released monthly series of the window, or a confirmed-source generated series admitted by S6-T25 under the same backtest and release rules; it chooses the model of each series by the rolling-origin backtest above, from the closed candidate list only (expanded by S6-T27 under decision 0038 inventory items 1 and 14 after its baseline commit passes review): the candidate with the smallest mean absolute scaled error, ties by list order. No person and no language model chooses a model. A series with fewer than three origins, or with less than twice the horizon of history at the first origin, returns `NO_DATA` with reason `series_too_short`, shown as "not enough history", never a model without a backtest. It reproduces the fixture: MASE 0.889 for seasonal naive against 1.000 for drift; forecast 14, range 13 to 16, 1 of 3; `NO_DATA` with four values; the smoothing levels 10, 11 and 11. |
 | MTH-99 | Under decision 0038 inventory items 1 and 14, a conformal procedure may replace the baseline error-extreme interval only after its per-family coverage test; its own held-out backtest supplies the interval and the same caption counts, with no probability or confidence claim. The following is the retained baseline procedure. Every forecast is shown with its interval and its measured backtest error. The interval at each horizon runs from the forecast plus the smallest to the forecast plus the largest backtest error of the chosen candidate at that horizon, and its caption states how many past values of the backtest fell inside the range that the other past errors gave, each value checked against a range built without its own error, and how many there were, both as Fact chips and never as a percentage. It is never called a probability or a confidence level and never said to hold for the next value. A forecast chart draws it as a band with that caption. The projection of C21 keeps its own rules and is never shown as a forecast. |
 | MTH-100 | A forecast is `inferred`, takes the subject, geography and class of its series, and its lineage names the method and version and the series; the model and the horizon identify the fact, and the interval ends, the backtest error and the number of backtest points are facts of the same computation, shown with it, resolving to the source like any fact (MTH-08). Every forecast of card C30, of a Public series or of a released monthly series, is computed at request time by `eii_core.calc` from release tables, as a projection is (DAT-144), and none is written to the release. A forecast of a released monthly series carries the Synthetic class, the word "forecast" and the caveats `synthetic_not_evidence_about_qatar` and `synthetic_change` beside `forecast_backtest_range`, has the subject `area` of its series and the last released month as its origin, is a labelled projection from the released months and not a protected statistic of a later month (PRV-54), states no change between two months (ARC-130), and is off in public-only mode as a ranking criterion (MTH-65); a series with a carried-forward month in its window returns `SUPPRESSED` with `CARRIED_FORWARD`. A forecast of a Public split by sex or nationality stays on the source's own geography and categories. The licence series keep their names, licence issues and licence cancellations (PUB-94), and no net series is formed. The class `forecast_not_offered` declines three cases: a forecast of the success of a venture; a forecast, estimate, share, score, rank or fit for a named real place, building, business, owner or person; and a forecast of a series that is not on the list. |
+
+**S6-T14 step-one implementation boundary.** The baseline formulas above are
+carried forward unchanged and checked on invented histories, with series list
+`c30-series-v2`, candidate list `c30-candidates-v1` and method
+`c30_rolling_origin@v1`. The production horizon remains one until the horizon
+list is decided (OI-319). Display places and count rounding remain explicit
+handoff assumptions (OI-320). Each companion keeps the input pipeline and adds
+its own derived C30 lineage; no wire identity is invented. The unscaled error
+when the seasonal scale is zero keeps the series unit and is not relabelled a
+ratio. Static open registry entries return their original source reason before
+fitting; only an admitted short history returns `series_too_short` (OI-318,
+OI-325). Public monthly establishments join conditionally where genuine
+snapshot stock history exists, under decision 0064 item 38, never generated
+openings/closures or current-stock backfill (OI-321). No registry promotion or
+real history is claimed. Missing admission evidence, unpublished inputs and
+missing released window/generator metadata fail validation. The API reader and
+canonical emitter are missing (OI-324); catalogue declarations and exact English
+strings do not establish screen acceptance. The Fact family, card, stepped band,
+metadata/history chips, clamp rendering and native Arabic remain step two
+(OI-322, OI-323). OI-03, OI-98 and OI-102 stay open.
 
 ### C31 Entry, closure and survival base rates
 
@@ -2402,6 +2432,95 @@ Decision 0036 includes relatedness only on relationships the confirmed source ac
 [Decision 0038](decisions/0038-advanced-methods-are-measured-spikes.md), Accepted spike inventory, is the closed list of nineteen accepted experiments and their card/task mappings, baselines, pass tests and blocking facts. Step one of each task audits those facts and stops with its reason if they fail. No unmeasured gain is asserted. Missing pass thresholds are fixed and reviewed before a run; a failure retains the baseline. A passing method follows decision 0036's same pipeline, real-shaped fixture swap, go-live re-fit/re-backtest, own interval/error procedure, version and retreat pins, fixed seeds and CPU fallback. Rule 25's method honesty and decision 0035's audience presentation apply together. No new source or finer privacy partition is authorised.
 
 **C30 baseline and challengers.** C30's formula and worked fixture above remain the baseline contract. S6-T27 runs on S6-T14's approved commit: AutoETS, AutoTheta, AutoARIMA and equal-weight combination must beat seasonal naive out of sample, with conformal coverage measured at the stated level per family. Chronos-2 (TimesFM 2.5 second) must beat that statistical ensemble in the same backtest with CPU determinism checked. Each held import/trade, certificates-of-origin, pay/employee/activity and establishment/size-class series is audited for length, categories and geography; insufficient history still refuses. Batch fitting and evaluation may use GPU only after the measured budget miss of decision 0038 item 5 R15; request-time forecasts remain tested CPU calculations from release tables (MTH-100), never a new release table of forecasts. Backtest selection remains code-owned and captions report empirical counts and error, never a probability or confidence claim.
+
+### S6-T27 spike-only score and procedure
+
+The supplied lead ruling L-1228, accepting design-review findings F1 to F4,
+defines `s6-t27-prefix-mase-v1` under `evals/forecast_spike/` only. It changes
+neither C30's original worked fixture nor production candidates or serving.
+The source/shape audit is
+[S6-T27 audit](../custodian/publicdata/review/s6_t27_forecast_audit.md).
+The committed experiment registration describes invented fixtures only; no
+Public or released-family result is established by it. The fix-round fixture
+command fits real AutoETS, AutoTheta and AutoARIMA with StatsForecast 2.1.1
+(written retreat 2.1.0, not tried); the equal-weight combination uses those
+three point outputs. `statistical.py` remains under the experiment only.
+The real-model record is `evals/forecast_spike/evidence/real_statsforecast_run.json`;
+the earlier stub record is retained separately. Neither is a Public claim.
+
+Before fitting, freeze series membership, each source dataset, frequency,
+measure, compatible unit/currency/valuation/classification, provenance stratum,
+published geography/category, candidate order and paired target-origin set.
+Family means source dataset × frequency × measure with those compatible strata;
+Public and generated histories remain separate. Horizon is one. The lead's
+pre-run assumptions are exact levels 4/5 for annual/quarterly families and 9/10
+for monthly families, and at least twelve evaluated targets per candidate ×
+family × horizon. They are experiment thresholds, never on-screen probabilities.
+The registration hash identifies this contract; result input hashes identify
+the observations separately.
+
+With the original first origin `L = max(2h, m + 1)`, freeze each series' seasonal
+scale on its initial training prefix only:
+`q = sum(abs(y[t] - y[t-m]), t=m..L-1) / (L-m)` in zero-based notation.
+Every candidate's series score is its mean absolute error over that series'
+preregistered targets divided by this frozen scale. Family score is the
+equal-weight mean of complete per-series scores, independent of series length
+or outcomes. A zero scale reports MAE separately in the series' own unit; it
+never enters a MASE mean, and a family containing it cannot pass that comparison.
+Empty series targets, fewer than twelve evaluated targets, missing predictions
+or missing required intervals cannot pass or shrink a paired denominator.
+The existing C30 minimum of three rolling origins remains a separate refusal.
+
+Fixed candidates are scored separately. Retain seasonal naive, drift and simple
+exponential smoothing unchanged; the equal-weight combination is the arithmetic
+mean of AutoETS, AutoTheta and AutoARIMA forecasts at each origin. A selecting
+policy chooses using only matured earlier fixed-candidate errors at each outer
+origin, with fixed-order ties. Its residuals are produced prospectively by that
+same policy; the final winner's retrospective residual column is never used.
+
+Each candidate or policy uses only its own earlier residuals from this backtest
+for the conformal wrap. For `c` complete matured absolute residuals and exact
+level `a/b`, take order statistic `k = ceil((c+1)*a/b)` and point plus/minus that
+radius; when `k > c`, no interval exists. Four earlier residuals are needed for
+4/5 and nine for 9/10. Coverage is counted separately for every candidate ×
+family × horizon on the frozen targets. Its positive, complete denominator must
+meet twelve, and `covered*b >= evaluated*a` decides coverage. No cross-candidate
+pooling, evaluation-driven exclusions or calibration from a second error source
+is allowed. Count coverage against the original target value, never a value
+reconstructed from a rounded residual. All named statistical challengers and the combination must strictly
+beat seasonal naive; ties fail. A zero-shot challenger compares against that
+same equal-weight combination, on the same preregistered targets.
+
+Arithmetic uses C30's fixed fifty-digit half-up Decimal context, separately from
+display rounding. Finite binary floats convert losslessly with
+`Decimal.from_float` before arithmetic. The statistical adapters fit a fresh
+model on each training prefix, with the family's season length, exact integer
+percentages converted from the registered rational levels, and one CPU thread
+per fit. The documented statistical point output is `mean`; native bounds are
+validated separately and never replace the same-backtest conformal wrap.
+Short-prefix library refusals and missing required calibration retain their
+blocked cells and original denominators. There is no stub or simpler-model
+fallback in the fixture command. Native interval variance may be undefined on
+a short prefix even when the point is finite; non-finite native bounds refuse
+in the native-interval adapter, while only the finite point enters calibration.
+No zero-shot inference is implemented or accepted while compatible package pins,
+model revision/file hashes, official median API documentation or weights are
+absent. Chronos-2 precedes TimesFM 2.5.
+Record each pinned revision's training boundary, its source and uncertainty
+before execution: post-cutoff, overlapping/unknown and generated strata have
+separate verdict scope. Unknown overlap is descriptive only; insufficient
+eligible history blocks the uncontaminated Public comparison. Generated fits
+remain placeholders requiring decision 0036's real-source re-fit/re-backtest.
+
+This build is CPU only, with no GPU permission or serving-performance pass.
+Fresh-process and worker-count byte equality now exercises the real pinned
+statistical models on invented histories; CPU batch measurements are fixture
+evidence only, with no time-budget or serving pass. Actual zero-shot models still
+owe their own determinism proof and batch measurements. Both remain blocked.
+The spike stops at its decision record regardless of outcome. No output enters
+the product, core, a release table or a Fact chip; a later promotion needs its
+own reviewed core design under MTH-100 and rules 16 to 18. Production baseline,
+privacy, source-geography and display rules remain unchanged.
 
 **Hot and cold spots map card.** S7-T23 builds the card committed by decision 0038 item 5 R8. Inputs are already released values at zone or release-unit grain and the matching public geography. The task specifies the esda statistic, neighbourhood, fixed seed, stability procedure and reviewed validation criterion before code; none is invented by this record. The output is a tested-code spatial-pattern fact with method/version, source chain and stability evidence, respecting suppression and MTH-53. Municipality clustering/hot spots remain prohibited (eight units). Missing valid inputs or failed validation keeps the released-value map without hot/cold classification. No result is a prediction or advice to act.
 

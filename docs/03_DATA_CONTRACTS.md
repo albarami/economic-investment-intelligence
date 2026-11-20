@@ -2501,3 +2501,54 @@ filtering or deduplication. The composition entry point is
 collision. Source, selected snapshot, method, licence and retrieval lineage travel
 with the contribution. S4-T05 supplies other contributions and its configured edit
 distance; this task introduces no new collision threshold or normaliser.
+
+## S6-T14 step-one handoff
+
+DAT-158's seven forecast metrics are represented by the internal `ForecastFact`
+and `ForecastLineage` of `eii_core.calc.forecast`. Each companion retains its
+original source method/version and adds separate C30 method/version,
+series/indicator, model/horizon and release/window/generator/home-family
+metadata. `ReleaseAdmission` checks the supplied table grain, release identity,
+schema/table digests and source hashes; it does not verify mounted bytes.
+No forecast is written into a release table. No canonical fact emitter is
+present on this base. DAT-93's series/indicator identity and DAT-158's
+ratio-only error for zero-scale history remain OI-320; exact typed output is
+retained without a false ratio or fractional displayed count. The generic fact
+schema and its qualifiers are unchanged. Document 03 section 12's
+`app.read_seat_context()` remains required before a future endpoint dispatch;
+a custodian `contracts.read_selected` is not a product reader (OI-324).
+
+## S6-T25 generated-series calculation handoff
+
+The internal catalogue `c30-series-v3` adds occupation earner counts separately
+for residence and workplace through `occupation_pay`, bound to `op_res_quartile`
+and `op_work_quartile` respectively. Confirmed feeds, units, geography, history
+and evaluated exclusions are recorded in
+[the generated-series audit](../custodian/publicdata/review/s6_t25_generated_series.md).
+Hiring/leaving forecasts remain retired under decision 0046 item 1.
+
+`ReleaseAdmission` now carries the existing manifest `window_period` and
+`window_key`. Released series carry both too: they must match the admission,
+all history months must lie within that span and the origin must be its last
+month. A stayer pair contributes both months to this check. The next forecast
+month remains allowed as a labelled projection from already released values
+(DAT-158), not a new protected statistic. This changes no manifest, window or
+privacy rule and verifies no mounted bytes; OI-324 still owns that verification.
+
+Released-series admission also requires the unique, typed
+`ReleaseAdmission.feed_names` set to equal its catalogue definition's
+`confirmed_sources` exactly; a wrong, extra or missing feed returns the closed
+`forecast_not_offered` refusal before fitting. The names are the existing
+rule 12 feed identities selected for that series, separate from the existing
+source-chain hash binding. Mounted manifest verification and its feed-to-table
+source-chain mapping remain OI-324 work. Occupation family markers explicitly
+end in `band=ALL`, binding the group's total rather than one band row (PRV-38;
+section 7.3 `occupation_pay` grain).
+
+`ForecastResult` verifies its entire supplied computation against a fresh C30
+backtest of the admitted trailing history, before accepting the handoff. Under
+lead ruling L-1209 F2, a known unavailable source returns internal
+`ForecastOpen` with `status=NO_DATA`, its exact registry reason and no numeric
+facts. Absence is never relabelled `series_too_short`; this does not add a
+DAT-90 reason or close OI-325's API/emitter mapping. Source-to-release swap
+parity and the real-source go-live re-fit gate remain dependency work.

@@ -819,3 +819,53 @@ historical confirmation and require the new schema hold and zero requests.
 Commands and their actual results belong in PROGRESS.md and the builder return.
 The lead runs mutation campaigns and live evidence checks; invented fixtures do
 not establish page access, reviewed pins or another-maker approval.
+
+## S6-T14 step-one offline evidence scope
+
+The task's ordinary tests retain the C30 hand-worked candidates, rolling-origin
+fixture, short-history thresholds, independent clamps, exact refusal keys,
+property counts, protected families, carry-before-suffix and hostile Decimal
+contexts. New red-first plants cover unchanged input pipeline versions, per-fact
+derived lineage, known open reasons, absent/foreign release evidence, missing
+hashes, publication and generator/window metadata, Public snapshot eligibility,
+Public-split ranking refusal, immutable qualifiers, integer input counts,
+published hotel indicator/grain and USD capex units, municipal geography relabelling
+and source-only refusal without fabricated input. Prefix-call and separate
+horizon-residual fixtures retain the original baseline arithmetic.
+
+Catalogue plants remove every companion and either clamp, swap metrics, periods,
+units, evidence, provenance or lineage references and alter the released sentence.
+The existing application is checked to expose no forecast route or claim while
+its reader/emitter are absent. Invented manifest and source-chain fixtures prove
+binding checks only; they do not prove a verified mounted release, real history,
+wire identity, store parity or a rendered screen. Step two owns the shared Fact
+family integration, stepped band and rendered states. Full command exits, counts,
+seed, intermediate failures and remaining gaps are recorded under S6-T14 in
+PROGRESS.md; no mutation campaign is run under decision 0055.
+
+## S6-T25 calculation admission evidence scope
+
+Invented occupation histories exercise the same forecast contract on residence
+and workplace families. Plants alter table, source/feed catalogue metadata,
+grain, partition, family measure/role/column/breakdown, geography and provenance.
+Known unavailable sources must return NO_DATA with their exact source reason
+and empty facts without entering fitting; short history and carried-forward
+suppression retain their distinct contracts.
+
+Freshness plants substitute complete computations, consistently rebuild their
+companions and update release/source/window/generator metadata. Result validation
+must rerun the admitted history's backtest, including candidates, residuals,
+selection, scale, interval, error and caption counts. Distinct replacement
+histories are observed entering rolling backtests and final CPU fits; repeat and
+hostile Decimal-context tests retain exact output. Window plants keep labels
+unchanged while altering admitted span/key or placing history before/after it;
+paired histories stay inside the one window and the next forecast month remains
+permitted.
+
+These are bounded calculation tests, not source-to-release pipeline parity,
+mounted-manifest evidence or go-live real-source re-fitting. The dependency pins
+and owners in the
+[generated-series audit](../custodian/publicdata/review/s6_t25_generated_series.md)
+remain binding; TST-267 is not declared complete by these fixtures. No privacy
+rule, attack size, tolerance or assertion is reduced. PROGRESS.md records the
+actual commands, intermediate failures, exits and counts.

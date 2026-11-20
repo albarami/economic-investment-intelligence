@@ -37,6 +37,8 @@ NUMERIC_UNITS = (
     "qar_million",
     "qar_per_month",
     "qar_per_kg",
+    "qar_per_m2",
+    "usd_million",
     "kwh",
     "ratio",
     "percent",

@@ -1,0 +1,22 @@
+{
+  "version": "s6-t27-prefix-mase-v1",
+  "fixture_only": true,
+  "seed": 27,
+  "horizon": 1,
+  "minimum": 12,
+  "levels": {"year": [4, 5], "quarter": [4, 5], "month": [9, 10]},
+  "candidates": ["seasonal_naive", "drift", "simple_exponential_smoothing", "auto_ets", "auto_theta", "auto_arima", "equal_weight", "nested_policy"],
+  "adapter_kind": "statsforecast_prefix_callbacks",
+  "generator_version": "invented-trend-cycle-v1",
+  "series": [
+    {"key": "syn-annual-a", "frequency": "year", "length": 28, "first_target": 6},
+    {"key": "syn-annual-b", "frequency": "year", "length": 24, "first_target": 6},
+    {"key": "syn-quarter-a", "frequency": "quarter", "length": 28, "first_target": 9},
+    {"key": "syn-month-a", "frequency": "month", "length": 36, "first_target": 22}
+  ],
+  "scope": "invented_generated_fixtures_only_no_public_or_release_acceptance",
+  "training_strata": ["generated", "post_cutoff", "overlapping_or_unknown"],
+  "zero_scale": "separate_mae_no_family_mase_pass",
+  "aggregation": "equal_series_weight_paired_targets",
+  "selection": "matured_inner_errors_fixed_order_ties"
+}
