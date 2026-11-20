@@ -7,6 +7,7 @@ from hashlib import sha256
 
 import pytest
 from custodian.tests.fixtures.classification import (
+    DIGEST,
     REVIEW,
     SCHEMA,
     binding,
@@ -759,3 +760,140 @@ def test_b_synthetic_tariff_is_not_production_admission():
         CrosswalkError, match="tariff code is not canonical dotted source grain"
     ):
         parse(review, context, allow_invented=False)
+
+
+def test_h_review_date_requires_dashed_calendar_shape():
+    review, context = documents()
+    review["groups"][0]["reviewed_on"] = "2026-W47-5"
+    with pytest.raises(CrosswalkError, match="review or retrieval date is not ISO"):
+        parse(review, context)
+
+
+@pytest.mark.parametrize("plant", ["hostname", "username", "password"])
+def test_h_public_source_url_guards(plant):
+    review, context = documents()
+    context["snapshots"][0]["url"] = {
+        "hostname": "https:///syn-source",
+        "username": "https://syn-user" + chr(64) + "example.invalid/syn-source",
+        "password": "https://:syn-word" + chr(64) + "example.invalid/syn-source",
+    }[plant]
+    with pytest.raises(
+        CrosswalkError, match="source URL is not a public uncredentialed address"
+    ):
+        parse(review, context)
+
+
+def test_h_tariff_level_requires_matching_grain():
+    review, context = documents()
+    source = review["groups"][0]["source"]
+    source["code"] = "SYN-TARIFF-1000.0001"
+    declare(context, source)
+    with pytest.raises(
+        CrosswalkError, match="tariff code is not canonical dotted source grain"
+    ):
+        parse(review, context)
+
+
+def test_h_industry_code_requires_canonical_slug():
+    review, context = documents()
+    key = "mfg_industry/syn-A_B"
+    context["snapshots"].append({**context["snapshots"][2], "registry_key": key})
+    target = review["groups"][0]["links"][0]["target"]
+    target.update(code=key, version=key + ":" + DIGEST)
+    declare(context, target)
+    with pytest.raises(
+        CrosswalkError, match="manufacturing endpoint is not its source industry"
+    ):
+        parse(review, context)
+
+
+@pytest.mark.parametrize(
+    "field,value", [("level", "industry"), ("code", "SYN-ISIC-10A1")]
+)
+def test_h_isic_endpoint_guards(field, value):
+    review, context = documents()
+    target = isic()
+    target[field] = value
+    review["groups"][0]["links"][0]["target"] = target
+    declare(context, target)
+    with pytest.raises(
+        CrosswalkError, match="ISIC endpoint differs from the pinned spine class"
+    ):
+        parse(review, context)
+
+
+def test_h_occupation_level_requires_major_group():
+    review, context = documents()
+    target = review["groups"][1]["links"][0]["target"]
+    target["level"] = "class"
+    declare(context, target)
+    with pytest.raises(
+        CrosswalkError, match="occupation endpoint is not a released major group"
+    ):
+        parse(review, context)
+
+
+def test_h_empty_decision_requires_a_pending_reason():
+    review, context = documents()
+    review["groups"] = [
+        group(product(), status="unreviewed", reason="outside_review_scope")
+    ]
+    with pytest.raises(CrosswalkError, match="empty decision cannot claim a mapping"):
+        parse(review, context)
+
+
+def test_h_missing_schema_has_fixed_diagnostic(monkeypatch, tmp_path):
+    import eii_custodian.publicdata.review.classification as module
+
+    review, context = documents()
+    monkeypatch.setattr(module, "_SCHEMA", tmp_path / "absent.schema.json")
+    with pytest.raises(CrosswalkError, match="crosswalk schema is missing"):
+        parse(review, context)
+
+
+def test_h_nonbasis_source_ref_must_resolve():
+    review, context = documents()
+    review["groups"][0]["links"][0]["source_refs"].append("syn-absent")
+    with pytest.raises(
+        CrosswalkError, match="link basis or source chain is unresolved"
+    ):
+        parse(review, context)
+
+
+def test_h_editorial_rationale_cannot_be_null():
+    review, context = documents()
+    review["groups"][0]["links"][0]["rationale"] = None
+    with pytest.raises(
+        CrosswalkError, match="editorial basis lacks rationale or configuration hash"
+    ):
+        parse(review, context)
+
+
+def test_h_duplicate_source_with_distinct_link_is_refused():
+    review, context = documents()
+    review["groups"].append(group(product(), [link(industry("b"), "syn-link-z")]))
+    with pytest.raises(CrosswalkError, match="duplicate source decision"):
+        parse(review, context)
+
+
+def test_h_duplicate_target_with_valid_weights_is_refused():
+    review, context = documents()
+    review["groups"][0]["links"] = [
+        link(industry(), "syn-l", official=True, split=weight()),
+        link(industry(), "syn-r", official=True, split=weight("0.6")),
+    ]
+    with pytest.raises(CrosswalkError, match="duplicate link or target identity"):
+        parse(review, context)
+
+
+def test_h_duplicate_parent_with_disjoint_children_is_refused():
+    review, context, _ = family_documents()
+    child = product("1000.0001.0003")
+    declare(context, child)
+    context["tariff_families"].append(
+        {**deepcopy(context["tariff_families"][0]), "children": [child]}
+    )
+    with pytest.raises(
+        CrosswalkError, match="tariff family has no unique bound parent"
+    ):
+        parse(review, context)

@@ -465,3 +465,47 @@ def test_f3_direct_parent_mapping_cannot_bypass_complete_family():
     assert resolved.occupations == ()
     assert resolved.status == "unreviewed"
     assert resolved.paths == ()
+
+
+def test_h_c13_refuses_a_non_tariff_source():
+    review, context = documents()
+    with pytest.raises(
+        ValueError, match="C13 requires a validated crosswalk and a tariff identity"
+    ):
+        c13_selection(parse(review, context), endpoint(industry()))
+
+
+def test_h_resolver_requires_a_crosswalk():
+    with pytest.raises(
+        ValueError,
+        match="resolver requires a validated crosswalk and a tariff identity",
+    ):
+        resolve_occupations({}, endpoint(product()))
+
+
+def test_h_c13_requires_a_crosswalk():
+    with pytest.raises(
+        ValueError, match="C13 requires a validated crosswalk and a tariff identity"
+    ):
+        c13_selection({}, endpoint(product()))
+
+
+@pytest.mark.parametrize(
+    "changes,message",
+    [
+        ({"system": "hs"}, "unknown classification system"),
+        ({"level": "heading"}, "unknown classification level"),
+        ({"version": ""}, "classification identity is empty"),
+    ],
+    ids=["system", "level", "empty_identity"],
+)
+def test_h_endpoint_identity_guards(changes, message):
+    parts = {
+        "system": "customs_tariff",
+        "version": "v",
+        "level": "tariff8",
+        "code": "c",
+    }
+    parts.update(changes)
+    with pytest.raises(ValueError, match=message):
+        endpoint_from_parts(**parts)

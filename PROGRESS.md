@@ -42589,3 +42589,87 @@ Let F be `custodian/tests/test_classification_review.py core/tests/test_classifi
 - Final verification after records: all seven brief checks and git diff --check exited 0: focused 219 passed; lint clean; format 832 files; mypy 447 source files; documentation 1134 text files/122 Markdown files; tree 8 rules; rules byte-identical. Exact commands, exits and outputs are in .overnight/tmp/fix1-final-checks.json.
 - The extra scope audit initially exited 1 because its spacing assertion expected three newlines between the appended correction and round heading; the writer correctly inserted two. The corrected audit checks the exact correction and heading with that actual spacing, then checks preserved history, exact scoped files, unchanged protected files, identifier/path hygiene, all recorded exits and the return marker. This fixes the audit expectation only; no repository guard, test assertion or earlier evidence row changed.
 - Corrected scope audit: python3 .overnight/tmp/fix1_scope_audit.py exited 0; 7 changed tracked files, 33 deciding removals, 8 green checks including whitespace, no staged files, prior progress bytes preserved, contract confined to its task section, clean new-text identifier/path scan and correct return marker.
+
+Correction (S2-T47 re-review): the 33 removal proofs of fix round one cover the guards listed in review finding B and findings A, C, E, F and G only. A wider sweep of 133 single removals at a6acb9b1 left 22 further guard clauses surviving with 219 passing; they are review finding H.
+
+## S2-T47 — Fix round two, finding H (2026-11-20)
+
+- Maker/model: OpenAI Codex, GPT-6. Builder persona: senior test engineer for validated classification crosswalks, closed schemas, guard clauses and single-removal proofs. Strict self-review persona: reviewer rejecting masked plants, a match on another guard's message, production changes, weakened assertions, skips and raised bounds.
+- Authority/source: complete `.overnight/BRIEF.md`; `.overnight/IN/REREVIEW-A2.md`, finding H and its three numbered tables; TASKS.md S2-T47 criterion 5; AGENTS.md rule 37. Findings A to G are outside this repair and unchanged.
+- Skills read and applied: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. Test-driven-development and verification-before-completion applied in plain meaning where unavailable: add the plants, remove one clause only in the copy to get red, restore it to get green, inspect scope and run the requested checks. No independent reviewer is impersonated; another-maker re-review remains pending.
+- Tracked scope: only `custodian/tests/test_classification_review.py`, `core/tests/test_classification.py` and this appended PROGRESS block. Sixteen reader and six core plants were added, each asserting the guard's own `pytest.raises(..., match=...)` diagnostic. Every earlier test and assertion is retained. No production line, schema, fixture, threshold, bound, skip, baseline or rule was changed.
+- Full base commit: `a6acb9b1cbf61cb821ecd6290176cbd973936b98`. This is the tested HEAD plus the scoped uncommitted additions. `git switch -c test/s2-t47-fix2` exited 128: shared Git metadata is read-only. No new branch or commit was possible; the tree is left changed for the lead to apply the brief's requested commit title and trailer. No push.
+- Environment: existing prepared engine-group environment; Python 3.14.6, uv 0.11.31, Linux x86_64, pytest 9.2.0, ruff 0.17.4, mypy 2.4.1. All uv commands used `UV_OFFLINE=1` and `UV_CACHE_DIR=.overnight/tmp/uv-cache`; proof and final checks used workspace-local TMPDIR, `PYTEST_ADDOPTS=--hypothesis-seed=47`, and the unchanged eii profile. The initial baseline and first added-test run used the bootstrap's automatic seed, which was not captured; these files contain no property-generated test. The decisive copy runs and final check are explicitly seeded. Exact environment probe: `.overnight/tmp/fix2-environment.json`.
+- Initial focused baseline (the same three-file pytest command below) exited 0, 219 passed. After the additions it exited 0, 241 passed. Initial lint, mypy, documentation and parity checks exited 0 with the same counts as below. Initial `uv run --locked ruff format --check .` exited 1: two files would be reformatted, 830 already formatted. `uv run --locked ruff format .` exited 0: two files reformatted, 830 unchanged. The final checks below followed those whitespace-only changes; no assertion changed.
+- No network or service operation, secret/private/vault/public-data-cache read, retry, skip, raised bound or baseline refresh. No whole-suite, hosted-check, release, real-mapping approval or independent approval is claimed. No new unresolved choice or random failure was observed; the review's proposed open items remain for the lead, and OPEN_ITEMS.md is unchanged.
+
+The reader is `custodian/src/eii_custodian/publicdata/review/classification.py`; the core is `core/src/eii_core/classification.py`. Reader test names below resolve in `custodian/tests/test_classification_review.py`, core names in `core/tests/test_classification.py`. Guard locations reproduce review H's identifiers against the unchanged base.
+
+| # | Isolating plant | Required diagnostic |
+|---|---|---|
+| 1 | group reviewed_on = 2026-W47-5 | `review or retrieval date is not ISO` |
+| 2 | source URL = https:///syn-source | `source URL is not a public uncredentialed address` |
+| 3 | tariff12 source code = SYN-TARIFF-1000.0001; declared | `tariff code is not canonical dotted source grain` |
+| 4 | target code = mfg_industry/syn-A_B; matching snapshot/version; declared | `manufacturing endpoint is not its source industry` |
+| 5 | declared ISIC target level = industry | `ISIC endpoint differs from the pinned spine class` |
+| 6 | declared ISIC target code = SYN-ISIC-10A1 | `ISIC endpoint differs from the pinned spine class` |
+| 7 | declared occupation target level = class | `occupation endpoint is not a released major group` |
+| 8 | empty unreviewed decision reason = outside_review_scope | `empty decision cannot claim a mapping` |
+| 9 | reader _SCHEMA points to absent.schema.json in tmp_path | `crosswalk schema is missing` |
+| 10 | source URL with username only; chr(64) separator | `source URL is not a public uncredentialed address` |
+| 11 | source URL with password only and empty username; chr(64) separator | `source URL is not a public uncredentialed address` |
+| 12 | source_refs retains syn-basis and appends syn-absent | `link basis or source chain is unresolved` |
+| 13 | editorial rationale = null; configuration hash retained | `editorial basis lacks rationale or configuration hash` |
+| 14 | same source in another group with target industry b and fresh syn-link-z | `duplicate source decision` |
+| 15 | same industry target, distinct syn-l/syn-r link ids, official weights 0.4/0.6 | `duplicate link or target identity` |
+| 16 | same parent, disjoint declared third child SYN-TARIFF-1000.0001.0003 | `tariff family has no unique bound parent` |
+| 17 | C13 receives validated Crosswalk and industry identity | `C13 requires a validated crosswalk and a tariff identity` |
+| 18 | resolver receives {} and tariff identity | `resolver requires a validated crosswalk and a tariff identity` |
+| 19 | C13 receives {} and tariff identity | `C13 requires a validated crosswalk and a tariff identity` |
+| 20 | endpoint_from_parts system = hs; otherwise valid identity | `unknown classification system` |
+| 21 | endpoint_from_parts level = heading; otherwise valid identity | `unknown classification level` |
+| 22 | endpoint_from_parts version = empty text; otherwise valid identity | `classification identity is empty` |
+
+The proof command `UV_OFFLINE=1 UV_CACHE_DIR=.overnight/tmp/uv-cache uv run --locked python .overnight/tmp/fix2_prove_guards.py` exited 0. It ran `git archive HEAD` (exit 0), extracted into a newly created disposable folder under `.overnight/tmp/`, and overlaid only the two new test files. Each child Python process checked the reader, core and fixture imports against that copy before running pytest. The archived baseline and restored final focused suite each exited 0 with 241 passed. Each numbered mutation below removed only that guard clause, leaving the other clauses in place; its selected new plant failed in the call phase while all three controls passed. Restoring the clause then gave four passes. Both production module hashes matched before and after; the disposable copy was deleted. Exact function-scoped removals, exits and counts are in `.overnight/tmp/fix2-guard-results.json`; child reports are `.overnight/tmp/fix2-proof-*.json`, with local paths redacted.
+
+| # | Guard in review H | New test name | Red count / exit | Restored green / exit |
+|---|---|---|---|---|
+| 1 | reader:127 dashed date shape | `test_h_review_date_requires_dashed_calendar_shape` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 2 | reader:160 URL host | `test_h_public_source_url_guards[hostname]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 3 | reader:200-206 tariff grain by level | `test_h_tariff_level_requires_matching_grain` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 4 | reader:215-217 industry code pattern | `test_h_industry_code_requires_canonical_slug` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 5 | reader:236 ISIC level | `test_h_isic_endpoint_guards[level-industry]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 6 | reader:238 ISIC code pattern | `test_h_isic_endpoint_guards[code-SYN-ISIC-10A1]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 7 | reader:242 occupation level | `test_h_occupation_level_requires_major_group` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 8 | reader:326 empty decision with another reason | `test_h_empty_decision_requires_a_pending_reason` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 9 | reader:357-358 missing schema | `test_h_missing_schema_has_fixed_diagnostic` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 10 | reader:161 URL username | `test_h_public_source_url_guards[username]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 11 | reader:162 URL password | `test_h_public_source_url_guards[password]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 12 | reader:276 unresolved non-basis source ref | `test_h_nonbasis_source_ref_must_resolve` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 13 | reader:287 editorial rationale null | `test_h_editorial_rationale_cannot_be_null` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 14 | reader:409-410 duplicate source decision | `test_h_duplicate_source_with_distinct_link_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 15 | reader:422 repeated target in a group | `test_h_duplicate_target_with_valid_weights_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 16 | reader:455 repeated family parent | `test_h_duplicate_parent_with_disjoint_children_is_refused` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 17 | core:302 C13 non-tariff source | `test_h_c13_refuses_a_non_tariff_source` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 18 | core:244 resolver given a non-Crosswalk | `test_h_resolver_requires_a_crosswalk` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 19 | core:302 C13 given a non-Crosswalk | `test_h_c13_requires_a_crosswalk` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 20 | core:56 unknown system | `test_h_endpoint_identity_guards[system]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 21 | core:58 unknown level | `test_h_endpoint_identity_guards[level]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+| 22 | core:60 empty identity | `test_h_endpoint_identity_guards[empty_identity]` | 1 failed, 3 passed / 1 | 4 passed / 0 |
+
+The controls in every row were `test_ac1_review_basis_and_binding`, `test_b_production_registry_positive_control` and `test_ac3_two_hop_trace_and_missing_link`. These are focused deciding-plant proofs, not a claim that only one test fails in a whole-suite mutant run. Exact-message assertions also detect a changed diagnostic: removing guard 8 reaches the unsigned-decision refusal, 9 exposes FileNotFoundError, 12 exposes KeyError, and 18/19 expose AttributeError. With each guard present, the planted input reaches that guard's own diagnostic.
+
+| Command | Exit | Actual result |
+|---|---|---|
+| `uv run --locked python -m pytest custodian/tests/test_classification_review.py core/tests/test_classification.py core/tests/test_calculation_purity.py -q -p no:cacheprovider` | 0 | 241 passed, no failures or skips |
+| `uv run --locked ruff check .` | 0 | All checks passed |
+| `uv run --locked ruff format --check .` | 0 | 832 files already formatted |
+| `uv run --locked mypy` | 0 | No issues in 447 source files |
+| `python3 scripts/check_docs.py` | 0 | 1134 text files and 122 Markdown files checked |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical |
+| `git diff --check` | 0 | No whitespace errors |
+
+- Check evidence: `.overnight/tmp/fix2-final-checks.json`; preliminary checker outputs: `.overnight/tmp/fix2-initial-checks.json`. The proof script itself records each selected node and all process exit codes. Generated evidence contains relative source references only.
+- Strict builder self-review: APPROVE for this tests-only finding-H repair; another-maker review is pending. Muhasabah: PASS for sourced evidence, unchanged production, append-only history, exact scope and explicit limits.
+
+- Post-record verification: `python3 .overnight/tmp/fix2_scope_audit.py` exited 0: exactly three tracked files changed, prior tests and progress bytes retained, production hashes unchanged, 22 unique red/green proofs, disposable copy deleted, all seven recorded checks green, marker and new-text hygiene verified, no staged files. `python3 scripts/check_docs.py` exited 0: 1134 text files and 122 Markdown files. `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exited 0. Final diff: 264 insertions and zero deletions before this evidence line.
