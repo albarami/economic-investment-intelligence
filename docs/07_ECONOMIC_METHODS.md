@@ -898,6 +898,17 @@ by hour: steps 1 and 2 are repeated with t_ij(h) from C25 for each hour shown
 
 **Inputs.** `pub_customs_import` (C5: value in QAR by tariff line, origin and month); `pub_manufacturing` (`mfg_industry`: one dataset per manufacturing industry, with rows by licence type, labour and cumulative licensed investment in QAR million, 2019 to 2025; and the main manufacturing products, 2016 to 2022); a committed, reviewed crosswalk from tariff lines to the manufacturing industries, each line with a reviewer and a review date. Certificates of origin and arriving vessels (`pub_trade_logistics`) stand beside the screen as separate Public context.
 
+**Reviewed selection.** S2-T47's typed crosswalk contract is in document 03
+**Reviewed classification crosswalk (S2-T47)**; release carriage and this card's
+calculation remain S7-T11's. C13 counts every non-`mapped` status (`unmapped`,
+`ambiguous` and `unreviewed`, including an absent decision) as "not mapped";
+there is no third displayed bucket. An eight-digit parent maps to industry i
+only when every twelve-digit child in the bound `cus_imp_2025` snapshot is
+mapped to that identical industry endpoint. A split, partly mapped or missing
+child leaves the parent outside `M_i`, flagged and never apportioned. Multiple
+industry targets have no C13 allocation rule, even with published weights.
+No industry mapping is inferred from a tariff prefix or an industry name.
+
 **Formula.**
 
 ```

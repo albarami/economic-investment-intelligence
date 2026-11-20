@@ -1634,6 +1634,126 @@ In a committed review file an activity code is written in reversible dotted form
 | DAT-106 | Every source in `source_registry` has publisher, dataset or page title, licence, retrieval date and file SHA-256. A Public source also has its URL, which holds no key or token (rule 14). A Synthetic or Simulated source uses the feed producer as publisher, the contract and feed as title, the repository licence, the build date as retrieval date and the feed file hash; its seed remains provenance in the manifest rather than replacing any Source-chain field. | Not-null check for every source-chain field; Public URL check, where a URL that holds a key or token fails; Synthetic and Simulated feed-hash-to-registry check. |
 | DAT-107 | The input class of a `fact_lineage` row follows the source kind: `public_dataset`, `public_document` and `reviewed_config` give `public`; `synthetic_feed` gives `synthetic`; `simulation_output` gives `simulated`. | Mapping check. |
 
+### Reviewed classification crosswalk (S2-T47)
+
+[Decision 0070](decisions/0070-the-decision-pack-of-the-value-studies.md) item B3
+adds a classification association, separate from the graph and the worker maps
+of DAT-03 and DAT-31. The files beside the activity spine are
+`custodian/publicdata/review/product_activity_occupation.v1.json`, its
+`.schema.json` and its `.binding.json`. The schema major is the literal
+`product_activity_occupation.v1`; `mapping_revision` identifies the reviewed
+configuration separately from endpoint versions. The committed initial file
+admits nothing. Fixtures establish no real mapping approval.
+
+`custodian/src/eii_custodian/publicdata/review/classification.py` supplies
+`parse_crosswalk` and `load_crosswalk`. The caller supplies an explicit context:
+`mode`, `snapshots`, `endpoint_meanings`, and `tariff_families`. An upstream
+custodian reader must verify this context against its selected receipts, the
+reviewed activity spine and the complete source-grain tariff inventory before
+admission. This validator does not fetch, select or read a cache. A matching
+binding is not proof that caller-supplied context came from a verified receipt.
+Each snapshot has `registry_key`, `snapshot_sha256`, `publisher`, `title`,
+`licence`, `retrieved_on` (calendar date) and a public, uncredentialed `url`.
+Production metadata matches the existing source registry; this task adds no
+row. Each endpoint meaning has the exact endpoint and `meaning_sha256`; a
+changed meaning requires renewed review.
+
+Every endpoint has exactly `system`, `version`, `level`, `code`:
+
+| System | Level and code | Version |
+|---|---|---|
+| `customs_tariff` | `tariff12`, canonical dotted twelve-digit line of `cus_imp_2025`; or `tariff8`, canonical dotted eight-digit line of `cus_imp_2019` | Registry key, colon, selected snapshot SHA-256; no HS revision is asserted |
+| `manufacturing_industry` | `industry`; the complete `mfg_industry/<slug>` registry key | That key, colon, selected snapshot SHA-256 |
+| `isic_class` | `class`; four-digit class admitted through the reviewed spine | `licence_codes_2025_05`, reusing the spine version |
+| `occupation_group` | `major_group`; DAT-127 codes `0` to `9` only | `occupation_group.v1` |
+
+The source `mfg_industry/main-manufacturing-products` is titled
+"Manufacturing industries and main manufacturing products" in the registry.
+An industry name never creates an ISIC class or an industry-to-ISIC bridge.
+`unmapped` and `other` are never occupation targets. Invented test dictionaries
+use `SYN-TARIFF-` plus canonical dotted groups, `SYN-ISIC-` plus an invented
+class, and `mfg_industry/syn-` slugs; both file and context must declare
+`invented_fixture` and the reader must explicitly allow that mode. Such a file
+cannot be admitted in production. No bare eight- or eleven-digit code is
+written or accepted.
+
+The review's `evidence` entries have exactly `evidence_id`, `registry_key`,
+`snapshot_sha256`, `locator`, and resolve to a complete context snapshot.
+`groups` have `link_kind` (`product_to_activity` or `activity_to_occupation`),
+`source`, `status`, `reason`, `reviewed_by_role`, `reviewed_on`, `links`.
+Directions are tariff to industry/class and industry/class to occupation;
+hops compose only on an identical middle endpoint, including version and
+level. The closed statuses are `mapped`, `unmapped`, `ambiguous`, `unreviewed`.
+Reasons are `reviewer_approved`, `reviewer_rejected_no_target`,
+`reviewer_undecided`, `multi_link_no_published_weight`,
+`awaiting_human_review`, and the resolver's `outside_review_scope` for an
+endpoint absent from the file. Absence is never a reviewed rejection.
+
+Each link has `link_id`, `target`, `basis_kind`, `basis_ref`, `source_refs`,
+`rationale`, `configuration_sha256`, `reviewed_by_role`, `reviewed_on`,
+`weight`. All links and every mapped, unmapped or ambiguous group require a
+reviewer role key and ISO calendar date. The lead-designated human reviewer
+checks direction, meaning, versions and basis. Models cannot sign. An empty
+rejected group is `unmapped` / `reviewer_rejected_no_target`; an empty undecided
+group is `ambiguous` / `reviewer_undecided`. An unsigned pending group has no
+links, blank review fields and `unreviewed` / `awaiting_human_review`. Status
+and reason are recomputed; inconsistent claims fail. Unknown properties,
+duplicate JSON properties, duplicate decisions, link IDs, targets, meanings
+or evidence identities, incomplete chains and unsupported versions fail.
+
+Basis uses the graph vocabulary `official` or `editorial_reviewed`, without
+adding a graph type. Editorial basis requires a rationale and configuration
+hash and forbids a weight. Production in this version admits editorial links
+or explicit gaps only: a further classification/correspondence source needs
+its own decision. Official basis and published weights are exercised only on
+invented fixtures. A published weight retains exact decimal text, `scope`,
+`denominator` and `evidence_ref`, which must be the link's basis evidence.
+A single link is mapped; multiple links are mapped only when all carry
+published weights with one evidence reference, scope and denominator. All-null
+multiple links remain `ambiguous` / `multi_link_no_published_weight`; mixed
+null and non-null weights fail. No equal split, normalisation, multiplied
+two-hop weight or worker-derived split is made.
+
+The binding has exactly `schema_version`
+(`product_activity_occupation.binding.v1`), `review_sha256`, `schema_sha256`,
+`context_sha256`. The first two digests cover exact review and schema bytes;
+the context digest covers UTF-8 JSON with sorted keys, separators comma/colon
+and preserved array order. Missing or stale bindings refuse even a signed
+gap. A change to the review, schema, source chain, endpoint meaning/version or
+complete child inventory requires a newly reviewed binding.
+
+`core/src/eii_core/classification.py` is the pure typed consumer contract:
+immutable `Crosswalk`, `GroupDecision`, `Link`, `Evidence`, `Snapshot`,
+`TariffFamily`, `OccupationResolution` and `C13Selection` shapes. Its resolver
+returns both links and their original weights side by side, all paths and
+distinct occupation codes; there is no numeric input or allocation output.
+The worst participating hop determines composed status, in order
+`unreviewed`, `unmapped`, `ambiguous`, `mapped`. A missing branch cannot be
+discarded to promote another; only a fully mapped result exposes admitted
+occupation associations. These associations establish no worker attribute,
+qualification, staffing demand, readiness or person-level join, and accept
+no protected statistic. `core/tests/test_calculation_purity.py` applies its
+unchanged import/call policy and isolated runtime guard to this module in
+addition to the calculation directory. Focused tests are
+`custodian/tests/test_classification_review.py` and
+`core/tests/test_classification.py`, with invented dictionaries in
+`custodian/tests/fixtures/classification.py`.
+
+`C13Selection` is a typed input shape, not a calculation adapter. It has source,
+status, reason, the `mapped`/`not_mapped` bucket, nullable industry, original
+decisions, nullable bound family, method version, mapping revision and review
+and context digests. A tariff family carries its explicit eight-digit parent,
+every twelve-digit child in the selected `cus_imp_2025` snapshot and that
+snapshot's identity. The caller's verified inventory, never a guessed prefix,
+establishes family membership. Missing, repeated or incompatible children
+refuse or remain outside mapped C13 selection. C13's conservative roll-up and
+single gap bucket are specified in document 07 C13. C5's input/supplier baskets,
+other cards' existing mappings and DAT-03/DAT-31 worker maps are unchanged.
+Release carriage is S7-T11's: this task adds no release table, manifest artefact
+or `source_registry` row and grants no product import of custodian code.
+S7-T11 must bind the verified reviewed configuration and source chains under
+DAT-105 to DAT-107 before a product reader consumes them.
+
 ### PUB-67 supporting provenance
 
 The selected-cache series build retains its ordinary licence `source_chain`,

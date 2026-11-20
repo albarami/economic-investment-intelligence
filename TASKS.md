@@ -823,7 +823,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: reviewed crosswalk and versioned schema beside the existing activity-spine review files, deterministic readers, focused tests and task-owned contract/method documentation. Slice S2 owns this layer through S2-T04's reviewed spine and S2-T07's calculation inputs; document 07 C13 already consumes a reviewed product mapping.
 - Depends: S2-T04, S2-T07.
 - Requirements: [decision 0070](docs/decisions/0070-the-decision-pack-of-the-value-studies.md) item B3; document 07 C13, MTH-68; AGENTS.md rules 7, 16 to 19 and 37.
-- Delivery: hard; personas Data and Methods; status queued.
+- Delivery: hard; personas Data and Methods; status in progress: built locally, review pending.
 
 ### S2-T10 — Review follow-up for slice S2
 - Goal: Close every proposed open item that the reviews of slice S2 entered in `OPEN_ITEMS.md`, before the slice S2 gate.
