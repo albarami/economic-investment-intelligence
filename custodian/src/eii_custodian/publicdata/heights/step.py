@@ -23,7 +23,12 @@ from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
 
 from .calibration import gba_calibration
-from .landmarks import apply_landmark_heights, load_landmark_heights
+from .landmarks import (
+    LANDMARK_HEIGHTS_PATH,
+    apply_landmark_heights,
+    load_landmark_heights,
+    verify_landmark_receipts,
+)
 from .manifest import (
     dump_sorted,
     manifest_block,
@@ -41,6 +46,7 @@ from .model import (
     BUILDINGS_RELATIVE,
     HEIGHTS_FILE,
     HEIGHTS_RELATIVE,
+    LANDMARK_HEIGHTS_RELATIVE,
     MANIFEST_FILE,
     RULES_PATH,
     Building,
@@ -149,8 +155,10 @@ def build_heights(
     if not buildings_path.is_file():
         raise HeightError("building_table_absent")
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
+    landmarks = load_landmark_heights()
+    verify_landmark_receipts(cache, landmarks)
     buildings, landmark_citations = apply_landmark_heights(
-        load_buildings(buildings_path), load_landmark_heights()
+        load_buildings(buildings_path), landmarks
     )
     results = read_sources(cache, entries, rules, bounds=_table_bounds(buildings))
     index = globfp_index(results["bldg_3dglobfp"].globfp)
@@ -160,6 +168,7 @@ def build_heights(
     counts = height_counts(choices, globfp_matches)
     errors = fallback_errors(candidates)
     heights_body = dump_sorted(rows)
+    landmark_bytes = LANDMARK_HEIGHTS_PATH.read_bytes()
     input_files: list[dict[str, object]] = [
         {
             "key": "building_table",
@@ -169,6 +178,12 @@ def build_heights(
             "source_chain": (
                 "the asset pipeline's own manifest entry of the same key and sha256"
             ),
+        },
+        {
+            "key": "landmark_heights",
+            "path": LANDMARK_HEIGHTS_RELATIVE,
+            "role": "read",
+            "sha256": file_sha256(landmark_bytes),
         },
         {
             "key": "heights",

@@ -21,6 +21,7 @@ from shapely.geometry.base import BaseGeometry
 from eii_core.calc.building_heights import HEIGHT_SOURCES, height_value
 
 BUILDINGS_RELATIVE = "assets/buildings/buildings.geojson"
+LANDMARK_HEIGHTS_RELATIVE = "publicdata/review/landmark_heights.yaml"
 HEIGHTS_RELATIVE = "assets/heights"
 HEIGHTS_FILE = "heights.json"
 MANIFEST_FILE = "manifest.heights.json"

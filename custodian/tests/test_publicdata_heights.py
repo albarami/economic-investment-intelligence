@@ -2769,6 +2769,10 @@ def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
         "eii_custodian.publicdata.heights.step.load_landmark_heights",
         lambda: load_landmark_heights(LANDMARK_FIXTURE_PATH),
     )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.verify_landmark_receipts",
+        lambda _cache, _rows: None,
+    )
     buildings_path = tmp_path / "buildings.geojson"
     buildings_path.write_bytes(
         invented.buildings_bytes(
@@ -3018,13 +3022,91 @@ def test_duplicate_landmark_building_ids_refuse_in_both_orders(tmp_path: Path) -
             load_landmark_heights(path)
 
 
-def test_a_fictitious_landmark_publisher_is_refused(tmp_path: Path) -> None:
+def test_a_fictitious_landmark_page_url_is_refused(tmp_path: Path) -> None:
+    """A citation with no registry row is refused before a receipt is checked."""
     path = tmp_path / "bad.yaml"
     document = _landmark_document()
-    document["entries"][0]["citation"]["publisher"] = "SYN-publisher"
+    document["entries"][0]["citation"]["page_url"] = (
+        "https://example.invalid/SYN/no-registry-page"
+    )
+    document["entries"][0]["citation"]["publisher"] = "Example Heights Publisher"
     path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
     with pytest.raises(HeightError, match="landmark_heights_citation"):
         load_landmark_heights(path)
+
+
+def test_a_production_landmark_citation_must_match_the_registry(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_url"] = (
+        "https://example.invalid/SYN/no-registry-page"
+    )
+    target = tmp_path / "landmark_heights.yaml"
+    target.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.landmarks.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    with pytest.raises(HeightError, match="landmark_heights_citation"):
+        load_landmark_heights()
+
+
+def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    row = next(entry for entry in load_registry() if entry.kind == "public_page")
+    document = _landmark_document()
+    citation = document["entries"][0]["citation"]
+    citation["page_url"] = row.url
+    citation["publisher"] = row.publisher
+    citation["licence_basis"] = row.licence_basis
+    target = tmp_path / "landmark_heights.yaml"
+    target.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.landmarks.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_landmark_heights",
+        load_landmark_heights,
+    )
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0.1, 0.1, 0.5), None, None
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+    )
+    out_dir = tmp_path / "out"
+    with pytest.raises(HeightError, match="landmark_heights_citation"):
+        build_heights(
+            cache,
+            (globfp_row,),
+            buildings_path,
+            out_dir,
+            [],
+            invented.rules_file(tmp_path / "rules.yaml"),
+        )
+    assert not (out_dir / "heights.json").exists()
 
 
 def test_a_planted_omitted_heights_step_refuses_the_build(
@@ -3046,6 +3128,103 @@ def test_a_planted_omitted_heights_step_refuses_the_build(
     outcome = run_build((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "heights_output_absent"
+
+
+def test_a_planted_omitted_heights_step_refuses_when_outputs_already_exist(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    out_dir.mkdir(parents=True)
+    (out_dir / "heights.json").write_text("[]", encoding="utf-8")
+    (out_dir / "manifest.heights.json").write_text("{}", encoding="utf-8")
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr("eii_custodian.publicdata.heights.step.build_heights", noop)
+    cache = tmp_path / "data" / "public_cache"
+    _ensure_building_table(cache)
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = run_build((), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "heights_output_absent"
+    assert not (out_dir / "heights.json").exists()
+
+
+def test_a_landmark_citation_with_a_short_hash_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_sha256"] = "abc"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_citation"):
+        load_landmark_heights(path)
+
+
+def test_a_landmark_citation_with_a_blank_field_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["citation"]["licence_basis"] = "   "
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_citation"):
+        load_landmark_heights(path)
+
+
+def test_a_malformed_landmark_document_version_is_refused(tmp_path: Path) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["version"] = 2
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights"):
+        load_landmark_heights(path)
+
+
+def test_duplicate_landmark_ids_refuse_in_both_orders(tmp_path: Path) -> None:
+    base = _landmark_document()["entries"][0]
+    second = dict(base, building_id="SYN-B-LM02", height_m="150.00")
+    for entries in ([base, second], [second, base]):
+        path = tmp_path / "dup.yaml"
+        path.write_text(
+            yaml.safe_dump({"version": 1, "entries": entries}, sort_keys=False),
+            encoding="utf-8",
+        )
+        with pytest.raises(HeightError, match="landmark_heights_duplicate"):
+            load_landmark_heights(path)
+
+
+def test_a_landmark_height_outside_the_calculation_context_is_refused(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["height_m"] = "1e60"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    with pytest.raises(HeightError, match="landmark_heights_height"):
+        load_landmark_heights(path)
+
+
+def test_the_manifest_records_the_committed_hand_list_hash(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
+    from eii_custodian.publicdata.heights.landmarks import LANDMARK_HEIGHTS_PATH
+
+    out_dir, _ = _card_setup(tmp_path)
+    files = {record["key"]: record for record in _manifest(out_dir)["files"]}
+    record = files["landmark_heights"]
+    assert record["path"] == "publicdata/review/landmark_heights.yaml"
+    assert record["sha256"] == file_sha256(LANDMARK_HEIGHTS_PATH.read_bytes())
+
+
+def test_gba_rules_without_a_class_field_refuse_before_parse(tmp_path: Path) -> None:
+    document = invented.rules_document()
+    document["sources"]["bldg_gba"]["class_field"] = ""
+    rules_path = invented.write_rules(tmp_path / "rules.yaml", document)
+    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
+    row = invented.entry("bldg_gba", extension="zip")
+    with pytest.raises(HeightError, match="structure_mismatch"):
+        _sources(tmp_path, (row,), bodies=((row, body),), rules=rules_path)
 
 
 def test_gba_calibration_drops_subprecision_values(tmp_path: Path) -> None:

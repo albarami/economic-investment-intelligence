@@ -48,10 +48,11 @@ has count 0 and reason `no_pairs`. The same numbers are computed by
 text `"3.0"` with the label `ASSUMPTION` (the lead's stated assumption of
 2026-11-14; the owner replaces it). It is parsed to `Decimal` — never a float —
 and no Python file may repeat the literal. The same file declares the structure
-each height source must match, in the form confirmed in pass five:
-`bldg_3dglobfp` is `shapefile_zip` with the field `Height`, `bldg_gba` is
-`shapefile_zip` with `Height` and class field `SYN_class` (calibration only,
-not in the PUB-106 order pending OI-310), and `bldg_wsf3d` is a `GTiff` band
+each height source must match: `bldg_3dglobfp` is `shapefile_zip` with the
+field `Height`; `bldg_gba` is `shapefile_zip` with its height and class fields
+still `to be confirmed` on the registry row (calibration only, not in the
+PUB-106 order pending OI-310), and fixtures carry `SYN_class` while the
+production reader refuses another schema by name; `bldg_wsf3d` is a `GTiff` band
 `1` of the declared sample type `int16` with nodata `-32767` and scale
 `"0.1"`, both in metres and EPSG:4326; the reader refuses another driver or
 another sample type by name (`structure_mismatch`); the value `to be confirmed`

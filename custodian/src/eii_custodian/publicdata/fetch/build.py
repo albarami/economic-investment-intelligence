@@ -1438,6 +1438,8 @@ def _heights(
 
     root = cache.parent
     out_dir = root / HEIGHTS_RELATIVE
+    for name in (HEIGHTS_FILE, MANIFEST_FILE):
+        (out_dir / name).unlink(missing_ok=True)
     try:
         build_heights(
             cache,

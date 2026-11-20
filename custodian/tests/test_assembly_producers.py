@@ -445,6 +445,21 @@ def test_busyness_actual_table_is_indexed_as_an_index_not_a_people_count(
     assert all(figure.figure_id.endswith(":busyness_index") for figure in figures)
 
 
+def test_height_adapter_refuses_a_missing_building_table(tmp_path: Path) -> None:
+    from custodian.tests.fixtures.heights import invented
+
+    from eii_custodian.publicdata.heights.step import HeightError
+
+    cache = tmp_path / "data/public_cache"
+    rows = (
+        invented.entry("bldg_3dglobfp", extension="zip"),
+        invented.entry("bldg_wsf3d", extension="tif"),
+    )
+    state = context(cache, rows)
+    with pytest.raises(HeightError, match="building_table_absent"):
+        state.heights()
+
+
 def test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering(
     tmp_path: Path,
 ) -> None:

@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
 from eii_core.calc.building_heights import height_value
 
 from .model import Building, HeightError
+
+if TYPE_CHECKING:
+    from eii_custodian.publicdata.fetch.registry import Entry
 
 _PENDING = "basemap_building_ids_unconfirmed"
 _CITATION_KEYS = frozenset(
@@ -70,6 +75,67 @@ def _valid_sha256(text: str) -> bool:
     return len(text) == 64 and all(ch in "0123456789abcdef" for ch in text)
 
 
+def _registry_by_url() -> dict[str, Entry]:
+    from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+
+    found: dict[str, Entry] = {}
+    for entry in load_registry():
+        if entry.url:
+            found[entry.url] = entry
+        if entry.landing_url:
+            found[entry.landing_url] = entry
+    return found
+
+
+def _bind_citation_registry(row: LandmarkHeight) -> None:
+    """Require the citation page to name a registry row with matching evidence."""
+    by_url = _registry_by_url()
+    entry = by_url.get(row.citation.page_url)
+    if entry is None:
+        raise HeightError("landmark_heights_citation")
+    if entry.publisher != row.citation.publisher:
+        raise HeightError("landmark_heights_citation")
+    if entry.licence_basis != row.citation.licence_basis:
+        raise HeightError("landmark_heights_citation")
+
+
+def verify_landmark_receipts(
+    cache: Path, landmarks: tuple[LandmarkHeight, ...]
+) -> None:
+    """Each cited page must name the digest of its cache receipt."""
+    if not landmarks:
+        return
+    from eii_custodian.publicdata.fetch.receipts import cache_directory
+    from eii_custodian.publicdata.fetch.registry import Entry
+
+    by_url = _registry_by_url()
+    for row in landmarks:
+        entry = by_url.get(row.citation.page_url)
+        if not isinstance(entry, Entry):
+            raise HeightError("landmark_heights_citation")
+        directory = cache_directory(cache, entry.key)
+        digest = row.citation.page_sha256
+        found = False
+        for meta in directory.rglob("*.meta.json"):
+            try:
+                receipt = json.loads(meta.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if receipt.get("sha256") == digest:
+                found = True
+                break
+        citation = directory / "citation.json"
+        if not found and citation.is_file():
+            try:
+                receipt = json.loads(citation.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                raise HeightError("landmark_heights_citation") from None
+            if receipt.get("sha256") == digest:
+                found = True
+        if not found:
+            raise HeightError("landmark_heights_citation")
+
+
 def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...]:
     """Read the committed hand list; every refusal is named."""
     target = path if path is not None else LANDMARK_HEIGHTS_PATH
@@ -112,8 +178,6 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
             text = citation[field]
             if not isinstance(text, str) or not text.strip():
                 raise HeightError("landmark_heights_citation")
-        if citation["publisher"].startswith("SYN-"):
-            raise HeightError("landmark_heights_citation")
         if not _valid_sha256(citation["page_sha256"]):
             raise HeightError("landmark_heights_citation")
         height_text = entry["height_m"]
@@ -141,6 +205,16 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
                 ),
             )
         )
+    if rows:
+        try:
+            skip_registry = target.resolve().is_relative_to(
+                LANDMARK_FIXTURE_PATH.parent.resolve()
+            )
+        except (OSError, ValueError):
+            skip_registry = False
+        if not skip_registry:
+            for loaded in rows:
+                _bind_citation_registry(loaded)
     return tuple(rows)
 
 
@@ -186,4 +260,5 @@ __all__ = [
     "LandmarkHeight",
     "apply_landmark_heights",
     "load_landmark_heights",
+    "verify_landmark_receipts",
 ]

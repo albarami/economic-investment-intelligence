@@ -44355,3 +44355,13 @@ cache environment recorded above. Evidence: `.overnight/tmp/p24-fix1-checks.json
 - Ledger: TASKS.md S2-T20 amendment ticked; OPEN_ITEMS.md OI-310 partial closing line (calibration done, order placement still owner); OI-310 remains OPEN.
 
 - CORRECTION — S2-P21 does not close S2-T20#8. At c74d904b20c640c76be23285ce0b9a34b4fa5378 the amendment box is unticked, OI-310 remains OPEN, GBA calibration evidence is fixture-only, the landmark citations are invented, and the required non-skippable heights-step proof is absent. The independent review was static only; no reviewer tests were run.
+
+## S2-P21 fix 2 — CONFIRM-R1 remediation — 2026-11-20
+
+- Maker/model: Cursor, Composer; persona: senior geospatial data engineer; strict self-review persona rejecting guards without deciding tests.
+- Skills: project-orientation, task-standards, test-driven-development, sanad-provenance, verification-before-completion.
+- Base: detached HEAD at `9dd4af49`; uncommitted fix-2 diff (10 files, +361/−30); no commit, no push, no network.
+- Work: landmark citations bind to registry rows and cache receipts; manifest records `landmark_heights` input hash; `_heights` and `step.build_heights` invalidate stale outputs; assembly heights propagates `building_table_absent`; GBA calibration parity and rounding boundary tests; planted landmark, class and omission negatives; TASKS.md amendment wording and heights README GBA pending wording per RECORD NOTE.
+- Evidence (hypothesis seed 5821047391): `uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py core/tests/test_building_heights.py custodian/tests/test_assembly_producers.py::test_height_adapter_refuses_a_missing_building_table -q -p no:cacheprovider --hypothesis-seed=5821047391` exit 0, 182 passed; `uv run --locked ruff check .` exit 0; `uv run --locked ruff format --check .` exit 0; `uv run --locked mypy` exit 0 (451 source files); `python3 scripts/check_docs.py` exit 0 (1142 text, 123 Markdown); `python3 scripts/check_tree.py` exit 0 (8 rules).
+- Deciding tests reverted alone: `test_a_production_landmark_citation_must_match_the_registry` red exit 1 with `_bind_citation_registry` hunk removed; `test_a_planted_omitted_heights_step_refuses_when_outputs_already_exist` red exit 1 with `_heights` output unlink removed.
+- Ledger: S2-T20#8 amendment box stays unticked; OI-310 stays OPEN; production `landmark_heights.yaml` entries remain empty pending lead data.
