@@ -1,9 +1,15 @@
 # Atlas finished-file source
 
 S2-T25 implements `eii_custodian.publicdata.atlas.parse.parse_archives@v1`.
-The source pages, licence, native revision, available history, access tier and
-units are NOT READ. Decision 0040 supplies unverified page leads. No host has
-been admitted. `confirmed: false` and `bound_origin: pending` prevent requests.
+S2-P18 records dated publisher readings in
+`custodian/publicdata/review/trade_publisher_readings.yaml`, linked by the registry.
+The current download page and legacy index have different classification/history
+statements; neither establishes a selected file vintage or native measure mapping.
+The two dataset/index hosts are admitted under PUB-03. File-specific licence,
+Qatar key, schema and exact member/count/byte bounds remain pending; a rounded
+MB label is not an exact byte bound. `confirmed: false` and `bound_origin: pending`
+keep downloads inactive for missing technical metadata. Pending terms alone
+refuse nothing under decision 0059.
 
 The configuration names two finished downloads, in order:
 `country_product_year`, then `country_partner_product_year`. A rebuild member,

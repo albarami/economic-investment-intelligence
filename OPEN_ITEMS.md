@@ -2767,6 +2767,10 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The live build record that lists the 15 rows, the names of the other six, and for each the task that reads it; each URL and byte bound is confirmed from the publisher's metadata, and no bound is invented.
 - NEEDED BY: the slice S2 gate.
 
+- UPDATE (2026-11-20, S2-P18): LEFT OPEN. The package requires publisher metadata readings, but its final AUTHORITY says no network and forbids the live cache. No new URL, byte bound, publisher fact or host is confirmed. The live build record and remaining row inventory still belong to the lead. Registry/configuration and TASKS.md are unchanged; no closure or red/green implementation result is claimed. See PROGRESS.md, S2-P18 offline disposition.
+
+- UPDATE (2026-11-20, S2-P18 publisher readings): LEFT OPEN. The current brief explicitly authorizes publisher-page GETs, superseding the earlier package no-network disposition above. Eight independent source records now retain page/error hashes, exact used sentences and pending technical fields in `custodian/publicdata/review/trade_publisher_readings.yaml`; successfully read metadata hosts have PUB-03 plants. No exact archive/member/row bound is invented from a rounded MB label. The live build record, other-six-row inventory and actual receipts cannot be supplied without the lead's live run. Source-record/host checks: initial red exit 1 (21 failed, 1 passed); implemented green exit 0 (22 passed), seed 7359124608. This is partial metadata evidence, not closure of OI-309 or of any live acceptance box.
+
 ## OI-310 — Where GlobalBuildingAtlas stands in the height order
 
 - ID: OI-310
@@ -4112,6 +4116,10 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: The supplied task record says all policies are unconfirmed; pending fetches refuse before transport. No source page reading or live Qatar comparison is claimed.
 - NEEDED: The lead verifies each source-native indicator set, history and excluded coverage, Qatar coverage, historical/forecast fields, licence words, access tier, schema and count/byte bounds, records date and hash, and activates only from that evidence.
 
+- UPDATE (2026-11-20, S2-P18): LEFT OPEN. Existing terms excerpts in document 04, section S2-T21 part B terms readings, do not establish the selected benchmark metadata required here. Independent publisher dataset/documentation readings cannot be made under this package's no-network authority. All benchmark policies remain unconfirmed; pending terms alone fail nothing under decision 0059. No implementation change or red/green result is claimed. See PROGRESS.md, S2-P18 offline disposition.
+
+- UPDATE (2026-11-20, S2-P18 publisher readings): LEFT OPEN. Under the current publisher-GET authority, WDI dataset/catalogue/terms and UNCTAD portal/FAQ/terms readings are now independently recorded with body hashes and exact words in `custodian/publicdata/review/trade_publisher_readings.yaml`. Catalog metadata version is not a selected data vintage. Qatar country-page access and IMF/ILOSTAT documentation returned HTTP 403; source-native indicator/history/status mappings, schemas and exact count/byte bounds remain unverified. All four download policies remain unconfirmed. The review plants reject a failed page used to confirm a fact and premature activation: red exit 1 (21 failed, 1 passed before records), green exit 0 (22 passed), seed 7359124608. Pending terms alone are not a refusal reason (decision 0059).
+
 ### PO-S2-80 — The live trade selection awaits the lead and owner
 
 - ID: PO-S2-80
@@ -4120,6 +4128,10 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - CONCERNS: `custodian/publicdata/trade_reconciliation.yaml` and its reviewed input manifests
 - EVIDENCE: The supplied record says the selection is unconfirmed and dispatch performs no live comparison.
 - NEEDED: The lead selects reviewed years, partners, product scopes and manifests through the closed non-ranking mechanism and one BACI-aligned HS revision; the owner confirms; every gap is retained and the live run is recorded.
+
+- UPDATE (2026-11-20, S2-P18): LEFT OPEN. Selection remains the lead's proposal for owner confirmation; this package does not select years, partners, scopes or manifests. custodian/publicdata/trade_reconciliation.yaml stays byte-for-byte unchanged, with confirmed false. No live comparison, closure or red/green implementation result is claimed. See PROGRESS.md, S2-P18 offline disposition.
+
+- UPDATE (2026-11-20, S2-P18 publisher readings): LEFT OPEN, owner/lead dependency. No year, partner, scope, HS revision or manifest is selected. Read-only byte comparison against HEAD proves `custodian/publicdata/trade_reconciliation.yaml` unchanged, SHA-256 `481d87de1bff5de4026700cbf710570252da8ec51fc0941adc12d142277b80a4`, exit 0. No live comparison or red/green implementation claim applies to this unchanged owner decision.
 
 ### PO-S2-81 — The merge-9 hand-plant audit overwrites its detail file
 

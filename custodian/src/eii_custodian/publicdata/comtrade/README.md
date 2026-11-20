@@ -1,6 +1,6 @@
 # UN Comtrade fetch
 
-This adapter is the keyed provider interface of decision 0040 item 2. The committed registry row is unconfirmed: terms are still "terms to be read", hosts are not on the allow-list, and `skip_reason` is `metadata_unconfirmed`.
+This adapter is the keyed provider interface of decision 0040 item 2. The download policy remains unconfirmed with `skip_reason: metadata_unconfirmed`. S2-P18 records the publisher's documentation, current licence words and free per-call/daily limits in `custodian/publicdata/review/trade_publisher_readings.yaml`, linked by the registry row's `basis_note`. Its documentation and licence hosts are reviewed; API source/redirect hosts, schema, quota reset/scope, selected bounds and owner selection remain pending. No data request or key was used.
 
 ## What the lead checks before any fetch
 
@@ -9,7 +9,7 @@ This adapter is the keyed provider interface of decision 0040 item 2. The commit
 3. The closed selection: years, frequencies, one classification revision aligned with S2-T24, flows, chapters and the mirror partners. The selection is a registry value. It is not chosen from a ranking of fetched rows.
 4. Count bounds and the last periods, checked equal to the policy.
 
-Until that reading is recorded, activation refuses the fetch.
+Missing technical metadata keeps activation unconfirmed. A missing terms reading alone never refuses a source (decision 0059).
 
 ## Confirmed mapping
 

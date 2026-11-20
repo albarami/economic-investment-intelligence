@@ -1,8 +1,13 @@
 # S2-T26 benchmark handoff
 
-All four mappings are inactive. Registry identities and landing pages are
-decision 0040 leads, not verified publisher facts. No host was added to PUB-03.
-No licence words, live schema, Qatar identifier, unit or bound has been guessed.
+All four download mappings remain inactive. S2-P18 records WDI dataset/catalogue
+and UNCTAD portal/terms readings, with body hashes and exact words in
+`custodian/publicdata/review/trade_publisher_readings.yaml`. Their successfully
+read metadata hosts enter PUB-03; this confirms no download URL or redirect.
+WDI catalogue metadata version is separate from a selected file vintage. Qatar
+coverage, indicator/status mappings, native schemas and count/byte bounds remain
+unverified. The attempted IMF and ILOSTAT pages returned HTTP 403; neither is
+activated and no access challenge is bypassed. No missing source has a substitute.
 
 | Source | Pending source-specific work |
 |---|---|

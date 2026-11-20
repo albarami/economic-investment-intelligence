@@ -503,11 +503,78 @@ refused. Terms remain `terms to be read` on basis `owner_decision`, decision
 fetches nothing. A narrower year selection records the excluded coverage and
 infers no concordance.
 
+#### Publisher metadata readings (S2-P18)
+
+Read on 2026-11-20, from each publisher's own dataset, documentation and terms
+pages only. The registry's eight `basis_note` records resolve to
+[custodian/publicdata/review/trade_publisher_readings.yaml](../custodian/publicdata/review/trade_publisher_readings.yaml).
+Each record holds publisher, URL, date read, SHA-256 of the complete response
+body and the exact words used. HTTP error bodies are labelled as errors and
+never support a confirmed fact. An incomplete reading has no complete-body
+hash. Confirmed metadata facts are distinct from a confirmed download policy.
+This dated record supersedes the earlier NOT READ descriptions only for the
+individual facts it confirms; every source's download policy remains unconfirmed.
+
+- Comtrade: the subscription page states a free keyed download of 100K records
+  per call and up to 500 API calls/day. The public preview table states 500
+  records, one period and one product per call. Registration is required for
+  the keyed route; no account or key was used for this reading. The documentation
+  and licence hosts are admitted under PUB-03. The attempted API documentation
+  path returned HTTP 404; the API host and redirects remain unreviewed. No data
+  request, measured gap, schema confirmation or owner selection is claimed.
+- BACI: the named dataset page exceeded the fixed metadata intake ceiling.
+  Alternative documentation paths returned HTTP 404. No complete page hash,
+  publisher version, Etalab licence, unit, reconciliation or byte bound is
+  confirmed, and no CEPII host is added.
+- Gravity: the named page in both path casings and an attempted README returned
+  HTTP 404. Version, Etalab licence, country keys, units and exact bounds remain
+  pending; no CEPII host is added.
+- Atlas: the current download page and the legacy index were read separately.
+  The legacy index explicitly describes four-digit country-product-year and
+  country-partner-product-year files, HS 1992 and SITC revision 2. Its displayed
+  MB sizes are rounded descriptions, never exact byte bounds. The current page
+  lists HS 1992, HS 2012 and HS 2022 histories and USD trade values. These
+  statements do not establish a selected file's vintage, native measure schema,
+  country key or coverage. The terms route returned an application shell and
+  Dataverse returned an empty HTTP 202; file-specific licence and citation
+  remain pending. Only the two successfully read dataset/index hosts are added.
+- WDI: DataBank and the dataset catalogue identify World Development Indicators.
+  The catalogue labels its metadata version and update date and states CC BY 4.0;
+  the general dataset terms retain indicator-specific third-party exceptions.
+  A catalogue metadata version is not a selected file vintage. The Qatar page
+  returned HTTP 403, so selected indicator histories, Qatar keys, status fields,
+  native schema and bounds remain pending. The successful dataset/catalogue and
+  terms hosts are added; the denied country-page host is not added.
+- UNCTAD: the portal terms state CC BY 3.0 IGO and its attribution requirement;
+  the FAQ states free access with no registration and defines inward/outward FDI
+  flows. This establishes neither Qatar FDI coverage nor a dataset vintage,
+  period/status mapping, schema or bound. The successfully read portal host is
+  added. Flows stay separate from announced projects.
+- IMF WEO and ILOSTAT: the attempted dataset/documentation pages returned
+  HTTP 403. The original ILO address also attempted an unreviewed redirect,
+  which was not followed. No access challenge was bypassed, no new host is
+  admitted and neither source's metadata or Qatar coverage is confirmed.
+
+Current registry terms, read 2026-11-20 (body hashes and URLs in the linked review):
+
+- `un_comtrade`, United Nations Statistics Division: "Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations."
+- `wb_wdi`, World Bank: "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below."
+- `unctad_fdi`, UNCTAD: "All materials provided on this website are copyrighted under the Creative Commons Attribution 3.0 IGO license. All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source."
+
+The PUB-03 and review-integrity plants are in
+`custodian/tests/test_trade_publisher_readings.py`. Tests use invented mutations
+and read only committed metadata; they never request a publisher page. Existing
+BACI, Gravity/Atlas, Comtrade and benchmark fixture tests remain technical
+contract evidence, not proof of a live download. No raw publisher body or bulk
+file is added to the repository. Missing terms alone fail nothing under decision
+0059. The zero bounds, inactive policies and `trade_reconciliation.yaml` selection
+are unchanged; OI-309, PO-S2-79 and PO-S2-80 remain open.
+
 ### 2.3 Trade and benchmark source plan — decision 0040
 
 [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) items 1 to 9 govern this addition. Pending registry rows for the named trade sources do not confirm that a file is held or that a page was read. Their full fetch/security contract is in that decision; S2-T23 to S2-T26 own implementation.
 
-The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Pending registry rows for `cepii_baci`, `cepii_gravity` and `atlas_complexity` record that planned identity only. They do not confirm a page lead, a licence, a version or a host. The addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL. S2-T23 adds the `un_comtrade` registry row with metadata unconfirmed; `wb_wdi`, `unctad_fdi`, `imf_weo` and `ilostat_qat` are not registry rows yet.
+Historical leads recorded for decision 0040; current readings are in **Publisher metadata readings (S2-P18)** above. The advisor's 20:43 note supplies these addresses and descriptions. No external page was opened in the decision 0040 documentation task. “The page states” below means the supplied lead, **to be verified by the named task**, not a confirmed licence, version, schema or availability. Pending registry rows for `cepii_baci`, `cepii_gravity` and `atlas_complexity` record that planned identity only. They do not confirm a page lead, a licence, a version or a host. The addresses in this table remain unverified leads. A Gravity page lead that carries a query string is not stored as a reviewed data URL. S2-T23 adds the `un_comtrade` registry row with metadata unconfirmed; `wb_wdi`, `unctad_fdi`, `imf_weo` and `ilostat_qat` are not registry rows yet.
 
 | Planned source_id | Publisher, dataset and page address | Page lead and verification task | Intended use |
 |---|---|---|---|
@@ -1922,7 +1989,7 @@ These inactive technical mappings have commit_allowed false. At registration
 their terms were pending, checked on 2026-11-16; that date was not a publisher
 retrieval. S2-T21 part B records World Bank and UNCTAD portal terms read on
 2026-11-19 in section 4, "S2-T21 part B terms readings"; IMF and ILOSTAT remain
-pending with their recorded reasons. No new source or redirect host is approved.
+pending with their recorded reasons. S2-P18 independently records later dataset/documentation readings and eight metadata-host additions in **Publisher metadata readings (S2-P18)**; no download policy or data redirect is thereby confirmed.
 Native schemas, live receipts, selected-dataset terms and count/byte evidence
 remain lead-owned work.
 The offline adapter and its limitations are recorded in the benchmarks README.
