@@ -43,6 +43,70 @@ SELECTION = {"block": "section#company", "fields": {"name": "b", "activity": "p"
 MICRO = '<div itemscope itemtype="https://schema.org/Organization"><span itemprop="name">{n}</span><span itemprop="isicV4">SYN-class</span>{x}</div>'
 
 
+SPLIT_RUNS = [
+    "<i>Fa<u>x</u>: none</i>",
+    "<i>Chi<u>ef</u> Executive</i>",
+    "<i>M<u>r</u>. Invented</i>",
+    "<i>Direc<u>tor</u></i>",
+    "<i><u>Fa</u></i>x: none",
+    "<i>Chi</i>ef Executive",
+]
+
+
+@pytest.mark.parametrize("extra", SPLIT_RUNS)
+def test_split_and_fused_run_refused_in_selected_block(extra):
+    data = f'<section id="company"><b>{NAME}</b><p>SYN activity</p>{extra}</section>'.encode()
+    with pytest.raises(WebError):
+        extract(
+            data,
+            Company("syn-a", NAME, "register", {}),
+            receipt(data),
+            selectors=SELECTION,
+            selectors_reviewed=True,
+        )
+
+
+@pytest.mark.parametrize("extra", SPLIT_RUNS)
+def test_split_and_fused_run_refused_in_microdata(extra):
+    data = MICRO.format(n=NAME, x=extra).encode()
+    with pytest.raises(WebError):
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+
+
+@pytest.mark.parametrize("extra", SPLIT_RUNS)
+@pytest.mark.parametrize("kind", ["microdata", "selector"])
+def test_split_and_fused_run_refused_in_reviewer_bundle(extra, kind):
+    data = MICRO.format(n=NAME, x="").encode()
+    result = extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+    fragment = (
+        MICRO.format(n=NAME, x=extra)
+        if kind == "microdata"
+        else f'<section id="company"><b>{NAME}</b><p>SYN activity</p>{extra}</section>'
+    ).encode()
+    candidates = tuple(
+        replace(c, fragment_sha256=sha256_hex(fragment)) for c in result.candidates
+    )
+    with pytest.raises(WebError, match="review_bundle_refused"):
+        reviewer_bundle(NAME, replace(result, fragment=fragment, candidates=candidates))
+
+
+@pytest.mark.parametrize(
+    "extra", ["<i> Fa<u>x</u>: none</i>", "<i> Chi<u>ef</u> Executive</i>"]
+)
+def test_spaced_split_run_control_refused(extra):
+    data = MICRO.format(n=NAME, x=extra).encode()
+    with pytest.raises(WebError):
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data))
+
+
+def test_run_window_bounds_cost():
+    data = MICRO.format(n=NAME, x="<u>a</u>" * 3000).encode()
+    assert (
+        extract(data, Company("syn-a", NAME, "register", {}), receipt(data)).status
+        == "matched"
+    )
+
+
 @pytest.mark.parametrize(
     "extra",
     ["<i>Telephone: none</i>", "<i>Chief Executive</i>", "<i>Mr. Invented</i>"],

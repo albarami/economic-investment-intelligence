@@ -107,6 +107,18 @@ def _source_values(value: object) -> None:
         safe_text("address", str(value))
 
 
+_RUN_WINDOW = 128
+
+
+def _runs(node: Node) -> list[str]:
+    """Text runs in document order; adjacent runs may render fused or apart."""
+    return [
+        run
+        for child in node.children
+        for run in ([child] if isinstance(child, str) else _runs(child))
+    ]
+
+
 def validate_fragment(fragment: bytes) -> None:
     """Accept a declared source block, never a re-dump of candidate fields."""
     try:
@@ -130,10 +142,16 @@ def validate_fragment(fragment: bytes) -> None:
                     _source_values(key)
                     _source_values(value)
             _source_values(root.text())
-            for node in (root, *root.descendants()):
-                for child in node.children:
-                    if isinstance(child, str):
-                        _source_values(child)
+            runs = _runs(root)
+            for i, first in enumerate(runs):
+                span, inner = first, 0
+                _source_values(span)
+                for run in runs[i + 1 :]:
+                    span += run
+                    _source_values(span)
+                    inner += len(run)
+                    if inner > _RUN_WINDOW:
+                        break
     except (ShapeError, UnicodeError, json.JSONDecodeError, TypeError, RecursionError):
         raise WebError("fragment_refused") from None
 
