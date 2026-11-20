@@ -39249,6 +39249,258 @@ Seed:      1880996636
 Notes:     Lead only, owed; never executed by this preparation. Hosted/head checks and fresh-seed exact merge-result run remain separate.
 ```
 
+### MERGE TRAIN S2-9 — Slice S2: task log (pull request 106)
+
+Maker: Anthropic; model: Claude Fable 5.2 (preparation of these ledger inputs only). Persona: release coordinator writing script-checked ledger inputs; strict self-review as a records reviewer who rejects any claim without a source. Skills loaded: project-orientation, task-standards, sanad-provenance, verification-before-completion, muhasabah-gate.
+
+Train S2-9 carries task S2-T10 part F (open item OI-129): five commits picked in order, and the lead's records commit. Base f8438c5e21250e96ab10b05643959f063d874176; WORK e273fc71255768b56f12b4bc140101eb7f5edfc4; six work commits; twelve files (git diff --name-status of base and WORK). The file-by-file comparison of each pick with its original is in identity-proof.json, written by make_spec.py from Git: the commit messages are equal, the changed lines of every file are equal, and every file is byte-equal after the pick except the record file `PROGRESS.md`, to which both lines of work append; make_spec.py refuses any other difference.
+
+Sources used below. "Log" is the lead's run log of 2026-11-20, cited by its time. "Return" is the review or builder return file of the named job. "Commit" is the Git object. "PROGRESS.md" is the builders' own evidence under the five headings that begin "S2-T10 part F". No test was run to prepare this log; every count below is quoted from its source and none is new. PROGRESS.md numbers the reviews first to fifth in the order rev1, sec1, conf2, conf3, conf4; the fifth commit's message says "the fifth confirmation" for the job the log calls conf4.
+
+#### Commit 1 of 5 — the supervisor (original d6383e44c5af9946c2cd0baac16ae998c1f72181)
+
+- Pick: d10010b7dd1d52f7d322db2141f2d00bd164c3bd.
+- Subject: fix(sandbox): no sandboxed process outlives a driver killed during start-up (S2-T10 part F, OI-129).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M; committed by the lead because the builder's sandbox could not commit. Sources: log 06:04 (launch), log 06:40 (result), the commit's Builder line.
+- Lead's check at the result: 34 passed (supervisor, mounts and argv tests). Source: log 06:40.
+- Review S2-T10F.M.rev1: OpenAI, gpt-6.1-sol through Codex. Verdict REJECTED; finding F1 (unbounded cleanup wait) accepted by ruling L-1193. Sources: log 06:40 (launch), log 06:46 (verdict and ruling). The return file of this review is not among the supplied inputs.
+- Security review S2-T10F.M.sec1: Cognition, Devin SWE-2 High. Verdict APPROVED with findings: 1 is rev1's F1; 2 is a set-up exception before the supervisor's guarded block that exits with a traceback and not a refusal; 3 is a known limit, acceptable. Source: log 06:51. The return file of this review is not among the supplied inputs.
+- Outcome: one fix round, ruled with L-1193 (log 06:51); it is commit 2.
+
+#### Commit 2 of 5 — the bounded cleanup wait (original c55f78675510ad19d1b69fb2347d2910e27886b1)
+
+- Pick: 26b4bcd690b06c59850f3422537f57e88b7b8588.
+- Subject: fix(sandbox): the launcher's cleanup wait is bounded and a stalled supervisor is ended by the launcher (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r2; committed by the lead. Sources: log 06:51 (launch), log 07:28 (result), the commit's Builder line.
+- Lead's checks at the result: four sandbox test files exit 0, 41 passed, 3 subtests; check-enforcement exit 0, OK. Source: log 07:28.
+- Confirmation S2-T10F.M.conf1: Cognition, SWE-2 High through Devin. No verdict: the job ended with an empty response (exit 1), recorded as a tool error and not a finding, and was not retried there. Source: log 07:33.
+- Confirmation S2-T10F.M.conf2: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range d6383e44..c55f7867: F1 stale-ancestor process-number reuse, F2 the deadline not carried through the walk, F3 unreadable metadata confirming falsely; its checks 2, 3 and 5 pass; findings from source inspection, no test run by the reviewer. Sources: log 07:39; return S2-T10F.M.conf2.md.
+- Outcome: all three findings accepted by ruling L-1203 (log 07:39); the fix is commit 3.
+
+#### Commit 3 of 5 — ancestry, deadline and unread processes (original 34294ca91d2838436a49f94e1532f3d95f5dde9b)
+
+- Pick: c2cf6a403b2bd29c9ec2cdbee37dbeeb9a359f5f.
+- Subject: fix(sandbox): the stalled-run cleanup validates ancestry, carries its deadline and never confirms an unread process (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r3; committed by the lead because the builder's Git folder was read-only. Sources: log 07:39 (launch), log 08:06 (result), return S2-T10F.M.r3.md, the commit's Builder line.
+- Lead's checks at the result: 44 passed, 3 subtests; check-enforcement OK. Source: log 08:06.
+- Confirmation S2-T10F.M.conf3: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range c55f7867..34294ca9: F1 and F3 closed; F2 not fixed (index building, frontier processing and finalization outside the deadline); source inspection, no test run by the reviewer. Sources: log 08:15; return S2-T10F.M.conf3.md.
+- Ruling L-1206 (log 08:15) follows this verdict; under it the fourth round changes F2 only (return S2-T10F.M.r4.md, title) and conf4 is the "last round for F2" (log 08:44). The text of the ruling itself is not among the supplied inputs.
+- Not verdicts of record: three pilot replays of the conf3 brief on 34294ca9 (Cognition SWE-2 High, DeepSeek V4.1 Flash, xAI Grok 4.7) each returned CONFIRMED where conf3 rejected on F2; the lead classed each as lesser and kept F2 accepted on the code. Sources: log 08:28, 08:30, 08:33.
+
+#### Commit 4 of 5 — one deadline for the whole cleanup (original c5968f98ef5c8b2a0a280c43c64e0bbe0fb9b98a)
+
+- Pick: ea227d460ce52f1b027b7ca55159738b0e1c8d2c.
+- Subject: fix(sandbox): one deadline bounds the whole stalled-run cleanup (S2-T10).
+- Builder: Anthropic, Claude Opus 5.5, job S2-T10F.M.r4; committed by the lead because Git refused the builder's commit. Sources: log 08:15 (launch), log 08:44 (result), return S2-T10F.M.r4.md, the commit's Builder line.
+- Lead's checks at the result: four sandbox test files exit 0, 48 passed, 5 subtests; check-enforcement OK; ruff check and format clean. Source: log 08:44.
+- Confirmation S2-T10F.M.conf4: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict REJECTED on the range 34294ca9..c5968f98: the indexing and frontier causes of F2 are closed; the remaining path is the descriptor closes after a wait that used its whole allowance, which run past KILL_SECONDS; TARGET_SLOTS is a fail-safe bound whose value needs an open item; no test run by the reviewer. Sources: log 08:54; return S2-T10F.M.conf4.md.
+- Ruling L-1214 (log 08:54): the remaining path was reproduced on the virtual clock (2.0029 against 2.0) and is real; the lead fixed it (CLOSE_SECONDS, one sixteenth of KILL_SECONDS, kept for the closes; the result judged after them; no bound raised; plant red; 512 closes measured at 0.102 ms); checks green; a narrow confirmation, conf5, by the same reviewing model. The fix is commit 5; the open item for the TARGET_SLOTS value is OI-351 of the records commit.
+
+#### Commit 5 of 5 — the closes inside the deadline (original 15ea661cf0075582422f663ace1acf9b80da6a2b)
+
+- Pick: 20b89cc01d56ce70808e75c84ff3555957d34fb6.
+- Subject: fix(sandbox): the closes after the waits end within the cleanup deadline (S2-T10).
+- Builder: the lead, Anthropic, Claude Opus 5.5. Sources: log 08:54 (ruling L-1214, "the lead fixed it"), log 09:03 ("lead fix committed 15ea661c"), PROGRESS.md "S2-T10 part F, fifth round" (its Builder line), the commit (no Builder line; its trailer names Claude Opus 5.5).
+- Lead's recorded checks: `test_sandbox_supervisor.py` exit 0, 17 passed, 5 subtests; four sandbox test files exit 0, 48 passed, 5 subtests; check-enforcement exit 0, "sandbox enforcement: OK"; scripts unittest exit 0, 947 tests, OK. Sources: PROGRESS.md "S2-T10 part F, fifth round"; log 09:03 for the 947.
+- Confirmation S2-T10F.M.conf5: OpenAI, GPT-6.1 Sol through Codex (the return names itself "OpenAI, GPT-6 (Codex)"). Verdict CONFIRMED on 15ea661c against c5968f98, limited to the finalization-deadline fix under L-1214; no finding within that hunk; the remaining F2 path closed for the modelled costs; no test run by the reviewer, the executions being the lead's. Sources: log 09:07; return S2-T10F.M.conf5.md.
+- The lead's closing line: "part F closed; five commits join train S2-9". Source: log 09:07.
+
+#### Records commit (e273fc71255768b56f12b4bc140101eb7f5edfc4)
+
+- Subject: chore(records): train S2-9 records: OI-129 closed by the part F fix; OI-351 and OI-352 (S2-T10).
+- Author: the lead; the commit's trailer names Claude Opus 5.5. Source: the commit.
+- Content, as first committed at e273fc71255768b56f12b4bc140101eb7f5edfc4: `OPEN_ITEMS.md` and `TASKS.md` only, 24 lines added and 2 removed. OI-129 changes from OPEN to CLOSED with a CLOSED BY line; OI-351 (the chosen target count of 512) and OI-352 (the deadline's dependence on fast host operations, and three walk cases still unproved) are appended; the S2-T10 delivery line gains the part F sentence. Source: git show of the commit.
+- No review or confirmation of the records commit is among the supplied inputs. For that reason this ledger passes no open-item file and no TASKS.md replacement: the records commit already carries them.
+
+#### What the evidence does and does not show
+
+- Each of the five commits was read by a maker other than its builder's. The verdicts of record are: commit 1 REJECTED (rev1) and APPROVED with findings (sec1); commits 2, 3 and 4 REJECTED (conf2, conf3, conf4); commit 5 CONFIRMED (conf5).
+- Each accepted finding is answered by the following commit, and its closure is stated by the rejecting maker's next return: conf3 closes F1 and F3 of conf2; conf4 closes the indexing and frontier causes of F2; conf5 closes the remaining F2 path, for the modelled costs.
+- No single review in the supplied inputs returns APPROVED or CONFIRMED for the whole range of the five commits: conf5 is limited to the last fix. This log states no such verdict.
+- Still owed and not claimed here: the confirmation of the joined head by a maker other than the one that joined the train (rule 33, decision 0032), the six hosted checks on the joined head, and the lead's whole test with a fresh seed on the exact merge result. The command rows that follow this log are the lead's runs at WORK.
+
+#### Evidence for the work commit `e273fc71255768b56f12b4bc140101eb7f5edfc4`
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_argv.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_forbidden_options_never_appear; test_no_interpreter_refuses; test_run_starts_bubblewrap_with_nothing_inherited; test_setup_failure_exit_and_timeout; test_start_failure_closes_the_control_pipe. Source: scripts/tests/test_sandbox_argv.py at e273fc71; 16 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_mounts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_driver_killed_at_the_first_sandbox_process; test_driver_killed_while_a_layer_is_unarmed; test_timeout_kills_the_process_group; test_timeout_with_a_stalled_supervisor_is_bounded. Source: scripts/tests/test_sandbox_mounts.py at e273fc71; 11 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_prove.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    4 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file of the train (M), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_prove_runs. Source: scripts/tests/test_sandbox_prove.py at e273fc71; 4 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m pytest scripts/tests/test_sandbox_supervisor.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "17 passed, 5 subtests passed in 1.54s" (pytest with subtests: the whole summary line is matched, so no failed, error or skipped word passes (precedent: train S2-3); the count is the one recorded at original 15ea661c, whose copy of this file and of the launcher and supervisor is byte-equal)
+Seed:      none
+Notes:     Changed test file of the train (A), run alone with pytest, the runner of the lead's recorded part F checks (PROGRESS.md, headings "S2-T10 part F"). Coverage anchors (tests the train adds or changes): test_a_closed_control_pipe_is_refused_and_nothing_starts; test_a_foreign_launcher_is_refused_and_nothing_starts; test_a_setup_error_is_refused_and_nothing_starts; test_a_stale_tree_never_signals_an_unrelated_process; test_an_ending_signal_ends_the_run; test_an_orphan_is_ended_when_the_program_ends; test_an_unreadable_process_is_never_confirmed; test_arguments_are_checked; test_closing_the_control_pipe_ends_the_run; test_status_is_passed_through; test_subreaper_refused_is_reported; test_the_cleanup_time_is_bounded; test_the_frontier_stops_at_the_deadline; test_the_index_is_not_built_after_the_deadline; test_the_kill_work_is_bounded_before_a_process_is_taken; test_the_launcher_ends_a_stalled_run_itself; test_the_walk_stops_at_its_deadline. Source: scripts/tests/test_sandbox_supervisor.py at e273fc71; 17 test functions by syntax-tree count. Changed helper it imports: scripts/tests/sandbox_support.py. Result at WORK owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "830 files already formatted"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 447 source files"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1128 text files, 121 Markdown files: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte parity at WORK (rule 2); the train changes neither file.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','f8438c5e21250e96ab10b05643959f063d874176...e273fc71255768b56f12b4bc140101eb7f5edfc4'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:scripts/sandbox_supervisor.py A:scripts/tests/test_sandbox_supervisor.py M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:scripts/ci_junit.py M:scripts/sandbox_launch.py M:scripts/tests/sandbox_support.py M:scripts/tests/test_sandbox_argv.py M:scripts/tests/test_sandbox_mounts.py M:scripts/tests/test_sandbox_prove.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "12 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK scope: 12 files; 10 are of the five part F commits and the records commit changes OPEN_ITEMS.md and TASKS.md.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','f8438c5e21250e96ab10b05643959f063d874176..e273fc71255768b56f12b4bc140101eb7f5edfc4'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Five picks of the approved part F commits and the records commit; linear; six subjects checked by make_spec.py.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     The blocking proof of the generator sandbox on the build machine, owed because the train changes scripts/sandbox_launch.py and adds scripts/sandbox_supervisor.py. The matched line is ENFORCEMENT_OK of scripts/sandbox_check.py.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    947 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The scripts guard tests on the joined tree, run with unittest as rule 44 lists them. They include the four changed sandbox test files and the 8 unchanged test files that import a changed module (test-inventory.json). No expected count is pinned: the recorded 947 was taken on another base.
+```
+
+```text
+### MERGE TRAIN S2-9 — Slice S2: task log
+Commit:    e273fc71255768b56f12b4bc140101eb7f5edfc4
+Command:   ./eii test --seed 3587189981
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11980 passed, 0 failed, 0 skipped
+Seed:      3587189981
+Notes:     The whole test at WORK with the seed given at run time; lead only, never run by this preparation. The hosted checks on the joined head and the fresh-seed run on the exact merge result stay separate.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
