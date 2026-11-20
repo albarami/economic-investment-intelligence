@@ -197,6 +197,34 @@ def test_non_json_stac_child_refuses_before_request(monkeypatch):
     )
 
 
+@pytest.mark.parametrize(
+    "key",
+    [
+        "bldg_ovt/stac-collections",
+        "bldg_ovt/stac-part-288",
+        "bldg_ovt/STAC-collection",
+        "bldg_ovt/stac-collection.json",
+        "bldg_ovt/stac/collection",
+        "bldg_ovt/stac-part-00288x",
+        "bldg_ovt/stac-collection\n",
+        "bldg_ovt/stac-part-٠٠٢٨٨",
+        "bldg_ovt/notes",
+    ],
+)
+def test_misnamed_json_child_refuses_before_request(monkeypatch, key):
+    parent, parts, stac, _body = mixed_registry(monkeypatch, "bldg_ovt")
+    bad = replace(stac[0], key=key)
+
+    def reader(url):
+        pytest.fail("Misnamed JSON child must refuse before a request")
+
+    assert_refusal(
+        listing.prepare_listing(parent, reader, (parent, *parts, *stac, bad)),
+        parent.url,
+        "listing_registered_part",
+    )
+
+
 def test_stac_child_is_not_required_in_parquet_listing(monkeypatch):
     parent, parts, stac, body = mixed_registry(monkeypatch, "bldg_ovt")
     # Plant valid-looking whole-file metadata and a release URL on a STAC key.
