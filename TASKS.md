@@ -774,6 +774,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Depends: S2-T12, S2-T27.
 - Requirements: PUB-86, PUB-87, PUB-88, PLN-25, DAT-142, DAT-143.
 - Delivery: hard; personas Data; status in progress: bilingual acquisition/crosswalk mechanisms and custodian page-table build merged in pull requests 99 and 104; live Arabic inventory, reviewed real crosswalks, release/application loading and screen quotations remain open.
+- P04 contract follow-up, 2026-11-20: PO-S2-107, PO-S2-109 and PO-S2-111 have local fixes and planted proofs recorded in PROGRESS.md, **S2-P04 — FDI crosswalk contract — 2026-11-20**. The third acceptance box stays unticked: PO-S2-108 still needs a verified source-issued municipality-code-only target, and OI-182 still needs real reviewed mapping rows and the lead's review. Invented contract tests do not prove that whole criterion; no source or fetched value is added here.
 
 ### S2-T40 — The unstable-key evidence test holds under every hash seed (ruling L-1050)
 - Goal: Make the unstable-key evidence test hold under every string hash seed, fixed at its cause and never by a skip, retry, pinned seed or weakened assertion, with a guard that runs it under fixed hash seeds (ruling L-1050; OI-314).
