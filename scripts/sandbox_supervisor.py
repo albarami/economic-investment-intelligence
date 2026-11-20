@@ -29,9 +29,11 @@ How it closes that window:
    process of the namespace.
 
 There is no path that runs the command without this supervision: a step that
-fails refuses the run before bubblewrap starts. The supervisor itself being
-killed by another process (``SIGKILL``) is outside this; the launcher's
-process is the one whose end it covers.
+fails, or raises an error, refuses the run before bubblewrap starts. The
+supervisor itself being killed by another process (``SIGKILL``) is outside
+this; the launcher's process is the one whose end it covers. When this
+process's cleanup does not finish in time, the launcher kills it, its process
+group and every descendant itself (``sandbox_launch``).
 
 Usage::
 
@@ -196,11 +198,17 @@ def supervise(
     launcher: int, control: int, fds: tuple[int, ...], program: list[str]
 ) -> NoReturn:
     """Start the program under supervision and end its run with the launcher."""
-    os.set_inheritable(control, False)
-    wake = catch_ending_signals()
-    problem = become_subreaper() or arm_parent_death(launcher)
-    if problem is None and ending((control, wake), 0):
-        problem = "the launcher ended before the sandbox started"
+    try:
+        os.set_inheritable(control, False)
+        wake = catch_ending_signals()
+        problem = become_subreaper() or arm_parent_death(launcher)
+        if problem is None and ending((control, wake), 0):
+            problem = "the launcher ended before the sandbox started"
+    except Exception as error:
+        # Nothing has started yet: an error here is a refusal like the others.
+        problem = (
+            f"the run was refused after an error in its set-up ({type(error).__name__})"
+        )
     if problem is not None:
         refuse(problem)
     try:

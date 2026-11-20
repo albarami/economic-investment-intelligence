@@ -313,7 +313,11 @@ class MountRules(unittest.TestCase):
             self.fail("a sandboxed process outlived its driver")
 
     def _start_driver(
-        self, source: str, payload: dict[str, str], marker: str
+        self,
+        source: str,
+        payload: dict[str, str],
+        marker: str,
+        stdout: int | None = None,
     ) -> subprocess.Popen[bytes]:
         """Start a driver that launches a sandbox and ends survivors after the test."""
         driver = subprocess.Popen(
@@ -327,6 +331,7 @@ class MountRules(unittest.TestCase):
                 marker,
             ],
             env={"PATH": os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"},
+            stdout=stdout,
         )
 
         def end_survivors() -> None:
@@ -395,9 +400,10 @@ class MountRules(unittest.TestCase):
             )
 
     def test_driver_killed_at_the_first_sandbox_process(self) -> None:
-        # OI-129 with the real bubblewrap: the driver is killed as soon as any
-        # process of the launch exists, without a pause, so inside bubblewrap's
-        # start-up window. No sandboxed process may outlive it.
+        # OI-129 on the production launch path: kill the driver at the first
+        # marked descendant, which may be the supervisor before bubblewrap
+        # starts. The stand-in test separately proves cleanup of an existing
+        # unarmed inner layer.
         marker = "eii-first-" + os.urandom(4).hex()
         with tempfile.TemporaryDirectory() as tmp:
             fx = support.make_fixture(tmp)
@@ -427,6 +433,60 @@ class MountRules(unittest.TestCase):
                 marker,
                 "a sandboxed process outlived a driver killed during start-up",
             )
+
+    def test_timeout_with_a_stalled_supervisor_is_bounded(self) -> None:
+        # F1 of the part F review: a supervisor whose cleanup never finishes
+        # must not hold the launcher. Within the same 10 s as the time-out test
+        # the launcher kills the supervisor's process group and every
+        # descendant, the one in a session of its own included, and says so.
+        marker = "eii-stalled-" + os.urandom(4).hex()
+        with tempfile.TemporaryDirectory() as tmp:
+            fx = support.make_fixture(tmp)
+            standin = Path(tmp) / "standin" / "sandbox_supervisor.py"
+            standin.parent.mkdir()
+            standin.write_text(support.STALLED_SUPERVISOR, encoding="utf-8")
+            tree = standin.with_name("tree.pids")
+            driver = self._start_driver(
+                support.STALLED_DRIVER,
+                {
+                    "root": str(fx.root),
+                    "scenario": str(fx.scenario),
+                    "venv": str(launch.current_venv()),
+                    "supervisor": str(standin),
+                },
+                marker,
+                stdout=subprocess.PIPE,
+            )
+            try:
+                deadline = time.monotonic() + 10
+                while time.monotonic() < deadline and not tree.exists():
+                    time.sleep(0.01)
+                if not tree.exists():
+                    self.fail("the stalled supervisor did not start its processes")
+                pids = [int(item) for item in tree.read_text().split()]
+                self.assertEqual(len(pids), 4)
+                self.assertLessEqual(set(pids), set(support.marker_processes(marker)))
+                # The second child leads a session of its own, as bubblewrap's
+                # inner layer does: a kill of the process group alone misses it.
+                self.assertNotEqual(os.getsid(pids[2]), os.getsid(pids[0]))
+                try:
+                    out, _ = driver.communicate(timeout=30)
+                except subprocess.TimeoutExpired:
+                    self.fail(
+                        "the launcher did not return after its supervisor stalled"
+                    )
+            finally:
+                if driver.poll() is None:
+                    driver.kill()
+                driver.wait(timeout=5)
+            done = json.loads(out)
+            self.assertLess(done["elapsed"], 10)
+            self.assertEqual(
+                done["error"],
+                "sandbox build-world timed out after 1 s; the supervisor's cleanup "
+                "did not finish and its processes were killed by the launcher",
+            )
+            self.assertEqual(support.marker_processes(marker), [])
 
     def test_check_commands_have_teeth(self) -> None:
         self.assertEqual(sandbox_check.check_bubblewrap(), [])

@@ -32,6 +32,7 @@ REQUIRED = {
         "test_hostile_surroundings_do_not_reach_the_sandbox",
         "test_exit_statuses_and_setup_failure",
         "test_timeout_kills_the_process_group",
+        "test_timeout_with_a_stalled_supervisor_is_bounded",
         "test_die_with_parent",
         "test_driver_killed_while_a_layer_is_unarmed",
         "test_driver_killed_at_the_first_sandbox_process",

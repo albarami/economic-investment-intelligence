@@ -22,6 +22,24 @@ import sandbox_supervisor as supervisor
 SHELL = "/bin/sh"
 # A sleeper whose command line carries the marker given after it.
 SLEEP = f"{sys.executable} -I -c 'import time; time.sleep(60)'"
+# The supervisor with ``os.pipe2`` failing as it does when no descriptor is
+# left, in its own process only: its set-up fails before anything starts.
+FAILING_SETUP = """
+import errno
+import os
+import sys
+
+sys.path.insert(0, sys.argv[1])
+import sandbox_supervisor as supervisor
+
+
+def fail(*args):
+    raise OSError(errno.EMFILE, os.strerror(errno.EMFILE))
+
+
+supervisor.os.pipe2 = fail
+supervisor.main(sys.argv[2:])
+"""
 
 
 class Run:
@@ -142,6 +160,107 @@ class SupervisorRules(unittest.TestCase):
                 ),
             )
             self.assertFalse(planted.exists())
+
+    def test_a_setup_error_is_refused_and_nothing_starts(self) -> None:
+        # Finding 2 of the second part F review: an error in the set-up, before
+        # the run's own error handling, is refused with the supervisor's line.
+        with tempfile.TemporaryDirectory() as tmp:
+            planted = Path(tmp) / "started"
+            control, keep = os.pipe()
+            try:
+                command = launch.supervisor_command(
+                    control, (), [SHELL, "-c", f"touch {planted}"]
+                )
+                done = subprocess.run(
+                    [
+                        command[0],
+                        "-I",
+                        "-B",
+                        "-c",
+                        FAILING_SETUP,
+                        str(launch.SUPERVISOR.parent),
+                        *command[4:],
+                    ],
+                    env={},
+                    capture_output=True,
+                    text=True,
+                    close_fds=True,
+                    pass_fds=(control,),
+                    timeout=20,
+                    check=False,
+                )
+            finally:
+                os.close(control)
+                os.close(keep)
+            self.assertEqual(
+                (done.returncode, done.stdout, done.stderr),
+                (
+                    1,
+                    "",
+                    "sandbox supervisor: the run was refused after an error in its "
+                    "set-up (OSError)\n",
+                ),
+            )
+            self.assertFalse(planted.exists())
+
+    def test_the_launcher_ends_a_stalled_run_itself(self) -> None:
+        # F1 of the part F review, without bubblewrap: the launcher's own kill
+        # reaches the process group and the session below it, and reports an
+        # end it cannot confirm (a late supervisor, a refused signal) as not
+        # confirmed; the kills are sent in every case.
+        marker = "eii-stalled-" + os.urandom(4).hex()
+        self.addCleanup(_end, marker)
+        with tempfile.TemporaryDirectory() as tmp:
+            standin = Path(tmp) / "stalled.py"
+            standin.write_text(support.STALLED_SUPERVISOR, encoding="utf-8")
+            tree = standin.with_name("tree.pids")
+            real_killpg = os.killpg
+
+            def refused(group: int, signum: int) -> None:
+                if signum == signal.SIGSTOP:
+                    raise PermissionError("planted")
+                real_killpg(group, signum)
+
+            for case in ("confirmed", "late", "refused"):
+                with self.subTest(case=case):
+                    tree.unlink(missing_ok=True)
+                    process = subprocess.Popen(
+                        [sys.executable, "-I", "-B", str(standin), marker],
+                        env={},
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                        start_new_session=True,
+                    )
+                    deadline = time.monotonic() + 10
+                    while time.monotonic() < deadline and not tree.exists():
+                        time.sleep(0.01)
+                    self.assertTrue(tree.exists())
+                    pids = [int(item) for item in tree.read_text().split()]
+                    self.assertEqual(
+                        sorted(pids), sorted(support.marker_processes(marker))
+                    )
+                    if case == "confirmed":
+                        self.assertTrue(launch.end_stalled(process))
+                        self.assertEqual(support.marker_processes(marker), [])
+                    else:
+                        if case == "late":
+                            late = subprocess.TimeoutExpired("supervisor", 0)
+                            planted = patch.object(process, "wait", side_effect=late)
+                        else:
+                            planted = patch.object(os, "killpg", side_effect=refused)
+                        with planted:
+                            self.assertFalse(launch.end_stalled(process))
+                        process.wait(timeout=5)
+                        deadline = time.monotonic() + 5
+                        while time.monotonic() < deadline and support.marker_processes(
+                            marker
+                        ):
+                            time.sleep(0.05)
+                        self.assertEqual(support.marker_processes(marker), [])
+                    self.assertEqual(process.returncode, -signal.SIGKILL)
+                    process.communicate(timeout=5)
 
     def test_an_orphan_is_ended_when_the_program_ends(self) -> None:
         # The program leaves a process behind that has no parent-death signal;

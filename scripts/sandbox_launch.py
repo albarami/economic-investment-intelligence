@@ -15,9 +15,12 @@ in ``sandbox_check``.
 from __future__ import annotations
 
 import os
+import select
+import signal
 import stat
 import subprocess
 import sys
+import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -33,6 +36,15 @@ BWRAP_PREFIX = "bwrap: "
 SUPERVISOR = Path(__file__).resolve().with_name("sandbox_supervisor.py")
 SUPERVISOR_PREFIX = "sandbox supervisor: "
 SETUP_PREFIXES = (BWRAP_PREFIX, SUPERVISOR_PREFIX)
+# At the time limit the launcher closes the control pipe and waits at most
+# CLEANUP_SECONDS for the supervisor's own cleanup. If that does not finish,
+# the launcher kills the supervisor, its process group and every descendant
+# itself, waits at most KILL_SECONDS for them to end and DRAIN_SECONDS for the
+# output to close (F1 of the part F review). With a 1 s limit the sum stays
+# within the 10 s that the time-out tests allow.
+CLEANUP_SECONDS = 4.0
+KILL_SECONDS = 2.0
+DRAIN_SECONDS = 1.0
 # os.open flags of a mount source: a path descriptor that does not follow a
 # symbolic link in the last part and is closed in every started program.
 OPEN_FLAGS = os.O_PATH | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -444,6 +456,142 @@ def supervisor_command(
     ]
 
 
+def _parent_of(pid: int) -> int | None:
+    """Return the parent's process id of ``pid``, or None when it is gone."""
+    try:
+        text = Path(f"/proc/{pid}/stat").read_text(encoding="ascii", errors="replace")
+    except OSError:
+        return None
+    # The command name in brackets can hold spaces; the parent follows the
+    # state after the last closing bracket.
+    fields = text.rpartition(")")[2].split()
+    if len(fields) < 2 or not fields[1].isdigit():
+        return None
+    return int(fields[1])
+
+
+def descendants(root: int) -> list[tuple[int, int]]:
+    """Return ``(pid, parent)`` of every descendant of ``root``, parents first.
+
+    The walk follows the parent of each process in ``/proc``, so it also finds
+    processes in another process group or session, such as bubblewrap's inner
+    layer.
+    """
+    below: dict[int, list[int]] = {}
+    for entry in Path("/proc").iterdir():
+        if not entry.name.isdigit():
+            continue
+        parent = _parent_of(int(entry.name))
+        if parent is not None:
+            below.setdefault(parent, []).append(int(entry.name))
+    found: list[tuple[int, int]] = []
+    frontier = [root]
+    while frontier:
+        parent = frontier.pop(0)
+        for pid in sorted(below.get(parent, ())):
+            found.append((pid, parent))
+            frontier.append(pid)
+    return found
+
+
+def _ended(handles: Sequence[int], deadline: float) -> bool:
+    """Return whether every pinned process ended before ``deadline``."""
+    for handle in handles:
+        watch = select.poll()
+        watch.register(handle, select.POLLIN)
+        left = max(deadline - time.monotonic(), 0.0)
+        if not watch.poll(int(left * 1000)):
+            return False
+    return True
+
+
+def _signalled(target: int, signum: int, *, group: bool) -> bool:
+    """Send ``signum`` to a process group or a pinned process.
+
+    Returns:
+        True when it was sent or the target is already gone; False on any other
+        error, such as a refused permission.
+    """
+    try:
+        if group:
+            os.killpg(target, signum)
+        else:
+            signal.pidfd_send_signal(target, signum)
+    except ProcessLookupError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+def end_stalled(process: subprocess.Popen[str]) -> bool:
+    """Kill a supervisor whose cleanup did not finish, and every process below it.
+
+    The supervisor started a session of its own, so its process group is the
+    supervisor's id; bubblewrap's inner layer runs in yet another session, so
+    the group alone can miss it. The group is stopped first; then every
+    descendant found by a walk of ``/proc`` is pinned by a process descriptor
+    and stopped, until a walk finds no new one, so that none can start another
+    unseen. Each pinned process and the group are then killed. The supervisor is
+    not reaped before its group is signalled, so its id cannot have been
+    reused. Every wait is bounded by ``KILL_SECONDS``.
+
+    Returns:
+        True only when every signal was sent, the walk settled, the supervisor
+        was reaped and every pinned process ended before the bound; False when
+        that is not confirmed.
+    """
+    deadline = time.monotonic() + KILL_SECONDS
+    pinned: dict[int, int] = {}
+    sent = True
+    try:
+        if process.returncode is None:
+            sent &= _signalled(process.pid, signal.SIGSTOP, group=True)
+        settled = False
+        while not settled and time.monotonic() < deadline:
+            settled = True
+            for pid, parent in descendants(process.pid):
+                if pid in pinned:
+                    continue
+                settled = False
+                try:
+                    handle = os.pidfd_open(pid)
+                except ProcessLookupError:
+                    continue
+                except OSError:
+                    sent = False
+                    continue
+                # The walk and the pin are two steps: keep the pin only when the
+                # process still has the parent that the walk saw.
+                if _parent_of(pid) != parent:
+                    os.close(handle)
+                    continue
+                pinned[pid] = handle
+                sent &= _signalled(handle, signal.SIGSTOP, group=False)
+        for handle in pinned.values():
+            sent &= _signalled(handle, signal.SIGKILL, group=False)
+        if process.returncode is None:
+            sent &= _signalled(process.pid, signal.SIGKILL, group=True)
+        try:
+            process.wait(timeout=max(deadline - time.monotonic(), 0.0))
+        except subprocess.TimeoutExpired:
+            return False
+        return sent and settled and _ended(list(pinned.values()), deadline)
+    finally:
+        for handle in pinned.values():
+            os.close(handle)
+
+
+def _drain(process: subprocess.Popen[str]) -> None:
+    """Read the rest of the output for at most DRAIN_SECONDS, then close it."""
+    try:
+        process.communicate(timeout=DRAIN_SECONDS)
+    except subprocess.TimeoutExpired:
+        for stream in (process.stdout, process.stderr):
+            if stream is not None:
+                stream.close()
+
+
 def _start(
     profile: tables.Profile, argv: list[str], passed: tuple[int, ...], timeout: float
 ) -> SandboxResult:
@@ -452,7 +600,9 @@ def _start(
     The launcher keeps the write end of a control pipe and never writes to it;
     the supervisor holds the read end. When the launcher ends in any way, or
     closes the write end at the time limit, the supervisor kills bubblewrap and
-    every process that bubblewrap leaves behind (``sandbox_supervisor``).
+    every process that bubblewrap leaves behind (``sandbox_supervisor``). If
+    that cleanup does not finish within ``CLEANUP_SECONDS``, the launcher kills
+    them itself (``end_stalled``) and says so in the time-out.
     """
     # Both ends are closed in every started program unless passed by number.
     control, keep = os.pipe()
@@ -478,10 +628,25 @@ def _start(
             stdout, stderr = process.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             # Closing the write end makes the supervisor kill and reap every
-            # process of the run; then it ends and is waited for.
+            # process of the run; then it ends and is waited for, for a bounded
+            # time only.
             os.close(keep)
             keep = -1
-            process.communicate()
+            stopped = f"sandbox {profile.name} timed out after {timeout:g} s; "
+            try:
+                process.communicate(timeout=CLEANUP_SECONDS)
+            except subprocess.TimeoutExpired:
+                ended = end_stalled(process)
+                _drain(process)
+                raise SandboxTimeout(
+                    stopped
+                    + "the supervisor's cleanup did not finish and its processes "
+                    + (
+                        "were killed by the launcher"
+                        if ended
+                        else "were sent a kill by the launcher, but their end is not confirmed"
+                    )
+                ) from None
             raise SandboxTimeout(
                 f"sandbox {profile.name} timed out after {timeout:g} s; "
                 "every process of the sandbox was killed"
@@ -515,7 +680,7 @@ def run_in_sandbox(
         profile_name: ``build-world`` or ``build-release``.
         layout: The host folders to mount.
         command: The program (absolute path) and its arguments.
-        timeout: Seconds before the process group is killed.
+        timeout: Seconds before supervisor cleanup is requested.
         venv: The environment to use; the running one when None.
 
     Returns:
@@ -525,7 +690,9 @@ def run_in_sandbox(
         SandboxError: Bubblewrap is missing, or the layout does not fit.
         SandboxSetupError: Bubblewrap failed to build the sandbox.
         SandboxTimeout: The command ran longer than ``timeout``; the
-            supervisor killed every process of the run.
+            supervisor killed every process of the run, or, when its cleanup
+            did not finish in time, the launcher killed them (its text says
+            which, and says when their end is not confirmed).
 
     Every process of the run ends when the launcher ends, however it ends and
     at any moment, bubblewrap's start-up included: bubblewrap runs under

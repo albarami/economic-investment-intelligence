@@ -715,7 +715,9 @@ class ArgvRules(unittest.TestCase):
             str(timed.exception),
             "sandbox build-world timed out after 3 s; every process of the sandbox was killed",
         )
-        self.assertEqual(calls, [(3, False), (None, True)])
+        # The wait for the supervisor's cleanup is bounded (F1 of the part F
+        # review); it was unbounded (None) before.
+        self.assertEqual(calls, [(3, False), (launch.CLEANUP_SECONDS, True)])
         labels.append("g")
         with self.assertRaises(launch.SandboxSetupError) as setup:
             run(lambda timeout=None: ("", "bwrap: fake\n"), 1)
