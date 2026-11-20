@@ -1072,9 +1072,11 @@ number against the verified enumeration at both read stages. Assembly carries th
 all-date manifest and receipt exactly once, even when all selected keys are gaps.
 Only HTTP 404/410 with one attempt permits a `request_failed` gap; body refusals require
 HTTP 200 with one attempt. Other reason/status/attempt combinations refuse. The bounded
-JPEG check forces a full rasterio/GDAL JPEG pixel read after validating the frame size;
-missing scan/quantization structure and invalid scans become HTTP-200 invalid-tile gaps
-under L-1303. No live coverage or successful acquisition is established by these rules.
+JPEG check forces a full rasterio/GDAL JPEG pixel read after validating the frame size,
+inside `rasterio.Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE")` so libjpeg warnings become
+errors. Missing scan/quantization structure and decoder-reported invalid or truncated
+scans become HTTP-200 invalid-tile gaps under L-1303. No live coverage or successful
+acquisition is established by these rules.
 
 
 The fetch registry kinds are `portal_dataset`, `paged_layer`, `https_file`, `terms_page`,

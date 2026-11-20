@@ -69,8 +69,10 @@ production name remains machine-global and is explicitly passed by the superviso
 Metadata activation checks QNG EPSG:2932, origin, extent, every declared level through the cap and
 decreasing resolutions, approximately 0.53 m at level ten, 512-pixel JPEG. Each tile's JPEG frame header must also
 declare those dimensions; the bounded reader then forces a full pixel read with the pinned
-rasterio/GDAL JPEG driver. Missing SOS, missing quantization or invalid scan structure is
-`tile_format_or_gap`, never a present member. The same decoder runs during shard verification. All dates must
+rasterio/GDAL JPEG driver inside `rasterio.Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE")`,
+treating libjpeg warnings as errors. Missing SOS, missing quantization and decoder-reported
+invalid or truncated scans are `tile_format_or_gap`, never a present member. The same
+decoder runs during shard verification. All dates must
 have a compatible scheme. Old export scales are not tile levels. The boundary is projected
 with the installed rasterio adapter and every intersecting tile is enumerated, including
 coastal/island intersections. Actual metadata, coverage and disk sufficiency remain
@@ -207,6 +209,14 @@ immutable initial bytes, driver selection and an explicit full pixel read. Refer
 identities are `https://rasterio.readthedocs.io/en/stable/topics/memory-files.html` and
 `https://rasterio.readthedocs.io/en/stable/api/rasterio.io.html`. These identifiers record
 an offline reading on 2026-11-20, not a documentation-host request. No pin changed.
+
+Fix round five also reads the installed official `rasterio.Env` and `Env.__init__`
+docstrings offline: GDAL options apply on context entry and previous configuration is
+restored on exit. Reference identity:
+`https://rasterio.readthedocs.io/en/stable/api/rasterio.env.html#rasterio.env.Env`.
+The invented SOS-only and truncated baseline/progressive scan tests establish rejection
+with `GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"` on the pinned driver; this is not a claim
+that every possible scan corruption is detectable. No documentation host is contacted.
 
 
 ## Fix-round-four mixed-retry correction

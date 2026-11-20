@@ -45348,3 +45348,90 @@ Final ledger checks after the S2-T51 evidence append: `python3 scripts/check_doc
 
 - Final post-ledger checks: `python3 scripts/check_docs.py` exit 0; `git diff --check`
   exit 0, recorded in `.overnight/tmp/f4/commands.jsonl`. Return marker verified.
+
+
+## S2-T51 f5 truncated-JPEG decoder correction — 2026-11-20
+
+- Authority: fix-five brief, confirmation cf3 R1 / k68 item 8, L-1303's recorded-gap
+  treatment, decision 0079 items 2–4, document 03 **Selected national imagery archive
+  integrity** and document 04 **3.1 Registry and sidecar record**.
+- Builder: senior GIS and security engineer, test-first; maker/model OpenAI / Codex,
+  GPT-6 (more specific serving variant unavailable). Strict self-review persona:
+  geospatial archive integrity and decoder-correctness reviewer. Skills applied:
+  project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer
+  self-review rules, post-patch-validation runtime evidence principles and muhasabah-gate.
+  Equivalent test-first, systematic debugging, isolated worktree/archive execution and
+  verification rules cover the unavailable named superpowers workflows.
+- Starting/final HEAD `87cfa295676f3af7d5e0f58ecc2da3990f3e35b0`. No commit or push. Plan executed:
+  reproduce all four truncations red, add only the requested strict GDAL decode
+  context, prove removal red/restoration green in git-archive scratch, update the
+  three decode descriptions, then run the named checks and compare retained failures.
+- `jpeg()` loads `rasterio.Env` through `import_module` and wraps its existing
+  bounded JPEG driver read in `GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"`. Existing
+  dimension/size, RasterioIOError-to-tile_format_or_gap and archive verification
+  paths stay intact. Decoder warnings no longer silently produce present grey-fill
+  tiles. Documents 03/04 and SNAPSHOT.md name the exact setting and scope the claim
+  to decoder-reported damage; no claim covers undetectable entropy substitutions.
+- Permanent persistent-gap cases use a seeded noise tile (seed 79): SOS with zero
+  scan bytes, baseline scans cut to 10 and 90 percent, progressive cut to 50 percent,
+  all ending in EOI. The helper verifies the encoded frame kind and intact decode
+  under the strict Env; each damaged body independently raises RasterioIOError.
+  Existing assertions verify HTTP 200, one attempt, exact tile_format_or_gap reason,
+  no present member, immutable resume without refetch and missing product coverage.
+- Red before fix: exit 1, four executed gap-expectation failures, not import/setup
+  failures. Strict wrapper green: exit 0, all twelve persistent-gap cases pass.
+  Git archive plant removes only the Env wrapper (alias and dataset.read retained):
+  red exit 1, all four new cases fail; restoration green exit 0, all four pass.
+  `.overnight/tmp/f5/wrapper-only-removal.patch` and `plant-result.json` record it.
+- Focused GIS/imagery/structured/binding run: exit 1, 1 failed, 534 passed, 191 warnings in 112.17s (0:01:52).
+  Its sole failure is the retained `test_absent_imagery_row_makes_no_request` ID.
+  Product imagery: exit 0, seven pass. Whole custodian suite ran exactly once:
+  exit 1, 226 failed, 9580 passed, 192 warnings in 542.32s (0:09:02). Failure-ID sets: baseline 226, final 226,
+  zero new and zero absent. Baseline is the unchanged f4 failure-ID file; cf3 also
+  reports this same set. Existing failures remain open; no baseline was refreshed.
+- Ruff check, format --check, mypy (467 source files), check_docs, check_tree,
+  AGENTS/CLAUDE byte parity and diff whitespace all exit 0. Installed official Env
+  docstrings read offline; Python 3.14.6, rasterio 1.5.2, GDAL 3.12.2, Linux WSL2;
+  hypothesis/noise seed 79; UV_OFFLINE=1, UV_NO_SYNC=1, EII_DECISION_PROVIDER=none,
+  PYTHONDONTWRITEBYTECODE=1, workspace-local TMPDIR/Ruff/mypy caches. No dependency
+  sync, pin change, snapshot-host command, real public cache, D: drive, .env,
+  .private or vault input was used. All new byte/transport/geometry inputs invented.
+- Evidence: `.overnight/tmp/f5/commands.jsonl`, full logs, both `*-comparison.json`
+  and `*-failure-ids.txt` files, `tested-state.json` and `implementation.patch`.
+  Source/test/doc hashes unchanged after checks. Patch SHA-256
+  `5f69d3c49df7803a6ec37324eb5afa8b856f4e45b039ddabdc63ae5bece98ad0` (before this ledger append).
+  Prior PROGRESS bytes verified by length/hash and preserved; this is append-only.
+- Strict self-review: APPROVE for the scoped R1 correction; Muhasabah: PASS.
+  Different-maker confirmation of this change, normal merge/acquisition approval,
+  live capacity/first-hour/completeness, both-store parity and later integration
+  remain pending. The known suite failures are not closed. No new unresolved choice
+  or random failure was found. This self-review is not an independent verdict.
+- Commands and actual exits (workspace-relative; full argv/logs in commands.jsonl):
+
+- `red-before-wrapper`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'persistent_tile_gap and (sos-no-data or truncated-scan)'`; cwd `.`.
+- `green-wrapper`: exit 0; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k persistent_tile_gap`; cwd `.`.
+- `interface-reading`: exit 0; `uv run --locked python -c 'import platform, rasterio; print(platform.platform()); print(platform.python_version()); print(rasterio.__version__); print(rasterio.__gdal_version__); print(rasterio.Env.__doc__); print(rasterio.Env.__init__.__doc__)'`; cwd `.`.
+- `format-apply`: exit 0; `uv run --locked ruff format custodian/src/eii_custodian/publicdata/gis/snapshot_archive.py custodian/tests/test_gis_snapshot.py`; cwd `.`.
+- `archive-wrapper-removal`: exit 0; `git archive HEAD core custodian product scripts gateway contracts conftest.py pyproject.toml AGENTS.md`; cwd `.`.
+- `plant-wrapper-red`: exit 1; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'persistent_tile_gap and (sos-no-data or truncated-scan)' --basetemp .overnight/tmp/f5/archive-wrapper-removal/.test-tmp`; cwd `.overnight/tmp/f5/archive-wrapper-removal`.
+- `plant-wrapper-restored-green`: exit 0; `.venv/bin/python3 -m pytest -q -p no:cacheprovider --hypothesis-seed=79 custodian/tests/test_gis_snapshot.py -k 'persistent_tile_gap and (sos-no-data or truncated-scan)' --basetemp .overnight/tmp/f5/archive-wrapper-removal/.test-tmp`; cwd `.overnight/tmp/f5/archive-wrapper-removal`.
+- `plant-harness`: exit 0; `uv run --locked python .overnight/tmp/f5/plant.py`; cwd `.`.
+- `product-imagery`: exit 0; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 product/tests/test_released_imagery.py`; cwd `.`.
+- `agents-parity`: exit 0; `cmp AGENTS.md CLAUDE.md`; cwd `.`.
+- `diff-whitespace`: exit 0; `git diff --check`; cwd `.`.
+- `tree`: exit 0; `python3 scripts/check_tree.py`; cwd `.`.
+- `format`: exit 0; `uv run --locked ruff format --check .`; cwd `.`.
+- `lint`: exit 0; `uv run --locked ruff check .`; cwd `.`.
+- `docs`: exit 0; `python3 scripts/check_docs.py`; cwd `.`.
+- `mypy`: exit 0; `uv run --locked mypy`; cwd `.`.
+- `pin-tested-state`: exit 0; `python3 .overnight/tmp/f5/state.py`; cwd `.`.
+- `focused-gis-imagery`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 -rf custodian/tests/test_gis_snapshot.py custodian/tests/test_gis_reference_inheritance.py custodian/tests/test_gis_paged.py custodian/tests/test_gis_imagery_views.py custodian/tests/test_gis_imagery_views_survivors.py custodian/tests/test_gis_layers.py custodian/tests/test_gis_layers_survivors.py custodian/tests/test_gis_layers_survivors_refusals.py scripts/tests/test_gis_snapshot_binding.py product/tests/test_structured_address.py`; cwd `.`.
+- `suite-progress`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `current-progress`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `current-progress-2`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `current-progress-3`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `current-progress-4`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `current-progress-5`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `custodian-suite`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 -rf custodian/tests`; cwd `.`.
+- `current-progress-6`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
+- `compare-failure-ids`: exit 0; `python3 .overnight/tmp/f5/compare.py`; cwd `.`.

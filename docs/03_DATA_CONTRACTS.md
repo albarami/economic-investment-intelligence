@@ -2663,6 +2663,8 @@ A `request_failed` tile gap has HTTP 404 or 410 and one attempt; a
 `response_bytes_or_gap`, `tile_format_or_gap` or `tile_dimensions_refused` gap has HTTP
 200 and one attempt. Other combinations refuse `gap_reason_integrity`. The existing
 `outside_extent` gap retains null status and zero attempts. A present JPEG must pass the
-bounded format/dimension checks and a full pixel decode by the pinned JPEG driver;
-structure or scan failures become invalid-tile gaps during acquisition, and refuse
-archive verification if planted in a stored member (L-1303).
+bounded format/dimension checks and a full rasterio/GDAL JPEG pixel read inside
+`rasterio.Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE")`, treating libjpeg warnings as
+errors. Missing scan/quantization structure and decoder-reported invalid or truncated
+scans become invalid-tile gaps during acquisition, and refuse archive verification
+if planted in a stored member (L-1303).

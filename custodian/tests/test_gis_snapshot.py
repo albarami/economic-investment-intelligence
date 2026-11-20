@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+from rasterio import Env
 from rasterio.errors import NotGeoreferencedWarning, RasterioIOError
 from rasterio.io import MemoryFile
 from shapely.geometry import MultiPolygon, box
@@ -58,6 +59,33 @@ NO_QUANTIZATION_JPEG = (
 )
 SOS = JPEG.index(b"\xff\xda")
 INVALID_SCAN_JPEG = JPEG[: SOS + 2] + b"\x00\x02\xff\xd9"
+
+
+def truncated_noise_jpeg(percent, *, progressive=False):
+    """Keep a seeded invented scan's prefix and EOI, including zero scan bytes."""
+    pixels = np.random.default_rng(79).integers(0, 256, (1, 512, 512), dtype="uint8")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", NotGeoreferencedWarning)
+        with MemoryFile() as memory:
+            with memory.open(
+                driver="JPEG",
+                width=512,
+                height=512,
+                count=1,
+                dtype="uint8",
+                PROGRESSIVE="YES" if progressive else "NO",
+            ) as dataset:
+                dataset.write(pixels)
+            body = memory.read()
+        assert (b"\xff\xc2" if progressive else b"\xff\xc0") in body
+        # The intact control decodes under the same strict configuration.
+        with Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"):
+            with MemoryFile(body, filename="invented.jpg") as memory:
+                with memory.open(driver="JPEG") as dataset:
+                    assert dataset.read().shape == (1, 512, 512)
+    sos = body.index(b"\xff\xda")
+    scan = sos + 2 + int.from_bytes(body[sos + 2 : sos + 4], "big")
+    return body[: scan + (len(body) - 2 - scan) * percent // 100] + b"\xff\xd9"
 
 
 @pytest.fixture(autouse=True)
@@ -1356,6 +1384,10 @@ def test_coverage_guards_refuse_independently_with_valid_hashes(
         "no-scan",
         "no-quantization",
         "invalid-scan",
+        "sos-no-data",
+        "truncated-scan-baseline-10pct",
+        "truncated-scan-baseline-90pct",
+        "truncated-scan-progressive-50pct",
     ],
 )
 def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, failure):
@@ -1367,6 +1399,10 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
         "no-scan": NO_SCAN_JPEG,
         "no-quantization": NO_QUANTIZATION_JPEG,
         "invalid-scan": INVALID_SCAN_JPEG,
+        "sos-no-data": truncated_noise_jpeg(0),
+        "truncated-scan-baseline-10pct": truncated_noise_jpeg(10),
+        "truncated-scan-baseline-90pct": truncated_noise_jpeg(90),
+        "truncated-scan-progressive-50pct": truncated_noise_jpeg(50, progressive=True),
     }
     if failure in invalid_bodies:
         # Independent decoder proof: not merely our own marker validation.
@@ -1377,7 +1413,10 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
                     with pytest.raises(RasterioIOError):
                         dataset.read()
         else:
-            with pytest.raises(RasterioIOError):
+            with (
+                Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"),
+                pytest.raises(RasterioIOError),
+            ):
                 with MemoryFile(
                     invalid_bodies[failure], filename="invented.jpg"
                 ) as memory:

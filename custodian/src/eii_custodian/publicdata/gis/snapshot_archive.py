@@ -77,6 +77,7 @@ def jpeg(body: bytes) -> None:
     """Bound size/dimensions before fully decoding with the pinned JPEG driver."""
     memory_file = import_module("rasterio.io").MemoryFile
     decode_error = import_module("rasterio.errors").RasterioIOError
+    gdal_env = import_module("rasterio").Env
 
     if (
         not 21 <= len(body) <= MAX_TILE_BYTES
@@ -116,9 +117,10 @@ def jpeg(body: bytes) -> None:
             if width != 512 or height != 512:
                 raise SnapshotRefusal("tile_dimensions_refused")
             try:
-                with memory_file(body, filename="tile.jpg") as memory:
-                    with memory.open(driver="JPEG") as dataset:
-                        dataset.read()
+                with gdal_env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"):
+                    with memory_file(body, filename="tile.jpg") as memory:
+                        with memory.open(driver="JPEG") as dataset:
+                            dataset.read()
             except decode_error:
                 raise SnapshotRefusal("tile_format_or_gap") from None
             return
