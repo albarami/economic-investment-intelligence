@@ -17,11 +17,11 @@ from urllib.request import Request
 import pytest
 from custodian.tests.fixtures.invented_chain import intermediate_pem
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_live_acquire import school, school_transport
 from custodian.tests.test_s2_t29_live_shapes import STAMP, embedded, entry
 
 from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.certificate_pins import (
     PinError,
     current_pin,

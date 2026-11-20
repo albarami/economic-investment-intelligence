@@ -8,9 +8,10 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.additions.build import build_additions
-from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.build import fetch_entry
 from eii_custodian.publicdata.fetch.checks import schema_failure
 from eii_custodian.publicdata.fetch.registry import (
     Entry,

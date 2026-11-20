@@ -18,8 +18,8 @@ def no_real_opener(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_gravity_complete_archive(tmp_path: Path) -> None:
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
     from eii_custodian.publicdata.gravity.contracts import read_selected
 
@@ -57,8 +57,8 @@ def build(
     stream_transport=stream,
 ):
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
 
     return run_build(
@@ -75,7 +75,8 @@ def build(
 
 
 def test_gravity_pending_state(tmp_path: Path) -> None:
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     pending = next(row for row in load_registry() if row.source_id == "cepii_gravity")
@@ -100,8 +101,8 @@ def test_gravity_repeat_publication_is_idempotent(tmp_path: Path) -> None:
 
 def test_gravity_does_not_use_the_baci_stream(tmp_path: Path) -> None:
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
 
     result = run_build(

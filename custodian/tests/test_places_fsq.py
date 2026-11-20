@@ -21,10 +21,10 @@ from custodian.tests.fixtures.places_fsq.invented import (
     write_places,
 )
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
 import h3
 from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault

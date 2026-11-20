@@ -12,8 +12,9 @@ from typing import cast
 
 import pytest
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
-from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.build import fetch_entry
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.kinds import (
     _terms_fingerprint,
@@ -1339,7 +1340,7 @@ def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> Non
 
 
 def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
-    """A successful build creates files only inside the cache directory it was given."""
+    """A successful build writes only under the cache data root (cache and assets)."""
     marker = tmp_path / "marker.txt"
     marker.write_text("keep", encoding="utf-8")
     cache = tmp_path / "data" / "public_cache"
@@ -1350,9 +1351,11 @@ def test_build_writes_only_under_the_cache(tmp_path: Path) -> None:
     outcome = run_build((_entry(),), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert marker.read_text(encoding="utf-8") == "keep"
+    data_root = cache.parent
     for path in tmp_path.rglob("*"):
         if path.is_file() and path != marker:
-            assert "public_cache" in path.parts
+            rel = path.relative_to(data_root)
+            assert rel.parts[0] in ("public_cache", "assets")
 
 
 def key_offenders(root: Path) -> tuple[str, ...]:

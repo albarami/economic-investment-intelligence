@@ -254,8 +254,9 @@ def test_streamed_dataset_without_a_licence_records_pending(entries, tmp_path):
     row whose portal states no licence records the same pending state as the
     ordinary path; the sidecar holds licence_review "pending" with the date in
     retrieved_utc, the build log carries the advisory, and nothing fails."""
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata import completeness
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.report import licence_unstated_line
 
     entry = _streamed_entry(entries)
@@ -284,7 +285,8 @@ def test_streamed_differing_licence_records_pending(entries, tmp_path):
     a differing licence records the same pending state as the ordinary path;
     the build log carries the licence_pending_line advisory, the sidecar keeps
     the observed licence, and nothing fails."""
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.report import licence_pending_line
 
     entry = _streamed_entry(entries)

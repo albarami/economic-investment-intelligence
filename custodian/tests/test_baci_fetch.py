@@ -4,8 +4,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.baci.invented import entry, metadata, stream
-
-from eii_custodian.publicdata.fetch.build import run_build
+from custodian.tests.support.fetch_build import run_build
 
 
 def test_baci_complete_archive(tmp_path: Path) -> None:

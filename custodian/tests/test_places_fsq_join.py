@@ -6,11 +6,12 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build as support_run_build
 from custodian.tests.test_places_fsq import _release_entry
 from custodian.tests.test_publicdata_behaviour import _clock, _entry, _ok, _sleep
 
 import h3
-from eii_custodian.publicdata.fetch import build
+from eii_custodian.publicdata.fetch import build as fetch_build_module
 from eii_custodian.publicdata.places_fsq.assemble import _table_row
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
 from eii_custodian.publicdata.places_fsq.parse import parse_file
@@ -20,8 +21,8 @@ from eii_custodian.publicdata.places_fsq.policy import assert_policy, load_mappi
 def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
     """A skipped copy adds only its skip line, preserving stage calls and output."""
     events = []
-    original_publish = build.publish_investment
-    original_stage = build.run_stage
+    original_publish = fetch_build_module.publish_investment
+    original_stage = fetch_build_module.run_stage
 
     def publish(*args, **kwargs):
         events.append("investment")
@@ -34,16 +35,16 @@ def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
     def transport(url):
         return _ok(url, b"invented-bytes")
 
-    monkeypatch.setattr(build, "publish_investment", publish)
-    monkeypatch.setattr(build, "run_stage", stage)
-    baseline = build.run_build(
+    monkeypatch.setattr(fetch_build_module, "publish_investment", publish)
+    monkeypatch.setattr(fetch_build_module, "run_stage", stage)
+    baseline = support_run_build(
         (_entry(),), transport, tmp_path / "baseline", _clock, _sleep
     )
     assert baseline.failure is None
     assert events == ["investment", "series", "regression"]
     events.clear()
     skipped = replace(_release_entry(), skip_reason="SYN-disabled")
-    joined = build.run_build(
+    joined = support_run_build(
         (skipped, _entry()), transport, tmp_path / "joined", _clock, _sleep
     )
     assert joined.failure is None

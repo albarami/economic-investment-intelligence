@@ -121,19 +121,9 @@ def _card_setup(tmp_path):
 
 def _ensure_building_table(cache: Path) -> Path:
     """Write a minimal building table beside the public cache."""
-    buildings = cache.parent / "assets" / "buildings" / "buildings.geojson"
-    buildings.parent.mkdir(parents=True, exist_ok=True)
-    if not buildings.is_file():
-        buildings.write_bytes(
-            invented.buildings_bytes(
-                [
-                    invented.building_feature(
-                        "SYN-B-0001", invented.square(0, 0, 1), None, None
-                    )
-                ]
-            )
-        )
-    return buildings
+    from custodian.tests.support.buildings import ensure_minimal_building_table
+
+    return ensure_minimal_building_table(cache)
 
 
 def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:

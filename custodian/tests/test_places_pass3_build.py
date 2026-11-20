@@ -8,12 +8,12 @@ from pathlib import Path
 
 from custodian.tests.fixtures.frame.invented import invented_archive, invented_layer
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_area_files import _install_road
 from custodian.tests.test_places_stage import _frame_review
 from custodian.tests.test_publicdata_behaviour import _clock, _sleep
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 

@@ -7,9 +7,9 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry

@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_places_area_files import (
     _FRAME,
     _RING,
@@ -33,7 +34,6 @@ from shapely.geometry import Polygon
 from shapely.wkb import dumps as dump_wkb
 
 import h3
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.transport import TransportFault
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.places.area_files import (

@@ -44824,3 +44824,11 @@ Remaining: the newly recorded C22/C30/C31 method inheritance and issued-series t
 Final post-write verification: documentation check exit 0 (1169 text files, 127 Markdown files). The read-only scope audit exits 0: exactly the five intended tracked files changed, all changes unstaged, HEAD unchanged, fixture restored to HEAD bytes, exactly three reason replacements and no other TOML differences, exact test and C2 sentence changes, append-only OPEN_ITEMS/PROGRESS histories, exactly one appended PROGRESS block, unchanged byte-identical AGENTS/CLAUDE, red/green exits 1 and 0, return marker correct, and git diff --check exit 0. No source changes followed the 770-test pass. Strict self-check APPROVE for this bounded follow-up; muhasabah PASS.
 
 - 2026-11-20 21:54 S2-T50 follow-up committed as 10ba2d2c; confirmation cf1 (Claude C) finding A: document 07 C2 sentence on 2015-12 corrected (the window is the full 13 months, seven of them zero; not clipped), text supplied by the reviewer and applied by the lead; lead check of the extract: window 2015-06..2016-06 sorted [0,0,0,0,0,0,0,1,1,1,2,5,9], median 0.
+## S2-P21 fix 4 — shared building-table fixture — 2026-11-20
+
+- Maker/model: Composer (Cursor agent), Composer 2.5; persona: senior geospatial data engineer and test architect; strict self-review: rejects weakened guards and session pollution of height-absence plants.
+- Skills: project-orientation, task-standards, test-driven-development, systematic-debugging, verification-before-completion.
+- Work: `custodian/tests/support/buildings.py`, `fetch_build.py`, `test_buildings_support.py`; non-heights `run_build` call sites use the wrapper; `test_publicdata_heights._ensure_building_table` delegates to the shared helper; flat-cache wrapper removes session-shared `assets/` after each run.
+- Custodian tests before: `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests` exit 1, 8799 passed, 193 failed; after: exit 0, 8993 passed, 0 failed.
+- Checks: ruff check exit 0; ruff format --check exit 0; mypy exit 0; check_docs exit 0; check_tree exit 0.
+- No commit; no network.

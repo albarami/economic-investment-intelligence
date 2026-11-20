@@ -4,12 +4,12 @@ import json
 from dataclasses import replace
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_awards import profile, row
 from custodian.tests.test_s2_t29_pages import BODY, STAMP, URL, page_entry, review
 from custodian.tests.test_s2_t29_transport import pin
 
 from eii_custodian.publicdata.fetch import award_checks, certificate_pins, page_records
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError
 from eii_custodian.publicdata.fetch.transport import Response

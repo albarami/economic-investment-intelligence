@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.report import coverage_line
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.stage import EXPECTED, SECTION_10_IDS, run_stage

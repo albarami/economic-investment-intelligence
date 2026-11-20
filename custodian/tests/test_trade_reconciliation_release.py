@@ -333,7 +333,7 @@ def test_native_comtrade_retains_unit_not_api_price(tmp_path, monkeypatch):
 
 
 def test_pending_selection_and_dispatch(tmp_path, monkeypatch):
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
 
     pending = tr.load_selection()
     assert pending is not None
@@ -400,7 +400,9 @@ def native_selection(source, role):
 
 @pytest.mark.parametrize("plant", ["comtrade", "baci", "decimal"])
 def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
-    from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+    from custodian.tests.support.fetch_build import run_build
+
+    from eii_custodian.publicdata.fetch.build import LOG_NAME
 
     from .fixtures.comtrade.invented import invented_entry
 
@@ -722,7 +724,9 @@ def test_selection_unreadable_plant(tmp_path):
     ids=["policy", "binding"],
 )
 def test_dispatch_comparison_invalid(tmp_path, monkeypatch, plant, reason):
-    from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+    from custodian.tests.support.fetch_build import run_build
+
+    from eii_custodian.publicdata.fetch.build import LOG_NAME
 
     monkeypatch.setattr(tr, "read_portal", portal)
     p = (

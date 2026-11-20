@@ -231,7 +231,8 @@ def test_pending_terms_fields_still_fetch_and_read(tmp_path):
 
 
 def test_build_dispatch_pending_no_transport(tmp_path):
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     entries = tuple(

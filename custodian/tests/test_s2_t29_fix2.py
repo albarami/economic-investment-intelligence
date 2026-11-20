@@ -8,12 +8,12 @@ from http.client import HTTPMessage, IncompleteRead
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_fix import award_intake
 from custodian.tests.test_s2_t29_pages import BODY, STAMP, page_entry, review
 from custodian.tests.test_s2_t29_transport import pin
 
 from eii_custodian.publicdata.fetch import awards, page_records
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.fetch.transport import (

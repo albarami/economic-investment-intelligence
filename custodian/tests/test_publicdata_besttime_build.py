@@ -293,8 +293,9 @@ def test_besttime_empty_list_without_credentials_or_costs(tmp_path):
 
 
 def test_besttime_dispatch_passes_environment(tmp_path, monkeypatch):
+    from custodian.tests.support.fetch_build import run_build as support_run_build
+
     from eii_custodian.publicdata.busyness import build as busy
-    from eii_custodian.publicdata.fetch import build
 
     entry, _review, cache, env = setup(tmp_path)
     seen = []
@@ -304,7 +305,7 @@ def test_besttime_dispatch_passes_environment(tmp_path, monkeypatch):
         return "invented-digest"
 
     monkeypatch.setattr(busy, "build_busyness", reader)
-    outcome = build.run_build(
+    outcome = support_run_build(
         (entry,),
         lambda req: pytest.fail("generic transport"),
         cache,
@@ -430,8 +431,9 @@ def test_besttime_reason_totals_and_sidecar_credit_total(tmp_path, found):
 
 
 def test_besttime_build_failure_names_missing_place(tmp_path, monkeypatch):
+    from custodian.tests.support.fetch_build import run_build as support_run_build
+
     from eii_custodian.publicdata.busyness import build as busy
-    from eii_custodian.publicdata.fetch import build
 
     entry, review, cache, env = setup(tmp_path)
     (cache / "places_s2_t06/pub_place.jsonl").write_text("")
@@ -443,7 +445,7 @@ def test_besttime_build_failure_names_missing_place(tmp_path, monkeypatch):
             entry, transport, cache, clock, environ, review
         ),
     )
-    outcome = build.run_build(
+    outcome = support_run_build(
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,
@@ -509,8 +511,9 @@ def test_besttime_all_days_and_values_stay_on_own_venue(tmp_path):
 
 
 def test_besttime_missing_keys_failure_log_is_key_free(tmp_path, monkeypatch):
+    from custodian.tests.support.fetch_build import run_build as support_run_build
+
     from eii_custodian.publicdata.busyness import build as busy
-    from eii_custodian.publicdata.fetch import build
 
     entry, review, cache, env = setup(tmp_path)
     del env["BESTTIME_API_KEY_PRIVATE"]
@@ -522,7 +525,7 @@ def test_besttime_missing_keys_failure_log_is_key_free(tmp_path, monkeypatch):
             entry, transport, cache, clock, environ, review
         ),
     )
-    outcome = build.run_build(
+    outcome = support_run_build(
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,
@@ -536,8 +539,9 @@ def test_besttime_missing_keys_failure_log_is_key_free(tmp_path, monkeypatch):
 
 
 def test_besttime_input_secret_is_not_logged(tmp_path, monkeypatch):
+    from custodian.tests.support.fetch_build import run_build as support_run_build
+
     from eii_custodian.publicdata.busyness import build as busy
-    from eii_custodian.publicdata.fetch import build
 
     entry, _review, cache, env = setup(tmp_path)
 
@@ -545,7 +549,7 @@ def test_besttime_input_secret_is_not_logged(tmp_path, monkeypatch):
         raise busy.BuildInputError(env["BESTTIME_API_KEY_PRIVATE"])
 
     monkeypatch.setattr(busy, "build_busyness", refuse)
-    outcome = build.run_build(
+    outcome = support_run_build(
         (entry,),
         lambda req: pytest.fail("sent"),
         cache,

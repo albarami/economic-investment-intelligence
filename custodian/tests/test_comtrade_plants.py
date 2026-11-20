@@ -19,6 +19,7 @@ from custodian.tests.fixtures.comtrade.invented import (
     invented_policy,
     trusted_source,
 )
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.comtrade.assemble import assemble
 from eii_custodian.publicdata.comtrade.fetch import fetch_source
@@ -35,7 +36,6 @@ from eii_custodian.publicdata.comtrade.state import (
     reserve,
 )
 from eii_custodian.publicdata.fetch.allowlist import canonical_https
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
 from eii_custodian.publicdata.fetch.transport import (
     AttemptResult,

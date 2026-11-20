@@ -18,10 +18,10 @@ def no_real_opener(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_atlas_complete_archive(tmp_path: Path) -> None:
     from custodian.tests.fixtures.atlas.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.atlas.config import Config
     from eii_custodian.publicdata.atlas.contracts import read_selected
-    from eii_custodian.publicdata.fetch.build import run_build
 
     outcome = run_build(
         [entry()],
@@ -59,9 +59,9 @@ def build(
     stream_transport=stream,
 ):
     from custodian.tests.fixtures.atlas.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.atlas.config import Config
-    from eii_custodian.publicdata.fetch.build import run_build
 
     return run_build(
         [entry() if source is None else source],
@@ -75,7 +75,8 @@ def build(
 
 
 def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     pending = next(

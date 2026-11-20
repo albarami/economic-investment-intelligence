@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.heights import invented
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_publicdata_behaviour import (
     _FILE_TERMS,
     FILE_URL,
@@ -29,7 +30,6 @@ from custodian.tests.test_publicdata_behaviour import (
     _stored_page,
 )
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.report import terms_attempt_record
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.heights.step import build_heights

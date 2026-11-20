@@ -15,12 +15,12 @@ import unicodedata
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.build import (
     BuildOutcome,
     FetchFailure,
     _previous_term_hashes,
-    run_build,
 )
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -193,6 +193,7 @@ def _expect_second_receipt(
     host = served.split("/", 3)[2]
     notice = f"TERMS {watched.key} changed since the last build ({watched.terms_url})"
     passed = f"PASS {watched.key} sha256={digest} host={host}"
+    heights = "PASS heights rows=1 fallback_buildings=0"
     loaded = json.loads((cache / "build-log.json").read_text(encoding="utf-8"))
     metas = sorted(
         path.name
@@ -205,9 +206,15 @@ def _expect_second_receipt(
             f"{digest}.meta.json",
         )
     )
-    assert [line for line in outcome.lines if line.startswith("PASS ")] == [passed]
+    assert [line for line in outcome.lines if line.startswith("PASS ")] == [
+        passed,
+        heights,
+    ]
     assert notice in outcome.lines
-    assert [line for line in loaded["lines"] if line.startswith("PASS ")] == [passed]
+    assert [line for line in loaded["lines"] if line.startswith("PASS ")] == [
+        passed,
+        heights,
+    ]
     assert notice in loaded["lines"]
     assert loaded["terms"] == [
         {

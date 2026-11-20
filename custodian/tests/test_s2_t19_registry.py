@@ -8,9 +8,10 @@ from pathlib import Path
 import pytest
 import yaml
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.allowlist import ALLOWED_HOSTS, approve
-from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
+from eii_custodian.publicdata.fetch.build import fetch_entry
 from eii_custodian.publicdata.fetch.registry import (
     COLLECTED_FAMILIES,
     RegistryError,

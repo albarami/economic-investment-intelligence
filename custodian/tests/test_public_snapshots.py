@@ -244,9 +244,9 @@ def test_comtrade_state_operational(comtrade_archive, name):
 def test_fetched_terms_bytes_are_archived(tmp_path):
     from dataclasses import replace
 
+    from custodian.tests.support.fetch_build import run_build
     from custodian.tests.test_publicdata_fetch import _citation_entry, _clock, _sleep
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.transport import Response
 
     entry = replace(
@@ -518,7 +518,8 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
     from decimal import Decimal
     from importlib import import_module
 
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
     from eii_custodian.publicdata.fetch.transport import SlotSecrets
 

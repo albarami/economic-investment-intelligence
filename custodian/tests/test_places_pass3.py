@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_area_files import (
     _FRAME,
@@ -21,7 +22,6 @@ from custodian.tests.test_places_pass2 import _empty_review, _Hand
 from custodian.tests.test_publicdata_behaviour import _clock, _entry, _sleep
 from shapely.geometry import Point, Polygon, box
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.places import PlacesError

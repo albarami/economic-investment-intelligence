@@ -235,7 +235,7 @@ def test_trade_manifest_omits_absent_family(tmp_path, kind):
     import importlib
     import json
 
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
 
     fixture = importlib.import_module("custodian.tests.fixtures." + kind + ".invented")
     config = importlib.import_module("eii_custodian.publicdata." + kind + ".config")

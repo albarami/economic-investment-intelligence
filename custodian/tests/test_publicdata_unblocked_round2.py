@@ -321,8 +321,9 @@ def test_listing_refuses(tmp_path, monkeypatch, plant):
 
 
 def test_listing_build_keeps_existing_part_fetch(tmp_path, monkeypatch):
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch import registry
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.transport import Response
 
     parent = listing_fixture(monkeypatch)
@@ -406,7 +407,7 @@ def test_activated_portal_fetches_with_declared_schema(tmp_path, key):
 
 
 def test_accident_awaits_byte_bound_without_fetching(tmp_path):
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
 
     entry = next(e for e in load_registry() if e.key == "accident")
 
