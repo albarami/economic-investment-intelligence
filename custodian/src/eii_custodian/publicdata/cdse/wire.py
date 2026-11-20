@@ -34,6 +34,7 @@ DOCUMENTED_ENDPOINTS = {
     "process": "https://sh.dataspace.copernicus.eu/process/v1",
 }
 CRS_URL = "http://www.opengis.net/def/crs/EPSG/0/32639"
+INPUT_BANDS = ("B04", "B03", "B02", "SCL", "dataMask")
 
 # Local masking policy over the documented SCL categories. TILE exposes dates;
 # SIMPLE's empty scenes object cannot establish contributing acquisitions.
@@ -41,7 +42,7 @@ CRS_URL = "http://www.opengis.net/def/crs/EPSG/0/32639"
 EVALSCRIPT = """//VERSION=3
 function setup() {
   return {
-    input: ["B04", "B03", "B02", "SCL", "dataMask"],
+    input: INPUT_BANDS,
     mosaicking: "TILE",
     output: {id: "default", bands: 4, sampleType: "AUTO"}
   };
@@ -60,7 +61,7 @@ function evaluatePixel(samples, scenes) {
 function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {
   outputMetadata.userData = {dates: Object.keys(contributors).sort()};
 }
-"""
+""".replace("INPUT_BANDS", json.dumps(INPUT_BANDS))
 
 
 @dataclass(frozen=True)

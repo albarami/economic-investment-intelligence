@@ -108,6 +108,11 @@ per pixel." SCL therefore adds a counted band; dataMask does not add another.
 The tests exercise both area/request minima, sample/band factors and an invented
 plan below/above the recorded nominal ceiling. The old CostModel remains an
 explicit invented linear fixture, not the verified billing formula.
+`bulk_budget` takes its counted input bands from the same `INPUT_BANDS` tuple
+that builds the wire script, and requires a positive, explicit `tile_samples`
+upper bound from its caller for every Process attempt, including reserved retries.
+No default of one sample is inferred from TILE mosaicking. The lead still must
+establish that bound before a live plan can be admitted.
 
 D6: "To conform to the rate limiter, all rate limiting policies have to be
 satisfied." A response of HTTP 429 stops the session; no automatic retry is

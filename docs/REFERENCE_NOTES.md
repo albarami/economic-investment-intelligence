@@ -18,7 +18,7 @@ The last section of each file lists the statements of the pack about these libra
 
 ## DuckDB 2.0
 
-Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 1) and as the embedded reader (docs/02_ARCHITECTURE.md section "Technology stack" row "Build engine and embedded reader"). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`.
+Used here as the build engine for the public pack, the synthetic world and the release (docs/decisions/0004-duckdb-build-engine-and-embedded-standby.md section "Decision" item 1) and as the embedded reader (docs/02_ARCHITECTURE.md section "Technology stack" row "Build engine and embedded reader"). Series 2.0, retreat series 1.5; the pins.toml row is `duckdb`. P15 intentionally records a separate dated reading of P9 for the setting in S33; both addresses resolve to the same Configuration page. The 2026-11-20 GETs returned identical fetched-body hashes. S32’s quotation is on P14, under GeoParquet Metadata, rather than P13; the same-date re-read confirmed its existing page attribution and fetched-body hash.
 
 ### Pages read
 

@@ -44,7 +44,7 @@ def tile():
     return k.tiles_for(box(500000, 2700000, 500020, 2700020), "EPSG:32639")[0]
 
 
-def raster(t, *, width=None):
+def raster(t, *, width=None, alpha=None):
     width = t.width if width is None else width
     with MemoryFile() as memory:
         with memory.open(
@@ -59,6 +59,8 @@ def raster(t, *, width=None):
             values = np.ones((4, t.height, width), dtype=np.uint8)
             values[3] *= 255
             values[3, 0, 0] = 0  # Honest transparent gap, never a cloud-free claim.
+            if alpha is not None:
+                values[3] = alpha
             ds.write(values)
         return memory.read()
 
@@ -150,6 +152,7 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
         metadata=1,
         refresh=1,
         retries=1,
+        tile_samples=1,
         reserve_note="Invented lead choice",
     )
     assert plan.requests == 5
@@ -166,6 +169,7 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
             metadata=1,
             refresh=1,
             retries=1,
+            tile_samples=1,
             reserve_note="Invented lead choice",
         )
 
@@ -196,6 +200,7 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
                 metadata=1,
                 refresh=1,
                 retries=1,
+                tile_samples=1,
                 reserve_note="Invented lead choice",
             )
     with pytest.raises(ValueError):
@@ -207,8 +212,74 @@ def test_quota_unknown_insufficient_rounding_and_enumeration():
             metadata=1,
             refresh=0,
             retries=1,
+            tile_samples=1,
             reserve_note="",
         )
+
+
+@pytest.mark.parametrize("samples,allowance", [(1, "1.5"), (2, "2")])
+def test_bulk_budget_reserves_wire_bands_and_explicit_tile_samples(samples, allowance):
+    """INVENTED plan: old RGB/single-sample literals fit, actual factors do not."""
+    from eii_custodian.publicdata.cdse.wire import INPUT_BANDS
+
+    t = k.tiles_for(box(0, 0, 7680, 5120), k.CRS)[0]
+    model = k.CostModel(
+        Decimal(3 * 512 * 512),
+        Decimal(1),
+        Decimal("0.005"),
+        Decimal("0.1"),
+        Decimal(0),
+        Decimal(0),
+        proof(),
+    )
+    options = dict(metadata=0, refresh=0, retries=1, reserve_note="Invented bound")
+    # Exactly two processing attempts: initial request plus one reserved retry.
+    # The invented quantum has no effect on these integral documented costs.
+    assert k.documented_units(t.width * t.height, INPUT_BANDS, samples) * 2 == (
+        Fraction(4 * samples)
+    )
+    assert model.picture_cost(t.width * t.height, bands=3, samples=1) * 2 <= (
+        Decimal(allowance) * 2
+    )
+    with pytest.raises(
+        k.CdseError, match="bulk_allowance_insufficient_fallback_retained"
+    ):
+        k.bulk_budget(
+            (t,), model, Decimal(allowance) * 2, 3, tile_samples=samples, **options
+        )
+    plan = k.bulk_budget(
+        (t,), model, Decimal(4) * samples, 3, tile_samples=samples, **options
+    )
+    assert plan.units == Decimal(4) * samples
+    assert plan.kinds == ("token", "process", "process")
+
+
+def test_bulk_budget_requires_positive_explicit_tile_sample_bound():
+    model = k.CostModel(*(Decimal(1),) * 6, proof())
+    options = dict(metadata=0, refresh=0, retries=0, reserve_note="Invented bound")
+    with pytest.raises(TypeError, match="tile_samples"):
+        k.bulk_budget((tile(),), model, Decimal(100), 2, **options)
+    for samples in (0, -1, True, 1.5, None):
+        with pytest.raises(k.CdseError, match="quota_inputs_refused"):
+            k.bulk_budget(
+                (tile(),), model, Decimal(100), 2, tile_samples=samples, **options
+            )
+
+
+@pytest.mark.parametrize(
+    "alpha,coverage,reason",
+    [
+        (128, "partial", "raster_mask_refused"),
+        (0, "partial", "raster_no_valid_pixels"),
+        (None, "complete_valid_pixels", "coverage_unsupported"),
+    ],
+)
+def test_raster_mask_and_coverage_refusal_plants(alpha, coverage, reason):
+    """INVENTED alpha and one-gap rasters must reach their specific refusal."""
+    t = tile()
+    body = raster(t, alpha=alpha)
+    with pytest.raises(k.CdseError, match=f"^{reason}$"):
+        c.validate_raster(body, replace(metadata(t), coverage=coverage))
 
 
 def test_receipt_chain_and_snapshot_immutability(tmp_path):
@@ -401,7 +472,7 @@ def test_documented_unrounded_units_and_nominal_allowance():
 
 def test_evalscript_tracks_contributing_dates_and_masks():
     """Execute the fixed script on INVENTED samples; no provider invocation."""
-    from eii_custodian.publicdata.cdse.wire import EVALSCRIPT
+    from eii_custodian.publicdata.cdse.wire import EVALSCRIPT, INPUT_BANDS
 
     harness = """
 const rgb = {B04: 0.1, B03: 0.2, B02: 0.3, SCL: 4, dataMask: 1};
@@ -430,6 +501,8 @@ console.log(JSON.stringify({outputs, metadata, settings: setup()}));
     assert output["outputs"][7:] == [[0, 0, 0, 0]] * 3
     assert output["metadata"] == {"userData": {"dates": ["2026-11-02T12:00:00Z"]}}
     assert output["settings"]["mosaicking"] == "TILE"
+    assert output["settings"]["input"] == list(INPUT_BANDS)
+    assert INPUT_BANDS == ("B04", "B03", "B02", "SCL", "dataMask")
 
 
 def process_archive(

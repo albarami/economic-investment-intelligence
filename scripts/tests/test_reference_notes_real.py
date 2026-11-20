@@ -29,6 +29,40 @@ REAL_NOTE_PATHS = (
 
 
 class RealNotes(unittest.TestCase):
+    def test_p24_summary_rows_match_local_reading_closures(self) -> None:
+        text = (REPO / "OPEN_ITEMS.md").read_text()
+        expected = (
+            "| OI-200 | **CLOSED LOCALLY 2026-11-20 (P24)**. DuckDB P13/P14 and S29\u2013S32 of docs/REFERENCE_NOTES.md record the two official Parquet-page readings with publisher, quotations, date and fetched-body hashes; R10/S28 stay OBSERVED. Independent another-maker confirmation remains with the lead. Source: OI-200 P24 closure block. |",
+            "| OI-224 | **CLOSED LOCALLY 2026-11-20 (P24)**. The `_GEOPARQUET` comment in read.py names publisher, page URL and retrieval date; DuckDB P15/S33 record the quotation and fetched-body hash. Supplies the P2 reading only; OI-202 and the real-file check stay open. Independent another-maker confirmation remains with the lead. Source: OI-224 P24 closure block. |",
+        )
+        for row in expected:
+            with self.subTest(item=row.split(" | ")[0]):
+                self.assertEqual(
+                    [line for line in text.splitlines() if line.startswith(row[:10])],
+                    [row],
+                )
+
+    def test_p24_terms_cell_preserves_only_remaining_attribution_hold(self) -> None:
+        text = (REPO / "docs/04_PUBLIC_DATA_PACK.md").read_text()
+        rows = [
+            line
+            for line in text.splitlines()
+            if line.startswith("| `satellite_cdse_backup` |")
+            and "Owner-requested Sentinel-2 L2A" in line
+        ]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(
+            rows[0].split(" | ")[-1],
+            "Imagery notice and interface terms read 2026-11-20 (CDSE README D15/D12, fetched-body hashes recorded); complete attribution pending: the read pages supply no complete service-specific display line; `provider_terms`, empty decision_record, commit false; proposed decision 0066 |",
+        )
+
+    def test_configuration_repeat_reading_is_explicit(self) -> None:
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        self.assertIn("P15 intentionally records a separate dated reading of P9", block)
+        self.assertIn("both addresses resolve to the same Configuration page", block)
+
     def test_parquet_official_readings(self) -> None:
         """OI-200: observations cannot stand in for the four owed READ rows."""
         text = (REPO / tables.DOCS).read_text()

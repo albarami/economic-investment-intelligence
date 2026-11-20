@@ -44134,3 +44134,173 @@ Local handoff-integrity audit: initial `python3 .overnight/tmp/finish-p11/audit_
   command then exits 0, 35 passed, 28 subtests passed. Lint, format-check
   (836 files), mypy (450 source files), notes (367 rows), tree (eight rules),
   guidance cmp and whitespace checks all exit 0 on this final test state.
+
+
+## S2-P24 FIX1 — Review R1 corrections (2026-11-20)
+
+- Maker: OpenAI. Model: GPT-6-based Codex; exact serving variant not exposed.
+  Expert persona: senior engineer for official-documentation readings, provider
+  contracts and raster validation. Strict self-review persona: reviewer rejecting
+  an assumed factor where a supplied value is required, and an unplanted guard.
+- Skills read/applied: project-orientation, task-standards, github-flow,
+  sanad-provenance, strict-reviewer and muhasabah-gate. The requested named
+  test-driven-development and verification-before-completion skills are not
+  installed; their test-first and measured-verification rules are applied here.
+- Authority: full .overnight/BRIEF.md and .overnight/IN/REVIEW-R1.md, against
+  base commit `94bb9e20aab121124d0dbe4d4bb9c20f920187e8`. Leave changes uncommitted;
+  no commit, push, service operation, provider request or account query is made.
+  No credential, private input, vault or data cache is read. All test payloads
+  are invented. Only already-cited official documentation receives plain GETs.
+- Environment: existing Linux/bash workspace, locked uv Python environment,
+  `UV_OFFLINE=1`, `UV_CACHE_DIR=.overnight/tmp/uv-cache`; inherited TMPDIR is
+  workspace-local. All pytest commands use `-q -p no:cacheprovider
+  --hypothesis-seed=7392165840`. No timeout, retry, assertion, skip, baseline,
+  privacy/security rule, task box or gate is weakened.
+
+### Finding changes and test-first evidence
+
+- F1: `bulk_budget` now shares `wire.INPUT_BANDS` with the generated closed
+  Evalscript, counts B04/B03/B02/SCL, excludes dataMask unless alone, and requires
+  non-defaulted `tile_samples`. `CostModel.picture_cost` rejects a non-positive
+  or non-integer bound; initial requests and reserved retries use that bound.
+  The caller still owes a justified upper bound; the wire's TILE setting alone
+  supplies none. The README retains the pending live-budget/formula limitations.
+  Tests: `test_bulk_budget_reserves_wire_bands_and_explicit_tile_samples`,
+  `test_bulk_budget_requires_positive_explicit_tile_sample_bound`, and the
+  strengthened `test_evalscript_tracks_contributing_dates_and_masks`.
+  Initial combined F1/F2 red: exit 1, 6 failed / 9 deselected (new required
+  keyword and fixture alpha parameter absent). Adding the signature alone while
+  retaining old cost literals produced the substantive F1 red: exit 1, 2 failed /
+  13 deselected, both DID NOT RAISE. The shared-band assertion separately failed
+  first: exit 1, 1 failed / 14 deselected (missing INPUT_BANDS). Implementing the
+  wire binding and factors made the two-file suite green: exit 0, 25 passed /
+  12 subtests passed after the record corrections below.
+  The final planted plan uses an invented 768-by-512 image and a model whose
+  band/area/sample factors agree exactly with `documented_units` for that image;
+  the explicit invented quantum does not round these integral costs. Both
+  allowances admit the old literals and refuse the documented factors, including
+  one reserved retry. Its positive boundary and wire checks pass: exit 0,
+  3 passed / 12 deselected. Final F1 knockouts are retained separately from the
+  earlier, more artificial fixture proofs.
+- F2: three parameterized cases of
+  `test_raster_mask_and_coverage_refusal_plants` pass alpha 128, all-zero alpha,
+  and complete_valid_pixels against the original one-gap fixture. They require
+  the exact errors raster_mask_refused, raster_no_valid_pixels and
+  coverage_unsupported. The initial three red cases were the missing fixture
+  alpha parameter, not absent production guards. Extending the invented raster
+  helper made them green against the existing guards. Production `cache.py`
+  needs no final change; each existing guard was then removed alone to prove
+  its own deciding red, and restored byte for byte.
+- RN1: the two OPEN_ITEMS summary rows are replaced verbatim with the review's
+  corrected OI-200/OI-224 rows. `test_p24_summary_rows_match_local_reading_closures`
+  failed first for both stale rows (exit 1), then passed with their replacements.
+  Original item blocks, OI-202 and pending independent confirmation are preserved.
+- RN2: the source inventory's satellite_cdse_backup terms cell is replaced
+  verbatim with the review's corrected cell, retaining only the complete-credit
+  hold. `test_p24_terms_cell_preserves_only_remaining_attribution_hold` failed
+  first (exit 1) after its selector was scoped to the source inventory rather
+  than both tables, then passed with the replacement. D15/D12 remain the cited
+  historical readings; this round did not re-read those legal pages.
+- Page point: `test_configuration_repeat_reading_is_explicit` failed first
+  (exit 1) for the missing clarification and passes with it. DuckDB S32 really
+  is on P14's GeoParquet Metadata section, not P13. P15 is intentionally a new
+  dated reading of P9: both GET addresses resolve to the same Configuration page
+  and have identical body hashes. The reference-notes opening paragraph now
+  states both results; the existing P14 attribution and hashes stay correct.
+
+### Deciding revert-alone proofs
+
+`python3 .overnight/tmp/p24_fix1_proofs.py` exits 0 only after each child pytest
+returns the expected exit 1 and restores each target in finally. This is an
+expected-failure proof runner, not a claim that its child tests passed. Commands,
+outputs and actual exits are in `.overnight/tmp/p24-fix1/proofs.json` and the
+named logs. Each RN1 row is reverted independently; no test change accompanies
+any knockout. The focused -k selections are not exclusions from final checks.
+
+| Isolated reverted production/document change | Child exit | Observed result |
+|---|---:|---|
+| F1 old bands=3, samples=1 literals | 1 | 2 failed, 13 deselected |
+| F1 band count alone replaced by 3 | 1 | 2 failed, 13 deselected |
+| F1 sample factor alone replaced by 1 | 1 | 1 failed, 1 passed, 13 deselected |
+| F1 sample bound made optional | 1 | 1 failed, 14 deselected |
+| F1 SCL removed from the wire input tuple | 1 | 1 failed, 14 deselected |
+| F2 alpha-128 guard removed alone | 1 | 1 failed, 14 deselected |
+| F2 all-zero guard removed alone | 1 | 1 failed, 14 deselected |
+| F2 complete-coverage guard removed alone | 1 | 1 failed, 14 deselected |
+| RN1 OI-200 summary row alone restored to base | 1 | 1 failed, 1 passed, 9 deselected, 1 subtest passed |
+| RN1 OI-224 summary row alone restored to base | 1 | 1 failed, 1 passed, 9 deselected, 1 subtest passed |
+| RN2 old terms cell alone restored | 1 | 1 failed, 9 deselected |
+| Page clarification alone removed | 1 | 1 failed, 9 deselected |
+
+After aligning the F1 sizing fixture exactly with the documented factors,
+`python3 .overnight/tmp/p24_fix1_factor_proofs.py` repeated the five F1 knockouts:
+runner exit 0, the same individual exit-1 results and counts listed above.
+These final factor proofs are in `.overnight/tmp/p24-fix1-final/`, leaving the
+first proof logs intact. Every production/document change is restored.
+
+### Official pages actually re-read in this round
+
+All six GETs returned HTTP 200 on 2026-11-20, with fetched-body hashes matching
+the existing readings. Evidence: `.overnight/tmp/p24-fix1-pages.json` includes
+requested/final addresses, body hashes and the relevant extracted page text.
+No search, sign-in, key, account or provider request was used.
+
+| Reading | Requested official page |
+|---|---|
+| DuckDB P13, Parquet overview | https://duckdb.org/docs/2.0/data/parquet/overview.html |
+| DuckDB P14, Parquet metadata / GeoParquet Metadata | https://duckdb.org/docs/2.0/data/parquet/metadata.html |
+| DuckDB P15, Configuration / enable_geoparquet_conversion | https://duckdb.org/docs/2.0/configuration/overview.html |
+| DuckDB P9, same Configuration address without .html | https://duckdb.org/docs/2.0/configuration/overview |
+| CDSE D5, Processing Units / input bands, dataMask and samples | https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Overview/ProcessingUnit.html |
+| CDSE D8, Evalscript Functions / TILE samples and scenes | https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Evalscript/Functions.html |
+
+### Preserved development incidents
+
+- First records run: exit 1, 4 failed / 1 passed / 7 deselected, including the
+  two stale RN1 subtests, missing clarification and an RN2 selector matching two
+  tables. Scoping the RN2 selector produced the intended stale-cell red:
+  exit 1, 1 failed / 9 deselected; no assertion was removed.
+- First joined two-file run: exit 1, 2 failed / 24 passed / 11 subtests passed.
+  The automatic RN1 extraction had added an extra table delimiter to OI-200;
+  removing it made the row match the review exactly. The other failure was
+  the notes check rejecting a new prose block outside its closed format.
+  A direct notes check exited 1 with five prose failures. Moving that block
+  before Pages read still failed (exit 1, 1 failed / 24 passed / 12 subtests
+  passed); appending it to the existing permitted opening paragraph fixed the
+  formatting without changing the checker. The resulting two-file run exited
+  0, 25 passed / 12 subtests passed.
+- First broad lint exited 1 for RUF001 on the exact review-row en dash in a
+  Python assertion string. Spelling it as a Unicode escape retains the exact
+  expected text; lint then exited 0. No lint configuration changed.
+- Formatter application: exit 0, 1 file reformatted / 835 unchanged. Initial
+  five-file regression before the Unicode spelling cleanup: exit 0, 44 passed /
+  30 subtests passed. Format check: exit 0, 836 files. Mypy: exit 0, 450 source
+  files. Notes check: exit 0, 2 files / 6 libraries / 367 rows. Final checks of
+  the completed change and append-only record are recorded below.
+
+S2-T41's live admission, reviewed real frame/response, justified sample upper
+bound, remaining allowance, complete display credit and independent maker
+confirmation remain for the lead. Boxes three through five stay unticked.
+No whole task, operational budget or slice gate is claimed complete. No new
+numbered open item and no random failure closure is introduced. Strict
+self-review: APPROVE these bounded R1 corrections for handoff, pending another
+maker's confirmation. Muhasabah: PASS for this sourced, bounded handoff; the
+recorded planted reds and development errors are retained, not hidden.
+
+
+### FIX1 final verification — completed code, tests and evidence block
+
+Every command below returned its real exit 0. Locked uv commands used the offline
+cache environment recorded above. Evidence: `.overnight/tmp/p24-fix1-checks.json`.
+
+| Command | Exit | Observed result |
+|---|---:|---|
+| `uv run --locked python -m pytest scripts/tests/test_reference_notes_real.py scripts/tests/test_cdse_key.py scripts/tests/test_cdse_isolation.py custodian/tests/test_cdse_transport.py custodian/tests/test_cdse_cache.py -q -p no:cacheprovider --hypothesis-seed=7392165840` | 0 | 44 passed, 30 subtests passed in 1.63s |
+| `uv run --locked ruff check .` | 0 | All checks passed! |
+| `uv run --locked ruff format --check .` | 0 | 836 files already formatted |
+| `uv run --locked mypy` | 0 | Success: no issues found in 450 source files |
+| `python3 scripts/check_docs.py` | 0 | checked 1139 text files, 123 Markdown files: OK |
+| `python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| `cmp AGENTS.md CLAUDE.md` | 0 | byte-identical |
+| `uv run --locked python scripts/check_reference_notes.py` | 0 | checked 2 files, 6 libraries, 367 rows: OK |
+| `git diff --check` | 0 | byte-identical |

@@ -270,9 +270,16 @@ def bulk_budget(
     metadata: int,
     refresh: int,
     retries: int,
+    tile_samples: int,
     reserve_note: str,
 ) -> Budget:
-    """Reserve every metadata/refresh/retry attempt before bulk acquisition."""
+    """Reserve all attempts using the wire bands and a caller-supplied TILE bound.
+
+    The sample bound is required; the fixed TILE script supplies no upper count.
+    This fixture model does not establish a verified live allowance or formula.
+    """
+    from eii_custodian.publicdata.cdse.wire import INPUT_BANDS
+
     if model is None or free_units is None or free_requests is None:
         raise CdseError("bulk_quota_unknown")
     model.validate()
@@ -294,8 +301,12 @@ def bulk_budget(
             or not 0 < tile.height <= EDGE_CAP
         ):
             raise CdseError("tile_dimensions_refused")
+    # README D5: input bands count, with dataMask uncounted unless alone.
+    counted_bands = len(set(INPUT_BANDS) - {"dataMask"}) or 1
     costs = tuple(
-        model.picture_cost(tile.width * tile.height, bands=3, samples=1)
+        model.picture_cost(
+            tile.width * tile.height, bands=counted_bands, samples=tile_samples
+        )
         for tile in tiles
     )
     pixels = sum(tile.width * tile.height for tile in tiles)
