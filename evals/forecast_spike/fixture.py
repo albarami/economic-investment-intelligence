@@ -15,8 +15,9 @@ from hashlib import sha256
 from pathlib import Path
 from unittest.mock import patch
 
-from .backtest import Run, run
-from .contract import AUTOS, Family, Registration, SeriesSpec
+from .backtest import Predictor, Run, run, stage_verdict
+from .contract import Family, Registration, SeriesSpec
+from .statistical import predictors
 
 
 def _network_forbidden(*_args: object, **_kwargs: object) -> None:
@@ -24,7 +25,7 @@ def _network_forbidden(*_args: object, **_kwargs: object) -> None:
 
 
 def fixture_job(spec: SeriesSpec) -> Run:
-    """Only arithmetic fixtures run here; this is not an inference sandbox."""
+    """Real CPU statistical fits on invented histories, without model weights."""
     registration = Registration((spec,))
     values = tuple(Decimal(10 + 2 * i + i % 3) for i in range(len(spec.periods)))
     with (
@@ -34,7 +35,7 @@ def fixture_job(spec: SeriesSpec) -> Run:
         return run(
             registration,
             {spec.key: values},
-            {key: lambda prefix, _season: prefix[-1] for key in AUTOS},
+            predictors(spec.family.frequency),
             expected_registration_sha256=registration.sha256,
         )
 
@@ -49,7 +50,7 @@ def fixture_specs(document: dict[str, object]) -> tuple[SeriesSpec, ...]:
         "horizon": 1,
         "minimum": 12,
         "levels": {"year": [4, 5], "quarter": [4, 5], "month": [9, 10]},
-        "adapter_kind": "invented_prefix_stubs",
+        "adapter_kind": "statsforecast_prefix_callbacks",
         "generator_version": "invented-trend-cycle-v1",
         "scope": "invented_generated_fixtures_only_no_public_or_release_acceptance",
         "training_strata": ["generated", "post_cutoff", "overlapping_or_unknown"],
@@ -109,6 +110,16 @@ def fixture_specs(document: dict[str, object]) -> tuple[SeriesSpec, ...]:
     return tuple(specs)
 
 
+def fixture_predictors() -> dict[str, Predictor]:
+    def callback(key: str) -> Predictor:
+        def predict(prefix: tuple[Decimal, ...], m: int) -> Decimal:
+            return predictors({1: "year", 4: "quarter", 12: "month"}[m])[key](prefix, m)
+
+        return predict
+
+    return {key: callback(key) for key in ("auto_ets", "auto_theta", "auto_arima")}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workers", type=int, choices=(1, 2), required=True)
@@ -129,18 +140,29 @@ def main() -> int:
             )
             for spec in specs
         },
-        {key: lambda prefix, _season: prefix[-1] for key in AUTOS},
+        fixture_predictors(),
         expected_registration_sha256=registration.sha256,
     )
     print(
         json.dumps(
             {
                 "fixture_only": True,
-                "model_inference": "blocked",
+                "model_inference": "statsforecast_auto_models",
+                "adapter_kind": "statsforecast_prefix_callbacks",
+                "statistical_library": {"name": "statsforecast", "version": "2.1.1"},
+                "challengers": {"chronos_2": "blocked", "timesfm_2_5": "blocked"},
                 "preregistration_file_sha256": sha256(raw).hexdigest(),
                 "registration_sha256": registration.sha256,
                 "runs": [asdict(result) for result in results],
                 "family_summaries": [asdict(summary) for summary in joint.summaries],
+                "statistical_stage_verdicts": [
+                    {
+                        "frequency": family.frequency,
+                        "verdict": stage_verdict(joint, family, "statistical"),
+                    }
+                    for family in dict.fromkeys(spec.family for spec in specs)
+                ],
+                "lock_sha256": sha256(Path("uv.lock").read_bytes()).hexdigest(),
             },
             default=str,
             sort_keys=True,

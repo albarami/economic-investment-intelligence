@@ -2441,7 +2441,12 @@ neither C30's original worked fixture nor production candidates or serving.
 The source/shape audit is
 [S6-T27 audit](../custodian/publicdata/review/s6_t27_forecast_audit.md).
 The committed experiment registration describes invented fixtures only; no
-Public or released-family result or library-model gain is established by it.
+Public or released-family result is established by it. The fix-round fixture
+command fits real AutoETS, AutoTheta and AutoARIMA with StatsForecast 2.1.1
+(written retreat 2.1.0, not tried); the equal-weight combination uses those
+three point outputs. `statistical.py` remains under the experiment only.
+The real-model record is `evals/forecast_spike/evidence/real_statsforecast_run.json`;
+the earlier stub record is retained separately. Neither is a Public claim.
 
 Before fitting, freeze series membership, each source dataset, frequency,
 measure, compatible unit/currency/valuation/classification, provenance stratum,
@@ -2488,9 +2493,19 @@ same equal-weight combination, on the same preregistered targets.
 
 Arithmetic uses C30's fixed fifty-digit half-up Decimal context, separately from
 display rounding. Finite binary floats convert losslessly with
-`Decimal.from_float` before arithmetic. No external inference is implemented or
-accepted while compatible package pins, model revision/file hashes, official
-median API documentation or weights are absent. Chronos-2 precedes TimesFM 2.5.
+`Decimal.from_float` before arithmetic. The statistical adapters fit a fresh
+model on each training prefix, with the family's season length, exact integer
+percentages converted from the registered rational levels, and one CPU thread
+per fit. The documented statistical point output is `mean`; native bounds are
+validated separately and never replace the same-backtest conformal wrap.
+Short-prefix library refusals and missing required calibration retain their
+blocked cells and original denominators. There is no stub or simpler-model
+fallback in the fixture command. Native interval variance may be undefined on
+a short prefix even when the point is finite; non-finite native bounds refuse
+in the native-interval adapter, while only the finite point enters calibration.
+No zero-shot inference is implemented or accepted while compatible package pins,
+model revision/file hashes, official median API documentation or weights are
+absent. Chronos-2 precedes TimesFM 2.5.
 Record each pinned revision's training boundary, its source and uncertainty
 before execution: post-cutoff, overlapping/unknown and generated strata have
 separate verdict scope. Unknown overlap is descriptive only; insufficient
@@ -2498,8 +2513,10 @@ eligible history blocks the uncontaminated Public comparison. Generated fits
 remain placeholders requiring decision 0036's real-source re-fit/re-backtest.
 
 This build is CPU only, with no GPU permission or serving-performance pass.
-Fresh-process and worker-count fixture byte equality proves harness machinery
-only; each actual pinned model still owes that proof and its batch measurements.
+Fresh-process and worker-count byte equality now exercises the real pinned
+statistical models on invented histories; CPU batch measurements are fixture
+evidence only, with no time-budget or serving pass. Actual zero-shot models still
+owe their own determinism proof and batch measurements. Both remain blocked.
 The spike stops at its decision record regardless of outcome. No output enters
 the product, core, a release table or a Fact chip; a later promotion needs its
 own reviewed core design under MTH-100 and rules 16 to 18. Production baseline,

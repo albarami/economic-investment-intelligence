@@ -43811,3 +43811,139 @@ pyproject, lock and pins was empty. No commit, push, real model result or full
 method acceptance is claimed. Actual Auto model integration is also blocked by
 the absent statsforecast dependency; Auto-labelled fixture callbacks remain
 stubs. The return proposes the remaining pins, command authority and open items.
+
+
+## S6-T27 — real Auto-model adapters and temporary-root correction, fix round one, 2026-11-20
+
+Maker: OpenAI Codex; model GPT-6 (exact runtime variant not exposed). Builder:
+principal methods architect for forecasting, conformal evaluation and CPU
+challengers. Strict self-review: statistical reviewer rejecting leaked windows,
+retrospective selection, empty or pooled denominators, unpinned inference,
+environment dependence, surrogate-model passes, skips and raised bounds.
+Different-maker implementation review remains pending with the lead.
+Skills loaded: project-orientation, task-standards, github-flow,
+sanad-provenance, strict-reviewer and muhasabah-gate. Requested
+test-driven-development, systematic-debugging and verification-before-completion
+were unavailable; their plain-meaning procedures were applied.
+
+Authority: TASKS.md S6-T27; decision 0038 items 2 and 7; supplied L-1228 points
+1 to 13 accepting F1 to F4; the supplied fix-round brief and lead notes.
+Input HEAD `cd4ed344f5009f470aace646dacd9e630099b707`; changes remain uncommitted.
+`git switch -c fix/forecast-spike-s6-t27-r1` exited 128: ref store read-only.
+No stage, commit, push, merge or write-boundary bypass was attempted.
+
+Cause/fix: the weights report's promised fixture-folder exception was absent
+and masked by a local TMPDIR. An explicit --fixture-temp-root now admits only
+an existing directory strictly below the system temporary root, with weights
+strictly below it; repository paths excluding data and .private remain accepted.
+Seven outside/forbidden/broad/nonexistent-root plants and the default-path
+control accompany the original admission tests. Red exit 1: 8 failed, 27 passed;
+green exit 0: 35 passed. Both final temporary-directory environments pass.
+
+The fixture command's Auto-labelled prefix-last functions are replaced by real
+StatsForecast 2.1.1 AutoETS, AutoTheta and AutoARIMA callbacks; retreat 2.1.0
+was supplied by the lead and is untried. Each fit gets only its training prefix,
+family season length and exact level. Binary outputs convert losslessly to
+Decimal; CPU thread settings and threadpoolctl enforce one thread per fit.
+The existing harness combines the three real points equally. Named test doubles
+remain in unit tests only. Native intervals are validated separately; the
+original same-backtest prospective conformal intervals, scoring, targets and
+minimum remain unchanged. Chronos-2 and TimesFM 2.5 remain blocked; no weight
+fetch, network, private input, data-cache read or package installation occurred.
+
+New-adapter red evidence: missing module exit 2, then 26 failed against the
+unimplemented interface (exit 1). Tiny-prefix library refusals caused two
+intermediate exits 1 with 1 failed and 25 passed; newly introduced all-fits-exist
+expectations were replaced by explicit refusal/blocked-cell assertions. No
+original bound or core assertion changed. Final adapter module: exit 0,
+30 passed and 8 warnings. A planted full-history callback invocation made the
+real suffix test fail: exit 1, 1 failed, 29 deselected; restoring prefix slicing
+made it pass: exit 0, 1 passed, 29 deselected. Harness bytes were restored.
+Process-test red: exit 1 for the old blocked inference label, then exit 1 for
+an incorrect complete-coverage expectation on tiny prefixes. Actual library
+refusals now retain blocked cells without fallback or changed targets.
+
+Environment: Python 3.14.6, Linux x86_64;
+coreforecast 0.0.20, numpy 2.5.4, scipy 1.18.1, statsforecast 2.1.1, threadpoolctl 3.8.0.
+UV_OFFLINE=1, EII_DECISION_PROVIDER=none, PYTHONDONTWRITEBYTECODE=1;
+Hypothesis seed 27 and generator seed 27; no world build or world seed.
+Full command:
+`uv run --locked python -m pytest scripts/tests/test_forecast_spike.py scripts/tests/test_forecast_spike_adapters.py scripts/tests/test_forecast_spike_process.py scripts/tests/test_forecast_spike_registration.py scripts/tests/test_forecast_spike_statistical.py core/tests/test_forecast_backtest.py core/tests/test_forecast_models.py -q -s -p no:cacheprovider --hypothesis-seed=27`.
+TMPDIR unset: exit 0, 158 passed, 8 warnings in 53.26 seconds. TMPDIR set to a
+newly created external temporary directory: exit 0, 158 passed, 8 warnings in
+53.45 seconds. Directory removed. The orchestration initially exited 1 after
+the successful unset run because other temporary variables still chose an
+inside-checkout folder; a subsequent explicit system-temporary attempt exited 1
+before tests because that filesystem is read-only. The external proof used the
+explicitly writable runner-cache temporary area and removed its own folder.
+These are recorded setup causes, not random test failures or retries.
+
+New evidence: `evals/forecast_spike/evidence/real_statsforecast_run.json` and
+`evals/forecast_spike/evidence/real_statsforecast_external_tmp_run.json`.
+Each records four fresh CPU processes (workers one and two), candidate by family
+by horizon results, complete/covered counts, CPU batch time, warning messages
+and largest-worker peak memory. Both environments have identical result SHA-256
+`24cac80aa9c244008584cfdf3e3c5c17e4bfbada3344f24e7067802f7e8f1160`.
+Preregistration-file SHA-256 `6825c77b6dc5087f5a3e06ff52910f23b86e0a1b0ad4dc767e58272b8699a14c`;
+measurement-contract SHA-256 `e6c7133625aa22dfd229264753834d9749c31131c393228e7753cf340a0430b3`;
+lock SHA-256 `a52942b7065dbe4bc33f714ec1d9192150b2417c4193d4d9fef8338a064e1dda`.
+Exact per-cell result and batch-time tables are in the two evidence files and
+`.overnight/RETURN.md`; they are fixture evidence only. Code-computed statistical
+stage: annual blocked, quarterly blocked, monthly pass on invented histories.
+Real tiny-prefix refusals block some registered calibration cells. No Public
+claim, source acceptance, production promotion or serving/budget pass follows.
+The old invented_run.json is unchanged. Native variance warnings are retained.
+
+Document 07 and the experiment README describe the real adapter boundary.
+The reference notes and pins record the supplied exact and retreat versions and
+the official models-page extract read by the lead on 2026-11-20; installed
+signatures/docstrings were inspected offline. No worker page fetch. The closed
+reference schema now explicitly validates the StatsForecast section/address.
+Reference registration red: exit 1, 1 failed, 12 passed. Schema-count migration
+intermediates: 93 failed, 44 passed, 216 subtests passed, then 1 failed,
+44 passed, 308 subtests passed. Final reference tests: exit 0, 31 passed,
+309 subtests passed. An additional reference/registration/admission run:
+exit 0, 79 passed, 309 subtests passed. Structural row counts reflect the added
+library; no plant, checking rule or result baseline was removed or refreshed.
+
+Initial lint exit 1, three findings; formatter applications exited 0 (seven,
+then two files reformatted); initial mypy exit 1, five errors in four files.
+Before this append: ruff check exit 0; format check exit 0, 826 files; mypy
+exit 0, 448 source files; uv lock --check exit 0, 91 packages; reference notes
+exit 0, two files, seven libraries, 367 rows; check_versions exit 0, 71 components;
+docs exit 0, 1125 text files, 121 Markdown files; tree exit 0, eight rules;
+AGENTS/CLAUDE cmp exit 0; diff whitespace exit 0. Final post-record checks are
+appended below and recorded in RETURN.md. Core, backtest.py, contract.py,
+pyproject.toml, uv.lock, both rules files and the old evidence record are unchanged.
+No ./eii test, skip, timeout increase, assertion tolerance change or mutation
+campaign was used. Direct fixture execution remains inside pytest proofs only.
+
+Proposed commands and open items are in RETURN.md: lead rule-44 admission of
+the fixture/model-report forms, prospective handling of tiny-prefix refusals,
+real zero-shot pins/weights/median/boundary proof, existing Public/released-input
+blockers and source-swap/go-live obligations, forecast-group provisioning for
+hosted jobs under their workflow-fingerprint review, lead commit and independent
+review. No task acceptance box was changed. Self-audit PASS for the bounded
+correction and its truthful fixture evidence; no full method or hosted-readiness
+approval is claimed.
+
+### S6-T27 fix round one — post-record verification
+
+All ten post-record commands exited 0: `uv run --locked ruff check .` (all
+checks passed); `uv run --locked ruff format --check .` (826 files);
+`uv run --locked mypy` (448 source files); `uv lock --check` (91 packages);
+`uv run --locked python scripts/check_reference_notes.py` (two files, seven
+libraries, 367 rows); `uv run --locked python scripts/check_versions.py`
+(71 components); `python3 scripts/check_docs.py` (1126 text files, 121 Markdown
+files); `python3 scripts/check_tree.py` (eight rules); `cmp AGENTS.md CLAUDE.md`
+(byte-identical); `git diff --check` (no output). Exact command outputs are in
+`.overnight/fix1-final-checks.json`; the two full test runs and timings remain
+in `.overnight/fix1-checks.jsonl` and the separate real-model evidence records.
+A preservation and text audit exited 0: original PROGRESS.md prefix preserved;
+registration differs only in adapter kind; core, backtest/contract, manifests,
+lock, both rules files and old evidence unchanged; result/registration/lock
+hashes, cell counts and blocked challenger labels verified. Added text contains
+no absolute local path, e-mail or forbidden bare digit run. No code changed
+after the two 158-pass regression runs. The final return carries per-item
+red/green evidence, all candidate/family/horizon cells, CPU timings, proposed
+commands and open items. Lead commit and different-maker review remain pending.

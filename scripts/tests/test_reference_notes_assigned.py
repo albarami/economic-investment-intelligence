@@ -51,10 +51,13 @@ Plant = Callable[[Path], None]
 Expect = Callable[[Path], list[str]]
 
 
-def _summary(rows: int, failures: int | str) -> str:
+def _summary(rows: int, failures: int | str, additional_library_rows: int) -> str:
+    # Existing plants use the original six-library fixture's counts. The new
+    # StatsForecast section contributes seven independently validated rows.
+    rows += additional_library_rows
     if failures == "OK":
-        return f"checked 2 files, 6 libraries, {rows} rows: OK"
-    return f"checked 2 files, 6 libraries, {rows} rows: {failures} failure(s)"
+        return f"checked 2 files, 7 libraries, {rows} rows: OK"
+    return f"checked 2 files, 7 libraries, {rows} rows: {failures} failure(s)"
 
 
 def _font_table(root: Path) -> int:
@@ -95,10 +98,13 @@ class NotesAssigned(unittest.TestCase):
         *,
         rows: int = 81,
         failures: int | str = "OK",
+        additional_library_rows: int = 7,
     ) -> None:
         lines = sup.run(root)
         self.assertEqual(sup.fails(lines), expect(root))
-        self.assertEqual(sup.summary(lines), _summary(rows, failures))
+        self.assertEqual(
+            sup.summary(lines), _summary(rows, failures, additional_library_rows)
+        )
 
     def test_assigned_section_and_opening(self) -> None:
         with self.subTest("a"):
@@ -164,6 +170,7 @@ class NotesAssigned(unittest.TestCase):
                 ],
                 rows=45,
                 failures=1,
+                additional_library_rows=0,
             )
         with self.subTest("d"):
             root = self._plant(

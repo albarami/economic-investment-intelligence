@@ -1,4 +1,4 @@
-"""S6-T27 plants: invented values only; never a public cache or real fit."""
+"""S6-T27 plants: invented values only; no Public cache; prefix-last functions here are named test doubles."""
 
 from dataclasses import replace
 from decimal import Decimal, getcontext, localcontext
@@ -54,7 +54,7 @@ def generated(length: int = 28) -> tuple[Decimal, ...]:
     return tuple(D(10 + 2 * i + i % 3) for i in range(length))
 
 
-def predictors() -> dict[str, Predictor]:
+def prefix_last_test_doubles() -> dict[str, Predictor]:
     return {name: lambda prefix, _season: prefix[-1] for name in AUTOS}
 
 
@@ -67,7 +67,7 @@ def execute(
     return run(
         registration,
         values or {"syn-a": generated()},
-        predictors() if supplied is None else supplied,
+        prefix_last_test_doubles() if supplied is None else supplied,
         expected_registration_sha256=registration.sha256,
     )
 
@@ -100,7 +100,7 @@ def test_changed_preregistration_cannot_reuse_old_hash() -> None:
         run(
             changed,
             {"syn-a": generated()},
-            predictors(),
+            prefix_last_test_doubles(),
             expected_registration_sha256=original.sha256,
         )
 
@@ -212,7 +212,7 @@ def test_minimum_twelve_is_separate_from_c30_minimum() -> None:
 
 
 def test_cross_candidate_pooling_cannot_rescue_failed_coverage() -> None:
-    supplied = predictors()
+    supplied = prefix_last_test_doubles()
     supplied["auto_ets"] = lambda prefix, _season: prefix[-1] + D(10000)
     # A jump beyond all earlier errors produces a miss in the bad candidate.
     values = (*generated()[:27], D(20000))
@@ -241,7 +241,7 @@ def test_strict_beat_rejects_ties() -> None:
 
 
 def test_three_of_four_coverage_cannot_pass_four_fifths() -> None:
-    supplied = predictors()
+    supplied = prefix_last_test_doubles()
     supplied["auto_ets"] = lambda prefix, _season: (
         prefix[-1] + 1 - (2 if len(prefix) >= 15 else 1)
     )
@@ -286,7 +286,7 @@ def test_public_revision_break_cannot_be_stitched() -> None:
 
 
 def test_late_missing_prediction_is_not_an_outcome_dependent_exclusion() -> None:
-    supplied = predictors()
+    supplied = prefix_last_test_doubles()
 
     def missing(prefix: tuple[Decimal, ...], _season: int) -> Decimal:
         if len(prefix) == 26:
@@ -443,7 +443,7 @@ def test_observations_require_exact_decimal_values(value: object) -> None:
         run(
             Registration((spec(),)),
             {"syn-a": cast(tuple[Decimal, ...], (value,) * 28)},
-            predictors(),
+            prefix_last_test_doubles(),
             expected_registration_sha256=Registration((spec(),)).sha256,
         )
 

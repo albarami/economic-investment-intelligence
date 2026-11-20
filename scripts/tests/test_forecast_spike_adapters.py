@@ -2,6 +2,7 @@
 
 import json
 import socket
+import tempfile
 from dataclasses import replace
 from datetime import date
 from hashlib import sha256
@@ -208,9 +209,81 @@ def test_offline_model_command_returns_nonzero_blocked_report(
     with patch.object(
         socket, "socket", side_effect=AssertionError("network forbidden")
     ):
-        code = check_models(["--weights-root", str(tmp_path / "absent")])
+        code = check_models(
+            [
+                "--weights-root",
+                str(tmp_path / "absent"),
+                "--fixture-temp-root",
+                str(tmp_path),
+            ]
+        )
     assert code == 2
     result = json.loads(capsys.readouterr().out)
     assert list(result["models"]) == ["chronos_2", "timesfm_2_5"]
     assert all(row["status"] == "blocked" for row in result["models"].values())
     assert result["production_promotion"] is False
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "outside",
+        "data",
+        "private",
+        "fixture_data",
+        "fixture_private",
+        "wrong_fixture",
+        "broad_fixture",
+    ],
+)
+def test_weights_root_guard_plants(
+    kind: str, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    weights = {
+        "outside": root.parent / "syn-unapproved-weights",
+        "data": root / "data/syn-unread",
+        "private": root / ".private/syn-unread",
+    }.get(kind, tmp_path / "absent")
+    args = ["--weights-root", str(weights)]
+    if kind == "fixture_data":
+        args = [
+            "--weights-root",
+            str(tmp_path / "data/syn-unread"),
+            "--fixture-temp-root",
+            str(tmp_path),
+        ]
+    elif kind == "fixture_private":
+        args = [
+            "--weights-root",
+            str(tmp_path / ".private/syn-unread"),
+            "--fixture-temp-root",
+            str(tmp_path),
+        ]
+    elif kind == "wrong_fixture":
+        args += ["--fixture-temp-root", str(tmp_path / "absent-root")]
+    elif kind == "broad_fixture":
+        args += ["--fixture-temp-root", tempfile.gettempdir()]
+    with patch(
+        "evals.forecast_spike.check_models.readiness",
+        side_effect=AssertionError("must refuse before reading"),
+    ):
+        with pytest.raises(SystemExit) as exc:
+            check_models(args)
+    assert exc.value.code == 2
+    assert (
+        "weights root must be in the repository, excluding data and .private, "
+        "or strictly below --fixture-temp-root, an existing directory strictly "
+        "below the system temporary root; data and .private are excluded in both cases"
+        in capsys.readouterr().err
+    )
+
+
+def test_weights_default_experiment_path_is_accepted(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    assert check_models([]) == 2
+    assert all(
+        row["status"] == "blocked"
+        for row in json.loads(capsys.readouterr().out)["models"].values()
+    )

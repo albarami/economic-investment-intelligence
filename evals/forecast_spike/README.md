@@ -12,13 +12,19 @@ score and procedure” specifies the arithmetic. Each result carries its contrac
 and input hashes. The original C30 score, interval and candidate list are intact.
 
 `preregistration.json` preregisters invented annual, quarterly and monthly
-fixtures. The generated formula and Auto-labelled prefix stubs are declared as
-fixtures; they are not implementations or measurements of AutoETS, AutoTheta or
-AutoARIMA. `fixture.py` proves the harness in fresh CPU processes with worker
+fixtures. The generated formula stays invented. `statistical.py` now fits real
+AutoETS, AutoTheta and AutoARIMA through StatsForecast 2.1.1 (retreat 2.1.0,
+not tried), as fixed prefix callbacks. The fixture command has no stub route;
+prefix-last test doubles live only in named unit-test helpers. `fixture.py`
+checks the real statistical adapters in fresh CPU processes with worker
 counts one and two. Stable result bytes exclude process, timing and memory
-metadata, which are written separately to stderr. Memory is the largest worker's
+metadata, which are written separately to stderr. Library warnings are retained
+in that stream and summarised in the evidence. BLAS/OpenMP environment limits
+are set before library imports, and threadpoolctl limits each actual fit to one
+thread, including when the caller has already loaded a wider thread pool.
+Memory is the largest worker's
 peak, not aggregate process memory. No batch budget or serving-performance pass
-is asserted. The socket patches in the arithmetic workers are fixture guards,
+is asserted. The socket patches in the fixture workers are fixture guards,
 not a security sandbox or permission to execute an unreviewed model.
 
 `adapters.py` contains CPU/pin/hash admission and training-boundary classification
@@ -46,11 +52,23 @@ continuity, revision mappings and dependency inputs keep their families blocked.
 Calculation-level invented substitution does not establish source-to-release
 parity, actual volumes or the real-source go-live gate.
 
-`evidence/invented_run.json` records the initial fixture run: registration and
+`evidence/invented_run.json` preserves the initial stub fixture run: registration and
 result hashes, candidate/family scores and coverage counts, CPU batch times and
 worker peaks. Its workload includes the parallel series jobs and their joint
 family scoring. It is experimental evidence, not a test baseline or a library
-performance result.
+performance result. `evidence/real_statsforecast_run.json` separately records
+the real-model run; it never replaces a test baseline. Tiny prefixes can be
+refused by the real library. Missing required forecasts/calibration keep cells
+blocked on the original registered targets; no fallback, later start, reduced
+minimum or new target selection is applied.
+
+Every actual fit uses the family's season length and requests exactly 80 or 90
+from its rational preregistered level. Native mean/interval arrays are checked
+and converted losslessly from their finite binary floats to Decimal. The API
+names the statistical point `mean`. The harness takes only the finite point;
+its intervals remain the candidate's own prospective conformal residuals.
+Native interval variance can be undefined on short prefixes; the separate native
+interval adapter refuses non-finite bounds and never supplies them to scoring.
 
 ## Validation and proposed command contracts
 
@@ -64,5 +82,9 @@ as internal invented-fixture proofs under L-1228 point 8.
 The return proposes direct fixture and model-report commands for rule 44.
 **The lead must add them to both rules files before direct execution.** No new
 command is authorised by this README. Model fetching/inference commands and
-package installation are intentionally absent. The weights report accepts only
-an experiment folder or an invented temporary folder inside the repository.
+package installation are intentionally absent. The weights report accepts a
+repository path excluding `data` and `.private`. Tests may explicitly supply
+`--fixture-temp-root`: an existing fixture directory strictly below the system
+temporary root (including a configured TMPDIR); weights must then lie strictly
+below that named directory. Forbidden components remain forbidden, the entire
+temporary root is refused, and arbitrary outside paths remain refused.

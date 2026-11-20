@@ -32,7 +32,7 @@ class RealNotes(unittest.TestCase):
     def test_real_notes_pass(self) -> None:
         lines = sup.run(REPO)
         self.assertEqual(len(lines), 1)
-        self.assertTrue(lines[0].startswith("checked 2 files, 6 libraries, "))
+        self.assertTrue(lines[0].startswith("checked 2 files, 7 libraries, "))
         self.assertTrue(lines[0].endswith(" rows: OK"))
         count = int(lines[0].split(", ")[2].split()[0])
         self.assertGreater(count, 0)
@@ -47,7 +47,7 @@ class RealNotes(unittest.TestCase):
         with self.subTest("clean"):
             proc = sup.cli(["--root", str(root)], Path.cwd(), {"PATH": ""})
             self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-            self.assertEqual(proc.stdout, "checked 2 files, 6 libraries, 81 rows: OK\n")
+            self.assertEqual(proc.stdout, "checked 2 files, 7 libraries, 88 rows: OK\n")
             self.assertEqual(proc.stderr, "")
         sup.edit(root, tables.WEB, link, "../docs/10_FRONTEND.md")
         with self.subTest("failure"):
@@ -56,7 +56,7 @@ class RealNotes(unittest.TestCase):
             self.assertEqual(
                 proc.stdout,
                 f"FAIL cross-link: {tables.WEB}:1: no link to {link}\n"
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)\n",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)\n",
             )
             self.assertEqual(proc.stderr, "")
         with self.subTest("bogus"):
@@ -87,7 +87,7 @@ class RealNotes(unittest.TestCase):
         with self.subTest("empty-env"):
             proc = sup.cli(["--root", str(good)], hostile, {})
             self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-            self.assertTrue(proc.stdout.startswith("checked 2 files, 6 libraries, "))
+            self.assertTrue(proc.stdout.startswith("checked 2 files, 7 libraries, "))
             self.assertTrue(proc.stdout.endswith(" rows: OK\n"))
             self.assertEqual(proc.stderr, "")
         with self.subTest("hostile-pythonpath"):
@@ -116,16 +116,16 @@ class RealNotes(unittest.TestCase):
 
     def test_tables_have_their_sizes(self) -> None:
         self.assertEqual(len(tables.LIBRARIES[tables.WEB]), 3)
-        self.assertEqual(len(tables.LIBRARIES[tables.DOCS]), 3)
+        self.assertEqual(len(tables.LIBRARIES[tables.DOCS]), 4)
         fields = [len(lib.fields) for lib in tables.LIBRARIES[tables.WEB]] + [
             len(lib.fields) for lib in tables.LIBRARIES[tables.DOCS]
         ]
-        self.assertEqual(fields, [6, 6, 3, 7, 4, 5])
+        self.assertEqual(fields, [6, 6, 3, 7, 4, 5, 1])
         pin_rows = [len(lib.rows) for lib in tables.LIBRARIES[tables.WEB]] + [
             len(lib.rows) for lib in tables.LIBRARIES[tables.DOCS]
         ]
-        self.assertEqual(pin_rows, [2, 4, 2, 1, 3, 2])
-        self.assertEqual(len(tables.OFFICIAL), 13)
+        self.assertEqual(pin_rows, [2, 4, 2, 1, 3, 2, 1])
+        self.assertEqual(len(tables.OFFICIAL), 14)
         self.assertEqual(len(tables.CLAIM_WORDS), 13)
         self.assertEqual(len(tables.RULES), 23)
         self.assertEqual(len(tables.TABLES), 5)

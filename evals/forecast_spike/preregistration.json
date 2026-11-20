@@ -6,7 +6,7 @@
   "minimum": 12,
   "levels": {"year": [4, 5], "quarter": [4, 5], "month": [9, 10]},
   "candidates": ["seasonal_naive", "drift", "simple_exponential_smoothing", "auto_ets", "auto_theta", "auto_arima", "equal_weight", "nested_policy"],
-  "adapter_kind": "invented_prefix_stubs",
+  "adapter_kind": "statsforecast_prefix_callbacks",
   "generator_version": "invented-trend-cycle-v1",
   "series": [
     {"key": "syn-annual-a", "frequency": "year", "length": 28, "first_target": 6},

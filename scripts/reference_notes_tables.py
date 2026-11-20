@@ -141,6 +141,7 @@ OFFICIAL = (
     ("github.com", "/carbon-design-system/"),
     ("raw.githubusercontent.com", "/carbon-design-system/"),
     ("platform.claude.com", "/docs/en/"),
+    ("nixtlaverse.nixtla.io", "/statsforecast/"),
 )
 
 
@@ -227,6 +228,11 @@ LIBRARIES: dict[str, tuple[Library, ...]] = {
                 "inference geographies",
                 "minimum cacheable prefix",
             ),
+        ),
+        Library(
+            "StatsForecast 2.1",
+            ("statsforecast",),
+            ("exact pin and written retreat pin",),
         ),
     ),
 }

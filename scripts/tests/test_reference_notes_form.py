@@ -54,7 +54,7 @@ class NotesForm(unittest.TestCase):
         folder, root = _root()
         self.addCleanup(folder.cleanup)
         lines = sup.run(root)
-        self.assertEqual(lines, ["checked 2 files, 6 libraries, 81 rows: OK"])
+        self.assertEqual(lines, ["checked 2 files, 7 libraries, 88 rows: OK"])
 
     def test_inputs_missing_and_malformed(self) -> None:
         cases: list[tuple[str, Callable[[Path], None], list[str], str]] = [
@@ -62,43 +62,43 @@ class NotesForm(unittest.TestCase):
                 "web-missing",
                 lambda r: _unlink(r, WEB),
                 [sup.fail_line(WEB, "input", None, "missing")],
-                "checked 2 files, 6 libraries, 36 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 43 rows: 1 failure(s)",
             ),
             (
                 "docs-missing",
                 lambda r: _unlink(r, DOCS),
                 [sup.fail_line(DOCS, "input", None, "missing")],
-                "checked 2 files, 6 libraries, 45 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 45 rows: 1 failure(s)",
             ),
             (
                 "web-dir",
                 lambda r: _unlink_mkdir(r, WEB),
                 [sup.fail_line(WEB, "input", None, "not a regular file")],
-                "checked 2 files, 6 libraries, 36 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 43 rows: 1 failure(s)",
             ),
             (
                 "docs-symlink",
                 _docs_symlink,
                 [sup.fail_line(DOCS, "input", None, "not a regular file")],
-                "checked 2 files, 6 libraries, 45 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 45 rows: 1 failure(s)",
             ),
             (
                 "web-utf8",
                 lambda r: sup.write(r, WEB, b"\xff\xfe"),
                 [sup.fail_line(WEB, "input", None, "not UTF-8")],
-                "checked 2 files, 6 libraries, 36 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 43 rows: 1 failure(s)",
             ),
             (
                 "docs-empty",
                 lambda r: sup.write(r, DOCS, "   \n"),
                 [sup.fail_line(DOCS, "input", None, "empty")],
-                "checked 2 files, 6 libraries, 45 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 45 rows: 1 failure(s)",
             ),
             (
                 "pins-missing",
                 lambda r: _unlink(r, tables.PINS),
                 [sup.fail_line(tables.PINS, "input", None, "missing")],
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
             ),
             (
                 "pins-decode",
@@ -108,13 +108,13 @@ class NotesForm(unittest.TestCase):
                         tables.PINS, "input", None, "cannot be parsed (TOMLDecodeError)"
                     )
                 ],
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
             ),
             (
                 "pins-no-rows",
                 lambda r: sup.write(r, tables.PINS, "schema = 1\n"),
                 [sup.fail_line(tables.PINS, "input", None, "no component rows")],
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
             ),
             (
                 "pins-no-name",
@@ -128,13 +128,13 @@ class NotesForm(unittest.TestCase):
                         tables.PINS, "input", None, "a component row has no name"
                     )
                 ],
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
             ),
             (
                 "pins-dir",
                 _pins_unlink_mkdir,
                 [sup.fail_line(tables.PINS, "input", None, "not a regular file")],
-                "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
             ),
         ]
         for name, plant, fails, summ in cases:

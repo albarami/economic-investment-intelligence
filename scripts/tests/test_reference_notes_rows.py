@@ -1074,7 +1074,7 @@ class NotesRows(unittest.TestCase):
                         n_p97,
                         'S1: READ source "P97" is not a page id of this section',
                     ),
-                    "checked 2 files, 6 libraries, 81 rows: 5 failure(s)",
+                    "checked 2 files, 7 libraries, 88 rows: 5 failure(s)",
                 ],
             )
         with self.subTest(label="docs-p97-only"):
@@ -1098,7 +1098,7 @@ class NotesRows(unittest.TestCase):
                         n,
                         'S1: READ source "P97" is not a page id of this section',
                     ),
-                    "checked 2 files, 6 libraries, 81 rows: 1 failure(s)",
+                    "checked 2 files, 7 libraries, 88 rows: 1 failure(s)",
                 ],
             )
         with self.subTest(label="cross-link-before-date-header"):
