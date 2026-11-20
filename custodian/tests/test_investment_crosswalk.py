@@ -1,4 +1,4 @@
-"""Invented identifier crosswalks; no fetched name or value is a fixture."""
+"""Invented project crosswalks and a source-receipted code-only target."""
 
 from __future__ import annotations
 
@@ -189,6 +189,84 @@ def test_review_reference_digit_runs_are_refused(tmp_path: Path, digits, prefix)
     result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
     assert isinstance(result, InvestmentFailure), result
     assert result.check == "crosswalk_review"
+
+
+@pytest.mark.parametrize("digits", [7, 9, 10, 12])
+@pytest.mark.parametrize("prefix", ["", "invented_"])
+def test_review_reference_other_digit_runs_are_accepted(tmp_path: Path, digits, prefix):
+    """INVENTED near-miss references stay valid; only eight and eleven refuse."""
+    c, _page, row, document, path, _good = specimen(tmp_path)
+    row["review_reference"] = prefix + "1" * digits
+    path.write_text(json.dumps(document), encoding="utf-8")
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(result, InvestmentFailure), result
+    assert result.mappings[0].review_reference == row["review_reference"]
+
+
+def test_municipality_code_target_source_chain():
+    """PO-S2-108's lead extract supplies codes and receipt fields, never names."""
+    import eii_custodian.publicdata.investment_crosswalk as c
+
+    source_hash = "12226c26959a5aa378bf979ce782c237629e1882d12c00879b62cae5ffac752f"
+    expected = "municipality_code,source_id,source_sha256,retrieved_utc\n" + "".join(
+        f"{code},bnd_zone_2020,{source_hash},2026-11-20T11:27:25Z\n"
+        for code in ("1", "2", "3", "4", "5", "6", "7", "8")
+    )
+    assert (c._REVIEW / "municipality_codes.csv").read_bytes() == expected.encode()
+
+
+@pytest.mark.parametrize(
+    ("plant", "check"),
+    [
+        ("control", None),
+        ("absent_code", "crosswalk_target"),
+        ("manufactured_key", "crosswalk_target"),
+        ("names_file", "name_derived_key"),
+        ("changed_byte", "crosswalk_target_hash"),
+    ],
+)
+def test_municipality_code_target(tmp_path: Path, plant, check):
+    """An invented project uses only a pinned member of the supplied code list."""
+    c, page, row, document, path, _good = specimen(tmp_path)
+    target = (c._REVIEW / "municipality_codes.csv").read_bytes()
+    target_path = tmp_path / "municipality_codes.csv"
+    target_path.write_bytes(target)
+    row.update(
+        column="municipality_code",
+        target_key="3",
+        target_resource=target_path.name,
+        target_sha256=sha256_hex(target),
+    )
+    path.write_text(json.dumps(document), encoding="utf-8")
+    control = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(control, InvestmentFailure), control
+    assert control.mappings[0].target_key == "3"
+    spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
+    parsed = parse_fdi(
+        page.body,
+        replace(spec.dashboard, crosswalk=control),
+        replace(b._envelope(), page_sha256=sha256_hex(page.body)),
+    )
+    assert not isinstance(parsed, InvestmentFailure), parsed
+    assert parsed[0][0]["municipality_code"] == "3"
+    assert parsed[0][0]["mapping_coverage"]["municipality_code"] == "reviewed"
+
+    if plant == "control":
+        return
+    if plant == "absent_code":
+        row["target_key"] = "9"
+    elif plant == "manufactured_key":
+        row["target_key"] = "SYN-area-AA-0001"
+    elif plant == "names_file":
+        # Even identical code-only bytes cannot make the names resource valid.
+        (tmp_path / "municipality_names.csv").write_bytes(target)
+        row["target_resource"] = "municipality_names.csv"
+    else:
+        target_path.write_bytes(target.replace(b"3,bnd_", b"9,bnd_", 1))
+    path.write_text(json.dumps(document), encoding="utf-8")
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == check
 
 
 @pytest.mark.parametrize(
