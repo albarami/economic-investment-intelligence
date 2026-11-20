@@ -32,7 +32,7 @@ from .snapshot_policy import (
     configured_root,
     safe_child,
 )
-from .snapshot_receipt import validate_receipt
+from .snapshot_receipt import same_boundary_chain, validate_receipt
 from .snapshot_scheme import read_scheme
 
 
@@ -68,6 +68,12 @@ def reviewed_inputs(
             or set(body.get("dates", {})) != set(SERVICES)
         ):
             raise SnapshotRefusal("release_selection_incomplete")
+        boundary = read_checked(
+            safe_child(root, "boundary-source"), body["boundary_source"]
+        )
+        validate_receipt(boundary, "boundary-source", "boundary-source")
+        if boundary.sha256 != body["boundary_sha256"]:
+            raise SnapshotRefusal("release_selection_identity")
         selections = []
         for date in SERVICES:
             levels = body["dates"][date]
@@ -102,6 +108,14 @@ def reviewed_inputs(
                     or enumeration["boundary_sha256"] != body["boundary_sha256"]
                 ):
                     raise SnapshotRefusal("release_selection_identity")
+                projected = read_checked(
+                    safe_child(root, f"{date}/level-{level:02d}/inputs/boundary"),
+                    enumeration["inputs"]["boundary"],
+                )
+                validate_receipt(projected, "boundary", date)
+                same_boundary_chain(projected.sidecar, boundary.sidecar)
+                if projected.sidecar["upstream_sha256"] != boundary.sha256:
+                    raise SnapshotRefusal("release_selection_identity")
                 metadata = read_checked(
                     safe_child(root, f"{date}/level-{level:02d}/inputs/metadata"),
                     enumeration["metadata_sha256"],
@@ -109,23 +123,19 @@ def reviewed_inputs(
                 if set(levels) != {str(n) for n in read_scheme(metadata.body).levels}:
                     raise SnapshotRefusal("release_selection_incomplete")
                 selections.append(selection)
-        boundary = read_checked(
-            safe_child(root, "boundary-source"), body["boundary_source"]
-        )
-        validate_receipt(boundary, "boundary-source", "boundary-source")
-        if boundary.sha256 != body["boundary_sha256"]:
-            raise SnapshotRefusal("release_selection_identity")
         boundary_files = (
             (boundary.path, boundary.sha256),
             (boundary.receipt_path, digest(boundary.receipt_path.read_bytes())),
         )
+        manifest_files = (
+            (manifest.path, manifest.sha256),
+            (manifest.receipt_path, digest(manifest.receipt_path.read_bytes())),
+        )
         selections[0] = replace(
-            selections[0], files=selections[0].files + boundary_files
+            selections[0], files=selections[0].files + boundary_files + manifest_files
         )
         # Shared bytes bind once; never the acquisition directory or its mutable indexes.
         files = {sha: path for selection in selections for path, sha in selection.files}
-        files[manifest.sha256] = manifest.path
-        files[digest(manifest.receipt_path.read_bytes())] = manifest.receipt_path
         return (
             root,
             tuple(selections),

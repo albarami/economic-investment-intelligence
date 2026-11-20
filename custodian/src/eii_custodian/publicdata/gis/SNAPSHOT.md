@@ -62,7 +62,9 @@ production name remains machine-global and is explicitly passed by the superviso
 
 Metadata activation checks QNG EPSG:2932, origin, extent, every declared level through the cap and
 decreasing resolutions, approximately 0.53 m at level ten, 512-pixel JPEG. Each tile's JPEG frame header must also
-declare those dimensions; the reader checks the header and hashes without decoding pixels. All dates must
+declare those dimensions; the bounded reader then forces a full pixel read with the pinned
+rasterio/GDAL JPEG driver. Missing SOS, missing quantization or invalid scan structure is
+`tile_format_or_gap`, never a present member. The same decoder runs during shard verification. All dates must
 have a compatible scheme. Old export scales are not tile levels. The boundary is projected
 with the installed rasterio adapter and every intersecting tile is enumerated, including
 coastal/island intersections. Actual metadata, coverage and disk sufficiency remain
@@ -102,7 +104,15 @@ date; each kind has a closed set of additional fields. Unread terms retain the e
 pending record under decision 0059. The projected boundary preserves its original
 publisher, URL and licence chain and binds the original boundary hash and projection
 method. Resume and release selection validate the same schema and refuse incomplete or
-foreign lineage, even when the envelope hashes agree.
+foreign lineage, even when the envelope hashes agree. A shared boundary-chain check holds
+source id/key, publisher, URL, licence basis/id and decision record against the original;
+resume also holds upstream hash and method version. Retrieval time and terms readings are
+not chain identity. As a result, `pin_boundary` refuses a changed source chain under an
+unchanged boundary identity; review requires a new namespace. The shared shard-lineage
+check compares metadata, boundary and enumeration hashes and shard number with the
+verified enumeration at both resume and selection. Gap reasons also bind status and
+attempt count: request failures require HTTP 404/410 and one attempt; successful-body
+refusals require HTTP 200 and one attempt, otherwise `gap_reason_integrity`.
 
 A completed shard is skipped only after its pointer, receipt, whole-body hash, member
 hashes and expected keys verify. A partially staged shard is fetched again. Changed
@@ -128,7 +138,8 @@ remain unmeasured. Hashes are rechecked through opened descriptors; the
 independent mount judge rejects writable/overbroad mounts. Acquisition writes one tile at a time into staging; validation reads bounded tile
 members without loading whole shards into memory. The assembly seam streams one
 shard at a time into release staging, copies objects without aliasing acquisition files,
-and carries source receipts/credits. The existing build-release command stays a placeholder;
+and carries source receipts/credits. The selected all-date manifest and its receipt enter
+the same hash/copy/rehash path exactly once, including all-gap releases. The existing build-release command stays a placeholder;
 its eventual integration and UI display remain with the tasks that own those surfaces.
 
 ## Product readers
@@ -180,3 +191,22 @@ These are reference identifiers, not claims of an online reading. The local read
 GeoJSON input/output and source/target CRS parameters; exact installed pins stay unchanged.
 The installed official `BaseGeometry.difference` docstring was also read offline for the
 uncovered-land operation in fix round f1; it returns the difference of the geometries.
+
+The fix-round-three offline interface reading covers the installed rasterio 1.5.2 official
+`MemoryFile`, `MemoryFile.open` and `DatasetReader.read` docstrings and `RasterioIOError`:
+immutable initial bytes, driver selection and an explicit full pixel read. Reference
+identities are `https://rasterio.readthedocs.io/en/stable/topics/memory-files.html` and
+`https://rasterio.readthedocs.io/en/stable/api/rasterio.io.html`. These identifiers record
+an offline reading on 2026-11-20, not a documentation-host request. No pin changed.
+
+
+## Fix-round-three self-review hold
+
+The requested gap validator now enforces one attempt. A separate invented mixed-history
+probe found that a retryable status followed by a missing or invalid tile can still produce
+a gap with multiple attempts. Publication currently precedes the new validation, so the
+shard/pointer can be retained and then refused on every resume. This producer/consumer
+mismatch is proposed PO-S2-T51-F3-01 in PROGRESS.md, **S2-T51 f3 seven-finding corrections**,
+and the worker return. It needs producer alignment and a no-publication/resume plant before
+operational acceptance. Do not weaken the gap rule or rewrite the recorded attempt count.
+No live archive was read or changed by that probe; acquisition approval remains pending.

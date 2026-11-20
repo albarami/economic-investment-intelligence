@@ -10,6 +10,7 @@ import tarfile
 import tempfile
 from collections.abc import Callable, Iterable, Iterator, Mapping
 from dataclasses import dataclass
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -73,7 +74,10 @@ def _immutable(path: Path, body: bytes) -> None:
 
 
 def jpeg(body: bytes) -> None:
-    """Bounded JPEG marker reading; a tile must declare the registered dimensions."""
+    """Bound size/dimensions before fully decoding with the pinned JPEG driver."""
+    memory_file = import_module("rasterio.io").MemoryFile
+    decode_error = import_module("rasterio.errors").RasterioIOError
+
     if (
         not 21 <= len(body) <= MAX_TILE_BYTES
         or not body.startswith(b"\xff\xd8\xff")
@@ -111,6 +115,12 @@ def jpeg(body: bytes) -> None:
             width = int.from_bytes(body[cursor + 7 : cursor + 9], "big")
             if width != 512 or height != 512:
                 raise SnapshotRefusal("tile_dimensions_refused")
+            try:
+                with memory_file(body, filename="tile.jpg") as memory:
+                    with memory.open(driver="JPEG") as dataset:
+                        dataset.read()
+            except decode_error:
+                raise SnapshotRefusal("tile_format_or_gap") from None
             return
         if marker in {0xDA, 0xD9}:
             break
@@ -187,6 +197,19 @@ def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str
         }:
             raise SnapshotRefusal("gap_reason_integrity")
         if (
+            gap["reason"] == "request_failed"
+            and (status not in {404, 410} or attempts != 1)
+        ) or (
+            gap["reason"]
+            in {
+                "response_bytes_or_gap",
+                "tile_format_or_gap",
+                "tile_dimensions_refused",
+            }
+            and (status != 200 or attempts != 1)
+        ):
+            raise SnapshotRefusal("gap_reason_integrity")
+        if (
             not isinstance(key, list)
             or len(key) != 3
             or any(type(n) is not int or n < 0 for n in key)
@@ -214,6 +237,18 @@ def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str
     ):
         raise SnapshotRefusal("gap_enumeration_integrity")
     return gaps
+
+
+def shard_lineage(
+    side: Mapping[str, Any], enumeration: Mapping[str, Any], shard: int
+) -> None:
+    if (
+        side.get("metadata_sha256") != enumeration["metadata_sha256"]
+        or side.get("boundary_sha256") != enumeration["boundary_sha256"]
+        or side.get("enumeration_sha256") != digest(canonical(enumeration))
+        or side.get("shard") != shard
+    ):
+        raise SnapshotRefusal("shard_lineage_integrity")
 
 
 class Archive:
@@ -248,11 +283,7 @@ class Archive:
             snap = read_checked(folder, identity)
             side = snap.sidecar
             validate_receipt(snap, "shard", self.enumeration["date"])
-            if (
-                side.get("enumeration_sha256") != self.identity
-                or side.get("shard") != shard
-            ):
-                raise SnapshotRefusal("archive_integrity")
+            shard_lineage(side, self.enumeration, shard)
             checked_gaps(snap, self.expected(shard))
             return snap
         except SnapshotRefusal:
@@ -441,10 +472,8 @@ def verify_selection(root: Path, manifest: str) -> Selection:
         for row in data["shards"]:
             snap = read_checked(archive._folder(row["shard"]), row["identity"])
             validate_receipt(snap, "shard", archive.enumeration["date"])
-            if (
-                snap.sha256 != row["sha256"]
-                or snap.sidecar.get("enumeration_sha256") != archive.identity
-            ):
+            shard_lineage(snap.sidecar, archive.enumeration, row["shard"])
+            if snap.sha256 != row["sha256"]:
                 raise SnapshotRefusal("completion_integrity")
             gaps.extend(checked_gaps(snap, archive.expected(row["shard"])))
             snapshots.append(snap)

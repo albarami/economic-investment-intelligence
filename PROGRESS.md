@@ -45211,3 +45211,62 @@ Final ledger checks after the S2-T51 evidence append: `python3 scripts/check_doc
   rehashed unchanged after the whole run. Existing progress bytes are preserved; no
   OPEN_ITEMS.md change, no commit/push and no independent approval or live coverage claim.
   Proposed open items are confined to the return. Muhasabah: PASS for scoped evidence honesty.
+
+
+## S2-T51 f3 seven-finding corrections — 2026-11-20
+
+- Starting/full HEAD `b21af69f5c31adffb032e32a36a51342909032e3`; uncommitted worker changes only, as the brief requires.
+  Builder persona: senior geospatial-acquisition and release-integrity engineer, test-first.
+  Strict self-review persona: geospatial provenance and release-integrity reviewer.
+  Maker/model: OpenAI / Codex, GPT-6. Skills: project-orientation, task-standards,
+  github-flow, sanad-provenance, strict-reviewer self-review rules, post-patch-validation
+  evidence principles and muhasabah-gate; equivalent test-first, debugging, execution
+  and completion-verification rules. No independent maker approval is claimed.
+- Authority: `.overnight/IN/CONFIRM-cf2.md` N1/N2/N3, `CHECK-c12.md` CF1/CF2 and
+  `CHECK-k68.md` items 6 and 8, with L-1303. N1 pins the definition-time production
+  lock default; N2 changes an opened object's mtime after its true digest and refuses
+  before caching. N3 binds gap reasons to allowed HTTP status and one attempt.
+- CF1 uses one boundary-chain check at resume/selection, preserving upstream and method
+  at resume and excluding retrieval/terms-reading changes. Explicit side effect:
+  `pin_boundary` refuses a changed chain under an unchanged identity; review requires
+  a new namespace. CF2 shares all four shard-lineage comparisons at both boundaries.
+  All sixteen confirmed C12 defect probes are permanent tests, with controls retained.
+- K6 adds the selected all-date manifest and receipt to the first Selection.files, so
+  the existing verified copy path carries each exactly once, including all-gap release.
+  K8 fully decodes bounded JPEGs through pinned rasterio/GDAL; the genuine encoded
+  positive fixture replaces the old header-only bytes. Missing scan/quantization and
+  invalid scan plants independently fail decoding, become HTTP-200 gaps and serve no tile.
+- Environment: Linux x86_64 WSL2, Python 3.14.6, rasterio 1.5.2; UV_OFFLINE=1,
+  UV_NO_SYNC=1, EII_DECISION_PROVIDER=none, PYTHONDONTWRITEBYTECODE=1; seed 79;
+  temporary/cache writes within `.overnight/tmp/f3`. No network, host snapshot command,
+  external-drive, real-cache, secret or vault reading, commit or push. No dependency/pin change.
+- Archived HEAD plus final new plants: exit 1, 66 failed (intended safety plants, no collection/setup error),
+  `.overnight/tmp/f3/red-final-plants-on-HEAD.log`. The requested guard-removal proof
+  uses separate git archives under `.overnight/tmp/f3/archives`: 21 guards removed
+  alone, each red exit 1 and restored green exit 0. Exact summaries and command argv
+  are in `guard-removals.json` and `commands.jsonl` under that evidence folder.
+- Final broad GIS/imagery/address/binding run: exit 1, 522 passed and the single
+  baseline-listed absent-imagery-row/building_table_absent failure. Product imagery
+  file separately: exit 0, 7 passed. Whole custodian suite, run once on the final
+  code/test state: exit 1, 226 failed, 9561 passed, 177 warnings in 620.47s (0:10:20).
+  Exact failing-ID comparison with the supplied f2 list: 226 baseline IDs, 226 final,
+  zero new and zero absent. `suite-comparison.json` records the comparison; no baseline
+  was refreshed and no known failure is closed by this work.
+- Final Ruff check, Ruff format check (871 files), mypy (467 source files), document
+  and tree checks and AGENTS/CLAUDE byte parity: exit 0 each. Documents 03/04/12 and
+  SNAPSHOT.md record changed contracts and plants. Existing progress bytes remain intact.
+- Retained edit-time failures: initial fixture migration left a byte substitution that
+  no longer changed the tile (corrected to a second valid encoded JPEG without relaxing
+  the immutable-object assertions); initial mypy found untyped rasterio imports (the
+  implementation now follows the existing dynamic driver adapter pattern); initial lint
+  found one unused helper result (renamed). Initial red and intermediate logs remain.
+- Tested-state manifest SHA-256 `4963832d6b3ad0b93ca1fe3f5466db94d796665cae461ef97de0eaa10bc8fd90`
+  covers seven source/test files (including the unchanged production lock and product
+  reader); rehashed unchanged after the whole run. A final adjacent mixed-retry probe
+  (503 then 404/410 or invalid 200) reproduced an N3 producer/consumer mismatch: a
+  two-attempt gap is published before validation, then resume refuses it permanently.
+  This is proposed PO-S2-T51-F3-01, not silently repaired or assigned to the baseline.
+  Operational self-review is REJECT pending producer alignment without weakening N3.
+  Detailed finding-by-finding return, exact commands/exits and proposed open items: `.overnight/RETURN.md`. This scoped
+  self-review does not qualify a merge or live acquisition; different-maker confirmation,
+  existing suite holds and lead-owned live/integration evidence remain pending.

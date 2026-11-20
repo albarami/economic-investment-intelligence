@@ -51,6 +51,24 @@ EXTRA = {
 }
 
 
+BOUNDARY_CHAIN = (
+    "source_id",
+    "key",
+    "publisher",
+    "url",
+    "licence_basis",
+    "licence_id",
+    "decision_record",
+)
+
+
+def same_boundary_chain(
+    projected: Mapping[str, Any], original: Mapping[str, Any]
+) -> None:
+    if any(projected[key] != original[key] for key in BOUNDARY_CHAIN):
+        raise SnapshotRefusal("boundary_chain_mismatch")
+
+
 def public_chain(kind: str, imagery_date: str, stamp: str) -> dict[str, Any]:
     if kind not in EXTRA or (imagery_date not in SERVICES and kind != "all-dates"):
         raise SnapshotRefusal("receipt_lineage")
@@ -146,9 +164,13 @@ def publish_public(
     from .snapshot_archive import read_checked
 
     if (directory / "index" / (identity + ".json")).exists():
-        validate_receipt(
-            read_checked(directory, identity), side["kind"], side["imagery_date"]
-        )
+        stored = read_checked(directory, identity)
+        validate_receipt(stored, side["kind"], side["imagery_date"])
+        if side["kind"] in {"boundary", "boundary-source"}:
+            same_boundary_chain(stored.sidecar, side)
+            for key in ("upstream_sha256", "method_version"):
+                if stored.sidecar[key] != side[key]:
+                    raise SnapshotRefusal("boundary_chain_mismatch")
     snapshot = publish_snapshot(directory, "json", body, dict(side), identity=identity)
     validate_receipt(snapshot, side["kind"], side["imagery_date"])
     return snapshot

@@ -2642,3 +2642,27 @@ placeholder release command or the other tables' privacy checks.
 ## Structured Public address reader — decision 0079
 
 `structured-address-v1` is a fixed application-schema read of `pub_address_point` under DAT-168: exact equality on the three published address strings, order by `feature_key`, at most six fetched rows to signal truncation, at most five returned candidates. Both stores hold the composite index `(zone_number, street_number, building_number, feature_key)`. It returns no utility account, parcel number, person join, score or guessed match. Its selected source-registry/receipt lineage supplies publisher, dataset, terms/basis, retrieval date and hash. The table is persisted Public data; a query or its response is not persisted. Decision 0079 item 5 adds this separate offline route without changing the keyed-provider route.
+
+
+## Selected national imagery archive integrity — S2-T51
+
+Under decision 0079 items 3 and 4 and document 04 **3.1 Registry and sidecar record**,
+resume and release selection use the same closed receipt schema. Projected and original
+boundary receipts must agree on `source_id`, `key`, `publisher`, `url`, `licence_basis`,
+`licence_id` and `decision_record`; the projected upstream hash equals the original body
+hash. Resume also requires unchanged `upstream_sha256` and `method_version`. Retrieval
+times and terms-reading text/date are excluded from this chain comparison. Consequently,
+`pin_boundary` refuses a changed chain under an unchanged boundary identity: the lead
+must review a new namespace rather than silently replace the retained chain.
+
+At both shard read boundaries, `metadata_sha256`, `boundary_sha256`,
+`enumeration_sha256` and shard number must match the verified enumeration and selected
+shard. Assembly carries the explicitly selected all-date manifest and its receipt once
+through the same verified-object copy path, including an all-gap release.
+A `request_failed` tile gap has HTTP 404 or 410 and one attempt; a
+`response_bytes_or_gap`, `tile_format_or_gap` or `tile_dimensions_refused` gap has HTTP
+200 and one attempt. Other combinations refuse `gap_reason_integrity`. The existing
+`outside_extent` gap retains null status and zero attempts. A present JPEG must pass the
+bounded format/dimension checks and a full pixel decode by the pinned JPEG driver;
+structure or scan failures become invalid-tile gaps during acquisition, and refuse
+archive verification if planted in a stored member (L-1303).

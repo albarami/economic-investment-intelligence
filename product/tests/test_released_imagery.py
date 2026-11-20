@@ -103,3 +103,27 @@ def test_first_read_accepts_intact_object_when_relatime_updates_atime(tmp_path):
     old = time.time_ns() - 3600 * 1_000_000_000
     os.utime(path, ns=(old, old))
     assert ReleasedImagery(output, identity).tile("1995-02", 10, 0, 0) == JPEG
+
+
+def test_change_during_hash_refuses_without_caching_pre_hash_identity(tmp_path):
+    import hashlib
+    import os
+
+    from eii_product.api import gis_imagery
+
+    output, identity = released_fixture(tmp_path)
+    reader = ReleasedImagery(output, identity)
+    path = next((output / "objects").glob("*.tar"))
+    original_digest = hashlib.file_digest
+
+    def change_after_hash(stream, algorithm):
+        actual = original_digest(stream, algorithm)
+        status = path.stat()
+        os.utime(path, ns=(status.st_atime_ns, status.st_mtime_ns + 1_000_000_000))
+        return actual
+
+    with patch.object(gis_imagery.hashlib, "file_digest", change_after_hash):
+        with pytest.raises(ValueError, match=r"^imagery_integrity$"):
+            reader.tile("1995-02", 10, 0, 0)
+    assert not reader._verified
+    assert reader.tile("1995-02", 10, 0, 0) == JPEG

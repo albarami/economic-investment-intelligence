@@ -896,3 +896,26 @@ Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-s
 `GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.
 
 Invented offline plants cover rate/retry windows, host/redirect/locator/level refusal, metadata and boundary changes, missing receipts, outer and member hashes, interruption, global lock contention, root unset/traversal/symlink/wrong-drive placement, priority failure, disk breach, overbroad/writable sandbox binding, ordinary-mode isolation, ambiguous search, unknown fields and store binding parity. Tests never read real cache or external-drive inputs, use live keys, or open a network connection. The live fetch and different-maker confirmation remain separate evidence.
+
+
+S2-T51 fix round three adds permanent, envelope-consistent plants for projected boundary
+publisher/allow-listed URL/licence changes at resume and full-release selection, shard
+metadata/boundary/enumeration hash and shard-number changes at both read stages, and
+full-release refusal before forged lineage can reach credits. Source-boundary chain,
+upstream and method changes under an unchanged identity refuse, while later retrieval
+times and terms readings retain the original receipt. The release boundary's independent
+upstream recheck is isolated with an already-verified level result so that its earlier
+transitive check cannot mask removal.
+
+Separate plants pin the production lock's definition-time default and change an opened
+product object after its true digest is computed, demanding refusal before caching.
+Each forbidden gap reason/status/attempt combination is planted with consistent shard
+and completion envelopes and must report `gap_reason_integrity`. Complete and all-gap
+assembly must copy the selected all-date manifest and receipt exactly once, with bytes
+hashing to their object names. The positive JPEG is genuinely encoded in memory; the old
+header-only fixture is retained as `no-scan`, with missing-quantization and invalid-scan
+plants independently rejected by the pinned decoder, recorded as HTTP-200 gaps with no
+member and no served tile. Missing quantization opens successfully but fails the forced
+pixel read, so a marker or open-only substitute is caught. Guard-removal evidence uses
+separate tracked-file archives under the task's workspace temporary folder, and records
+red and restored-green exits. These fixtures supply no live source result.

@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import json
+import warnings
 from copy import deepcopy
 from itertools import pairwise
 from unittest.mock import patch
 from uuid import uuid4
 
+import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+from rasterio.errors import NotGeoreferencedWarning, RasterioIOError
+from rasterio.io import MemoryFile
 from shapely.geometry import MultiPolygon, box
 
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
@@ -31,7 +35,29 @@ BOUNDARY_RECEIPT = {
     "terms_words": "Invented terms",
     "terms_read_on": "2026-11-20",
 }
-JPEG = b"\xff\xd8\xff\xc0\x00\x11\x08\x02\x00\x02\x00\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00invented-tile\xff\xd9"
+# Preserve the old header-only bytes as a planted invalid successful response.
+NO_SCAN_JPEG = b"\xff\xd8\xff\xc0\x00\x11\x08\x02\x00\x02\x00\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00invented-tile\xff\xd9"
+
+
+def encoded_jpeg(value=0):
+    """A genuine, uniform invented tile encoded by the pinned in-memory driver."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", NotGeoreferencedWarning)
+        with MemoryFile() as memory:
+            with memory.open(
+                driver="JPEG", width=512, height=512, count=1, dtype="uint8"
+            ) as dataset:
+                dataset.write(np.full((1, 512, 512), value, dtype="uint8"))
+            return memory.read()
+
+
+JPEG = encoded_jpeg()
+DQT = JPEG.index(b"\xff\xdb")
+NO_QUANTIZATION_JPEG = (
+    JPEG[:DQT] + JPEG[DQT + 2 + int.from_bytes(JPEG[DQT + 2 : DQT + 4], "big") :]
+)
+SOS = JPEG.index(b"\xff\xda")
+INVALID_SCAN_JPEG = JPEG[: SOS + 2] + b"\x00\x02\xff\xd9"
 
 
 @pytest.fixture(autouse=True)
@@ -179,6 +205,13 @@ def test_lock_does_not_relabel_body_io_errors(tmp_path):
             with policy.run_lock(tmp_path, name=policy.MACHINE_LOCK):
                 raise OSError(code, "invented disk fault")
         assert caught.value.errno == code
+
+
+def test_production_lock_name_is_constant_across_processes():
+    assert (
+        policy.run_lock.__wrapped__.__kwdefaults__["name"]
+        == "\0eii-gis-imagery-snapshot"
+    )
 
 
 def test_run_passes_exact_machine_lock_name(tmp_path):
@@ -495,30 +528,7 @@ def test_command_root_unset_refuses_without_any_connection(tmp_path):
         assert run(tmp_path, {}, ("--gis-imagery-snapshot", "--seed", "9")) == 2
 
 
-@pytest.mark.parametrize(
-    "plant",
-    [None, "gap", "partial", "coverage"]
-    + [
-        (field, stage)
-        for field in (
-            "publisher",
-            "url",
-            "licence_basis",
-            "decision_record",
-            "terms_read_on",
-            "retrieved_utc",
-            "bytes",
-            "sha256",
-            "foreign_url",
-            "unknown_field",
-            "boundary_source_url",
-        )
-        for stage in ("resume", "selection")
-    ],
-)
-def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
-    tmp_path, monkeypatch, capsys, plant
-):
+def all_dates_acquisition(tmp_path, monkeypatch, plant=None):
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
     from eii_custodian.publicdata.gis import snapshot_release as release
     from eii_custodian.publicdata.gis import snapshot_runner as runner
@@ -628,6 +638,72 @@ def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
     assert projected.sidecar["publisher"] == "Invented boundary publisher"
     assert projected.sidecar["url"] == "https://www.data.gov.qa/invented-boundary"
     assert projected.sidecar["upstream_sha256"] == digest(boundary)
+    return root, selections, files, complete, boundary, identity
+
+
+@pytest.mark.parametrize(
+    "plant",
+    [None, "gap", "partial", "coverage"]
+    + [
+        (field, stage)
+        for field in (
+            "publisher",
+            "url",
+            "licence_basis",
+            "decision_record",
+            "terms_read_on",
+            "retrieved_utc",
+            "bytes",
+            "sha256",
+            "foreign_url",
+            "unknown_field",
+            "boundary_source_url",
+        )
+        for stage in ("resume", "selection")
+    ],
+)
+def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
+    tmp_path, monkeypatch, capsys, plant
+):
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+    from eii_custodian.publicdata.gis import snapshot_release as release
+    from eii_custodian.publicdata.gis import snapshot_runner as runner
+    from eii_custodian.publicdata.gis.snapshot_archive import digest, read_checked
+
+    root, selections, files, complete, _boundary, identity = all_dates_acquisition(
+        tmp_path, monkeypatch, plant
+    )
+    if plant in (None, "gap"):
+        # Assembly uses the same immutable manifest/receipt pair as the sandbox.
+        # Count copies, too: shared inputs must be carried exactly once.
+        from eii_custodian.publicdata.gis.snapshot_archive import canonical
+
+        manifest = read_checked(root / "all-dates", identity)
+        manifest_files = (
+            (manifest.path, manifest.sha256),
+            (manifest.receipt_path, digest(manifest.receipt_path.read_bytes())),
+        )
+        for item in manifest_files:
+            assert sum(item in selection.files for selection in selections) == 1
+            assert files.count(item) == 1
+        output = tmp_path / "release"
+        copied = []
+        original_copy = release.shutil.copyfile
+
+        def copy(source, target):
+            copied.append(source)
+            return original_copy(source, target)
+
+        with patch.object(release.shutil, "copyfile", copy):
+            assembled = release.assemble(selections, output)
+        for source, sha in manifest_files:
+            assert copied.count(source) == 1
+            target = output / "objects" / (sha + ".json")
+            assert target.read_bytes() == source.read_bytes()
+            assert digest(target.read_bytes()) == sha
+        release_manifest = json.loads((output / (assembled + ".json")).read_bytes())
+        assert bool(release_manifest["tiles"]) is (plant is None)
+        assert canonical(complete) == manifest.body
     if plant in ("gap", "partial"):
         coverage = complete["coverage"]["1995-02"]["10"]
         if plant == "gap":
@@ -861,9 +937,7 @@ def test_changed_bytes_publish_new_objects_without_overwriting_selected_shard(tm
     archive, _ = fixture_archive(tmp_path)
     original = archive.read_shard(0)
     with pytest.raises(policy.SnapshotRefusal, match="identity_changed"):
-        archive.write_shard(
-            0, {(10, 0, 0): JPEG.replace(b"invented-tile", b"invented-change")}, STAMP
-        )
+        archive.write_shard(0, {(10, 0, 0): encoded_jpeg(100)}, STAMP)
     assert archive.read_shard(0).sha256 == original.sha256
     assert len(list((tmp_path / "shards/000000/index").glob("*.json"))) == 2
 
@@ -1271,12 +1345,44 @@ def test_coverage_guards_refuse_independently_with_valid_hashes(
         verify_selection(level, manifest)
 
 
-@pytest.mark.parametrize("failure", ["404", "410", "empty", "non-jpeg", "dimensions"])
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "404",
+        "410",
+        "empty",
+        "non-jpeg",
+        "dimensions",
+        "no-scan",
+        "no-quantization",
+        "invalid-scan",
+    ],
+)
 def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, failure):
     from eii_custodian.publicdata.gis.snapshot_archive import read_checked
     from eii_custodian.publicdata.gis.snapshot_release import assemble
     from eii_product.api.gis_imagery import ReleasedImagery, imagery_router
 
+    invalid_bodies = {
+        "no-scan": NO_SCAN_JPEG,
+        "no-quantization": NO_QUANTIZATION_JPEG,
+        "invalid-scan": INVALID_SCAN_JPEG,
+    }
+    if failure in invalid_bodies:
+        # Independent decoder proof: not merely our own marker validation.
+        if failure == "no-quantization":
+            # Opening succeeds: only a forced pixel read detects this defect.
+            with MemoryFile(invalid_bodies[failure], filename="invented.jpg") as memory:
+                with memory.open() as dataset:
+                    with pytest.raises(RasterioIOError):
+                        dataset.read()
+        else:
+            with pytest.raises(RasterioIOError):
+                with MemoryFile(
+                    invalid_bodies[failure], filename="invented.jpg"
+                ) as memory:
+                    with memory.open() as dataset:
+                        dataset.read()
     calls = []
 
     def transport(url):
@@ -1284,6 +1390,7 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
         if url.endswith("?f=json"):
             return Response(url, metadata(), ())
         body = {
+            **invalid_bodies,
             "empty": b"",
             "non-jpeg": b"not-a-jpeg",
             "dimensions": JPEG.replace(b"\x02\x00\x02\x00", b"\x01\x00\x02\x00"),
@@ -1303,6 +1410,10 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
     assert gap["attempts"] == 1
     if failure in {"404", "410"}:
         assert gap["http_status"] == int(failure)
+    else:
+        assert gap["http_status"] == 200
+    if failure in invalid_bodies:
+        assert gap["reason"] == "tile_format_or_gap"
     selection = verify_selection(level, manifest)
     assert tuple(selection.iter_tiles()) == ()
     assert selection.shards[0].sidecar["members"] == []
@@ -1474,3 +1585,249 @@ def test_ordinary_registry_has_no_unenforced_snapshot_switches():
     assert "snapshot_tiles_allowed" not in rows
     assert "snapshot_contract" not in rows
     assert rows["export_tiles_allowed"] is False
+
+
+BOUNDARY_CHANGES = [
+    ("publisher", "Another invented publisher"),
+    ("url", "https://www.data.gov.qa/another-invented-boundary"),
+    ("licence_id", "CC0-1.0"),
+]
+
+
+@pytest.mark.parametrize("field,value", BOUNDARY_CHANGES)
+def test_cf1_resume_projected_lineage_must_match_original(tmp_path, field, value):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (identity,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    enumeration = json.loads(read_checked(level / "completion", identity).body)[
+        "enumeration"
+    ]
+    rewrite_sidecar(
+        level / "inputs/boundary",
+        enumeration["inputs"]["boundary"],
+        lambda side: side.update({field: value}),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^boundary_chain_mismatch$"):
+        small_acquisition(tmp_path)
+
+
+@pytest.mark.parametrize("field,value", BOUNDARY_CHANGES)
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+def test_cf1_full_release_projected_lineage_must_match_original(
+    tmp_path, monkeypatch, capsys, field, value, stage
+):
+    from eii_custodian.publicdata.gis import snapshot_release as release
+    from eii_custodian.publicdata.gis import snapshot_runner as runner
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    root, _, _, complete, _, _ = all_dates_acquisition(tmp_path, monkeypatch)
+    original = read_checked(root / "boundary-source", complete["boundary_source"])
+    original_receipt = original.receipt_path.read_bytes()
+    level = root / "1995-02/level-10"
+    enumeration = json.loads(
+        read_checked(level / "completion", complete["dates"]["1995-02"]["10"]).body
+    )["enumeration"]
+    rewrite_sidecar(
+        level / "inputs/boundary",
+        enumeration["inputs"]["boundary"],
+        lambda side: side.update({field: value}),
+    )
+    if stage == "resume":
+        assert runner.run({}) == 1
+        assert "boundary_chain_mismatch" in capsys.readouterr().out
+    else:
+        with pytest.raises(policy.SnapshotRefusal, match=r"^boundary_chain_mismatch$"):
+            release.reviewed_inputs({})
+    assert original.receipt_path.read_bytes() == original_receipt
+
+
+@pytest.mark.parametrize("field", ["metadata_sha256", "boundary_sha256"])
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+def test_cf2_shard_source_hash_must_match_enumeration(tmp_path, field, stage):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (identity,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", identity).body)
+    rewrite_sidecar(
+        level / "shards/000000",
+        completion["shards"][0]["identity"],
+        lambda side: side.update({field: "0" * 64}),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^shard_lineage_integrity$"):
+        if stage == "resume":
+            small_acquisition(tmp_path)
+        else:
+            verify_selection(level, identity)
+
+
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+@pytest.mark.parametrize(
+    "field,value", [("shard", 7), ("enumeration_sha256", "0" * 64)]
+)
+def test_cf2_shard_number_and_enumeration_must_match(tmp_path, stage, field, value):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (identity,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", identity).body)
+    rewrite_sidecar(
+        level / "shards/000000",
+        completion["shards"][0]["identity"],
+        lambda side: side.update({field: value}),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^shard_lineage_integrity$"):
+        if stage == "resume":
+            small_acquisition(tmp_path)
+        else:
+            verify_selection(level, identity)
+
+
+@pytest.mark.parametrize("field", ["metadata_sha256", "boundary_sha256"])
+def test_cf2_full_release_shard_hash_must_match_and_never_reach_credits(
+    tmp_path, monkeypatch, field
+):
+    from eii_custodian.publicdata.gis import snapshot_release as release
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    root, _, _, complete, _, _ = all_dates_acquisition(tmp_path, monkeypatch)
+    level = root / "1995-02/level-10"
+    completion = json.loads(
+        read_checked(level / "completion", complete["dates"]["1995-02"]["10"]).body
+    )
+    rewrite_sidecar(
+        level / "shards/000000",
+        completion["shards"][0]["identity"],
+        lambda side: side.update({field: "0" * 64}),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^shard_lineage_integrity$"):
+        release.reviewed_inputs({})
+
+
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+@pytest.mark.parametrize(
+    "reason,status,attempts",
+    [("request_failed", status, 1) for status in (200, 503, None)]
+    + [("request_failed", 404, attempts) for attempts in (0, 2, 4)]
+    + [
+        (reason, status, attempts)
+        for reason in (
+            "response_bytes_or_gap",
+            "tile_format_or_gap",
+            "tile_dimensions_refused",
+        )
+        for status, attempts in ((404, 1), (None, 1), (200, 0), (200, 2), (200, 4))
+    ],
+)
+def test_gap_reason_status_and_attempt_integrity(
+    tmp_path, stage, reason, status, attempts
+):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    def missing(url):
+        return Response(
+            url,
+            metadata() if url.endswith("?f=json") else b"",
+            (),
+            evidence={"http_status": 200 if url.endswith("?f=json") else 404},
+        )
+
+    (identity,) = small_acquisition(tmp_path, missing)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", identity).body)
+    completion["gaps"][0].update(reason=reason, http_status=status, attempts=attempts)
+    rewrite_sidecar(
+        level / "shards/000000",
+        completion["shards"][0]["identity"],
+        lambda side: side.update(gaps=deepcopy(completion["gaps"])),
+    )
+    identity = republish_completion(level, completion)
+    with pytest.raises(policy.SnapshotRefusal, match=r"^gap_reason_integrity$"):
+        if stage == "resume":
+            small_acquisition(tmp_path, missing)
+        else:
+            verify_selection(level, identity)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("source_id", "another_invented_boundary"),
+        ("key", "another_invented_boundary"),
+        *BOUNDARY_CHANGES,
+        ("licence_basis", "owner_decision"),
+        ("decision_record", "0026"),
+        ("upstream_sha256", "f" * 64),
+        ("method_version", "invented-union-v2"),
+    ],
+)
+def test_pin_boundary_refuses_changed_chain_under_same_identity(
+    tmp_path, monkeypatch, field, value
+):
+    from eii_custodian.publicdata.gis.snapshot_runner import pin_boundary
+
+    root, _, _, _, body, identity = all_dates_acquisition(tmp_path, monkeypatch)
+    # identity above names the all-date manifest; the boundary keeps its own hash.
+    from eii_custodian.publicdata.gis.snapshot_archive import digest
+
+    assert identity != digest(body)
+    path = root / "national-land.meta.json"
+    side = json.loads(path.read_bytes())
+    if field == "licence_basis":
+        # A valid alternative source chain must pass the owner-decision schema.
+        side["decision_record"] = "0026"
+    side["fetch_url" if field == "url" else field] = value
+    path.write_text(json.dumps(side))
+    with pytest.raises(policy.SnapshotRefusal, match=r"^boundary_chain_mismatch$"):
+        pin_boundary(root, body, digest(body))
+
+
+def test_boundary_recheck_time_and_terms_reading_are_not_chain_identity(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.gis import snapshot_runner as runner
+    from eii_custodian.publicdata.gis.snapshot_archive import digest, read_checked
+
+    root, _, _, complete, body, _ = all_dates_acquisition(tmp_path, monkeypatch)
+    before = read_checked(root / "boundary-source", complete["boundary_source"])
+    receipt_bytes = before.receipt_path.read_bytes()
+    path = root / "national-land.meta.json"
+    side = json.loads(path.read_bytes())
+    side.update(
+        retrieved_utc="2026-11-21T00:00:00Z",
+        terms_words="Invented later reading",
+        terms_read_on="2026-11-21",
+    )
+    path.write_text(json.dumps(side))
+    assert runner.pin_boundary(root, body, digest(body)) == complete["boundary_source"]
+    assert runner.run({}) == 0
+    assert before.receipt_path.read_bytes() == receipt_bytes
+
+
+def test_selection_rechecks_projected_upstream_after_level_verification(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.gis import snapshot_release as release
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    root, selections, _, complete, _, _ = all_dates_acquisition(tmp_path, monkeypatch)
+    level = root / "1995-02/level-00"
+    completion = json.loads(
+        read_checked(level / "completion", complete["dates"]["1995-02"]["0"]).body
+    )
+    rewrite_sidecar(
+        level / "inputs/boundary",
+        completion["enumeration"]["inputs"]["boundary"],
+        lambda side: side.update(upstream_sha256="f" * 64),
+    )
+    # Isolate the release boundary's own recheck from verify_selection's earlier
+    # transitive upstream check, with the already-verified level as its input.
+    with patch.object(
+        release, "verify_selection", return_value=selections[0]
+    ) as verified:
+        with pytest.raises(
+            policy.SnapshotRefusal, match=r"^release_selection_identity$"
+        ):
+            release.reviewed_inputs({})
+    assert verified.call_count == 1

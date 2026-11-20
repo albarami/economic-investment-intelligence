@@ -1060,7 +1060,22 @@ Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution w
 
 ### 3.1 Registry and sidecar record
 
-The dedicated national imagery archive follows [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) item 3 and `custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md`: its closed registry is `custodian/publicdata/review/gis_snapshot.json`, with ordinary and nightly eligibility false. A shard receipt includes imagery date, metadata/boundary/enumeration hashes, member names and hashes, publisher, terms/basis, retrieval UTC, byte size and generator version. Completion is published last; staging and gaps are never complete. Resume verifies every skipped shard and its receipt. A release selects a reviewed all-date manifest hash explicitly; it never selects the newest directory.
+The dedicated national imagery archive follows [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) item 3 and `custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md`: its closed registry is `custodian/publicdata/review/gis_snapshot.json`, with ordinary and nightly eligibility false. A shard receipt includes imagery date, metadata/boundary/enumeration hashes, member names and hashes, publisher, terms/basis, retrieval UTC, byte size and generator version. Completion is published last after every enumerated key is accounted for as a verified tile or a recorded gap; staging is never complete. Resume verifies every skipped shard and its receipt. A release selects a reviewed all-date manifest hash explicitly; it never selects the newest directory.
+
+S2-T51 uses one boundary-chain check at resume and selection over source id/key,
+publisher, URL, licence basis/id and decision record, comparing the projected receipt
+with the retained original. Resume also holds upstream hash and method version constant,
+without comparing later retrieval times or terms readings. `pin_boundary` therefore
+refuses a changed chain under an unchanged identity; review requires a new namespace.
+The shared shard-lineage check holds metadata, boundary and enumeration hashes and shard
+number against the verified enumeration at both read stages. Assembly carries the selected
+all-date manifest and receipt exactly once, even when all selected keys are gaps.
+Only HTTP 404/410 with one attempt permits a `request_failed` gap; body refusals require
+HTTP 200 with one attempt. Other reason/status/attempt combinations refuse. The bounded
+JPEG check forces a full rasterio/GDAL JPEG pixel read after validating the frame size;
+missing scan/quantization structure and invalid scans become HTTP-200 invalid-tile gaps
+under L-1303. No live coverage or successful acquisition is established by these rules.
+
 
 The fetch registry kinds are `portal_dataset`, `paged_layer`, `https_file`, `terms_page`,
 `citation_only` and `paged_cards` (S2-T19's six paged tender-card lists, PUB-108). These are
