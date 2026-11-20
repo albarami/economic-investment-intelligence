@@ -218,4 +218,4 @@ def _pair(label_node: _El) -> tuple[str, str]:
                 continue
             if passed and isinstance(child, _El) and "card-title" in child.classes:
                 values.append(_norm(_text(child)))
-    return _norm(_text(label_node)), "|".join(values)
+    return _norm(_text(label_node)), "|".join(value for value in values if value)

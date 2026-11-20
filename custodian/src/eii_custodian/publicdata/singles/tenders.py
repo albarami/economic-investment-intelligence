@@ -101,7 +101,7 @@ _TENDER_KEY = re.compile(r"\Atnd_[0-9a-f]{16}(?:_[1-9][0-9]*)?\Z")
 _MONEY = Decimal("0.01")
 _DATE_FIELDS = frozenset({"award_date", "publish_date", "closing_date", "cancel_date"})
 _AMOUNT_FIELDS = frozenset({"bond", "documents"})
-_SPLIT = ("buying_entity", "category", "tender_type", "cancel_reason")
+_SPLIT = ("buying_entity", "category", "tender_type", "cancel_reason", "company_size")
 _SHARED = (
     "publish_date",
     "award_date",
@@ -109,7 +109,6 @@ _SHARED = (
     "cancel_date",
     "bond",
     "documents",
-    "company_size",
 )
 _IDENTIFIER_COLUMNS = frozenset(
     {
@@ -827,6 +826,7 @@ def _row_for(group: Sequence[_Parsed]) -> TenderRow:
     entities = _field_by_language(group, "buying_entity")
     categories = _field_by_language(group, "category")
     kinds = _field_by_language(group, "tender_type")
+    sizes = _field_by_language(group, "company_size")
     buying_entity = _as_text(entities.get("en"))
     if not buying_entity:
         raise TenderError("missing_buying_entity")
@@ -851,7 +851,7 @@ def _row_for(group: Sequence[_Parsed]) -> TenderRow:
         documents_value_qar=_as_decimal(
             _shared(group, "documents", "documents_value_qar")
         ),
-        company_size=_as_text(_shared(group, "company_size", "company_size")),
+        company_size=_as_text(sizes.get("en") or sizes.get("ar")),
         lists=_lists(group),
     )
 
