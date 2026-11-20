@@ -341,9 +341,9 @@ def test_configured_pin_refuses_before_send(
 @pytest.mark.parametrize("version", [1, 2])
 def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
     entry, dec, body = setup(tmp_path, monkeypatch, version=version)
-    from eii_custodian.publicdata.fetch import award_checks
+    from eii_custodian.publicdata.fetch import award_links
 
-    original = award_checks.check_awards
+    original = award_links.check_all_awards
     key = "SYN company" if version == 2 else "syn_company"
     monkeypatch.setattr(
         awards,
@@ -358,7 +358,7 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
     )
     seen = []
 
-    def check(rows, schema, seed, proof_reader):
+    def check(rows, schema, proof_reader):
         def proof(url):
             projected = proof_reader(url)
             assert projected == [
@@ -367,9 +367,9 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
             seen.append(url)
             return projected
 
-        return original(rows, schema, seed, proof)
+        return original(rows, schema, proof)
 
-    monkeypatch.setattr(awards, "check_awards", check)
+    monkeypatch.setattr(awards, "check_all_awards", check)
     result = fetch(entry, tmp_path, body)
     assert seen == dec["reviewed_urls"]
     assert result.sidecar["award_check"]["mismatched"] == 2

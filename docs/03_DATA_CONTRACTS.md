@@ -1143,10 +1143,12 @@ proof checks or publication. Dates use day/month/year; invalid dates are counted
 The summary records row count, dated/invalid/blank counts, date range and unknown
 completeness. The original scrape date is distinct from the intake UTC date.
 
-The `awards_owner_scrape` archive registry receipt carries `award_check`: lead
+The `awards_owner_scrape` archive registry receipt carries `award_check`, labelled
+by `award_check_scope: sample`: lead
 seed, distinct nonblank URL frame count, selected count, matched/mismatched/failed
 counts, match rate, incomplete status and per-link result. Above thirty links the
-seed selects exactly thirty without replacement; otherwise all links are read.
+seed selects exactly thirty without replacement; otherwise the sample uses the
+whole frame. Sample outcomes are derived from the full check without another fetch.
 The rate is matching selected links divided by all selected links, including
 failed fetches; an empty frame has null rate. Short frames and failed fetches
 are incomplete. Only transport or bounded-read failures count as failed fetches.
@@ -1154,9 +1156,9 @@ The shared `open_https` transport classifies a response-body `HTTPException`
 (including `IncompleteRead`) as `TransportFault("unreachable")`, with no upstream
 diagnostic text; keyed requests retain the same closed fault. Existing registry
 sources now retry this mid-body failure and record `unreachable` after the
-existing attempt limit, instead of letting it crash the build. Award proofs use
-the same retries, count an exhausted read as a failed fetch and mark the check
-incomplete. Certificate refusals retain their exact closed reason even when
+existing attempt limit, instead of letting it crash the build. Award proofs make
+one attempt per distinct link, count a failed read with its closed reason and mark
+the check incomplete; they do not retry. Certificate refusals retain their exact closed reason even when
 raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
@@ -1169,6 +1171,24 @@ name equality after the closed normalization in document 04, section 2.4.
 Whitespace-only registrations never match, and duplicate register entries remain
 ambiguous. Awarded values never become turnover or sales, and identifiers stay in
 the custodian matching boundary. Release consumers remain separate tasks.
+
+Under decision 0064 item 41, the same receipt also carries `award_links`, with
+`method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
+`report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
+`failed_fetches`, `match_rate`, `incomplete`, `status` and `results`. Every link is
+checked once in URL order through the existing transport and reviewed proof scope.
+Each result has `report_url`, `result` and `reason`: a match uses `matched`, a
+mismatch uses `proof_mismatch`, and fetch failures use only `proof_fetch_failed`,
+`unreachable`, `http_status` or `body_bytes`. Failed attempts stay in the checked
+denominator; `match_rate` is matched divided by checked, null for an empty frame.
+Empty frames or any failed fetch set `incomplete` and `award_links_incomplete`;
+otherwise the status is `all_links_recorded`. Publication compares this complete
+frame with the intake, validates every result and recomputes the totals and the
+seeded sample. Missing, skipped, duplicated or inconsistent evidence refuses
+publication. `assembly/final_audit.json` retains the full-link record under `t29`
+and explicitly labels the separate sample; assembly refuses absent or incomplete
+full-link evidence even when its sample passed. OI-277's live evidence remains
+the lead's work; invented-response tests do not establish a live match rate.
 
 Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
 rows, are staged together within the cache. A failed write or final validation

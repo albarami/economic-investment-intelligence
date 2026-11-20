@@ -793,6 +793,18 @@ a nested source symlink and a failure at the final staged replacement rename,
 asserting closed refusals, no outside copy and byte-identical prior trees. Each
 staging plant fails when its specific guard is removed and passes with it restored.
 
+`test_award_all_links.py` exercises decision 0064 item 41 through the existing
+award build dispatch with invented links and a stub transport. It asserts every
+distinct nonblank link is visited exactly once, including failures; a failure or
+mismatch outside the seeded sample changes the full-check rate. It plants a
+skipped link at publication and missing, duplicated or inconsistent receipt fields
+at assembly, verifies exact sample parity at the frame boundaries, retains all
+winners of a shared proof link and keeps hard trust/archive/schema refusals fatal.
+Full-link evidence reaches `assembly/final_audit.json` under `t29`; the sample
+remains explicitly labelled. The award-specific incomplete-read test now requires
+one attempt and no retry sleeps; unrelated registry-source retries stay covered.
+These tests supply no live source result or acceptance of OI-277.
+
 The accident and population-grid test files add bounded acquisition and explicit
 older-snapshot selection plants. Cadence tests extend the closed source assignment
 map. Existing grid fixtures now explicitly select the archived object they create;

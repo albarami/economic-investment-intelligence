@@ -655,6 +655,14 @@ the lead's one-line advisor notice is still required after real attempts.
 No offline pass closes N4/OI-137, N6/OI-138, N7/OI-139, the birth-year-use ruling,
 or the source-completion gate. No live fetch is claimed by this implementation.
 
+Decision 0064 item 41 adds a separate all-link background check on this same
+award path. Each distinct nonblank `report_url` receives one transport attempt;
+the source receipt's `award_links` retains every outcome, a closed failure reason,
+totals and matched/checked rate. The existing seeded sample is derived from those
+outcomes and stays labelled `sample`. Document 03, S2-T29 cached page and awards
+contracts, specifies the full record and assembly refusals. The lead still records
+the live all-link rate and registration-match evidence under OI-277.
+
 ### S2-T19 source reading and collection boundary
 
 The lead's structure readings of 2026-11-15 confirm the declarations below (PUB-07,

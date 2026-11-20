@@ -267,15 +267,17 @@ def _optional(build: Production, name: str) -> dict[str, Any]:
 
 
 def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
-    """Retain T29 sample statistics and the remaining OI-277 mismatch counter.
+    """Validate complete T29 link evidence and retain labelled sample statistics.
 
-    These sample statistics do not establish the all-link background re-check
-    required by decision 0064 item 41. No report rows or firm names are returned.
+    Per-link outcomes and their denominator reach the gate report; no report
+    rows or firm names are returned. OI-277 live acceptance stays with the lead.
     """
     from .fetch.award_checks import AwardError, validate_check_receipt
+    from .fetch.award_links import validate_links_receipt
 
     try:
         validate_check_receipt(receipt)
+        validate_links_receipt(receipt)
     except AwardError:
         raise AssemblyError("assembly_t29_refused") from None
     check = receipt["award_check"]
@@ -283,6 +285,7 @@ def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
     if (
         check["seed"] != seed
         or check["incomplete"] is not False
+        or receipt["award_links"]["incomplete"] is not False
         or type(count) is not int
         or count < 0
     ):
@@ -291,6 +294,8 @@ def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
         "key": "awards_owner_scrape",
         "sha256": receipt["sha256"],
         "award_check": {key: value for key, value in check.items() if key != "results"},
+        "award_check_scope": "sample",
+        "award_links": receipt["award_links"],
         "registration_double_space_only": count,
     }
 

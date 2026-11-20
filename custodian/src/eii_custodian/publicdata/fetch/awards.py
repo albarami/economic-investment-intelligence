@@ -19,10 +19,15 @@ from typing import Any
 from .allowlist import approve, host_of
 from .award_checks import (
     AwardError,
-    check_awards,
     double_space_only,
     match_register,
     validate_check_receipt,
+)
+from .award_links import (
+    ProofFetchError,
+    check_all_awards,
+    sample_from_links,
+    validate_links_receipt,
 )
 from .certificate_pins import (
     Pin,
@@ -323,16 +328,20 @@ def _publish_awards(
     registers: list[dict[str, str]],
     registration_inputs: list[dict[str, object]] | None = None,
 ) -> Snapshot:
-    """Append one intake snapshot with the sample check on its registry receipt."""
+    """Append one intake snapshot with full-link and labelled sample evidence."""
     # Ruling L-1001: a pending basis of use is a record and never refuses.
     if entry.source_id != SOURCE or entry.commit_allowed:
         raise AwardError("receipt_missing")
+    if type(seed) is not int:
+        raise AwardError("award_seed_pending")
     for row in batch.rows:
         utc(row.get("retrieved_utc"))
     cache_directory(cache, entry)
     validate_claim(SOURCE, "awarded_value")
     originals = [row["original"] for row in batch.rows]
-    check = check_awards(originals, profile, seed, proof_reader)
+    links = check_all_awards(originals, profile, proof_reader)
+    # Publication independently checks the full frame against the intake below.
+    check = sample_from_links(links, seed)
     match = match_register(originals, profile, registers)
     side = sidecar_for(
         entry,
@@ -351,6 +360,8 @@ def _publish_awards(
         period_first=batch.summary.get("date_first"),
         period_last=batch.summary.get("date_last"),
         award_check=check,
+        award_check_scope="sample",
+        award_links=links,
         summary=batch.summary,
         method=METHOD,
         original_scrape_date=SCRAPE_DATE,
@@ -359,6 +370,7 @@ def _publish_awards(
         registration_inputs=registration_inputs or [],
     )
     validate_check_receipt(side)
+    validate_links_receipt(side, originals)
     raw = publish_snapshot(cache / entry.key / "raw", batch.extension, batch.body, side)
     body = json.dumps(
         {
@@ -422,7 +434,7 @@ def fetch_awards(
     """Normal build dispatch; the lead supplies the reviewed intake manifest."""
     from dataclasses import replace
 
-    from .kinds import read_bounded
+    from .kinds import read_once
     from .page_records import _obstacle
 
     declaration = load_declaration(SOURCE)
@@ -463,7 +475,7 @@ def fetch_awards(
                 else nullcontext()
             )
             with scope, limit, page_transport(None if version_two else pin):
-                response, failure = read_bounded(transport, sleep, url)
+                response, failure = read_once(transport, url)
             if (
                 version_two
                 and response is not None
@@ -473,7 +485,9 @@ def fetch_awards(
             if failure is not None and failure.check == "blocked_host":
                 raise AwardError("blocked_host")
             if failure or response is None:
-                raise AwardError("proof_fetch_failed")
+                raise ProofFetchError(
+                    failure.check if failure else "proof_fetch_failed"
+                )
             if any(
                 address not in proof_urls
                 for address in (*response.hops, response.final_url)
