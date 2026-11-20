@@ -3716,6 +3716,8 @@ S2-T10 part A — NOT CLOSED: The gateway facade calls _provider before RecordSt
 
 S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal reading and the thin break pass. Lead ruling or the named pass is owed; no campaign run here.
 
+2026-11-20 — CLOSED by P09 for the thin hand break pass required by decision 0064 item 43. Cause: listed values and early exits lacked deciding one-by-one evidence. Fix: eleven additional tests and stronger existing assertions in `scripts/tests/test_spine_triage.py`; both production modules remain byte-identical to the base. The explicitly listed 119 plants each give red exit 1 with the defect present and green exit 0 after restoration; the endpoint-or-empty operand is explained by `keyed_cap` refusing missing/empty endpoints before gateway construction. The redundant `CacheError` list entry is separately explained by its `ValueError` parent. Deciding `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`: exit 0, 35 tests; seeded focused pytest: exit 0, 35 passed and 64 subtests passed, seed 6739204157. Exact breaks, tests and explanations: `.overnight/RETURN.md` and the appended PROGRESS.md block **S2-T10 / P09 — Spine-triage thin hand break pass**. This supersedes the earlier PO-S2-44 carrying snapshot only; no mutation campaign, live-cache qualification or different-maker approval is claimed. S2-T10 amendment box 7 remains unticked pending its other closure and the lead review gate.
+
 ### PO-S2-45 — No run of the spine triage on the real public cache is recorded
 
 - ID: PO-S2-45
