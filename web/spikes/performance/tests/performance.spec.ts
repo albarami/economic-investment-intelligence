@@ -1,5 +1,6 @@
 import { expect, test, type ConsoleMessage, type Page } from '@playwright/test';
 import { EventEmitter } from 'node:events';
+import { setImmediate } from 'node:timers/promises';
 import {
   ARABIC_REDUCED,
   FULL,
@@ -97,6 +98,11 @@ function diagnosticPage(fail: boolean) {
   const value = { phase: 'done' } as Spike;
   const fixture = Object.assign(page, {
     context: () => ({ browser: () => browser }),
+    route: async () => {},
+    url: () => 'http://127.0.0.1/',
+    goto: async () => {
+      page.emit('pageerror', new Error('INVENTED navigation error'));
+    },
     evaluate: async () => {
       page.emit('console', {
         type: () => 'warning',
@@ -194,6 +200,105 @@ test('readiness diagnostics keep events observed before the readiness call', asy
   expect(first.event).toBe('pageerror');
   expect(first.detail).toBe('INVENTED navigation error');
   expect(first.elapsedMs).toBeGreaterThanOrEqual(0);
+});
+
+test('readiness diagnostics in open retain navigation events and the original readiness rejection', async () => {
+  const fixture = diagnosticPage(true);
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    await open(fixture.page, '/en/_perf', SMALL);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+  }
+  expect(caught).toBe(fixture.failure);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]?.[0]).toBe('READINESS FAILURE');
+  const first = JSON.parse(String(reports[0]?.[1]))[0];
+  expect(first.event).toBe('pageerror');
+  expect(first.detail).toBe('INVENTED navigation error');
+  expect(first.elapsedMs).toBeGreaterThanOrEqual(0);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics in open report a rejected navigation once', async () => {
+  const fixture = diagnosticPage(false);
+  const failure = new Error('INVENTED navigation rejection');
+  Object.assign(fixture.page, {
+    goto: async () => {
+      fixture.events.emit('pageerror', failure);
+      throw failure;
+    },
+  });
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    await open(fixture.page, '/en/_perf', SMALL);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+  }
+  expect(caught).toBe(failure);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]?.[0]).toBe('READINESS FAILURE');
+  const events = JSON.parse(String(reports[0]?.[1]));
+  expect(events).toHaveLength(1);
+  expect(events[0].event).toBe('pageerror');
+  expect(events[0].detail).toBe(failure.message);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics in open abandon readiness when a foreign request wins navigation', async () => {
+  const fixture = diagnosticPage(false);
+  let finishNavigation = () => {};
+  const navigation = new Promise<void>((resolve) => {
+    finishNavigation = resolve;
+  });
+  let evaluations = 0;
+  Object.assign(fixture.page, {
+    goto: async () => {
+      fixture.events.emit('request', {
+        url: () => 'https://assets.invalid/INVENTED.js',
+      });
+      await navigation;
+    },
+    evaluate: async () => {
+      evaluations += 1;
+      throw fixture.failure;
+    },
+  });
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  try {
+    await expect(open(fixture.page, '/en/_perf', SMALL)).rejects.toThrow(
+      /non-same-origin request:.*assets\.invalid/,
+    );
+  } finally {
+    finishNavigation();
+    // Drain the pending navigation and its rejection handler without a sleep.
+    await setImmediate();
+    console.error = original;
+  }
+  expect(evaluations).toBe(0);
+  expect(reports).toEqual([]);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
 });
 
 test('readiness diagnostics report a host timeout without awaiting the hung page', async () => {
@@ -310,7 +415,13 @@ async function open(
     }
   });
   const pending = (async () => {
-    await page.goto(path);
+    try {
+      await page.goto(path);
+    } catch (error) {
+      diagnostics.report();
+      throw error;
+    }
+    if (settled) throw new Error('readiness abandoned after a foreign request');
     return ready(page);
   })();
   void pending.catch(() => undefined);
