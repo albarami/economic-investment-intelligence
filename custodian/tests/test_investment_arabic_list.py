@@ -10,12 +10,14 @@ flag stands false until it.
 
 from __future__ import annotations
 
+import copy
 import importlib.util
 from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlsplit
 
 import pytest
+import yaml
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.registry import read_yaml
@@ -256,3 +258,29 @@ def test_a_listed_page_url_in_the_other_language_is_refused() -> None:
     found = _pages([bare], LANDING_URL, spec.kind_rules)
     assert not isinstance(found, InvestmentFailure)
     assert found[0].language == "ar"
+
+
+def test_a_malformed_listed_page_url_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A list entry whose URL cannot be split is refused by name, not a crash."""
+    import eii_custodian.publicdata.investment_build as build
+
+    root = repository_root(Path(__file__))
+    document = read_yaml(root / "custodian" / "publicdata" / "investment_pages.yaml")
+    planted = copy.deepcopy(document)
+    planted["sources"]["investqa_pages"]["pages"].append(
+        {
+            "kind": "sector",
+            "url": "https://[agency.invalid/ar/invented",
+            "language": "ar",
+        }
+    )
+    path = tmp_path / "pages.yaml"
+    path.write_text(yaml.safe_dump(planted), encoding="utf-8")
+    monkeypatch.setattr(build, "_PAGES", path)
+    result = load_source_spec("investqa_pages", url=LANDING_URL)
+    assert isinstance(result, InvestmentFailure)
+    assert result.check == "missing_page"
+    assert result.expected == "valid page URL"
+    assert result.observed == "unreadable"

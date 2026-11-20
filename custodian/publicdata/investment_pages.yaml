@@ -1,7 +1,7 @@
 # Page inventory for the investment readers.
-# The dashboard shape and the agency page list are confirmed by the lead's run
-# of both readers on the real pages on 2026-11-14 (live_page_compared). Tests
-# keep their own inventory.
+# The dashboard shape and English agency page list were confirmed by the lead's
+# run on real pages on 2026-11-14. Arabic paths await their own live comparison.
+# Tests use invented pages.
 schema_version: investment_pages.v2
 sources:
   fdi_projects:

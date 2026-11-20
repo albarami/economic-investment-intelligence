@@ -1014,7 +1014,12 @@ def _pages(
                 "en or ar",
                 "missing or unknown",
             )
-        segment = urlsplit(page_url).path.strip("/").split("/", 1)[0].casefold()
+        try:
+            segment = urlsplit(page_url).path.strip("/").split("/", 1)[0].casefold()
+        except ValueError:
+            return InvestmentFailure(
+                1, "investqa_pages", url, "missing_page", "valid page URL", "unreadable"
+            )
         if segment in {"en", "ar"} and segment != language:
             return InvestmentFailure(
                 1, "investqa_pages", url, "page_language", language, segment
