@@ -14,6 +14,11 @@ building artifacts before the attempt; inventory errors retain their own
 `FAIL buildings` name. Heights then verifies the table's completion manifest
 against the same pins before reading it. National live coverage is unconfirmed.
 
+The four buildings STAC metadata registry rows inherit the same release's
+`bldg_ovt` licence fields exactly, including its terms wording and date read.
+`commit_allowed` remains false. Item addresses still require confirmation;
+the licence record does not establish completeness.
+
 Staged table validation translates a height-contract refusal to
 `building_table_invalid`, retaining its name in the error detail and publishing
 neither artifact. The table is replaced before its completion manifest. The

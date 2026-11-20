@@ -5517,3 +5517,8 @@ The original unnumbered review-disposition section records S2-T44 placement afte
 ### S2-T50 — Review follow-up
 
 - OPEN before the S2 gate (review r1 finding 4): cards C22, C30 and C31 use C2's bulk months by reference and inherit decision 0078's rule; C31 applies it to the issued series, which `bulk_months` does not cover; none is in code yet.
+
+## S2-T20L round-two whole-suite verification hold — 2026-11-20
+
+- The brief's whole custodian command, `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests`, exited **1** with **9325 passed, 217 failed, 1 warning** on unchanged HEAD `424639020be7eff3ffb899f88eb704b78aa26e73` plus the bounded round-two metadata/count/doc patch. Failures span **38** test files. Many stop at `building_table_absent` before an expected success or downstream refusal. Baseline status and root cause for all failures were not established by this round; no broad fixture repair, skip, producer exception or tolerance change is authorised by its narrow brief.
+- The lead must triage the exact failed node IDs in `.overnight/tmp/f2/failures.txt` against `.overnight/tmp/f2/logs/custodian.log`, assign any required fixes to the owning task and obtain green whole-suite evidence before claiming suite readiness. These logs are workspace handoff files, not committed or independent-maker evidence. No random failure is closed by a rerun. Neither registry test named by the round-two brief appears in the full-run failure list. See PROGRESS.md, **S2-T20L — Round-two registry licence fix**.

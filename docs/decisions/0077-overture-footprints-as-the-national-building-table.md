@@ -18,7 +18,9 @@
    its shared frame step before heights. This producer is not a separate script
    or command. Every required part must be registered, unskipped, explicitly
    pinned and verified through its receipt. STAC collection and item snapshots
-   use reviewed `https_file` registry rows and the existing transport. Unknown
+   use reviewed `https_file` registry rows and the existing transport. Their
+   licence fields follow the same release's `bldg_ovt` registry row
+   exactly; `commit_allowed` remains false. Unknown
    item URLs remain unconfirmed, never guessed. An unregistered linked item or
    incomplete part set refuses national completeness. National boundary bounds
    must fit the PUB-17 frame box. Counts distinguish outside-box rows from

@@ -2008,6 +2008,9 @@ All retrieved 2026-11-11 unless stated.
 - Overture Maps Foundation: release catalogue `https://stac.overturemaps.org/2026-10-21.0/catalog.json`;
   places guide `https://docs.overturemaps.org/guides/places`; attribution page
   `https://docs.overturemaps.org/attribution/`.
+  The four buildings STAC metadata registry rows follow the same release's
+  `bldg_ovt` licence fields exactly, including its terms wording and date read;
+  `commit_allowed` remains false. Item addresses still require confirmation.
 - Community Data License Agreement Permissive 2.0, `https://cdla.dev/permissive-2-0/`.
 - OpenStreetMap copyright and licence, `https://www.openstreetmap.org/copyright`; Qatar extract
   `https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf`.

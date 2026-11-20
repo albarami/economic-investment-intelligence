@@ -979,8 +979,8 @@ def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
     assert (
-        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2
-    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations.
+        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4
+    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations; S2-T20L STAC metadata.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
