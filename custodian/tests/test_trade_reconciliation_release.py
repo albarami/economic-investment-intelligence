@@ -446,7 +446,7 @@ def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
     assert result.failure.check == "comparison_invalid"
     assert result.failure.observed == "NO_DATA"
     expected = (
-        "FAIL trade_reconciliation  comparison_invalid "
+        "FAIL trade_reconciliation comparison_invalid "
         "expected=verified inputs observed=NO_DATA"
     )
     assert expected in result.lines
@@ -754,6 +754,6 @@ def test_dispatch_comparison_invalid(tmp_path, monkeypatch, plant, reason):
     assert result.failure.check == "comparison_invalid"
     assert result.failure.observed == "NO_DATA"
     assert (
-        "FAIL trade_reconciliation  comparison_invalid expected=verified inputs observed=NO_DATA"
+        "FAIL trade_reconciliation comparison_invalid expected=verified inputs observed=NO_DATA"
     ) in result.lines
     assert json.loads((tmp_path / LOG_NAME).read_text())["lines"] == list(result.lines)
