@@ -365,7 +365,7 @@ def _dbf_text_field(dbf: bytes, field_name: str) -> tuple[str, ...]:
     """Each live record's fixed-width text field, trimmed and non-empty."""
     minimum = _DBF_HEADER_BYTES + _DBF_FIELD_BYTES + 2
     if len(dbf) < minimum or dbf[0:1] != _DBF_VERSION:
-        raise HeightError("structure_mismatch")
+        raise HeightError("structure_mismatch", "class_table")
     count = int.from_bytes(dbf[4:8], "little")
     header_len = int.from_bytes(dbf[8:10], "little")
     record_len = int.from_bytes(dbf[10:12], "little")
@@ -379,7 +379,7 @@ def _dbf_text_field(dbf: bytes, field_name: str) -> tuple[str, ...]:
         or dbf[header_len - 1] != _DBF_TERMINATOR
         or len(dbf) < records_end
     ):
-        raise HeightError("structure_mismatch")
+        raise HeightError("structure_mismatch", "class_header")
     fields: list[tuple[str, str, int, int]] = []
     offset = 1
     for index in range(descriptors // _DBF_FIELD_BYTES):
@@ -389,28 +389,30 @@ def _dbf_text_field(dbf: bytes, field_name: str) -> tuple[str, ...]:
             name = descriptor[:11].split(b"\x00", 1)[0].decode("ascii")
             field_type = descriptor[11:12].decode("ascii")
         except UnicodeDecodeError:
-            raise HeightError("structure_mismatch") from None
+            raise HeightError("structure_mismatch", "class_descriptor") from None
         fields.append((name, field_type, offset, descriptor[16]))
         offset += descriptor[16]
     if offset != record_len:
-        raise HeightError("structure_mismatch")
+        raise HeightError("structure_mismatch", "class_record_length")
     found = [field for field in fields if field[0] == field_name]
-    if len(found) != 1 or found[0][1] != "C":
-        raise HeightError("structure_mismatch")
+    if len(found) != 1:
+        raise HeightError("structure_mismatch", "class_field_absent")
+    if found[0][1] != "C":
+        raise HeightError("structure_mismatch", "class_field_type")
     _name, _type, field_offset, field_size = found[0]
     values: list[str] = []
     for row in range(count):
         start = header_len + row * record_len
         record = dbf[start : start + record_len]
         if record[0:1] != _DBF_LIVE:
-            raise HeightError("structure_mismatch")
+            raise HeightError("structure_mismatch", "class_record")
         try:
             text = record[field_offset : field_offset + field_size].decode("ascii")
         except UnicodeDecodeError:
-            raise HeightError("structure_mismatch") from None
+            raise HeightError("structure_mismatch", "class_record") from None
         stripped = text.strip()
         if not stripped:
-            raise HeightError("structure_mismatch")
+            raise HeightError("structure_mismatch", "class_record_blank")
         values.append(stripped)
     return tuple(values)
 
@@ -480,7 +482,7 @@ def _parse_gba(
 ) -> tuple[tuple[BaseGeometry, Decimal, str], ...]:
     """The published GBA shapefile with a height and a class field per record."""
     if not structure.class_field:
-        raise HeightError("structure_mismatch")
+        raise HeightError("structure_mismatch", "class_field_undeclared")
     bodies = _zip_members(body)
     if bodies["cpg"].strip() != b"ISO-8859-1":
         raise HeightError("structure_mismatch")

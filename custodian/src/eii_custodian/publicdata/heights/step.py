@@ -1,7 +1,8 @@
 """B7: `build_heights` — read, match, call the calc functions, write.
 
-A missing building table is a skip line, never a failure (B10). A refused
-input raises `HeightError`, whose name is the check the FAIL line carries.
+A missing building table refuses with `building_table_absent` (decision 0064
+item 25). A refused input raises `HeightError`, whose name is the check the
+FAIL line carries.
 """
 
 from __future__ import annotations

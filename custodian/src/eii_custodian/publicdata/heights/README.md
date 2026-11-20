@@ -10,7 +10,13 @@ decision 0023 item A2:
 1. `recorded` — the building's own recorded height (`Public`, observed),
    including heights from the committed hand list
    (`custodian/publicdata/review/landmark_heights.yaml`), each with its cited
-   public page, publisher and retrieval date in the asset manifest;
+   public page, publisher and retrieval date in the asset manifest. The list
+   is empty and `pending` until the basemap building ids are confirmed. A
+   cited page must name a registry row with the same publisher and licence
+   basis, and resolve through the snapshot verifier to cached page bytes whose
+   receipt names that row's source and key, the cited URL, publisher, licence
+   basis, retrieval day and page hash; any other case refuses with
+   `landmark_heights_citation` and a named detail, and the step writes nothing;
 2. `floor_count` — the floor count times the stated storey height;
 3. `3dglobfp` — the open heights of 3D-GloBFP, `bldg_3dglobfp`
    (CC BY 4.0, credit "Che et al. 2024");

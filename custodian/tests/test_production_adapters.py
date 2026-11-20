@@ -107,11 +107,14 @@ def test_real_frame_refuses_incomplete_inputs_instead_of_fixture_mode(
 
 
 def test_real_height_seam_absence_is_named_and_not_a_table(tmp_path: Path) -> None:
+    """A missing building table refuses (S2-P21 F3); it is never a NO_DATA record."""
+    from eii_custodian.publicdata.heights.model import HeightError
+
     build = context(tmp_path)
-    build.heights()
-    record = json.loads((tmp_path / "assembly/heights.json").read_text())
-    assert record["state"] == "NO_DATA"
-    assert record["reason"] == "building_table_absent"
+    with pytest.raises(HeightError) as err:
+        build.heights()
+    assert err.value.name == "building_table_absent"
+    assert not (tmp_path / "assembly/heights.json").exists()
     assert "pub_building_height" not in build.tables
 
 

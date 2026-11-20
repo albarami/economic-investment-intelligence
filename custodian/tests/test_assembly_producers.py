@@ -332,9 +332,12 @@ def test_confirmation_adapters_read_pending_t19_and_height_absence(
 ) -> None:
     from eii_custodian.publicdata.assembly_reports import gather_audit
     from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.heights.model import HeightError
 
     build = context(tmp_path, load_registry())
-    build.heights()
+    with pytest.raises(HeightError) as err:
+        build.heights()
+    assert err.value.name == "building_table_absent"
     rows = {row["task"]: row for row in gather_audit(build)["confirmations"]}
     assert rows["S2-T19"]["state"] == "pending"
     assert rows["S2-T19"]["references"] == ["s2_t19_confirmation.yaml"]
@@ -456,8 +459,50 @@ def test_height_adapter_refuses_a_missing_building_table(tmp_path: Path) -> None
         invented.entry("bldg_wsf3d", extension="tif"),
     )
     state = context(cache, rows)
-    with pytest.raises(HeightError, match="building_table_absent"):
+    with pytest.raises(HeightError) as err:
         state.heights()
+    assert err.value.name == "building_table_absent"
+    assert not (cache / "assembly/heights.json").exists()
+    assert state.data_files == {}
+
+
+def test_a_noop_height_producer_over_earlier_valid_outputs_refuses(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """S2-P21 F3: outputs left by an earlier run never stand for this run's."""
+    from custodian.tests.fixtures.heights import invented
+
+    from eii_custodian.publicdata.heights import step
+
+    buildings, globfp, wsf = invented.card_fixture(tmp_path)
+    cache = tmp_path / "data/public_cache"
+    rows = (
+        invented.entry("bldg_3dglobfp", extension="zip"),
+        invented.entry("bldg_wsf3d", extension="tif"),
+    )
+    for row, body in zip(rows, (globfp, wsf), strict=True):
+        invented.store(cache, row, body)
+    path = cache.parent / "assets/buildings/buildings.geojson"
+    path.parent.mkdir(parents=True)
+    path.write_bytes(buildings)
+    context(cache, rows).heights()
+    output = cache.parent / "assets/heights"
+    assert (output / "heights.json").is_file()
+    assert (output / "manifest.heights.json").is_file()
+    (cache / "assembly/heights.json").unlink()
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr(step, "build_heights", noop)
+    state = context(cache, rows)
+    with pytest.raises(AssemblyError) as err:
+        state.heights()
+    assert str(err.value) == "assembly_heights_incomplete"
+    assert not (output / "heights.json").exists()
+    assert not (output / "manifest.heights.json").exists()
+    assert not (cache / "assembly/heights.json").exists()
+    assert state.data_files == {}
 
 
 def test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering(

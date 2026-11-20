@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from pathlib import Path
@@ -76,7 +75,7 @@ def _valid_sha256(text: str) -> bool:
 
 
 def _registry_by_url() -> dict[str, Entry]:
-    from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+    from eii_custodian.publicdata.fetch.registry import load_registry
 
     found: dict[str, Entry] = {}
     for entry in load_registry():
@@ -87,53 +86,73 @@ def _registry_by_url() -> dict[str, Entry]:
     return found
 
 
+def _refuse_citation(detail: str) -> HeightError:
+    return HeightError("landmark_heights_citation", detail)
+
+
+def _registry_entry(row: LandmarkHeight) -> Entry:
+    """The registry row the citation names, with matching publisher and licence."""
+    entry = _registry_by_url().get(row.citation.page_url)
+    if entry is None:
+        raise _refuse_citation("registry_row")
+    if entry.publisher != row.citation.publisher:
+        raise _refuse_citation("registry_publisher")
+    if entry.licence_basis != row.citation.licence_basis:
+        raise _refuse_citation("registry_licence")
+    return entry
+
+
 def _bind_citation_registry(row: LandmarkHeight) -> None:
     """Require the citation page to name a registry row with matching evidence."""
-    by_url = _registry_by_url()
-    entry = by_url.get(row.citation.page_url)
-    if entry is None:
-        raise HeightError("landmark_heights_citation")
-    if entry.publisher != row.citation.publisher:
-        raise HeightError("landmark_heights_citation")
-    if entry.licence_basis != row.citation.licence_basis:
-        raise HeightError("landmark_heights_citation")
+    _registry_entry(row)
+
+
+def _page_directory(cache: Path, entry: Entry) -> Path:
+    """A public page's bytes are its raw snapshot; a file's are the row's own."""
+    from eii_custodian.publicdata.fetch.receipts import cache_directory
+
+    directory = cache_directory(cache, entry.key)
+    return directory / "raw" if entry.kind == "public_page" else directory
 
 
 def verify_landmark_receipts(
     cache: Path, landmarks: tuple[LandmarkHeight, ...]
 ) -> None:
-    """Each cited page must name the digest of its cache receipt."""
-    if not landmarks:
-        return
-    from eii_custodian.publicdata.fetch.receipts import cache_directory
-    from eii_custodian.publicdata.fetch.registry import Entry
+    """Resolve each cited page through its verified snapshot and receipt.
 
-    by_url = _registry_by_url()
+    The snapshot verifier rechecks the index, the receipt's own hash and the
+    page bytes; the receipt must then name the registry row's source and key,
+    the cited URL, publisher, licence basis, retrieval day and page hash.
+    """
+    from eii_custodian.publicdata.fetch.snapshots import (
+        SnapshotError,
+        read_snapshot,
+        utc,
+    )
+
     for row in landmarks:
-        entry = by_url.get(row.citation.page_url)
-        if not isinstance(entry, Entry):
-            raise HeightError("landmark_heights_citation")
-        directory = cache_directory(cache, entry.key)
-        digest = row.citation.page_sha256
-        found = False
-        for meta in directory.rglob("*.meta.json"):
-            try:
-                receipt = json.loads(meta.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                continue
-            if receipt.get("sha256") == digest:
-                found = True
-                break
-        citation = directory / "citation.json"
-        if not found and citation.is_file():
-            try:
-                receipt = json.loads(citation.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                raise HeightError("landmark_heights_citation") from None
-            if receipt.get("sha256") == digest:
-                found = True
-        if not found:
-            raise HeightError("landmark_heights_citation")
+        entry = _registry_entry(row)
+        citation = row.citation
+        try:
+            snapshot = read_snapshot(
+                _page_directory(cache, entry), citation.page_sha256
+            )
+            retrieved_day = utc(snapshot.sidecar["retrieved_utc"]).date().isoformat()
+        except SnapshotError:
+            raise _refuse_citation("page_snapshot") from None
+        side = snapshot.sidecar
+        if snapshot.sha256 != citation.page_sha256:
+            raise _refuse_citation("receipt_hash")
+        if side.get("source_id") != entry.source_id or side.get("key") != entry.key:
+            raise _refuse_citation("receipt_source")
+        if citation.page_url not in {side.get("fetch_url"), side.get("landing_url")}:
+            raise _refuse_citation("receipt_url")
+        if side.get("publisher") != citation.publisher:
+            raise _refuse_citation("receipt_publisher")
+        if side.get("licence_basis") != citation.licence_basis:
+            raise _refuse_citation("receipt_licence")
+        if retrieved_day != citation.retrieved_on:
+            raise _refuse_citation("receipt_date")
 
 
 def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...]:
@@ -142,53 +161,55 @@ def load_landmark_heights(path: Path | None = None) -> tuple[LandmarkHeight, ...
     try:
         document = yaml.safe_load(target.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError):
-        raise HeightError("landmark_heights") from None
-    if not isinstance(document, dict) or document.get("version") != 1:
-        raise HeightError("landmark_heights")
+        raise HeightError("landmark_heights", "document") from None
+    if not isinstance(document, dict):
+        raise HeightError("landmark_heights", "document")
+    if document.get("version") != 1:
+        raise HeightError("landmark_heights", "version")
     entries = document.get("entries")
     if not isinstance(entries, list):
-        raise HeightError("landmark_heights")
+        raise HeightError("landmark_heights", "entries")
     pending = document.get("pending", "")
     if not entries:
         if pending != _PENDING:
-            raise HeightError("landmark_heights")
+            raise HeightError("landmark_heights", "pending")
         return ()
     if pending:
-        raise HeightError("landmark_heights_entry")
+        raise HeightError("landmark_heights_entry", "pending")
     seen_buildings: set[str] = set()
     seen_landmarks: set[str] = set()
     rows: list[LandmarkHeight] = []
     for entry in entries:
         if not isinstance(entry, dict) or set(entry) != _ENTRY_KEYS:
-            raise HeightError("landmark_heights_entry")
+            raise HeightError("landmark_heights_entry", "keys")
         citation = entry["citation"]
         if not isinstance(citation, dict) or set(citation) != _CITATION_KEYS:
-            raise HeightError("landmark_heights_citation")
+            raise _refuse_citation("citation_keys")
         for field in ("landmark_id", "building_id", "name_en"):
             text = entry[field]
             if not isinstance(text, str) or not text.strip():
-                raise HeightError("landmark_heights_entry")
+                raise HeightError("landmark_heights_entry", "field")
         if entry["landmark_id"] in seen_landmarks:
-            raise HeightError("landmark_heights_duplicate")
+            raise HeightError("landmark_heights_duplicate", "landmark_id")
         if entry["building_id"] in seen_buildings:
-            raise HeightError("landmark_heights_duplicate")
+            raise HeightError("landmark_heights_duplicate", "building_id")
         seen_landmarks.add(entry["landmark_id"])
         seen_buildings.add(entry["building_id"])
         for field in _CITATION_KEYS:
             text = citation[field]
             if not isinstance(text, str) or not text.strip():
-                raise HeightError("landmark_heights_citation")
+                raise _refuse_citation("citation_field")
         if not _valid_sha256(citation["page_sha256"]):
-            raise HeightError("landmark_heights_citation")
+            raise _refuse_citation("page_sha256")
         height_text = entry["height_m"]
         if not isinstance(height_text, str):
-            raise HeightError("landmark_heights_height")
+            raise HeightError("landmark_heights_height", "text")
         try:
             height = Decimal(height_text)
         except ArithmeticError:
-            raise HeightError("landmark_heights_height") from None
+            raise HeightError("landmark_heights_height", "text") from None
         if height_value(height) is None:
-            raise HeightError("landmark_heights_height")
+            raise HeightError("landmark_heights_height", "unusable")
         rows.append(
             LandmarkHeight(
                 landmark_id=entry["landmark_id"],

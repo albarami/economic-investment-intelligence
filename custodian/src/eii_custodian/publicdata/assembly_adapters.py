@@ -701,6 +701,10 @@ class Production:
         # The existing asset convention is relative to the data directory.
         building = local(self.cache.parent, BUILDINGS_RELATIVE)
         output = local(self.cache.parent, HEIGHTS_RELATIVE)
+        # Earlier outputs are removed here, outside the producer, so only files
+        # this invocation wrote can be hashed and recorded as built.
+        for name in (HEIGHTS_FILE, MANIFEST_FILE):
+            (output / name).unlink(missing_ok=True)
         build_heights(
             self.cache,
             self.entries,
@@ -709,7 +713,7 @@ class Production:
             self.lines,
             terms_attempts=tuple(self.fetched.terms_attempts) if self.fetched else (),
         )
-        if not building.is_file():
+        if not all((output / name).is_file() for name in (HEIGHTS_FILE, MANIFEST_FILE)):
             raise AssemblyError("assembly_heights_incomplete")
         paths = {
             name: file_hash(output / name) for name in (HEIGHTS_FILE, MANIFEST_FILE)

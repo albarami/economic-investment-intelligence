@@ -182,7 +182,9 @@ def test_errors_by_class_on_two_pairs_shares_the_even_count_median() -> None:
     assert block.median_absolute == Decimal("10.00")
 
 
-def test_gba_overall_errors_match_fallback_errors_for_identical_pairs() -> None:
+def test_error_from_pairs_on_normalized_pairs_matches_fallback_errors() -> None:
+    """The shared core helper only; the GBA caller's own parity is decided by
+    test_gba_calibration_equals_fallback_errors_on_identical_raw_pairs."""
     rows = _rows()
     gba_pairs: list[tuple[Decimal, Decimal]] = []
     for candidates in rows.values():
@@ -201,7 +203,8 @@ def test_gba_overall_errors_match_fallback_errors_for_identical_pairs() -> None:
     assert overall.median_absolute == fallback.median_absolute
 
 
-def test_gba_subprecision_and_half_up_boundaries_match_fallback_errors() -> None:
+def test_error_from_pairs_on_boundary_pairs_matches_fallback_errors() -> None:
+    """The shared core helper only, at the precision and half-up boundaries."""
     cases = [
         (Decimal("100.001"), Decimal("100")),
         (Decimal("99.995"), Decimal("100")),

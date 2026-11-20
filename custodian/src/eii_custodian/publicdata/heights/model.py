@@ -174,7 +174,7 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
         raise HeightError("rules_nodata")
     class_field = raw.get("class_field", "")
     if class_field != "" and not has_field:
-        raise HeightError("rules_field_or_band")
+        raise HeightError("rules_field_or_band", "class_field")
     if class_field != "" and not isinstance(class_field, str):
         raise HeightError("rules_class_field")
     return SourceStructure(
