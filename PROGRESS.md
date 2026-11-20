@@ -43330,3 +43330,13 @@ All pytest commands below use `uv run --locked python -m pytest -q -p no:cachepr
 
 - Final ledger rechecks: documentation exit 0 (1139 text files, 123 Markdown files), tree exit 0 (8 rules), diff whitespace exit 0. Append-integrity check confirmed every original PROGRESS byte is preserved and exactly one P05 block is appended. The added-text digit/path check first exited 1 because the required full commit hash contains an identifier-length digit run; the same hash is now recorded as two explicitly concatenated literal parts, with no change to its value or any earlier evidence. The corrected check is recorded after verification.
 - Corrected added-text/append/hash/guard/marker verification: exit 0, all checks passed. Final post-format documentation check: exit 0, 1139 text files and 123 Markdown files; tree exit 0, 8 rules; diff whitespace exit 0. Only evidence text changed after the 128-test final run.
+
+### S2 P05 fix round one (review S2-P05.r1 finding F1, nit N1) — 2026-11-20
+
+- Fixer: the lead (Anthropic Claude Opus 5.5), applying the reviewer's exact fix; confirmation by another maker follows.
+- F1: `test_methods_fixture_has_no_census_counts` now refuses any source name containing "census", any published row citing such a source, and any row citing a source with no entry. Planted on a copy of the fixture: a row citing `pub_census_zone` exit 1 (1 failed); a row citing an undeclared source exit 1 (1 failed); restored fixture exit 0.
+- N1: `test_c1_population_plants` pins the expected reason per plant (missing, duplicate, wrong year, wrong indicator).
+- Document 07 C1 worked example: one line naming `lic_active` (May 2025) and `test_pinned_c1` as the source of the two new counts.
+- Command: `UV_OFFLINE=1 uv run --locked python -m pytest core/tests/test_public_methods.py custodian/tests/test_pinned_method_replays.py custodian/tests/test_method_cache.py custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider --hypothesis-seed=2958173604` exit 0, 128 passed. `ruff check .` exit 0; `ruff format --check .` exit 0 (836 files); `scripts/check_docs.py` exit 0 (1139 text, 123 Markdown).
+- Correction (P05): the temporary path came from the environment of the builder's shell (TMPDIR or --basetemp, not recorded); the recorded pytest command itself uses pytest's default temporary path.
+- Correction (P05): the P05 change is committed as b5677c56 on base d5ab3131; review range d5ab3131..b5677c56.

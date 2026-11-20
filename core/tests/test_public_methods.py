@@ -28,8 +28,10 @@ FIXTURE = Path(__file__).parent / "fixtures/methods/public_methods.json"
 def test_methods_fixture_has_no_census_counts():
     fixture = json.loads(FIXTURE.read_text())
     assert "C8" not in fixture["published"], "census counts and shares stay local"
+    assert not any("census" in name for name in fixture["sources"])
     for row in fixture["published"].values():
-        assert "pub_census_national" not in row["sources"]
+        assert set(row["sources"]) <= fixture["sources"].keys(), row["anchor"]
+        assert not any("census" in source for source in row["sources"])
 
 
 def test_methods_fixture_sources_have_attribution():

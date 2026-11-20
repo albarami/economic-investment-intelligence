@@ -182,6 +182,8 @@ The denominators `a_j` and `a` include every licence-activity, including legacy 
 | LQ, restaurants (5610101), Al Daayen | 1.39 |
 | LQ, coffee shops (5630112, 173 licences), Al Daayen | 3.05 |
 
+The all-activity count of Al Daayen and the national coffee-shop count were read from the cached open-licence table `lic_active` (May 2025) and are asserted by `test_pinned_c1`.
+
 Arithmetic for the densities: 361 / 111,282 × 10,000 = 32.440, which rounds to 32.4 and is shown as 32. 4,782 / 3,219,982 × 10,000 = 14.851, which rounds to 14.9 and is shown as 15.
 
 Tolerance: densities as rounded integers exactly; LQ ± 0.01. The location quotients are the research results; the residents year is 2025, because those two resident counts reproduce 32.4 and 14.9.

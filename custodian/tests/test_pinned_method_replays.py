@@ -90,9 +90,15 @@ def test_c1_replay_uses_population_schema_and_all_activities(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "plant", ["missing", "duplicate", "wrong_year", "wrong_indicator"]
+    ("plant", "reason"),
+    [
+        ("missing", "C1:population_missing"),
+        ("duplicate", "C1:population_duplicate"),
+        ("wrong_year", "C1:population_missing"),
+        ("wrong_indicator", "C1:population_missing"),
+    ],
 )
-def test_c1_population_plants(tmp_path, plant):
+def test_c1_population_plants(tmp_path, plant, reason):
     review, active, active_chain, population, population_chain = c1_readings(tmp_path)
     methods.c1_replay(
         active, active_chain, population, population_chain, review, "INVENTED first"
@@ -112,7 +118,7 @@ def test_c1_population_plants(tmp_path, plant):
         target["year"] = "2024"
     else:
         target["indicator"] = "Employed"
-    with pytest.raises(ValueError, match=r"C1:population_(missing|duplicate)"):
+    with pytest.raises(ValueError, match=reason):
         methods.c1_replay(
             active, active_chain, population, population_chain, review, "INVENTED first"
         )
