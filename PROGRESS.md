@@ -43587,3 +43587,84 @@ wording and S6-T05's request-time backtest cost remain lead follow-ups already
 raised by Lens A. No new policy decision, feed or privacy rule is proposed.
 Self-review and muhasabah: PASS for these bounded fixes and their evidence;
 full task acceptance and different-maker approval remain pending.
+
+## S6-T25 fix round two — invented confirmed-feed admission plant
+
+Maker: Cognition. Model: SWE-2 High (Devin CLI). Builder persona: a senior
+Python test engineer for provenance-bound forecasting code. Strict self-review
+persona: a reviewer who rejects a plant that cannot fail, a loosened assertion
+and any change outside the test file. Skills: test-driven-development and
+verification-before-completion, applied in their plain meaning under the
+brief: the plant was proven able to fail before its green run was accepted.
+No independent approval is claimed; the lead must obtain confirmation from the
+original two lenses.
+
+Base and current HEAD: 140d864cf81a55458cf3be7be391931a75a213c5, whose parent
+is 1491ff73014194504a70710caa6be2d797a4a047.
+
+Scope and authority: Confirmation B finding F1 (.overnight/IN/CONF-B.md). The
+wrong/extra-feed plants at the former line 251 used only the existing
+residence.v1 identity; F1 required an otherwise self-consistent generated
+series carrying an invented feed. Added
+test_invented_confirmed_feed_refuses_before_fitting to
+core/tests/test_forecast_generated.py only: for both generated occupation
+series, wrong and extra plants carry invented.v1 inside
+admission.feed_names while series.sources and admission.source_hashes stay
+self-consistent; the test asserts invented.v1 appears in no definition's
+confirmed_sources, monkeypatches backtest to fail if reached, and asserts the
+exact ForecastNotOffered("forecast_not_offered") refusal. No production code,
+document, catalogue entry, feed identity, refusal reason, assertion,
+privacy/window rule or other file was changed.
+
+Environment: Linux x86_64, Python 3.14.6, uv 0.11.31; the existing environment
+was used without synchronisation. Every uv invocation used UV_OFFLINE=1,
+UV_NO_SYNC=1, UV_CACHE_DIR=.overnight/tmp/uv-cache and TMPDIR=.overnight/tmp.
+Pytest used the existing profile, no cache provider and one date-shaped seed of eight digits (its digits are kept out of the repository under AGENTS.md rule 9; the lead's rerun below uses seed 3127409581); no
+random draw was added. No network, source data, private calibration, data
+cache or vault read was performed. No ./eii test, dependency change, skip,
+retry, time-limit increase or baseline refresh was performed.
+
+Test commands and actual results:
+
+- Red proof, admission guard bypassed in memory only: uv run --locked python -
+  with a heredoc used inspect.getsource/exec to replace only the
+  feed_names/confirmed_sources set equality inside _admitted by True. No
+  workspace source was changed. pytest.main ran
+  core/tests/test_forecast_generated.py -q -p no:cacheprovider
+  --hypothesis-seed=<the builder's seed> --tb=short -k invented_confirmed_feed: exit 1,
+  4 failed, 156 deselected; every failure was the fail-on-fit spy
+  ("unconfirmed feeds fitted"), proving the plant reaches fitting without the
+  guard.
+- Green, fresh process with production guards intact: uv run --locked python
+  -m pytest core/tests/test_forecast_generated.py -q -p no:cacheprovider
+  --hypothesis-seed=<the builder's seed> -k invented_confirmed_feed: exit 0, 4 passed,
+  156 deselected.
+- Required check on the final formatted bytes: uv run --locked python -m
+  pytest core/tests/test_forecast_generated.py core/tests/test_forecast.py -q
+  -p no:cacheprovider --hypothesis-seed=<the builder's seed>: exit 0, 288 passed, no
+  failures or skips.
+
+Repository checks and actual results:
+
+- uv run --locked ruff check .: exit 0, all checks passed.
+- uv run --locked ruff format --check .: first exit 1, one file required
+  formatting (the new plant's ternary expression) and 813 were already
+  formatted. Applied uv run --locked ruff format
+  core/tests/test_forecast_generated.py: exit 0, one reformatted, whitespace
+  only. Final check exit 0, 814 files already formatted.
+- uv run --locked mypy: exit 0, 436 source files.
+- git diff --check: exit 0, no whitespace defects.
+- git status: exactly one modified path,
+  core/tests/test_forecast_generated.py; nothing else changed.
+- git add of the test path: exit 128, the shared worktree index is read-only.
+  No commit or push was possible. The change is left in the workspace under
+  the brief's explicit fallback; no approval or sandbox bypass was attempted.
+
+Proposed open items: original-lens confirmation of this plant; the existing
+OI-324 mounted-manifest and feed-to-table mapping verification remains the
+boundary stated by the audit and document 03. No new feed, privacy rule,
+threshold or catalogue choice is proposed. Self-review and muhasabah: PASS
+for this bounded test addition and its evidence; full task acceptance and
+different-maker approval remain pending.
+
+Lead rerun (2026-11-20, same worktree, seed 3127409581): uv run --locked python -m pytest core/tests/test_forecast_generated.py core/tests/test_forecast.py -q -p no:cacheprovider --hypothesis-seed=3127409581: exit 0, 288 passed; the same file with -k invented_confirmed_feed: exit 0, 4 passed, 156 deselected.

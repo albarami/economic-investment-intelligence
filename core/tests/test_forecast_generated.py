@@ -270,6 +270,30 @@ def test_wrong_or_extra_confirmed_feeds_refuse_before_fitting(monkeypatch, key, 
     )
 
 
+@pytest.mark.parametrize("key", [key for key, _, _ in OCCUPATIONS])
+@pytest.mark.parametrize("plant", ["wrong", "extra"])
+def test_invented_confirmed_feed_refuses_before_fitting(monkeypatch, key, plant):
+    series = occupation(key)
+    feeds = definition(key).confirmed_sources
+    # The planted name is no feed of this window's universe (rule 12).
+    assert "invented.v1" not in {
+        name for spec in DEFINITIONS for name in spec.confirmed_sources
+    }
+    planted = (
+        (*feeds[:-1], "invented.v1") if plant == "wrong" else (*feeds, "invented.v1")
+    )
+    admission = replace(series.admission, feed_names=planted)
+    assert admission.source_hashes == tuple(
+        (source.lineage_ref, source.sha256) for source in series.sources
+    )  # A self-consistent source chain cannot legitimise an invented feed.
+    monkeypatch.setattr(
+        f, "backtest", lambda *a, **k: pytest.fail("unconfirmed feeds fitted")
+    )
+    assert f.forecast_series(replace(series, admission=admission)) == (
+        f.ForecastNotOffered("forecast_not_offered")
+    )
+
+
 @pytest.mark.parametrize("key", GENERATED_KEYS)
 def test_exact_confirmed_feed_set_reaches_facts_regardless_of_order(key):
     series = generated(key)
