@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -15,7 +14,7 @@ from urllib.parse import urlsplit
 from ..fetch.allowlist import approve_closed, canonical_https, host_of
 from ..fetch.receipts import sha256_hex
 from ..fetch.snapshots import utc
-from .contracts import WebError, checked_url, digest, dump, loads
+from .contracts import WebError, checked_url, digest, dump, input_name, loads
 
 _FRAME: ContextVar[tuple[str, ...] | None] = ContextVar(
     "company_web_frame", default=None
@@ -42,10 +41,11 @@ class Manifest:
     @classmethod
     def from_data(cls, value: Mapping[str, Any]) -> Manifest:
         # Copy through canonical JSON: the caller cannot mutate the reviewed input.
-        data = json.loads(json.dumps(value))
         try:
+            data = json.loads(json.dumps(value))
             if (
-                set(data)
+                not isinstance(data, dict)
+                or set(data)
                 != {
                     "version",
                     "reviewed_by",
@@ -59,11 +59,16 @@ class Manifest:
                 or data["version"] != 1
             ):
                 raise WebError("manifest_refused")
+            if not isinstance(data["access"], dict) or not isinstance(
+                data["selectors"], dict
+            ):
+                raise WebError("manifest_refused")
             identity(data["reviewed_by"])
             utc(data["reviewed_utc"])
             provider = data["provider"]
             if (
-                set(provider)
+                not isinstance(provider, dict)
+                or set(provider)
                 != {
                     "host",
                     "path",
@@ -75,6 +80,10 @@ class Manifest:
                 or provider["keyless"] is not True
                 or provider["visitor_readable"] is not True
                 or provider["attribute"] != "href"
+                or any(
+                    not isinstance(provider[k], str)
+                    for k in ("host", "path", "result_selector")
+                )
             ):
                 raise WebError("provider_refused")
             checked_url(canonical_https(provider["host"], provider["path"], ()))
@@ -102,7 +111,8 @@ class Manifest:
                 raise WebError("access_record_missing")
             for host, access in data["access"].items():
                 if (
-                    set(access) != {"terms_url", "robots_url", "delay_seconds"}
+                    not isinstance(access, dict)
+                    or set(access) != {"terms_url", "robots_url", "delay_seconds"}
                     or type(access["delay_seconds"]) not in (int, float)
                     or not 2 <= access["delay_seconds"] <= 3600
                 ):
@@ -122,13 +132,17 @@ class Manifest:
                 raise WebError("selector_refused")
             for selectors in data["selectors"].values():
                 if (
-                    set(selectors) != {"block", "fields"}
+                    not isinstance(selectors, dict)
+                    or set(selectors) != {"block", "fields"}
+                    or not isinstance(selectors["fields"], dict)
                     or set(selectors["fields"])
                     - {"name", "address", "website", "activity"}
                     or "name" not in selectors["fields"]
                 ):
                     raise WebError("selector_refused")
                 for selector in (selectors["block"], *selectors["fields"].values()):
+                    if not isinstance(selector, str):
+                        raise WebError("selector_refused")
                     Node("a").matches(selector)
         except (KeyError, TypeError, ValueError):
             raise WebError("manifest_refused") from None
@@ -214,6 +228,4 @@ def company_requests(
 
 
 def query_name(value: str) -> str:
-    if re.search(r"[;$`|&<>\\\r\n]", value):
-        raise WebError("query_refused")
-    return value
+    return input_name(value)

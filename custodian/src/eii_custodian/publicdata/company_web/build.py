@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from ..fc_register.names import contribution as financial_contribution
+from ..fetch.allowlist import host_of
 from ..fetch.build import CACHE_RELATIVE, utc_now
 from ..fetch.page_records import selected_page
 from ..fetch.receipts import sha256_hex
@@ -135,6 +136,7 @@ def _search_stage(
             url = request_url(company, plan)
             request_sha256 = sha256_hex(url.encode())
             access.prepare(company, search_url=url)
+            access.allow(url)
             with company_requests(
                 plan, company.key, search_url=url, company_name=company.name
             ):
@@ -142,7 +144,7 @@ def _search_stage(
             urls = result.urls
         except (WebError, TransportFault) as error:
             reason = str(error) if isinstance(error, WebError) else "unavailable"
-            if reason not in {"obstacle", "unavailable"}:
+            if reason not in {"obstacle", "unavailable", "input_refused"}:
                 raise
             status = reason
         rows.append(
@@ -193,9 +195,25 @@ def _fetch_stage(
     by_key = {r["company_key"]: r for r in searched["rows"]}
     if len(by_key) != len(inputs) or set(by_key) != {c.key for c in inputs}:
         raise WebError("company_binding_refused")
-    outcomes = []
+    outcomes: list[dict[str, Any]] = []
     for company in inputs:
         row = by_key[company.key]
+        if company.input_refused:
+            if (
+                row["status"] != "input_refused"
+                or row["request_sha256"]
+                or row["urls"]
+                or plan.urls(company.key)
+            ):
+                raise WebError("search_binding_refused")
+            outcomes.append(
+                {
+                    "company_key": company.key,
+                    "search_status": "input_refused",
+                    "pages": [],
+                }
+            )
+            continue
         if row["request_sha256"] != sha256_hex(
             request_url(company, plan).encode()
         ) or set(plan.urls(company.key)) - set(row["urls"]):
@@ -209,7 +227,7 @@ def _fetch_stage(
                     page = access.page(company, url)
                     selected = page.identity
                     try:
-                        selectors = plan.data["selectors"].get(url.split("/")[2])
+                        selectors = plan.data["selectors"].get(host_of(url))
                         result = extract(
                             page.body,
                             company,
@@ -284,7 +302,7 @@ def _review_stage(
                 page = load_page(access.cache, company.key, p["identity"])
                 if page.snapshot.sidecar["original_url"] != p["url"]:
                     raise WebError("page_binding_refused")
-                selectors = plan.data["selectors"].get(p["url"].split("/")[2])
+                selectors = plan.data["selectors"].get(host_of(p["url"]))
                 try:
                     result = extract(
                         page.body,

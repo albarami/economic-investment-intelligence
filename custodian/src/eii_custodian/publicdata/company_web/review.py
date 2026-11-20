@@ -9,6 +9,7 @@ from typing import Any
 
 from ..fetch.receipts import sha256_hex
 from .contracts import VERSION, Candidate, Extraction, WebError, digest, safe_text
+from .parse import validate_fragment
 from .scope import identity
 
 
@@ -61,9 +62,16 @@ def reviewer_bundle(company_name: object, result: Extraction) -> dict[str, objec
     name = safe_text("name", company_name)
     if (
         result.status != "matched"
-        or sha256_hex(result.fragment) != result.candidates[0].fragment_sha256
+        or not result.candidates
+        or any(
+            sha256_hex(result.fragment) != c.fragment_sha256 for c in result.candidates
+        )
     ):
         raise WebError("review_bundle_refused")
+    try:
+        validate_fragment(result.fragment)
+    except WebError:
+        raise WebError("review_bundle_refused") from None
     candidates = []
     for candidate in result.candidates:
         candidate.validate()

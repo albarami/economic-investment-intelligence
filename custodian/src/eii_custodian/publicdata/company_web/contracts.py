@@ -8,6 +8,7 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from dataclasses import field as dc_field
+from ipaddress import ip_address
 from typing import Any
 from urllib.parse import unquote, urlsplit
 
@@ -21,7 +22,8 @@ _FORBIDDEN = re.compile(
     r"(?<!\d)(?:\d{8}|\d{11})(?!\d)|[\w.+-]+@[\w.-]+|"
     r"\b(?:tel|telephone|phone|fax|mobile|mr|mrs|ms|dr|prof|"
     r"person|employee|salary|salaries|wage|wages|chief|director|manager|"
-    r"job.?title|ceo|cfo|cto)\b",
+    r"job.?title|ceo|cfo|cto|founder|founded|owner|chairman|chairwoman|"
+    r"president|partner|sheikh)\b",
     re.IGNORECASE,
 )
 
@@ -70,7 +72,18 @@ def checked_url(url: str, *, query: bool = False) -> str:
     from ..fetch.allowlist import approve_closed, host_of
 
     try:
+        if not isinstance(url, str):
+            raise WebError("url_refused")
         parts = urlsplit(url)
+        host = (parts.hostname or "").rstrip(".")
+        if "." not in host or host == "localhost" or host.endswith(".localhost"):
+            raise WebError("url_refused")
+        try:
+            ip_address(host)
+        except ValueError:
+            pass
+        else:
+            raise WebError("url_refused")
         if (
             not approve_closed(url, hosts=frozenset({host_of(url)}), selectors=()).ok
             and not query
@@ -87,6 +100,18 @@ def checked_url(url: str, *, query: bool = False) -> str:
     except ValueError:
         raise WebError("url_refused") from None
     return url
+
+
+def input_name(value: object) -> str:
+    """Register names are query inputs; output/person guards apply after extraction."""
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or any(unicodedata.category(c) == "Cc" for c in value)
+        or re.search(r"[;$`|&<>\\\r\n]", value)
+    ):
+        raise WebError("input_refused")
+    return value
 
 
 def lineage(body: bytes, meta: Mapping[str, Any]) -> None:
@@ -117,9 +142,15 @@ class Company:
     name: str = dc_field(repr=False)
     source: str
     register_fields: Mapping[str, str] = dc_field(repr=False)
+    input_refused: bool = dc_field(init=False)
 
     def __post_init__(self) -> None:
-        safe_text("name", self.name)
+        try:
+            input_name(self.name)
+        except WebError:
+            object.__setattr__(self, "input_refused", True)
+        else:
+            object.__setattr__(self, "input_refused", False)
         if not self.key or self.source not in {"register", "fc_register"}:
             raise WebError("company_refused")
         if set(self.register_fields) - FIELDS:

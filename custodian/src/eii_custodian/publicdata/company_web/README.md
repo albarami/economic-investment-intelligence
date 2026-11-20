@@ -34,6 +34,13 @@ same selected page, preferring its published primary name to its alternate name.
 Its tooling identity is a hash of the source and name, never a registration or
 establishment number. An absent number remains absent.
 
+Input names receive only nonempty-string, control-character and query-metacharacter
+checks. Ordinary trading words do not bar a register name from search. A refused
+input stays in the company denominator as `input_refused`, sends no request and
+has no pages or fields; other companies continue. The inventory records this
+derived flag. Extracted values, reviewer bundles and retained names still receive
+the full person, contact and identifier guard.
+
 `inventory` archives those company inputs for the lead to select a batch. It
 opens no source connection and needs no host manifest. Its cached company keys
 are used to construct the batch manifest. `search` and later stages select only
@@ -72,6 +79,8 @@ The manifest's closed shape is:
   usable; access obstacles stop the host. Robots rules are enforced and a slower
   crawl delay is honoured. Tests inject time and refuse a sleeper that does not
   actually advance it. Real use supplies the real monotonic clock and sleeper.
+  Robots rules apply before the search request as well as before company pages;
+  a disallowed search stops that host and counts `search_obstacle` per company.
 - `selectors`: an empty object or a per-host mapping with exactly `block` and
   `fields`, using the existing closed simple-selector syntax. Fields are only
   name/address/website/activity, with name required. This entire declaration is
@@ -84,6 +93,11 @@ The manifest has a scoped exact-URL frame; its contexts only narrow a parent
 frame and always reset on exit. Redirects, final addresses and injected responses
 are checked too. Static `allowlist.approve` is unchanged and streams cannot use
 the company scope. Credentials, headers and postbacks are refused in that scope.
+IP-literal, localhost (including its subdomains) and single-label hosts are refused
+before manifest admission. Selector lookup uses the parsed, lowercase host,
+including when a URL spells an explicit default HTTPS port. Manifest containers
+are type-checked before their properties are read; malformed inputs use the fixed
+refusal diagnostic.
 
 Every complete fetched company page, including a no-block or mixed-content page,
 is stored in full through the shared immutable snapshot archive, with its original
@@ -105,13 +119,19 @@ activity is source `isicV4`, `naics` or description text, never mapped to a spin
 Absent fields remain absent. Web fields are separate candidates, with conflicts
 against register-published fields marked; no register field is overwritten.
 
-The archived reviewer bundle holds the matched company name, a canonical fragment
-of the declared fields, page/fragment hashes, source address, parser and proposed
-fields. It excludes register keys, rows, files and values of conflicting register
-fields. Each proposal includes an opaque `candidate_digest` and `value_sha256`,
-so another-maker decisions bind exactly without receiving a register key. The
-fragment is a projection of the declared source fields, never the archived full
-body's replacement. Its hash is distinct from the full-page hash.
+The archived reviewer bundle holds the matched company name, the selected source
+block before field assembly, page/fragment hashes, source address, parser and
+proposed fields. For JSON-LD this is the canonical serialization of the parsed
+Organization/LocalBusiness object, retaining separate PostalAddress parts and
+activity source properties. For microdata or a reviewed selector it is the
+serialized selected source subtree, including context outside the field nodes.
+Personal contexts and forbidden source values refuse the fragment. It excludes
+register keys, rows, files and values of conflicting register fields. Each proposal
+includes an opaque `candidate_digest` and `value_sha256`, so another-maker decisions
+bind exactly without receiving a register key. A re-dump of assembled candidate
+fields is refused as a fragment, including when its hashes are recomputed. The
+fragment never replaces the archived full body; its hash is distinct from the
+full-page hash.
 
 The reviewer returns records keyed by `candidate_digest`. Each record has exactly
 `candidate_digest`, `field`, `value_sha256`, `page_sha256`, `fragment_sha256`,

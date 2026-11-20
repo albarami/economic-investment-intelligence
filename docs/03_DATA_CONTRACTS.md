@@ -2558,6 +2558,12 @@ records remain uncommitted under PUB-04, with explicit archive selections. See
 [the tooling contract](../custodian/src/eii_custodian/publicdata/company_web/README.md)
 and [decision 0076](decisions/0076-company-web-pages-search-fetch-review-and-storage.md).
 
+The review fragment is the parsed source JSON-LD object or serialized selected
+microdata/selector subtree before candidate-field assembly, not a re-dump of the
+candidates. Invalid input names remain counted per company as `input_refused`
+without a search, page or candidate; valid register trading words are checked
+again by the full output guard only when extracted.
+
 ## Register file projections (S2-T49)
 
 This schema records the lead's column/type/format metadata, not a source value.

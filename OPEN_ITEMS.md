@@ -5528,3 +5528,53 @@ The original unnumbered review-disposition section records S2-T44 placement afte
 
 - PROPOSED OPEN ITEM: obtain the other-maker confirmations required by ruling L-1304 / AGENTS.md rule 33 for the register header/drop boundary, weekly/registers contract and exact `www.cepii.fr` host-test change. This worker supplies local uncommitted evidence, not an independent-maker approval or permission to merge.
 - The four L-1304 suite failures are locally resolved by the bounded changes recorded in PROGRESS.md, **S2-JOIN3-JF1 — fixture port and binding L-1304 integration**. Historical blocker rows are retained unchanged; this append does not silently close them. No new unresolved implementation choice or random failure was found. The lead retains the exact-merge-result and hosted-check gates.
+
+## OI-354 — Company-web provider verification and financial-centre capture
+
+- ID: OI-354
+- TYPE: OPEN
+- RAISED BY: S2-T48 build proposals, retained in PROGRESS.md **S2-T48 — Offline company-web build, 2026-11-20**, and review r1 record note R4; recorded by fix round 1.
+- CONCERNS: S2-T48 search/fetch activation; decision 0076 items 2, 3 and 7.
+- EVIDENCE: the offline fixtures use invented provider and company hosts. They establish no actual provider request contract, terms reading, approved run host manifest or S2-T36 live capture.
+- NEEDED: the lead verifies a keyless visitor-readable provider and its closed request/result shape, records dated terms/robots and the reviewed manifest, and confirms S2-T36's pinned live name capture before company-web live use. No worker or test selects a provider or opens a network connection.
+- NEEDED BY: the first lead-shell S2-T48 live search/fetch and its live acceptance evidence.
+
+## OI-355 — Confirm the public-register adapter shape
+
+- ID: OI-355
+- TYPE: OPEN
+- RAISED BY: S2-T48 build proposals in PROGRESS.md and review r1 record note R4; recorded by fix round 1.
+- CONCERNS: `company_web.build.input_companies`, S2-T48 input contract.
+- EVIDENCE: the adapter is tested only with invented CSV columns documented in the company-web README. This task has read no real register file and cannot establish that its columns have that shape.
+- NEEDED: the lead confirms the real public-register shape in its authorised shell; any adapter change receives its own scoped review and invented fixtures, with no register row, file or other field disclosed to workers or reviewers.
+- NEEDED BY: the first S2-T48 live inventory/search.
+
+## OI-356 — Company-web refresh cadence remains unconfirmed
+
+- ID: OI-356
+- TYPE: OPEN
+- RAISED BY: S2-T48 plan revision 2 F12, build proposals in PROGRESS.md and review r1 record note R4; recorded by fix round 1.
+- CONCERNS: S2-T48 refresh policy; decision 0076 **Consequences and change triggers**.
+- EVIDENCE: the build contract explicitly leaves cadence unconfirmed. Visitor pacing and bounded batches constrain requests but establish no refresh schedule.
+- NEEDED: the lead records a reviewed cadence with source/access evidence, preserving the existing request interval, batch bounds and obstacle refusals.
+- NEEDED BY: any scheduled company-web refresh.
+
+## OI-357 — Existing missing-building-table failures remain unresolved
+
+- ID: OI-357
+- TYPE: OPEN
+- RAISED BY: S2-T48 build regression evidence and review r1 baseline verification, record notes R3 and R4; recorded by fix round 1.
+- CONCERNS: existing public-snapshot, public-fetch and public-cadence tests.
+- EVIDENCE: review r1 records 14 failed and 78 passed on both the reviewed build and base `4edfe1ea9d21a686cd79172d998c1fbf2f0bc757`, with identical failing test IDs at `FetchFailure(source_id='heights', check='building_table_absent')`. The reviewer pinned `PYTHONPATH` to the archive copy and verified the import path. This is attributed reviewer evidence, not a new baseline run by this fix.
+- NEEDED: investigate and fix the missing-building-table cause in its owning scope, retain the failures and reproduce the corrected regressions without weakening their gate or using a green rerun alone as closure.
+- NEEDED BY: the S2 whole-test/gate evidence that includes those suites.
+
+## OI-358 — Company-web independent review and live E1–E7 evidence
+
+- ID: OI-358
+- TYPE: OPEN
+- RAISED BY: S2-T48 build proposals in PROGRESS.md and review r1 record note R4; recorded by fix round 1.
+- CONCERNS: S2-T48 acceptance criteria and decision 0076 items 5 to 7.
+- EVIDENCE: the build and fix exercise invented offline fixtures only. Review r1 rejected the build; this fix has no different-maker confirmation and establishes no accepted real field or live count.
+- NEEDED: another maker reviews this fix without edits; the lead runs live search/fetch, records the manifest and full-page receipts, extraction and matching outcomes, actual independent field-review maker/tool/model/session, unchanged scanner/commit evidence E6 and reconciled E7 counts. E1–E5 retain their documented owners. Pending/rejected fields stay unretained and no fixture ticks live criteria 1, 2, 4 or 7.
+- NEEDED BY: S2-T48 completion and the S2 gate.

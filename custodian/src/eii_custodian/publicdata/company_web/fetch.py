@@ -216,13 +216,20 @@ class Access:
             )
             self.checked[host] = robot
 
-    def page(self, company: Company, url: str) -> Page:
-        self.prepare(company, page_url=url)
+    def allow(self, url: str) -> None:
+        """Apply prepared robots rules before sending either a search or a page."""
         host = host_of(url)
+        if host in self.stopped:
+            raise WebError(self.stopped[host])
         robot = self.checked[host]
         if robot is not None and not robot.can_fetch("*", url):
             self.stopped[host] = "obstacle"
             raise WebError("obstacle")
+
+    def page(self, company: Company, url: str) -> Page:
+        self.prepare(company, page_url=url)
+        self.allow(url)
+        host = host_of(url)
         with company_requests(self.manifest, company.key):
             if url not in self.manifest.urls(company.key):
                 raise WebError("url_refused")

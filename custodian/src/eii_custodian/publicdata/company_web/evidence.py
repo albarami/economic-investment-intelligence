@@ -67,6 +67,7 @@ def reconcile(
             "searched",
             "search_obstacle",
             "search_unavailable",
+            "input_refused",
             "pages",
             "fetched",
             "proposed",
@@ -85,11 +86,18 @@ def reconcile(
     retained = []
     all_digests = set()
     for outcome in outcomes:
-        if outcome.search_status not in {"searched", "obstacle", "unavailable"}:
+        if outcome.search_status not in {
+            "searched",
+            "obstacle",
+            "unavailable",
+            "input_refused",
+        }:
             raise WebError("search_counts_refused")
         counts[
             "searched"
             if outcome.search_status == "searched"
+            else "input_refused"
+            if outcome.search_status == "input_refused"
             else "search_" + outcome.search_status
         ] += 1
         urls = tuple(expected_urls[outcome.company_key])

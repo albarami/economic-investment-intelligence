@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from html import escape
 from typing import Any
 
 from ..fetch.award_checks import normalise_name
@@ -45,6 +46,92 @@ ADDRESS_FIELDS = (
     "postalCode",
     "addressCountry",
 )
+
+_VOID_TAGS = frozenset(
+    {
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
+    }
+)
+
+
+def _subtree(node: Node) -> bytes:
+    """Serialise the selected source tree, including context outside field nodes."""
+    attrs = "".join(
+        " " + key + ("" if value is None else '="' + escape(value, quote=True) + '"')
+        for key, value in node.attrs.items()
+    )
+    start = "<" + node.tag + attrs + ">"
+    if node.tag in _VOID_TAGS:
+        return start.encode()
+    return (
+        start.encode()
+        + b"".join(
+            escape(c, quote=False).encode() if isinstance(c, str) else _subtree(c)
+            for c in node.children
+        )
+        + ("</" + node.tag + ">").encode()
+    )
+
+
+def _source_values(value: object) -> None:
+    """A larger source fragment must not disclose personal/identifier context."""
+    if isinstance(value, str):
+        # Source formatting is retained verbatim; candidate values still receive
+        # the unchanged output guard. Inspect context with HTML whitespace folded.
+        text = value.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+        if text.strip():
+            safe_text("address", text)
+    elif isinstance(value, dict):
+        if set(value) & PERSONAL or _types(value.get("@type")) & PERSONAL:
+            raise WebError("personal_context_refused")
+        for key, child in value.items():
+            _source_values(key)
+            _source_values(child)
+    elif isinstance(value, list):
+        for child in value:
+            _source_values(child)
+    elif type(value) in (int, float):
+        safe_text("address", str(value))
+
+
+def validate_fragment(fragment: bytes) -> None:
+    """Accept a declared source block, never a re-dump of candidate fields."""
+    try:
+        if fragment.lstrip().startswith(b"{"):
+            value = loads(fragment)
+            # Selection already checked the page's schema context. A selected
+            # @graph child may inherit it without carrying @context itself.
+            if not isinstance(value, dict) or _blocks(value, schema=True) != [value]:
+                raise WebError("fragment_refused")
+            _source_values(value)
+        else:
+            root = Tree(fragment).root
+            if len(root.nodes()) != 1 or any(
+                isinstance(c, str) and c.strip() for c in root.children
+            ):
+                raise WebError("fragment_refused")
+            for node in root.descendants():
+                if _personal_html(node):
+                    raise WebError("personal_context_refused")
+                for key, value in node.attrs.items():
+                    _source_values(key)
+                    _source_values(value)
+            _source_values(root.text())
+    except (ShapeError, UnicodeError, json.JSONDecodeError, TypeError, RecursionError):
+        raise WebError("fragment_refused") from None
 
 
 def _types(value: object) -> set[str]:
@@ -183,12 +270,12 @@ def extract(
     lineage(body, meta)
     try:
         root = Tree(body).root
-        blocks = []
+        blocks: list[tuple[dict[str, Any], bytes]] = []
         for node in root.find('script[type="application/ld+json"]'):
             selected = _blocks(loads(node.text()))
             if selected and _personal_html(node):
                 raise WebError("personal_context_refused")
-            blocks.extend(selected)
+            blocks.extend((block, dump(block)) for block in selected)
         for node in root.descendants():
             if node.attrs.get("itemtype") in {
                 "https://schema.org/Organization",
@@ -196,7 +283,8 @@ def extract(
                 "http://schema.org/Organization",
                 "http://schema.org/LocalBusiness",
             }:
-                blocks.append(_micro(node))
+                fragment = _subtree(node)
+                blocks.append((_micro(node), fragment))
         if selectors is not None:
             if not selectors_reviewed or set(selectors) != {"block", "fields"}:
                 raise WebError("selector_refused")
@@ -207,6 +295,8 @@ def extract(
                 raise WebError("personal_context_refused")
             if set(selectors["fields"]) - {"name", "address", "website", "activity"}:
                 raise WebError("field_refused")
+            fragment = _subtree(selected_node)
+            validate_fragment(fragment)
             selected_fields = {
                 k: safe_text(
                     k,
@@ -230,7 +320,9 @@ def extract(
                     str(meta["sha256"]),
                     str(meta["fetch_url"]),
                 )
-            fields = _fields(blocks[0])
+            block, fragment = blocks[0]
+            validate_fragment(fragment)
+            fields = _fields(block)
     except (ShapeError, json.JSONDecodeError, TypeError, KeyError, RecursionError):
         raise WebError("schema_refused") from None
     expected, observed = normalise_name(company.name), normalise_name(fields["name"])
@@ -245,7 +337,6 @@ def extract(
 
         status = "ambiguous" if base(expected) == base(observed) else "name_mismatch"
         return Extraction(status, (), b"", str(meta["sha256"]), str(meta["fetch_url"]))
-    fragment = dump(fields)
     candidates = tuple(
         Candidate(
             company.key,
