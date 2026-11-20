@@ -39501,6 +39501,264 @@ Seed:      3587189981
 Notes:     The whole test at WORK with the seed given at run time; lead only, never run by this preparation. The hosted checks on the joined head and the fresh-seed run on the exact merge result stay separate.
 ```
 
+Maker: OpenAI; model: GPT-6 (Codex; exact served variant not exposed). This identity describes preparation of these ledger inputs only.
+
+### MERGE TRAIN S2-10 — Slice S2: task log (pull request 108)
+
+Persona: senior release coordinator writing script-checked ledger inputs. Strict self-review persona: records reviewer rejecting claims without a source. Skills loaded: project-orientation, task-standards, sanad-provenance and muhasabah-gate. Verification-before-completion was not available in the installed catalogue or workspace skill files; the brief's plain-meaning verification rules apply. This self-check is not another-maker review.
+
+Base: 32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef. WORK: bb9357549396610a3841353302e79b01820f78f0. The initial base is e5292de5b1b553a7399391ca9c00b80a5bfd5daa, the head of PR 107, not its squash merge. The supplied brief and lead log at 2026-11-20 11:55 require the eventual move onto that squash merge. The initial joined head is b57b7b75f55a46903f881e23ead42cea5aa8e708. Git's BASE..WORK log and name-status inventory supply the commit and file counts in preparation.json; these are not test counts.
+
+Sources: `Log` below means `.overnight/IN/LOG-S2-10-evidence.md`, cited by date/time and job or ruling. All times without another date are on 2026-11-20. `Return` means the exact `.overnight/IN/` file named. Commit hashes resolve to local Git objects, inspected with git show. Builder returns describe their own checks; they are not new executions by this preparation. Launch/result identities are kept separate from returns that self-name another model. Requested routing is not proof of the model actually served.
+
+#### S2-T47 — reviewed classification crosswalk
+
+| Stage | Original full commit | Pick at WORK | Builder and source |
+|---|---|---|---|
+| Initial build | 809392bacf1a4703e1e5e9b5b38385fe5f22500b | 214393b4cbcd02047ea4f7f0ccfbea93a36b51a3 | OpenAI GPT-6.1 Sol via Codex A: Log 09:33 launch and 09:58 result; original commit Builder line. Return S2-T47.b1.return.md self-names OpenAI GPT-6. |
+| Fix A to G | a6acb9b1cbf61cb821ecd6290176cbd973936b98 | c13170f389eb3c6da4f639bbd2bcb4b5affad20b | OpenAI GPT-6.1 Sol via Codex B: Log 10:09 launch and 10:25 result; original commit Builder line. Return S2-T47.fix1.return.md self-names OpenAI GPT-6. |
+| Fix H, test plants | 1d698a491a426ace75126b589af147b935e7f845 | 964f07057946f3e562911139ed64e602c4bfb54a | OpenAI GPT-6.1 Sol via Codex B: Log 10:38 launch and 10:48 result; original commit Builder line. Return S2-T47.f2.return.md self-names OpenAI GPT-6. |
+
+Initial picks on the initial base were respectively 4afbdc6c4d32e900c542480e0b0a000df8872c55, d30d6380bae7d69142838a882dbcc72a5622a36a and 0641d71e9c310482465934369c36624b4214576b (Log 11:55; git show). The lead committed the work because the builders could not commit, as each original's Builder line states.
+
+| Review or confirmation | Maker/model as evidenced | Verdict and bounded meaning | Source |
+|---|---|---|---|
+| S2-T47.designreview | Anthropic Claude Fable 5.2 via login C | REJECTED; findings F1 to F8 bound into build brief by L-1223. No separate design approval is supplied. | Log 09:19 launch, 09:29 result/ruling, 09:33 correction; detailed design return not supplied. |
+| S2-T47.revB on 809392ba | Zhipu GLM-5.3 via relay per lead log; return self-names OpenAI GPT-6.2-Astra | REJECTED solely because command execution exited 2 in the read-only reviewer environment; its four substantive checks say PASS. L-1227 accepts this as a substantive pass with the lead's command evidence, not a reviewer APPROVED. | Log 09:58 launch and both 10:01 entries; Return S2-T47.revB.md, Checks and Findings. |
+| S2-T47.revA on 809392ba | Anthropic Claude Fable 5.2 | REJECTED: A, direct tariff8 bypass; B, non-deciding guard plants; C to G also accepted by L-1230. | Log 10:09; Return S2-T47.revA.md, Verdict and Findings A to G. |
+| S2-T47.revA2 on a6acb9b1 | Anthropic Claude Fable 5.2 | REJECTED on H only. A to G closed; further guard plants required. L-1234 orders their repair. | Log 10:38; Return S2-T47.revA2.md, Check 1 and Findings H. |
+| S2-T47.cf2 | Requested Anthropic Claude Opus 5.5 | No verdict: launch stopped by governor, then rerouted. | Log 10:48 launch and 10:49 gate. |
+| S2-T47.cf2k on 1d698a49 | Served Moonshot Kimi K3.1 Pro via relay per lead log; return self-names OpenAI Codex with no exact model | CONFIRMED: H closed on source inspection and recorded single-removal evidence. No independent pytest or removal run by this reviewer. | Log 10:49 launch and 10:52 result; Return S2-T47.cf2k.md, Verdict, Checks 3/4 and Findings. |
+
+The lead explicitly records “S2-T47 APPROVED at 1d698a49 (L-1234)” at Log 10:52. This is the lead's disposition after the review chain, not an invented APPROVED from cf2k or revA2. The final recorded focused result is 241 passed, from the lead at Log 10:48 and the builder's S2-T47.f2.return.md; no such result is claimed at the joined WORK by this preparation.
+
+The first review's correction about permissive-baseline evidence is in Return S2-T47.revA.md, Record Notes; the wider-sweep correction is in Return S2-T47.revA2.md, Record Notes. The follow-up commits append their evidence (git show a6acb9b1 and 1d698a49). Proposed items R1 to R4 in the first review and R5/R6 in the re-review are not disposed of by the H confirmation. Log 10:09 says R1 to R4 go to the records commit, but b57b7b75 changes TASKS.md only; do not claim those items were serialized there. Lead disposition/serialization remains to be checked. The committed production review is empty and supplies no real mapping approval (Return S2-T47.b1.return.md, Modules, contracts and tests).
+
+#### S2-T10 part F — F01 round 2
+
+- Reviewed original: 2c7ebaa9e7297aa0fb8c926f36164f8377f76b5d. Carry used for the train: 6f8a16bb4cbbdb39bf696b8cb4a4745d8a1e78e7. Pick at WORK: 237e64624b3259494077ab4cd9a25cfe791858c0. Initial pick: f2b051c565782e5c4b7c41a5d3dd967366fc7938. Sources: git show of each; Log 10:52 live-run diagnosis and 11:55 join.
+- Builder: OpenAI GPT-6.1 Sol via Codex, per Log 2026-11-19 23:36 launch, Log 00:06 and the original Builder line. Return S2-T10F.A2.return.md self-names OpenAI Codex / GPT-6-based Codex with exact deployment unknown. The lead replaced a workspace path in the README with a plain description before committing; source: Log 00:06 and original commit body.
+- Work: L-1178's later column-order and floating-bound rules, and the all-dates release-path validation. Sources: original commit; Return S2-T10F.A2.return.md, PO-S2-36 and PO-S2-123 sections. No source file was fetched by this preparation.
+- Reviewer S2-T10F.A2.rev1: Z.ai/Zhipu GLM-5.3 via Droid according to Log 00:06/00:33; the return self-names GLM 4.7. Verdict APPROVED on 2c7ebaa9, no rejecting findings. Sources: Log 00:33 and Return S2-T10F.A2.rev1.return.md, Verdict and Findings.
+- Reviewer-recorded evidence: both targeted plants reproduced red (4 failed and 8 failed); full custodian suite 8539 passed. These are historical results at the reviewed commit, not at WORK. Source: Return S2-T10F.A2.rev1.return.md, R3/R4, corroborated by Log 00:33. Its C1 scope note distinguishes the builder's 790 from the review's 779; neither is relabelled as a joined-head count.
+- The lead reports equal patch IDs between the reviewed original and carry at Log 11:55. `reviewed-f01-proof.json` independently compares the changed-line sequences, commit messages and resulting blobs of all affected files between those two commits; it does not purport to compute a patch ID. `identity-proof.json` compares the carry to the train pick. Both use Git objects only.
+- Record notes 1 to 4 remain as stated in Return S2-T10F.A2.rev1.return.md: source hash retained by the lead, differing command scopes, open-item closing text awaiting lead serialization, and the builder-model naming disclosure. `OPEN_ITEMS.md` at WORK still labels PO-S2-36 and PO-S2-123 OPEN. This draft writes no closure. S2-T10's status at WORK omits this F01 round; tasks_md.json supplies one bounded addition without ticking criteria or closing items.
+
+#### S2-T37 — live-run follow-up S2-LR5
+
+| Stage | Original full commit | Pick at WORK | Builder and source |
+|---|---|---|---|
+| XML listing repair | 9a3b97fde21533b2de6ac97b7b514d920aae646c | c548e9487907cda79891f069eaa4560b2156aaab | OpenAI GPT-6.1 Sol via Codex B: Log 10:52 launch, 11:05 result and original Builder line. Return S2-LR5.b1.return.md self-names OpenAI GPT-6, exact variant unknown. |
+| F1 deciding root-tag plants | d4a8dd4cc4eb6c22dfac8662e34f624994d9ddd6 | 081bc5a838b3a6b7f84110a07edbff0c3e16fd70 | Lead-authored fix: Log 11:37. Commit trailer names Claude Opus 5.5 (Anthropic); the log does not independently state the lead's model for that action. |
+
+Initial picks were 51c17aa11908fb3f00aa385d2ce9e881d6cb8a5b and 099c07422ab0b34f0743c6e388d1ea7b695959fb (Log 11:55; git show). The source repair followed the lead's failed live build: Log 10:52 records rc 1 and `places_fsq/copy release_missing`; the copy listing was XML while discovery expected HTML. That live diagnosis is lead-supplied evidence, not a network check by this preparation.
+
+| Review or confirmation | Maker/model as evidenced | Verdict and bounded meaning | Source |
+|---|---|---|---|
+| Initial lens A route | Requested Anthropic Claude Opus via login C | No verdict: stopped by governor. | Log 11:09. |
+| Initial lens B route | Requested Moonshot Kimi K3.1 Pro via Droid | No verdict: invalid model; the alternative custom route was not used. | Log 11:09. |
+| S2-LR5.lensA on 9a3b97fd | Requested Google Gemini 4 Carbon through Abacus; result served as RouteLLM, exact backend maker/model not established | APPROVED, no findings, parser/provenance inspection and reported plant probes. Tests not run under the read-only constraint. Do not upgrade the requested model to a verified served identity. | Log 11:11 launch and 11:35 result; Return S2-LR5.lensA.md, Verdict, Tests run and Record Notes. |
+| S2-LR5.lensB on 9a3b97fd | Moonshot AI Kimi K3.1 Pro High via Devin | REJECTED on F1: wrong-namespace plant also triggers the scalar guard, so does not decide the root guard. No shell/tests; carry preservation and historical PROGRESS preservation not independently checked by this reviewer. | Log 11:13; L-1237 (11:12); Return S2-LR5.lensB.md. |
+| S2-LR5.cf1 on d4a8dd4c | Moonshot AI Kimi K3.1 Pro High via Devin | CONFIRMED; F1 closed, no findings, static deciding-path inspection. No independent execution. | Log 11:37 launch and 11:39 result; Return S2-LR5.cf1.md. |
+
+The 11:37 launch log uses the phrase “Cognition Devin Kimi K3.1 Pro”; the result at 11:39 and cf1 return identify Moonshot as the model maker. Devin is the route here, not evidence that the model maker is Cognition. The lead's “ready for train S2-10” statement at 11:39 follows lens A APPROVED and lens B F1 CONFIRMED; no separate whole-train verdict is supplied.
+
+Historical checks: Log 11:05 records 256 places tests passed on the repair. Log 11:36 and Return S2-LR5.cf1.md record the lead's root-guard removal as 2 failed / 59 passed; Log 11:37 records restored 84 passed. The figures refer to their stated selections, not an identical command or a joined-head run. The original and pick comparisons in identity-proof.json cover every file; no assertion that the later repair leaves the whole releases.py unchanged is made, since that file implements the new XML discovery.
+
+#### Lead fix: the S2-T47 resolver tests move to the custodian side
+
+| Stage | Commit at WORK | Author and confirmation |
+|---|---|---|
+| Test module relocation | b28a3753496c8bb9c24af5c388db2d9ec31bbae4 | Lead (trailer Claude Opus 5.5, Anthropic), Log 12:52. Cause: the lead's ledger try 1 (Log 12:45) stopped python-core at collection because `core/tests/test_classification.py` imported custodian test fixtures and the custodian reader, which the runner's `python -P` start does not put on the path. The module moves unchanged to `custodian/tests/test_classification_resolver.py` with one docstring sentence; docs/03 names the new path. Rule 33 forced-difference confirmation: S2-T47.mv1, Zhipu GLM-5.3 through the relay (another maker), CONFIRMED, Log 12:57. Runner evidence on the fix, seed 2547224853: python-core 749 passed, custodian-1 4743, custodian-2 4167, each exit 0. make_spec.py checks the commit's four-file inventory and that the moved module differs from the original only by the inserted docstring lines. |
+
+#### Records commit
+
+- Commit at WORK: bb9357549396610a3841353302e79b01820f78f0. Initial commit: b57b7b75f55a46903f881e23ead42cea5aa8e708.
+- Subject: `chore(records): train S2-10 records: S2-T47 and the S2-T37 live-run follow-up in review`.
+- Authoring role: lead, per Log 11:55. Commit trailer: Claude Opus 5.5 (Anthropic); this is trailer attribution, not separate served-model telemetry.
+- git show of the initial records commit changes only TASKS.md, two additions and two deletions: S2-T47's delivery line and S2-T37's delivery line. It neither closes an open item nor adds an F01 round-two status sentence. make_spec.py checks the record-file inventory at run time.
+- No review or confirmation of this records commit, or of the complete joined head, is supplied. `tasks_md.json` adds only S2-T10's F01 round-two status through the ledger; no replacement is needed for the two status lines already present. The S2-T37 line names the requested Google model; the review table above preserves the narrower served-identity evidence without silently rewriting a lead record.
+
+#### Identity proof and remaining lead gates
+
+`identity-proof.json` is generated file by file from each original and pick. Commit messages and file inventories must match. All code and test resulting blobs must match their originals at each pick. The only unequal patch lines allowed are literally empty separators in PROGRESS.md: the initial S2-T47 pick omits two added blank lines and the initial S2-T37 repair pick omits one (Git deltas; Log 11:55). Every such difference is enumerated, never hidden by ignoring arbitrary whitespace. Whole PROGRESS/TASKS files also contain different base histories.
+
+Document 03 differs in full-file bytes for the initial crosswalk and A-to-G fix, but its task patch lines match. Its `pub_tender` company_size wording difference already exists between the respective parents; make_spec.py requires the parent-to-parent delta to equal the resulting-file delta exactly. This inherited wording is not an altered crosswalk hunk and not a code/test change. The proof records both ranges and blob IDs. Any other non-record file difference or nonblank patch change refuses preparation and needs lead resolution under decision 0032 item 2.
+
+The generator prepares one pytest row for every changed test file under custodian/tests, core/tests or scripts/tests, using the brief's exact runner form. The AST inventory gives named changed-test anchors, including decorator edits; function counts are syntax counts, not parametrized test results. The two changed fixture modules are helpers, not standalone test suites. Shared check rows and the whole-test seed are runtime inputs for the lead; none is executed here.
+
+Still owed: review-note dispositions/serialization where not already recorded; another-maker confirmation of the joined head under rule 33 and decision 0032; required hosted checks on the actual head; the records-only move's attached diff after PR 107 merges, with new task confirmation if code/tests change; rerun hosted checks on that moved head and the lead's fresh-seed whole test on the exact squash-merge result under decision 0039. This preparation grants no task, train, live-run or slice-gate approval and runs no ledger or tests.
+
+#### Evidence for the work commit `bb9357549396610a3841353302e79b01820f78f0`
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest core/tests/test_calculation_purity.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_purity_guard_and_planted_io_helper. Source: core/tests/test_calculation_purity.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 4 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_classification_resolver.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    55 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_ac3_many_to_many_keeps_paths_without_numeric_input_duplication; test_ac3_two_hop_trace_and_missing_link; test_ac4_typed_consumer_rejects_prohibited_output; test_ac5_consumer_imports_no_custodian_and_uses_no_arithmetic; test_ac5_stable_order_from_shuffled_inputs; test_b_c13_requires_a_manufacturing_industry; test_b_direct_tariff8_requires_a_bound_family; test_b_resolver_refuses_a_non_tariff_source; test_d_reason_types_and_selection_contract_are_closed; test_f1_absent_endpoint_is_unreviewed_not_unmapped; test_f2_composition_cannot_upgrade_worse_hop; test_f2_two_hop_weights_stay_side_by_side_never_multiplied; test_f2_worst_status_over_multiple_branches; test_f3_c13_has_only_mapped_and_not_mapped_buckets; test_f3_c13_multi_target_has_no_allocation_rule; test_f3_c13_parent_requires_every_bound_child; test_f3_c13_single_published_weight_has_no_allocation_rule; test_f3_c13_t1_t2_t3_worked_example_selection_inputs; test_f3_direct_parent_mapping_cannot_bypass_complete_family; test_f4_middle_endpoint_identity_has_no_bridge; test_h_c13_refuses_a_non_tariff_source; test_h_c13_requires_a_crosswalk; test_h_endpoint_identity_guards; test_h_resolver_requires_a_crosswalk. Source: custodian/tests/test_classification_resolver.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 24 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_classification_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    181 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T47. Changed test file (A). Coverage anchors (added or changed test functions, including decorators): test_ac1_absent_basis_or_review_plant; test_ac1_review_basis_and_binding; test_ac1_source_chain_plant; test_ac1_stale_binding_plant; test_ac1_valid_sha256_is_not_a_bare_identifier; test_ac2_mapping_status_and_multiplicity; test_ac2_silent_status_upgrade_plant; test_ac4_classification_only_boundary_plant; test_ac5_additional_closed_admission_guards; test_ac5_closed_schema_and_endpoint_plants; test_ac5_malformed_json_or_duplicate_property; test_ac5_missing_binding; test_b_bare_digit_guard_isolated_in_locator; test_b_child_in_two_distinct_families; test_b_date_only_unreviewed_signature; test_b_duplicate_property_in_otherwise_valid_document; test_b_isolated_endpoint_guards; test_b_official_basis_is_not_production_admission; test_b_production_registry_metadata_guard; test_b_production_registry_positive_control; test_b_public_source_url_guard; test_b_review_context_mode_mismatch; test_b_synthetic_tariff_is_not_production_admission; test_f1_unsigned_group_decision_plant; test_f2_changed_published_weight_requires_renewed_review; test_f2_unweighted_and_published_multi_link_controls; test_f2_weight_guard_plants; test_f3_bound_tariff_inventory_guards; test_f3_method_contract_keeps_every_nonmapped_status_in_one_bucket; test_f4_isic_endpoint_control_and_no_implicit_bridge; test_f5_fixture_mode_cannot_be_admitted_as_production; test_f6_empty_committed_review_has_no_approval_or_carriage; test_f6_f8_contract_names_task_modules_and_deferred_carriage; test_h_duplicate_parent_with_disjoint_children_is_refused; test_h_duplicate_source_with_distinct_link_is_refused; test_h_duplicate_target_with_valid_weights_is_refused; test_h_editorial_rationale_cannot_be_null; test_h_empty_decision_requires_a_pending_reason; test_h_industry_code_requires_canonical_slug; test_h_isic_endpoint_guards; test_h_missing_schema_has_fixed_diagnostic; test_h_nonbasis_source_ref_must_resolve; test_h_occupation_level_requires_major_group; test_h_public_source_url_guards; test_h_review_date_requires_dashed_calendar_shape; test_h_tariff_level_requires_matching_grain. Source: custodian/tests/test_classification_review.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 46 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_format.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    74 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T10 part F F01 round 2. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_fsq_deprecated_bounds_used_when_order_unknown; test_fsq_float_all_non_null_nan_has_no_bounds; test_fsq_float_order_nan_bound_refuses_with_control; test_fsq_float_orders_use_non_nan_bounds_with_control; test_fsq_hand_encoded_unknown_order_still_refuses; test_fsq_ieee_order_uses_modern_bounds_instead_of_deprecated; test_fsq_int96_timestamp_order_is_recognised_without_coordinate_coercion; test_fsq_order_on_wrong_physical_type_refuses; test_fsq_orders_missing_or_unknown_refuse; test_fsq_type_order_zero_widens_but_total_order_keeps_sign; test_fsq_writer_emits_orders_and_optional_deprecated_pair. Source: custodian/tests/test_places_fsq_format.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 29 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    61 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     S2-T10 part F F01 round 2 and S2-T37 follow-up. Changed test file (M). Coverage anchors (added or changed test functions, including decorators): test_bad_dated_candidates_fail_closed; test_build_public_reports_listing_reason_and_never_uses_cached_release; test_equal_release_dates_and_undated_paths_remain_valid; test_every_date_in_receipt_and_selection_paths_must_match; test_fetch_follows_listing_to_newest_metadata_partitions_and_data; test_observed_bucket_shape_selects_metadata_backed_newest_release; test_plant_bucket_shape_failures; test_plant_dated_folder_without_metadata_is_not_a_release; test_plant_processing_instruction_anywhere_is_refused; test_plant_root_alone_wrong_with_s3_children_is_refused; test_plant_truncated_listing_is_never_read_in_part; test_plant_xml_declarations_are_refused; test_unordered_listing_selects_greatest_valid_calendar_date. Source: custodian/tests/test_places_fsq_releases.py at bb9357549396610a3841353302e79b01820f78f0; runner: scripts/run_tests.py SUITES and task brief. 21 functions by AST, not a pytest case count. Actual exit and count owed to the lead run at WORK.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "835 files already formatted"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 449 source files"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1138 text files, 123 Markdown files: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead check at WORK; result owed to this run.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Rule 2 byte parity at WORK; result owed.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef...bb9357549396610a3841353302e79b01820f78f0'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:core/src/eii_core/classification.py A:custodian/publicdata/review/product_activity_occupation.v1.binding.json A:custodian/publicdata/review/product_activity_occupation.v1.json A:custodian/publicdata/review/product_activity_occupation.v1.schema.json A:custodian/src/eii_custodian/publicdata/review/classification.py A:custodian/tests/fixtures/classification.py A:custodian/tests/test_classification_resolver.py A:custodian/tests/test_classification_review.py M:PROGRESS.md M:TASKS.md M:core/tests/test_calculation_purity.py M:custodian/src/eii_custodian/publicdata/places_fsq/README.md M:custodian/src/eii_custodian/publicdata/places_fsq/errors.py M:custodian/src/eii_custodian/publicdata/places_fsq/fetch.py M:custodian/src/eii_custodian/publicdata/places_fsq/footer.py M:custodian/src/eii_custodian/publicdata/places_fsq/releases.py M:custodian/src/eii_custodian/publicdata/places_fsq/select.py M:custodian/tests/fixtures/places_fsq/invented.py M:custodian/tests/test_places_fsq_format.py M:custodian/tests/test_places_fsq_releases.py M:docs/03_DATA_CONTRACTS.md M:docs/07_ECONOMIC_METHODS.md'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "22 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact BASE..WORK name-status inventory from Git: 22 files.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','32cc9ad1278a506d3d0b42bfdae9ea8b2ba05eef..bb9357549396610a3841353302e79b01820f78f0'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     8 linear commits; subjects checked by make_spec.py.
+```
+
+```text
+### MERGE TRAIN S2-10 — Slice S2: task log
+Commit:    bb9357549396610a3841353302e79b01820f78f0
+Command:   ./eii test --seed 2845535193
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    12297 passed, 0 failed, 0 skipped
+Seed:      2845535193
+Notes:     Seed supplied at run time. Lead only. Hosted checks on the actual head and a fresh-seed whole test on the exact merge result remain separate gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
