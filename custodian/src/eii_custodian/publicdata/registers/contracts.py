@@ -59,8 +59,6 @@ SCHEMAS: dict[str, dict[str, str]] = {
         district_ar="text?",
         block_en="integer",
         block_ar="integer",
-        nationality_group="text",
-        nationality_group_ar="text",
         establishment_nationality_ar="text",
         points_at_location="integer",
     ),
@@ -97,11 +95,12 @@ PREFIXES = ("SYN-E-", "SYN-L-", "SYN-G-", "SYN-P-", "SYN-F-")
 METHOD = "register_file_projection"
 VERSION = "v1"
 
+# These source headers are required at intake; their values are dropped before parsing.
+HEADER_ONLY = ("nationality_group", "nationality_group_ar")
+
 # Derived/internal fields are validated at intake but are not Public card facts.
 # In particular an inferred geocoder building is never promoted to a named tower.
-INPUT_ONLY = frozenset(
-    {"row_key", "nationality_group", "nationality_group_ar", "points_at_location"}
-)
+INPUT_ONLY = frozenset({"row_key", "points_at_location"})
 CARD_COLUMNS = (
     *(name for name in SCHEMAS["establishments"] if name not in INPUT_ONLY),
     "registered_address",

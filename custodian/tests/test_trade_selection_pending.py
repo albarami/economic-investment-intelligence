@@ -141,7 +141,9 @@ def test_scope_directive_never_becomes_a_compared_cell(tmp_path, monkeypatch, fi
 
 
 def test_pending_dispatch_records_no_comparison(tmp_path, monkeypatch):
-    from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+    from custodian.tests.support.fetch_build import run_build
+
+    from eii_custodian.publicdata.fetch.build import LOG_NAME
 
     selected = tr.Selection.from_mapping(pending_mapping())
     monkeypatch.setattr(tr, "read_portal", lambda *args: pytest.fail("pending read"))

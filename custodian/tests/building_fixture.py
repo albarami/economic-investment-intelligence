@@ -182,11 +182,13 @@ def table(prepared):
     return json.loads((prepared.output / "buildings.geojson").read_text())
 
 
-def bind_height_table(cache, entries, path):
+def bind_height_table(cache, entries, path, *, write_manifest=True):
     """Hand-written lineage prerequisite for isolated C47 hierarchy fixtures.
 
     These dummy input bodies are invented, not producer output. Full producer
     integration and manifest tamper plants live in test_publicdata_buildings.
+    ``write_manifest=False`` supplies registrations without repairing the
+    manifest, so missing-manifest and altered-hash plants remain deciding.
     """
     from eii_custodian.publicdata.building_inputs import (
         BUILDING_METHOD,
@@ -227,16 +229,17 @@ def bind_height_table(cache, entries, path):
         chain[row.key] = fingerprint(
             read_snapshot(cache / row.key, snapshot.stem), snapshot.stem
         )
-    path.with_name("manifest.buildings.json").write_bytes(
-        dump(
-            {
-                "method": BUILDING_METHOD,
-                "source_release": SOURCE_RELEASE,
-                "output_sha256": file_hash(path),
-                "national_completeness": True,
-                "source_chain": chain,
-            }
+    if write_manifest:
+        path.with_name("manifest.buildings.json").write_bytes(
+            dump(
+                {
+                    "method": BUILDING_METHOD,
+                    "source_release": SOURCE_RELEASE,
+                    "output_sha256": file_hash(path),
+                    "national_completeness": True,
+                    "source_chain": chain,
+                }
+            )
         )
-    )
     assert set(keys) <= set(reviewed_selections(cache))
     return (*tuple(entries), *added)

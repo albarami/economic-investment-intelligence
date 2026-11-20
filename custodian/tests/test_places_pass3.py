@@ -117,8 +117,7 @@ def test_invalid_review_yaml_is_one_refusal_and_the_build_goes_on(
         url="https://www.ilo.org/resource/news/planted",
     )
     outcome = run_build((citation,), _unused, cache, _clock, _sleep)
-    assert outcome.failure is not None
-    assert outcome.failure.check == "building_table_absent"
+    assert outcome.failure is None
     assert "REFUSED review_unreadable" in outcome.lines
     assert all("Parser" not in line for line in outcome.lines)
     assert any(line.startswith("COVERAGE ") for line in outcome.lines)

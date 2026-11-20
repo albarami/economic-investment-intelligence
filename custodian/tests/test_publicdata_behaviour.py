@@ -1399,6 +1399,7 @@ def test_citation_only_writes_metadata_and_does_not_fetch(tmp_path: Path) -> Non
 _BUILD_WRITE_ALLOWLIST = frozenset(
     {
         f"data/{BUILDINGS_RELATIVE}",
+        "data/assets/buildings/manifest.buildings.json",
         f"data/{HEIGHTS_RELATIVE}/{HEIGHTS_FILE}",
         f"data/{HEIGHTS_RELATIVE}/{MANIFEST_FILE}",
     }

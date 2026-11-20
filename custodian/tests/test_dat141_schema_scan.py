@@ -676,3 +676,21 @@ def test_scan_refuses_a_named_registry_that_is_not_a_file(tmp_path: Path) -> Non
     with pytest.raises(ValueError) as caught:
         scan_tree((tmp_path,), missing)
     assert str(caught.value) == f"named registry is not a file: {missing}"
+
+
+def test_register_company_nationality_group_declaration_still_fails(
+    tmp_path: Path,
+) -> None:
+    """L-1304: input-only columns never exempt a company registry schema."""
+    registry = tmp_path / "registry.yaml"
+    registry.write_text(
+        "sources:\n  - key: biz_register\n    source_id: biz_register\n"
+        "    release_tables: [pub_register_company]\n"
+        "    public_splits: [nationality]\n"
+        "    columns:\n      - {name: nationality_group, type: string}\n",
+        encoding="utf-8",
+    )
+    scan = scan_tree((tmp_path,), registry)
+    assert [(v.schema, v.field, v.category) for v in scan.violations] == [
+        ("biz_register", "nationality_group", "nationality")
+    ]

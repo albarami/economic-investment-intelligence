@@ -7,6 +7,7 @@ from collections import Counter
 from dataclasses import replace
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_awards import STAMP, profile, row
 from custodian.tests.test_s2_t29_fix import award_intake
 
@@ -20,7 +21,6 @@ from eii_custodian.publicdata.fetch.award_links import (
     sample_from_links,
     validate_links_receipt,
 )
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.fetch.transport import ATTEMPT_LIMIT, TransportFault

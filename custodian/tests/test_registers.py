@@ -31,7 +31,10 @@ from eii_custodian.publicdata.review.cache_fixture import read_parquet
 
 def csv_bytes(role, rows):
     stream = io.StringIO(newline="")
-    writer = csv.DictWriter(stream, fieldnames=list(SCHEMAS[role]))
+    headers = list(SCHEMAS[role])
+    if role == "establishments":
+        headers += ["nationality_group", "nationality_group_ar"]
+    writer = csv.DictWriter(stream, fieldnames=headers)
     writer.writeheader()
     writer.writerows(rows)
     return stream.getvalue().encode()
@@ -802,3 +805,25 @@ def test_stale_two_table_wording_is_gone():
         )
         assert "`pub_register_snapshot`" in row
         assert "two key columns" not in row
+
+
+@pytest.mark.parametrize("column", ["nationality_group", "nationality_group_ar"])
+def test_input_only_nationality_is_header_checked_and_dropped(frame, column):
+    from eii_custodian.publicdata.registers.parse import _rows
+
+    assert column not in _rows(inputs()["establishments"], "establishments")[0]
+    assert column not in parse("biz_register", inputs(), frame)[0]
+    body = inputs()["establishments"].decode().splitlines()
+    header = body[0].split(",")
+    index = header.index(column)
+    # Missing or renamed source headers must still refuse.
+    for replacement in (None, "SYN_unconfirmed_column"):
+        rows = [line.split(",") for line in body]
+        for row in rows:
+            if replacement is None:
+                row.pop(index)
+        if replacement is not None:
+            rows[0][index] = replacement
+        altered = ("\n".join(",".join(row) for row in rows) + "\n").encode()
+        with pytest.raises(RegisterError, match=r"^input_schema$"):
+            parse("biz_register", {"establishments": altered}, frame)

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.building_fixture import PARTS, bind_height_table, world
 from custodian.tests.fixtures.atlas.invented import (
     configuration,
     entry,
@@ -18,6 +20,7 @@ from custodian.tests.support.buildings import (
 from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.atlas.config import Config
+from eii_custodian.publicdata.fetch.build import _heights
 from eii_custodian.publicdata.fetch.build import run_build as production_run_build
 
 
@@ -65,20 +68,69 @@ def test_minimal_building_table_satisfies_run_build(tmp_path: Path) -> None:
     ensure_minimal_building_table(cache)
     path = building_table_path(cache.parent)
     assert path.is_file()
-    accepted = run_build(
-        [entry()],
-        metadata,
-        cache,
-        lambda: "2026-11-16T00:00:00Z",
-        lambda _: None,
-        atlas_stream=stream,
-        atlas_config=Config.from_mapping(configuration()),
-    )
-    assert accepted.failure is None
+    entries = bind_height_table(cache, [entry()], path, write_manifest=False)
+    assert _heights(cache, entries, [], []) is None
     path.unlink()
     with pytest.raises((FileNotFoundError, OSError)):
         path.read_bytes()
-    refused_again = production_run_build(
+    refused_again = _heights(cache, entries, [], [])
+    assert refused_again is not None
+    assert refused_again.check == "building_table_absent"
+
+
+@pytest.mark.parametrize("plant", ["missing_manifest", "altered_hash"])
+def test_shared_helper_manifest_is_required_and_verified(
+    tmp_path: Path, plant: str
+) -> None:
+    cache = tmp_path / "data/public_cache"
+    path, _ = ensure_minimal_building_table(cache)
+    entries = bind_height_table(cache, (), path, write_manifest=False)
+    assert _heights(cache, entries, [], []) is None
+    manifest = path.with_name("manifest.buildings.json")
+    if plant == "missing_manifest":
+        manifest.unlink()
+        expected = "building_manifest_absent"
+    else:
+        block = json.loads(manifest.read_text())
+        block["output_sha256"] = "0" * 64
+        manifest.write_text(json.dumps(block))
+        expected = "building_table_hash"
+    refused = _heights(cache, entries, [], [])
+    assert refused is not None
+    assert refused.check == expected
+    assert not (cache.parent / "assets/heights/heights.json").exists()
+
+
+def test_missing_part_registration_still_refuses(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.building_inputs import BuildingError
+
+    prepared = world(tmp_path)
+    prepared.produce()
+    prepared.entries = tuple(row for row in prepared.entries if row.key != PARTS[0])
+    with pytest.raises(BuildingError) as refused:
+        prepared.produce()
+    assert refused.value.name == "building_part_unregistered"
+    assert refused.value.detail == PARTS[0]
+
+
+def test_run_build_verifies_the_shared_helper_manifest(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from custodian.tests.support import fetch_build
+
+    original = fetch_build.ensure_minimal_building_table
+
+    def tampered(cache):
+        path, created = original(cache)
+        manifest = path.with_name("manifest.buildings.json")
+        block = json.loads(manifest.read_text())
+        block["output_sha256"] = "0" * 64
+        manifest.write_text(json.dumps(block))
+        return path, created
+
+    monkeypatch.setattr(fetch_build, "ensure_minimal_building_table", tampered)
+    cache = tmp_path / "data/public_cache"
+    outcome = run_build(
         [entry()],
         metadata,
         cache,
@@ -87,8 +139,32 @@ def test_minimal_building_table_satisfies_run_build(tmp_path: Path) -> None:
         atlas_stream=stream,
         atlas_config=Config.from_mapping(configuration()),
     )
-    assert refused_again.failure is not None
-    assert refused_again.failure.check == "building_table_absent"
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_hash"
+    assert not building_table_path(cache.parent).exists()
+    assert not (cache.parent / "assets/heights/heights.json").exists()
+    assert not list(cache.glob("bldg_ovt/**/*.meta.json"))
+    assert not (cache / "snapshot_pins.json").exists()
+
+
+def test_run_build_restores_fixture_pins_and_preserves_existing_receipts(
+    tmp_path: Path,
+) -> None:
+    cache = tmp_path / "data/public_cache"
+    path, _ = ensure_minimal_building_table(cache)
+    before = {file: file.read_bytes() for file in cache.rglob("*") if file.is_file()}
+    outcome = run_build(
+        [entry()],
+        metadata,
+        cache,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
+        atlas_stream=stream,
+        atlas_config=Config.from_mapping(configuration()),
+    )
+    assert outcome.failure is None
+    assert not path.exists()
+    assert all(file.read_bytes() == body for file, body in before.items())
 
 
 def test_atlas_fixture_contains_its_height_outputs(tmp_path: Path) -> None:

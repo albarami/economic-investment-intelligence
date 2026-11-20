@@ -467,7 +467,11 @@ def _entry(row: object) -> Entry:
             or row.get("skip_reason") != "lead_shell_file_input"
             or row.get("extension") != "csv"
             or row.get("refetch")
-            != {"value": "none", "reason": "lead_shell_file_input"}
+            != {
+                "value": "weekly",
+                "family": "registers",
+                "evidence": "decision 0045 item 4; EII check schedule",
+            }
             or row.get("release_tables")
             != ["pub_register_company", "pub_register_snapshot"]
         ):

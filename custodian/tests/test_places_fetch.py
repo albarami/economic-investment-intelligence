@@ -283,8 +283,7 @@ def test_skip_reason_still_set_fetches_nothing(tmp_path: Path) -> None:
 
     outcome = run_build((planted,), transport, fixture_cache, _clock, _sleep)
     assert calls == []
-    assert outcome.failure is not None
-    assert outcome.failure.check == "building_table_absent"
+    assert outcome.failure is None
     expected = _skipped_lines(planted)
     assert outcome.lines[: len(expected)] == expected
 
@@ -347,8 +346,7 @@ def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
     baseline = run_build(
         (public_entry(),), transport, tmp_path / "baseline", _clock, _sleep
     )
-    assert baseline.failure is not None
-    assert baseline.failure.check == "building_table_absent"
+    assert baseline.failure is None
     assert events == ["investment", "series", "regression"]
     events.clear()
     skipped = tuple(
@@ -359,8 +357,7 @@ def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
     joined = run_build(
         (*skipped, public_entry()), transport, tmp_path / "joined", _clock, _sleep
     )
-    assert joined.failure is not None
-    assert joined.failure.check == "building_table_absent"
+    assert joined.failure is None
     expected = tuple(line for entry in skipped for line in _skipped_lines(entry))
     assert joined.lines[: len(expected)] == expected
     assert joined.lines[len(expected) :] == baseline.lines

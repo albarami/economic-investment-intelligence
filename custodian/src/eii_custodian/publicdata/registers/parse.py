@@ -14,6 +14,7 @@ from eii_custodian.publicdata.frame.grid import point_cell
 
 from .contracts import (
     CARD_COLUMNS,
+    HEADER_ONLY,
     NUMERIC_COLUMNS,
     REGISTRATION,
     ROLES,
@@ -106,7 +107,10 @@ def _rows(body: bytes, role: str) -> list[dict[str, str | None]]:
         reader = csv.reader(io.StringIO(body.decode("utf-8"), newline=""), strict=True)
         header = next(reader, [])
         schema = SCHEMAS[role]
-        if len(header) != len(schema) or set(header) != set(schema):
+        expected = set(schema) | (
+            set(HEADER_ONLY) if role == "establishments" else set()
+        )
+        if len(header) != len(expected) or set(header) != expected:
             refuse("input_schema")
         rows = []
         for record in reader:
@@ -116,6 +120,7 @@ def _rows(body: bytes, role: str) -> list[dict[str, str | None]]:
                 {
                     name: parse_value(value, schema[name])
                     for name, value in zip(header, record, strict=True)
+                    if name in schema
                 }
             )
         return rows

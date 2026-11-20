@@ -2102,7 +2102,8 @@ fetch, independently of row order.
 
 Both file declarations contain every required registry field, no fetch URL,
 fetch host, landing URL or terms URL, `nightly_live_fetch: false`,
-`commit_allowed: false`, no automatic refetch and the technical dispatch reason
+`commit_allowed: false`, the `registers` family with a weekly check schedule
+(decision 0045 item 4; ruling L-1304), and the technical dispatch reason
 `lead_shell_file_input`. `prepare` refuses transport for this kind and the fetch
 build skips it before any network dispatch. This is not a terms-based refusal.
 The rows record the owner's local-use basis, decision 0026. Publisher placeholders
@@ -2112,8 +2113,11 @@ retrieval timestamp, hash, terms words/date and basis note come from the complet
 file receipt, never from a guessed attribution. The lead's real-file check is
 waiting. No fetched or file-input record belongs in this repository.
 
-`custodian/publicdata/sources.yaml` declares each primary CSV column as a string
-lexeme. The schema-only type and format per column for the commerce file and all
+`custodian/publicdata/sources.yaml` declares each admitted primary CSV column as a
+string lexeme. The commerce source headers `nationality_group` and
+`nationality_group_ar` are required at intake and their values dropped before
+parsing; neither column is declared in a registry or release schema (DAT-141;
+ruling L-1304). The schema-only type and format per column for the commerce file and all
 three financial-centre companion roles are in
 `custodian/src/eii_custodian/publicdata/registers/contracts.py`, `SCHEMAS`.
 The declarations are UTF-8, comma-separated, headered CSV. They distinguish

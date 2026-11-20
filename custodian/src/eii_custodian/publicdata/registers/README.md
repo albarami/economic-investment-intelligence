@@ -15,7 +15,10 @@ schema and privacy checks; this module does not implement those checks. The
 future release-builder call site remains with its owner.
 
 `contracts.SCHEMAS` is the schema-only lead contract: column list, declared
-lexeme type and value format for each of the four CSV roles. CSV scalar lexemes
+lexeme type and value format for each of the four CSV roles. The commerce
+source also requires the two `HEADER_ONLY` column names at intake; they are
+absent from registry and release schemas and their values are dropped before
+lexeme validation (ruling L-1304). CSV scalar lexemes
 are validated as strings. The release projects capital to a non-negative BIGINT
 in QAR and coordinates to finite DOUBLE values; other declared card fields keep
 source strings, preserving leading zeros and publisher spelling. Dates must be
@@ -26,7 +29,9 @@ The only supplied categorical values, the tax flag, are validated as declared.
 
 The commerce projection preserves its declared card fields except internal
 `row_key`, the extra `nationality_group` fields and derived `points_at_location`.
-Those fields are validated but never released. The financial-centre projection
+The extra nationality-group columns are header-checked and dropped; internal
+row keys and location counts are validated but never released. The
+financial-centre projection
 maps `qfc_number` to `registration_number`, preserves its published names,
 registered address and licence status, and preserves at most one published
 notice and its complete date. The geocoded companion contributes coordinates

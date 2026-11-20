@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from custodian.tests.building_fixture import bind_height_table
 from custodian.tests.fixtures.heights import invented
 
 from eii_custodian.publicdata.heights.model import BUILDINGS_RELATIVE
@@ -15,11 +16,12 @@ def building_table_path(data_root: Path) -> Path:
 
 
 def ensure_minimal_building_table(cache: Path) -> tuple[Path, bool]:
-    """Write one valid invented building row beside the public cache.
+    """Write one invented row and its verifiable isolated inventory manifest.
 
     ``cache`` is the directory passed to ``run_build``. The table lives at
     ``cache.parent / assets/buildings/buildings.geojson``. The second return
     value is true only when this call created the file.
+    Existing tables and manifests are left for the real verifier to decide.
     """
     path = building_table_path(cache.parent)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -37,4 +39,5 @@ def ensure_minimal_building_table(cache: Path) -> tuple[Path, bool]:
             ]
         )
     )
+    bind_height_table(cache, (), path)
     return path, True

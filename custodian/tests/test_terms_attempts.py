@@ -17,6 +17,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.building_fixture import bind_height_table
 from custodian.tests.fixtures.heights import invented
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_publicdata_behaviour import (
@@ -139,7 +140,7 @@ def _heights(tmp_path: Path, attempts: tuple[dict[str, object], ...]) -> dict:
     out_dir = tmp_path / "data" / "assets" / "heights"
     build_heights(
         cache,
-        (globfp_row, wsf_row),
+        bind_height_table(cache, (globfp_row, wsf_row), path),
         path,
         out_dir,
         [],

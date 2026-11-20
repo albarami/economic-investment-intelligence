@@ -206,6 +206,7 @@ def test_exact_hosts_and_pack_list():
         "download.geoservice.dlr.de",
         "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
         "besttime.app",
+        "www.cepii.fr",
     }
     added = {
         "eservices.qfc.qa",

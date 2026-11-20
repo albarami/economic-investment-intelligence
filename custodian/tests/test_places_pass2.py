@@ -368,15 +368,13 @@ def test_build_public_leaves_other_stages(
         url="https://www.ilo.org/resource/news/planted",
     )
     quiet = run_build((citation,), _unused, cache, _clock, _sleep)
-    assert quiet.failure is not None
-    assert quiet.failure.check == "building_table_absent"
+    assert quiet.failure is None
     assert called == []
     assert any(line.startswith("COVERAGE ") for line in quiet.lines)
     assert all(not line.startswith("areas:") for line in quiet.lines)
     skipped = replace(citation, skip_reason="planted skip")
     left = run_build((skipped,), _unused, cache, _clock, _sleep)
-    assert left.failure is not None
-    assert left.failure.check == "building_table_absent"
+    assert left.failure is None
     assert left.lines[0] == "SKIP planted planted skip"
     assert any(line.startswith("COVERAGE ") for line in left.lines)
     assert all(not line.startswith("areas:") for line in left.lines)
@@ -392,8 +390,7 @@ def test_build_public_leaves_other_stages(
     _install_road(cache)
     (review / "showcase_gazetteer.yaml").write_text("[]\n", encoding="utf-8")
     again = run_build((citation,), _unused, cache, _clock, _sleep)
-    assert again.failure is not None
-    assert again.failure.check == "building_table_absent"
+    assert again.failure is None
     assert "areas: nothing to do" in again.lines
     assert any(line.startswith("COVERAGE ") for line in again.lines)
     assert called == []

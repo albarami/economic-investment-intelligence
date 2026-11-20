@@ -12864,7 +12864,7 @@ sources:
     extension: "json"
 
   - key: "biz_register"
-    refetch: {value: none, reason: lead_shell_file_input}
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "biz_register"
     slug: ""
     kind: "register_file"
@@ -12927,8 +12927,6 @@ sources:
       - {name: district_ar, type: string}
       - {name: block_en, type: string}
       - {name: block_ar, type: string}
-      - {name: nationality_group, type: string}
-      - {name: nationality_group_ar, type: string}
       - {name: establishment_nationality_ar, type: string}
       - {name: points_at_location, type: string}
     reconciliation: "schema metadata only; registers/contracts.py declares each lexeme format; no category values inferred"
@@ -12936,7 +12934,7 @@ sources:
     extension: "csv"
 
   - key: "fc_register/file"
-    refetch: {value: none, reason: lead_shell_file_input}
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "fc_register"
     slug: "file"
     kind: "register_file"
