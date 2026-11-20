@@ -185,6 +185,9 @@ def test_pub03_refuses_metadata_only_publisher_hosts(host):
     assert not approve("https://" + host + "/metadata?key=invented").ok
 
 
+P29_LEAD_READ_HOSTS = frozenset({"www.cepii.fr"})
+
+
 def p18_fetch_hosts():
     """Configured fetch addresses and reviewed redirects, excluding reading-only URLs."""
     from eii_custodian.publicdata.atlas.config import load_config as atlas_config
@@ -222,11 +225,17 @@ def check_p18_fetch_host_delta():
         if page["reading"] == "read"
     }
     # L-1270 narrows F3: a read host also needs a configured fetch purpose and
-    # reviewed redirects. All P18 fetch policies/URLs remain unconfirmed/empty.
+    # reviewed redirects. All P18 fetch policies/URLs remain unconfirmed/empty,
+    # except the BACI row: S2-P29 fix 1 admits its host on the lead's
+    # publisher-page reading (document 04, BACI pending identity and coverage
+    # (S2-T24)), not on a P18 reading.
     fetch_hosts = p18_fetch_hosts()
-    assert not fetch_hosts
+    assert fetch_hosts == P29_LEAD_READ_HOSTS
     assert PRE_P18 <= allowlist.ALLOWED_HOSTS
-    assert allowlist.ALLOWED_HOSTS - PRE_P18 == read_hosts & fetch_hosts
+    assert (
+        allowlist.ALLOWED_HOSTS - PRE_P18
+        == (read_hosts | P29_LEAD_READ_HOSTS) & fetch_hosts
+    )
 
 
 def test_pub03_fetch_host_delta_matches_readings_and_fetch_configuration():
