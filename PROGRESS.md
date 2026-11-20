@@ -43673,3 +43673,141 @@ Lead rerun (2026-11-20, same worktree, seed 3127409581): uv run --locked python 
 
 - Correction (2026-11-20): the lead committed fix round one as 140d864cf81a55458cf3be7be391931a75a213c5 and fix round two as 4bda0020c6cd823071812cb1238662ddf5306fb4. Confirmation A (Anthropic, Claude Fable 5.2) on 4bda0020c6cd823071812cb1238662ddf5306fb4, offline and without synchronisation: the three-file command of its brief exit 0, 334 passed; the eleven-file regression set exit 0, 521 passed. Confirmation B (Moonshot, Kimi K3.1 Pro) on the same head: CONFIRMED, no finding.
 - Round three (the lead, Anthropic Claude Opus 5.5, applying confirmation A's non-blocking N2 and N3 with its exact block): a released series with no admission raises "release admission required" again, as on the Public route; a Public admission carrying feed names is refused before fitting, so no feed name reaches a Public fact's lineage. Plants `test_released_series_without_admission_is_an_error` (seven keys) and `test_public_admission_with_feed_names_refuses_before_fitting`: red before the change, exit 1, 8 failed; green after, exit 0, 8 passed (seed 2718281829). The eleven-file regression set: exit 0, 529 passed. `ruff check .` exit 0; `ruff format --check .` exit 0, 814 files; `mypy` exit 0, 436 source files.
+
+## S6-T27 — offline combined-forecast harness, build round one, 2026-11-20
+
+Maker: OpenAI; model: GPT-6 Codex (exact runtime variant not exposed).
+Builder persona: principal methods architect for statistical forecasting,
+rolling-origin evaluation and CPU challengers. Strict self-review persona:
+statistical reviewer rejecting leaked windows, retrospective selection, empty
+or pooled denominators and unpinned models. Different-maker implementation
+review remains pending with the lead. Authority: TASKS.md S6-T27; decision 0038
+items 2 and 7 and inventory items 1 and 14; supplied ruling L-1228 points 1 to
+13, accepting findings F1 to F4. Input commit:
+`a487a9c268a0c66a6b097b85e9ce458bf9a973cd`.
+
+Skills loaded: project-orientation, task-standards, github-flow,
+sanad-provenance, strict-reviewer, al-muhasibi and muhasabah-gate.
+The installed catalogues/search did not contain test-driven-development or
+verification-before-completion; their plain-meaning rules were applied through
+failing tests before implementation and observed checks before this report.
+No delegated or different-maker implementation review is claimed.
+
+Step one: `custodian/publicdata/review/s6_t27_forecast_audit.md` records the
+source, HS/frequency/unit/history and F limitations. No cache or real record was
+read. Public and released acceptance runs are blocked; S2-T19, S2-T23, S2-T24
+and S2-T25 source families retain their blockers. The lead's ruling permits
+independent invented/generated fixture work. No TASKS.md box was changed.
+
+Build: `evals/forecast_spike/` contains immutable registration, frozen-prefix
+MASE, per-candidate/family/horizon coverage, prospective nested selection and
+same-backtest conformal residuals. Zero-scale MAE stays separate. Exact levels
+are 4/5 and 9/10, horizon one and minimum twelve. Baselines are imported unchanged
+from core; no core, production catalogue, dependency, pin or rules-file change.
+The challenger admission adapters check CPU settings, revision/file hashes,
+lock metadata, documented median and training-boundary strata. Actual inference
+is blocked and unimplemented pending official API confirmation, packages and
+weights. No package was installed and no network call was made.
+
+Environment: Python 3.14.6, x86_64. Existing extracted tools matching uv.lock
+were reused through `.overnight/tmp/check_env.py` with UV_OFFLINE=1 and
+UV_NO_SYNC=1; all temporary test/type/lint output is under `.overnight/tmp`.
+The bootstrap installs nothing. Initial uv execution in the empty local
+virtual environment exited 1 (pytest absent); another existing tool environment
+exited 1 (pytest absent), and a pytest-only environment exited 4 (Hypothesis
+absent). These are setup failures, not test evidence. Deterministic fixture
+registration seed is 27; later pytest commands explicitly use
+`--hypothesis-seed=27`. The first red run used the repository's automatic pytest
+seed, which was not printed; its fixtures contain no random draw.
+
+### S6-T27 red then green evidence
+
+Each pytest command below uses `uv run --locked python -m pytest`, the named
+files, `-q -p no:cacheprovider`, and seed 27 except the first red run noted above.
+Commands were executed through the existing-tool bootstrap described above.
+
+| File or command scope | Red exit and count | Green exit and count |
+|---|---|---|
+| scripts/tests/test_forecast_spike.py, initial contract/backtest tests | 1; 36 failed against unimplemented methods | 0; initial 36 passed within the 60-test run |
+| scripts/tests/test_forecast_spike_adapters.py, initial pin/CPU/hash/boundary/determinism plants | 1; 24 failed against unimplemented admission methods | 0; 24 passed within that 60-test run |
+| scripts/tests/test_forecast_spike_process.py | 1; 1 failed against unimplemented runner; then 1 failed because the tool bootstrap omitted core from child imports | 0; 1 passed after the bootstrap correction, within 66 passed |
+| Candidate-stage and revision-break plants in test_forecast_spike.py | 1; 4 failed, 37 passed | 0; included in 66 passed |
+| Empty member plus unknown/changed preregistration policy plants | 1; 4 failed, 50 passed across test_forecast_spike.py and test_forecast_spike_registration.py | 0; included in 81 passed |
+| Offline blocked-model report plant in test_forecast_spike_adapters.py | 1; 1 failed, 26 passed | 0; 28 passed with the process test |
+| Predictor Decimal-context contamination, mutable collections and non-Decimal input plants | 1; 7 failed, 43 passed | 0; 50 passed in test_forecast_spike.py |
+| Original-target coverage plant with an extreme finite prediction | 1; 1 failed, 50 passed; rounded residual reconstruction falsely covered every target | 0; included in 90 passed after counting original targets |
+| Joint-family process report | 1; 1 failed for missing family summaries | 0; 1 passed after joint scoring was added |
+
+Two intermediate initial backtest runs each exited 1 with 35 passed and one
+failed: test-side Decimal subtraction/absolute-value expectations used the
+ambient precision instead of the fixed scoring precision. Expectations now use
+the specified context or exact copy_abs; no assertion or tolerance was weakened.
+No random failure, retry, skip, refreshed baseline or raised limit is used.
+
+Final touched-file command:
+`uv run --locked python -m pytest scripts/tests/test_forecast_spike.py scripts/tests/test_forecast_spike_adapters.py scripts/tests/test_forecast_spike_process.py scripts/tests/test_forecast_spike_registration.py -q -s -p no:cacheprovider --hypothesis-seed=27`
+exited 0: **90 passed**. Earlier, that four-file set plus
+`core/tests/test_forecast_backtest.py core/tests/test_forecast_models.py`, with
+the same flags, exited 0: **110 passed**, including the unchanged C30 regression
+fixtures. The later additions touch evals and its tests only; core remains
+byte-unchanged by git diff.
+
+The initial run record was captured through
+`uv run --locked python -m pytest scripts/tests/test_forecast_spike_process.py -q -s -p no:cacheprovider --hypothesis-seed=27`:
+exit 0, 1 passed. It is `evals/forecast_spike/evidence/invented_run.json`, never
+a refreshed test baseline. Four fresh CPU processes, worker counts one and two,
+had identical result bytes. Recorded fixture batch seconds: 0.148559, 0.156272,
+0.143197, 0.140084; corresponding largest-worker peaks in KiB: 30720, 30464,
+30464, 30464. These include fixture jobs and joint scoring, not model fitting;
+no serving or budget pass is claimed. Unknown training overlap remains
+ineligible for an uncontaminated Public comparison. Both actual challengers
+remain blocked, never passed by stub evidence.
+
+Registration file SHA-256:
+`14ee4c5cc25ae716911978c1cc0a72b3a6d6c9a281da5a1ceae4f3388bcb3a1b`.
+Expanded measurement-contract SHA-256:
+`e6c7133625aa22dfd229264753834d9749c31131c393228e7753cf340a0430b3`.
+Stable fixture output SHA-256:
+`df6c58e6182538fec8e74340b52ea971f991f5bac8dd4b89bbffde2536cc22ab`.
+
+Repository-check evidence before the final document append: ruff check exited 1
+with 18 initial style findings; later additions produced four import findings,
+then one import finding; after fixes it exited 0. Mypy initially exited 1 with
+three errors in two files (444 checked); formatter placement of deliberate
+invalid-input test ignores later produced four errors in one file (446 checked),
+replaced with explicit typed casts for the planted invalid inputs; final mypy
+exit 0, 446 source files. Formatter applications exited 0 (seven, six, three and
+one files respectively reformatted during implementation; unrelated files were
+unchanged). Ruff format --check exited 0, 824 files. The documentation check
+exited 0, 1121 text files and 121 Markdown files before the new evidence JSON;
+tree check exited 0, eight rules; cmp AGENTS.md CLAUDE.md exited 0. Final checks
+after this append are recorded in the following evidence block.
+
+`git switch -c feat/forecast-spike-s6-t27` exited 128: Git's ref store is read
+only. No branch, stage, commit or push was made; input HEAD remains the full
+commit above. No attempt to bypass the write boundary was made. The lead must
+commit and arrange a different-maker review. `./eii test` was not run.
+Document 07's new spike-only section and the audit/README describe the bounded
+result. `.overnight/RETURN.md` holds proposed commands, exact package request
+strings for lead confirmation, unresolved model pins, a draft decision record
+and proposed open items. No numbered decision record or new rule-44 authority
+was committed. Self-audit permits the bounded fixture evidence; full method
+acceptance remains blocked.
+
+### S6-T27 final post-document check block
+
+Input HEAD remains `a487a9c268a0c66a6b097b85e9ce458bf9a973cd`; seed 27,
+Python 3.14.6 x86_64; same offline/no-sync existing-tool bootstrap as above.
+After the new run record and return were written: `uv run --locked ruff check .`
+exit 0 (all checks passed); `uv run --locked ruff format --check .` exit 0
+(824 files); `uv run --locked mypy` exit 0 (446 source files);
+`python3 scripts/check_docs.py` exit 0 (1122 text files, 121 Markdown files);
+`python3 scripts/check_tree.py` exit 0 (eight rules); `cmp AGENTS.md CLAUDE.md`
+exit 0. The final touched-file test command above remains exit 0, 90 passed;
+no code changed after that run. `git diff --numstat` before this final block
+reported 120 additions and zero deletions in PROGRESS.md and 72 additions and
+zero deletions in document 07. Git diff for core, both rules files, TASKS.md,
+pyproject, lock and pins was empty. No commit, push, real model result or full
+method acceptance is claimed. Actual Auto model integration is also blocked by
+the absent statsforecast dependency; Auto-labelled fixture callbacks remain
+stubs. The return proposes the remaining pins, command authority and open items.

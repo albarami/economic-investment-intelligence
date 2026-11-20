@@ -2433,6 +2433,78 @@ Decision 0036 includes relatedness only on relationships the confirmed source ac
 
 **C30 baseline and challengers.** C30's formula and worked fixture above remain the baseline contract. S6-T27 runs on S6-T14's approved commit: AutoETS, AutoTheta, AutoARIMA and equal-weight combination must beat seasonal naive out of sample, with conformal coverage measured at the stated level per family. Chronos-2 (TimesFM 2.5 second) must beat that statistical ensemble in the same backtest with CPU determinism checked. Each held import/trade, certificates-of-origin, pay/employee/activity and establishment/size-class series is audited for length, categories and geography; insufficient history still refuses. Batch fitting and evaluation may use GPU only after the measured budget miss of decision 0038 item 5 R15; request-time forecasts remain tested CPU calculations from release tables (MTH-100), never a new release table of forecasts. Backtest selection remains code-owned and captions report empirical counts and error, never a probability or confidence claim.
 
+### S6-T27 spike-only score and procedure
+
+The supplied lead ruling L-1228, accepting design-review findings F1 to F4,
+defines `s6-t27-prefix-mase-v1` under `evals/forecast_spike/` only. It changes
+neither C30's original worked fixture nor production candidates or serving.
+The source/shape audit is
+[S6-T27 audit](../custodian/publicdata/review/s6_t27_forecast_audit.md).
+The committed experiment registration describes invented fixtures only; no
+Public or released-family result or library-model gain is established by it.
+
+Before fitting, freeze series membership, each source dataset, frequency,
+measure, compatible unit/currency/valuation/classification, provenance stratum,
+published geography/category, candidate order and paired target-origin set.
+Family means source dataset × frequency × measure with those compatible strata;
+Public and generated histories remain separate. Horizon is one. The lead's
+pre-run assumptions are exact levels 4/5 for annual/quarterly families and 9/10
+for monthly families, and at least twelve evaluated targets per candidate ×
+family × horizon. They are experiment thresholds, never on-screen probabilities.
+The registration hash identifies this contract; result input hashes identify
+the observations separately.
+
+With the original first origin `L = max(2h, m + 1)`, freeze each series' seasonal
+scale on its initial training prefix only:
+`q = sum(abs(y[t] - y[t-m]), t=m..L-1) / (L-m)` in zero-based notation.
+Every candidate's series score is its mean absolute error over that series'
+preregistered targets divided by this frozen scale. Family score is the
+equal-weight mean of complete per-series scores, independent of series length
+or outcomes. A zero scale reports MAE separately in the series' own unit; it
+never enters a MASE mean, and a family containing it cannot pass that comparison.
+Empty series targets, fewer than twelve evaluated targets, missing predictions
+or missing required intervals cannot pass or shrink a paired denominator.
+The existing C30 minimum of three rolling origins remains a separate refusal.
+
+Fixed candidates are scored separately. Retain seasonal naive, drift and simple
+exponential smoothing unchanged; the equal-weight combination is the arithmetic
+mean of AutoETS, AutoTheta and AutoARIMA forecasts at each origin. A selecting
+policy chooses using only matured earlier fixed-candidate errors at each outer
+origin, with fixed-order ties. Its residuals are produced prospectively by that
+same policy; the final winner's retrospective residual column is never used.
+
+Each candidate or policy uses only its own earlier residuals from this backtest
+for the conformal wrap. For `c` complete matured absolute residuals and exact
+level `a/b`, take order statistic `k = ceil((c+1)*a/b)` and point plus/minus that
+radius; when `k > c`, no interval exists. Four earlier residuals are needed for
+4/5 and nine for 9/10. Coverage is counted separately for every candidate ×
+family × horizon on the frozen targets. Its positive, complete denominator must
+meet twelve, and `covered*b >= evaluated*a` decides coverage. No cross-candidate
+pooling, evaluation-driven exclusions or calibration from a second error source
+is allowed. Count coverage against the original target value, never a value
+reconstructed from a rounded residual. All named statistical challengers and the combination must strictly
+beat seasonal naive; ties fail. A zero-shot challenger compares against that
+same equal-weight combination, on the same preregistered targets.
+
+Arithmetic uses C30's fixed fifty-digit half-up Decimal context, separately from
+display rounding. Finite binary floats convert losslessly with
+`Decimal.from_float` before arithmetic. No external inference is implemented or
+accepted while compatible package pins, model revision/file hashes, official
+median API documentation or weights are absent. Chronos-2 precedes TimesFM 2.5.
+Record each pinned revision's training boundary, its source and uncertainty
+before execution: post-cutoff, overlapping/unknown and generated strata have
+separate verdict scope. Unknown overlap is descriptive only; insufficient
+eligible history blocks the uncontaminated Public comparison. Generated fits
+remain placeholders requiring decision 0036's real-source re-fit/re-backtest.
+
+This build is CPU only, with no GPU permission or serving-performance pass.
+Fresh-process and worker-count fixture byte equality proves harness machinery
+only; each actual pinned model still owes that proof and its batch measurements.
+The spike stops at its decision record regardless of outcome. No output enters
+the product, core, a release table or a Fact chip; a later promotion needs its
+own reviewed core design under MTH-100 and rules 16 to 18. Production baseline,
+privacy, source-geography and display rules remain unchanged.
+
 **Hot and cold spots map card.** S7-T23 builds the card committed by decision 0038 item 5 R8. Inputs are already released values at zone or release-unit grain and the matching public geography. The task specifies the esda statistic, neighbourhood, fixed seed, stability procedure and reviewed validation criterion before code; none is invented by this record. The output is a tested-code spatial-pattern fact with method/version, source chain and stability evidence, respecting suppression and MTH-53. Municipality clustering/hot spots remain prohibited (eight units). Missing valid inputs or failed validation keeps the released-value map without hot/cold classification. No result is a prediction or advice to act.
 
 **National-table widening.** Inventory items 1 and 14 audit the held series above; item 4 includes thin national cells, item 16 tests product/origin relatedness on held import and certificates-of-origin relationships, and S7-T17's R11 sub-step audits employee/activity, size-class and pay-change decompositions where comparable periods exist. Rule 10 keeps each national table on its source's own categories and geography, separate from protected figures and synthetic-record joins. R11's register branch is Public and Observed on comparable monthly snapshots only, never generated months.
