@@ -279,7 +279,7 @@ def test_loader_contract_plants(tmp_path, plant):
     else:
         tables["register_company_list"] = [
             dict(
-                registration_number="54322"
+                registration_number="97005"
                 if plant == "list_missing_company"
                 else "54321",
                 period="2026-11",

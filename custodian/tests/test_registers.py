@@ -7,6 +7,8 @@ import io
 import json
 import socket
 from dataclasses import replace
+from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -52,7 +54,7 @@ def commerce(**updates):
         lon="1.25",
         lat="2.25",
         registration_number="54321",
-        licence_number="4321",
+        licence_number="97003",
         tax_registered="No",
         establishment_nationality="SYN establishment nationality",
         establishment_nationality_ar="SYN establishment nationality",
@@ -200,7 +202,7 @@ def test_declared_registration_shapes_and_open_categories(frame, number):
 def test_duplicate_registration_and_row_key_refused(frame):
     for rows, reason in [
         ([commerce(), commerce(row_key="c" * 20)], "duplicate_registration_key"),
-        ([commerce(), commerce(registration_number="54322")], "duplicate_row_key"),
+        ([commerce(), commerce(registration_number="97005")], "duplicate_row_key"),
     ]:
         with pytest.raises(RegisterError, match="^" + reason + "$"):
             parse("biz_register", inputs(rows=rows), frame)
@@ -325,7 +327,7 @@ def test_history_keeps_exited_company_and_earlier_location(tmp_path, frame):
     earlier = capture(period="2026-11")
     moved = capture(period="2026-12", files=inputs(rows=[commerce(lon="15.25")]))
     current = capture(
-        period="2027-01", files=inputs(rows=[commerce(registration_number="54322")])
+        period="2027-01", files=inputs(rows=[commerce(registration_number="97005")])
     )
     result = build(
         tmp_path,
@@ -489,6 +491,62 @@ def test_release_schema_and_identifier_egress_plants(
     }[table, column]
     with pytest.raises(RegisterError, match="^" + reason + "$"):
         validate_release(tables, frame)
+
+
+@pytest.mark.parametrize(
+    ("value", "reason"),
+    [
+        pytest.param(["54321"], "registration_egress", id="key_in_list"),
+        pytest.param({"k": "54321"}, "registration_egress", id="key_in_mapping"),
+        pytest.param(b"54321", "registration_egress", id="key_as_bytes"),
+        pytest.param({"54321": None}, "registration_egress", id="mapping_key"),
+        pytest.param({"k": ([b"54321"],)}, "registration_egress", id="nested_bytes"),
+        pytest.param(["SYN-E-7F3K2Q"], "identifier_prefix", id="prefix_in_list"),
+        pytest.param(Decimal("1.5"), "artefact_type", id="decimal"),
+        pytest.param(date(2026, 11, 1), "artefact_type", id="date"),
+        pytest.param({"k": [Decimal("1.5")]}, "artefact_type", id="nested_decimal"),
+        pytest.param(b"\xff", "artefact_encoding", id="invalid_bytes"),
+    ],
+)
+def test_release_value_artefact_plants(tmp_path, frame, value, reason):
+    result = build(
+        tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
+    )
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
+        validate_release(
+            {**result.tables, "source_registry": [{"value": value}]}, frame
+        )
+
+
+@pytest.mark.parametrize("table", ["source_registry", "fact_lineage"])
+@pytest.mark.parametrize(
+    "digest",
+    [
+        pytest.param("a" * 28 + "1" * 8 + "b" * 28, id="eight_digit_run"),
+        pytest.param("a" * 29 + "54321" + "b" * 30, id="registration_token"),
+    ],
+)
+def test_release_value_sha256_exemption(tmp_path, frame, table, digest):
+    assert len(digest) == 64
+    result = build(
+        tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
+    )
+    validate_release({**result.tables, table: [{"sha256": digest}]}, frame)
+
+
+def test_release_value_nested_typed_public_values_pass(tmp_path, frame):
+    result = build(
+        tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
+    )
+    validate_release(
+        {
+            **result.tables,
+            "source_registry": [
+                {"value": {"k": [None, True, False, 54321, (10**7, 2.65432)]}}
+            ],
+        },
+        frame,
+    )
 
 
 @pytest.mark.parametrize(

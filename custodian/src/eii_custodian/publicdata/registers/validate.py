@@ -102,6 +102,21 @@ def scan_content(value: object, content: frozenset[str]) -> None:
             scan_content(item, content)
 
 
+def _scan_release_value(value: object, keys: frozenset[str]) -> None:
+    """DAT-11 / L-1288: typed numbers are Public facts; all else as artefacts."""
+    if value is None or type(value) in (bool, int, float):
+        return
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            scan_artefact(key, keys)
+            _scan_release_value(item, keys)
+    elif isinstance(value, list | tuple):
+        for item in value:
+            _scan_release_value(item, keys)
+    else:
+        scan_artefact(value, keys)
+
+
 def validate_release(
     tables: Mapping[str, Sequence[Mapping[str, object]]],
     frame: Frame,
@@ -200,6 +215,5 @@ def validate_release(
                 # DAT-11 scans every string column. Typed numeric Public values
                 # (including cell keys, capital, counts and coordinates) are not
                 # identifier strings. Non-key card strings get the same scan.
-                if isinstance(value, str):
-                    _text(value, frozen)
+                _scan_release_value(value, frozen)
     return frozen

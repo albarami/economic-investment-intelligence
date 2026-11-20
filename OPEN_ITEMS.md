@@ -5505,3 +5505,4 @@ The original unnumbered review-disposition section records S2-T44 placement afte
   excluded. This is an explicit assumption about the ruling's application, not
   an assertion that the real files exclude personal names. The lead must confirm
   this interpretation before the real-file run; no real trade name was read.
+- OPEN — S2-T49 confirmation K1: under L-1288, a licence number equal to another company's registration key refuses the whole build with `registration_egress` (fails safe); the lead's real-file run decides. Source: `.overnight/IN/CONFIRM-cf1.md`, note K1; this round reads no real files and changes no rule.
