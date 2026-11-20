@@ -856,6 +856,14 @@ Open question to settle in your plan with options: where the archive persists so
 - Requirements: [decision 0070](docs/decisions/0070-the-decision-pack-of-the-value-studies.md) item E; document 03 **S2-T29 cached page and awards contracts**; AGENTS.md rules 5, 7, 13, 19 and 37.
 - Delivery: hard; personas Data; status queued.
 
+### S2-T48 — Company web pages: address, website and activity
+- Goal: For financial-centre and register companies, search the public web by company name and Qatar, fetch the pages found, and extract company-level name, address, website and activity with full provenance ([decision 0074](docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md) item 8).
+- Acceptance criteria: [ ] a command-line web search runs per company by company name and Qatar; [ ] each fetched page is stored in the public cache with source address, retrieval date and SHA-256 and a provenance receipt; [ ] extracted fields are company-level only (never a person, job title or salary); [ ] a field is kept only when another maker's review accepts it; [ ] a page that names no matching company is refused, with a planted test; [ ] no number of exactly eight or eleven digits is committed; [ ] counts are reported in the evidence.
+- Scope: search and fetch tooling under the public seam, provenance receipts, review records, invented fixtures and tests; no person-level or salary data.
+- Depends: S2-T01, S2-T27, S2-T36; [decision 0074](docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md) item 8.
+- Requirements: AGENTS.md rules 5, 7, 9, 13, 19 and 37; document 04 PUB-01, PUB-03 and PUB-04.
+- Delivery: hard; personas Data; status not started.
+
 ## slice S3 — Living map and Public-only answer
 
 ### S3-T01 — Store interface and portable query registry

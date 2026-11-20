@@ -1738,6 +1738,7 @@
 - DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 1 records 1,458 such rows in the commercial file as read on 2026-11-15.
 - OPTIONS: **Default until the owner says otherwise:** count these rows and leave them out of the snapshot and stock, with their reason. An owner's decision on another published number would replace that default; no alternative key is settled here.
 - NEEDED BY: before the first real world build.
+- CLOSED: 2026-11-20, decision 0074 item 5. Cause: rows without a registration number needed an alternative key. Owner: "for nubmer 1 yes, for number 2 alow , for website he should make clis to do the search by company name qatar and will prbably find their adress . for number 4i confirm."
 
 ## OI-187 — Proving DAT-24 for a register without activity codes
 
@@ -1748,6 +1749,7 @@
 - DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 2 calls this an interim Part A state, not a final reading allowed by DAT-24.
 - OPTIONS: **Default until decided:** the code-distribution check remains NOT PROVED and code fields stay null until a register file shows a code. A later decision must establish the proof; the requirement stays unchanged.
 - NEEDED BY: before a finished `business_register.v1` feed or a release.
+- CLOSED: 2026-11-20, decision 0074 item 6. Cause: the lead needed permission to read company-level activity columns for counting without proving DAT-24 from the code-free register file alone. Owner: "for nubmer 1 yes, for number 2 alow , for website he should make clis to do the search by company name qatar and will prbably find their adress . for number 4i confirm."
 
 ## OI-188 — Reviewing the register's activity texts
 
@@ -1778,6 +1780,7 @@
 - DONE SO FAR: [decision 0033](docs/decisions/0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 5 requires them to be read, counted, name-checked for SYN-20 and given identifiers in canonical order.
 - OPTIONS: **Default in Part A:** give them no jobs, report their count and exclude them from the December snapshot. Owner task S4-T01 or a later decision record must settle their feed treatment; Part B may add their rows.
 - NEEDED BY: Part B of task S4-T02.
+- CLOSED: 2026-11-20, decision 0074 item 7. Cause: the financial centre's companies publish no registration or establishment number on their register. Owner: "for qfc its ok if he doesnt find a cr or eid number . the name and adress and wesbsite he can fetch the web and find their adress im sure we dicussed this before and even if not let him do it"
 
 ## OI-191 — Stating the calibration table's conditions in the repository
 

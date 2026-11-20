@@ -222,6 +222,7 @@ The slice numbers of the earlier plan are kept, so that slice references across 
 | Optional free CDSE backup cache; no analytical or display output (proposed decision 0066) | slice S2 | S2-T41 |
 | Reviewed product-to-activity-to-occupation crosswalk (decision 0070 item B3) | slice S2 | S2-T47 |
 | Older awarded pages, one-time cached enrichment after the slice S2 gate (decision 0070 item E) | slice S2, after its gate | S2-T46 |
+| Company web pages: address, website and activity for register and financial-centre companies (decision 0074 item 8) | slice S2 | S2-T48 |
 | Public asking-rent context from a property listing source, never calculator prefill (decision 0070 item B2) | slice S6 | S6-T40 |
 | Awards and supplier release with its card family (decision 0070 item B1) | slice S7 | S7-T35 |
 | Typed reference to an earlier answer item in the chain slot (decision 0070 item C) | slice S8 | S8-T19 |
@@ -414,6 +415,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S2-T38 — Load employed people by municipality as a Public fact on the source's own geography ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 15).
 - S2-T39 — Read the agency's Arabic pages, add the full-page column once decision record 0029 settles it, and fill the FDI crosswalk by lead review ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 32).
 - S2-T47 — Build the reviewed product-to-activity-to-occupation crosswalk beside S2-T04's spine and S2-T07's calculation inputs. Depends: S2-T04, S2-T07. Full criteria and planted guards: TASKS.md, S2-T47; decision 0070 item B3. Runs before the slice S2 review follow-up and gate.
+- S2-T48 — Search and fetch company web pages for register and financial-centre companies; extract company-level address, website and activity with provenance receipts and another-maker review ([decision 0074](decisions/0074-company-level-fields-of-the-owners-company-workbook.md) item 8). Depends: S2-T01, S2-T27, S2-T36. Full criteria and planted guards: TASKS.md, S2-T48.
 - S2-T08 — Assemble the public pack, record the publisher's terms in its own words with the date read and the basis of use for every source, a missing field recorded as pending ([decision 0059](decisions/0059-publisher-terms-are-a-record-not-a-gate.md)), with no terms-based release exclusion, confirm the coverage bar uses the finest geography available from a visitor-readable source (PUB-82), and complete the twenty-figure source review, the slice S2 confirmations (PLN-25) and OI-03 closure evidence.
 - S2-T09 — After the reviewer has checked them against the source, write the values listed by MTH-03 into the method cards.
 - S2-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).

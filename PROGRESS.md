@@ -44394,3 +44394,24 @@ cache environment recorded above. Evidence: `.overnight/tmp/p24-fix1-checks.json
 - Work: decision record [0073](docs/decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md); amended documents 03, 08, 09 and `docs/README.md`; closed OI-102 and PO-S2-116; adopted PO-S2-118 through decision 0073 item 3; ticked TASKS.md S2-T17 district-subject criterion and S2-T44 criterion 5 with the named assertion exception.
 - TDD: planted missing link at `docs/03_DATA_CONTRACTS.md:1527` to `decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md` before the file existed — `python3 scripts/check_docs.py` exit 1 (one link failure); green exit 0 after the record and anchors were complete.
 - Checks (actual exits recorded below in `.overnight/RETURN.md`): no test source file was touched; documentation guard `scripts/tests/test_check_docs_exceptions.py` run with hypothesis seed 3847291056 as the package documentation-test stand-in.
+## S2-P27 — company-level fields of the owner's company workbook (decision 0074, 2026-11-20)
+
+- Maker/model: Cursor agent, Composer 2.5. Expert persona: senior technical writer for decision records. Strict self-review persona: rejects a guard without a planted test, a claim without tree evidence, a weakened assertion, a skip or a raised bound.
+- Skills loaded: project-orientation, task-standards, test-driven-development (plain meaning), sanad-provenance (plain meaning), verification-before-completion (plain meaning).
+- Base HEAD: `d5ab31319669ea9b557043ca866099c67b69cc48`. Documents-only package per `.overnight/IN/PACKAGE.md`; no commit, push or network.
+- Deliverable 1 — decision 0074 and rule 3: **closed.** New `docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md`; `docs/README.md` index and in-brief line; AGENTS.md and CLAUDE.md rule 3 and Status row amended per package item 4.
+- Deliverable 2 — OI-186, OI-187, OI-190: **left open** (package: owner's decision still needed on key, activity proof and financial-centre feed treatment). Each item received the dated 2026-11-20 UPDATE line prescribed in the package.
+- TASKS.md: no box ticked (decision 0064 item 33 register-restoration criterion remains unproved).
+- Deciding tests — RED then GREEN: before the decision file existed, `test -f docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md` → exit 1; before the rule 3 citation, `rg -q 'decision 0074' AGENTS.md` → exit 1. After the record and amendments, `python3 scripts/check_docs.py` → exit 0 (1139 text files, 124 Markdown files); `python3 scripts/check_tree.py` → exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` → exit 0; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_check_docs*.py' -v` → exit 0 (111 passed); `uv run --locked python -m pytest scripts/tests/test_check_docs_exceptions.py -q -p no:cacheprovider --hypothesis-seed=8392741056` → exit 0 (111 passed, 65 subtests); `uv run --locked ruff check .` → exit 0; `uv run --locked ruff format --check .` → exit 0 (835 files); `uv run --locked mypy` → exit 0 (449 source files).
+- PROPOSED OPEN ITEMS: none. OI-186, OI-187 and OI-190 remain open by design until the owner decides the cited questions.
+
+### S2-P27 — round 2 — owner follow-up on decision 0074 (2026-11-20)
+
+- Maker/model: Cursor agent, Composer 2.5. Personas unchanged from round 1.
+- Authority: `.overnight/IN/PACKAGE-b2.md` supersedes round 1 on OI-186, OI-187, OI-190 and S2-T48.
+- Deliverable 1 — decision 0074 items 5–8 and rule 3: **closed.** Extended decision 0074 with OI-186, OI-187, OI-190 and company web pages; AGENTS.md and CLAUDE.md rule 3 cites item 6 for lead-shell activity columns; docs/README.md index updated.
+- Deliverable 2 — OPEN_ITEMS.md OI-186, OI-187, OI-190: **closed.** First-round UPDATE lines replaced by CLOSED lines dated 2026-11-20 with decision 0074 item cites and owner quotations.
+- Deliverable 3 — S2-T48: **closed (task recorded, not implemented).** TASKS.md and docs/14_IMPLEMENTATION_PLAN.md list S2-T48 with acceptance boxes unticked.
+- TASKS.md: no existing box ticked (register-restoration and DAT-24 proof criteria unchanged).
+- Deciding tests — RED then GREEN: before items 5–8, `rg -q 'OI-186 decided' docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md` → exit 1; before S2-T48, `rg -q 'S2-T48' TASKS.md` → exit 1; before OI-186 CLOSED, `rg 'CLOSED: 2026-11-20, decision 0074 item 5' OPEN_ITEMS.md` → exit 1. After edits, those searches exit 0.
+- Checks (round 2 brief): `python3 scripts/check_docs.py` → exit 0 (1139 text files, 124 Markdown files); `python3 scripts/check_tree.py` → exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` → exit 0; `uv run --locked python -m unittest scripts.tests.test_check_docs_exceptions scripts.tests.test_rules_retired_names -v` → exit 0 (114 tests).
