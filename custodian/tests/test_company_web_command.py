@@ -13,8 +13,8 @@ from custodian.tests.company_web_fixture import (
     manifest,
     offline_network,  # noqa: F401
 )
-from scripts.commands import build_public
 
+import commands.build_public as build_public
 from eii_custodian.publicdata.company_web.build import run_company_web
 from eii_custodian.publicdata.company_web.contracts import Company
 from eii_custodian.publicdata.fetch import build
