@@ -10,11 +10,12 @@ from .assembly_io import local, read_object
 from .fetch.receipts import sha256_hex, sidecar_for
 from .fetch.registry import Entry
 from .fetch.snapshots import publish_snapshot
-from .singles.tenders import LIST_PATHS
+from .singles.tenders import LIST_PATHS, TenderError
 
 
 def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
     pages = []
+    readings = []
     for list_name, _ in LIST_PATHS:
         for language in ("en", "ar"):
             prefix = entry.key + "/" + list_name + "/" + language
@@ -29,10 +30,47 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
                     or receipt["language"] != language
                 ):
                     raise AssemblyError("assembly_tender_pages_incomplete")
-                for number in range(1, bound + 1):
+                stop = receipt.get("stop_page")
+                count = receipt.get("pages_read", bound)
+                if type(count) is not int or not 1 <= count <= bound:
+                    raise AssemblyError("assembly_tender_pages_incomplete")
+                if stop is not None and (
+                    type(stop) is not int or stop != count or list_name != "awarded"
+                ):
+                    raise AssemblyError("assembly_tender_pages_incomplete")
+                if stop is None and count != bound:
+                    raise AssemblyError("assembly_tender_pages_incomplete")
+                previous = None
+                cutoff = receipt.get("award_cutoff")
+                if cutoff is not None:
+                    from .fetch.awards import intake_cutoff
+
+                    selected_cutoff, reason, digest = intake_cutoff(cache, stamp)
+                    if (
+                        list_name != "awarded"
+                        or reason
+                        or selected_cutoff != cutoff
+                        or receipt.get("workbook_sha256") != digest
+                    ):
+                        raise AssemblyError("assembly_tender_pages_incomplete")
+                for number in range(1, count + 1):
                     page_text = local(
                         cache, prefix + "/" + str(number) + ".html"
                     ).read_text(encoding="utf-8")
+                    if cutoff is not None:
+                        from .singles.tenders import (
+                            _award_page,
+                            _checked_page,
+                            _require_count,
+                        )
+
+                        raw = _checked_page(page_text, language)
+                        _require_count(len(raw.cards), is_last=number == bound)
+                        previous, covered = _award_page(raw, language, cutoff, previous)
+                        if covered != (number == stop):
+                            raise AssemblyError("assembly_tender_pages_incomplete")
+                    elif stop is not None:
+                        raise AssemblyError("assembly_tender_pages_incomplete")
                     pages.append(
                         {
                             "list_name": list_name,
@@ -41,11 +79,17 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
                             "html": page_text,
                         }
                     )
-            except (KeyError, OSError, UnicodeError, AssemblyError):
+                readings.append(receipt)
+            except (KeyError, OSError, UnicodeError, ValueError, TenderError):
                 raise AssemblyError("assembly_tender_pages_incomplete") from None
     body = (
         json.dumps(
-            {"method": "assembly-tender-pages.v1", "pages": pages}, sort_keys=True
+            {
+                "method": "assembly-tender-pages.v1",
+                "pages": pages,
+                "readings": readings,
+            },
+            sort_keys=True,
         )
         + "\n"
     ).encode()

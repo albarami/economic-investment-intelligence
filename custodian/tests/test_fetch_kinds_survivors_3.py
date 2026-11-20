@@ -253,9 +253,7 @@ def test_tender_handoff(fail, cached, tmp_path, monkeypatch):
     )
     assert calls == ["called"]
     if fail:
-        refusal(
-            result, FILE_URL, "invented_refusal", "invented_refusal", "invented_refusal"
-        )
+        refusal(result, FILE_URL, "invented_refusal", "", "")
     else:
         assert result == kinds.Prepared(
             b"", FILE_URL, "invented.invalid", "Planted publisher", "", None, "", None

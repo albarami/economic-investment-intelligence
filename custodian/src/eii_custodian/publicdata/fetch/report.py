@@ -93,10 +93,10 @@ def fail_line(key: str, url: str, check: str, expected: str, observed: str) -> s
     """Return the failure line naming the check, the expected value and the observed value."""
     from eii_custodian.publicdata.fetch.transport import public_address
 
-    return (
-        f"FAIL {key} {public_address(url)} {check} "
-        f"expected={expected} observed={observed}"
+    comparison = (
+        f" expected={expected} observed={observed}" if expected or observed else ""
     )
+    return f"FAIL {key} {public_address(url)} {check}{comparison}"
 
 
 def terms_changed_line(key: str, terms_url: str) -> str:

@@ -120,6 +120,7 @@
 
 | [0066](decisions/0066-an-optional-free-cdse-backup-cache.md) | Optional free CDSE backup, credential inventories and unread cache; display assigned separately | Proposed, 2026-11-19 |
 | [0068](decisions/0068-public-map-integration-follow-ons.md) | Four Public map integration tasks S3-T24 to S3-T27 before S3-T10's end-to-end step; C3 default retained and C6 phone-sheet fix returned to S3-T09; no value cut | Lead ruling L-1136 recorded, 2026-11-19; independent review pending |
+| [0069](decisions/0069-the-tender-workbook-taken-as-is-and-the-portal-read-incrementally.md) | The tender workbook taken as is; the awarded list read incrementally to its verified latest award date; complementary dated sources and deployment upkeep left open | Proposed, 2026-11-20 |
 
 ## Identifiers and change control
 

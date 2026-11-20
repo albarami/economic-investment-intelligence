@@ -134,10 +134,12 @@ class FetchFailure:
     @property
     def detail(self) -> str:
         """Return the failure detail: source, URL, check, expected value and observed value."""
-        return (
-            f"{self.source_id} {self.url} {self.check} "
-            f"expected={self.expected} observed={self.observed}"
+        comparison = (
+            f" expected={self.expected} observed={self.observed}"
+            if self.expected or self.observed
+            else ""
         )
+        return f"{self.source_id} {self.url} {self.check}{comparison}"
 
 
 @dataclass(frozen=True)
@@ -837,12 +839,8 @@ def run_build(
                 lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
             except (PageError, AwardError, PinError, SnapshotError) as exc:
                 reason = str(exc)
-                failure = FetchFailure(
-                    1, entry.source_id, "", reason, "verified snapshot", "NO_DATA"
-                )
-                lines.append(
-                    fail_line(entry.key, "", reason, "verified snapshot", "NO_DATA")
-                )
+                failure = FetchFailure(1, entry.source_id, "", reason, "", "")
+                lines.append(fail_line(entry.key, "", reason, "", ""))
                 break
             except (OSError, ValueError, KeyError, TypeError):
                 failure = FetchFailure(

@@ -60,6 +60,9 @@ def test_awards_intake_dates_blanks(tmp_path):
         "date_first": "2024-02-03",
         "date_last": "2024-02-03",
         "completeness": "unknown",
+        "stored_date_cells": 0,
+        "unparsed_date_rows": [3],
+        "date_reading_assumption": "stored_day_month_swapped",
     }
     assert batch.rows[0]["retrieved_utc"] == STAMP
 
@@ -261,6 +264,7 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
     import json
 
     from commands import build_public
+    from eii_custodian.publicdata import assembly_adapters
     from eii_custodian.publicdata.fetch import awards
     from eii_custodian.publicdata.fetch.registry import load_registry
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
@@ -290,6 +294,15 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
         + "\n"
     ).encode()
     (folder / "syn.csv").write_bytes(body)
+    monkeypatch.setattr(
+        assembly_adapters,
+        "read_yaml",
+        lambda _: {
+            "sources": {
+                "awards_owner_scrape": {"profile": schema, "max_bytes": len(body)}
+            }
+        },
+    )
     (folder / "intake.json").write_text(
         json.dumps(
             {
@@ -311,7 +324,7 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
         build_public.run(
             tmp_path,
             {},
-            [],
+            ["--seed", "73"],
             transport=lambda url: Response(url, proof, ()),
             sleep=lambda _: None,
         )

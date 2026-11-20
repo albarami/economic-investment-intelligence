@@ -12576,20 +12576,20 @@ sources:
     release_tables: []
     caveat_keys: []
     columns:
-    - name: اسم الشركة
+    - name: Company name
       type: string
-    - name: رقم السجل التجاري
+    - name: Commercial Registration Number
       type: string
-    - name: القيمة الموافق عليها
+    - name: Approved Value
       type: number
-    - name: النتيجة المالية
+    - name: Financial Result
       type: string
-    - name: البنود الموافق عليها
+    - name: Approved Items
       type: string
     row_count_min: null
     row_count_max: null
     reconciliation: none
-    skip_reason: awards_profile_pending
+    skip_reason: ''
     extension: html
 
   - key: "satellite_cdse_backup"

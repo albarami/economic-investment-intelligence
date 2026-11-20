@@ -57,6 +57,9 @@ def test_profile_records_counts_hash_mapping_seed_and_no_rows(tmp_path: Path) ->
         "date_first": "2026-03-02",
         "date_last": "2026-03-02",
         "completeness": "unknown",
+        "stored_date_cells": 0,
+        "unparsed_date_rows": [3],
+        "date_reading_assumption": "stored_day_month_swapped",
     }
     assert (
         awards["profile"]["columns"]

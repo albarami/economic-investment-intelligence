@@ -17,7 +17,10 @@ from eii_custodian.publicdata.fetch.transport import Response
 
 @pytest.mark.parametrize("source", ["insurance_tables", "awards_owner_scrape"])
 def test_held_dispatch_continues(tmp_path, source):
-    held = next(e for e in load_registry() if e.source_id == source)
+    held = replace(
+        next(e for e in load_registry() if e.source_id == source),
+        skip_reason="SYN-held",
+    )
     following = replace(page_entry(), key="SYN-next", skip_reason="SYN-held")
 
     def forbidden(url):
@@ -34,7 +37,14 @@ def test_held_dispatch_continues(tmp_path, source):
 
 
 @pytest.mark.parametrize("source", ["insurance_tables", "awards_owner_scrape"])
-def test_cleared_hold_keeps_evidence_refusal(tmp_path, source):
+def test_cleared_hold_keeps_evidence_refusal(tmp_path, source, monkeypatch):
+    if source == "awards_owner_scrape":
+        from eii_custodian.publicdata.fetch import awards
+
+        # Plant the original held profile explicitly now that the real one is active.
+        monkeypatch.setattr(
+            awards, "load_declaration", lambda _: {"profile": "[LEAD: evidence 3]"}
+        )
     held = next(e for e in load_registry() if e.source_id == source)
     outcome = run_build(
         (replace(held, skip_reason=""),),

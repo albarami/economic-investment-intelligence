@@ -927,29 +927,29 @@ sources:
     - https://monaqasat.mof.gov.qa/TendersOnlineServices/AwardedTenders/1
     - https://monaqasat.mof.gov.qa/TermsOfUse
     columns:
-    - - اسم الشركة
+    - - Company name
       - string
-    - - رقم السجل التجاري
+    - - Commercial Registration Number
       - string
-    - - القيمة الموافق عليها
+    - - Approved Value
       - number
-    - - النتيجة المالية
+    - - Financial Result
       - string
-    - - البنود الموافق عليها
+    - - Approved Items
       - string
     as_of: retrieval_date
     publisher_date: null
     period_fields: []
-    bounds_basis: unconfirmed
-    bounds_reason: Observed counts and acquisition bounds await the lead normal-seam run (L-895 item 5; plan O11).
+    bounds_basis: lead_measured_file_size
+    bounds_reason: Lead measured workbook size 2 534 256 bytes in the aggregate profile relayed 2026-11-20; rounded up to the next power-of-two MiB (4 MiB). This bounds intake and individual proof responses, not a row count.
     pins:
-    - *id009
-    evidence: .overnight/IN/EVIDENCE-shapes.md O7 (h3 winner heading, date span, one-or-more rows, invalid div-inside-tr
-      list); L-897 item 4; intake profile and mapping NOT FOUND; .overnight/IN/EVIDENCE-shapes.md O10 terms wording/read
-      2026-11-17; .overnight/IN/EVIDENCE-items-1-2.md item 2 and L-892 item 4 pins (files/approval pending). max_bytes
-      remains plan O11.
-    hold: awards_profile_pending
-    max_bytes: null
+    - host: monaqasat.mof.gov.qa
+      sha256: c8025f9fc65fdfc95b3ca8cc7867b9a587b5277973957917463fc813d0b625a9
+      file: tenders_pub.intermediate.pem
+      security_review: APPROVED
+    evidence: Owner aggregate workbook profile relayed 2026-11-20; proposed decision 0069 items 1 and 2. Source report headings remain those reviewed in O7. Reuses the same-host issuing intermediate already pinned for tenders_pub; both its registry PEM hash and this DER hash must verify. No certificate or workbook row was read by the builder.
+    hold: null
+    max_bytes: 4194304
     shape:
       profile: awards
       selector: table.custom--table
@@ -965,7 +965,31 @@ sources:
       total_prefix: ''
       last_selector: ''
       path_template: ''
-    profile: '[LEAD: evidence 3]'
+    profile:
+      format: xlsx
+      sheet: 'Awarded Contracts '
+      columns:
+      - tender_name
+      - ministry
+      - award_date
+      - report_url
+      - Company name
+      - Commercial Registration Number
+      - Approved Value
+      - Approved Value Number
+      - Financial Result
+      - Approved Items
+      types: [string, string, string, string, string, string, string, string, string, string]
+      company: Company name
+      registration: Commercial Registration Number
+      value: Approved Value
+      date: award_date
+      row_count: 9048
+      dated_rows: 9045
+      proof_columns:
+        company: Company name
+        registration: Commercial Registration Number
+        value: Approved Value
   fc_register:
     version: 2
     kind: fc_company_cards
