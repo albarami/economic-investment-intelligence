@@ -43481,3 +43481,221 @@ Restored-source checks, real exits (raw results in `.overnight/tmp/p10_checks.js
 - OI-262: its DONE SO FAR line now names pull request 78 in place of the unfilled placeholder.
 - PO-S2-119: the gate-hold table row reconciled to the item's CLOSED 2026-11-20 line; review S2-P12.r1 record notes 1 and 3 recorded under the item; note 1 carried as PO-S2-142 (S2-T11).
 
+
+## S2-P03b — Complete S2-T36 guard-removal evidence — 2026-11-20
+
+Maker/model: OpenAI / GPT-6 Codex. Senior persona: senior Python test engineer for
+data-intake guards. Strict self-review persona: a reviewer rejecting interface-only
+reds and requiring a deciding assertion. No independent-maker approval is claimed.
+Skills applied: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. The named test-driven-development and
+verification-before-completion skills are unavailable here; their plain procedures
+are applied through isolated deletion probes, explicit assertions and real exits.
+
+Base and unchanged HEAD: `5c5fd5dbb4c965f4aa01cd4b901111216c7260df`. Environment: Python
+3.14.6 on Linux, locked dependencies, provider unused, seed `7391628504`.
+Commands run from the repository root. UV commands use offline mode and a cache
+inside `.overnight/tmp`; pytest temporary outputs also stay in that folder.
+No network request, real cache read, production edit, commit, push or merge was made.
+The source of each result is the named code site and the recorded executed probe,
+not the supplied returns' historical claims. Scope authority: `.overnight/BRIEF.md`,
+TASKS.md **S2-T36**, AGENTS.md rules 35 to 39, and OPEN_ITEMS.md **PO-S2-113**.
+The supplied S2-T36 revA, revB, confA, confB and fix1 returns were read.
+
+Disposition: **PO-S2-113 LEFT OPEN for one guard**, `fc_register/acquire.py:80`
+(`expected in seen_requests`). The initial ordinal is fixed, every successor
+increases it, and ordinal participates in immutable request equality. A duplicate
+identity cannot be reached without also replacing the identity constructor or
+advancement invariant. Such a multi-change probe would not remove only this guard.
+Its removed suite is still green. The original review also identifies this
+check as defense in depth; no fictitious deciding plant or gate closure is claimed.
+
+The inventory has 82 deletion probes: 45
+were green and 37 test-red before these plants; after the
+plants, 81 have explicit semantic assertion failures and
+1 remains green. The final intact suite has 180 passed,
+zero failed and zero skipped. A before-red with only an unexpected runtime error
+is marked NON-DECIDING RED rather than credited. The after-red column names an
+assertion for every credited probe. These are present-day removal proofs, not a
+claim to recreate the original builder's historical failing-first chronology.
+
+Inventory method: every explicit refusal block of `fc_register`, its declaration,
+timestamp and final-fragment validation calls, the register request/frame/TLS
+checks in `fetch/page_requests`, and the review-named capture/transport/projection
+boundaries are listed below. Independently named progress, response-hash,
+delivered-state and inventory clauses are also removed individually. Compound
+blocks and their separately listed clauses are not distinct vulnerability counts.
+The pin-context routing row is the positive verifying-context branch. The terminal
+success dispatch and ordinary traversal branches are control flow, not refusals.
+
+Only one guard is removed per fresh child process by an in-memory source loader;
+production bytes never change. For an if-guard, its predicate becomes false; for
+an OR clause, only that clause becomes false; for the three validation calls,
+only that call becomes a pass statement. The other boundary replacements are
+recorded in `manifest.json`. No test, bound, tolerance, attack size or retry was
+relaxed. Socket connection entry points are blocked in every deletion child.
+Invented reader/admission stand-ins isolate the checked boundary from earlier
+verification, without replacing its predicate. They demonstrate revalidation
+contracts and do not claim malformed artifacts can pass upstream verification.
+
+The before phase runs the four original register modules. The after phase also
+runs `test_fc_register_guards.py`. New assertions were added while the evidence
+was refined; each JSON retains its own real pass/fail counts. The final restored
+run covers the exact final test files. Header/missing-pin mocks now return finite
+invented bodies if reached; redirect tests provide the reviewed frame and pin;
+TLS assertions still require the exact PinError and closed reason. Missing-state
+assertions likewise still require TransportFault with schema_missing.
+
+Evidence: `.overnight/tmp/p03b/proof.py`, `manifest.json`, `before-<id>.json`,
+`after-<id>.json`, and six `after-final-<id>.json` records for the strengthened
+terminal, TLS, redirect and missing-state assertions. The latter records supplement,
+not replace, the first after results. Each table row uses that final record when
+present. The evidence collection resumes only unrecorded probes; it does not retry
+failed probes. Helpers under `.overnight/tmp/p03b` are scratch, not production.
+
+File:line locations below are relative to
+`custodian/src/eii_custodian/publicdata/`. Test aliases are files under
+`custodian/tests/`: F=`test_fc_register.py`, C=`test_fc_register_capture.py`,
+I=`test_fc_register_inventory.py`, T=`test_fc_register_transport.py`,
+G=`test_fc_register_guards.py`. Restoring the named guard means using unchanged
+production; every row shares the final GREEN intact run recorded below.
+
+| Guard | Production file:line | Removed before | Plant added or strengthened | Removed after |
+|---|---|---|---|---|
+| Credential body markers (acquire-38) | `fc_register/acquire.py:38` | `RED; exit 1; 1 failed/96 passed; C::test_sign_in_pin_and_size_are_terminal; DID NOT RAISE PageError` | `G::test_obstacle_classification_is_independent_of_parser[SYN sign in-credentials]` | `RED; exit 1; 4 failed/169 passed; G::test_obstacle_classification_is_independent_of_parser[SYN sign in-credentials]; assert acquire.obstacle(body) == reason` |
+| Eligible refusal-body markers (acquire-40) | `fc_register/acquire.py:40` | `NON-DECIDING RED; exit 1; 2 failed/95 passed; C::test_every_eligible_transition_attempts_capture[obstacle-None]; eii_custodian.publicdata.fetch.page_records.PageError: schema_missing` | `G::test_obstacle_classification_is_independent_of_parser[SYN robot check-refusal_body]` | `RED; exit 1; 4 failed/169 passed; G::test_obstacle_classification_is_independent_of_parser[SYN robot check-refusal_body]; assert acquire.obstacle(body) == reason` |
+| Response URL allow-list (acquire-48) | `fc_register/acquire.py:48` | `GREEN; exit 0; 97 passed` | `G::test_checked_response_checks_allowlist_without_request_frame` | `RED; exit 1; 1 failed/172 passed; G::test_checked_response_checks_allowlist_without_request_frame; DID NOT RAISE ShapeError` |
+| Response byte cap (acquire-52) | `fc_register/acquire.py:52` | `RED; exit 1; 1 failed/96 passed; C::test_sign_in_pin_and_size_are_terminal; DID NOT RAISE PageError` | `Existing deciding case retained` | `RED; exit 1; 1 failed/172 passed; C::test_sign_in_pin_and_size_are_terminal; DID NOT RAISE PageError` |
+| Classified obstacle refusal (acquire-55) | `fc_register/acquire.py:55` | `RED; exit 1; 2 failed/95 passed; C::test_sign_in_pin_and_size_are_terminal; DID NOT RAISE PageError` | `G::test_checked_response_raises_its_classified_obstacle` | `RED; exit 1; 3 failed/170 passed; G::test_checked_response_raises_its_classified_obstacle; DID NOT RAISE ShapeError` |
+| Duplicate request identity (acquire-80) | `fc_register/acquire.py:80` | `GREEN; exit 0; 97 passed` | `Not plantable under the increasing-ordinal invariant; left open` | `GREEN; exit 0; 173 passed` |
+| Terminal transport failures cannot capture (acquire-98) | `fc_register/acquire.py:98` | `NON-DECIDING RED; exit 1; 6 failed/91 passed; C::test_terminal_failure_never_loads_capture[http-404]; eii_custodian.publicdata.fetch.certificate_pins.PinError: capture_identity_mismatch` | `G::test_terminal_refusal_is_not_converted_to_capture[http]` | `RED; exit 1; 7 failed/169 passed; G::test_terminal_refusal_is_not_converted_to_capture[http]; assert str(caught) == ("http" if fault == "http" else "credentials")` |
+| Terminal shape failures cannot capture (acquire-103) | `fc_register/acquire.py:103` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; C::test_sign_in_pin_and_size_are_terminal; eii_custodian.publicdata.fetch.certificate_pins.PinError: capture_identity_mismatch` | `G::test_terminal_refusal_is_not_converted_to_capture[body]` | `RED; exit 1; 2 failed/174 passed; G::test_terminal_refusal_is_not_converted_to_capture[body]; assert str(caught) == ("http" if fault == "http" else "credentials")` |
+| Producer cannot consume captures (acquire-108) | `fc_register/acquire.py:108` | `GREEN; exit 0; 97 passed` | `G::test_unavailable_page_cannot_load_capture_without_permission_or_pin[True]` | `RED; exit 1; 1 failed/172 passed; G::test_unavailable_page_cannot_load_capture_without_permission_or_pin[True]; Regex pattern did not match.` |
+| Capture requires a configured pin (acquire-111) | `fc_register/acquire.py:111` | `GREEN; exit 0; 97 passed` | `G::test_unavailable_page_cannot_load_capture_without_permission_or_pin[False]` | `RED; exit 1; 1 failed/172 passed; G::test_unavailable_page_cannot_load_capture_without_permission_or_pin[False]; Regex pattern did not match.` |
+| Missing capture has a closed refusal (acquire-116) | `fc_register/acquire.py:116` | `NON-DECIDING RED; exit 1; 3 failed/94 passed; F::test_failed_mid_chain_records_date_and_no_partial_inventory; AttributeError: 'NoneType' object has no attribute 'identity'` | `G::test_missing_capture_has_a_closed_error_before_admission` | `RED; exit 1; 4 failed/169 passed; G::test_missing_capture_has_a_closed_error_before_admission; assert isinstance(caught, ShapeError), "missing intake must have a closed refusal"` |
+| Digest, response uniqueness and ordinal block (acquire-135) | `fc_register/acquire.py:135` | `RED; exit 1; 9 failed/88 passed; F::test_live_chain_plants_refuse_without_partial_publication[replay]; DID NOT RAISE PageError` | `G::test_paging_revalidates_the_admitted_upstream_digest` | `RED; exit 1; 10 failed/163 passed; G::test_paging_revalidates_the_admitted_upstream_digest; DID NOT RAISE ShapeError` |
+| Terminal consumes exactly the supplied receipts (acquire-160) | `fc_register/acquire.py:160` | `RED; exit 1; 1 failed/96 passed; C::test_capture_plants_refuse_without_copy_or_publication[false_terminal]; DID NOT RAISE any of (PageError, PinError)` | `Existing deciding case retained` | `RED; exit 1; 1 failed/172 passed; C::test_capture_plants_refuse_without_copy_or_publication[false_terminal]; DID NOT RAISE any of (PageError, PinError)` |
+| Closed fragment keys and object (parse-32) | `fc_register/parse.py:32` | `RED; exit 1; 1 failed/96 passed; C::test_capture_plants_refuse_without_copy_or_publication[extra_property]; DID NOT RAISE any of (PageError, PinError)` | `G::test_fragment_guards_have_canonical_plants[extra_top-schema_missing]` | `RED; exit 1; 2 failed/171 passed; G::test_fragment_guards_have_canonical_plants[extra_top-schema_missing]; DID NOT RAISE ShapeError` |
+| Projection version and canonical encoding (parse-34) | `fc_register/parse.py:34` | `RED; exit 1; 1 failed/96 passed; F::test_canonical_fragment_rejects_extra_markup_and_missing_progress; DID NOT RAISE ValueError` | `G::test_fragment_guards_have_canonical_plants[projection-schema_missing]` | `RED; exit 1; 2 failed/171 passed; G::test_fragment_guards_have_canonical_plants[projection-schema_missing]; DID NOT RAISE ShapeError` |
+| Closed progress contract (parse-37) | `fc_register/parse.py:37` | `RED; exit 1; 1 failed/96 passed; C::test_capture_plants_refuse_without_copy_or_publication[progress]; DID NOT RAISE any of (PageError, PinError)` | `G::test_fragment_guards_have_canonical_plants[progress-paging_incomplete]` | `RED; exit 1; 2 failed/171 passed; G::test_fragment_guards_have_canonical_plants[progress-paging_incomplete]; DID NOT RAISE ShapeError` |
+| Nonempty row array (parse-45) | `fc_register/parse.py:45` | `GREEN; exit 0; 97 passed` | `G::test_fragment_guards_have_canonical_plants[empty_rows-schema_missing]` | `RED; exit 1; 1 failed/172 passed; G::test_fragment_guards_have_canonical_plants[empty_rows-schema_missing]; DID NOT RAISE ShapeError` |
+| Closed scalar row contract (parse-48) | `fc_register/parse.py:48` | `GREEN; exit 0; 97 passed` | `G::test_fragment_guards_have_canonical_plants[empty_name-schema_missing]` | `RED; exit 1; 3 failed/170 passed; G::test_fragment_guards_have_canonical_plants[empty_name-schema_missing]; DID NOT RAISE ShapeError` |
+| Exact reviewed shape (parse-60) | `fc_register/parse.py:60` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[shape-schema_missing]` | `RED; exit 1; 1 failed/172 passed; G::test_project_guards_have_otherwise_valid_pages[shape-schema_missing]; DID NOT RAISE ShapeError` |
+| Card label binding (parse-67) | `fc_register/parse.py:67` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[label-schema_missing]` | `RED; exit 1; 1 failed/172 passed; G::test_project_guards_have_otherwise_valid_pages[label-schema_missing]; DID NOT RAISE ShapeError` |
+| Nested field node refusal (parse-72) | `fc_register/parse.py:72` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; F::test_shape_and_request_plants[nested]; IndexError: list index out of range` | `G::test_projection_refusals_do_not_depend_on_a_later_request[nested]` | `RED; exit 1; 2 failed/171 passed; G::test_projection_refusals_do_not_depend_on_a_later_request[nested]; DID NOT RAISE ShapeError` |
+| One canonical current page (parse-81) | `fc_register/parse.py:81` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[current-paging_incomplete]` | `RED; exit 1; 1 failed/172 passed; G::test_project_guards_have_otherwise_valid_pages[current-paging_incomplete]; DID NOT RAISE ShapeError` |
+| Unique next control (parse-86) | `fc_register/parse.py:86` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[duplicate_next-paging_incomplete]` | `RED; exit 1; 1 failed/172 passed; G::test_project_guards_have_otherwise_valid_pages[duplicate_next-paging_incomplete]; DID NOT RAISE ShapeError` |
+| Exact public postback control (parse-95) | `fc_register/parse.py:95` | `RED; exit 1; 1 failed/96 passed; F::test_shape_and_request_plants[detail]; Regex pattern did not match.` | `Existing deciding case retained` | `RED; exit 1; 1 failed/172 passed; F::test_shape_and_request_plants[detail]; Regex pattern did not match.` |
+| Terminal cannot have a later live link (parse-100) | `fc_register/parse.py:100` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[later_link-paging_incomplete]` | `RED; exit 1; 1 failed/174 passed; G::test_project_guards_have_otherwise_valid_pages[later_link-paging_incomplete]; DID NOT RAISE ShapeError` |
+| Both pagers agree (parse-111) | `fc_register/parse.py:111` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; F::test_shape_and_request_plants[pager_disagreement]; IndexError: list index out of range` | `G::test_projection_refusals_do_not_depend_on_a_later_request[pager_disagreement]` | `RED; exit 1; 2 failed/173 passed; G::test_projection_refusals_do_not_depend_on_a_later_request[pager_disagreement]; DID NOT RAISE ShapeError` |
+| One POST form (parse-114) | `fc_register/parse.py:114` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[form_method-schema_missing]` | `RED; exit 1; 1 failed/174 passed; G::test_project_guards_have_otherwise_valid_pages[form_method-schema_missing]; DID NOT RAISE ShapeError` |
+| Delivered hidden fields are declared and unique (parse-121) | `fc_register/parse.py:121` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[duplicate_hidden-schema_missing]` | `RED; exit 1; 1 failed/174 passed; G::test_project_guards_have_otherwise_valid_pages[duplicate_hidden-schema_missing]; DID NOT RAISE ShapeError` |
+| Complete fields and empty initial events (parse-129) | `fc_register/parse.py:129` | `GREEN; exit 0; 97 passed` | `G::test_project_guards_have_otherwise_valid_pages[missing_hidden-schema_missing]` | `RED; exit 1; 2 failed/173 passed; G::test_project_guards_have_otherwise_valid_pages[missing_hidden-schema_missing]; DID NOT RAISE ShapeError` |
+| Inventory source and URL identity (names-19) | `fc_register/names.py:19` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[entry]` | `RED; exit 1; 1 failed/174 passed; G::test_inventory_independent_revalidation[entry]; DID NOT RAISE PageError` |
+| Selected receipt and payload version (names-23) | `fc_register/names.py:23` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[selected_receipt]` | `RED; exit 1; 2 failed/173 passed; G::test_inventory_independent_revalidation[selected_receipt]; DID NOT RAISE PageError` |
+| No inputs after terminal (names-34) | `fc_register/names.py:34` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[after_terminal]` | `RED; exit 1; 1 failed/174 passed; G::test_inventory_independent_revalidation[after_terminal]; DID NOT RAISE PageError` |
+| Raw receipt and manifest binding (names-37) | `fc_register/names.py:37` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[input_receipt]` | `RED; exit 1; 2 failed/173 passed; G::test_inventory_independent_revalidation[input_receipt]; DID NOT RAISE PageError` |
+| Projected representation and upstream digest (names-48) | `fc_register/names.py:48` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[representation]` | `RED; exit 1; 2 failed/173 passed; G::test_inventory_independent_revalidation[representation]; DID NOT RAISE PageError` |
+| Request identity and response uniqueness (names-66) | `fc_register/names.py:66` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[identity]` | `RED; exit 1; 2 failed/173 passed; G::test_inventory_independent_revalidation[identity]; DID NOT RAISE PageError` |
+| Inventory shown-page ordinal (names-69) | `fc_register/names.py:69` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[progress]` | `RED; exit 1; 1 failed/174 passed; G::test_inventory_independent_revalidation[progress]; DID NOT RAISE PageError` |
+| Terminal chain and exact aggregate rows (names-75) | `fc_register/names.py:75` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[unterminated]` | `RED; exit 1; 2 failed/173 passed; G::test_inventory_independent_revalidation[unterminated]; DID NOT RAISE PageError` |
+| Producer hold, bound and tool evidence (capture-37) | `fc_register/capture.py:37` | `GREEN; exit 0; 97 passed` | `G::test_producer_missing_evidence_refuses_before_visitor[hold]` | `RED; exit 1; 3 failed/172 passed; G::test_producer_missing_evidence_refuses_before_visitor[hold]; DID NOT RAISE PinError` |
+| Pre-write overwrite refusal (capture-87) | `fc_register/capture.py:87` | `GREEN; exit 0; 97 passed` | `G::test_producer_overwrite_refuses_before_any_partial_output` | `RED; exit 1; 1 failed/174 passed; G::test_producer_overwrite_refuses_before_any_partial_output; assert isinstance(caught, certs.PinError), "overwrite must refuse before any write"` |
+| Collision refuses the build (build-25) | `fc_register/build.py:25` | `RED; exit 1; 1 failed/96 passed; I::test_complete_inventory_retains_hidden_duplicate_names_and_caller_refuses; DID NOT RAISE ValueError` | `Existing deciding case retained` | `RED; exit 1; 1 failed/174 passed; I::test_complete_inventory_retains_hidden_duplicate_names_and_caller_refuses; DID NOT RAISE ValueError` |
+| Closed delivered postback contract (fetch-page_requests-88) | `fetch/page_requests.py:88` | `RED; exit 1; 1 failed/96 passed; F::test_postback_must_equal_delivered_state_before_send; DID NOT RAISE TransportFault` | `G::test_postback_closed_contract_with_matching_delivered_state[target]` | `RED; exit 1; 8 failed/167 passed; G::test_postback_closed_contract_with_matching_delivered_state[target]; DID NOT RAISE TransportFault` |
+| Active register exact URL (fetch-page_requests-99) | `fetch/page_requests.py:99` | `RED; exit 1; 1 failed/96 passed; F::test_active_register_exact_url_guard_without_a_frame; DID NOT RAISE TransportFault` | `Existing deciding case retained` | `RED; exit 1; 1 failed/174 passed; F::test_active_register_exact_url_guard_without_a_frame; DID NOT RAISE TransportFault` |
+| Reviewed frame and allow-list (fetch-page_requests-106) | `fetch/page_requests.py:106` | `RED; exit 1; 1 failed/96 passed; F::test_frame_and_path_refusals[https://example.invalid/SYN]; DID NOT RAISE TransportFault` | `G::test_frame_membership_is_independent_of_register_exact_path` | `RED; exit 1; 2 failed/173 passed; G::test_frame_membership_is_independent_of_register_exact_path; DID NOT RAISE TransportFault` |
+| Reject unverified supplied TLS context (fetch-page_requests-148) | `fetch/page_requests.py:148` | `GREEN; exit 0; 97 passed` | `G::test_page_context_rejects_unverified_supplied_context_with_valid_pin` | `RED; exit 1; 1 failed/174 passed; G::test_page_context_rejects_unverified_supplied_context_with_valid_pin; DID NOT RAISE PinError` |
+| Route reviewed pin to verifying context (fetch-page_requests-153) | `fetch/page_requests.py:153` | `RED; exit 1; 39 failed/58 passed; C::test_producer_failure_writes_no_form_or_person_state; Regex pattern did not match.` | `G::test_reviewed_pin_context_is_available_and_verifying` | `RED; exit 1; 44 failed/131 passed; G::test_reviewed_pin_context_is_available_and_verifying; assert caught is None, (` |
+| Required host cannot use an unpinned context (fetch-page_requests-157) | `fetch/page_requests.py:157` | `RED; exit 1; 1 failed/96 passed; T::test_post_token_and_missing_pin_refuse_before_send; DID NOT RAISE PinError` | `G::test_required_register_pin_cannot_fall_back_to_system_context` | `RED; exit 1; 2 failed/173 passed; G::test_required_register_pin_cannot_fall_back_to_system_context; DID NOT RAISE PinError` |
+| Admission identity equals requested identity (fetch-certificate_pins-118) | `fetch/certificate_pins.py:118` | `RED; exit 1; 4 failed/93 passed; C::test_capture_plants_refuse_without_copy_or_publication[replay]; Regex pattern did not match.` | `G::test_direct_capture_admission_revalidates_projection_evidence[identity]` | `RED; exit 1; 5 failed/170 passed; G::test_direct_capture_admission_revalidates_projection_evidence[identity]; DID NOT RAISE PinError` |
+| Projected admission branch and raw exclusion (fetch-certificate_pins-122) | `fetch/certificate_pins.py:122` | `RED; exit 1; 2 failed/95 passed; C::test_capture_plants_refuse_without_copy_or_publication[wrong_page]; Regex pattern did not match.` | `G::test_direct_capture_admission_revalidates_projection_evidence[projection]` | `RED; exit 1; 5 failed/170 passed; G::test_direct_capture_admission_revalidates_projection_evidence[projection]; DID NOT RAISE PinError` |
+| Required projected admission evidence (fetch-certificate_pins-125) | `fetch/certificate_pins.py:125` | `RED; exit 1; 1 failed/96 passed; C::test_direct_fc_admission_cannot_use_legacy_raw_capture; Regex pattern did not match.` | `G::test_direct_capture_admission_revalidates_projection_evidence[projection]` | `RED; exit 1; 3 failed/172 passed; G::test_direct_capture_admission_revalidates_projection_evidence[projection]; DID NOT RAISE PinError` |
+| Admitted shown page equals ordinal (fetch-certificate_pins-136) | `fetch/certificate_pins.py:136` | `RED; exit 1; 1 failed/96 passed; C::test_capture_plants_refuse_without_copy_or_publication[wrong_page]; Regex pattern did not match.` | `G::test_direct_capture_admission_revalidates_projection_evidence[progress]` | `RED; exit 1; 2 failed/173 passed; G::test_direct_capture_admission_revalidates_projection_evidence[progress]; DID NOT RAISE PinError` |
+| Paged intake requires identity (fetch-certificate_pins-293) | `fetch/certificate_pins.py:293` | `GREEN; exit 0; 97 passed` | `G::test_paged_capture_requires_identity_even_without_an_intake` | `RED; exit 1; 1 failed/174 passed; G::test_paged_capture_requires_identity_even_without_an_intake; DID NOT RAISE PinError` |
+| Loader projection and digest evidence (fetch-certificate_pins-342) | `fetch/certificate_pins.py:342` | `GREEN; exit 0; 97 passed` | `G::test_capture_loader_rejects_bad_evidence_before_admission[projection]` | `RED; exit 1; 2 failed/173 passed; G::test_capture_loader_rejects_bad_evidence_before_admission[projection]; DID NOT RAISE PinError` |
+| Closed ordinal receipt filenames (fetch-certificate_pins-384) | `fetch/certificate_pins.py:384` | `GREEN; exit 0; 97 passed` | `G::test_capture_filename_is_a_closed_ordinal_contract` | `RED; exit 1; 1 failed/174 passed; G::test_capture_filename_is_a_closed_ordinal_contract; assert isinstance(caught, certs.PinError), (` |
+| Direct TLS error remains a pin error (fetch-transport-301) | `fetch/transport.py:301` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; T::test_tls_errors_are_terminal_never_connection_recovery[False]; eii_custodian.publicdata.fetch.transport.TransportFault: unreachable https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx` | `T: finite opener / verifying redirect frame / exact TLS assertions, as applicable` | `RED; exit 1; 1 failed/175 passed; T::test_tls_errors_are_terminal_never_connection_recovery[False]; assert isinstance(caught.value, PinError)` |
+| Wrapped TLS error remains a pin error (fetch-transport-307) | `fetch/transport.py:307` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; T::test_tls_errors_are_terminal_never_connection_recovery[True]; eii_custodian.publicdata.fetch.transport.TransportFault: unreachable https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx` | `T: finite opener / verifying redirect frame / exact TLS assertions, as applicable` | `RED; exit 1; 1 failed/175 passed; T::test_tls_errors_are_terminal_never_connection_recovery[True]; assert isinstance(caught.value, PinError)` |
+| No postback redirect (fetch-transport-386) | `fetch/transport.py:386` | `NON-DECIDING RED; exit 1; 2 failed/95 passed; T::test_post_redirect_never_sends_a_second_request[https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx]; eii_custodian.publicdata.fetch.certificate_pins.PinError: certificate_chain_incomplete` | `T: finite opener / verifying redirect frame / exact TLS assertions, as applicable` | `RED; exit 1; 1 failed/175 passed; T::test_post_redirect_never_sends_a_second_request[https://eservices.qfc.qa/qfcpublicregister/publicregister.aspx]; DID NOT RAISE TransportFault` |
+| Upstream digest syntax (acquire-135-term0) | `fc_register/acquire.py:135 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_paging_revalidates_the_admitted_upstream_digest` | `RED; exit 1; 1 failed/175 passed; G::test_paging_revalidates_the_admitted_upstream_digest; DID NOT RAISE ShapeError` |
+| No repeated upstream response (acquire-135-term1) | `fc_register/acquire.py:135 (clause 1)` | `RED; exit 1; 1 failed/96 passed; C::test_capture_plants_refuse_without_copy_or_publication[non_progress]; Regex pattern did not match.` | `Existing deciding case retained` | `RED; exit 1; 1 failed/175 passed; C::test_capture_plants_refuse_without_copy_or_publication[non_progress]; Regex pattern did not match.` |
+| Shown page equals requested ordinal (acquire-135-term2) | `fc_register/acquire.py:135 (clause 2)` | `RED; exit 1; 3 failed/94 passed; F::test_live_chain_plants_refuse_without_partial_publication[missing]; DID NOT RAISE PageError` | `Existing deciding case retained` | `RED; exit 1; 3 failed/173 passed; F::test_live_chain_plants_refuse_without_partial_publication[missing]; DID NOT RAISE PageError` |
+| Active frame required for postback (fetch-page_requests-88-term0) | `fetch/page_requests.py:88 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_postback_requires_active_frame_even_with_delivered_state` | `RED; exit 1; 1 failed/175 passed; G::test_postback_requires_active_frame_even_with_delivered_state; DID NOT RAISE TransportFault` |
+| Postback exact URL (fetch-page_requests-88-term1) | `fetch/page_requests.py:88 (clause 1)` | `GREEN; exit 0; 97 passed` | `G::test_postback_closed_contract_with_matching_delivered_state[url]` | `RED; exit 1; 1 failed/175 passed; G::test_postback_closed_contract_with_matching_delivered_state[url]; Regex pattern did not match.` |
+| Declared target membership (fetch-page_requests-88-term2) | `fetch/page_requests.py:88 (clause 2)` | `GREEN; exit 0; 97 passed` | `G::test_postback_closed_contract_with_matching_delivered_state[target]` | `RED; exit 1; 1 failed/175 passed; G::test_postback_closed_contract_with_matching_delivered_state[target]; DID NOT RAISE TransportFault` |
+| Empty argument (fetch-page_requests-88-term3) | `fetch/page_requests.py:88 (clause 3)` | `RED; exit 1; 1 failed/96 passed; F::test_postback_must_equal_delivered_state_before_send; DID NOT RAISE TransportFault` | `G::test_postback_closed_contract_with_matching_delivered_state[argument]` | `RED; exit 1; 2 failed/174 passed; G::test_postback_closed_contract_with_matching_delivered_state[argument]; DID NOT RAISE TransportFault` |
+| Delivered state exists (fetch-page_requests-88-term4) | `fetch/page_requests.py:88 (clause 4)` | `GREEN; exit 0; 97 passed` | `G::test_postback_closed_contract_with_matching_delivered_state[missing_delivered]` | `RED; exit 1; 1 failed/175 passed; G::test_postback_closed_contract_with_matching_delivered_state[missing_delivered]; assert isinstance(caught.value, TransportFault)` |
+| Delivered fields equal prior state (fetch-page_requests-88-term5) | `fetch/page_requests.py:88 (clause 5)` | `RED; exit 1; 1 failed/96 passed; F::test_postback_must_equal_delivered_state_before_send; DID NOT RAISE TransportFault` | `Existing deciding case retained` | `RED; exit 1; 1 failed/175 passed; F::test_postback_must_equal_delivered_state_before_send; DID NOT RAISE TransportFault` |
+| Target equals delivered target (fetch-page_requests-88-term6) | `fetch/page_requests.py:88 (clause 6)` | `GREEN; exit 0; 97 passed` | `G::test_postback_cannot_switch_to_the_other_valid_delivered_target` | `RED; exit 1; 1 failed/175 passed; G::test_postback_cannot_switch_to_the_other_valid_delivered_target; DID NOT RAISE TransportFault` |
+| Exact delivered field names (fetch-page_requests-88-term7) | `fetch/page_requests.py:88 (clause 7)` | `GREEN; exit 0; 97 passed` | `G::test_postback_closed_contract_with_matching_delivered_state[fields]` | `RED; exit 1; 1 failed/175 passed; G::test_postback_closed_contract_with_matching_delivered_state[fields]; DID NOT RAISE TransportFault` |
+| Raw receipt is valid (names-37-term0) | `fc_register/names.py:37 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[input_receipt]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[input_receipt]; DID NOT RAISE PageError` |
+| Manifest binds raw receipt evidence (names-37-term1) | `fc_register/names.py:37 (clause 1)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[sidecar_binding]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[sidecar_binding]; DID NOT RAISE PageError` |
+| Inventory request identity matches chain (names-66-term0) | `fc_register/names.py:66 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[identity]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[identity]; DID NOT RAISE PageError` |
+| Inventory rejects repeated response hash (names-66-term1) | `fc_register/names.py:66 (clause 1)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[repeated_hash]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[repeated_hash]; DID NOT RAISE PageError` |
+| Inventory must end terminal (names-75-term0) | `fc_register/names.py:75 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[unterminated]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[unterminated]; DID NOT RAISE PageError` |
+| Aggregate rows equal reconstructed rows (names-75-term1) | `fc_register/names.py:75 (clause 1)` | `GREEN; exit 0; 97 passed` | `G::test_inventory_independent_revalidation[rows]` | `RED; exit 1; 1 failed/175 passed; G::test_inventory_independent_revalidation[rows]; DID NOT RAISE PageError` |
+| Fragment projection version (parse-34-term0) | `fc_register/parse.py:34 (clause 0)` | `GREEN; exit 0; 97 passed` | `G::test_fragment_guards_have_canonical_plants[projection-schema_missing]` | `RED; exit 1; 1 failed/175 passed; G::test_fragment_guards_have_canonical_plants[projection-schema_missing]; DID NOT RAISE ShapeError` |
+| Fragment canonical encoding (parse-34-term1) | `fc_register/parse.py:34 (clause 1)` | `RED; exit 1; 1 failed/96 passed; F::test_canonical_fragment_rejects_extra_markup_and_missing_progress; DID NOT RAISE ValueError` | `Existing deciding case retained` | `RED; exit 1; 1 failed/175 passed; F::test_canonical_fragment_rejects_extra_markup_and_missing_progress; DID NOT RAISE ValueError` |
+| Producer validates the closed declaration first (producer-declaration) | `fc_register/capture.py:36` | `GREEN; exit 0; 97 passed` | `G::test_producer_checks_closed_declaration_before_any_visitor_request` | `RED; exit 1; 1 failed/179 passed; G::test_producer_checks_closed_declaration_before_any_visitor_request; DID NOT RAISE ShapeError` |
+| Producer validates its timestamp before a request (producer-clock) | `fc_register/capture.py:40` | `GREEN; exit 0; 97 passed` | `G::test_producer_checks_timestamp_before_any_visitor_request` | `RED; exit 1; 1 failed/179 passed; G::test_producer_checks_timestamp_before_any_visitor_request; Expected 'mock' to not have been called. Called 1 times.` |
+| Projector validates its reconstructed fragment (project-final-fragment) | `fc_register/parse.py:138` | `GREEN; exit 0; 97 passed` | `G::test_projection_validates_its_reconstructed_fragment[empty_name]` | `RED; exit 1; 2 failed/178 passed; G::test_projection_validates_its_reconstructed_fragment[empty_name]; DID NOT RAISE ShapeError` |
+| No live requests after capture admission (capture-only-replay) | `fc_register/acquire.py:85` | `RED; exit 1; 25 failed/72 passed; C::test_capture_plants_refuse_without_copy_or_publication[digest]; Regex pattern did not match.` | `G::test_capture_replay_finishes_without_manufacturing_a_live_post` | `RED; exit 1; 26 failed/150 passed; G::test_capture_replay_finishes_without_manufacturing_a_live_post; assert caught is None, "an admitted complete capture chain must finish successfully"` |
+| Only approved scalar field text is projected (projection-fields) | `fc_register/parse.py:74` | `RED; exit 1; 41 failed/56 passed; F::test_live_same_target_empty_argument_advances_and_projects; assert sentinel not in body, path.name` | `G::test_inventory_independent_revalidation[entry]` | `RED; exit 1; 55 failed/121 passed; G::test_inventory_independent_revalidation[entry]; assert names.contribution(tmp_path, ent).names == (` |
+| HTTP not-found is ineligible for capture (eligible-404) | `fc_register/acquire.py:31` | `NON-DECIDING RED; exit 1; 1 failed/96 passed; C::test_terminal_failure_never_loads_capture[http-404]; eii_custodian.publicdata.fetch.certificate_pins.PinError: capture_identity_mismatch` | `G::test_capture_eligibility_is_a_closed_decision[http-404-False]` | `RED; exit 1; 3 failed/173 passed; G::test_capture_eligibility_is_a_closed_decision[http-404-False]; assert acquire.eligible(reason, status) is allowed` |
+| Forbidden page-scoped credential headers (headers) | `fetch/transport.py:192` | `RED; exit 1; 3 failed/94 passed; T::test_post_header_refusals_precede_opener[Authorization]; DID NOT RAISE TransportFault` | `T: finite opener / verifying redirect frame / exact TLS assertions, as applicable` | `RED; exit 1; 3 failed/173 passed; T::test_post_header_refusals_precede_opener[Authorization]; DID NOT RAISE TransportFault` |
+
+Required checks:
+
+- `uv run --locked python -m pytest custodian/tests/test_fc_register.py custodian/tests/test_fc_register_capture.py custodian/tests/test_fc_register_inventory.py custodian/tests/test_fc_register_transport.py custodian/tests/test_fc_register_guards.py -q -p no:cacheprovider --hypothesis-seed=7391628504` — exit 0; 180 passed in 3.53s.
+- `uv run --locked ruff check .` — exit 0; All checks passed!.
+- `uv run --locked ruff format --check .` — exit 0; 836 files already formatted.
+- `python3 scripts/check_docs.py` — exit 0; checked 1139 text files, 123 Markdown files: OK.
+
+Execution corrections and retained limits:
+
+- The first helper invocation exited 1 before pytest: its transport line lookup
+  was wrong. Corrected it; that setup failure supplies no red evidence. An extra
+  generic transport fallback probe, outside the task's register guard list, stayed
+  green and is retained separately as `before-fetch-transport-313.json`; it is
+  excluded from the inventory and all closure claims.
+- The first before pass was interrupted with real exit 130 when deleting the
+  missing-pin refusal exposed an unbounded MagicMock body in the existing test.
+  No red was credited. Finite opener stand-ins were then added to the two original
+  transport tests, preserving their refusal and opener-not-called assertions.
+  Only unrecorded probes were resumed. The missing-pin/header before results
+  therefore already include that finite-fixture repair; the table does not
+  represent them as a pristine-base red.
+- Initial new-plant runs exited 1: first 42 passed/1 failed because a hold used an
+  unknown enum; then 71 passed/1 failed because a direct obstacle check lacked its
+  required pin context. Corrected only those setups to the accepted hold value
+  and an invented verifying pin. The subsequent new-plant run passed. Later added
+  plants have their own recorded deletion and final intact results.
+- The refined missing-state deletion emitted one shared-pytest-temporary-root
+  cleanup warning (OSError, Errno 39, Directory not empty) while final probes
+  overlapped. Its actual intended result was exit 1, 1 failed/175 passed. This is
+  retained in `cleanup-warning.json`; a green rerun is not offered as its closure.
+  Final required checks ran after the deletion processes finished.
+- The two terminal-gate probes, two TLS probes, redirect probe and missing-state
+  clause were rerun only after strengthening their assertions or test context;
+  their earlier results remain. No automatic retry, skip or refreshed baseline
+  was used. All removal failures are intentional; no import or collection error
+  is used as proof.
+
+Strict self-review: APPROVE this bounded test/evidence delivery with the sole
+unplantable guard expressly open; this is not an independent-maker approval or a
+slice-gate verdict. Muhasabah: PASS for sourced assertions, disclosed limits,
+unchanged production and recorded real exits. Live activation and other open
+source/capture items remain outside this brief.
+
+Post-write verification: `python3 scripts/check_docs.py` exited 0 after the ledger
+and return were written (1139 text files, 123 Markdown files); `git diff --check`
+exited 0. The read-only scope/hygiene audit first exited 1 because its path detector
+misclassified the documented relative scratch folder, then exited 1 after finding
+managed-interpreter traceback paths in two evidence records. Corrected the detector,
+redacted those diagnostics and tightened both recorders without changing result
+data. The next audit exited 0, proving unchanged HEAD/index/production/instructions,
+the four-file scope, the original ledger byte prefix, only the new open-item
+insertion, all 82 paired probes and credited assertions, intact 180-test success,
+required checks, report marker and authored-text hygiene. These audit corrections
+supply no guard red evidence and are not hidden by a rerun.

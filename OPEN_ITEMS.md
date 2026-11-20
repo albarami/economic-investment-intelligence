@@ -4470,6 +4470,9 @@ Revision-2 record points without extra numbers:
 
 - DISPOSITION — 2026-11-20, S2-P03: **LEFT OPEN**. The tracked text search, supplied `.overnight/IN/PACKAGE.md`, PROGRESS.md **S2-T36 — The financial centre's company register: task log**, **S2-T36 offline build** and **S2-T36 fix pass 1 — ruling L-1062** retain summaries, but not the original lens-A review or its complete remaining-guard list. The referenced `.overnight/IN/REVIEW-A.md` and S2-T36 review directory are absent. Under this package's explicit dependency rule, no guard list, per-guard chronology or closing verdict is inferred. The lead must supply that review/list and disposition its remaining red evidence; no new test or red/green result is claimed for this item.
 
+
+- DISPOSITION — 2026-11-20, S2-P03b: **LEFT OPEN for `fc_register/acquire.py:80` only**. The supplied original reviews are now available. PROGRESS.md **S2-P03b — Complete S2-T36 guard-removal evidence — 2026-11-20** records the code-derived per-guard inventory and real deletion results: 82 probes, 81 deciding semantic assertion reds, one green duplicate-request check, and 180 intact tests passed. Its increasing immutable ordinal prevents the duplicate identity needed to exercise that check; changing identity construction as well would violate the single-guard-removal brief. Production stays unchanged. The lead must disposition this redundancy and obtain the required independent review; no slice-gate closure is asserted. One concurrent instrumented probe also emitted a shared pytest temporary-root cleanup warning (Errno 39); it is retained in the same evidence block, without claiming a green rerun closes it. This dated record supersedes the earlier missing-review dependency explanation, not the OPEN status.
+
 ### PO-S2-114 — The register target check's exact-URL block has no test that fails without it
 
 - ID: PO-S2-114
