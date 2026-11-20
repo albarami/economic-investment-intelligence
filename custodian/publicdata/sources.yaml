@@ -12967,6 +12967,34 @@ sources:
     skip_reason: "lead_shell_file_input"
     extension: "csv"
 
+  - key: company_web
+    refetch: {value: none, reason: frequency_unconfirmed, evidence: "decision 0076 item 7; refresh cadence unconfirmed"}
+    source_id: company_web
+    slug: ""
+    kind: company_web
+    title_en: Company web pages
+    publisher: Per-host publisher in the uncommitted receipt
+    licence_id: not_stated
+    licence_basis: owner_decision
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: terms to be read
+    terms_read_on: "2026-11-20"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: none
+    skip_reason: ""
+    extension: html
+
 forecast_series:
   - key: licence_issues
     state: held

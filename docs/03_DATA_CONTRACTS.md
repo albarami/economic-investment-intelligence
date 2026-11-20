@@ -2544,6 +2544,20 @@ collision. Source, selected snapshot, method, licence and retrieval lineage trav
 with the contribution. S4-T05 supplies other contributions and its configured edit
 distance; this task introduces no new collision threshold or normaliser.
 
+### S2-T48 tooling fields (decision 0076)
+
+Company-web candidates remain outside product and release tables. The closed fields
+are name, address, website and activity; each binds the full-page and declared-fragment
+hashes, source address, retrieval UTC, publisher, local-use basis, parser version and
+deterministic extraction-run identity. Another-maker decisions bind the exact
+candidate digest and reviewer maker/tool/model/session. Pending and rejected fields
+are never retained. Register-published fields remain separate with their lineage;
+conflicts are marked and absent web fields stay empty. The retained web names add a
+`name_inventory.Contribution` to DAT-14/SYN-20 checks. Full source bytes and review
+records remain uncommitted under PUB-04, with explicit archive selections. See
+[the tooling contract](../custodian/src/eii_custodian/publicdata/company_web/README.md)
+and [decision 0076](decisions/0076-company-web-pages-search-fetch-review-and-storage.md).
+
 ## Register file projections (S2-T49)
 
 This schema records the lead's column/type/format metadata, not a source value.

@@ -979,15 +979,17 @@ def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
     assert (
-        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4
-    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations; S2-T20L STAC metadata.
+        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1
+    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations; S2-T20L STAC metadata; S2-T48 company web.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
     # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
-    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2  # S2-T49 files.
+    assert (
+        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1
+    )  # S2-T49 files; S2-T48 company web.
     assert {
         entry.key
         for entry in entries
@@ -1182,6 +1184,7 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         } | BANNED_SOURCE_IDS
 
     expected = {
+        "company_web",
         "satellite_cdse_backup",
         "biz_register",
         "fc_register",

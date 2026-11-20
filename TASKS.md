@@ -862,7 +862,7 @@ Open question to settle in your plan with options: where the archive persists so
 - Scope: search and fetch tooling under the public seam, provenance receipts, review records, invented fixtures and tests; no person-level or salary data.
 - Depends: S2-T01, S2-T27, S2-T36; [decision 0074](docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md) item 8.
 - Requirements: AGENTS.md rules 5, 7, 9, 13, 19 and 37; document 04 PUB-01, PUB-03 and PUB-04.
-- Delivery: hard; personas Data; status not started.
+- Delivery: hard; personas Data; status offline build implemented; checks and baseline evidence in PROGRESS.md; independent code review and lead live E1–E5 pending; acceptance boxes unchanged.
 
 ### S2-T49 — Commerce and financial-centre register Public tables
 - Goal: read the commerce register through `EII_REGISTER_FILE` and the financial-centre register through `EII_FC_REGISTER_FILE`, and build `pub_register_company` and `pub_register_snapshot` for every public and protected release (ARC-131, DAT-164, TST-196), with invented stand-in fixtures only in automated tests and no register-site fetcher in the repository (decision 0022 item 1).

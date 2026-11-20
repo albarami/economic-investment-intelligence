@@ -461,6 +461,7 @@ def run_build(
     _fetch_only: bool = False,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
+    entries = tuple(entry for entry in entries if entry.kind != "company_web")
     if seed is not None:
         from eii_custodian.publicdata.assembly import AssemblyError
         from eii_custodian.publicdata.assembly_adapters import Production

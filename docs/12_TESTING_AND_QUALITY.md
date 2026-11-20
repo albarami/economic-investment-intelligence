@@ -836,6 +836,22 @@ Commands and their actual results belong in PROGRESS.md and the builder return.
 The lead runs mutation campaigns and live evidence checks; invented fixtures do
 not establish page access, reviewed pins or another-maker approval.
 
+### S2-T48 offline guard evidence
+
+The company-web tests use invented companies, reserved test hosts, invented pages
+and injected transports/time. An autouse socket refusal prevents a test from
+opening a live connection. Plants cover company-only output, all lineage fields,
+request/company bindings, scoped hosts and redirects, manifest hashes, obstacle
+stops, missing access records, robots rules, pacing, batch bounds, declared
+parsers, exact names, independent exact-field review, output identifier runs,
+collision inventory and outcome reconciliation. The unchanged `check_docs.py`
+also runs against temporary git trees with runtime-constructed digit plants.
+These are TST-51/TST-09 fixtures; they establish no live acceptance criterion 1,
+2, 4 or 7 of S2-T48. The lead owns E1–E5 and safe committed counts; E6 records
+scanner exits and E7 reconciles all outcomes. Baseline failures, test corrections
+and actual exits belong in PROGRESS.md and the task return, never a refreshed
+security tolerance. See [the tooling contract](../custodian/src/eii_custodian/publicdata/company_web/README.md).
+
 ## Register file contract checks (S2-T49)
 
 `custodian/tests/test_registers.py` and `test_registers_intake.py` enforce TST-196

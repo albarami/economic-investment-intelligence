@@ -157,6 +157,19 @@ class KeyedRequest(str):
         return instance
 
 
+def _request_allowed(url: str) -> bool:
+    """Dynamic admission exists only inside the company-web exact URL frame."""
+    from ..company_web.scope import active, allowed
+
+    return allowed(url) if active() else approve(url).ok
+
+
+def _reviewed_allowed(url: str) -> bool:
+    from ..company_web.scope import active, allowed
+
+    return allowed(url) if active() else _stream_allowed(url)
+
+
 def open_https(
     url: str,
     token: str = "",
@@ -167,6 +180,7 @@ def open_https(
     legacy_chain_sha256: str | None = None,
 ) -> Response:
     """Open one HTTPS URL with the standard library. Redirects are checked first."""
+    from ..company_web.scope import active as company_active
     from .certificate_pins import PinError, browser_agent, current_pin, verified_context
     from .page_requests import (
         PIN_HOSTS,
@@ -177,6 +191,10 @@ def open_https(
     )
 
     check_target(url)
+    if company_active() and (
+        token or headers or isinstance(url, (KeyedRequest, PagePostback))
+    ):
+        raise TransportFault("blocked_host", "")
     supplied_partial_chain = ssl_context is not None and bool(
         ssl_context.verify_flags & ssl.VERIFY_X509_PARTIAL_CHAIN
     )
@@ -195,10 +213,9 @@ def open_https(
         ssl_context = page_context(host_of(url), ssl_context)
     elif pin is not None:
         ssl_context = verified_context(host_of(url), pin, context=ssl_context)
-    decision = approve(url)
-    if not decision.ok or (
+    if not _request_allowed(url) or (
         reviewed_urls is not None
-        and (url not in reviewed_urls or not _stream_allowed(url))
+        and (url not in reviewed_urls or not _reviewed_allowed(url))
     ):
         raise TransportFault("blocked_host", url)
     if ssl_context is not None and (
@@ -275,8 +292,9 @@ def open_https(
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
             body = _bounded_body(response, str(url))
             final = str(response.geturl())
-            if reviewed_urls is not None and (
-                final not in reviewed_urls or not _stream_allowed(final)
+            if (company_active() and not _request_allowed(final)) or (
+                reviewed_urls is not None
+                and (final not in reviewed_urls or not _reviewed_allowed(final))
             ):
                 raise TransportFault("blocked_host", "")
             etag = response.headers.get("ETag")
@@ -403,8 +421,8 @@ def _redirect_guard(
             if host_of(newurl) == SIGN_IN_HOST:
                 raise TransportFault("credential_missing_or_not_accepted", newurl)
             if (
-                not approve(newurl).ok
-                or (strict and not _stream_allowed(newurl))
+                not _request_allowed(newurl)
+                or (strict and not _reviewed_allowed(newurl))
                 or (reviewed_urls is not None and newurl not in reviewed_urls)
             ):
                 raise TransportFault("blocked_host", newurl)
@@ -428,9 +446,12 @@ def open_https_stream(
     url: str, *, reviewed_urls: tuple[str, ...] | None = None
 ) -> Iterator[StreamResponse]:
     """Open a bounded-chunk stream; the context always closes the response."""
+    from ..company_web.scope import active as company_active
     from .certificate_pins import PinError
     from .page_requests import PIN_HOSTS
 
+    if company_active():
+        raise TransportFault("blocked_host", "")
     if host_of(url) in PIN_HOSTS:
         raise PinError("certificate_chain_incomplete")
     if not _stream_allowed(url) or (

@@ -37,6 +37,7 @@ KINDS = frozenset(
         "awards_intake",
         "cdse_backup",
         "register_file",
+        "company_web",
     }
 )
 # S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
@@ -448,6 +449,20 @@ def _entry(row: object) -> Entry:
             or row.get("licence_basis") != "provider_terms"
         ):
             raise RegistryError("CDSE backup must remain optional and unread")
+    if source_id == "company_web" or kind == "company_web":
+        if (
+            source_id != "company_web"
+            or kind != "company_web"
+            or row.get("key") != source_id
+            or row.get("url") != ""
+            or row.get("fetch_host") != ""
+            or row.get("commit_allowed") is not False
+            or row.get("nightly_live_fetch") is not False
+            or row.get("release_tables") != []
+            or row.get("licence_basis") != "owner_decision"
+            or row.get("decision_record") != "0026"
+        ):
+            raise RegistryError("company web must remain lead-shell-only")
     if kind not in KINDS:
         raise RegistryError("unknown kind")
     if kind == "register_file":
