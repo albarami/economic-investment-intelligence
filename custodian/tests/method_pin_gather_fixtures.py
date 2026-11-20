@@ -22,6 +22,7 @@ from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.gate_report import CONFIRMATION_TASKS
 
 REPO = repository_root(Path(__file__))
+_S2_T09_RECORD = "s2_t09_source_checks.yaml"
 _GATHER_ROOT_FILES = (
     "docs/04_PUBLIC_DATA_PACK.md",
     "docs/03_DATA_CONTRACTS.md",
@@ -44,10 +45,13 @@ def stage_method_pin_gather_build(
         destination = root / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(REPO / relative, destination)
+    # The committed S2-T09 record is never copied: a staged record is written
+    # below, and with stage_record=False the record must be truly absent.
     shutil.copytree(
         REPO / "custodian/publicdata/review",
         root / "custodian/publicdata/review",
         dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns(_S2_T09_RECORD),
     )
     work = tmp_path / "pin-work"
     work.mkdir()
@@ -58,9 +62,7 @@ def stage_method_pin_gather_build(
     cache = tmp_path / "cache"
     (cache / "assembly").mkdir(parents=True, exist_ok=True)
     if stage_record:
-        write_yaml(
-            root / "custodian/publicdata/review/s2_t09_source_checks.yaml", record
-        )
+        write_yaml(root / "custodian/publicdata/review" / _S2_T09_RECORD, record)
     if stage_outputs:
         write_json(cache / "assembly/s2_t09_pin_artifact.json", artifact)
         write_json(cache / "assembly/s2_t09_pin_generation_config.json", config)

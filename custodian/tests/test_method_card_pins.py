@@ -1054,6 +1054,56 @@ def test_producer_guard_plants(tmp_path, plant, code):
         produce_pin_artifact(config, rows)
 
 
+def _producer_rows(record):
+    return [
+        {
+            "pin_id": row["pin_id"],
+            "values": row["values"],
+            "source_lineage": row["source_lineage"],
+        }
+        for row in record["pins"]
+    ]
+
+
+@pytest.mark.parametrize("version", [2, 0, -1, True, 1.0, "1", None])
+def test_producer_refuses_schema_version(tmp_path, version):
+    from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
+
+    _, record, artifact, config = case(tmp_path)
+    rows = _producer_rows(record)
+    # Control: the same rows and config with version 1 produce the artifact.
+    assert produce_pin_artifact(config, rows) == artifact
+    planted = {**config, "schema_version": version}
+    with pytest.raises(ValueError, match="pin_schema_version"):
+        produce_pin_artifact(planted, rows)
+
+
+def test_artifact_matches_config_accepts_matching_artifact(tmp_path):
+    from eii_custodian.publicdata.method_card_producer import artifact_matches_config
+
+    _, _, artifact, config = case(tmp_path)
+    assert artifact_matches_config(artifact, config) is None
+
+
+@pytest.mark.parametrize("side", ["artifact", "config"])
+def test_artifact_matches_config_refuses_mismatched_settings(tmp_path, side):
+    from eii_custodian.publicdata.method_card_producer import artifact_matches_config
+
+    _, _, artifact, config = case(tmp_path)
+    pin = next(
+        row["pin_id"] for row in artifact["pins"] if row["pin_id"] in CONFIGURATION_PINS
+    )
+    artifact = copy.deepcopy(artifact)
+    config = copy.deepcopy(config)
+    if side == "artifact":
+        row = next(row for row in artifact["pins"] if row["pin_id"] == pin)
+        row["settings"] = {**row["settings"], "invented_setting": "invented-a"}
+    else:
+        config["pins"][pin] = {**config["pins"][pin], "invented_setting": "invented-b"}
+    with pytest.raises(ValueError, match="pin_artifact_mismatch"):
+        artifact_matches_config(artifact, config)
+
+
 def test_method_pin_evidence_records_staged_s2_outputs(tmp_path):
     from custodian.tests.method_pin_gather_fixtures import (
         gathered_s2_t09_confirmation,
