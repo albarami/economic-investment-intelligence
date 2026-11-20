@@ -220,6 +220,12 @@ The slice numbers of the earlier plan are kept, so that slice references across 
 | The data rule's amendments to existing tasks (item 12) | slices S4 to S9 | S4-T02, S4-T03, S4-T08, S5-T02, S5-T03, S5-T10, S6-T11, S6-T12, S6-T14, S6-T15, S6-T17, S7-T10, S9-T03 |
 | A product for companies only, designed for its three personas: the oversight seat, its read functions and every ministry-only view leave version 1, the ledger stays as the internal question log with no screen, and scene 7 of the guided story becomes the international entrant's headquarters evidence pack (item 15) | slices S9 and S10 | S9-T01, S9-T03, S9-T04 (withdrawn), S10-T03 |
 | Optional free CDSE backup cache; no analytical or display output (proposed decision 0066) | slice S2 | S2-T41 |
+| Reviewed product-to-activity-to-occupation crosswalk (decision 0070 item B3) | slice S2 | S2-T45 |
+| Older awarded pages, one-time cached enrichment after the slice S2 gate (decision 0070 item E) | slice S2, after its gate | S2-T46 |
+| Public asking-rent context from a property listing source, never calculator prefill (decision 0070 item B2) | slice S6 | S6-T40 |
+| Awards and supplier release with its card family (decision 0070 item B1) | slice S7 | S7-T35 |
+| Typed reference to an earlier answer item in the chain slot (decision 0070 item C) | slice S8 | S8-T19 |
+| Frozen live/staging runbook, promotion and rollback with freeze/build/load implementation (decision 0071) | slice S3, after its gate | S3-T28 |
 | The snapshot archive, explicit reviewed snapshot references, re-fetch cadence and dated price inputs ([decision 0045](decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md)) | slice S2 | S2-T27; amendments to S2-T19 and S2-T08 |
 | Three-site sensitivity, staffing geography, the Qatari day and time-dependent reach (capabilities 1, 2, 3 and 6) | slices S3, S6 and S7 | S3-T16, S6-T03, S6-T07, S6-T13, S6-T20, S6-T21, S7-T05 |
 | Visitor opportunity through permitted movement splits and separate Public hotel and venue evidence (capability 4) | slices S3, S6 and S7 | S3-T14; amendments to S6-T03 and S7-T08 |
@@ -406,6 +412,7 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S2-T37 — Read the newest dated release of the places copy at each refresh, with its date recorded and shown ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 14).
 - S2-T38 — Load employed people by municipality as a Public fact on the source's own geography ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 15).
 - S2-T39 — Read the agency's Arabic pages, add the full-page column once decision record 0029 settles it, and fill the FDI crosswalk by lead review ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 32).
+- S2-T45 — Build the reviewed product-to-activity-to-occupation crosswalk beside S2-T04's spine and S2-T07's calculation inputs. Depends: S2-T04, S2-T07. Full criteria and planted guards: TASKS.md, S2-T45; decision 0070 item B3. Runs before the slice S2 review follow-up and gate.
 - S2-T08 — Assemble the public pack, record the publisher's terms in its own words with the date read and the basis of use for every source, a missing field recorded as pending ([decision 0059](decisions/0059-publisher-terms-are-a-record-not-a-gate.md)), with no terms-based release exclusion, confirm the coverage bar uses the finest geography available from a visitor-readable source (PUB-82), and complete the twenty-figure source review, the slice S2 confirmations (PLN-25) and OI-03 closure evidence.
 - S2-T09 — After the reviewer has checked them against the source, write the values listed by MTH-03 into the method cards.
 - S2-T10 — Close every proposed open item of the slice's reviews before the gate (REV-41).
@@ -429,6 +436,12 @@ OI-02 remains open, so the estimates must not be converted to a demonstration da
 - S2-T30's announcement revisions and independently sourced milestones retain their archived inputs and remain separate from observed investment, with missing evidence rather than an invented value.
 
 **Cut first.** No gate item is cut; a scope change is an owner decision under section 20.
+
+**Post-gate acquisition (decision 0070 item E).** S2-T46 fetches the older awarded portal pages once after the
+slice S2 gate and keeps cached enrichment joined to the registered workbook by tender id. This is acquisition
+beside S2-T19 and S2-T29, using S2-T27's receipts and immutable snapshots. Depends: the approved slice S2 gate,
+S2-T19, S2-T27 and S2-T29. It is excluded from S2-T10's blanket dependency and is not a prerequisite of the gate
+or S2-T08. S7-T35 consumes its reviewed output. Full criteria and planted guards are in TASKS.md, S2-T46.
 
 ## Audience-origin removal sequence — decision 0035
 
@@ -501,6 +514,29 @@ and live receipt remain required; tests use invented shapes only.
 - All of Qatar shows in 3D with heights marked as estimates and the clock moves no figure; the open map works with no network, the satellite mode shows its credits only inside the collapsed map credits while it is on, and no test calls the imagery provider; the key of the photorealistic 3D mode never reaches the browser, its billable requests are refused once the project-wide count reaches the cap, it is never mixed with another basemap in one view, and no test or continuous integration calls it; an address search result is never stored; and the financial centre's firms are counted per tower, with district-level firms never drawn as building points (decision 0023).
 
 **Cut first.** No public-only capability is cut. Non-essential opening animation is removed first.
+
+### Post-gate frozen live service — decision 0071
+
+[Decision 0071](decisions/0071-after-go-live-operations-and-continuous-promotion.md) records the owner's decision
+of 2026-11-20: the live site starts with the first map when the slice S3 gate is approved. S3-T28 owns the runbook
+to start live, start staging, promote and roll back using the existing commands, and implements the freeze,
+build-release and load-release commands that rule 44 still describes as placeholders. This is the first-release
+and entry layer of S3-T02 and S3-T20, with S0-T09's command skeleton; S11-T01 and S11-T06 retain later hardening
+and all their acceptance checks. Depends: the approved slice S3 gate, S3-T02 and S3-T20. S3-T28 is excluded from
+S3-T11's pre-gate blanket dependency, so neither post-gate operation holds up that gate.
+
+Serve a FROZEN RELEASE through the owner's public route, a tunnel to a fixed loopback port, without naming its
+domain or provider. Live has its own release folder, database and loopback port, simulated traffic
+(`EII_TRAFFIC_PROVIDER=simulated`) and only the keys it needs. Development and staging run on other ports and
+never touch it. From the first map on, the lead promotes each ready visible slice, card family or enhancement
+when all hold: merged on main with six required hosted checks green; another maker's APPROVED; whole-test exit 0
+on the release; staging smoke and health checks pass; previous release folder kept for instant rollback;
+unfinished features absent. Switch the route's served release and port and log every promotion's release id and
+checklist result. Full testable criteria and plants: TASKS.md, S3-T28.
+
+All slice gates, rule 12's freeze/window_key/register/exit-7 rules and rule 24 remain. S3-T28 must explicitly
+reconcile the current S3-T02 Public-only freeze refusal through its reviewed plan and contract amendments;
+this note supplies no fabricated protected window or register entry and claims no working frozen release.
 
 ## 12. slice S4 — Synthetic world, months, presence and traffic
 
@@ -626,6 +662,34 @@ The slice gate includes these tasks and their planted violations; no existing ga
 
 ## 14. slice S6 — The flagship location choice
 
+### Priority before go-live — decision 0070
+
+[Decision 0070](decisions/0070-the-decision-pack-of-the-value-studies.md) item A records the owner's decision of
+2026-11-20. Put the following existing answers first in the slice S6 and slice S7 work order and in the guided
+demo as they become available, respecting their existing dependencies:
+
+| Priority sequence | Existing task and card owners |
+|---|---|
+| Robust site shortlist, with rank stability under changed weights | S6-T11 / C11; S6-T21 / C40 |
+| Labour-shed staffing comparison | S6-T20 / C39; S7-T03 / C10 |
+| Imports beside local manufacturing | S7-T11 / C13, with S7-T02 supplier inputs |
+| Second-site shared reach | S7-T05 / C7 |
+| Parcel diligence | S6-T12 / C16 and document 09 AI-136; S6-T10 / C41 for separate price context |
+| Break-even workbench with the user's own rent | S7-T01 / C4 |
+
+The card definitions are in document 07; document 09 section 3 owns their playbooks. This is an order note only:
+no new data, changed criterion, dependency bypass or weakened gate. The priority list does not cut other existing
+tasks or reorder the blocks within an answer. In particular it preserves the people-working/people-living opening,
+rank stability, protected staffing controls, the Public-only imports screen, shared-reach wording, parcel limits
+and the user's own rent. The guided-demo implementation retains its existing criteria and checks this priority
+sequence when it assembles the available capabilities.
+
+S6-T40 adds the separate Public asking-rent context of decision 0070 item B2 beside S6-T10/S6-T12 property context.
+It uses a property listing source whose actual identity and terms the lead records in the registry at build time.
+Facts say "asking rents from listings", with date and listing count per area and property type. Calculators keep
+the user's own rent and are never prefilled. Depends: S2-T01, S2-T27, S6-T10, S6-T12 and S6-T04; full criteria and
+planted guards: TASKS.md, S6-T40. It runs before the slice S6 review follow-up and gate.
+
 **Decision 0040 source work and named sub-steps.** [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) adds the following; no non-queued task is amended and no completed evidence is relabelled. Each item belongs to this slice's existing integration and review gate.
 
 - **S6-T27, public trade forecast families.** Additional dependencies: S2-T23, S2-T24, S2-T25, S2-T19. Acceptance: Audit portal customs/trade/certificates and Comtrade/BACI/finished Atlas histories by source, HS revision, frequency, unit and length before C30 admission. Keep separate series, original backtest baselines, conformal coverage and CPU-serving checks; insufficient history refuses. Original criteria, review and gate remain; status queued in TASKS.md at this amendment.
@@ -733,6 +797,14 @@ The slice gate includes these tasks and their planted violations; no existing ga
 
 ## 15. slice S7 — The other journeys and the three services
 
+**Priority and addition (decision 0070).** Item A's **Priority before go-live — decision 0070** note in section 14
+also governs this slice and the guided demo, with dependencies and every existing criterion unchanged. Item B1
+adds S7-T35, the awards and supplier release with its closed card family, in the answer layer owned by S7-T09 and
+S7-T02. It joins `awards_owner_scrape` to newer awarded portal items by tender id and consumes S2-T46's reviewed
+older-page cached enrichment. Depends: S2-T19, S2-T27, S2-T29, S2-T46, S7-T02 and S7-T09. Full criteria and planted
+guards: TASKS.md, S7-T35. Run it before S7-T13's provenance audit and the slice's review follow-up and gate; an award
+value is never turnover or sales and an award never proves a supplier certification.
+
 **Decision 0040 source work and named sub-steps.** [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) adds the following; no non-queued task is amended and no completed evidence is relabelled. Each item belongs to this slice's existing integration and review gate.
 
 - **S7-T02, trade origins and concentration.** Additional dependencies: S2-T23, S2-T24. Acceptance: Use Comtrade/BACI with portal imports for product/partner concentration, dependence and change at the published grain. Review denominator, units and HS mappings; no unreviewed fact or source merge. Original criteria, review and gate remain; status queued in TASKS.md at this amendment.
@@ -807,6 +879,12 @@ The slice gate includes these tasks and their planted violations; no existing ga
 **Cut first.** No gate item is cut; a scope change is an owner decision under section 20.
 
 ## 16. slice S8 — The four cases and the assistant
+
+**Typed answer reference (decision 0070 item C).** S8-T19 extends document 09 AI-17's typed context with a reference
+to an item of an earlier answer in the chain slot. S8-T01, S8-T03 and S8-T06 own the routing, validation and
+memo/replay layers and are its dependencies. Carry no earlier prose as context or fact; revalidate the reference
+and obtain current facts through the existing closed tools. Full criteria and planted guards: TASKS.md, S8-T19.
+Run it before the slice S8 review follow-up and gate, with all existing catalogue, accounting and seat rules.
 
 **Decision 0040 source work and named sub-steps.** [decision 0040](decisions/0040-public-trade-sources-and-held-tables-in-use.md) adds the following; no non-queued task is amended and no completed evidence is relabelled. Each item belongs to this slice's existing integration and review gate.
 
@@ -1003,6 +1081,23 @@ Never cut:
 | A source of decision 0019 changes its page, access or terms, or the traffic provider's rule on storing responses forbids the use made. | A fetcher fails on the fetched page, the terms read at fetch forbid the use, or the provider's terms are read and forbid it. | On a failure, fail the build naming the source and load nothing from it; on changed terms of a visitor-readable source, record the publisher's own words and date read and update document 17, DHA-102, without switching off the source; the provider's responses are stored nowhere ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 17 and 19). | Lead data role |
 | A forecast, estimate or base rate reads as a promise, or is shown without its interval, range or counts, method or source, or is attached to a named business. | Review finds a forecast without its caption counts and backtest error, an estimate without its cases and drivers, a scenario called a forecast, or wording such as a probability or a chance. | Reject the card; show only the sentences of the method card, rendered by application templates with every numeral a Fact chip (rules 21, 23 and 25). | Lead accuracy role |
 | The larger scope outruns the plan. | The slice S1 re-estimate or measured throughput shows a slice far beyond its plan. | Re-estimate after slice S1; raise a scope change with the owner as a decision record; never half-build below a gate. | Lead delivery role |
+
+## ENHANCEMENT BACKLOG
+
+[Decision 0070](decisions/0070-the-decision-pack-of-the-value-studies.md), **Enhancement backlog**, records the
+owner's decision of 2026-11-20. These are the remaining additions from the value studies. Each is **release:
+after go-live**, with its data needs and the AGENTS.md rule numbers it touches below. This creates no new intake,
+source, method or export permission. Existing approved tasks, including the two branch/delivery own-data forms,
+weather profiles, forecasts and print/export, keep their criteria; the backlog describes additional work only.
+
+| Enhancement | Data needs before implementation | Project rules touched (AGENTS.md) | Release |
+|---|---|---|---|
+| Real business outcomes | A confirmed, authorised source of actual outcomes, with units, periods, coverage, rights and complete lineage; no invented outcomes or success labels | 3, 5, 7, 8, 11, 12, 16, 19, 24, 25 | release: after go-live |
+| General own-records intake beyond the two existing forms | Reviewed schemas and purposes for the additional company-owned records, with identifier rejection, session/seat boundaries, retention and egress contracts; no extension inferred from the branch and delivery forms | 3, 9, 11, 13, 14, 18, 21, 22, 24 | release: after go-live |
+| Utility readiness | Dated Public evidence of actual service availability, connection or capacity for the relevant geography, with publisher terms and hashes; existing utility series alone establish no readiness | 3, 5, 7, 8, 16, 19, 24, 25 | release: after go-live |
+| Weather | Additional cited Public weather observations and any required spatial/temporal mapping and coverage, separate from already-approved weather profiles; no inferred consumption or business outcome | 3, 5, 7, 16, 19, 24, 25 | release: after go-live |
+| Extra forecasts | Eligible, sufficiently long source histories with units, frequency and revisions; tested backtests, intervals, measured errors and method/source lineage for each extra series | 7, 12, 16, 17, 19, 24, 25 | release: after go-live |
+| Audit export | An explicit export schema over permitted released facts, method/source chains and review records, with suppression, seat, identifier and secret exclusions; existing print/export is not a general audit dump | 7, 11, 12, 14, 19, 23, 24 | release: after go-live |
 
 ## 22. Later backlog
 
