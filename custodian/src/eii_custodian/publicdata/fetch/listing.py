@@ -34,10 +34,16 @@ def prepare_listing(
         return _refuse(entry, "listing_url")
     expected: dict[str, tuple[int, str]] = {}
     for part in entries if entries is not None else registry.load_registry():
-        # STAC metadata shares this parent; only whole-file part keys belong
-        # to the release listing. Validate their metadata below, even if broken.
-        if re.fullmatch(re.escape(entry.key) + r"/part-[0-9]{5}", part.key) is None:
+        if not part.key.startswith(entry.key + "/"):
             continue
+        # Only declared STAC JSON children are outside the part listing.
+        # Unknown children refuse before a request, even with broken metadata.
+        if re.fullmatch(re.escape(entry.key) + r"/part-[0-9]{5}", part.key) is None:
+            if part.extension == "json" and re.fullmatch(
+                re.escape(entry.key) + r"/stac-(?:collection|part-[0-9]{5})", part.key
+            ):
+                continue
+            return _refuse(entry, "listing_registered_part")
         key = urlsplit(part.url).path.lstrip("/")
         recorded, invalid = _recorded(part)
         if (

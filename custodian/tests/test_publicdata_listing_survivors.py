@@ -153,6 +153,50 @@ def test_mixed_registry_malformed_part_still_refuses(monkeypatch, plant):
     )
 
 
+@pytest.mark.parametrize(
+    "key",
+    [
+        "bldg_ovt/part-386",
+        "bldg_ovt/part-000386",
+        "bldg_ovt/Part-00386",
+        "bldg_ovt/part-00386.parquet",
+        "bldg_ovt/parts/part-00386",
+        "bldg_ovt/notes",
+    ],
+)
+@pytest.mark.parametrize("plant", ["no_metadata", "foreign_host"])
+def test_malformed_key_child_refuses_before_request(monkeypatch, key, plant):
+    parent, parts, _stac, _body = mixed_registry(monkeypatch, "bldg_ovt")
+    bad = replace(parts[0], key=key)
+    if plant == "no_metadata":
+        bad = replace(bad, basis_note="no recorded size or etag")
+    else:
+        bad = replace(bad, url="https://invented-other.invalid/" + PREFIX + "x.parquet")
+
+    def reader(url):
+        pytest.fail("reached a request")
+
+    assert_refusal(
+        listing.prepare_listing(parent, reader, (parent, *parts, bad)),
+        parent.url,
+        "listing_registered_part",
+    )
+
+
+def test_non_json_stac_child_refuses_before_request(monkeypatch):
+    parent, parts, stac, _body = mixed_registry(monkeypatch, "bldg_ovt")
+    bad = replace(stac[0], extension="parquet")
+
+    def reader(url):
+        pytest.fail("Non-JSON STAC child must refuse before a request")
+
+    assert_refusal(
+        listing.prepare_listing(parent, reader, (parent, *parts, bad)),
+        parent.url,
+        "listing_registered_part",
+    )
+
+
 def test_stac_child_is_not_required_in_parquet_listing(monkeypatch):
     parent, parts, stac, body = mixed_registry(monkeypatch, "bldg_ovt")
     # Plant valid-looking whole-file metadata and a release URL on a STAC key.

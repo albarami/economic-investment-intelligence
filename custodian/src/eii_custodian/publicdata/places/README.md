@@ -30,10 +30,12 @@ receipt is checked before the file is read. Tests use invented Parquet and a
 stand-in transport. They do not fetch those files.
 
 Release listings compare only registered `part-NNNNN` child keys against their
-recorded whole-file size and ETag. STAC metadata children keep their separate
-HTTPS fetch, receipts and building-completeness checks. The places stage selects
-only Parquet entries from either Overture family, so a verified STAC JSON
-snapshot cannot enter a place or building reader.
+recorded whole-file size and ETag. Only JSON children named exactly
+`stac-collection` or `stac-part-NNNNN` skip those comparisons; every other
+non-part child refuses before any listing request. STAC metadata children keep
+their separate HTTPS fetch, receipts and building-completeness checks. The places
+stage selects only Parquet entries from either Overture family, so a verified
+STAC JSON snapshot cannot enter a place or building reader.
 Assembly retains those metadata receipts in its source chain and credits a
 gazetteer output only to entries that declare that release table.
 
