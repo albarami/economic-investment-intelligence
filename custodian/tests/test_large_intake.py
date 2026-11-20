@@ -36,11 +36,11 @@ class Sink:
         return len(body)
 
 
-def stream(entry, chunks, size=None, etag=None, final=None):
+def stream(entry, chunks, size=None, etag=None, final=None, hops=()):
     @contextmanager
     def read(url):
         assert url == entry.url
-        yield StreamResponse(final or url, (), size, iter(chunks), etag=etag)
+        yield StreamResponse(final or url, hops, size, iter(chunks), etag=etag)
 
     return read
 
@@ -538,6 +538,30 @@ def test_stream_source_and_hosts_are_closed(entries):
         large.receive(
             entry, stream(entry, [b"x"], final="https://unlisted.invalid/SYN"), Sink()
         )
+
+
+@pytest.mark.parametrize("blocked_hop", [False, True])
+def test_stream_checks_hops_before_writing_with_allowed_final_url(entries, blocked_hop):
+    """Invented hop chain; the final URL alone cannot decide this refusal."""
+    entry = entries["bldg_wsf3d"]
+    hop = "https://unlisted.invalid/SYN-hop" if blocked_hop else entry.url
+    read = stream(entry, [b"SYN"], 3, final=entry.url, hops=(hop,))
+    sink = Sink()
+    if blocked_hop:
+        with pytest.raises(large.IntakeError) as caught:
+            large.receive(entry, read, sink)
+        assert str(caught.value) == "blocked_host"
+        assert sink.count == 0
+        assert sink.digest.hexdigest() == hashlib.sha256(b"").hexdigest()
+    else:
+        received = large.receive(entry, read, sink)
+        assert received.nbytes == sink.count == 3
+        assert (
+            received.sha256
+            == sink.digest.hexdigest()
+            == hashlib.sha256(b"SYN").hexdigest()
+        )
+        assert received.final_url == entry.url
 
 
 def test_redirect_userinfo_is_absent_from_the_failure(entries, tmp_path, monkeypatch):

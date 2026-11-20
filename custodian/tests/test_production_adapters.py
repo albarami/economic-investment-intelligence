@@ -219,6 +219,17 @@ def test_overture_parent_pin_reads_its_declared_listing_archive(tmp_path: Path) 
     assert receipt_valid(row, build.receipts[row.key])
 
 
+def test_listing_receipt_is_refused_for_an_invented_other_source() -> None:
+    from custodian.tests.test_source_completeness import receipt
+
+    from eii_custodian.publicdata.completeness import receipt_valid
+
+    row = entry()
+    assert receipt_valid(row, receipt(row)) is True
+    stored = replace(row, key=row.key + "/listing", extension="json")
+    assert receipt_valid(row, receipt(stored)) is False
+
+
 def test_duplicate_table_is_refused_without_replacing_first_output(
     tmp_path: Path,
 ) -> None:

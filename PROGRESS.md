@@ -43083,3 +43083,142 @@ The two ledger files retain their complete earlier byte prefixes. `.overnight/RE
 - Red/green: PUB-04 plant failed on "when the build records one" before F1; README plant failed on "keeping the stated pipeline limits" before F4; tender plant failed without "Arabic requests add none" before F3; PO-S2-110 returned to gate hold; PO-S2-83 partial close for archive wording only.
 - Checks: `uv run --locked python -m pytest custodian/tests/test_fc_register.py custodian/tests/test_gate_records_survivors.py custodian/tests/test_places_fsq_releases.py custodian/tests/test_public_snapshots.py custodian/tests/test_tenders.py -q -p no:cacheprovider --hypothesis-seed=5829103746` — exit 0, 238 passed; `uv run --locked python -m unittest scripts.tests.test_fsq_exclusions -v` — exit 0, 12 passed; `uv run --locked ruff check .` — exit 0; `uv run --locked ruff format --check .` — exit 0, 835 files; `python3 scripts/check_docs.py` — exit 0, 1138 text files; `cmp AGENTS.md CLAUDE.md` — exit 0.
 - Correction (append): the fix round was committed as 27efa1ab475b6847d7a9a3d2bd03cb3a2292dbc7 on 74bddd3f; no push. Reviewer confirmation round: APPROVED, the three changed doc tests fail on the 74bddd3f text and pass at 27efa1ab.
+
+## S2-P03 — Guard plants without a deciding case
+
+Date: 2026-11-20. Run by: workspace package builder, offline; not lead or CI.
+
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant is not exposed).
+Builder persona: senior Python test engineer for data-intake guards.
+Strict self-review persona: reviewer rejecting a guard without a deciding plant,
+an unsupported closure, weakened assertion, skip or raised bound. This self-review
+is not independent approval from another maker.
+
+Authority: `.overnight/BRIEF.md` and `.overnight/IN/PACKAGE.md`; owner task S2-T10,
+with guards owned by S2-T08 part B, S2-T36 and S2-T10 part b. Inspected base HEAD:
+`d5ab31319669ea9b557043ca866099c67b69cc48`. No commit, push, branch mutation or network use.
+
+Skills loaded: project-orientation, task-standards, sanad-provenance, github-flow,
+strict-reviewer and muhasabah-gate. test-driven-development and
+verification-before-completion are unavailable as installed skills; their plain
+requirements were applied: write the tests first, demonstrate semantic reds with
+an in-memory defect or guard removal, restore the original implementation, then
+record actual seeded green checks. No unavailable skill is claimed loaded.
+
+Environment: existing Linux bash workspace, locked Python 3.14.6, pytest 9.2.0,
+Hypothesis 6.170.15; `UV_OFFLINE=1`, `EII_DECISION_PROVIDER=none`, inherited
+workspace-local `TMPDIR`, existing configured dependency cache. No dependency
+install or pin change. Every pytest command uses seed 6472901536 and disables the
+cache provider. Authored scratch/evidence files stay under `.overnight/tmp/p03/`;
+no secret file, private folder, vault or data cache was read. Only installed skill
+instructions were read outside this workspace; no task evidence came from there.
+
+Item dispositions (the original evidence/needed lines are preserved):
+
+- PO-S2-74: CLOSED by test hardening. Six existing receipt violations previously
+  accepted any ValueError. Added their exact reason texts and made the expected
+  lookup unconditional; all ten cases now have exact assertions, including the
+  already separate `absent` case. Test:
+  `custodian/tests/test_series_exact_regressions.py::test_pub64_requires_receipt_lineage`.
+  Red: deliberately substitute `SYN-wrong-receipt-reason` for the exception while
+  retaining refusal; all six newly pinned cases fail, exit 1. Green: unchanged
+  production code, exit 0 in the 18-case focused run and 190-case touched-file run.
+  The calendar/timestamp expectations are the pinned Python runtime's literal
+  errors, not newly invented application refusal strings.
+- PO-S2-91: CLOSED by a deciding plant. Added a stub stream with an unlisted hop
+  and the allowed final URL, asserting exact `blocked_host`, zero written bytes
+  and the empty digest; its allowed-hop control checks bytes, hash and final URL.
+  Test: `custodian/tests/test_large_intake.py::test_stream_checks_hops_before_writing_with_allowed_final_url`.
+  Red: remove only hop iteration in memory, leaving the final-URL check; exit 1,
+  one failed/one passed. Green: original guard, exit 0 in the focused and full
+  touched-file runs. `large.py` remains unchanged.
+- PO-S2-104: CLOSED by a deciding plant. An otherwise valid invented source
+  receipt is refused when only its key becomes the source key plus `/listing`.
+  Both its ordinary-receipt positive control and the existing declared-listing
+  archive control remain. Test:
+  `custodian/tests/test_production_adapters.py::test_listing_receipt_is_refused_for_an_invented_other_source`;
+  control: `test_overture_parent_pin_reads_its_declared_listing_archive`.
+  Red: remove only the listing exception's source whitelist in memory; exit 1,
+  one failed/one passed. Green: original scope check, exit 0 in the focused and
+  full touched-file runs. `completeness.py` remains unchanged.
+- PO-S2-114: CLOSED by a deciding plant. Stub `active()` true while confirming no
+  frame is set, accept the canonical URL, prove the invented alternate same-host
+  path passes `approve()`, and assert its `TransportFault.kind` is `blocked_host`.
+  This isolates the exact-URL guard from broader frame and host refusals. Test:
+  `custodian/tests/test_fc_register.py::test_active_register_exact_url_guard_without_a_frame`.
+  Red: remove only the exact-URL block in memory; exit 1, one failed/three passed
+  (the previous path plants still pass). Green: original guard, exit 0 in the
+  focused and full touched-file runs. `page_requests.py` remains unchanged.
+- PO-S2-113: LEFT OPEN, as the package explicitly requires when its dependency is
+  absent. OPEN_ITEMS.md and PROGRESS.md's S2-T36 task log, offline build and fix
+  pass preserve summary notes, not the original lens-A review or the complete
+  remaining-guard list. The referenced `.overnight/IN/REVIEW-A.md`, S2-T36 review
+  directory, and tracked original review/guard list are absent; the only supplied
+  input is PACKAGE.md. Search evidence: `.overnight/tmp/p03/guard-list-search.txt`.
+  No inferred list, new test or red/green result is claimed for this item. The
+  lead must supply the original review/list and disposition its remaining reds.
+
+No TASKS.md box is ticked: PACKAGE.md names no box, and none of S2-T10's whole
+closure/reviewer criteria or the live-acquisition criteria of S2-T08/S2-T36 is
+proved by this package. Independent closure review remains with the lead. The
+new per-item lines and final S2-P03 note in OPEN_ITEMS.md supersede the four
+missing-test implementation holds without rewriting the older reconciliation.
+
+Red proof commands, each invoked with the environment above (actual process
+exits; production files never changed, patched code existed only in memory):
+
+- `uv run --locked python .overnight/tmp/p03/prove.py receipt_reasons`: exit 1;
+  0 passed, 6 failed, 0 skipped; exact-reason assertion failures.
+- `uv run --locked python .overnight/tmp/p03/prove.py hop_guard`: exit 1;
+  1 passed, 1 failed, 0 skipped; bad-hop plant reports DID NOT RAISE IntakeError.
+- `uv run --locked python .overnight/tmp/p03/prove.py listing_scope`: exit 1;
+  1 passed, 1 failed, 0 skipped; unsupported listing receipt returns True.
+- `uv run --locked python .overnight/tmp/p03/prove.py exact_target`: exit 1;
+  3 passed, 1 failed, 0 skipped; exact-target plant reports DID NOT RAISE TransportFault.
+
+The proof runner invokes pytest with `-q -p no:cacheprovider
+--hypothesis-seed=6472901536 --tb=short` and the item selectors retained in its
+source. Each command's sanitized output is in its matching `.log` file.
+
+Green commands and required checks, with real exits and counts:
+
+- Focused green:
+  `uv run --locked python -m pytest custodian/tests/test_series_exact_regressions.py::test_pub64_requires_receipt_lineage custodian/tests/test_large_intake.py::test_stream_checks_hops_before_writing_with_allowed_final_url custodian/tests/test_production_adapters.py::test_listing_receipt_is_refused_for_an_invented_other_source custodian/tests/test_production_adapters.py::test_overture_parent_pin_reads_its_declared_listing_archive custodian/tests/test_fc_register.py::test_active_register_exact_url_guard_without_a_frame custodian/tests/test_fc_register.py::test_frame_and_path_refusals -q -p no:cacheprovider --hypothesis-seed=6472901536`:
+  exit 0; 18 passed, 0 failed, 0 skipped.
+- Touched test files:
+  `uv run --locked python -m pytest custodian/tests/test_series_exact_regressions.py custodian/tests/test_large_intake.py custodian/tests/test_production_adapters.py custodian/tests/test_fc_register.py -q -p no:cacheprovider --hypothesis-seed=6472901536`:
+  initial exit 0, 190 passed in 17.57 s; after the formatter's signature-layout
+  correction, final exit 0, 190 passed in 16.18 s; 0 failed, 0 skipped in both.
+- `uv run --locked ruff check .`: initial and final exits 0, all checks passed.
+- `uv run --locked ruff format --check .`: first exit 1, one file would be
+  reformatted/834 already formatted. Corrected only the new test's signature
+  layout, then exit 0, 835 files already formatted. No assertion changed.
+- `uv run --locked mypy`: exit 0, no issues in 449 source files.
+- `python3 scripts/check_docs.py`: pre-ledger exit 0, 1138 text files and 123
+  Markdown files checked. Post-ledger verification is retained in RETURN.md.
+- `python3 scripts/check_tree.py`: exit 0, 8 rules checked.
+- `cmp AGENTS.md CLAUDE.md`: exit 0, byte-identical; both unchanged.
+- `git diff --check`: exit 0, no whitespace defects.
+
+The check recorder `.overnight/tmp/p03/check.py` launches each command once,
+retains its real exit in the matching `.json`, preserves sanitized stdout/stderr
+in the matching `.log`, and returns the same exit. No retry or failure masking.
+The initial formatter failure remains recorded alongside the correction.
+
+Scope and limits: four test files plus OPEN_ITEMS.md and one appended PROGRESS.md
+block; requested report and scratch evidence are under `.overnight/`. All
+production modules, TASKS.md, agent instructions, bounds, time limits, baselines,
+retries and skips are unchanged. No mutation campaign, whole test, live cache
+suite, build-public run, database operation or live source confirmation occurred.
+These fixture results do not complete the slice S2 gate.
+
+Strict self-review: APPROVE for the four bounded test fixes and the explicitly
+open dependency; no independent maker approval is asserted. Muhasabah: PASS for
+sourced results, disclosed missing evidence, scope, literal test assertions and
+real command exits.
+
+PROPOSED OPEN ITEMS: none newly numbered. Retain PO-S2-113 for the missing
+original review/guard list and lead disposition. Different-maker review of the
+four implementation closures remains required by the existing workflow.
+
+Final post-append metadata checks: documentation exit 0 (1138 text files, 123 Markdown files), tree exit 0 (8 rules), whitespace exit 0. `python3 .overnight/tmp/p03/audit.py` exited 0: six scoped tracked files, original PROGRESS.md byte prefix and OPEN_ITEMS.md historical lines preserved, TASKS.md/AGENTS.md/CLAUDE.md unchanged, four closures/one open dependency, report marker and authored-text hygiene verified. Results are retained in `.overnight/tmp/p03/` and `.overnight/RETURN.md`.

@@ -264,6 +264,22 @@ def test_frame_and_path_refusals(address):
         check_target(address)
 
 
+def test_active_register_exact_url_guard_without_a_frame(monkeypatch):
+    from eii_custodian.publicdata.fetch import page_requests
+    from eii_custodian.publicdata.fetch.allowlist import approve
+
+    # Isolate the register guard from the broader frame check. Invented path
+    # on the declared host passes approve(), but is not the exact register URL.
+    assert page_requests._FRAME.get() is None
+    monkeypatch.setattr(page_requests, "active", lambda: True)
+    address = URL.rsplit("/", 1)[0] + "/SYN-other-page"
+    assert address != URL and approve(address).ok
+    page_requests.check_target(URL)
+    with pytest.raises(TransportFault) as caught:
+        page_requests.check_target(address)
+    assert caught.value.kind == "blocked_host"
+
+
 def test_committed_declaration_matches_kind_and_retains_activation_hold():
     from eii_custodian.publicdata.fetch.page_acquire import validate_entry
     from eii_custodian.publicdata.fetch.page_records import load_declaration

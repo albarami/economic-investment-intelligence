@@ -4034,6 +4034,8 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: The test asserts the refusal of PUB-64 without receipt lineage, but compares only three of the ten reason texts the refusal can carry; the reviewer recorded it as not a defect, for the next touch of the test.
 - NEEDED: the remaining seven reason texts asserted exactly when the test is next changed, or one line saying why the item is not valid.
 
+- CLOSING LINE — 2026-11-20, S2-P03: **CLOSED by test hardening**. The conditional `expected` lookup let six malformed receipts pass with any ValueError; `absent` already had its own exact assertion and `absent_field` was already mapped. `custodian/tests/test_series_exact_regressions.py::test_pub64_requires_receipt_lineage` now maps all six remaining cases and asserts every mapped reason unconditionally. An in-memory wrong-reason defect made those six cases fail (red exit 1, six failed); unchanged production code passed the shared focused run (green exit 0, 18 passed). Seed 6472901536; proof commands and logs: PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. Independent closure review remains with the lead; no slice acceptance is claimed.
+
 ### PO-S2-75 — The terms fingerprint means different things in the benchmark rows and document 04
 
 - ID: PO-S2-75
@@ -4204,6 +4206,8 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: The direct receive test plants only the final URL; the reviewer independently supplied a bad hop and observed blocked_host with zero bytes written. The guard holds; this is hardening, not an open security finding. Source: S2-T08B/review.S2-T08B.revI1B2.md, proposed open items; cfI1B2 retains it.
 - NEEDED: Add a bad-hop case to the direct required-stream test with a positive control and the specific refusal; preserve the existing opener redirect tests and host guards.
 
+- CLOSING LINE — 2026-11-20, S2-P03: **CLOSED by a deciding plant**. The direct `receive` test lacked an unlisted intermediate hop with an allowed final URL. `custodian/tests/test_large_intake.py::test_stream_checks_hops_before_writing_with_allowed_final_url` now asserts exact `blocked_host`, zero bytes written and an unchanged empty digest, alongside a good-hop control checking the returned bytes, hash and final URL. Removing only hop iteration in memory made the bad-hop case fail while the good control passed (red exit 1, one failed/one passed); unchanged production code passed the shared focused run (green exit 0, 18 passed). Seed 6472901536; PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. `large.py` is unchanged; independent closure review remains with the lead.
+
 ### PO-S2-92 — The stream readers repeat their chunk size
 
 - ID: PO-S2-92
@@ -4334,6 +4338,8 @@ S2-T10 part A — NOT CLOSED: The existing busy-venue scan already reads bytes a
 - EVIDENCE: The listing acceptance for places_ovt and bldg_ovt has the positive test test_overture_parent_pin_reads_its_declared_listing_archive. The reviewer found no negative plant showing a /listing receipt on another source refuses. No fix5 file adds it. Sources: S2-T08B/review.wP34A.md, P5; commits.fix5.md.
 - NEEDED: Add an invented other-source /listing receipt that refuses for the intended reason beside the existing valid listing control. Preserve receipt identity, hash and source-specific scope; this proposal does not assert the current guard accepts the bad receipt.
 
+- CLOSING LINE — 2026-11-20, S2-P03: **CLOSED by a deciding plant**. `custodian/tests/test_production_adapters.py::test_listing_receipt_is_refused_for_an_invented_other_source` starts with a valid invented source receipt, changes only its stored key to the source key plus `/listing`, and asserts `receipt_valid` is exactly False. The declared-listing positive control remains. Removing only the source whitelist from the listing exception in memory made the negative plant fail while that positive control passed (red exit 1, one failed/one passed); unchanged production code passed the shared focused run (green exit 0, 18 passed). Seed 6472901536; PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. `completeness.py` is unchanged; independent closure review remains with the lead.
+
 ### PO-S2-105 — Secondary agency pages retain landing-page attribution
 
 - ID: PO-S2-105
@@ -4439,6 +4445,8 @@ Revision-2 record points without extra numbers:
 - NEEDED: a lead disposition of the remaining guards' red evidence.
 - COMPARISON: none.
 
+- DISPOSITION — 2026-11-20, S2-P03: **LEFT OPEN**. The tracked text search, supplied `.overnight/IN/PACKAGE.md`, PROGRESS.md **S2-T36 — The financial centre's company register: task log**, **S2-T36 offline build** and **S2-T36 fix pass 1 — ruling L-1062** retain summaries, but not the original lens-A review or its complete remaining-guard list. The referenced `.overnight/IN/REVIEW-A.md` and S2-T36 review directory are absent. Under this package's explicit dependency rule, no guard list, per-guard chronology or closing verdict is inferred. The lead must supply that review/list and disposition its remaining red evidence; no new test or red/green result is claimed for this item.
+
 ### PO-S2-114 — The register target check's exact-URL block has no test that fails without it
 
 - ID: PO-S2-114
@@ -4448,6 +4456,8 @@ Revision-2 record points without extra numbers:
 - EVIDENCE: removing the exact-URL block for the register host, or only its frame condition, leaves `test_frame_and_path_refusals` green (exit 0, 3 passed), because the host block and the approval cover those strings; the fetcher builds only the constant register URL.
 - NEEDED: a planted test that fails when that block is removed, or a recorded reason it is redundant.
 - COMPARISON: none.
+
+- CLOSING LINE — 2026-11-20, S2-P03: **CLOSED by a deciding plant**. The former path plants were also rejected by the broader frame/approval checks. `custodian/tests/test_fc_register.py::test_active_register_exact_url_guard_without_a_frame` isolates this guard by stubbing `active()` true with no frame, checks the canonical URL succeeds, proves the invented alternate path passes `approve()`, and asserts `TransportFault.kind == "blocked_host"` for it. Removing only the exact-URL block in memory made the new plant fail while the three existing path plants stayed green (red exit 1, one failed/three passed); unchanged production code passed the shared focused run (green exit 0, 18 passed). Seed 6472901536; PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. `page_requests.py` is unchanged; independent closure review remains with the lead.
 
 ### PO-S2-119 — Pre-existing museum missing-value and field-binding notes
 
@@ -5313,3 +5323,8 @@ S2-T41 also retains the unnumbered provider-contract, acquisition-mapping and fr
 The unnumbered S2-T29 build/fix/join holds retain their scoped source, snapshot, pin and field-contract limits. PRs 86/98/105 are merged; this supersedes their old local/uncommitted shipping observations only. Current source/pin/proof-check holds remain OI-274/OI-275/OI-277/OI-278 and S2-T29’s unticked criteria. Later proposals OI-343/OI-345 keep their originally named later scope.
 
 The original unnumbered review-disposition section already records S2-T44 placement after S2-T43 as satisfied, and explicitly does not adopt the PO-S2-118 closure proposal. Retain that disposition. PO-S2-118 is a referenced label without its own item heading here; no replacement ID, closure or new task is invented.
+
+
+## S2-P03 guard-plant dispositions — 2026-11-20
+
+The dated closing lines added under PO-S2-74, PO-S2-91, PO-S2-104 and PO-S2-114 supersede their earlier reconciliation holds for the missing-test implementation work. The deciding red proofs and green runs are recorded in PROGRESS.md, **S2-P03 — Guard plants without a deciding case**. Independent closure review remains required; this is no slice-gate approval. PO-S2-113 remains open because its original review/remaining-guard list is absent. No other reconciliation hold or TASKS.md box changes.
