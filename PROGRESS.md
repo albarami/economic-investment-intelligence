@@ -43947,3 +43947,8 @@ no absolute local path, e-mail or forbidden bare digit run. No code changed
 after the two 158-pass regression runs. The final return carries per-item
 red/green evidence, all candidate/family/horizon cells, CPU timings, proposed
 commands and open items. Lead commit and different-maker review remain pending.
+
+### S6-T27 — lead's dependency placement (2026-11-20)
+
+- The lead moved `statsforecast==2.1.1` from its own `forecast` dependency group (commit cd4ed344) into the default `dev` group, so `uv sync --locked`, the six hosted checks and `./eii test` all install it with no change to a workflow file; the rule 44 line naming `--group forecast` is removed from both rules files in the same commit. Only `evals/forecast_spike/` imports the library (unchanged).
+- Commands: `uv lock` exit 0 (91 packages); `uv lock --check` exit 0; `uv sync --managed-python --all-packages --locked --group engine` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0. Verification rows follow in the task's ledger.

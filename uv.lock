@@ -374,6 +374,7 @@ dev = [
     { name = "pytest" },
     { name = "pyyaml" },
     { name = "ruff" },
+    { name = "statsforecast" },
     { name = "types-pyyaml" },
     { name = "uvicorn" },
 ]
@@ -386,9 +387,6 @@ engine = [
     { name = "pyvalhalla" },
     { name = "rasterio" },
     { name = "shapely" },
-]
-forecast = [
-    { name = "statsforecast" },
 ]
 mutation = [
     { name = "mutmut" },
@@ -405,6 +403,7 @@ dev = [
     { name = "pytest", specifier = "==9.2.0" },
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "ruff", specifier = "==0.17.4" },
+    { name = "statsforecast", specifier = "==2.1.1" },
     { name = "types-pyyaml", specifier = "==6.0.12.20261113" },
     { name = "uvicorn", specifier = "==0.54.0" },
 ]
@@ -418,7 +417,6 @@ engine = [
     { name = "rasterio", specifier = "==1.5.2" },
     { name = "shapely", specifier = "==2.2.0" },
 ]
-forecast = [{ name = "statsforecast", specifier = "==2.1.1" }]
 mutation = [{ name = "mutmut", specifier = "==3.8.1" }]
 
 [[package]]
