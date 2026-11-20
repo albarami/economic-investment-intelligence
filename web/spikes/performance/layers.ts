@@ -246,14 +246,15 @@ export async function mountScene(input: {
     return [hexLayer, particleLayer, ...roadLayers] as const;
   };
   let tick = 0;
+  const current = build(tick);
   const overlay = new MapLibreOverlay({
     interleaved: true,
-    layers: [...build(tick)],
+    layers: [...current],
   });
   map.addControl(overlay);
-  await whenIdle(map);
-  const current = build(tick);
-  overlay.setProps({ layers: [...current] });
+  // These same layer instances now hold the rendered sublayers and counts.
+  // Rebuilding identical props here schedules another full scene before the
+  // first sample, which is particularly costly for a software renderer.
   await whenIdle(map);
   const canvas = map.getCanvas();
   const counts = countLayers(current[0], current[1]);

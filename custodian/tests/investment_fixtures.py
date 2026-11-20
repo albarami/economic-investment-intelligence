@@ -642,5 +642,26 @@ def _token(value: object) -> str:
 
 
 def _agency_html(inner: str) -> bytes:
-    html = '<!DOCTYPE html><html lang="en"><body>' + inner + "</body></html>"
+    html = (
+        '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body>'
+        + inner
+        + "</body></html>"
+    )
     return html.encode("utf-8")
+
+
+def quotation_page(language: str = "en", extra: str = "") -> bytes:
+    """Invented content with inline nodes, furniture and a declared counterpart."""
+    content = "Invented café" if language == "en" else "نص مخترع ١٢"
+    return (
+        f'<!DOCTYPE html><html lang="{language}"><head><meta charset="utf-8">'
+        '<link rel="alternate" hreflang="en" href="/en/invented-page">'
+        "</head><body><main><h1>Invented title</h1>"
+        f'<p>{content} <a href="/invented-link">link</a> tail.</p>'
+        "<div>First <span>inline</span> last.</div><p>Second.</p>"
+        "<aside>Excluded side menu</aside><svg><text>Excluded vector</text></svg>"
+        '<div hidden>Excluded hidden</div><div aria-hidden="true">Excluded aria</div>'
+        '<section class="cookie">Excluded consent</section>'
+        "<form><label>Excluded form</label></form><!-- Excluded comment -->"
+        f"{extra}</main></body></html>"
+    ).encode()

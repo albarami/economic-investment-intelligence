@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from custodian.tests.repository_root import repository_root
 
+from eii_custodian.publicdata.fetch.allowlist import approve
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -278,7 +280,20 @@ def test_skip_reason_still_set_fetches_nothing(tmp_path: Path) -> None:
     outcome = run_build((planted,), transport, tmp_path, _clock, _sleep)
     assert calls == []
     assert outcome.failure is None
-    assert outcome.lines[0] == f"SKIP {planted.key} {planted.skip_reason}"
+    expected = _skipped_lines(planted)
+    assert outcome.lines[: len(expected)] == expected
+
+
+def _skipped_lines(entry: Entry) -> tuple[str, str]:
+    """Filled terms keep their off-list advisory before the technical skip."""
+    assert entry.terms_url
+    assert approve(entry.terms_url).ok is False
+    host = urlsplit(entry.terms_url).hostname
+    return (
+        f"TERMS {entry.key} not read: host {host} is not on the allow-list "
+        f"({entry.terms_url})",
+        f"SKIP {entry.key} {entry.skip_reason}",
+    )
 
 
 def test_pack_scopes_the_foursquare_line_and_the_readme_orders_the_build() -> None:
@@ -301,7 +316,7 @@ def test_pack_scopes_the_foursquare_line_and_the_readme_orders_the_build() -> No
 
 
 def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
-    """The four skipped files add skip lines only, preserving every existing stage."""
+    """The four files add terms advisories and skips, preserving every stage."""
     from custodian.tests.test_publicdata_behaviour import _entry as public_entry
     from custodian.tests.test_publicdata_behaviour import _ok
 
@@ -339,10 +354,9 @@ def test_skipped_places_preserve_other_build_stages(tmp_path, monkeypatch):
         (*skipped, public_entry()), transport, tmp_path / "joined", _clock, _sleep
     )
     assert joined.failure is None
-    assert joined.lines[: len(skipped)] == tuple(
-        f"SKIP {entry.key} {entry.skip_reason}" for entry in skipped
-    )
-    assert joined.lines[len(skipped) :] == baseline.lines
+    expected = tuple(line for entry in skipped for line in _skipped_lines(entry))
+    assert joined.lines[: len(expected)] == expected
+    assert joined.lines[len(expected) :] == baseline.lines
     assert events == ["investment", "series", "regression"]
 
 

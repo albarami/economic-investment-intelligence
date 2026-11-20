@@ -18,6 +18,7 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
     workers: [],
     motion: [],
     removed: [],
+    overlayUpdates: [],
   };
   class GPUError extends Error {}
   let held = [];
@@ -70,6 +71,7 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
       assert.equal(props.interleaved, true);
     }
     setProps(props) {
+      observed.overlayUpdates.push(props);
       held = props.layers;
     }
   }
@@ -373,7 +375,7 @@ test('scene reports actual counts, accessors, motion, renderer and context event
   assert.equal(sub.scene.hexagonInstances, 5);
   assert.equal(sub.scene.particleInstances, 5);
   assert.deepEqual(Array.from(h.observed.workers), ['synthetic-worker']);
-  assert.deepEqual(h.observed.removed, ['error', 'error']);
+  assert.deepEqual(h.observed.removed, ['error']);
   assert.equal(
     h.exported.webglFailure(new h.GPUError('synthetic')),
     'webgl2-unavailable',
@@ -438,5 +440,17 @@ test('sampling uses every interior grid point and separates pixel categories', a
       particle,
       road: false,
     });
+  }
+});
+
+test('initial counts use the layers already rendered at idle without scheduling a duplicate scene', async () => {
+  for (const enabled of [false, true]) {
+    const h = await mountFixture(enabled);
+    assert.equal(h.observed.overlayUpdates.length, 0);
+    assert.equal(h.scene.hexagonInstances, 1);
+    assert.equal(h.scene.roadInstances, enabled ? h.payload.length : 0);
+    assert.equal(h.layers()[0].props.data.length, 1);
+    h.scene.step(125, 27, false);
+    assert.equal(h.observed.overlayUpdates.length, 1);
   }
 });

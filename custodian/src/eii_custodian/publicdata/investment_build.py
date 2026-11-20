@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.kinds import read_bounded
@@ -589,6 +589,23 @@ def _commit_batch(
         "table_snapshot_identity": table_digest,
         "pages": list(pages),
     }
+    if entry.source_id == "investqa_pages":
+        page_rows, refusals = selected_page_rows(
+            cache / entry.key, [dict(page) for page in pages], spec.furniture
+        )
+        checked_pages = validate_page_rows(page_rows, page_rows)
+        if isinstance(checked_pages, InvestmentFailure):
+            return checked_pages
+        page_body = _dump({"page_rows": page_rows, "page_refusals": refusals}).encode()
+        page_digest = sha256_hex(page_body)
+        try:
+            _archive_evidence(
+                cache, entry, envelope, terms, retrieved, page_digest, page_body
+            )
+        except SnapshotError:
+            return fail_of(envelope, "page_evidence", "verified page table", "invalid")
+        manifest["page_table_sha256"] = page_digest
+        manifest["page_table_snapshot_identity"] = page_digest
     manifest_text = _dump(manifest)
     manifest_digest = sha256_hex(manifest_text.encode("utf-8"))
     manifest_path = cache / entry.source_id / "manifests" / f"{manifest_digest}.json"
@@ -1198,3 +1215,129 @@ def _atomic_write(path: Path, text: str) -> None:
 
 def _replace(source: Path, destination: Path) -> None:
     os.replace(source, destination)
+
+
+def validate_page_rows(
+    rows: object,
+    extracted: list[dict[str, object]],
+) -> tuple[dict[str, object], ...] | InvestmentFailure:
+    """Require closed rows and byte equality against fresh selected-byte extraction."""
+    from .investment_agency import page_refusal
+    from .investment_contracts import PAGE_COLUMNS, PAGE_EXTRACTOR
+
+    if not isinstance(rows, list) or (extracted and not rows):
+        return page_refusal("page_rows_missing")
+    seen: set[tuple[str, str]] = set()
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != PAGE_COLUMNS:
+            return page_refusal("page_columns")
+        if row.get("extractor") != PAGE_EXTRACTOR:
+            return page_refusal("page_extractor_version")
+        key = (str(row["page_key"]), str(row["page_language"]))
+        if key in seen:
+            return page_refusal("page_duplicate_key")
+        seen.add(key)
+        original = next(
+            (item for item in extracted if item["page_url"] == row["page_url"]), None
+        )
+        if original is not None and row["page_language"] != original["page_language"]:
+            return page_refusal("page_language")
+        if original is None or row != original:
+            return page_refusal("page_text_mismatch")
+    if rows != extracted:
+        return page_refusal("page_rows_missing")
+    return tuple(dict(row) for row in rows)
+
+
+def page_public_totals(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    """PRV-115 row contributions; the release owner signs the complete inventory."""
+    entries = []
+    for row in rows:
+        selectors = {name: row[name] for name in ("page_key", "page_language")}
+        key = json.dumps(selectors, ensure_ascii=False, separators=(",", ":"))
+        entries.append(
+            {
+                "public_total_id": "row:pub_investqa_page:" + key,
+                "source_id": row["source_id"],
+                "table_name": "pub_investqa_page",
+                "selectors": selectors,
+                "status": "not_applicable",
+                "reason": "source_only",
+            }
+        )
+    return entries
+
+
+def selected_page_rows(
+    directory: Path,
+    pages: list[dict[str, object]],
+    furniture: frozenset[str],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    """Re-read each explicitly selected immutable snapshot; no pointer fallback."""
+    from .investment_agency import extract_page, page_refusal
+
+    rows: list[dict[str, object]] = []
+    refusals: list[dict[str, object]] = []
+    for order, page in enumerate(pages[1:], 1):
+        url = str(page.get("url", ""))
+        digest = str(page.get("sha256", ""))
+        key = str(page.get("page_key", urlsplit_path_key(url)))
+        try:
+            snapshot = read_snapshot(directory, digest)
+            if (
+                snapshot.sidecar.get("fetch_url") != url
+                or snapshot.sidecar.get("retrieved_utc") != page.get("retrieved_utc")
+                or snapshot.sidecar.get("source_id") != "investqa_pages"
+                or page.get("order") != order
+            ):
+                extracted: dict[str, object] | InvestmentFailure = page_refusal(
+                    "page_evidence", url
+                )
+            else:
+                extracted = extract_page(
+                    snapshot.body,
+                    page_url=url,
+                    page_language=str(page.get("language", "")),
+                    sequence=None,
+                    retrieved_on=str(page.get("retrieved_utc", ""))[:10],
+                    page_sha256=snapshot.sha256,
+                    manifest_sha256=digest,
+                    charset=str(snapshot.sidecar.get("charset", "")),
+                    furniture=furniture,
+                )
+        except (OSError, SnapshotError):
+            extracted = page_refusal("page_hash_mismatch", url)
+        if isinstance(extracted, InvestmentFailure):
+            refusals.append({"page_key": key, **asdict(extracted)})
+        else:
+            rows.append(extracted)
+    return rows, refusals
+
+
+def urlsplit_path_key(url: str) -> str:
+    """A report key from a page path, never its refused text."""
+    import re
+    from urllib.parse import urlsplit
+
+    return re.sub(r"[^a-z0-9]+", "_", urlsplit(url).path.casefold()).strip("_")
+
+
+def read_page_table(
+    directory: Path, manifest: Mapping[str, object]
+) -> dict[str, object] | InvestmentFailure:
+    """Read the page table beside the unchanged v1 record-table document."""
+    from .investment_agency import page_refusal
+
+    identity = manifest.get("page_table_snapshot_identity")
+    if not isinstance(identity, str):
+        return page_refusal("page_rows_missing")
+    try:
+        snapshot = read_snapshot(directory, identity)
+        if snapshot.sha256 != manifest.get("page_table_sha256"):
+            return page_refusal("page_hash_mismatch")
+        value = json.loads(snapshot.body)
+        if not isinstance(value, dict) or set(value) != {"page_rows", "page_refusals"}:
+            return page_refusal("page_rows_missing")
+        return value
+    except (OSError, SnapshotError, ValueError):
+        return page_refusal("page_evidence")

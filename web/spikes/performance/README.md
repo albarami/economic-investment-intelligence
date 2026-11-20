@@ -76,6 +76,16 @@ Run the local web mutation check with `uv run --locked python scripts/mutation_w
 
 ## Browser test fixtures
 
+The scene keeps the layer instances supplied to the initial overlay and reads
+its rendered counts after the first map idle event. It does not submit identical
+layers and wait for a second idle before sampling: that update caused another
+full render of the same scene on the headless software renderer. The layer regression
+requires no overlay update until the first real playback step; its failing run
+against the earlier implementation is recorded in PROGRESS.md. Both initial and
+final canvas samples still inspect every interior grid point, and the browser
+suite retains its original counts, plants, readiness condition and time limits.
+S2-T44's phase measurements and controlled-load reproduction are in PROGRESS.md.
+
 The browser suite keeps each named assertion test and each distinct plant. Tests
 with the same initial language, motion setting and road load share a page within
 a default-mode group; a failure does not skip later tests, and selecting one test

@@ -37834,6 +37834,291 @@ Seed:      3601468863
 Notes:     Lead's whole test at WORK with the supplied fresh seed, provider none, no network and unchanged limits. The scripts discovery exit 1 remains unresolved until actual lead evidence. Hosted/head and exact merge-result checks remain separate required lead gates.
 ```
 
+### MERGE TRAIN S2-7 — Slice S2: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/104)
+
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant not exposed).
+Senior expert persona: careful release coordinator tracing each ledger input to a Git object, log entry or file. Strict self-review persona: records reviewer rejecting unsupported claims. Self-review is not another-maker approval of this draft.
+Skills: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer and muhasabah-gate. No separately installed verification-before-completion skill was found; its plain meaning is applied by inspecting the outputs, executing the preparation command and recording its actual exit.
+
+The drafter prepared these ledger inputs from read-only Git and the supplied evidence; it ran no test and no ledger. The lead generated the execution specification with the real pull request number and a fresh seed, and ran the ledger.
+
+#### Git inventory and commit/task table
+
+Default BASE is `aded6a4f71415fb383fb4f83e8b70094b0eeeb9a` (PR 103 squash merge, as identified by the brief); WORK is HEAD, `33df19635b8d97c7a2ba3e77435e02f1ee50bae8`. Read-only Git supplies seven linear commit objects and the exact 23-path name-status scope. The generator freezes the seven subjects and scope, supports --base REF, refuses a changed base tree, scope or commit sequence, and writes the actual merges list (empty). Its --base option is for an equivalent-tree replay; a materially changed base needs renewed evidence, not relaxed expectations.
+
+| Task/change | Approved or confirmed source | Source own parent/base | Moved commit |
+|---|---|---|---|
+| S2-T21 B code | `36ad651a7774461ce5cae011e267302d742f9b41` | `98384ae5933dff2efb81721d087e74e6ce600011` | `8a148093c6e062b5d4f9801ff7b57603c6a67890` |
+| S2-T21 B documents | `933a7c98791e74317af72f3c9b2ce6088b216438` | `36ad651a7774461ce5cae011e267302d742f9b41` | `d04d63e6799779e8318952f2f349ab44dabe1019` |
+| S2-T21 B records | `86f7ed1db4edb1b6c95a52ef2bdccebca1602fc8` | `933a7c98791e74317af72f3c9b2ce6088b216438` | `38f156941e0168c2593a90898fa4ec9ce750edb3` |
+| S2-T44 | `85a8affacf88b3a927d6cf51579b793bca3d7653` | `98384ae5933dff2efb81721d087e74e6ce600011` | `6bdb9f4b2d467bdc61b7bc7b93919765199b2ca4` |
+| S2-T39 B | `6e38c0e8da066d696bd94dbe63492105807cc6c7` | `98384ae5933dff2efb81721d087e74e6ce600011` | `9b73fc62282e2b1d92ca0c984465dd7ab4ecb593` |
+| S2-T21 join-forced test | `ec2d40b0476b6b34a4afa6e195f8faabe0957bcd` | `d6783c3cb8e9136c937490e192b1ca3bfc1ce9e2` | `11ef7459cb00df9139a9a9a49472c6ed7cf278e9` |
+| S2-T21 join-forced document | `2877a3315ec7f0866c2ccfc807e0e22b93c817b7` | `ec2d40b0476b6b34a4afa6e195f8faabe0957bcd` | `33df19635b8d97c7a2ba3e77435e02f1ee50bae8` |
+
+Source: `git log --reverse --format=%H BASE..HEAD`, `git show` of the seven current commits, and each source object's `git rev-parse REF REF^`. Source-to-joined mappings are in reviews/TRAIN-S2-7.forced-differences.md and conf2 B2; the move mappings are in LOG 21:25 and reviews/TRAIN-S2-7.move-aded6a4f.range-diff.txt. The S2-T21 approval is on the complete three-commit series through 86f7ed1d, with own series base 98384ae5; individual parents are shown above. The final document source 2877a331 is CONFIRMED, not asserted APPROVED. Current hashes are mapped from reviewed sources; no earlier reviewer is claimed to have directly approved every moved hash.
+
+#### Join, forced differences, confirmations and move
+
+LOG 20:12 records an incomplete first join (it omitted two S2-T21 commits). LOG 20:13 explicitly corrects it: the reviewed join is five commits on `0b91f66d05e7163745d0dbad39b173c0ee173a22`, through d6783c3c. The incomplete join is not presented as approved. Joiner: the Anthropic lead (LOG 20:12 and 20:19); original task builders: OpenAI, with the lead committing unchanged builder trees where their sandboxes could not commit.
+
+The supplied forced-differences report lists every paired file of the five task commits. All code/test changed-line sequences are identical. Its two DIFFERS rows are records: OPEN_ITEMS.md reuses a join-point blank (3 vs 4), and S2-T39's PROGRESS.md reuses another (36 vs 37). The same nonblank sequences remain in order. TASKS.md S2-T39's approved Delivery replacement is placed before the newer S2-T40 section, and S2-T44 appears after S2-T43; conf1 Q2 confirms those contents and the shifted insertion offset. These are separate from the two later forced changes below.
+
+- **conf1**: Cognition Devin / SWE-2 High, VERDICT APPROVED d6783c3c, Q1-Q4 PASS (reviews/TRAIN-S2-7.conf1.md; LOG 20:30 RESULT, following 20:19 launch). Another maker than the Anthropic joiner. It reran the file-by-file proof, exit 0; generated prefix byte-identical, exact five-commit chain and metadata equal. It records 157 passes in three registry/investment files and docs/tree/cmp/diff-check/ruff exit 0 at that earlier head. Its proposed proof-path and task-offset notes are carried or disposed in po_items.md.
+- **Forced test change**: LOG 20:30 records S2-T21B.lv1 at 86f7ed1d, seed 2099362825, exit 1 (11676 passed, 1 failed). The old class-source guard asserted the placeholder that S2-T21's sourced terms replaced; the same failure existed at joined d6783c3c. Anthropic lead built ec2d40b0, moved as 11ef7459: only the target test's terms assertions/docstring plus appended PROGRESS evidence. Both address assertions stay unchanged; the test now requires the placeholder absent and the recorded reading present. Lead red/green/plant evidence is in LOG 20:30. **conf2** (OpenAI, another maker than this fix's Anthropic builder) VERDICT APPROVED ec2d40b0 at LOG 20:44, with A1-A3 and B1-B2 PASS. Its direct return independently proves the target change, reproduces old-test red and placeholder-plant red, records 22 current-file passes and 115 combined passes, and confirms all six joined commits and the original five-file proofs. conf2's local tool-restoration deviation and its failed audit while the plant remained installed are recorded in its return; direct committed-blob restoration, byte parity and final clean tree are explicitly proved. No failed intermediate audit is hidden.
+- **Forced document change**: LOG 20:57 records train S2-7.lv1 at ec2d40b0, seed 2511859216, exit 1: 11845 passed, 1 failed, 0 skipped in seven suites. The failing places-release test found document 04's S2-T21 terms row still named `places_fsq/copy-2025-01-10`, whereas S2-T37 on the joined base uses stable key `places_fsq/copy`. Anthropic lead commit 2877a331, moved as 33df1963, changes only that key cell; the words, date and basis stay the same. The log records 22 file passes and check_docs OK. **conf3 C1** explicitly CONFIRMED the current moved head at LOG 21:29: exactly one table cell, stable source-registry key, 22 passes exit 0. This is documentary join repair, with no production/test change.
+- **Move**: LOG 21:25 maps all seven commits from base 0b91f66d through 2877a331 onto aded6a4f through 33df1963. The supplied range-diff shows only OPEN_ITEMS.md, PROGRESS.md and TASKS.md context differences. **conf3 C2** compares the entire non-record diffs, byte-identical (422275 bytes; SHA-256 `0ca7360c60e109956596319de1a51ca8f42e6efcece48e7f382829b004bdf97b`), with exact seven-commit scope. It also reports docs/tree exit 0. Confirmer maker/model comes from LOG 21:29: Zhipu GLM-5.3 via relay/Codex, another maker than the Anthropic joiner. The return's generic “OpenAI Codex CLI” reviewer heading is a tool label; this draft preserves that discrepancy and attributes the routed maker from the lead log rather than inventing a model assertion by the return. Its actual verdict is CONFIRMED, not APPROVED. conf1/conf2 supply the preceding APPROVED verdicts and conf3 confirms the records-only move under decision 0039 item 2.
+
+Lead whole test S2-7.lv2 on 2877a331, seed 2297442108, exited 0: 11846 passed, 0 failed, 0 skipped in seven suites (S2-7.lv2.summary.txt and LOG 21:25). The prior failed summary is preserved in S2-7.lv1.summary.txt. This old-base pass does not substitute for a moved-head or exact merge-result run. The lead's whole test S2-7.mv1 on the moved head 33df1963, seed 1663203784, exited 1: 11845 passed, 1 failed, 0 skipped; the failure is the performance spike's browser suite, where two browser tests (roads paused playback plant is refused by name; roads full street load draws every link and carries the Simulated mark) stopped at 'spike readiness timed out' while the machine's load average stood near 122 with eight whole tests in flight. The same spike code passed in S2-7.lv2 on the old base. This is recorded as a new occurrence under OI-319 and is not closed by a green rerun. The lead's second whole test S2-7.mv2 on the same head, seed 1357531151, exited 0: 11846 passed, 0 failed, 0 skipped in 7 suites, 0 with problems.
+
+### S2-T21 — The registry loader follows decision 0026, part B: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/104)
+
+- Builder: OpenAI GPT-6.1 Sol, Codex codex-b (LOG 16:55, 17:58, 18:57; Git 8a148093 body). Evidence read/apply passes and the three committed task changes are distinct. The lead's 18:57 entry records applying the prepared three-field URL repair under L-1159, then committing the unchanged builder tree through 86f7ed1d on base 98384ae5. Source commits and parents are in the table.
+- Reviewer: Anthropic Claude Opus 5.5, another maker than the OpenAI builder. VERDICT APPROVED through 86f7ed1d at LOG 19:03, directly supported by reviews/S2-T21B.rev1.review.md. K1,K3-K7 PASS; K2 OPEN only for the evidence handoff. Its own seven-file run has 234 passed, exit 0; its plants and control distinguish the recorded checks. P1-P4 go to po_items.md; OPEN evidence is not silently called independently rehashed.
+- Scope/terms: the review traces 190 filled rows and three existing-address repairs, unchanged source keys/skip behavior, 37 pending terms records, and DHA-102 updates. RULING-L1153 items 1-6 governs whitespace-only normalization, HDX/per-level geoBoundaries readings, sourced DHA-102 changes, actual skip reasons, pending rows and elisions. The owner-decision and pending-source rules are preserved. The existing OPEN_ITEMS updates for OI-209, OI-210, OI-212 and OI-319 remain; OI-211 release proof and all acceptance boxes stay open.
+- Historical failures: LOG 18:57 reports builder whole run exit 1: sandbox cache guard failures, three empty URLs repaired under L-1159, old expectations corrected, and web-checks killed at the unchanged 1800-second limit. These are not green evidence. The later lead failure and join-forced test/doc repairs are recorded above with their own builders, reviewers, heads and seeds. Neither this draft nor a passing rerun alone closes OI-319 or any random failure.
+- Status replacement keeps part A merged and marks this part B in review. Remaining unread source bytes/terms and OI-211 are explicit; no full-task or slice completion is claimed.
+
+### S2-T44 — The performance spike mounts its scene once before sampling: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/104)
+
+- Builder: OpenAI GPT-6.1 Sol, Codex (LOG 17:46 corrected launch and 19:13 RESULT). Anthropic lead committed the builder's unchanged tree as 85a8affa on base 98384ae5; moved task commit is 6bdb9f4b. The measured cause was a duplicate initial layer submission and second idle wait; the fix retains the submitted instances and samples after one idle. Log 19:13 reports regression red then green, readiness 154371 ms under four busy loops against unchanged 170000 ms, and passing performance/web command groups. These are builder measurements, not this drafter's measurements.
+- Reviewer: xAI Grok 4.7 via Cursor (the returns label the maker SpaceXAI), another maker than OpenAI. rev1 at LOG 19:26 is VERDICT REJECTED on tool path only: the review mode prohibited shell and K2-K4/K6 lacked command evidence. This rejection is retained, not overwritten. Lead evidence at 19:24 provides bound-file diff 0, current node tests 11/11 exit 0, parent-code red 9/11 exit 1, restoration clean, lint/format/typecheck/docs/tree/cmp exits 0 and PROGRESS byte-prefix proof. rev1b is VERDICT APPROVED 85a8affa at LOG 19:31, based on that evidence (reviews/S2-T44.rev1b.stdout.md and rev1-lead-evidence.txt). The reviewer did not execute those commands; the browser suite was not part of that reading review.
+- LOG 19:58 records lead S2-T44.lv1, seed 4287592698, exit 1 (11663 passed, 1 failed), the hostile-surroundings entry timeout on the old base without S2-T42. It is attached to existing PO-S2-115, not a newly invented cause or OI. S2-T42 is already on S2-6/the joined base. No green rerun alone closes the occurrence.
+- The two hardening proposals go to po_items.md. The task-placement instruction is satisfied at HEAD; the confirmation's line-offset note is recorded without inventing a content difference. PO-S2-118's requested closure was explicitly not adopted by the reviewer; its label needs lead reconciliation because no matching ID exists at HEAD (M05). Bounds, limits, retries, assertions, layer counts and committed trace evidence stay unchanged according to the approved diff evidence.
+
+### S2-T39 — The investment sources in full, part B: task log (pull request https://github.com/albarami/economic-investment-intelligence/pull/104)
+
+- Builder: OpenAI GPT-6.1 Sol, Codex. LOG 18:40 records build1 PARTIAL at Q1/Q2 and the whole-run web timeout. RULING-L1157 resolves the companion table and release-reader scope: pub_investqa_record v1 stays unchanged, pub_investqa_page is new, and the extractor version is recorded. LOG 19:19 records build2 and unchanged-tree lead commit 6e38c0e8 on base 98384ae5, moved as 9b73fc62. The decision's actual column name is `extractor`; the reading review reconciles the ruling's descriptive `extractor_version` wording explicitly.
+- Reviewer: Cognition Devin / SWE-2 High, another maker than OpenAI, VERDICT APPROVED 6e38c0e8 at LOG 19:28, supported by reviews/S2-T39B.rev1.stdout.md. K1-K4 inspection PASS, K5 OPEN and K6 partial because the review tool executed no shell. RULING-L1162 explicitly accepts this APPROVED verdict and closes execution evidence with the lead's review-checkout results (rev1-lead-evidence.txt, header 19:27): 699 passed, exit 0; docs/tree/ruff/mypy/cmp exit 0, no AGENTS/CLAUDE diff and PROGRESS prefix retained. Those are lead executions, not reviewer runs. All seven proposed items go to po_items.md, as L-1162 directs.
+- Whole-test history: LOG 19:19 records the builder's exit 1 on intermediate-code/cache failures and a web internal timeout. LOG 19:50 records lead lv1 on 6e38c0e8, seed 1535136639, exit 1 (11702 passed, 1 failed), hostile-surroundings entry timeout. LOG 19:51 corrects the initial proposed new OI/task: it is existing PO-S2-115, fixed by S2-T42 on the forthcoming base; no S2-T45 or OI-332 is created. LOG 20:30 records lv2 on the same task head, seed 2017408496, exit 0 (11703 passed, 0 failed, 0 skipped in seven suites). Both results remain recorded; no random-failure closure follows from the green rerun.
+- Only the custodian page-table build, source declaration, selected-release reader and contract appendix are in this part B. Live Arabic inventory, real reviewed crosswalk entries, application loading, complete signed PRV-115 inventory and screen quotation delivery remain open with their owning tasks, as TASKS.md S2-T39 says. Part A remains merged through PR 99. This status replacement does not close the other parts or tick acceptance criteria.
+
+#### Executable-row and status inventory
+
+make_spec.py emits seven pytest commands, one per changed/added executable Python test file, with parsed changed-function coverage anchors and source HEAD. The changed investment_fixtures.py helper is exercised by its owning tests, not misrepresented as an independently collected test. The web test file is covered by the template's `cd web && npm run test:checks`; web/package.json explicitly includes `spikes/performance/tests/*.node-test.mjs`, and its row includes the changed listener/count and duplicate-scene anchors. Eight shared rows (ruff, format, mypy, docs, tree, cmp, scope, commits) and one whole-suite row make 17 rows total. The suite command is `./eii test --seed 1604699100` before numeric substitution. No command row has been executed by this drafter; no historical count is inserted as its result. commands.json equals spec.commands. lead_only_commands.json is empty; no lead-only data test changed.
+
+The three old Delivery strings in tasks_md.json are copied exactly from TASKS.md at HEAD. S2-T21 is the ledger's owning task; its replacement is in spec.tasks_md. S2-T44's stale in-progress line and S2-T39's stale awaiting-review/working-tree description are contradicted by LOG 19:31 and 19:28 respectively, so only these two approved train tasks use tasks_md_other. No unrelated status is changed. S2-T21 and S2-T39 remain explicitly partial; no acceptance box is changed.
+
+items.md carries OI-341, the lead's record of the two readiness timeouts of S2-7.mv1 (a further occurrence beside OI-319). OI-340 stays reserved, and the withdrawn OI-332/S2-T45 allocation is not revived. po_items.md carries 15 new review proposals, PO-S2-125 through PO-S2-139, with their source lines. The three remaining proposal bullets are recorded there as satisfied placement/offset instructions or the existing PO-S2-118 label requiring reconciliation. No proposed item is silently closed. Source line numbers point only into supplied evidence files; pack citations use task IDs, decision items or section headings.
+
+#### Notes for the records
+
+- M04 — Original source bodies absent from the S2-T21 review handoff and their independent rehash/quotation evidence are absent, as review K2/P1 and OI-209 record. The supplied validation_detail delegated results are not upgraded to independent reviewer rehashes. The review's APPROVED verdict still exists with that explicit handoff gap.
+- M05 — The insertion/disposition record for the already assigned PO-S2-118 label is absent at HEAD: the reviews and LOG 19:31 say it stays open, but OPEN_ITEMS.md has no matching ID/text. Keep the label for lead reconciliation; do not allocate a duplicate or adopt the builder's proposed closure. PO-S2-115 is separately linked to existing OI-323 at HEAD; its second/third old-base timeout occurrences remain logged above.
+- M06 — The original forced_diff_s27.py executable proof script is absent from these supplied inputs. Its generated file-by-file report and independent rerun records in conf1/conf2 are present, and conf3 C2 supplies the later byte-identical non-record-diff proof. This draft does not claim to have rerun the unavailable original script.
+
+No task approval verdict is absent: S2-T21's original series, S2-T44 rev1b and S2-T39 part B have sourced APPROVED verdicts. The forced test change has conf2 APPROVED; the forced document change and records-only move have conf3 CONFIRMED. Do not rename CONFIRMED to APPROVED or confuse the tool label with the log-attributed maker.
+
+#### Preparation record
+
+The drafter's helper failed once (exit 1, a source-line reference not found) before the proposal file was written, and its first output scan failed once on an overbroad path pattern; both were corrected and rerun. Neither ran a test, a ledger or a git write.
+
+#### Evidence for the work commit `33df19635b8d97c7a2ba3e77435e02f1ee50bae8`
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_activity_real_shape.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    22 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_pack_cell_names_the_confirmed_isic_address; test_release_field_reads_the_evidence_mark_from_the_map; test_active_codes_sum_across_municipalities. Source: custodian/tests/test_activity_real_shape.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    18 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_draw_over_investment_tables; test_agency_selected_release_writes_both_languages_and_inventory; test_agency_assembly_rejects_tampered_page_rows. Source: custodian/tests/test_assembly_native.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    64 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_page_text_determinism_and_bilingual_roundtrip; test_page_text_refusals_are_named; test_page_text_hash_language_and_version_refusals. Source: custodian/tests/test_investment_build.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    9 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_skip_reason_still_set_fetches_nothing; test_skipped_places_preserve_other_build_stages; test_registry_block_names_the_four_files. Source: custodian/tests/test_places_fetch.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    80 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_investment_sources_record_the_owner_decision_and_watch_terms; test_registry_counts_follow_decision_0026; test_terms_words_parity_normalises_whitespace_only. Source: custodian/tests/test_publicdata_registry.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    13 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_committed_terms_records; test_planted_incomplete_or_malformed_record_is_detected; test_pending_basis_remains_loadable_and_auditable. Source: custodian/tests/test_registry_terms_record.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked python -m pytest custodian/tests/test_weather_cache.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    21 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Coverage anchors: test_weather_registry_entry; test_weather_midnight; test_weather_refusals. Source: custodian/tests/test_weather_cache.py at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. No per-file result at this head is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   cd web && npm run test:checks
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "# duration_ms 536593.802751"
+Seed:      none
+Notes:     Coverage file: web/spikes/performance/tests/layers.node-test.mjs; anchors: scene reports actual counts, accessors, motion, renderer and context events; sampling uses every interior grid point and separates pixel categories; initial counts use the layers already rendered at idle without scheduling a duplicate scene. Source: the file and web/package.json scripts.test:checks at 33df19635b8d97c7a2ba3e77435e02f1ee50bae8. The approved web command includes this file and reports the actual exit; no new result is asserted.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Static lint at WORK; record the actual exit, not historical worker results.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "827 files already formatted"
+Seed:      none
+Notes:     Formatter check only at WORK; no formatting mutation.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 445 source files"
+Seed:      none
+Notes:     Locked type check at WORK; no inferred source-file count.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1124 text files, 120 Markdown files: OK"
+Seed:      none
+Notes:     Document validation at WORK supplies actual counts.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Repository tree guard at WORK, unchanged closed rules.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte comparison of both agent instruction files at WORK.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','aded6a4f71415fb383fb4f83e8b70094b0eeeb9a...33df19635b8d97c7a2ba3e77435e02f1ee50bae8'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/test_registry_terms_record.py M:OPEN_ITEMS.md M:PROGRESS.md M:TASKS.md M:custodian/publicdata/sources.yaml M:custodian/src/eii_custodian/publicdata/assembly_adapters.py M:custodian/src/eii_custodian/publicdata/assembly_native.py M:custodian/src/eii_custodian/publicdata/investment_agency.py M:custodian/src/eii_custodian/publicdata/investment_build.py M:custodian/src/eii_custodian/publicdata/investment_contracts.py M:custodian/tests/investment_fixtures.py M:custodian/tests/test_activity_real_shape.py M:custodian/tests/test_assembly_native.py M:custodian/tests/test_investment_build.py M:custodian/tests/test_places_fetch.py M:custodian/tests/test_publicdata_registry.py M:custodian/tests/test_weather_cache.py M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/17_DEPLOYMENT_HARDENING.md M:web/spikes/performance/README.md M:web/spikes/performance/layers.ts M:web/spikes/performance/tests/layers.node-test.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; output "23 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact frozen name-status scope from BASE..WORK, checked using read-only Git; no ledger records written by this draft.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','aded6a4f71415fb383fb4f83e8b70094b0eeeb9a..33df19635b8d97c7a2ba3e77435e02f1ee50bae8'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     All seven BASE..WORK subjects match the frozen Conventional Commit subjects; the script writes merges explicitly.
+```
+
+```text
+### MERGE TRAIN S2-7 — Slice S2: task log
+Commit:    33df19635b8d97c7a2ba3e77435e02f1ee50bae8
+Command:   ./eii test --seed 1604699100
+Exit code: 0
+Date:      2026-11-20
+Run by:    lead (local)
+Counts:    11846 passed, 0 failed, 0 skipped
+Seed:      1604699100
+Notes:     Required lead whole-test row at WORK: provider none, no network and unchanged limits; the real run requires a fresh seed. Historical whole tests belong to their recorded heads. Current moved-head, hosted/head and exact merge-result results remain separate required lead evidence; draft placeholder values are not a fresh-seed run.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -39617,3 +39902,811 @@ Environment: Linux WSL2; Python 3.14.6; uv 0.11.31; Node v22.22.3; npm 10.9.8. `
 Unresolved check evidence: scripts discovery ran 925 tests and reported seven failure entries, all in CleanEnvironment. Its offline clean sync lacked the pyyaml 6.0.3 wheel in the explicitly workspace-only cache; the log records failed syncs, four package-import subtests and the installed-name check. No cache was populated and no failed command was retried. This is worker environment evidence, not a newly allocated project open item and not a demonstrated task-code regression. Every nonzero check remains nonzero in the return. A prior standalone ruff probe also exited 0.
 
 The branch is an integration candidate only. S2-T43's independent verdict remains pending in the supplied brief; this worker has no later verdict. Another-maker train confirmation, resolution of any failed required check, hosted checks and the lead's fresh-seed whole test on the exact merge result remain open. S2-T37 and S2-T40 approvals are the supplied carry-back confirmations under L-1095; S2-T42 approval is the supplied S2-T42.rev1 return. No approval is inferred from a passing focused run.
+
+## S2-T21 part B — offline terms apply, 2026-11-19
+
+Maker: OpenAI; model: GPT-6 (Codex; exact runtime revision not exposed).
+Builder persona: senior public-data provenance engineer. Strict self-review
+persona: sanad reviewer. Skills: project-orientation, task-standards,
+sanad-provenance, github-flow, strict-reviewer and muhasabah-gate;
+test-driven-development and verification-before-completion in the brief's plain
+meaning where those named skills are not installed. No independent review by
+another maker is claimed.
+
+Base and unchanged detached HEAD:
+`98384ae5933dff2efb81721d087e74e6ce600011`.
+The requested `git switch -c work/S2-T21B-apply` failed with exit 128:
+Git could not create the branch ref in the read-only metadata. A second attempt
+confirmed exit 128. No commit, staging, push or merge was performed. The lead
+must make the requested code/tests, documents and records commits, with the
+brief's required trailer, in a writable checkout. This section records working
+changes, not evidence against a new commit.
+
+Scope and sources: TASKS.md S2-T21, decision 0026 items 1 to 5, decision 0059
+items 1 to 4, document 04 PUB-12/PUB-13/PUB-95/PUB-97, document 17 DHA-102,
+OI-209 to OI-212, and the supplied ruling L-1153 items 1 to 6 and evidence tables.
+303 registry rows are preserved. Exactly 190 mapped FILLED rows now carry the
+supplied terms URL, words, date and basis; all 37 mapped NOT FOUND rows are
+value-identical and retain their pending marker. The changed rows by basis are
+181 dataset, three portal_terms, three owner_decision and three provider_terms.
+The per-host inventory and individual pending reasons are recorded in the
+workspace return. No source was added, removed, switched off or newly skipped.
+The only changes beyond the four terms fields are clearing decision_record on
+wb_wdi and unctad_fdi: their supplied portal_terms basis cannot retain an
+owner_decision citation under the existing loader. Every other field is
+unchanged, including activation and commit flags. AGENTS.md and CLAUDE.md are
+unchanged and byte-identical.
+
+HDX uses the linked CC BY 3.0 IGO replacement; geoBoundaries retains separate
+ADM0 ODbL and ADM1/ADM2 CC BY 4.0 words. Quotation parity normalises whitespace
+only. Document 04 records each mapped key, words or pending reason, date or
+checked-on label, basis, evidence references and saved digests. DHA-102 applies
+only the sourced change list and retains prior entries without new evidence.
+OPEN_ITEMS.md has appended updates for OI-209, OI-210 and OI-212; OI-211 and the
+acceptance boxes are unchanged. The five OI-210 skips were already empty on the
+base, while accident retains partition_byte_bound_unconfirmed. Landing metadata
+is not export or parser proof.
+
+Evidence integrity: 30 distinct saved original bodies were rehashed and matched;
+101 available saved text views matched their recorded digests. 123 distinct
+referenced original bodies are absent from the supplied copies; their digest
+and quotation assertions were checked against validation_detail.json, rather
+than presented as independently rehashed bytes. Document 04 and the return state
+this limitation. No network read was used to replace a missing body.
+
+Environment: existing locked Python 3.14.6, pytest 9.2.0 and Hypothesis
+6.170.15, profile eii with database disabled; temporary files are workspace-local.
+No decision provider was selected, no database was started or stopped, no real
+public fetch or data-cache inspection was performed. The supplied full-run seed
+is 2718281901.
+
+Commands and actual results before the whole-run result:
+
+- `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py -vv -p no:cacheprovider`
+  first exited 1: seven failed, four passed, seed 1795100442. Six empty/whitespace
+  fields and an unread-marker/dataset plant were missed before the new audit;
+  the loader already caught the invalid date and unknown basis. This is the
+  test-first red evidence.
+- `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py -vv -p no:cacheprovider`
+  first exited 1: 114 passed, one failed, seed 1795100598. All plants passed;
+  the real-registry audit exposed the pre-existing missing terms URLs.
+- `uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py custodian/tests/test_registry_terms_record.py -vv -p no:cacheprovider`
+  exited 1: 115 passed, one failed, seed 1795100750. The added whitespace parity
+  check passed, including refusal of changed case or punctuation.
+- An intermediate repeat of the guard-only command exited 1: 12 passed, two
+  failed, seed 1795100912. One failure was the real registry; the other was an
+  incorrect new positive expectation that a whitespace-only basis loads. The
+  loader correctly refuses that noncanonical basis. The mistaken positive case
+  was removed; no production behavior or guard was weakened.
+- The final focused three-file command above exited 1: 117 passed, one failed,
+  seed 1795100950. All ten malformed/incomplete plants and both pending-basis
+  positive cases passed. The real-registry guard reports precisely tenders_pub,
+  bldg_3dglobfp/1636 and bldg_3dglobfp/1639, each with empty terms_url. These are
+  outside the supplied map. Scope clarification for three sourced URL-only
+  repairs was requested; no answer or authorization is assumed. The guard is
+  retained with its failure, not skipped or relaxed.
+- `uv run --locked ruff check .` exited 0 on the initial and subsequent runs:
+  All checks passed. The final source pass also exited 0.
+- `uv run --locked ruff format --check .` exited 0 on each run: 823 files already
+  formatted. No formatter mutation was needed.
+- `uv run --locked mypy` exited 0: 443 source files, no issues.
+- `python3 scripts/check_docs.py` exited 0 on the initial and subsequent
+  document runs: 1119 text files and 119 Markdown files.
+- `python3 scripts/check_tree.py` exited 0: eight rules.
+- `uv run --locked python .overnight/tmp/apply_terms.py` first exited 1 before
+  mutation on an absent optional file key in the validation records. The helper
+  was corrected to handle that record shape, then exited 0: 190 applied,
+  37 pending. No evidence source was edited.
+- The inline read-only scope audit first exited 1 on its incorrectly assumed
+  total count; corrected to compare the actual before/after inventories, it
+  exited 0: 303 preserved, 190 changed, 37 pending unchanged, the four terms
+  fields plus two required decision-record clearances, guidance byte-identical.
+- Inline saved-body and text-view digest audits exited 0. The complete missing
+  body inventory remains in the workspace return and its local evidence files.
+- `git diff --check`, `git status --short` and `git rev-parse HEAD` exited 0.
+
+`./eii test --seed 2718281901` is running at this append. Its completed
+python-guards stage reports 938 passed, eight failed and zero skipped; the
+reported failures concern the unavailable/read-only default uv cache, including
+seven clean-environment setup errors and a launcher subtest. The python-core
+stage reports 749 passed, zero failed and zero skipped. No cache substitution,
+retry, skip, fixture refresh or harness modification was applied. The whole
+command's final counts and actual exit are recorded in a subsequent append.
+
+Strict self-review: REJECTED for task completion until the real-registry guard,
+missing-original-byte and Git-delivery gaps are resolved. Muhasabah: PASS for
+candid, sourced reporting of these bounded edits and uncompleted requirements;
+no full-green, independent-approval, release or merge claim is made.
+
+### S2-T21 part B — affected expectation corrections and scope audit
+
+The ongoing whole run reported python-custodian-1: 4599 passed, one failed,
+zero skipped; its sole failure is the new audit of the three existing empty
+terms URLs. Python-custodian-2 reported 3731 passed, three failed, zero skipped.
+Those three failures were affected old expectations in test_places_fetch.py
+(two SKIP-prefix assertions) and test_weather_cache.py (an empty terms URL
+assertion). Filling the recorded terms introduces an advisory before SKIP,
+and the weather row now carries its supplied terms page. The assertions were
+updated to require the exact advisory/skip sequence and sourced weather URL/date;
+no transport-call, build-stage, size, ETag, host or redirect assertion was removed
+or relaxed. Production code and the allow-list remain unchanged.
+
+`uv run --locked python -m pytest custodian/tests/test_places_fetch.py custodian/tests/test_weather_cache.py -vv -p no:cacheprovider`
+exited 0: 30 passed, seed 1795101622. These are the focused green regressions
+for those three whole-run reds. Subsequent `uv run --locked ruff check .` and
+`uv run --locked ruff format --check .` exited 0; the formatter reported
+823 files already formatted. The whole run also reports python-product:
+786 passed, zero failed and zero skipped; its web checks are still running.
+The initial whole run began before these test-expectation corrections, so its
+results are retained as that revision's evidence rather than an exact final
+whole-project verdict.
+
+The complete inline read-only scope/privacy audit was interrupted with exit 130
+because an unnecessarily slow repeated comparison of the large historical
+ledger delayed it. It changed no source or evidence file. The efficient
+`uv run --locked python .overnight/tmp/check_apply.py` exited 0 (and repeated
+with exit 0 after the affected-test edits): 303 registry rows preserved,
+190 filled terms records matching their own document rows, 37 pending rows
+unchanged, only the four terms fields and two necessary citation clearances,
+open-item history preserved, PROGRESS.md append-only, guidance byte-identical,
+and return-marker and added-text privacy checks passing. No body hash or
+quotation evidence was altered by these helper corrections.
+
+After correcting the older document 04 terms summaries and benchmark pending
+history to agree with the new dated records, `python3 scripts/check_docs.py`
+exited 0: 1119 text files and 119 Markdown files. The closing source check
+`uv run --locked mypy` exited 0: 443 source files; `python3 scripts/check_tree.py`
+exited 0: eight rules; `git diff --check` exited 0. Later whole-run results and
+any final records-only checks follow below.
+
+### S2-T21 part B — same guard, complete supplied map
+
+The read-only `uv run --locked python -` mapped-scope check exited 0:
+`MAPPED GUARD GREEN: 227 mapped rows pass the unchanged guard; full-registry failure remains recorded separately`.
+It selected exactly the 227 keys of the supplied rows_map.tsv, wrote their
+unchanged current registry rows to a temporary registry under the workspace,
+and called the very same _assert_terms_records function. No guard was stubbed,
+no source field was changed, and the temporary file was removed. This is green
+evidence for all 190 filled and all 37 pending mapped records; it does not replace
+the retained failing audit of the complete 303-row registry, whose three empty
+terms URLs are outside that map. The whole command remains in its web stage.
+
+### S2-T21 part B — concrete, unapplied URL repair
+
+A read-only preparation command (`uv run --locked python -`) exited 0 and
+wrote .overnight/tmp/proposed-url-repairs.patch. It changes only the three empty
+terms_url fields: the tender uses the terms address already present on other
+registry declarations, and each height file uses its own recorded figshare
+landing URL. The command verified the exact three changed keys/fields and that
+the workspace registry text remained unchanged. No scope authorization is
+assumed and the patch was not applied.
+
+A second read-only command (`uv run --locked python -`) exited 0:
+`PROPOSED COPY GUARD GREEN: 303 rows; unapplied patch only; workspace registry unchanged`.
+It applied only those URL values to a temporary full registry and called the
+unchanged guard. This is a concrete proposed remedy for review, not a claim that
+the actual registry or whole suite passes. Required checks remain necessary if
+the lead authorizes and applies it. The document 17 Sources entry now accurately
+identifies the supplied saved evidence and the absence of a new apply-pass fetch.
+
+### S2-T21 part B — completed whole-command result
+
+`./eii test --seed 2718281901` completed with actual exit **1**. The runner's
+own summaries were:
+
+- python-guards: 938 passed, eight failed, zero skipped; the default uv-cache
+  environment/setup and launcher failures recorded above.
+- python-core: 749 passed, zero failed, zero skipped.
+- python-custodian-1: 4599 passed, one failed, zero skipped; the new audit of
+  tenders_pub and the two height rows with empty terms_url.
+- python-custodian-2: 3731 passed, three failed, zero skipped; the affected old
+  places/weather expectations, subsequently corrected with the separate
+  30-test green evidence above.
+- python-product: 786 passed, zero failed, zero skipped.
+- web-checks: counts unavailable. The unchanged 1800-second limit expired; the
+  runner killed the process group and reported FAIL timeout. The partial
+  browser passes are not a completed suite verdict, and no cause or exact
+  blocked test is inferred from the last displayed test. No timeout, web file,
+  assertion, baseline or gate was changed and no retry was performed.
+- web-unit: one passed, zero failed, zero skipped.
+
+The runner total was **10804 passed, 12 failed, zero skipped in seven suites,
+four with problems; RESULT: FAILED**. The unavailable web counts are not a
+completed aggregate and are not folded into a fabricated failed-test count.
+The initial whole run began before the affected Python expectations were
+corrected; their later focused green does not make this a final whole-project
+pass. The runner-level web timeout is appended to OPEN_ITEMS.md OI-319 as a
+separate occurrence for the lead, without claiming causal identity with its
+older readiness failure. A green rerun alone does not close it.
+
+Closing source checks after the affected test and document edits:
+`uv run --locked ruff check .` exited 0;
+`uv run --locked ruff format --check .` exited 0, 823 files already formatted;
+`uv run --locked mypy` exited 0, 443 source files;
+`python3 scripts/check_docs.py` exited 0, 1119 text files/119 Markdown files;
+`python3 scripts/check_tree.py` exited 0, eight rules;
+`git diff --check` exited 0; and
+`uv run --locked python .overnight/tmp/check_apply.py` exited 0 with all
+scope, per-key parity, history, guidance, marker and privacy checks passing.
+
+No branch or commit was possible because Git metadata is read-only. The actual
+registry keeps the three outside-map empty URL defects; their concrete,
+three-field patch is prepared but unapplied pending scope authorization. All
+227 mapped rows pass the unchanged guard; the proposed temporary full registry
+passes it for all 303 rows. Missing original evidence bodies remain explicitly
+unverified in this apply pass. Independent review, S2-T08/OI-211 proof, hosted
+checks and merge remain with their owners. The return report retains all counts,
+commands, real failures, pending reasons and proposed open items; no acceptance
+box is ticked.
+
+Final records-only checks after the completed run: `python3 scripts/check_docs.py`
+exited 0 (1119 text files/119 Markdown files); `python3 scripts/check_tree.py`
+exited 0 (eight rules); `git diff --check` and the scope/parity audit each exited
+0. `git rev-parse HEAD` exited 0 and confirmed the unchanged base hash above;
+`git status --short` exited 0 and reports only the nine intended working files.
+The return finalization helper initially exited 1 on an overbroad placeholder
+predicate matching legitimate pending-term wording. Its corrected, specific
+unfinished-command checks exited 0, preserving all pending source reasons and
+the required final marker. No source, test or evidence input was changed by
+that report-only correction. The report remains explicit that the task is
+partial and unapproved; all required check outcomes and blockers are retained.
+
+Lead application of the prepared three-field patch (appended, earlier rows
+unchanged): under lead ruling L-1159 the lead applied
+`.overnight/tmp/proposed-url-repairs.patch` (the `terms_url` of `tenders_pub`,
+the address already recorded for the same publisher in the registry, and of the
+two `bldg_3dglobfp` height files, each row's own recorded `landing_url`); no other
+field changed. `uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py
+custodian/tests/test_publicdata_registry.py custodian/tests/test_registry_survivors.py
+custodian/tests/test_places_fetch.py custodian/tests/test_weather_cache.py -q -p no:cacheprovider`
+exited 0, 148 passed. The whole test command is run again by the lead after the commits.
+
+## S2-T44 — Load-sensitive performance readiness: build pass 1
+
+- Date: 2026-11-19. Base commit: `98384ae5933dff2efb81721d087e74e6ce600011`;
+  branch `fix/S2-T44`; initial tracked working tree clean. No commit requested.
+- Builder: senior web test-infrastructure engineer (Playwright, headless Chromium,
+  MapLibre/deck.gl scenes and load-sensitive browser suites). Strict self-review:
+  rejects raised limits, retries, skipped or loosened assertions, and a green
+  re-run presented as a fix. Independent other-maker review remains with the lead.
+- Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+  strict-reviewer and muhasabah-gate. Systematic debugging, test-driven development
+  and verification-before-completion use the plain-meaning rules of the task brief;
+  those named superpowers skills are not installed in this session.
+- Plan: inspect the readiness path; measure both road loads without and with owned
+  CPU contention; name and test a cause; plant a regression before changing code;
+  run the required checks; leave PO-S2-118 closure to the lead.
+- Source of reported failure: `.overnight/IN/OCCURRENCE-1633.txt`, supplied by the
+  lead: full street load exhausted the 170000 ms readiness bound; shared road
+  setups ranged from 37055 to 85617 ms. These are supplied observations, not
+  measurements reproduced by this pass.
+- Snapshot gap: neither S2-T43 nor PO-S2-118 exists in this checkout's TASKS.md or
+  OPEN_ITEMS.md. S2-T44 is inserted after the last numbered task S2-T41 and before
+  S2-T10; the lead must place it after S2-T43 when joining the newer records.
+  OPEN_ITEMS.md remains unchanged; the return proposes a closure for review.
+- Environment probes: Node v22.22.3, npm 10.9.8; `nproc` reports 1, shell CPU
+  affinity is 8-11. Existing machine load was 52.69/40.79/35.39 at the first
+  probe and 66.13/47.46/38.26 at the next. “Normal” below means no added owned
+  load; this shared host is not otherwise idle. Scene seed is the existing 1;
+  counts, viewport, pixel ratio, plants, all timeouts and committed traces stay
+  fixed. Only loopback requests are used.
+- Inspection: buildPage builds once before Playwright launches. Readiness waits
+  for `done`/`failed` after generation, two map-idle waits, initial sample,
+  renderer display frame, smoke orbit, final sample and trace submission.
+  Each sample currently calls synchronous `readPixels` at all 256 interior grid
+  points. Measurements below test whether this is the bottleneck.
+
+S2-T44 baseline and planted regression evidence (all exits are actual):
+
+- Scratch phase probe: `TMPDIR="$PWD/.overnight/tmp" node
+  .overnight/tmp/measure.mjs`, from the root. The first attempt exited 1 during
+  instrumentation because Vite had already transformed the source. The probe was
+  corrected to use a pre-transform plugin; no application change was made for
+  that probe failure. Its subsequent baseline run exited 0, with two measured
+  full-wall scenes. Build 986.8 ms, server 4.4 ms, browser launch 42.5 ms.
+- The probe uses the existing Vite config, loopback static server and installed
+  headless browser. A temporary pre-transform inserts performance marks around
+  generation, both map-idle waits, both samples, orbit and posting. An init script
+  times the actual WebGL2 readPixels calls. It keeps the 170000 ms host readiness
+  race and full wall; all build/sink/browser temporary paths are under the
+  workspace temporary root. No committed source is instrumented.
+- Same command with `--load` exited 1: the full street scene reproduced
+  `spike readiness timed out` at 170015.2 ms, later completing at page clock
+  175613.4 ms. The shared first road scene completed. This run spawned exactly
+  four busy-loop Node children with `taskset -c 8-11`, then stopped all four by
+  their owned process IDs in finally. Build 964.3 ms, server 3.0 ms, browser
+  launch 55.5 ms. No pre-existing process was stopped.
+- Normal full street: generation 177.0 ms; first idle 52854.6 ms; second idle
+  31871.7 ms; initial sample 16485.6 ms; orbit 16938.4 ms; final sample 15916.7 ms
+  (orbit-end to post-start); post-start to done 16312.0 ms; host readiness
+  150386.6 ms; page creation 35.5 ms; navigation 300.3 ms.
+- Normal shared road scene: generation 154.2 ms; first idle 25932.1 ms; second
+  idle 17067.2 ms; initial sample 8723.8 ms; orbit 8897.5 ms; final sample
+  9463.5 ms; posting 5.9 ms; host readiness 70105.5 ms; page creation 22.8 ms;
+  navigation 266.4 ms. Both scenes had all configured layer counts.
+- Loaded full street: generation 360.6 ms; first idle 67412.6 ms; second idle
+  44052.2 ms; initial sample 21271.3 ms; orbit 20996.8 ms; final sample
+  21248.3 ms. Readiness expired before posting completed. Loaded shared road:
+  generation 351.5 ms; first idle 33714.6 ms; second idle 22538.8 ms; initial
+  sample 10672.1 ms; orbit 11025.6 ms; final sample 11049.9 ms; posting 8.8 ms;
+  host readiness 89058.9 ms. Navigation 589.2/543.3 ms and page creation
+  61.0/54.0 ms respectively.
+- The renderer identifies itself as ANGLE/Vulkan SwiftShader. Each scene made
+  512 readPixels calls, preserving the two 256-point samples. Under load, only
+  calls 1 and 257 exceeded 10 ms: full street 21260.4/21227.3 ms; shared road
+  10638.3/11016.8 ms. This rejects the initial suspicion of per-point overhead:
+  the first read waits for a rendered frame; the other reads are cheap.
+- Cause/hypothesis: mountScene submitted identical initial layers again after
+  the first idle and waited for a second idle. That forces redundant full-scene
+  rendering before readiness; it cost 31.9/44.1 seconds in the full street scene
+  without/with owned load. Test by keeping the initially submitted layer
+  instances and reading their initialized counts after the first idle. Playback
+  retains its real setProps updates. No sampler, motion, count or browser
+  assertion is changed.
+- Red: `node --test web/spikes/performance/tests/layers.node-test.mjs` exited 1,
+  11 tests: 10 passed, 1 failed, 0 skipped/cancelled/todo. The new regression
+  observed the old duplicate overlay update (actual 1, required 0). Green after
+  the fix: same command exited 0, 11 passed, 0 failed/skipped/cancelled/todo.
+  The existing error-listener assertion now expects one removal for the one
+  remaining idle wait; error rejection and listener cleanup tests remain.
+- Formatter preparation used a root-relative filename from web/ and exited 1
+  with FileNotFoundError; no file was changed by that preparation. The following
+  `npm run format` from web/ exited 0 and formatted only the changed layer test.
+  Inspection confirmed no unrelated tracked edits, including in evidence/.
+- Initial static checks: `npm run lint`, `npm run format:check` and `npm run
+  typecheck` from web/ each exited 0; no warnings, all matched files formatted,
+  and no type errors. `python3 scripts/check_docs.py` exited 0 (1118 text files,
+  119 Markdown files); `python3 scripts/check_tree.py` exited 0 (8 rules).
+  `cmp AGENTS.md CLAUDE.md` and `git diff --check` each returned no output in a
+  successful inspection shell; final separate invocations follow below.
+
+S2-T44 post-fix phase proof:
+
+- Scratch probe, same root command without `--load`: exit 0, both measured
+  scenes passed configured layer counts, road visibility, actual dash extension,
+  Simulated mark and legend/style assertions. Build 1432.7 ms, server 3.3 ms,
+  browser launch 39.2 ms. Full street readiness 123952.7 ms; shared road
+  readiness 53344.2 ms. Each retained both 256-point canvas samples.
+- Full street phases without added load: generation 195.8 ms; first idle
+  52161.0 ms; second idle absent; initial sample 16645.5 ms; orbit 16090.8 ms;
+  final sample 18169.5 ms; posting 20854.1 ms. Page creation 32.1 ms, navigation
+  316.0 ms. Shared road: generation 218.0 ms; first idle 26420.9 ms; second idle
+  absent; initial sample 8550.9 ms; orbit 8593.5 ms; final sample 9758.0 ms;
+  posting 6.7 ms. Page creation 23.8 ms, navigation 330.8 ms.
+- Same probe with `--load`: exit 0. All four owned busy loops ran for both
+  scenes and were stopped by PID after browser close. Build 647.5 ms, server
+  2.8 ms, browser launch 72.1 ms. Full street readiness 154371.4 ms; shared road
+  readiness 81021.1 ms. Both scenes passed all configured count, road, dash and
+  DOM assertions; the 170000 ms readiness limit was unchanged. This is a
+  reproduced failure followed by a causal change and controlled-load proof,
+  rather than an unmodified green re-run.
+- Full street loaded phases: generation 439.4 ms; first idle 82283.7 ms; second
+  idle absent; initial sample 24814.0 ms; orbit 23521.4 ms; final sample
+  23696.5 ms; posting 13.2 ms. Page creation 69.7 ms, navigation 696.9 ms.
+  Shared road: generation 349.8 ms; first idle 39607.3 ms; second idle absent;
+  initial sample 14302.9 ms; orbit 13242.0 ms; final sample 13795.5 ms; posting
+  15.4 ms. Page creation 50.9 ms, navigation 546.3 ms.
+- The shared machine remained busy (load average 56.14/54.98/49.19 during the
+  post-fix loaded probe). Necessary rendering still costs time and varies with
+  contention; these runs do not establish a guarantee under arbitrary CPU
+  starvation. The eliminated phase is identified directly in the marks.
+- Measurement clarification: the first normal probe accidentally nested its
+  second-sample mark in the first sample. Its final-sample interval above is
+  derived from orbit-end to post-start, which brackets that synchronous call.
+  Later probes fix that scratch instrumentation and mark both samples
+  independently. A parser of the stored marks gives 10672.0 ms for the baseline
+  loaded shared initial sample; the earlier 10672.1 ms used console stamps.
+  This sub-millisecond correction does not change the causal conclusion.
+- Road data is bundled from the recorded fixture at build time; the scene has
+  no remote tiles or glyph fetch. Generation is measured separately and was
+  under one second in each probe. The one page build, server start and browser
+  start occur outside readiness. No library API, package pin or lockfile
+  changes; existing layer/overlay APIs and the reference notes were reused.
+
+S2-T44 required complete performance run:
+
+- From web/: `TMPDIR="$PWD/../.overnight/tmp" npm run
+  test:spike:performance` exited 0. Node: 138 tests passed; 0 failed,
+  cancelled, skipped or todo. Browser: all 55 tests passed, including the
+  originally failing full-street case, each shared scene and every plant.
+- Node duration 1956668.2 ms; measured Playwright browser wall 1952447.6 ms.
+  This was without owned busy loops, on the already busy shared host. It is
+  NOT evidence of satisfying the separate 1800-second web-check gate: that
+  enclosing gate command was not run here and no limit was changed.
+- Shared setups in this complete run: uninterrupted English 84402.1 ms;
+  English pause 80328.2 ms; English reduced motion 103762.2 ms; Arabic playing
+  92539.0 ms; Arabic reduced motion 101957.3 ms. These real suite observations
+  are retained separately from the focused probe's timing results.
+- The loaded web-check proof is the root command `node
+  .overnight/tmp/run-loaded-checks.mjs`. That scratch wrapper starts the same
+  four busy-loop children through `taskset -c 8-11`, runs `npm run test:checks`
+  from web/ with the workspace temporary root, checks that none of its load
+  children exited before the command, records its actual command exit and wall
+  time, and stops only those owned children by PID in finally. Its result follows.
+
+S2-T44 loaded complete web-check verdict:
+
+- `node .overnight/tmp/run-loaded-checks.mjs` exited 0; its child `npm run
+  test:checks` from web/ exited 0. Node: 862 passed, 4 suites, 0 failed,
+  cancelled, skipped or todo. Nested performance browser suite: 55 passed,
+  including the original full-street case (reported duration 2.8 minutes).
+- Node duration 1487897.9 ms; wrapper command wall 1488098.9 ms; measured
+  performance browser wall 1415720.0 ms. The complete loaded web-check command
+  was below 1800 seconds in this run. All four pinned busy loops stayed alive
+  through the command and were then terminated by owned PID; the wrapper
+  waited for their exit and printed `LOAD stopped 4`.
+- Loaded shared setups: uninterrupted English 78406.6 ms; English pause
+  74042.6 ms; English reduced motion 43633.3 ms; Arabic playing 41499.9 ms;
+  Arabic reduced motion 57748.9 ms. The loaded complete run was faster than
+  the earlier no-owned-load run on this shared host; no claim is made that
+  added contention improved performance. The causal evidence is the removed
+  submission/idle phase and the planted regression, not a wall-time ratio.
+- Final code checks from web/: `npm run lint`, `npm run format:check`,
+  `npm run typecheck` each exited 0; no lint warnings, all matched files
+  formatted, no type errors. Separate `cmp AGENTS.md CLAUDE.md` and
+  `git diff --check` invocations each exited 0 with no output.
+- No time limit, assertion, planted browser case, layer count, pixel ratio,
+  viewport, retry, browser spec/config or committed evidence was changed.
+  No commit, staging, push, pull request or merge was performed. Other-maker
+  review, hosted CI, the lead's exact merged-result whole test and the
+  four-processor timing gate remain outside this builder pass. In particular,
+  the earlier 1956.7-second standalone performance run is retained as measured;
+  no two-run four-processor timing claim or OI-158 closure follows from this work.
+
+S2-T44 final record/report audit:
+
+- `python3 scripts/check_docs.py` after the report was written exited 0:
+  1118 text files, 119 Markdown files. `python3 scripts/check_tree.py`
+  exited 0: 8 rules.
+- The first inline scope/privacy audit exited 1: its scratch path detector
+  falsely matched the relative workspace temporary path as an absolute path.
+  Corrected the detector's prefix boundary, with planted absolute-path
+  refusals for each prefix and a relative-path allowance. No application
+  security guard or source rule was changed. `python3
+  .overnight/tmp/audit.py` then exited 0.
+- The audit proves exactly five authorized tracked files changed, HEAD is the
+  recorded base, no changes are staged, the prior PROGRESS bytes are a prefix,
+  TASKS contains only the one inserted entry, and the browser spec/config,
+  counts, package pins, OPEN_ITEMS, both agent-rule files and committed evidence
+  remain unchanged. It checks the return marker and private-path/email
+  absence, and redacts only the workspace prefix in owned scratch logs without
+  changing timings or verdicts. Native evidence is never rewritten.
+- Muhasabah: PASS for the bounded builder report. Every result is sourced to
+  actual output; the scratch instrumentation and audit corrections are
+  disclosed; assumptions about shared load are explicit; no independent
+  approval, native result, four-processor gate or merge is fabricated. The
+  return proposes PO-S2-118 closure for review and notes the absent task/item
+  records; neither OPEN_ITEMS.md nor an earlier evidence row is changed.
+
+## S2-T39B-BUILD1 — exact contract appendix; runtime stopped on open contract/scope points
+
+Date: 2026-11-19. Base commit: `98384ae5933dff2efb81721d087e74e6ce600011`.
+Builder persona: senior data engineer for public-source ingestion and release contracts.
+Strict self-review persona: provenance and data-contract reviewer; no independent-maker approval claimed.
+Skills applied: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. Test-driven development and verification-before-completion
+were followed in their plain meaning where unavailable: no runtime change was made without
+its required contract, and passing old tests are not claimed as new implementation proof.
+
+Authority: `.overnight/BRIEF.md`, reviewed plan r2 AC2 and build order, L-1043/L-1044,
+accepted decision 0029 Decision items 1–7 and appendix items 1–5, document 03 DAT-143,
+DAT-120/DAT-121 and section 7.3, S2-T39 and OI-178. Applied appendix items 1–5 exactly:
+section 7.2 gains the page-table catalogue row, section 7.3 gains the page-table columns
+and the exact record row, and DAT-143 gains the exact requirement/check replacements.
+The typed record column list remains unchanged. S2-T39's delivery line distinguishes
+this documentation under review from a runtime build that has not been completed;
+all four acceptance criteria remain unchecked. OPEN_ITEMS.md and the agent rule files
+were not changed. No commit, push, live input, fetch or mutation campaign was made.
+
+Stopped under the brief's explicit no-guess instruction. Decision 0029 names
+`investqa_page_text@1` and the separate page table but no replacement agency artifact/schema
+identifier for the brief's required schema bump. The current artifact is
+`pub_investqa_record.v1`; its cached page/block rows are not the typed release columns.
+Also, `assembly_native.py::read_investment`, called by
+`assembly_adapters.py::Production.reviewed_selections`, writes only the record table;
+both adapter files are outside the allowed change list. The return asks for the exact
+schema/artifact identity and the owning task or expanded scope for selected-release
+integration. Adding a cache field or registry declaration alone is not AC2 delivery.
+The extractor's exact element list is delegated by 0029 to part B's reviewed parser
+change, not treated as a new owner-level decision. No runtime implementation was begun.
+
+Environment: supplied `.venv`, Python 3.14.6, Linux x86_64; nothing sourced.
+For the uv commands below: `UV_OFFLINE=1`,
+`UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`, `TMPDIR="$PWD/.overnight/tmp"`.
+The full test command additionally sets `EII_DECISION_PROVIDER=none`.
+Seed: `3729156408`. No secret value or environment inventory was read or recorded.
+
+Commands and actual results before the integrated result:
+
+- Initial inline appendix-copy script, `python3 -`: exit 1, a pre-write assertion
+  detected code-block indentation; no file was written. Corrected dedenting version:
+  exit 0; appendix applied. This is not a runtime test red/green cycle.
+- `uv run --locked python -m pytest custodian/tests/test_investment_build.py custodian/tests/test_investment_agency.py custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider`:
+  exit 0; 80 passed in 3.15s. Existing parser/publication/bilingual acquisition regression
+  evidence only; no new quotation-release test or guard was added.
+- `uv run --locked ruff check .`: exit 0; all checks passed.
+- `uv run --locked ruff format --check .`: exit 0; 822 files already formatted.
+- `uv run --locked mypy`: exit 0; no issues in 443 source files.
+- `python3 scripts/check_docs.py`: exit 0; 1118 text files, 119 Markdown files checked.
+- `python3 scripts/check_tree.py`: exit 0; 8 rules checked.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; no output.
+- `git diff --check`: exit 0; no output.
+- Read-only exact-copy/scope audit, `uv run --locked python -`: exit 0. Three exact
+  appendix rows occur once, three DAT-143 replacements and two check clauses match,
+  four task boxes remain unchecked, the then-current tracked diff has exactly the
+  two documentation files, and AGENTS.md/CLAUDE.md bytes match. Reported interpreter
+  and platform are the values above.
+- `./eii test --seed 3729156408`: started; outcome pending in this append. Its actual
+  exit and counts will be appended without rewriting this row.
+
+There is no new runtime red/green evidence: no release schema, selected page-table output,
+round-trip test, new tamper plant, per-page scan contribution or older-selection proof
+was implemented. The return proposes retaining OI-178 open until that work and independent
+review pass; its proposed eventual closing line is conditional. No screen code changed.
+Strict self-review: REJECT for full AC2 completion. Muhasabah: PASS for the bounded evidence
+and explicit missing work. `.overnight/RETURN.md` carries the contract-to-decision mapping,
+questions, check record and proposed open-item text.
+
+
+S2-T39B-BUILD1 integrated run, interim evidence (same seed `3729156408`):
+`python-guards` reports 938 passed, 8 failed, 0 skipped; its pytest tail separately
+reports 1 failed, 939 passed, 7 errors in 316.26s. Both counts are retained; the
+count discrepancy is unresolved and no rerun was made. The failed test is
+`scripts/tests/test_commands.py::Commands::test_exit_codes_are_in_the_table`,
+subtest `command='test'`: a nested uv launcher cannot initialize the default
+cache because that location is read-only, so the expected usage-error prefix
+is absent. Seven class-setup errors in
+`scripts/tests/test_clean_environment.py::CleanEnvironment` all follow the missing
+default uv cache: `test_bare_environment_cannot_import`,
+`test_each_package_imports_from_clean_environment`,
+`test_hostile_surroundings_do_not_change_the_result`,
+`test_installed_names_equal_the_workspace_and_the_locked_declared_packages`,
+`test_lock_is_current`, `test_stale_lock_is_detected`, and
+`test_sync_all_packages_locked_keeps_lock`. The runner's Python-child allow-list
+omits the outer `UV_CACHE_DIR`; no outside cache was created or rule changed.
+The passing suites report: `python-core` 749, `python-custodian-1` 4587,
+`python-custodian-2` 3733, `python-product` 786; each reports 0 failed and 0 skipped.
+The web checks are still running; the command's exit and aggregate remain pending.
+
+Post-evidence checks already completed: `python3 scripts/check_docs.py` exit 0,
+1118 text files and 119 Markdown files; `python3 scripts/check_tree.py` exit 0,
+8 rules; `git diff --check` exit 0. A read-only scope audit,
+`uv run --locked python -`, exited 0 and confirmed the original PROGRESS.md
+bytes remain its prefix, only the three allowed tracked documentation files
+are changed, the return ends in the required marker, authored records hold no
+absolute private paths, HEAD is unchanged and the staging index is empty.
+
+
+S2-T39B-BUILD1 integrated run completion (same command and seed, no retry):
+`./eii test --seed 3729156408` exited 1. Runner total: 10794 passed, 8 failed,
+0 skipped in 7 suites, 2 with problems; RESULT: FAILED. The suite rows are
+`python-guards` 938 passed / 8 failed / 0 skipped; `python-core` 749 / 0 / 0;
+`python-custodian-1` 4587 / 0 / 0; `python-custodian-2` 3733 / 0 / 0;
+`python-product` 786 / 0 / 0; `web-checks` counts unavailable; `web-unit` 1 / 0 / 0.
+The guard failures and its separate pytest-tail count are retained in the preceding
+append. `web-checks` exceeded the unchanged 1800-second limit and the runner killed
+its process group. Its last visible browser result was
+`tests/performance.spec.ts:612:3`, `Arabic reduced-motion scene`,
+`roads mark and legend are visible ar reduced`; this identifies output context,
+not a failing test or root cause. No complete web-check count is claimed.
+The return proposes retaining the environment failures, guard count discrepancy
+and this timeout as unresolved follow-up, without a rule change or a green-rerun closure.
+
+The full check is not green and AC2 is not complete. `.overnight/RETURN.md` now
+contains the actual final exit, all reported suite counts, seed, named guard
+failures, timeout, exact document-contract mapping and the schema/scope questions.
+No runtime red/green or new release-table proof is claimed. No code, fixture,
+source registration, agent-rule file or earlier open-item/evidence row was changed.
+
+
+S2-T39B-BUILD1 final verification:
+Final post-completion verification: `python3 scripts/check_docs.py` exited 0
+(1118 text files, 119 Markdown files); `python3 scripts/check_tree.py` exited 0
+(8 rules); `cmp AGENTS.md CLAUDE.md` and `git diff --check` exited 0 with no output.
+The final read-only audit, `uv run --locked python -`, exited 0 and confirmed
+exact appendix application, all four unchecked task criteria, append-only ledger,
+a seed absent from the original ledger, the three-file tracked scope, unchanged
+HEAD/index, agent-rule byte parity, the actual full-run failure counts and the
+return marker. These checks do not turn the failed integrated run into a pass.
+
+
+S2-T39B-BUILD2 — bounded custodian implementation under L-1157, 2026-11-19.
+Maker/model: OpenAI / GPT-6 (Codex). Builder persona: senior data-contract
+engineer for deterministic extraction and public-source release provenance.
+Strict self-review persona: provenance reviewer rejecting any column or value
+not supported by decision 0029. Skills applied: project-orientation,
+task-standards, sanad-provenance, github-flow, strict-reviewer, muhasabah-gate;
+test-driven-development and verification-before-completion followed by their
+plain meaning where not installed. Self-review is not another maker's approval.
+HEAD remains `98384ae5933dff2efb81721d087e74e6ce600011`; no commit, staging,
+network call or real public-data-cache reading was performed by this build.
+The round-1 `.overnight/RETURN.md` was absent: its read exited 1. The supplied
+round-1 brief, r2 plan, L-1043/L-1044, L-1157 and existing round-1 ledger evidence
+were read; the three inherited documentation changes were retained.
+
+Source environment: clone `.venv`, activated only through its `bin/activate`;
+`UV_OFFLINE=1`, `TMPDIR=.overnight/tmp`, `UV_CACHE_DIR=.overnight/tmp/uv-cache`
+(the latter paths are resolved inside the workspace by the command shell).
+All focused pytest commands use `uv run --locked python -m pytest`, the
+repository's configuration, invented pages and repository temporary paths.
+The full command uses fresh seed `2948716035`, absent from earlier ledger rows.
+
+Red/green evidence (logs under `.overnight/tmp/`, not committed):
+- `custodian/tests/test_investment_build.py -k 'page_text or page_release or
+  page_rows_contribute' -q`: red exit 1, 21 failed / 31 deselected (missing new
+  interfaces); same command green exit 0, 21 passed / 31 deselected. These cover
+  bilingual text and deterministic byte equality, reordered elements, ASCII
+  eight/eleven-digit runs, Arabic-Indic and mixed-script runs built at runtime,
+  contact and synthetic/canary shapes, both hash comparisons, language/version,
+  altered text, duplicate/missing/extra-column rows and PRV-115 contributions.
+- `custodian/tests/test_assembly_native.py -k agency -q`: red exit 1,
+  7 failed / 11 deselected; first post-implementation run exit 1,
+  2 passed / 5 failed / 11 deselected because the tamper fixture updated
+  `nbytes` instead of the snapshot receipt's `bytes`. The receipt-fixture
+  correction retains the snapshot hash guard. Next run exit 0,
+  7 passed / 11 deselected. Cases bind the explicitly selected older bilingual
+  manifest, reject missing/version/text/duplicate/language plants and preserve
+  typed records when the quotation's contact scan refuses a page.
+- `custodian/tests/test_investment_build.py -k registry_declares_page -q`:
+  red exit 1, 1 failed / 62 deselected; green exit 0,
+  1 passed / 62 deselected after declaring the companion release table.
+- `custodian/tests/test_investment_build.py -k telephone_plain -q`:
+  red exit 1, 1 failed / 63 deselected; green exit 0,
+  1 passed / 63 deselected after retaining the contact scan for an unseparated
+  telephone-shaped token. No token value is copied into a refusal record.
+- Additional encoding, BOM/receipt/meta precedence, no-language, no-region,
+  truncation and invalid-sequence coverage was added after the extractor:
+  `custodian/tests/test_investment_build.py -k
+  'page_extractor_refuses_incomplete_source or page_encoding_bom or
+  page_receipt_charset' -q` exited 0, 10 passed / 52 deselected.
+  These ten cases have pass evidence only; no failing-first result is claimed.
+
+Broader regression evidence:
+- The four-file focused command (`test_investment_build.py`,
+  `test_assembly_native.py`, `test_investment_bilingual.py`,
+  `test_investment_agency.py`, all under `custodian/tests`, `-q`) first exited 1,
+  118 passed / 1 failed: `test_draw_over_investment_tables` still expected only
+  the old tables. After asserting the companion table and its empty numerical
+  draw, the command exited 0, 119 passed.
+- The expanded command (`custodian/tests/test_investment*.py`,
+  `test_assembly_native.py`, `test_production_adapters.py`,
+  `test_publicdata_registry.py`, `-q`) first exited 1, 697 passed / 1 failed:
+  `test_investment_build_survivors_2.py::test_agency_publishes_exact_counts_and_each_kind`
+  caught new keys in the old record document. The implementation was corrected
+  to keep that document unchanged and archive page rows/refusals separately,
+  referenced by the explicit manifest. No survivor test was edited. The same
+  expanded command then exited 0, 698 passed. A subsequent run includes the
+  new telephone plant; its final evidence follows below.
+
+Static checks so far: `uv run --locked ruff check .` first exited 1 with two
+unused fixture bindings, then exited 0 after correction; `ruff format .`
+exited 0 (8 reformatted / 814 unchanged), then exited 0 again (formatting the
+separate-page archive correction; see its log). `ruff format --check .`
+exited 0, 822 files formatted. `uv run --locked mypy` initially exited 0,
+443 source files; after the separate archive change it exited 1 with two
+new type errors (Mapping-to-dict list conversion and reuse of a snapshot-typed
+local). Explicit dictionary conversion and a separate checked-pages variable
+fixed both; the next run exited 0, 443 source files. No type suppression was added.
+`python3 scripts/check_docs.py` exited 0, 1118 text / 119 Markdown files;
+`python3 scripts/check_tree.py` exited 0, 8 rules; `cmp AGENTS.md CLAUDE.md`
+and `git diff --check` exited 0. Final post-record checks follow separately.
+
+Contract and limits: decision 0029 appendix items 1–5 remain applied to document
+03; item 2's extractor element lists and whitespace rule are recorded there.
+The exact column is `extractor`, holding `investqa_page_text@1`; L-1157 and the
+round-2 brief call its version `extractor_version`, but no extra column or
+record-schema bump was invented. `sequence` is null because snapshot inventory
+order is not evidence of the site's own page-list order. Declared alternate
+English links establish a paired key; no language counterpart is guessed.
+PRV-115 row contributions are emitted with canonical key selectors,
+`not_applicable` and `source_only`; this is not the complete signed release
+inventory. Loading, complete release signing/scans and all screen-side item 6
+checks remain with their owning tasks. AC2 is unchecked and no independent
+review approval is claimed. The whole test is running once with its recorded
+seed; no limit, assertion, baseline or failure has been suppressed.
+
+
+S2-T39B-BUILD2 final-code checks and integrated-run qualification:
+The expanded focused command completed with exit 0, 699 passed in 33.90s,
+including the unseparated-telephone plant. The final-code `ruff check .` and
+`ruff format --check .` each exited 0 (822 formatted files); `mypy` exited 0,
+443 source files. Post-record docs/tree checks exited 0 (1118 text files,
+119 Markdown files; 8 tree rules), as did agent byte parity and diff whitespace.
+The separate archive formatter run reported 3 files reformatted, 819 unchanged.
+The read-only scope/HEAD/index/task-box/return-marker audit exited 0.
+Arabic-RTL was also read for source-script preservation; decision 0029's
+verbatim requirement takes precedence over locale digit conversion.
+
+The whole run was started before the archive correction was fully finalized.
+Its guard suite copied intermediate files and reported four additional failures
+from the two type errors later fixed; the running suite is not evidence of an
+unchanged final tree. This sequencing mistake is retained explicitly. Reported
+`python-guards` row: 934 passed, 12 failed, 0 skipped; its pytest tail instead
+reports 935 passed, 5 failed and 7 errors in 311.64s. The runner/pytest count
+difference remains unresolved. Four code-check failures are
+`scripts/tests/test_pychecks_config.py::PychecksConfig::test_clean_copy_passes`,
+`test_real_repository_passes`, and
+`scripts/tests/test_pychecks_mypy.py::PychecksMypy::test_evals_copy_and_planted_type_error`,
+`test_mypy_python_version_is_read`; all identify the same two intermediate
+type errors. The command-table subtest `command='test'` and seven
+`CleanEnvironment` setup errors again identify the unavailable default uv cache:
+the child environment excludes the outer `UV_CACHE_DIR`. No cache outside the
+workspace, rule change, retry of the whole command or limit change was made.
+`python-core` reports 749 passed, 0 failed, 0 skipped. Other suite results remain
+pending. A targeted final-code run of the two pychecks guard files was started
+because the implementation changed; it does not erase the whole-run failures.
+
+
+S2-T39B-BUILD2 targeted final-code guard result:
+`uv run --locked python -m pytest scripts/tests/test_pychecks_config.py
+scripts/tests/test_pychecks_mypy.py -q` exited 0, 11 passed in 43.03s.
+This run follows the two recorded type fixes, uses the prescribed local offline
+environment, and does not replace the failed whole-run guard row.
+
+
+S2-T39B-BUILD2 integrated run, continued (seed `2948716035`):
+`python-custodian-1` reports 4594 passed / 0 failed / 0 skipped;
+`python-custodian-2` reports 3766 / 0 / 0; `python-product` reports 786 / 0 / 0.
+The web counting reporter is incomplete (no end marker) and currently contains
+820 pass records and 1 fail record, `real shell starts` in
+`web/scripts/tests/check-dev-server.node-test.mjs`. These are partial counts,
+not a completed suite verdict. No web code or timeout was changed, no cause is
+asserted and no rerun was used to close this failure. Whole-command completion
+and web-unit results remain pending.
+
+
+S2-T39B-BUILD2 whole-run completion (same command, no whole-run retry):
+`./eii test --seed 2948716035` exited 1; RESULT: FAILED.
+Runner total: 11690 passed, 13 failed, 0 skipped in 7 suites, 2 with problems.
+Suite rows (passed / failed / skipped): python-guards 934 / 12 / 0;
+python-core 749 / 0 / 0; python-custodian-1 4594 / 0 / 0;
+python-custodian-2 3766 / 0 / 0; python-product 786 / 0 / 0;
+web-checks 860 / 1 / 0; web-unit 1 / 0 / 0. The guard suite's separate pytest
+tail (935 passed, 5 failed, 7 errors in 311.64s), its count discrepancy, the
+intermediate-code type failures and nested default-cache failures remain as
+recorded above. The passing final-code guard run does not erase them.
+
+Separate web record: the suite completed 861 tests, 860 passed and 1 failed,
+0 cancelled/skipped/todo, in 650451.387202 ms. `real shell starts` in
+`web/scripts/tests/check-dev-server.node-test.mjs` reports
+`FAIL internal-error: TIMEOUT: timed out`, actual exit 1 versus expected 0,
+and duration 1820.88734 ms. This is an internal test timeout, not a suite timeout:
+web-checks completed within the unchanged 1800-second suite limit. The partial
+820-pass/one-fail reporter observation above was incomplete; the complete
+860/1/0 result supersedes it. No web edit, limit change or cause beyond the
+reported failure is claimed. Keep it unresolved for the lead; no green rerun
+alone closes it.
+
+No exact-final-tree whole-run proof is claimed: the run began before the two
+recorded type fixes. Final-code evidence is the 699 focused tests, 11 pychecks
+guard tests, mypy and static/docs/tree checks. TASKS.md retains unchecked AC2
+and names the failed run. `.overnight/RETURN.md` records the complete contract
+mapping, column-name discrepancy, all red/green and pass-only cases, failures,
+proposed OI-178 wording and owning-task handoffs. Strict self-review: REJECT
+for full AC2/merge-ready completion; independent review is not impersonated.
+Muhasabah: PASS for the bounded, explicit and sourced handoff.
+
+
+S2-T39B-BUILD2 final handoff verification:
+`python3 scripts/check_docs.py` exited 0 (1118 text / 119 Markdown files);
+`python3 scripts/check_tree.py` exited 0 (8 rules); `cmp AGENTS.md CLAUDE.md`
+and `git diff --check` exited 0. The read-only `python3 -` audit exited 0,
+proving append-only ledger bytes against HEAD, exact decision-0029 appendix
+rows retained, seed absent before this round, allowed tracked scope, unchanged
+HEAD and empty staging index, agent parity, final full-run failure/exit evidence,
+no private path or contact token in the return, and its required last-line marker.
+Diagnostic log locations were replaced by neutral placeholders within the
+workspace; test identities, recorded exits and counts remain unchanged.
+No implementation file changed after the passing final-code guard run.
+
+## S2-T21 — Fix: the class source's pack-cell test follows the recorded terms (lead, 2026-11-19)
+
+The lead's whole test of the approved S2-T21 part B head `86f7ed1db4edb1b6c95a52ef2bdccebca1602fc8` (`./eii test --seed 2099362825`, cores 8 to 11) exited 1: 11676 passed, 1 failed, `custodian/tests/test_activity_real_shape.py::test_pack_cell_names_the_confirmed_isic_address`. That older guard of the confirmed ISIC address also asserted that the terms cell of the `cls_isic4` row in document 04 section 2 still held the placeholder "UN terms of use; exact publisher wording and date read to be recorded"; S2-T21 part B replaced that placeholder with the publisher's recorded wording, as its criteria require. The failure is deterministic (the same file alone: 1 failed, 21 passed) and is carried by the train head of S2-7, which joins that commit.
+
+Fix: the test keeps both address assertions and now asserts that the placeholder is gone and that the cell holds the recorded reading (the quoted "personal, non-commercial use" wording, the read date and the basis `owner_decision`). No document, registry or production line changes.
+
+- red first: the unchanged test on the joined S2-7 head, whose `cls_isic4` structure cell is byte-identical to the approved S2-T21 part B head's: 1 failed, 21 passed.
+- green: `uv run --locked python -m pytest custodian/tests/test_activity_real_shape.py -q -p no:cacheprovider`: exit 0, 22 passed.
+- planted violation: with the placeholder written back into that cell, the fixed test fails (1 failed, 21 passed); the document restored, 22 passed and the tree shows only the test change.
+- `uv run --locked ruff check` and `ruff format --check` on the file: exit 0.
+- Builder: the lead (Anthropic, Claude Opus 5.5); reviewer: another maker, named in the ledger of the pull request of train S2-7.

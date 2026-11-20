@@ -177,7 +177,8 @@ def test_weather_registry_entry():
     assert row.point == (25.2854, 51.531)
     assert row.variables == ("temperature_2m",)
     assert row.cache_role == "generator_input"
-    assert row.terms_url == ""
+    assert row.terms_url == "https://open-meteo.com/en/terms"
+    assert row.terms_read_on == "2026-11-19"
     assert row.period_first == "2024-01-01T00:00"
     assert row.period_last == "2025-12-31T23:00"
     assert row.licence_url == "https://open-meteo.com/en/licence"

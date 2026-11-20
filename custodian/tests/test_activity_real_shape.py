@@ -548,7 +548,8 @@ def _pack_document() -> Path:
 
 
 def test_pack_cell_names_the_confirmed_isic_address() -> None:
-    """Only the class source's address cell changes; its terms cell stays."""
+    """The class source's address cell names the confirmed address; its terms cell
+    holds the publisher's wording recorded by S2-T21, not the earlier placeholder."""
     text = _pack_document().read_text(encoding="utf-8")
     line = next(
         item
@@ -557,9 +558,9 @@ def test_pack_cell_names_the_confirmed_isic_address() -> None:
     )
     assert ISIC_URL in line
     assert "direct machine-readable URL to be confirmed" not in line
-    assert (
-        "UN terms of use; exact publisher wording and date read to be recorded" in line
-    )
+    assert "exact publisher wording and date read to be recorded" not in line
+    assert "personal, non-commercial use" in line
+    assert "read 2026-11-19; basis `owner_decision`" in line
 
 
 def test_committed_review_signs_every_claimed_status() -> None:

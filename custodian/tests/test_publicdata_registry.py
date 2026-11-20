@@ -405,8 +405,9 @@ def test_investment_sources_record_the_owner_decision_and_watch_terms() -> None:
         assert entry.licence_basis == "owner_decision"
         assert entry.decision_record == "0026"
         assert entry.terms_words.strip()
-        assert entry.terms_read_on == "2026-11-14"
-    assert by_id["investqa_pages"].terms_words == _MARKER
+        expected_date = "2026-11-19" if source_id == "investqa_pages" else "2026-11-14"
+        assert entry.terms_read_on == expected_date
+    assert by_id["investqa_pages"].terms_words != _MARKER
     assert by_id["fdi_projects"].terms_words != _MARKER
 
 
@@ -974,7 +975,8 @@ def test_registry_counts_follow_decision_0026() -> None:
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
-    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1  # S2-T29 and S2-T36.
+    # S2-T21 part B records the two benchmark families' read portal terms.
+    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2
     assert {
         entry.key
         for entry in entries
@@ -993,7 +995,8 @@ def terms_words_absent_from_pack(
     return tuple(
         entry.source_id
         for entry in entries
-        if entry.terms_words != _MARKER and entry.terms_words not in pack
+        if entry.terms_words != _MARKER
+        and " ".join(entry.terms_words.split()) not in " ".join(pack.split())
     )
 
 
@@ -1014,6 +1017,16 @@ def test_terms_words_absent_from_document_04_fail_the_guard(tmp_path: Path) -> N
     entries = load_registry(_mutated(tmp_path, "words.yaml", planted))
     pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text(encoding="utf-8")
     assert "roads_osm" in terms_words_absent_from_pack(entries, pack)
+
+
+def test_terms_words_parity_normalises_whitespace_only() -> None:
+    """L-1153 item 1 permits whitespace runs, preserving words and punctuation."""
+    from dataclasses import replace
+
+    entry = replace(load_registry()[0], terms_words="Invented\nlicence\u00a0 words.")
+    assert terms_words_absent_from_pack((entry,), "Invented licence  words.") == ()
+    for changed in ("invented licence words.", "Invented licence words!"):
+        assert terms_words_absent_from_pack((entry,), changed) == (entry.source_id,)
 
 
 _BUSY_ID = "busy_besttime"
