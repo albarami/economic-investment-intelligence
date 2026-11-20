@@ -21,7 +21,7 @@ from .fetch.bounded import file_hash
 from .fetch.registry import Entry, read_yaml
 from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
 from .fetch.transport import Transport
-from .frame.build import FrameResult, build_frame, read_cached
+from .frame.build import FrameResult, build_public_frame, read_cached
 from .trade_reconciliation import Selection
 
 
@@ -334,28 +334,51 @@ class Production:
         )
 
     def frame(self) -> dict[str, str]:
+        from .building_inputs import (
+            BUILDING_MANIFEST_RELATIVE,
+            BuildingError,
+            invalidate_buildings,
+            verify_building_manifest,
+        )
         from .frame.municipality_output import (
             MUNICIPALITY_OUTPUT,
             write_municipality_output,
         )
+        from .heights.model import BUILDINGS_RELATIVE
         from .places.integrate import areas_before_stage
 
+        invalidate_buildings(self.cache)
         areas_before_stage(self.cache, self.lines, self.review)
-        result = build_frame(
-            self.cache,
-            self.entries,
-            self.review,
-            selections=self.selected,
-            build_date=datetime.fromisoformat(
-                self.stamp or self.clock().replace("Z", "+00:00")
-            ).date(),
-        )
+        try:
+            result = build_public_frame(
+                self.cache,
+                self.entries,
+                self.review,
+                selections=self.selected,
+                build_date=datetime.fromisoformat(
+                    self.stamp or self.clock().replace("Z", "+00:00")
+                ).date(),
+            )
+        except BuildingError as exc:
+            self.lines.append(f"FAIL buildings check={exc.name}")
+            if exc.name == "building_frame_absent":
+                raise AssemblyError("assembly_frame_incomplete") from None
+            raise
         if any(
             not result.tables.get(name)
             for name in ("municipality", "zone", "district", "grid_cell")
         ):
             raise AssemblyError("assembly_frame_incomplete")
         self.frame_result = result
+        building = local(self.cache.parent, BUILDINGS_RELATIVE)
+        if not building.is_file():
+            raise AssemblyError("assembly_buildings_incomplete")
+        verify_building_manifest(self.cache, self.entries, self.selected, building)
+        building_paths = {
+            name: file_hash(local(self.cache.parent, name))
+            for name in (BUILDINGS_RELATIVE, BUILDING_MANIFEST_RELATIVE)
+        }
+        self.data_files.update(building_paths)
         write_municipality_output(
             self.cache, result.tables["municipality"], result.sources
         )
@@ -424,6 +447,7 @@ class Production:
                 "sources": result.sources,
                 "report": result.report,
                 "files": paths,
+                "data_files": building_paths,
             },
         )
 
@@ -690,6 +714,7 @@ class Production:
         return output
 
     def heights(self) -> dict[str, str]:
+        from .building_inputs import BUILDING_MANIFEST_RELATIVE
         from .heights.model import (
             BUILDINGS_RELATIVE,
             HEIGHTS_FILE,
@@ -712,6 +737,7 @@ class Production:
             output,
             self.lines,
             terms_attempts=tuple(self.fetched.terms_attempts) if self.fetched else (),
+            selections=self.selected,
         )
         if not all((output / name).is_file() for name in (HEIGHTS_FILE, MANIFEST_FILE)):
             raise AssemblyError("assembly_heights_incomplete")
@@ -721,7 +747,15 @@ class Production:
         self.data_files.update(
             {HEIGHTS_RELATIVE + "/" + name: digest for name, digest in paths.items()}
         )
-        return self.record("heights", {"state": "built", "files": paths})
+        building_paths = {
+            name: file_hash(local(self.cache.parent, name))
+            for name in (BUILDINGS_RELATIVE, BUILDING_MANIFEST_RELATIVE)
+        }
+        self.data_files.update(building_paths)
+        return self.record(
+            "heights",
+            {"state": "built", "files": paths, "building_files": building_paths},
+        )
 
     def trade_reconciliation(self) -> dict[str, str]:
         from .trade_reconciliation import build_reconciliation, load_selection

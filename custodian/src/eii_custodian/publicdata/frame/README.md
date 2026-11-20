@@ -5,6 +5,27 @@ without network access. Its result contains tables, receipts with method
 `frame.v1`, inventories and named limitations. It is a partial frame build, not
 a completed release. Fixtures contain invented values only.
 
+Both public-build paths use `build_public_frame`, the required composition of
+`build_frame` and the canonical building producer of S2-T20 (proposed decision
+0077). It passes the same explicit selection mapping to both dependencies,
+uses all returned municipality geometries and has no inventory-skip argument.
+The frame-only geometry API above remains independent. Callers invalidate old
+building artifacts before the attempt; inventory errors retain their own
+`FAIL buildings` name. Heights then verifies the table's completion manifest
+against the same pins before reading it. National live coverage is unconfirmed.
+
+For nonzero in-box-outside-boundary counts the manifest defaults to
+`pending_lead_review`. The lead may write the closed local record
+`cache/review/building_boundary.json`: exactly `version` (integer one),
+`source_chain_sha256` (SHA-256 of the building manifest's canonical
+`source_chain`, using `building_inputs.dump`), `inside_box_outside_boundary`
+(the producer's exact integer count), and `outcome` (`reviewed_no_land` or
+`boundary_amendment_required`). A stale or malformed record refuses
+`building_boundary_review`; an accepted outcome carries its relative path and
+hash into the manifest. The second outcome requires a lead open item and a
+boundary amendment; it never edits geometry. This review does not replace the
+computed STAC and frame-box guards or determine their completeness flag.
+
 The lead's structure-only note for ruling L-202, read on 2026-11-14, supplies the
 raw schemas and join rules. `raw.py` reads the three named administrative
 GeoJSON members inside the licensed `bnd_hdx` ZIP without extracting files.

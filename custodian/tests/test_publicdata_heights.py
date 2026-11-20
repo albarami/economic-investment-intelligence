@@ -78,6 +78,44 @@ PACKAGE = Path(heights_package.__file__).resolve().parent
 CALC = Path(floor_height.__code__.co_filename).resolve()
 
 
+def fixture_heights(cache, entries, path, *args, **kwargs):
+    """Supply invented inventory lineage to isolated hierarchy/reader plants."""
+    from custodian.tests.building_fixture import bind_height_table
+
+    entries = bind_height_table(cache, entries, path)
+    return build_heights(cache, entries, path, *args, **kwargs)
+
+
+def fixture_fetch_and_heights(entries, transport, cache, clock, sleep, **kwargs):
+    """Exercise acquisition and the real height adapter with invented inventory.
+
+    Full frame/inventory workflow integration is tested separately. These
+    fixtures hold equatorial C47 examples, not a national frame or live table.
+    """
+    from custodian.tests.building_fixture import bind_height_table
+
+    from eii_custodian.publicdata.fetch.build import _heights
+
+    fetched = run_build(
+        entries, transport, cache, clock, sleep, _fetch_only=True, **kwargs
+    )
+    if fetched.failure is not None:
+        return fetched
+    path = cache.parent / "assets/buildings/buildings.geojson"
+    bound_entries = bind_height_table(cache, entries, path)
+    lines = list(fetched.lines)
+    failure = _heights(cache, bound_entries, lines, list(fetched.terms_attempts))
+    return replace(fetched, lines=tuple(lines), failure=failure)
+
+
+def test_landmark_binding_absent_on_refresh_refuses() -> None:
+    rows = load_landmark_heights(LANDMARK_FIXTURE_PATH)
+    with pytest.raises(HeightError) as error:
+        apply_landmark_heights([], rows)
+    assert error.value.name == "landmark_building_absent"
+    assert error.value.detail == rows[0].landmark_id
+
+
 def _clock() -> str:
     return "2026-11-14T00:00:00Z"
 
@@ -108,7 +146,7 @@ def _card_setup(tmp_path):
     path.write_bytes(buildings)
     out_dir = tmp_path / "data" / "assets" / "heights"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, wsf_row),
         path,
@@ -235,7 +273,7 @@ def test_the_real_doc04_credit_is_the_real_manifest_credit(tmp_path: Path) -> No
         )
     )
     out_dir = tmp_path / "out"
-    build_heights(cache, (globfp_row,), buildings, out_dir, [], RULES_PATH)
+    fixture_heights(cache, (globfp_row,), buildings, out_dir, [], RULES_PATH)
     credit = _manifest(out_dir)["credits"]["bldg_3dglobfp"]["credit"]
     assert credit == template.replace("{date}", "2026-11-14")
 
@@ -271,7 +309,7 @@ def test_an_absent_building_table_refuses_the_heights_step(
     """Decision 0064 item 25: a missing building table refuses the heights step."""
     lines: list[str] = []
     with pytest.raises(HeightError, match="building_table_absent"):
-        build_heights(
+        fixture_heights(
             tmp_path / "cache",
             (),
             tmp_path / "data" / "assets" / "buildings" / "buildings.geojson",
@@ -300,7 +338,7 @@ def test_the_committed_rules_read_both_sources_not_fetched(
         )
     )
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         tmp_path / "cache",
         (),
         buildings_path,
@@ -332,7 +370,7 @@ def test_the_floor_count_product_reads_the_committed_constant(
     )
     out_dir = tmp_path / "out"
     lines: list[str] = []
-    build_heights(tmp_path / "cache", (), buildings_path, out_dir, lines, RULES_PATH)
+    fixture_heights(tmp_path / "cache", (), buildings_path, out_dir, lines, RULES_PATH)
     row = _rows(out_dir)[0]
     expected = floor_height(Decimal(5), rules.storey_height)
     assert rules.storey_height == Decimal("3.0")
@@ -822,7 +860,7 @@ def test_non_commercial_terms_never_block_the_source(
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(wsf))
     _ensure_building_table(cache)
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / "bldg_wsf3d").glob("*.meta.json"))
     receipt = json.loads(receipt_path.read_text())
@@ -836,7 +874,7 @@ def test_non_commercial_terms_never_block_the_source(
         )
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings_path,
@@ -877,7 +915,7 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
 
     cache = tmp_path / "data" / "public_cache"
     _ensure_building_table(cache)
-    outcome = run_build(tuple(rows), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights(tuple(rows), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert seen == [entry.url for entry in rows]
     assert any("PASS heights" in line for line in outcome.lines)
@@ -926,7 +964,7 @@ def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
     )
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(globfp))
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
     receipt_text = receipt_path.read_text()
@@ -965,7 +1003,7 @@ def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
         assert url == refused.url
         return Response(final_url=signed_final, body=b"not json, invented", hops=())
 
-    refused_outcome = run_build(
+    refused_outcome = fixture_fetch_and_heights(
         (refused,), refused_transport, tmp_path / "second" / "cache", _clock, _sleep
     )
     assert refused_outcome.failure is not None
@@ -1070,7 +1108,7 @@ def test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns(
     )
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(globfp))
-    outcome = run_build((row,), no_transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), no_transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
     receipt_text = receipt_path.read_text()
@@ -1108,7 +1146,9 @@ def test_an_off_list_host_is_refused_before_the_transport(
         seen.append(url)
         return Response(final_url=url, body=b"planted", hops=())
 
-    outcome = run_build((row,), transport, tmp_path / "cache", _clock, _sleep)
+    outcome = fixture_fetch_and_heights(
+        (row,), transport, tmp_path / "cache", _clock, _sleep
+    )
     assert seen == []
     assert outcome.failure is not None
     assert outcome.failure.check == "blocked_host"
@@ -1121,7 +1161,7 @@ def test_run_build_refuses_heights_on_an_absent_table(tmp_path: Path) -> None:
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "building_table_absent"
     assert outcome.lines.count("SKIP heights building_table_absent") == 0
@@ -1169,7 +1209,7 @@ def test_an_fe50_table_fails_the_build_and_writes_no_heights(
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert any("FAIL heights" in line for line in outcome.lines)
     assert not (tmp_path / "data" / "assets" / "heights").exists()
@@ -1188,7 +1228,7 @@ def test_a_written_row_reads_back_as_the_same_decimal(tmp_path: Path) -> None:
         )
     )
     out_dir = tmp_path / "out"
-    build_heights(tmp_path / "cache", (), buildings_path, out_dir, [], RULES_PATH)
+    fixture_heights(tmp_path / "cache", (), buildings_path, out_dir, [], RULES_PATH)
     row = _rows(out_dir)[0]
     assert row["height_m"] == "30.13"
     assert Decimal(row["height_m"]) == metres(Decimal("30.127"))
@@ -1218,7 +1258,7 @@ def test_a_long_expansion_statistic_is_written_at_the_stated_decimals(
     cache = tmp_path / "data" / "public_cache"
     invented.store(cache, globfp_row, globfp)
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row,),
         buildings_path,
@@ -1260,7 +1300,7 @@ def test_a_non_positive_wsf_cell_is_counted_and_never_a_crash(
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (wsf_row,),
         buildings,
@@ -1411,7 +1451,7 @@ def test_a_floor_product_too_large_for_the_context_is_refused(
         )
     )
     with pytest.raises(HeightError) as err:
-        build_heights(tmp_path / "cache", (), path, tmp_path / "out", [], rules)
+        fixture_heights(tmp_path / "cache", (), path, tmp_path / "out", [], rules)
     assert err.value.name == "bad_floor_count"
 
 
@@ -1448,7 +1488,7 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
     def transport(url: str) -> Response:
         return Response(final_url=url, body=b"this is not a raster, invented", hops=())
 
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "structure_mismatch"
     assert any("FAIL heights" in line for line in outcome.lines)
@@ -1489,7 +1529,7 @@ def test_an_exception_the_step_does_not_own_still_propagates(
         "eii_custodian.publicdata.heights.step.load_buildings", stand_in
     )
     with pytest.raises(KeyError):
-        build_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
+        fixture_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
 
 
 def test_a_programming_error_inside_the_shape_reader_propagates(
@@ -1552,7 +1592,7 @@ def test_every_registry_row_of_a_source_is_named_in_the_manifest(
         )
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, missing),
         buildings,
@@ -1578,7 +1618,7 @@ def test_a_missing_table_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -
     assert (out_dir / "manifest.heights.json").is_file()
     lines: list[str] = []
     with pytest.raises(HeightError, match="building_table_absent"):
-        build_heights(
+        fixture_heights(
             tmp_path / "cache",
             (),
             tmp_path / "absent.geojson",
@@ -1607,7 +1647,7 @@ def test_a_refusal_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None
         )
     )
     with pytest.raises(HeightError):
-        build_heights(tmp_path / "cache", (), buildings, out_dir, [])
+        fixture_heights(tmp_path / "cache", (), buildings, out_dir, [])
     assert not (out_dir / "heights.json").exists()
     assert not (out_dir / "manifest.heights.json").exists()
 
@@ -1640,9 +1680,12 @@ def test_the_manifest_names_the_tables_source_chain_not_a_licence(
     """V8: the table record points at the asset pipeline's manifest entry."""
     out_dir, _ = _card_setup(tmp_path)
     record = {f["key"]: f for f in _manifest(out_dir)["files"]}["building_table"]
-    assert record["source_chain"] == (
-        "the asset pipeline's own manifest entry of the same key and sha256"
-    )
+    assert record["source_chain"] == {
+        "path": "assets/buildings/manifest.buildings.json",
+        "sha256": sha256_hex(
+            (out_dir.parent / "buildings/manifest.buildings.json").read_bytes()
+        ),
+    }
     for field in ("licence_id", "licence_basis", "url", "terms_words"):
         assert field not in record
 
@@ -2562,7 +2605,7 @@ def test_tied_footprints_with_two_heights_count_one(tmp_path: Path) -> None:
     same = invented.square(0.05, 0.05, 0.6)
     invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "9.5")]))
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings,
@@ -2590,7 +2633,7 @@ def test_tied_footprints_with_the_same_height_count_none(tmp_path: Path) -> None
     same = invented.square(0.05, 0.05, 0.6)
     invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "7.5")]))
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings,
@@ -2789,7 +2832,7 @@ def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
     )
     out_dir = tmp_path / "out"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, wsf_row),
         buildings_path,
@@ -2897,7 +2940,7 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     )
     out_dir = tmp_path / "out"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, wsf_row, gba_row),
         buildings_path,
@@ -2951,7 +2994,7 @@ def test_a_planted_skip_on_gba_still_runs_the_heights_step(
     )
     out_dir = tmp_path / "out"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, wsf_row, gba_row),
         buildings_path,
@@ -3050,7 +3093,7 @@ def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
     )
     out_dir = tmp_path / "out"
     _refused(
-        lambda: build_heights(
+        lambda: fixture_heights(
             cache,
             (globfp_row,),
             buildings_path,
@@ -3080,7 +3123,7 @@ def test_a_planted_omitted_heights_step_refuses_the_build(
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "heights_output_absent"
 
@@ -3104,7 +3147,7 @@ def test_a_planted_omitted_heights_step_refuses_when_outputs_already_exist(
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "heights_output_absent"
     assert not (out_dir / "heights.json").exists()
@@ -3773,7 +3816,7 @@ def test_an_invalid_landmark_height_refuses_the_build_and_leaves_no_output(
     cache = tmp_path / "card" / "data" / "public_cache"
     lines: list[str] = []
     _refused(
-        lambda: build_heights(
+        lambda: fixture_heights(
             cache,
             (
                 invented.entry("bldg_3dglobfp", extension="zip"),

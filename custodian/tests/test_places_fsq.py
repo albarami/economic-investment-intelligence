@@ -184,7 +184,8 @@ def test_build_fetches_only_the_qatar_file_and_no_foreign_host(tmp_path: Path) -
         )
     finally:
         del os.environ["PLACES_FSQ_TOKEN"]
-    assert outcome.failure is None
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
     assert seen == [
         entry.url,
         f"{COPY_ROOT}{_RELEASE}/places/_metadata",
@@ -240,7 +241,8 @@ def test_a_licence_different_from_the_registry_is_recorded_pending(
         outcome = run_build((entry,), transport, tmp_path / "licence", _clock, _sleep)
     finally:
         del os.environ["PLACES_FSQ_TOKEN"]
-    assert outcome.failure is None
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
     manifest = json.loads(
         (tmp_path / "licence" / RELEASE_KEY / _RELEASE / "manifest.json").read_text(
             encoding="utf-8"
@@ -273,7 +275,8 @@ def test_missing_terms_do_not_stop_the_fetch_and_missing_basis_is_pending(
         return Response(final_url=url, body=data.read_bytes(), hops=())
 
     outcome = run_build((bare,), transport, tmp_path / "cache", _clock, _sleep)
-    assert outcome.failure is None
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
     assert entry.terms_url not in seen
     text = (_PACKAGE / "publicdata" / "sources.yaml").read_text(encoding="utf-8")
     planted = tmp_path / "registry.yaml"

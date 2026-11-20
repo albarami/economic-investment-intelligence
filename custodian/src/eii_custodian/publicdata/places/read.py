@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import ROUND_CEILING, ROUND_HALF_EVEN, Context, Decimal, InvalidOperation
 from pathlib import Path
@@ -215,6 +215,75 @@ def _connect() -> Any:
     connection: Any = duckdb.connect()
     connection.execute(f"SET {_GEOPARQUET} = false")
     return connection
+
+
+def building_source_rows(path: Path) -> Iterator[dict[str, Any]]:
+    """Project verified building fields in bounded connection-cursor batches.
+
+    This leaves the showcase reader and its rounding unchanged. Optional fields
+    are read only for coverage counts; no numeric field mapping is activated.
+    The connection seam and metadata queries are those used by both readers.
+    """
+    import duckdb
+
+    connection = _connect()
+    try:
+        _require_schema(connection, path)
+        _building_crs(connection, path)
+        columns = _column_names(connection, path)
+        if not {"id", "geometry"} <= columns:
+            raise PlacesError("missing_column")
+        names = ("id", "geometry", "height", "num_floors", "is_underground", "sources")
+        projected = ", ".join(
+            name if name in columns else "NULL AS " + name for name in names
+        )
+        cursor = connection.execute(
+            f"SELECT {projected} FROM read_parquet(?)", [str(path)]
+        )
+        while True:
+            batch = cursor.fetchmany(2048)
+            if not batch:
+                break
+            for row in batch:
+                yield dict(zip(names, row, strict=True))
+    except duckdb.Error:
+        raise PlacesError("parquet") from None
+    finally:
+        connection.close()
+
+
+def _building_crs(connection: Any, path: Path) -> None:
+    """GeoParquet's absent CRS means CRS84; explicit unknown/lat-first refuses."""
+    rows = connection.execute(
+        "SELECT key, value FROM parquet_kv_metadata(?)", [str(path)]
+    ).fetchall()
+    try:
+        metadata = {
+            key.decode() if isinstance(key, bytes) else str(key): value
+            for key, value in rows
+        }
+        geo = json.loads(metadata["geo"])
+        if geo["primary_column"] != "geometry":
+            raise ValueError
+        column = geo["columns"]["geometry"]
+        if column["encoding"] != "WKB":
+            raise ValueError
+        if "crs" not in column:
+            return
+        crs = column["crs"]
+        if not isinstance(crs, dict) or crs.get("id") != {
+            "authority": "OGC",
+            "code": "CRS84",
+        }:
+            raise ValueError
+        axes = crs.get("coordinate_system", {}).get("axis")
+        if axes is not None and [axis["direction"] for axis in axes] != [
+            "east",
+            "north",
+        ]:
+            raise ValueError
+    except (KeyError, TypeError, ValueError, AttributeError):
+        raise PlacesError("crs") from None
 
 
 def _require_schema(connection: Any, path: Path) -> None:

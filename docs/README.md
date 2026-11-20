@@ -60,6 +60,10 @@
 
 ## Decision records
 
+[0077 — Overture footprints as the national building table](decisions/0077-overture-footprints-as-the-national-building-table.md)
+is proposed with S2-T20; it records the canonical footprint producer, counted
+unmapped fields, national-coverage guards and building-layer attribution.
+
 | Record | Decision | Status |
 |---|---|---|
 | [0001](decisions/0001-fully-synthetic-records-real-public-data.md) | Fully synthetic custodian-type records; cited real public data | Accepted, 2026-11-11; its consequences amended by decision 0022 on 2026-11-13 |

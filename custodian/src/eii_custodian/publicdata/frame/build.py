@@ -173,5 +173,44 @@ def build_frame(
         propose_reviews(review, output, set(), result.inventory, report)
         return FrameResult(result.tables, report, result.sources, result.inventory)
     return build_live_frame(
-        cache, registry, review, output, result, selected, build_date=build_date
+        cache,
+        registry,
+        review,
+        output,
+        result,
+        selected,
+        build_date=build_date,
     )
+
+
+def build_public_frame(
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    output: Path | None = None,
+    *,
+    selections: Mapping[str, str] | None = None,
+    build_date: date | None = None,
+) -> FrameResult:
+    """Required frame plus inventory dependency for both public-build paths.
+
+    The frame-only geometry API remains useful independently. A public build
+    always uses this composition, which has no inventory-skip option.
+    """
+    from shapely.ops import unary_union
+
+    from eii_custodian.publicdata.buildings import BuildingError, build_buildings
+
+    selected = reviewed_selections(cache) if selections is None else selections
+    result = build_frame(
+        cache, registry, review, output, selections=selected, build_date=build_date
+    )
+    if not isinstance(result, FrameResult) or not result.tables.get("municipality"):
+        raise BuildingError("building_frame_absent")
+    build_buildings(
+        cache,
+        registry,
+        selected,
+        unary_union([row["geometry"] for row in result.tables["municipality"]]),
+    )
+    return result

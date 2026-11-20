@@ -245,6 +245,10 @@ def apply_landmark_heights(
 ) -> tuple[list[Building], list[dict[str, object]]]:
     """Attach each landmark height where its building_id matches."""
     by_id = {row.building_id: row for row in landmarks}
+    building_ids = {building.building_id for building in buildings}
+    for landmark in landmarks:
+        if landmark.building_id not in building_ids:
+            raise HeightError("landmark_building_absent", landmark.landmark_id)
     citations: list[dict[str, object]] = []
     out: list[Building] = []
     for building in buildings:

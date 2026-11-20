@@ -512,6 +512,7 @@ def run_build(
             # an existing structured fetch failure and its network exit code.
             if build.fetched is not None and build.fetched.failure is not None:
                 return cast(BuildOutcome, build.fetched)
+            from eii_custodian.publicdata.building_inputs import BuildingError
             from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
             from eii_custodian.publicdata.series.parse import (
                 SERIES_REFUSALS,
@@ -519,6 +520,8 @@ def run_build(
             )
 
             reason = "assembly_build_refused"
+            if isinstance(exc, BuildingError):
+                reason = exc.name
             if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
                 reason = exc.word
             elif (
@@ -1080,13 +1083,29 @@ def run_build(
             lines,
         )
     if failure is None:
+        from eii_custodian.publicdata.building_inputs import BuildingError
+        from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
         from eii_custodian.publicdata.places.integrate import (
             areas_before_stage,
             frame_when_ready,
         )
 
+        selected_build_inputs = reviewed_selections(cache)
         areas_before_stage(cache, lines)
-        frame_when_ready(cache, entries, lines, build_date=build_date)
+        try:
+            frame_when_ready(
+                cache,
+                entries,
+                lines,
+                build_date=build_date,
+                selections=selected_build_inputs,
+            )
+        except BuildingError as error:
+            failure = FetchFailure(
+                1, "buildings", "", error.name, "valid building inputs", error.name
+            )
+            _write_log(cache, lines, previous_terms, terms_attempts)
+            return BuildOutcome(tuple(lines), failure, manifests)
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:
@@ -1128,7 +1147,9 @@ def run_build(
                 )
             )
         if failure is None:
-            failure = _heights(cache, entries, lines, terms_attempts)
+            failure = _heights(
+                cache, entries, lines, terms_attempts, selections=selected_build_inputs
+            )
 
     if benchmark_obstacles:
         cache.mkdir(parents=True, exist_ok=True)
@@ -1436,6 +1457,8 @@ def _heights(
     entries: tuple[Entry, ...] | list[Entry],
     lines: list[str],
     terms_attempts: list[dict[str, object]],
+    *,
+    selections: Mapping[str, str] | None = None,
 ) -> FetchFailure | None:
     """Run the heights step after the stage; a missing table refuses."""
     from eii_custodian.publicdata.heights.model import HEIGHTS_FILE, MANIFEST_FILE
@@ -1458,6 +1481,7 @@ def _heights(
             out_dir,
             lines,
             terms_attempts=tuple(terms_attempts),
+            selections=selections,
         )
     except HeightError as error:
         lines.append(

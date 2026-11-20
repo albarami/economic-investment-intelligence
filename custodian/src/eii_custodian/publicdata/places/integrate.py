@@ -11,6 +11,7 @@ import yaml
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
+from eii_custodian.publicdata.building_inputs import BuildingError, invalidate_buildings
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.snapshots import (
     SnapshotError,
@@ -53,6 +54,7 @@ def frame_when_ready(
     lines: list[str] | None = None,
     *,
     build_date: date | None = None,
+    selections: Mapping[str, str] | None = None,
 ) -> None:
     """Build the frame only when its boundary source is already in the cache."""
     from eii_custodian.publicdata.frame.municipality_output import (
@@ -60,6 +62,7 @@ def frame_when_ready(
     )
 
     (cache / MUNICIPALITY_OUTPUT).unlink(missing_ok=True)
+    invalidate_buildings(cache)
     hdx = next(
         (
             item
@@ -73,7 +76,7 @@ def frame_when_ready(
     review = cache.parent.parent / "custodian" / "publicdata" / "review"
     if not (review / "showcase_gazetteer.yaml").is_file():
         return
-    from eii_custodian.publicdata.frame.build import build_frame
+    from eii_custodian.publicdata.frame.build import build_public_frame
     from eii_custodian.publicdata.frame.checks import FrameError
     from eii_custodian.publicdata.frame.municipality_output import (
         write_municipality_output,
@@ -83,9 +86,17 @@ def frame_when_ready(
     token = _BUILD_LINES.set(log)
     try:
         try:
-            result = build_frame(
-                cache, tuple(entries), review, None, build_date=build_date
+            result = build_public_frame(
+                cache,
+                tuple(entries),
+                review,
+                None,
+                build_date=build_date,
+                selections=selections,
             )
+        except BuildingError as exc:
+            log.append(f"FAIL buildings check={exc.name}")
+            raise
         except FrameError:
             _note(log, "frame", "frame_refused")
         else:

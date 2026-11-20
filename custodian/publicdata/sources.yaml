@@ -1433,7 +1433,7 @@ sources:
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
-    title_en: "Overture Buildings, release 2026-10-21.0 (named showcase buildings only)"
+    title_en: "Overture Buildings, release 2026-10-21.0 (national building inventory and gazetteer)"
     publisher: "Overture Maps Foundation"
     licence_id: "ODbL"
     licence_basis: "dataset"
@@ -5747,6 +5747,124 @@ sources:
       USGS 3D Elevation Program Digital Elevation Program.
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
+
+# S2-T20 — reviewed STAC metadata; unconfirmed item addresses refuse completeness.
+  - key: "bldg_ovt/stac-collection"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC collection"
+    publisher: "Overture Maps Foundation"
+    licence_id: ""
+    licence_basis: "pending"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Metadata terms pending. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00288"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00288"
+    publisher: "Overture Maps Foundation"
+    licence_id: ""
+    licence_basis: "pending"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Metadata terms pending. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00384"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00384"
+    publisher: "Overture Maps Foundation"
+    licence_id: ""
+    licence_basis: "pending"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Metadata terms pending. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00385"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00385"
+    publisher: "Overture Maps Foundation"
+    licence_id: ""
+    licence_basis: "pending"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Metadata terms pending. Decision 0077 (proposed)."
 
 # S2-T17 — PUB-103 / C30 source admission, not backtest eligibility.
   - key: "ntl_blackmarble/2024-01"

@@ -77,18 +77,21 @@ def test_graph_calls_existing_spine_and_graph_in_release_mode(
         build.final_audit()
 
 
-def test_frame_invokes_real_nested_build_and_refuses_missing_places(
+def test_frame_invokes_real_nested_build_and_refuses_missing_inventory(
     tmp_path: Path,
 ) -> None:
     from custodian.tests.test_frame_live_survivors import _world
+
+    from eii_custodian.publicdata.buildings import BuildingError
 
     prepared = _world(tmp_path)
     build = context(prepared.cache, prepared.entries)
     build.review = prepared.review
     build.selected = reviewed_selections(prepared.cache)
-    with pytest.raises(AssemblyError, match="assembly_places_incomplete"):
+    with pytest.raises(BuildingError, match="building_part_unregistered"):
         build.frame()
-    assert build.frame_result.tables["grid_cell"]
+    assert build.frame_result is None
+    assert "FAIL buildings check=building_part_unregistered" in build.lines
     assert not (prepared.cache / "assembly/frame.json").exists()
 
 
@@ -485,7 +488,12 @@ def test_a_noop_height_producer_over_earlier_valid_outputs_refuses(
     path = cache.parent / "assets/buildings/buildings.geojson"
     path.parent.mkdir(parents=True)
     path.write_bytes(buildings)
-    context(cache, rows).heights()
+    from custodian.tests.building_fixture import bind_height_table
+
+    rows = bind_height_table(cache, rows, path)
+    initial = context(cache, rows)
+    initial.selected = reviewed_selections(cache)
+    initial.heights()
     output = cache.parent / "assets/heights"
     assert (output / "heights.json").is_file()
     assert (output / "manifest.heights.json").is_file()
@@ -496,6 +504,7 @@ def test_a_noop_height_producer_over_earlier_valid_outputs_refuses(
 
     monkeypatch.setattr(step, "build_heights", noop)
     state = context(cache, rows)
+    state.selected = reviewed_selections(cache)
     with pytest.raises(AssemblyError) as err:
         state.heights()
     assert str(err.value) == "assembly_heights_incomplete"
@@ -523,13 +532,19 @@ def test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering(
     path = cache.parent / "assets/buildings/buildings.geojson"
     path.parent.mkdir(parents=True)
     path.write_bytes(buildings)
+    from custodian.tests.building_fixture import bind_height_table
+
+    rows = bind_height_table(cache, rows, path)
     state = context(cache, rows)
+    state.selected = reviewed_selections(cache)
     state.heights()
     result = json.loads((cache / "assembly/heights.json").read_text())
     assert result["state"] == "built"
     assert set(state.data_files) == {
         "assets/heights/heights.json",
         "assets/heights/manifest.heights.json",
+        "assets/buildings/buildings.geojson",
+        "assets/buildings/manifest.buildings.json",
     }
     bound_files(cache.parent, state.data_files)
     (cache.parent / "assets/heights/heights.json").write_text("[]")

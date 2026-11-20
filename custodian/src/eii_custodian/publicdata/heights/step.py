@@ -7,6 +7,7 @@ FAIL line carries.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -20,8 +21,10 @@ from eii_core.calc.building_heights import (
     height_counts,
     largest_overlap,
 )
+from eii_custodian.publicdata.building_inputs import verify_building_manifest
 from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 
 from .calibration import gba_calibration
 from .landmarks import (
@@ -145,6 +148,7 @@ def build_heights(
     rules_path: Path | None = None,
     *,
     terms_attempts: tuple[dict[str, object], ...] = (),
+    selections: Mapping[str, str] | None = None,
 ) -> None:
     """Run the heights step; refuse on a bad input or a missing building table.
 
@@ -155,6 +159,8 @@ def build_heights(
         (out_dir / name).unlink(missing_ok=True)
     if not buildings_path.is_file():
         raise HeightError("building_table_absent")
+    selected = reviewed_selections(cache) if selections is None else selections
+    source_chain = verify_building_manifest(cache, entries, selected, buildings_path)
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
     landmarks = load_landmark_heights()
     verify_landmark_receipts(cache, landmarks)
@@ -176,9 +182,7 @@ def build_heights(
             "path": BUILDINGS_RELATIVE,
             "role": "read",
             "sha256": file_sha256(buildings_path.read_bytes()),
-            "source_chain": (
-                "the asset pipeline's own manifest entry of the same key and sha256"
-            ),
+            "source_chain": source_chain,
         },
         {
             "key": "landmark_heights",

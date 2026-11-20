@@ -40,14 +40,16 @@ def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
     baseline = support_run_build(
         (_entry(),), transport, tmp_path / "baseline", _clock, _sleep
     )
-    assert baseline.failure is None
+    assert baseline.failure is not None
+    assert baseline.failure.check == "building_table_absent"
     assert events == ["investment", "series", "regression"]
     events.clear()
     skipped = replace(_release_entry(), skip_reason="SYN-disabled")
     joined = support_run_build(
         (skipped, _entry()), transport, tmp_path / "joined", _clock, _sleep
     )
-    assert joined.failure is None
+    assert joined.failure is not None
+    assert joined.failure.check == "building_table_absent"
     assert joined.lines[0] == "SKIP places_fsq/copy SYN-disabled"
     assert joined.lines[1:] == baseline.lines
     assert events == ["investment", "series", "regression"]

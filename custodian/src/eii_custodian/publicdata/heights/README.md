@@ -7,6 +7,17 @@ Every building of the basemap building table
 (`data/assets/buildings/buildings.geojson`) receives a height in the order of
 decision 0023 item A2:
 
+Under proposed decision 0077, that table is the pinned Overture inventory built
+inside the shared public-frame composition. Before reading it, heights checks
+its output hash, method version and source chain against the current run's
+part and STAC pins and boundary snapshot, including their verified receipt
+hashes. The height manifest's `source_chain` gives the building manifest's
+relative path and hash. A missing table remains `building_table_absent`;
+a missing manifest, stale pin, changed boundary or altered table refuses.
+Overture height and floor mappings stay off, counted as
+`recorded_field_unconfirmed`; they are not silently treated as absent source
+values. The hierarchy below remains unchanged.
+
 1. `recorded` — the building's own recorded height (`Public`, observed),
    including heights from the committed hand list
    (`custodian/publicdata/review/landmark_heights.yaml`), each with its cited

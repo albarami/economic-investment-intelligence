@@ -13,6 +13,21 @@ of `cache.CACHE`. The lead uses `data/public_cache/`; no agent reads that cache.
 No fetching takes place here. Keep pytest's default traceback and short summary;
 never enable locals. Safe failures contain a fixed case ID and reason only.
 
+## National building inventory (S2-T20)
+
+`test_national_buildings.py` is lead-shell-only. After the complete public build,
+it rechecks the current pins and receipts, independently reconciles each part's
+selected IDs to the canonical table and every table ID to a height row, and
+checks exclusions and the per-part sorted-ID hashes. It repeats the building
+and height producers with no network and compares their hashes (FE-98). This
+replay rewrites only the producers' documented generated asset files, under
+`data/assets/buildings/` and `data/assets/heights/`. It prints public aggregate
+counts, optional-field coverage, boundary-review state and hashes, not IDs.
+It was not run by the worker. STAC item addresses/schema, frame-box coverage,
+invalid-footprint and in-box-outside-boundary review, and the pack's historical
+Lusail-box count still require the lead's source reading. No box is guessed for
+that historical comparison. A refusal is a failure, never a skip.
+
 ## Pinned method replays (P05)
 
 `test_pinned_c1` reads `lic_active` and `pop_muni` through `cache.pinned`.
