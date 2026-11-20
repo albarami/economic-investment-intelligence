@@ -773,7 +773,7 @@ def read_review_binding(path: Path) -> ReviewedBinding:
 
 
 _MODEL_PREFIX = "model review:"
-_MODEL_LIKE = re.compile(r"\s*model\W*review", re.IGNORECASE)
+_MODEL_LIKE = re.compile(r"\s*model[\W_]*review", re.IGNORECASE)
 _MODEL_ROLE = re.compile(
     r"model review: ([A-Za-z][A-Za-z0-9_-]*) ([^,\r\n]+), ([^,\r\n]+)"
 )

@@ -114,6 +114,7 @@ def test_model_signature_without_audit_is_refused():
         SIGNER.replace("model review:", "Model review:"),
         " " + SIGNER,
         SIGNER.replace("model review:", "model  review:"),
+        SIGNER.replace("model review:", "model_review:"),
     ],
 )
 @pytest.mark.parametrize("rejected", [False, True])
