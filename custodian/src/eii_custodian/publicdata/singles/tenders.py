@@ -54,6 +54,7 @@ CHAIN_PATH = Path("data/public_chain/tenders_pub.intermediate.pem")
 _PEM_BEGIN = "-----BEGIN CERTIFICATE-----"
 _PEM_END = "-----END CERTIFICATE-----"
 PAGE_SIZE = 20
+AWARD_CONTINUITY_PAGES = 2
 PACE_S = 3
 KIND = "paged_cards"
 LIST_PATHS = (
@@ -310,6 +311,8 @@ class ListReading:
     award_cutoff: str | None = None
     cutoff_reason: str = ""
     workbook_sha256: str | None = None
+    continuity_pages: int = 0
+    last_page_read: int = 0
 
 
 @dataclass(frozen=True)
@@ -655,7 +658,10 @@ def fetch_tenders(
                 if stop:
                     stop_page = 1
             for number in range(2, bound + 1):
-                if stop_page is not None:
+                if (
+                    stop_page is not None
+                    and number > stop_page + AWARD_CONTINUITY_PAGES
+                ):
                     break
                 body, hour = _get(
                     transport,
@@ -673,9 +679,13 @@ def fetch_tenders(
                 pages.append((number, text, raw, hour))
                 if list_name == "awarded" and award_cutoff is not None:
                     previous_date, stop = _award_page(
-                        raw, language, award_cutoff, previous_date
+                        raw,
+                        language,
+                        award_cutoff,
+                        previous_date,
+                        after_stop=stop_page is not None,
                     )
-                    if stop:
+                    if stop and stop_page is None:
                         stop_page = number
             last_raw = pages[-1][2]
             readings.append(
@@ -691,6 +701,10 @@ def fetch_tenders(
                     award_cutoff if list_name == "awarded" else None,
                     cutoff_reason if list_name == "awarded" else "",
                     workbook_sha256 if list_name == "awarded" else None,
+                    continuity_pages=len(pages) - stop_page
+                    if stop_page is not None
+                    else 0,
+                    last_page_read=pages[-1][0],
                 )
             )
             for _number, text, _raw, _hour in pages:
@@ -702,7 +716,12 @@ def fetch_tenders(
 
 
 def _award_page(
-    raw: RawPage, language: str, cutoff: str, previous: str | None
+    raw: RawPage,
+    language: str,
+    cutoff: str,
+    previous: str | None,
+    *,
+    after_stop: bool = False,
 ) -> tuple[str | None, bool]:
     """Check newest-first order before deciding whether this whole page is covered."""
     dates: list[str] = []
@@ -711,6 +730,8 @@ def _award_page(
         if not isinstance(value, str):
             # A missing date cannot establish coverage of this page.
             raise TenderError("award_date_missing")
+        if after_stop and value > cutoff:
+            raise TenderError("award_after_stop")
         if previous is not None and value > previous:
             raise TenderError("award_order_invalid")
         dates.append(value)
@@ -741,6 +762,11 @@ def _write_pages(
             for stale in directory.glob("*.html"):
                 if stale.name not in kept:
                     stale.unlink()
+        pages_read = reading.pages_read or sum(
+            1
+            for name, language, _number, _body in stored
+            if name == reading.list_name and language == reading.language
+        )
         payload = {
             "list_name": reading.list_name,
             "language": reading.language,
@@ -748,13 +774,10 @@ def _write_pages(
             "last_stated_last": reading.last_stated_last,
             "first_hour": reading.first_hour,
             "last_hour": reading.last_hour,
-            "pages_read": reading.pages_read
-            or sum(
-                1
-                for name, language, _number, _body in stored
-                if name == reading.list_name and language == reading.language
-            ),
+            "pages_read": pages_read,
             "stop_page": reading.stop_page,
+            "continuity_pages": reading.continuity_pages,
+            "last_page_read": reading.last_page_read or pages_read,
             "award_cutoff": reading.award_cutoff,
             "cutoff_reason": reading.cutoff_reason,
             "workbook_sha256": reading.workbook_sha256,

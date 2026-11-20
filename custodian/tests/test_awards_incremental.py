@@ -140,14 +140,15 @@ def test_cutoff_stop_page_and_mixed_page(tmp_path, date_pages, stop):
         award_cutoff="2024-02-03",
         cache=tmp_path / "pages",
     )
-    assert len(fake.calls) == stop * 2
+    last = min(stop + 2, len(date_pages))
+    assert len(fake.calls) == last * 2
     for reading in result.readings:
-        assert reading.pages_read == stop
+        assert reading.pages_read == last
         assert reading.stop_page == stop
         assert reading.award_cutoff == "2024-02-03"
     receipt = json.loads((tmp_path / "pages/awarded/en.receipt.json").read_bytes())
     assert receipt["award_cutoff"] == "2024-02-03"
-    assert receipt["pages_read"] == stop and receipt["stop_page"] == stop
+    assert receipt["pages_read"] == last and receipt["stop_page"] == stop
 
 
 @pytest.mark.parametrize(
@@ -209,7 +210,7 @@ def test_refused_report_url_never_supplies_a_cutoff(tmp_path, monkeypatch):
 
 def test_incremental_read_removes_stale_mutable_pages(tmp_path):
     cache = tmp_path / "pages"
-    stale = cache / "awarded/en/2.html"
+    stale = cache / "awarded/en/4.html"
     stale.parent.mkdir(parents=True)
     stale.write_bytes(b"SYN previous read")
     fake = _Fake(pages([["03/02/2024"] * 20, ["02/02/2024"]]))
@@ -550,3 +551,77 @@ def test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch(
     assert seen[0]["award_cutoff"] == "2024-02-03"
     assert seen[0]["workbook_sha256"] == sha256_hex(body)
     assert seen[0]["cutoff_reason"] == ""
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+@pytest.mark.parametrize("margin", [1, 2])
+def test_newer_award_after_wholly_covered_page_refuses(tmp_path, language, margin):
+    date_pages = [["03/02/2024"] * 20, ["02/02/2024"] * 20, ["01/02/2024"]]
+    fixture = pages(date_pages)
+    date_pages[margin] = ["01/02/2024", "04/02/2024"] + ["01/02/2024"] * (
+        18 if margin == 1 else 0
+    )
+    planted = pages(date_pages)
+    fixture.update({key: value for key, value in planted.items() if key[1] == language})
+    fake = _Fake(fixture)
+    with pytest.raises(TenderError, match=r"^award_after_stop$"):
+        _run(fake, tmp_path, lists=("awarded",), award_cutoff="2024-02-03")
+    assert any(call.url.endswith("/" + str(1 + margin)) for call in fake.calls)
+
+
+@pytest.mark.parametrize("stop", [1, 2])
+@pytest.mark.parametrize("margin", [0, 1, 2, 3])
+def test_continuity_margin_is_exact_and_records_early_list_end(tmp_path, stop, margin):
+    date_pages = [["04/02/2024"] * 10 + ["03/02/2024"] * 10] if stop == 2 else []
+    date_pages += [["03/02/2024"] * 20]
+    date_pages += [
+        [f"{2 if number == 0 else 1:02}/02/2024"] * 20 for number in range(margin)
+    ]
+    date_pages[-1] = date_pages[-1][:1]
+    fake = _Fake(pages(date_pages))
+    cache = tmp_path / "pages"
+    result, _ = _run(
+        fake, tmp_path, lists=("awarded",), award_cutoff="2024-02-03", cache=cache
+    )
+    expected_margin = min(margin, 2)
+    last = stop + expected_margin
+    assert len(fake.calls) == last * 2
+    for reading in result.readings:
+        assert reading.stop_page == stop
+        assert reading.pages_read == last
+        assert reading.last_page_read == last
+        assert reading.continuity_pages == expected_margin
+        receipt = json.loads(
+            (cache / "awarded" / (reading.language + ".receipt.json")).read_bytes()
+        )
+        assert receipt["stop_page"] == stop
+        assert receipt["pages_read"] == last
+        assert receipt["last_page_read"] == last
+        assert receipt["continuity_pages"] == expected_margin
+        assert receipt["first_stated_last"] == stop + margin
+        assert (reading.last_page_read == reading.first_stated_last) == (margin <= 2)
+
+
+@pytest.mark.parametrize("margin", [1, 2])
+def test_order_check_still_applies_below_cutoff_on_margin_pages(tmp_path, margin):
+    date_pages = [["03/02/2024"] * 20, ["01/02/2024"] * 20, ["01/02/2024"]]
+    date_pages[margin] = ["02/02/2024", "03/02/2024"] + ["01/02/2024"] * (
+        18 if margin == 1 else 0
+    )
+    with pytest.raises(TenderError, match=r"^award_order_invalid$"):
+        _run(
+            _Fake(pages(date_pages)),
+            tmp_path,
+            lists=("awarded",),
+            award_cutoff="2024-02-03",
+        )
+
+
+@pytest.mark.parametrize(
+    "expected,observed", [("", ""), ("SYN expected", "SYN observed")]
+)
+def test_failure_without_address_has_single_spacing(expected, observed):
+    suffix = f" expected={expected} observed={observed}" if expected else ""
+    assert fail_line(
+        "awards_owner_scrape", "", "intake_missing", expected, observed
+    ) == ("FAIL awards_owner_scrape intake_missing" + suffix)

@@ -10,7 +10,7 @@ from .assembly_io import local, read_object
 from .fetch.receipts import sha256_hex, sidecar_for
 from .fetch.registry import Entry
 from .fetch.snapshots import publish_snapshot
-from .singles.tenders import LIST_PATHS, TenderError
+from .singles.tenders import AWARD_CONTINUITY_PAGES, LIST_PATHS, TenderError
 
 
 def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
@@ -35,7 +35,10 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
                 if type(count) is not int or not 1 <= count <= bound:
                     raise AssemblyError("assembly_tender_pages_incomplete")
                 if stop is not None and (
-                    type(stop) is not int or stop != count or list_name != "awarded"
+                    type(stop) is not int
+                    or not 1 <= stop <= count
+                    or list_name != "awarded"
+                    or count != min(bound, stop + AWARD_CONTINUITY_PAGES)
                 ):
                     raise AssemblyError("assembly_tender_pages_incomplete")
                 if stop is None and count != bound:
@@ -51,6 +54,11 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
                         or reason
                         or selected_cutoff != cutoff
                         or receipt.get("workbook_sha256") != digest
+                        or type(receipt.get("last_page_read")) is not int
+                        or receipt["last_page_read"] != count
+                        or type(receipt.get("continuity_pages")) is not int
+                        or receipt["continuity_pages"]
+                        != (count - stop if stop is not None else 0)
                     ):
                         raise AssemblyError("assembly_tender_pages_incomplete")
                 for number in range(1, count + 1):
@@ -66,8 +74,14 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
 
                         raw = _checked_page(page_text, language)
                         _require_count(len(raw.cards), is_last=number == bound)
-                        previous, covered = _award_page(raw, language, cutoff, previous)
-                        if covered != (number == stop):
+                        previous, covered = _award_page(
+                            raw,
+                            language,
+                            cutoff,
+                            previous,
+                            after_stop=stop is not None and number > stop,
+                        )
+                        if covered != (stop is not None and number >= stop):
                             raise AssemblyError("assembly_tender_pages_incomplete")
                     elif stop is not None:
                         raise AssemblyError("assembly_tender_pages_incomplete")

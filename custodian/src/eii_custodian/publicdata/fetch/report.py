@@ -96,7 +96,9 @@ def fail_line(key: str, url: str, check: str, expected: str, observed: str) -> s
     comparison = (
         f" expected={expected} observed={observed}" if expected or observed else ""
     )
-    return f"FAIL {key} {public_address(url)} {check}{comparison}"
+    address = public_address(url)
+    address_slot = f" {address}" if address else ""
+    return f"FAIL {key}{address_slot} {check}{comparison}"
 
 
 def terms_changed_line(key: str, terms_url: str) -> str:
