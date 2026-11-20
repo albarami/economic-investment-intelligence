@@ -52,13 +52,21 @@ redirect or safety refusals preserve completed shards and exit nonzero. Disk exh
 and quota errors report `disk_safety_stop`, and I/O faults report `io_error`, including
 faults wrapped by immutable publication; a job-body fault is never labelled a lock fault.
 
+Only tile HTTP 404/410 and invalid successful tile bodies (empty, non-JPEG or wrong
+dimensions) become recorded gaps. Exhausted retries on HTTP 429/500/502/503/504 or an
+unreachable transport stop with `request_failed`, publishing no unfinished shard; resume
+requests that tile key again. Other unsuccessful statuses also stop rather than become
+gaps. A wholly out-of-extent tile is a gap with `outside_extent`, no HTTP status and zero
+attempts, and is never requested. Tests use a unique abstract lock name per test; the
+production name remains machine-global and is explicitly passed by the supervisor.
+
 Metadata activation checks QNG EPSG:2932, origin, extent, every declared level through the cap and
 decreasing resolutions, approximately 0.53 m at level ten, 512-pixel JPEG. Each tile's JPEG frame header must also
 declare those dimensions; the reader checks the header and hashes without decoding pixels. All dates must
 have a compatible scheme. Old export scales are not tile levels. The boundary is projected
 with the installed rasterio adapter and every intersecting tile is enumerated, including
 coastal/island intersections. Actual metadata, coverage and disk sufficiency remain
-unverified until the lead's live run. Missing/error/non-JPEG tiles remain explicit gaps;
+unverified until the lead's live run. Missing or invalid tiles remain explicit gaps;
 nothing is filled. A date's smaller service extent does not clip country enumeration or
 refuse the date: the uncovered land geometry is retained, and wholly uncovered tiles are
 recorded without requests. Upstream changes require review and a new namespace, never
@@ -131,6 +139,8 @@ unsafe path or level above ten, and shows missing-source/missing-coverage when a
 The whole-shard hash is cached for the reader's process lifetime by content identity and
 opened-file device, inode, size and modification/change timestamps. A changed file is
 hashed again, and the requested member hash is checked on every request.
+The identity comparison after hashing uses those same fields and excludes access time,
+which a normal first read may update on a relatime filesystem.
 The same-origin tile route supplies a picture only. The credit route supplies publisher,
 service, retrieval date, imagery date, terms and basis for the UI's always-visible credit;
 it supplies no numerical evidence. A release without imagery stays usable.

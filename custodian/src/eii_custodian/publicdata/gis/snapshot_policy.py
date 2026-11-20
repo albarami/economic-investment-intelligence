@@ -16,6 +16,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 ROOT_ENV = "EII_GIS_SNAPSHOT_ROOT"
+MACHINE_LOCK = "\0eii-gis-imagery-snapshot"
 HOST = "services.gisqatar.org.qa"
 BASE = f"https://{HOST}/server/rest/services/Imagery/"
 SERVICES = dict(
@@ -139,14 +140,14 @@ def safe_child(root: Path, relative: str) -> Path:
 
 
 @contextmanager
-def run_lock(root: Path) -> Iterator[None]:
+def run_lock(root: Path, *, name: str = MACHINE_LOCK) -> Iterator[None]:
     try:
         machine = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     except OSError:
         raise SnapshotRefusal("lock_unavailable") from None
     try:
         try:
-            machine.bind("\0eii-gis-imagery-snapshot")
+            machine.bind(name)
         except OSError as error:
             raise SnapshotRefusal(
                 "run_locked" if error.errno == errno.EADDRINUSE else "lock_unavailable"

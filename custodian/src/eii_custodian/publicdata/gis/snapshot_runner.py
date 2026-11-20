@@ -27,6 +27,7 @@ from eii_custodian.publicdata.fetch.transport import (
     open_gis_snapshot,
 )
 
+from . import snapshot_policy
 from .snapshot_archive import Archive, canonical, digest, jpeg, read_checked
 from .snapshot_policy import (
     GENERATOR,
@@ -121,7 +122,14 @@ def request(
             if error.kind in {"redirect", "blocked_host"}:
                 raise SnapshotRefusal("redirect_refused") from None
             response = Response(
-                url, b"", (), evidence={"http_status": error.status or 503}
+                url,
+                b"",
+                (),
+                evidence={
+                    "http_status": 503
+                    if error.kind == "unreachable"
+                    else error.status or 503
+                },
             )
         if response.hops or response.final_url != url:
             raise SnapshotRefusal("redirect_refused")
@@ -136,15 +144,15 @@ def request(
                 raise SnapshotRefusal("response_bytes_or_gap")
             return response.body
         if status not in {429, 500, 502, 503, 504} or attempt == 3:
-            if tile:
+            if tile and status in {404, 410}:
                 raise TileFailure("request_failed", status, attempt + 1)
-            raise SnapshotRefusal("request_failed " + url)
+            raise SnapshotRefusal("request_failed")
         wait = max(
             BACKOFF_S[attempt],
             _retry_wait(response.headers.get("Retry-After", ""), now()),
         )
         pace.defer(wait)
-    raise SnapshotRefusal("request_failed " + url)
+    raise SnapshotRefusal("request_failed")
 
 
 def _input(
@@ -462,6 +470,8 @@ def pin_boundary(root: Path, body: bytes, expected: str) -> str:
         )
         publish_public(safe_child(root, "boundary-source"), body, side, expected)
         return expected
+    except SnapshotRefusal:
+        raise
     except (OSError, ValueError, TypeError, KeyError):
         raise SnapshotRefusal("boundary_lineage_invalid") from None
 
@@ -472,7 +482,7 @@ def run(environ: Mapping[str, str]) -> int:
     try:
         load_contract()
         root = configured_root(environ)
-        with run_lock(root):
+        with run_lock(root, name=snapshot_policy.MACHINE_LOCK):
             lower_priority()
             # The lead stages only the reviewed public national-land boundary here.
             # No ordinary public-cache or private path is accepted as an argument.

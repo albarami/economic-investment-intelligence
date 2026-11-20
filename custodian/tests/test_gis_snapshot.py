@@ -6,6 +6,7 @@ import json
 from copy import deepcopy
 from itertools import pairwise
 from unittest.mock import patch
+from uuid import uuid4
 
 import pytest
 from hypothesis import given
@@ -31,6 +32,11 @@ BOUNDARY_RECEIPT = {
     "terms_read_on": "2026-11-20",
 }
 JPEG = b"\xff\xd8\xff\xc0\x00\x11\x08\x02\x00\x02\x00\x03\x01\x11\x00\x02\x11\x00\x03\x11\x00invented-tile\xff\xd9"
+
+
+@pytest.fixture(autouse=True)
+def isolated_machine_lock(monkeypatch):
+    monkeypatch.setattr(policy, "MACHINE_LOCK", "\0eii-test-" + uuid4().hex)
 
 
 @pytest.fixture(autouse=True)
@@ -148,20 +154,20 @@ def test_root_unset_wrong_drive_traversal_and_symlink(tmp_path):
 
 
 def test_lock_is_global_and_nonblocking(tmp_path):
-    with policy.run_lock(tmp_path):
+    with policy.run_lock(tmp_path, name=policy.MACHINE_LOCK):
         with pytest.raises(policy.SnapshotRefusal, match="locked"):
-            with policy.run_lock(tmp_path):
+            with policy.run_lock(tmp_path, name=policy.MACHINE_LOCK):
                 pytest.fail("second run entered")
-    with policy.run_lock(tmp_path):
+    with policy.run_lock(tmp_path, name=policy.MACHINE_LOCK):
         pass
 
 
 def test_machine_lock_refuses_two_different_roots(tmp_path):
-    with policy.run_lock(tmp_path / "first"):
+    with policy.run_lock(tmp_path / "first", name=policy.MACHINE_LOCK):
         with pytest.raises(policy.SnapshotRefusal, match=r"^run_locked$"):
-            with policy.run_lock(tmp_path / "second"):
+            with policy.run_lock(tmp_path / "second", name=policy.MACHINE_LOCK):
                 pytest.fail("second root admitted")
-    with policy.run_lock(tmp_path / "second"):
+    with policy.run_lock(tmp_path / "second", name=policy.MACHINE_LOCK):
         pass
 
 
@@ -170,9 +176,22 @@ def test_lock_does_not_relabel_body_io_errors(tmp_path):
 
     for code in (errno.ENOSPC, errno.EIO):
         with pytest.raises(OSError) as caught:
-            with policy.run_lock(tmp_path):
+            with policy.run_lock(tmp_path, name=policy.MACHINE_LOCK):
                 raise OSError(code, "invented disk fault")
         assert caught.value.errno == code
+
+
+def test_run_passes_exact_machine_lock_name(tmp_path):
+    from eii_custodian.publicdata.gis import snapshot_runner as runner
+
+    with (
+        patch.object(runner, "configured_root", return_value=tmp_path),
+        patch.object(
+            runner, "run_lock", side_effect=policy.SnapshotRefusal("lock_probe")
+        ) as lock,
+    ):
+        assert runner.run({}) == 1
+    lock.assert_called_once_with(tmp_path, name=policy.MACHINE_LOCK)
 
 
 @pytest.mark.parametrize(
@@ -279,7 +298,7 @@ def test_immutable_shard_receipt_and_resume(tmp_path):
 def test_resume_never_skips_corruption_or_incomplete_publish(tmp_path, corrupt):
     archive, _ = fixture_archive(tmp_path)
     if corrupt == "completion":
-        with pytest.raises(policy.SnapshotRefusal, match="complete"):
+        with pytest.raises(policy.SnapshotRefusal, match=r"^archive_integrity$"):
             verify_selection(tmp_path, "d" * 64)
         return
     snap = archive.read_shard(0)
@@ -478,7 +497,7 @@ def test_command_root_unset_refuses_without_any_connection(tmp_path):
 
 @pytest.mark.parametrize(
     "plant",
-    [None, "gap", "partial"]
+    [None, "gap", "partial", "coverage"]
     + [
         (field, stage)
         for field in (
@@ -491,12 +510,14 @@ def test_command_root_unset_refuses_without_any_connection(tmp_path):
             "bytes",
             "sha256",
             "foreign_url",
+            "unknown_field",
+            "boundary_source_url",
         )
         for stage in ("resume", "selection")
     ],
 )
 def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
-    tmp_path, monkeypatch, plant
+    tmp_path, monkeypatch, capsys, plant
 ):
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
     from eii_custodian.publicdata.gis import snapshot_release as release
@@ -624,18 +645,54 @@ def test_all_dates_mode_is_separate_complete_and_explicitly_selected(
         def damage(side):
             if field == "foreign_url":
                 side["url"] = "https://foreign.invalid/"
+            elif field == "unknown_field":
+                side["unregistered"] = "invented"
+            elif field == "boundary_source_url":
+                side.pop("url")
             else:
                 side.pop(field)
 
-        rewrite_sidecar(root / "all-dates", identity, damage)
+        folder, receipt_id = (
+            (root / "boundary-source", complete["boundary_source"])
+            if field == "boundary_source_url"
+            else (root / "all-dates", identity)
+        )
+        rewrite_sidecar(folder, receipt_id, damage)
         if stage == "resume":
             assert runner.run({}) == 1
+            if field in {"unknown_field", "boundary_source_url"}:
+                assert "receipt_fields" in capsys.readouterr().out
         else:
-            with pytest.raises(policy.SnapshotRefusal, match=r"receipt|integrity"):
+            reason = (
+                r"^receipt_fields$"
+                if field in {"unknown_field", "boundary_source_url"}
+                else r"receipt|integrity"
+            )
+            with pytest.raises(policy.SnapshotRefusal, match=reason):
                 release.reviewed_inputs({})
         return
     from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
     from eii_custodian.publicdata.gis.snapshot_archive import canonical
+
+    if plant == "coverage":
+        complete["coverage"]["1995-02"]["10"]["gap_count"] += 1
+        changed_body = canonical(complete)
+        changed_id = digest(changed_body)
+        publish_snapshot(
+            root / "all-dates",
+            "json",
+            changed_body,
+            runner.public_chain("all-dates", "all-dates", STAMP),
+            identity=changed_id,
+        )
+        (root / "release-selection.json").write_text(
+            json.dumps({"manifest_sha256": changed_id})
+        )
+        with pytest.raises(
+            policy.SnapshotRefusal, match=r"^release_selection_identity$"
+        ):
+            release.reviewed_inputs({})
+        return
 
     incomplete = deepcopy(complete)
     incomplete["dates"]["1995-02"].pop("0")
@@ -737,7 +794,10 @@ def test_jpeg_dimensions_must_match_the_declared_tile_size():
         jpeg(wrong)
 
 
-def test_interruption_retains_complete_shards_and_resumes_only_the_gap(tmp_path):
+@pytest.mark.parametrize("failure", ["503", "io"])
+def test_interruption_retains_complete_shards_and_resumes_only_the_gap(
+    tmp_path, failure
+):
     clock = Clock()
     pace = policy.Pacer(clock.time, clock.sleep)
     meta = json.loads(metadata())
@@ -750,11 +810,18 @@ def test_interruption_retains_complete_shards_and_resumes_only_the_gap(tmp_path)
         if url.endswith("?f=json"):
             return Response(url, body, ())
         if url.endswith("/0/" + str(policy.SHARD_TILES)):
+            if failure == "503":
+                raise TransportFault("http", url, 503)
             raise OSError("invented interruption")
         return Response(url, JPEG, ())
 
     land = box(1, 1800, 512 * 0.53 * policy.SHARD_TILES + 1, 1801)
-    with pytest.raises(OSError, match="invented interruption"):
+    exception, reason = (
+        (policy.SnapshotRefusal, "request_failed")
+        if failure == "503"
+        else (OSError, "invented interruption")
+    )
+    with pytest.raises(exception, match=reason):
         acquire(
             tmp_path,
             "1995-02",
@@ -1097,7 +1164,114 @@ def test_foreign_public_receipt_refuses(tmp_path, kind):
         verify_selection(level, manifest)
 
 
-@pytest.mark.parametrize("failure", ["404", "503", "empty", "non-jpeg", "dimensions"])
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+def test_unknown_metadata_receipt_field_is_refused(tmp_path, stage):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (manifest,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    enumeration = json.loads(read_checked(level / "completion", manifest).body)[
+        "enumeration"
+    ]
+    rewrite_sidecar(
+        level / "inputs/metadata",
+        enumeration["inputs"]["metadata"],
+        lambda side: side.update(unregistered="invented"),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^receipt_fields$"):
+        if stage == "resume":
+            small_acquisition(tmp_path)
+        else:
+            verify_selection(level, manifest)
+
+
+@pytest.mark.parametrize("stage", ["resume", "selection"])
+def test_shard_publisher_is_required_at_each_read_stage(tmp_path, stage):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    (manifest,) = small_acquisition(tmp_path)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", manifest).body)
+    rewrite_sidecar(
+        level / "shards/000000",
+        completion["shards"][0]["identity"],
+        lambda side: side.pop("publisher"),
+    )
+    with pytest.raises(policy.SnapshotRefusal, match=r"^receipt_fields$"):
+        if stage == "resume":
+            small_acquisition(tmp_path)
+        else:
+            verify_selection(level, manifest)
+
+
+def republish_completion(level, completion):
+    """Rehash the envelope so each coverage plant reaches its semantic guard."""
+    from eii_custodian.publicdata.gis.snapshot_archive import canonical, digest
+    from eii_custodian.publicdata.gis.snapshot_receipt import (
+        public_chain,
+        publish_public,
+    )
+
+    body = canonical(completion)
+    identity = digest(body)
+    publish_public(
+        level / "completion",
+        body,
+        public_chain("completion", "1995-02", STAMP),
+        identity,
+    )
+    return identity
+
+
+@pytest.mark.parametrize(
+    "plant,reason",
+    [
+        ("gap_key", "gap_enumeration_integrity"),
+        ("gap_count", "completion_coverage_integrity"),
+        ("gap_reason", "gap_reason_integrity"),
+        ("boundary_upstream", "boundary_upstream_integrity"),
+    ],
+)
+def test_coverage_guards_refuse_independently_with_valid_hashes(
+    tmp_path, plant, reason
+):
+    from eii_custodian.publicdata.gis.snapshot_archive import read_checked
+
+    def transport(url):
+        return Response(
+            url,
+            metadata() if url.endswith("?f=json") else b"",
+            (),
+            evidence={"http_status": 200 if url.endswith("?f=json") else 404},
+        )
+
+    (manifest,) = small_acquisition(tmp_path, transport)
+    level = tmp_path / "1995-02/level-10"
+    completion = json.loads(read_checked(level / "completion", manifest).body)
+    if plant in {"gap_key", "gap_reason"}:
+        gap = completion["gaps"][0]
+        gap.update({"key": [10, 9, 9]} if plant == "gap_key" else {"reason": "bogus"})
+        # Mirror the changed gap in completion: only the shard semantic guard
+        # can refuse it, not the completion/shard coverage equality check.
+        rewrite_sidecar(
+            level / "shards/000000",
+            completion["shards"][0]["identity"],
+            lambda side: side.update(gaps=deepcopy(completion["gaps"])),
+        )
+    elif plant == "gap_count":
+        completion["gap_count"] += 1
+    else:
+        rewrite_sidecar(
+            level / "inputs/boundary",
+            completion["enumeration"]["inputs"]["boundary"],
+            lambda side: side.update(upstream_sha256="f" * 64),
+        )
+    manifest = republish_completion(level, completion)
+    with pytest.raises(policy.SnapshotRefusal, match="^" + reason + "$"):
+        verify_selection(level, manifest)
+
+
+@pytest.mark.parametrize("failure", ["404", "410", "empty", "non-jpeg", "dimensions"])
 def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, failure):
     from eii_custodian.publicdata.gis.snapshot_archive import read_checked
     from eii_custodian.publicdata.gis.snapshot_release import assemble
@@ -1126,9 +1300,9 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
     completion = json.loads(read_checked(level / "completion", manifest).body)
     (gap,) = completion["gaps"]
     assert gap["key"] == [10, 0, 0]
-    assert gap["attempts"] == (4 if failure == "503" else 1)
-    if failure == "404":
-        assert gap["http_status"] == 404
+    assert gap["attempts"] == 1
+    if failure in {"404", "410"}:
+        assert gap["http_status"] == int(failure)
     selection = verify_selection(level, manifest)
     assert tuple(selection.iter_tiles()) == ()
     assert selection.shards[0].sidecar["members"] == []
@@ -1158,6 +1332,41 @@ def test_persistent_tile_gap_completes_and_resume_never_refetches(tmp_path, fail
     assert shard.path.is_file()
 
 
+@pytest.mark.parametrize("failure", [429, 500, 502, 503, 504, "unreachable", 403])
+def test_transient_tile_failure_stops_without_shard_and_retries_same_key(
+    tmp_path, failure
+):
+    calls = []
+
+    def transport(url):
+        calls.append(url)
+        if url.endswith("?f=json"):
+            return Response(url, metadata(), ())
+        if failure == "unreachable":
+            raise TransportFault("unreachable", url)
+        return Response(url, b"", (), evidence={"http_status": failure})
+
+    with pytest.raises(policy.SnapshotRefusal, match=r"^request_failed$"):
+        small_acquisition(tmp_path, transport)
+    key = policy.tile_url("1995-02", 10, 0, 0)
+    assert calls[1:] == [key] * (1 if failure == 403 else 4)
+    level = tmp_path / "1995-02/level-10"
+    assert not (level / "completion").exists()
+    assert not list((level / "shards").rglob("*.tar"))
+    assert not list((level / "shards").rglob("selection.json"))
+    resumed = []
+
+    def restored(url):
+        resumed.append(url)
+        return Response(url, metadata() if url.endswith("?f=json") else JPEG, ())
+
+    (manifest,) = small_acquisition(tmp_path, restored)
+    assert resumed == [policy.service_url("1995-02") + "?f=json", key]
+    assert tuple(verify_selection(level, manifest).iter_tiles()) == (
+        ("1995-02", 10, 0, 0, JPEG),
+    )
+
+
 def test_partial_service_extent_keeps_country_and_records_uncovered_geometry(tmp_path):
     from shapely.geometry import shape
 
@@ -1167,8 +1376,10 @@ def test_partial_service_extent_keeps_country_and_records_uncovered_geometry(tmp
 
     meta = json.loads(metadata())
     meta["fullExtent"]["xmax"] = 1.5
+    calls = []
 
     def transport(url):
+        calls.append(url)
         return Response(
             url, json.dumps(meta).encode() if url.endswith("?f=json") else JPEG, ()
         )
@@ -1184,6 +1395,40 @@ def test_partial_service_extent_keeps_country_and_records_uncovered_geometry(tmp
         output, assemble((verify_selection(level, manifest),), output)
     )
     assert reader.coverage["uncovered"][0]["geometry"] == completion["uncovered"]
+
+    # A second, wholly outside tile exercises the no-request branch, while
+    # retaining the partially covered tile and whole-country enumeration.
+    clock = Clock()
+    land = MultiPolygon([box(1, 1800, 2, 1801), box(300, 1800, 301, 1801)])
+    (manifest,) = acquire(
+        tmp_path / "outside",
+        "1995-02",
+        land,
+        "a" * 64,
+        transport,
+        policy.Pacer(clock.time, clock.sleep),
+        lambda: STAMP,
+        lambda: None,
+        levels=(10,),
+        boundary_receipt=BOUNDARY_RECEIPT,
+    )
+    completion = json.loads(
+        read_checked(tmp_path / "outside/1995-02/level-10/completion", manifest).body
+    )
+    assert completion["enumeration"]["tiles"] == [[10, 0, 0], [10, 0, 1]]
+    assert completion["gaps"] == [
+        {
+            "key": [10, 0, 1],
+            "reason": "outside_extent",
+            "attempts": 0,
+            "http_status": None,
+            "retrieved_utc": STAMP,
+        }
+    ]
+    assert [url for url in calls if not url.endswith("?f=json")] == [
+        policy.tile_url("1995-02", 10, 0, 0),
+        policy.tile_url("1995-02", 10, 0, 0),
+    ]
 
 
 def test_acquire_checks_finished_shard_before_completion_or_any_tile_request(tmp_path):

@@ -90,9 +90,18 @@ class ReleasedImagery:
                         status.st_ctime_ns,
                     )
                     if token not in self._verified:
+                        actual_hash = hashlib.file_digest(stream, "sha256").hexdigest()
+                        after = os.fstat(stream.fileno())
                         if (
-                            hashlib.file_digest(stream, "sha256").hexdigest() != sha
-                            or os.fstat(stream.fileno()) != status
+                            actual_hash != sha
+                            or (
+                                after.st_dev,
+                                after.st_ino,
+                                after.st_size,
+                                after.st_mtime_ns,
+                                after.st_ctime_ns,
+                            )
+                            != token[1:]
                         ):
                             raise ValueError("imagery_integrity")
                         self._verified.add(token)

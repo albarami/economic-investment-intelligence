@@ -92,3 +92,14 @@ def test_shard_hash_is_cached_and_file_change_invalidates_it(tmp_path):
         os.utime(path, ns=(stamp + 1, stamp + 1))
         assert reader.tile("1995-02", 10, 0, 0) == JPEG
         assert hashed.call_count == 2
+
+
+def test_first_read_accepts_intact_object_when_relatime_updates_atime(tmp_path):
+    import os
+    import time
+
+    output, identity = released_fixture(tmp_path)
+    path = next((output / "objects").glob("*.tar"))
+    old = time.time_ns() - 3600 * 1_000_000_000
+    os.utime(path, ns=(old, old))
+    assert ReleasedImagery(output, identity).tile("1995-02", 10, 0, 0) == JPEG

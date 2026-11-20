@@ -178,20 +178,20 @@ def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str
             raise SnapshotRefusal("archive_integrity")
         key = gap["key"]
         status, attempts = gap["http_status"], gap["attempts"]
+        if gap["reason"] not in {
+            "request_failed",
+            "response_bytes_or_gap",
+            "tile_format_or_gap",
+            "tile_dimensions_refused",
+            "outside_extent",
+        }:
+            raise SnapshotRefusal("gap_reason_integrity")
         if (
             not isinstance(key, list)
             or len(key) != 3
             or any(type(n) is not int or n < 0 for n in key)
             or type(attempts) is not int
             or not 0 <= attempts <= 4
-            or gap["reason"]
-            not in {
-                "request_failed",
-                "response_bytes_or_gap",
-                "tile_format_or_gap",
-                "tile_dimensions_refused",
-                "outside_extent",
-            }
             or (
                 status is not None
                 and (type(status) is not int or not 100 <= status <= 599)
@@ -212,7 +212,7 @@ def checked_gaps(snapshot: Snapshot, expected: list[list[int]]) -> list[dict[str
         or sorted(combined) != expected
         or len({tuple(key) for key in combined}) != len(combined)
     ):
-        raise SnapshotRefusal("archive_integrity")
+        raise SnapshotRefusal("gap_enumeration_integrity")
     return gaps
 
 
@@ -255,6 +255,8 @@ class Archive:
                 raise SnapshotRefusal("archive_integrity")
             checked_gaps(snap, self.expected(shard))
             return snap
+        except SnapshotRefusal:
+            raise
         except (OSError, ValueError, KeyError, TypeError, SnapshotError):
             raise SnapshotRefusal("archive_integrity") from None
 
@@ -457,7 +459,7 @@ def verify_selection(root: Path, manifest: str) -> Selection:
             or data.get("gap_count") != len(gaps)
             or data.get("uncovered") != archive.enumeration.get("uncovered")
         ):
-            raise SnapshotRefusal("completion_integrity")
+            raise SnapshotRefusal("completion_coverage_integrity")
         for name, identity in archive.enumeration.get("inputs", {}).items():
             if name not in {"metadata", "boundary"}:
                 raise SnapshotRefusal("completion_integrity")
@@ -468,7 +470,7 @@ def verify_selection(root: Path, manifest: str) -> Selection:
                 and item.sidecar["upstream_sha256"]
                 != archive.enumeration["boundary_sha256"]
             ):
-                raise SnapshotRefusal("completion_integrity")
+                raise SnapshotRefusal("boundary_upstream_integrity")
             if item.sha256 != identity:
                 raise SnapshotRefusal("completion_integrity")
             if (
@@ -491,5 +493,7 @@ def verify_selection(root: Path, manifest: str) -> Selection:
             tuple(gaps),
             data.get("uncovered"),
         )
+    except SnapshotRefusal:
+        raise
     except (OSError, ValueError, KeyError, TypeError, SnapshotError):
         raise SnapshotRefusal("completion_integrity_or_incomplete") from None

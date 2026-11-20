@@ -45170,3 +45170,44 @@ Final ledger checks after the S2-T51 evidence append: `python3 scripts/check_doc
 - Exact failure IDs and comparison: `baseline-failure-ids.txt`, `final-confirmed-failure-ids.txt`, `suite-comparison-confirmed.json` under `.overnight/tmp/f1/`. The first working-tree full run also exited 1 with 226 failures and no new IDs; it precedes the final wrapped-fault fixture correction. No whole-suite green result is claimed.
 - The final checked code/test state is recorded in `tested-code-state.json`: 14 files, manifest SHA-256 `db814f1b6885ed86b952f8687349dfd28c5a01d11586cbb759d7d4f2ceeccaee`. The files were rehashed after the confirmation and are unchanged. HEAD remains `a3fcc720ffd32f0d9023c29043b9a7c1c9dbfc58`; no commit was made.
 - Final ledger checks: `python3 scripts/check_docs.py` exit 0 (1183 text files, 128 Markdown files; `check-docs-final-ledger.log`), `python3 scripts/check_tree.py` exit 0 (8 rules), `cmp AGENTS.md CLAUDE.md` exit 0, `git diff --check` exit 0. PROGRESS.md remains append-only. Both `.overnight/RETURN-f1.md` and `.overnight/RETURN.md` contain the same finding-by-finding return and required final marker. Muhasabah self-audit: PASS for the scoped f1 delivery; existing baseline failures, the two proposed open items, real acquisition/integration limits and pending independent approval remain explicit. No commit, push or network operation was performed.
+
+
+## S2-T51 f2 confirmation corrections — 2026-11-20
+
+- Base/full HEAD `5945b0a816462424d4a8598700dc29e9bb7d31f4`; changes remain uncommitted, as the fix brief requires.
+  Builder: senior geospatial-acquisition and reliability engineer (Python), test-first;
+  strict self-review: reliability and Public-provenance reviewer; maker/model OpenAI / Codex,
+  GPT-6 (exact variant not exposed). Skills: project-orientation, task-standards, github-flow,
+  sanad-provenance, strict-reviewer rules and muhasabah-gate; equivalent test-first, debugging
+  and completion-verification rules. Different-maker confirmation remains pending.
+- Authority: confirmation C1–C7 and ruling L-1303. C1 restricts gaps to missing/invalid tiles,
+  preserves bounded transient-error stops and restores both 503/OSError interruption plants.
+  C2 excludes atime from the post-hash identity check. C3 retains the production global lock
+  while every test uses a unique name; run() explicitly passes MACHINE_LOCK.
+- C4/C5 plant unknown metadata/all-date fields and missing shard publisher/boundary-source URL
+  at both read stages with valid envelope hashes. C6 plants all five coverage/lineage guards
+  independently with their own diagnostics. C7 proves no out-of-extent tile request and the
+  exact zero-attempt gap. SNAPSHOT.md states gap statuses and resumable-stop behavior.
+- Environment: Python 3.14.6, Linux x86_64; UV_OFFLINE=1, UV_NO_SYNC=1;
+  TMPDIR under `.overnight/tmp/f2/runtime`; Hypothesis seed 79; no network/live acquisition,
+  external-drive, real-cache, secret or vault reading. Exact argv/exits/durations and logs:
+  `.overnight/tmp/f2/commands.jsonl`; full C-by-C evidence: `.overnight/RETURN-f2.md`.
+- Red on starting code: C1/C2 combined exit 1 (nine failed, one OSError control passed);
+  external production-lock holder exit 1 (30 failed, 148 passed). Green final snapshot file
+  under the same holder: exit 0, 200 passed. Product imagery file: exit 0, six passed.
+  Corrected isolated guard-removal probes: eleven actual assertion failures, exit 1 each.
+  Initial scratch-registry setup failures and intermediate diagnostic failures are retained
+  and explicitly excluded from acceptance evidence, not hidden.
+- Broader focused command (ten files, listed in the return): exit 1, 347 passed,
+  62 subtests passed and one known baseline failure, absent-imagery-row/building_table_absent.
+  Whole custodian command `uv run --locked python -m pytest -q -p no:cacheprovider
+  --hypothesis-seed=79 -rf custodian/tests`, once: exit 1,
+  226 failed, 9485 passed, 1 warning in 695.31s (0:11:35). Failure-ID comparison with both stored base and f1-confirmed
+  lists yields no new ID; `.overnight/tmp/f2/suite-comparison.json` holds exact sets.
+- `uv run --locked ruff check .`, `uv run --locked ruff format --check .`,
+  `uv run --locked mypy`, `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`,
+  `cmp AGENTS.md CLAUDE.md` and `git diff --check`: exit 0 each. No pin changed.
+- Tested-state manifest: seven code/test/runbook files, SHA-256 `470607e2646bc0ee30d6c41a6b4de0c5ca2168a68267bdf7fb9f8f102692c1cd`;
+  rehashed unchanged after the whole run. Existing progress bytes are preserved; no
+  OPEN_ITEMS.md change, no commit/push and no independent approval or live coverage claim.
+  Proposed open items are confined to the return. Muhasabah: PASS for scoped evidence honesty.
