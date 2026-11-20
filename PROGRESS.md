@@ -43699,3 +43699,90 @@ the four-file scope, the original ledger byte prefix, only the new open-item
 insertion, all 82 paired probes and credited assertions, intact 180-test success,
 required checks, report marker and authored-text hygiene. These audit corrections
 supply no guard red evidence and are not hidden by a rerun.
+
+## S2-P03b-FIX1 — Duplicate request identity deciding plant — 2026-11-20
+
+Maker/model: OpenAI / GPT-6 Codex. Senior persona: senior Python test engineer for
+data-intake guards. Strict self-review persona: a reviewer who rejects a guard
+without a deciding planted test. Skills applied: project-orientation,
+task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate.
+The named superpowers test-driven-development and verification-before-completion
+skills are unavailable in this session; their procedures are applied through the
+single-predicate removal proof, positive control, actual exits and final diff audit.
+No new independent-maker approval is claimed. Scope follows the supplied fix brief;
+no commit, push or network is authorized or performed.
+
+Base and unchanged HEAD: `cde44fc546e0e845032c5fd503477e6042333b34`.
+Environment: Python 3.14.6, Linux, locked workspace dependencies, offline uv,
+decision provider `none`, Hypothesis seed `5837291064`. Commands run from the
+repository root. `UV_OFFLINE=1`, `UV_CACHE_DIR=$PWD/.overnight/tmp/uv-cache`,
+`TMPDIR=$PWD/.overnight/tmp/p03b-fix1` and `PYTHONDONTWRITEBYTECODE=1` keep tool
+outputs in the workspace; no data cache is read. The removal child also blocks
+socket connection entry points. Evidence recorder:
+`.overnight/tmp/p03b-fix1/check.py`; removal helper:
+`.overnight/tmp/p03b-fix1/probe.py`. Each recorder invocation preserves its command,
+actual exit and sanitized output in `<check>.json` and `<check>.log` there.
+
+- CORRECTION — 2026-11-20, independent review of cde44fc5: the earlier acquire-80
+  row's 'Not plantable under the increasing-ordinal invariant' applies to
+  production input only. A test-side ordinal-blind `RequestIdentity` stand-in
+  decides it with only that guard removed. The independent reviewer recorded
+  exit 1, one failed/181 passed; intact 182 passed; seed 4826193057, in
+  `.overnight/IN/REVIEW-R2.md`, F-1/RN-2. Those are attributed review results,
+  not runs performed in this fix. The earlier row and every earlier PROGRESS
+  byte remain unchanged. The test is now added; the new measured result below
+  supersedes the earlier open disposition.
+
+Added the exact F-1 `OrdinalBlindIdentity` stand-in and two tests to
+`custodian/tests/test_fc_register_guards.py`. The refusal test plants equality
+that forgets ordinal and predecessor, and asserts the closed `paging_incomplete`
+refusal before a third request can be sent. Its control uses real identities with
+the same three invented pages. No existing assertion or production byte changed.
+The source loader replaces exactly one occurrence of
+`if expected in seen_requests:` with `if False:` in memory, checks the imported
+module's location, and verifies the production bytes again after pytest exits.
+Recorded unchanged SHA-256 of `fc_register/acquire.py`:
+`0e79a769180e778181ab581d2966b7effac5aa47844c9e76699a7320d1e7367a`.
+
+Supplemental removal row (aliases as in the earlier S2-P03b inventory):
+
+- Duplicate request identity (acquire-80), `fc_register/acquire.py:80`:
+  removed RED, exit 1, one failed/one passed, zero skipped;
+  `G::test_paging_refuses_a_repeated_request_identity`, `DID NOT RAISE ShapeError`.
+  `G::test_control_the_same_three_page_chain_completes_with_real_identities`
+  passes in that same removed run. Intact GREEN, exit 0, 85 passed in the guard
+  file, zero failed/skipped. This completes deciding evidence for the last of the
+  earlier inventory's 82 guards; no fresh run of the other 81 is claimed.
+
+Commands and observed exits/counts:
+
+- `python3 .overnight/tmp/p03b-fix1/check.py red` runs
+  `uv run --locked python .overnight/tmp/p03b-fix1/probe.py` — exit 1;
+  one failed/one passed in 0.30s, `DID NOT RAISE ShapeError`, zero skipped.
+  The helper passes the two new test node IDs to pytest, with `-q -p
+  no:cacheprovider --hypothesis-seed=5837291064
+  --basetemp=.overnight/tmp/p03b-fix1/pytest-red --tb=short`.
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_guards.py -q -p no:cacheprovider --hypothesis-seed=5837291064`
+  — exit 0; 85 passed in 0.32s, zero failed/skipped (`green.json`).
+- `uv run --locked python -m pytest custodian/tests/test_fc_register_guards.py::test_control_the_same_three_page_chain_completes_with_real_identities -q -p no:cacheprovider --hypothesis-seed=5837291064`
+  — exit 0; one passed in 0.21s, zero failed/skipped (`control.json`).
+- `uv run --locked ruff check .` — exit 0; All checks passed (`lint.json`).
+- `uv run --locked ruff format --check .` — exit 0; 836 files already formatted
+  (`format.json`).
+- `uv run --locked mypy` — exit 0; no issues in 449 source files (`mypy.json`).
+
+PO-S2-113 closes by the dated S2-P03b-FIX1 line in OPEN_ITEMS.md. RN-1 is adapted
+to the added test and its actual red/green exits; RN-2 is the appended correction
+above; RN-3 removes the extra leading blank line before the S2-P03b disposition.
+The prior cleanup warning stays recorded and is not closed by these green checks.
+No TASKS.md box, other open item or slice-gate verdict changes.
+
+- `python3 scripts/check_docs.py` — exit 0; checked 1139 text files,
+  123 Markdown files: OK (`.overnight/tmp/p03b-fix1/docs.json`).
+- `git diff --check` — exit 0 after the test, RN-1/RN-3 corrections and appended
+  evidence were written.
+
+Strict self-review: APPROVE the bounded fix under the supplied F-1 and RN-1 to
+RN-3 instructions; this is not independent-maker approval. Muhasabah: PASS for
+sourced evidence, actual exits, unchanged production, disclosed historical limits
+and the requested scope. The prior temporary-root cleanup warning remains open.

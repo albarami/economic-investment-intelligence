@@ -707,3 +707,53 @@ def test_projection_validates_its_reconstructed_fragment(plant):
         body = body.replace(b"pr-result-card", b"SYN-absent-card")
     with pytest.raises(ShapeError, match="schema_missing"):
         project(body, SHAPE)
+
+
+class OrdinalBlindIdentity(RequestIdentity):
+    """Invented defect: an identity whose equality forgets ordinal and predecessor."""
+
+    def _key(self):
+        return (self.method, self.url, self.target, self.argument)
+
+    def __eq__(self, other):
+        return isinstance(other, RequestIdentity) and self._key() == (
+            other.method,
+            other.url,
+            other.target,
+            other.argument,
+        )
+
+    def __hash__(self):
+        return hash(self._key())
+
+
+def test_paging_refuses_a_repeated_request_identity(tmp_path, monkeypatch):
+    monkeypatch.setattr(acquire, "RequestIdentity", OrdinalBlindIdentity)
+    monkeypatch.setattr(acquire, "page_context", lambda *a: None)
+    bodies = [page(1), page(2), page(3, True)]
+    sent = []
+
+    def send(request):
+        sent.append(request)
+        return Response(URL, bodies[len(sent) - 1], ())
+
+    p = pin()
+    with pytest.raises(ShapeError, match="paging_incomplete"):
+        acquire.pages(send, tmp_path, {p.host: p}, SHAPE, 65536, lambda _: None)
+    assert len(sent) == 2, "a repeated identity must refuse before its request is sent"
+
+
+def test_control_the_same_three_page_chain_completes_with_real_identities(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(acquire, "page_context", lambda *a: None)
+    bodies = [page(1), page(2), page(3, True)]
+    sent = []
+
+    def send(request):
+        sent.append(request)
+        return Response(URL, bodies[len(sent) - 1], ())
+
+    p = pin()
+    result = acquire.pages(send, tmp_path, {p.host: p}, SHAPE, 65536, lambda _: None)
+    assert len(result) == 3 and len(sent) == 3
