@@ -131,6 +131,27 @@ export const SMALL_SITES = [
   site(
     'open',
     'SMALL',
+    "'/en/_perf'",
+    'invented navigation readiness rejection',
+    'readiness diagnostics in open retain navigation events and the original readiness rejection',
+  ),
+  site(
+    'open',
+    'SMALL',
+    "'/en/_perf'",
+    'invented navigation rejection',
+    'readiness diagnostics in open report a rejected navigation once',
+  ),
+  site(
+    'open',
+    'SMALL',
+    "'/en/_perf'",
+    'invented abandoned navigation',
+    'readiness diagnostics in open abandon readiness when a foreign request wins navigation',
+  ),
+  site(
+    'open',
+    'SMALL',
     "'/ar/_perf?profile=smoke'",
     'arabic notice',
     'the Arabic route uses the Arabic notice',

@@ -13,8 +13,8 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.gis.imagery_views import (
@@ -291,6 +291,8 @@ def test_export_request_has_no_parameter_outside_the_closed_set(
 
 def test_absent_imagery_row_makes_no_request(tmp_path: Path) -> None:
     """The absent row is skipped where every other absent row is skipped."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = next(item for item in load_registry() if item.key == "gis_imagery_history")
     calls: list[str] = []
 
@@ -298,7 +300,7 @@ def test_absent_imagery_row_makes_no_request(tmp_path: Path) -> None:
         calls.append(url)
         raise AssertionError(url)
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert calls == []
     assert (
         entry.url
@@ -309,7 +311,7 @@ def test_absent_imagery_row_makes_no_request(tmp_path: Path) -> None:
     assert outcome.failure is None
     stored = [
         path.name
-        for path in tmp_path.rglob("*")
+        for path in fixture_cache.rglob("*")
         if path.is_file() and path.name != "build-log.json"
     ]
     assert stored == []

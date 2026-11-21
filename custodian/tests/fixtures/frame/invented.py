@@ -144,7 +144,7 @@ def invented_layer(source):
     }
 
 
-def invented_archive():
+def invented_archive(*, bounds=(0, 0, 0.04, 0.04)):
     import io
     import json
     import zipfile
@@ -191,7 +191,7 @@ def invented_archive():
                     {
                         "type": "Feature",
                         "properties": props,
-                        "geometry": mapping(box(0, 0, 0.04, 0.04)),
+                        "geometry": mapping(box(*bounds)),
                     }
                 ],
             }

@@ -2,6 +2,8 @@
 
 import builtins
 import contextlib
+import csv
+import hashlib
 import io
 import json
 import os
@@ -10,8 +12,8 @@ import tempfile
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
-from typing import Any
-from unittest.mock import patch
+from typing import Any, cast
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -129,6 +131,458 @@ class SpineTriageTest(unittest.TestCase):
         from spine_triage import requests
 
         return recorded_answers(self.root, dict(requests(self.context())))
+
+    def test_requests_have_exact_closed_contract(self) -> None:
+        from spine_triage import requests
+
+        # INVENTED cache only; inspect the boundary without selecting a provider.
+        context = self.context()
+        pairs = requests(context)
+        self.assertEqual(list(pairs), ["5610901", "5610902"])
+        title = context.inputs.classes[0]
+        for code, request in pairs.items():
+            with self.subTest(code=code):
+                self.assertEqual(
+                    asdict(request),
+                    {
+                        "decision_class": "spine_match",
+                        "kind": "yes_no",
+                        "input_class": "public",
+                        "input_text": request.input_text,
+                        "language": "ar",
+                        "rubric_id": "spine-triage-v1",
+                        "rubric_text": "Does the Arabic activity name fit the supplied "
+                        "ISIC class title? Answer yes or no.",
+                        "route": "offline-spine-triage-v1",
+                        "options": (),
+                        "case_id": "spine-" + code,
+                    },
+                )
+                row = next(
+                    row for row in context.inputs.spine.queue if row.code == code
+                )
+                self.assertEqual(
+                    json.loads(request.input_text),
+                    {
+                        "activity_name_ar": row.name_ar,
+                        "class_code": "5610",
+                        "class_title_en": title.label_en,
+                        "class_title_ar": title.label_ar,
+                        "code_system_version": CODE_SYSTEM_VERSION,
+                    },
+                )
+
+    def test_all_priority_groups_are_stable_and_accounted(self) -> None:
+        from spine_triage import triage
+
+        context = self.context()
+        row, _, legacy = context.inputs.spine.queue
+        queue = tuple(replace(row, code="561090" + str(n)) for n in range(1, 7))
+        queue = (*queue[:3], legacy, *queue[3:])
+        context = replace(
+            context,
+            inputs=replace(
+                context.inputs, spine=replace(context.inputs.spine, queue=queue)
+            ),
+        )
+        # INVENTED in-memory replies; no adapter is constructed or configured.
+        gateway = Mock(spec=Gateway, configured="recorded", endpoint=None, remaining=20)
+        answers = iter(("yes", "no", None, "yes", "no", None))
+
+        def decide(request: object) -> dict[str, object]:
+            answer = next(answers)
+            gateway.remaining -= 1
+            return {
+                "threshold_outcome": "DECIDED" if answer else "BELOW_THRESHOLD",
+                "returned_label": answer,
+                "memo_key": "invented-memo-" + str(gateway.remaining),
+            }
+
+        gateway.decide.side_effect = decide
+        result = triage(context, cast(Gateway, gateway))
+        self.assertEqual(
+            result.queue,
+            (queue[1], queue[5], queue[2], legacy, queue[6], queue[0], queue[4]),
+        )
+        self.assertFalse(result.fallback)
+        self.assertEqual(
+            [item.suggestion for item in result.suggestions],
+            [
+                "match",
+                "mismatch",
+                "unresolved",
+                "ineligible",
+                "match",
+                "mismatch",
+                "unresolved",
+            ],
+        )
+        self.assertEqual(
+            result.evidence,
+            {
+                "provider": "recorded",
+                "rubric_id": "spine-triage-v1",
+                "rubric_sha256": digest(
+                    "Does the Arabic activity name fit the supplied "
+                    "ISIC class title? Answer yes or no."
+                ),
+                "language": "ar",
+                "route": "offline-spine-triage-v1",
+                "calls": 6,
+                "returned_tokens": 6,
+                "model": "synthetic-recorded",
+            },
+        )
+        self.assertEqual(gateway.decide.call_count, 6)
+        self.assertEqual(
+            [item.memo_key for item in result.suggestions],
+            [
+                "invented-memo-19",
+                "invented-memo-18",
+                "invented-memo-17",
+                "",
+                "invented-memo-16",
+                "invented-memo-15",
+                "invented-memo-14",
+            ],
+        )
+
+    def test_each_failure_outcome_restores_prior_decisions_and_stops_calls(
+        self,
+    ) -> None:
+        from spine_triage import MODEL, triage
+
+        original = self.context()
+        first, second, legacy = original.inputs.spine.queue
+        queue = (first, second, replace(first, code="5610903"), legacy)
+        context = replace(
+            original,
+            inputs=replace(
+                original.inputs, spine=replace(original.inputs.spine, queue=queue)
+            ),
+        )
+        for failure in ("ERROR", "UNAVAILABLE"):
+            with self.subTest(outcome=failure):
+                # INVENTED stand-in exercises the keyed branch without an adapter.
+                gateway = Mock(
+                    spec=Gateway,
+                    configured="jev",
+                    endpoint="https://invented.invalid",
+                    remaining=7,
+                )
+                gateway.decide.side_effect = [
+                    {
+                        "threshold_outcome": "DECIDED",
+                        "returned_label": "yes",
+                        "memo_key": "a" * 64,
+                    },
+                    {"threshold_outcome": failure, "memo_key": "b" * 64},
+                ]
+                result = triage(context, cast(Gateway, gateway))
+                self.assertTrue(result.fallback)
+                self.assertEqual(result.queue, queue)
+                self.assertEqual(gateway.decide.call_count, 2)
+                self.assertEqual(
+                    [item.suggestion for item in result.suggestions],
+                    ["unresolved", "unresolved", "unresolved", "ineligible"],
+                )
+                self.assertEqual(
+                    [item.memo_key for item in result.suggestions],
+                    ["a" * 64, "b" * 64, "", ""],
+                )
+                self.assertEqual(result.evidence["calls"], 2)
+                self.assertEqual(result.evidence["model"], MODEL)
+                self.assertEqual(
+                    result.evidence["route"],
+                    "offline-spine-triage-v1-" + digest("https://invented.invalid"),
+                )
+
+    def test_each_provider_exception_has_closed_refusal_or_fallback(self) -> None:
+        from spine_triage import triage
+        from spine_triage_io import Refusal
+
+        for configured in ("none", "jev"):
+            for error in (OSError, ValueError, KeyError, TypeError):
+                with self.subTest(configured=configured, error=error):
+                    # INVENTED stand-in only; the environment stays provider none.
+                    gateway = Mock(
+                        spec=Gateway,
+                        configured=configured,
+                        endpoint="https://invented.invalid",
+                        remaining=0,
+                    )
+                    gateway.decide.side_effect = error("invented private body")
+                    if configured == "none":
+                        with self.assertRaisesRegex(Refusal, "^provider refused$"):
+                            triage(self.context(), cast(Gateway, gateway))
+                    else:
+                        result = triage(self.context(), cast(Gateway, gateway))
+                        self.assertTrue(result.fallback)
+                        self.assertEqual(
+                            result.queue, self.context().inputs.spine.queue
+                        )
+                        self.assertNotIn("invented private body", str(result))
+                    self.assertEqual(gateway.decide.call_count, 1)
+
+    def test_context_and_output_preserve_exact_lineage_and_columns(self) -> None:
+        from spine_triage_io import Result, Suggestion, write_outputs
+
+        context = self.context()
+        expected_hashes = {
+            name: hashlib.sha256(
+                (self.cache / (name + "." + suffix)).read_bytes()
+            ).hexdigest()
+            for name, suffix in (
+                ("review", "csv"),
+                ("queue", "csv"),
+                ("membership", "json"),
+            )
+        }
+        receipts = {}
+        for key in ("lic_active", "lic_cancelled", "cls_isic4"):
+            path = next((self.cache / key).glob("????-??-??/*.meta.json"))
+            expected_hashes[key + "_receipt"] = hashlib.sha256(
+                path.read_bytes()
+            ).hexdigest()
+            body = json.loads(path.read_text())
+            receipts[body["source_id"]] = {
+                name: body[name]
+                for name in (
+                    "source_id",
+                    "publisher",
+                    "landing_url",
+                    "licence_id",
+                    "licence_basis",
+                    "retrieved_utc",
+                    "sha256",
+                )
+            }
+        self.assertEqual(context.hashes, expected_hashes)
+        self.assertEqual({row["source_id"]: row for row in context.receipts}, receipts)
+        self.assertEqual(len(context.receipts), 3)
+        # INVENTED dotted-code row proves the reversible code path in suggestions.
+        result = Result(
+            context.inputs.spine.queue,
+            (Suggestion("5610" + "0000", "5610", "unresolved", "invented-memo"),),
+            False,
+            {"invented": "evidence"},
+        )
+        target = write_outputs(context, "invented-lineage", result)
+        self.assertEqual(target, self.cache / "spine_triage/invented-lineage")
+        with (target / "suggestions.csv").open(newline="") as handle:
+            self.assertEqual(
+                list(csv.reader(handle)),
+                [
+                    ["code", "candidate_isic_class", "suggestion", "memo_key"],
+                    ["5610.0000", "5610", "unresolved", "invented-memo"],
+                ],
+            )
+        binding = review_binding(CODE_SYSTEM_VERSION, context.inputs.classes)
+        self.assertEqual(
+            json.loads((target / "queue.binding.json").read_text()),
+            {
+                "code_system_version": CODE_SYSTEM_VERSION,
+                "inputs": [
+                    {"name": name, "code": code, "sha256": sha}
+                    for name, code, sha in binding.input_sha256
+                ],
+            },
+        )
+        manifest = json.loads((target / "manifest.json").read_text())
+        self.assertEqual(
+            manifest,
+            {
+                "method": "spine_triage.v1",
+                "inputs": expected_hashes,
+                "sources": list(context.receipts),
+                "spine": json.loads(json.dumps(asdict(context.inputs.manifest))),
+                "state": "complete",
+                "evidence": {"invented": "evidence"},
+                "outputs": {
+                    name: hashlib.sha256((target / name).read_bytes()).hexdigest()
+                    for name in ("queue.csv", "suggestions.csv", "queue.binding.json")
+                },
+            },
+        )
+        without_manifest = replace(
+            context, inputs=replace(context.inputs, manifest=None)
+        )
+        other = write_outputs(
+            without_manifest, "invented-no-manifest", replace(result, fallback=True)
+        )
+        self.assertIsNone(json.loads((other / "manifest.json").read_text())["spine"])
+        self.assertEqual(
+            json.loads((other / "manifest.json").read_text())["state"], "fallback"
+        )
+
+    def test_each_membership_key_is_required(self) -> None:
+        from spine_triage_io import Refusal
+
+        path = self.cache / "membership.json"
+        original = json.loads(path.read_text())
+        for key in ("playbook_codes", "supplier_codes", "supplier_complete"):
+            with self.subTest(key=key):
+                path.write_text(
+                    json.dumps(
+                        {name: value for name, value in original.items() if name != key}
+                    )
+                )
+                with self.assertRaisesRegex(Refusal, "^input refused$"):
+                    self.context()
+
+    def test_path_and_code_returns_and_run_id_boundaries(self) -> None:
+        from spine_triage_io import Refusal, codes, contained, output_path
+
+        context = self.context()
+        self.assertEqual(
+            contained(self.root, Path("invented/child")), self.root / "invented/child"
+        )
+        self.assertEqual(contained(self.root, self.cache), self.cache)
+        self.assertEqual(codes(["5610901", "5610.0000"]), ("5610901", "5610" + "0000"))
+        self.assertEqual(codes([]), ())
+        for run in (
+            "a",
+            "a" * 64,
+            "run-" + "1" * 7,
+            "run-" + "1" * 9,
+            "run-" + "1" * 10,
+            "run-" + "1" * 12,
+        ):
+            self.assertEqual(
+                output_path(context, run), self.cache / "spine_triage" / run
+            )
+        for run in (
+            "a" * 65,
+            "run-" + "1" * 8,
+            "run-" + "1" * 11,
+            "bad/name",
+            "Upper",
+            "run_",
+            "run-\n",
+        ):
+            with (
+                self.subTest(run=run),
+                self.assertRaisesRegex(Refusal, "^output refused$"),
+            ):
+                output_path(context, run)
+        for path in (Path("../invented"), self.root.parent / "invented-outside"):
+            with (
+                self.subTest(path=path.name),
+                self.assertRaisesRegex(Refusal, "^input refused$"),
+            ):
+                contained(self.root, path)
+        alias = self.root / "invented-alias"
+        alias.symlink_to(self.cache, target_is_directory=True)
+        with self.assertRaisesRegex(Refusal, "^input refused$"):
+            contained(self.root, alias / "queue.csv")
+
+    def test_script_entry_refuses_before_reading_inputs(self) -> None:
+        import runpy
+
+        # INVENTED missing arguments; the script must exit before any cache read.
+        with (
+            patch.object(sys, "argv", ["spine_triage.py"]),
+            patch.dict(os.environ, {"EII_DECISION_PROVIDER": "none"}),
+            contextlib.redirect_stdout(io.StringIO()) as output,
+            self.assertRaises(SystemExit) as stopped,
+        ):
+            runpy.run_path(
+                str(Path(__file__).resolve().parents[1] / "spine_triage.py"),
+                run_name="__main__",
+            )
+        self.assertEqual(stopped.exception.code, 3)
+        self.assertEqual(
+            output.getvalue(), "REFUSED spine triage input or authorisation\n"
+        )
+
+    def test_each_cli_input_is_required_before_context_or_gateway(self) -> None:
+        from spine_triage import main
+
+        for name in ("cache", "review", "queue", "membership"):
+            arguments = list(self.args)
+            index = arguments.index("--" + name)
+            del arguments[index : index + 2]
+            with (
+                self.subTest(name=name),
+                patch.dict(os.environ, {"EII_DECISION_PROVIDER": "none"}),
+                patch(
+                    "spine_triage.load_context",
+                    side_effect=AssertionError("context forbidden"),
+                ),
+                patch(
+                    "spine_triage.Gateway",
+                    side_effect=AssertionError("gateway forbidden"),
+                ),
+                contextlib.redirect_stdout(io.StringIO()) as output,
+            ):
+                self.assertEqual(main(arguments, root=self.root), 3)
+                self.assertEqual(
+                    output.getvalue(), "REFUSED spine triage input or authorisation\n"
+                )
+
+    def test_main_refuses_each_input_exception_without_echo(self) -> None:
+        from eii_custodian.publicdata.review.cache_fixture import CacheError
+        from spine_triage import main
+
+        for error in (OSError, ValueError, TypeError, SpineError, CacheError):
+            with (
+                self.subTest(error=error),
+                patch.dict(os.environ, {"EII_DECISION_PROVIDER": "none"}),
+                patch(
+                    "spine_triage.load_context",
+                    side_effect=error("invented private body"),
+                ),
+                patch(
+                    "spine_triage.Gateway",
+                    side_effect=AssertionError("gateway forbidden"),
+                ),
+                contextlib.redirect_stdout(io.StringIO()) as output,
+            ):
+                self.assertEqual(main(self.args, root=self.root), 3)
+                self.assertEqual(
+                    output.getvalue(), "REFUSED spine triage input or authorisation\n"
+                )
+
+    def test_both_binding_inputs_refuse_stale_identity(self) -> None:
+        from spine_triage_io import Refusal
+
+        inputs = self.context().inputs
+        for name in ("review", "queue"):
+            path = binding_path(self.cache / (name + ".csv"))
+            original = path.read_bytes() if path.exists() else None
+            try:
+                path.write_text(
+                    json.dumps({"code_system_version": "invented-stale", "inputs": []})
+                )
+                with (
+                    self.subTest(name=name),
+                    patch("spine_triage_io.load_activity_inputs", return_value=inputs),
+                    self.assertRaisesRegex(Refusal, "^input refused$"),
+                ):
+                    self.context()
+            finally:
+                if original is None:
+                    path.unlink()
+                else:
+                    path.write_bytes(original)
+
+    def test_missing_provider_defaults_to_none(self) -> None:
+        from spine_triage import main
+
+        baseline = (self.cache / "queue.csv").read_bytes()
+        with (
+            patch.dict(os.environ),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            os.environ.pop("EII_DECISION_PROVIDER", None)
+            self.assertEqual(main(self.args, root=self.root), 0)
+
+        output = self.cache / "spine_triage/invented-run"
+        self.assertEqual((self.cache / "queue.csv").read_bytes(), baseline)
+        self.assertEqual((output / "queue.csv").read_bytes(), baseline)
+        evidence = json.loads((output / "manifest.json").read_text())["evidence"]
+        self.assertEqual(evidence["provider"], "none")
+        self.assertEqual(evidence["model"], "none")
 
     def test_none_fixture_leaves_suite_stdout_clean(self) -> None:
         with contextlib.redirect_stdout(io.StringIO()) as output:
@@ -260,6 +714,22 @@ class SpineTriageTest(unittest.TestCase):
         )
         self.assertEqual(json.loads(manifest)["state"], "complete")
         self.assertEqual(
+            json.loads(manifest)["evidence"],
+            {
+                "provider": "none",
+                "rubric_id": "spine-triage-v1",
+                "rubric_sha256": digest(
+                    "Does the Arabic activity name fit the supplied "
+                    "ISIC class title? Answer yes or no."
+                ),
+                "language": "ar",
+                "route": "offline-spine-triage-v1",
+                "calls": 2,
+                "returned_tokens": 0,
+                "model": "none",
+            },
+        )
+        self.assertEqual(
             set(json.loads(manifest)["outputs"]),
             {"queue.csv", "suggestions.csv", "queue.binding.json"},
         )
@@ -318,6 +788,36 @@ class SpineTriageTest(unittest.TestCase):
     def test_stale_queue_binding_refused(self) -> None:
         path = binding_path(self.cache / "queue.csv")
         path.write_text(json.dumps({"code_system_version": "stale", "inputs": []}))
+        self.assertEqual(self.invoke(), 3)
+
+    def write_audited_review_binding(self, *, stale: bool = False) -> None:
+        binding = review_binding(CODE_SYSTEM_VERSION, self.context().inputs.classes)
+        audit = self.cache / "activity_spine_audits.json"
+        audit.write_text("[]\n")
+        binding_path(self.cache / "review.csv").write_text(
+            json.dumps(
+                {
+                    "code_system_version": binding.code_system_version,
+                    "inputs": [
+                        {
+                            "name": name,
+                            "code": code,
+                            "sha256": "a" * 64 if stale else sha,
+                        }
+                        for name, code, sha in binding.input_sha256
+                    ],
+                    "audit_sha256": hashlib.sha256(audit.read_bytes()).hexdigest(),
+                }
+            )
+            + "\n"
+        )
+
+    def test_full_review_binding_with_audit_hash_admitted(self) -> None:
+        self.write_audited_review_binding()
+        self.assertEqual(self.invoke(), 0)
+
+    def test_stale_review_binding_with_audit_hash_refused(self) -> None:
+        self.write_audited_review_binding(stale=True)
         self.assertEqual(self.invoke(), 3)
 
     def test_provider_and_arbitrary_argument_refusals(self) -> None:
@@ -414,10 +914,19 @@ class SpineTriageTest(unittest.TestCase):
             with self.subTest(field=field), self.assertRaises(Refusal):
                 keyed_cap(self.root, True, endpoint, "1", path)
         path.write_text(json.dumps(identity))
-        for raw in (None, "0", "-1", "bad", "5000001", "1" * 9, chr(0x661)):
+        for raw in (
+            None,
+            "0",
+            "-1",
+            "bad",
+            "5000001",
+            "1" * 9,
+            "0" * 7 + "1",
+            chr(0x661),
+        ):
             with self.subTest(cap=raw), self.assertRaises(Refusal):
                 keyed_cap(self.root, True, endpoint, raw, path)
-        for authorised, route in ((False, endpoint), (True, None)):
+        for authorised, route in ((False, endpoint), (True, None), (True, "")):
             with self.assertRaises(Refusal):
                 keyed_cap(self.root, authorised, route, "1", path)
         self.assertEqual(keyed_cap(self.root, True, endpoint, "1", path), 1)

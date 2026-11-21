@@ -98,6 +98,7 @@ def test_awards_audit_checks_actual_receipt_and_retains_normalisation_count(
 
     from eii_custodian.publicdata.assembly_reports import awards_evidence
     from eii_custodian.publicdata.fetch.award_checks import check_awards
+    from eii_custodian.publicdata.fetch.award_links import check_all_awards
 
     rows = [row(index) for index in range(30)]
     lookup = {item["report_url"]: item for item in rows}
@@ -106,6 +107,8 @@ def test_awards_audit_checks_actual_receipt_and_retains_normalisation_count(
         "source_id": "awards_owner_scrape",
         "sha256": "a" * 64,
         "award_check": check,
+        "award_check_scope": "sample",
+        "award_links": check_all_awards(rows, profile(), lookup.__getitem__),
         "registration_double_space_only": 2,
     }
     if change == "check":

@@ -9,6 +9,7 @@ join a row of the two places sources to the one body its receipt agrees with.
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,7 @@ from eii_custodian.publicdata.places.integrate import (
     _buildings_from_registry,
     _cache_points,
     _opened_place,
+    _place_from_registry,
     _receipt_of,
 )
 from eii_custodian.publicdata.places.read import FileReceipt
@@ -150,6 +152,36 @@ def test_a_file_key_the_registry_does_not_hold_is_refused(tmp_path: Path) -> Non
 
 
 # --- the registry and its receipts -----------------------------------------
+
+
+@pytest.mark.parametrize("source", ["places_ovt", "bldg_ovt"])
+def test_stac_receipts_never_enter_the_parquet_stage(
+    tmp_path: Path, source: str
+) -> None:
+    """A valid STAC snapshot before a valid part cannot become a Parquet input."""
+    cache = tmp_path / "cache"
+    part = _row(source + "/part-90001", source)
+    path = _receipted(cache, part.key, b"SYN-PARQUET")
+    metadata = []
+    for suffix in ("collection", "part-00288", "part-00384", "part-00385"):
+        key = source + "/stac-" + suffix
+        row = replace(_row(key, source), extension="json")
+        stac = cache / key / "syn.json"
+        stac.parent.mkdir(parents=True)
+        stac.write_bytes(b'{"type":"SYN-STAC"}')
+        _receipt(stac)
+        assert _receipt_of(cache, row) is not None
+        metadata.append(row)
+    entries = (*metadata, part)
+    expected_path = next(path.parent.glob("*/*.parquet"))
+    expected_receipt = receipt_for(path, part.key)
+    if source == "bldg_ovt":
+        assert _buildings_from_registry(cache, entries) == (
+            (expected_path,),
+            (expected_receipt,),
+        )
+    else:
+        assert _place_from_registry(cache, entries) == (expected_path, expected_receipt)
 
 
 def test_only_an_active_buildings_row_with_a_receipt_is_read(tmp_path: Path) -> None:

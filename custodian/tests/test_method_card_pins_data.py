@@ -523,7 +523,7 @@ def test_checked_c5_and_c14_values_match_second_replay_without_producer(tmp_path
     )
 
     from .method_card_data_replay import assert_record_matches_replay
-    from .method_card_pin_fixtures import case, save
+    from .method_card_pin_fixtures import case, lineage_context, save
 
     paths, record, artifact, _ = case(tmp_path)
     before, after = customs_files(tmp_path)
@@ -536,7 +536,7 @@ def test_checked_c5_and_c14_values_match_second_replay_without_producer(tmp_path
         if row["pin_id"] in expected:
             row["values"] = expected[row["pin_id"]].copy()
     save(paths, record, artifact)
-    checked = validate_source_check_record(*paths[:3])
+    checked = validate_source_check_record(*paths[:3], **lineage_context(record))
     # The comparison is made against a second replay call made after
     # validation, never against the dictionary that was written. The replays
     # read only the invented source files, never the producer artifact.
@@ -552,7 +552,7 @@ def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path)
     )
 
     from .method_card_data_replay import assert_record_matches_replay
-    from .method_card_pin_fixtures import case, save
+    from .method_card_pin_fixtures import case, lineage_context, save
 
     # The replay is computed first, before anything is written.
     deals, crosswalk = property_files(tmp_path)
@@ -578,7 +578,7 @@ def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path)
             row["values"] = tampered.copy()
     save(paths, record, artifact)
     # The artifact comparison is blind to this: record and artifact agree.
-    entries = validate_source_check_record(*paths[:3])
+    entries = validate_source_check_record(*paths[:3], **lineage_context(record))
     with pytest.raises(AssertionError, match="replay_value_mismatch"):
         assert_record_matches_replay(entries, replayed)
     # Positive control: the same record holding the untampered replayed
@@ -591,5 +591,5 @@ def test_plant_record_and_artifact_agree_but_differ_from_source_replay(tmp_path)
         if row["pin_id"] == "c14.medians_2024":
             row["values"] = replayed["c14.medians_2024"].copy()
     save(paths, record, artifact)
-    entries = validate_source_check_record(*paths[:3])
+    entries = validate_source_check_record(*paths[:3], **lineage_context(record))
     assert assert_record_matches_replay(entries, replayed)

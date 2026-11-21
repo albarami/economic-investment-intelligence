@@ -20,19 +20,34 @@ from eii_core.calc.public_methods import (
     wilson,
     zone_momentum,
 )
-from eii_core.calc.public_series import rounded
+from eii_core.calc.public_series import C2_METHOD_VERSION, rounded
 
 FIXTURE = Path(__file__).parent / "fixtures/methods/public_methods.json"
+
+
+def test_methods_fixture_has_no_census_counts():
+    fixture = json.loads(FIXTURE.read_text())
+    assert "C8" not in fixture["published"], "census counts and shares stay local"
+    assert not any("census" in name for name in fixture["sources"])
+    for row in fixture["published"].values():
+        assert set(row["sources"]) <= fixture["sources"].keys(), row["anchor"]
+        assert not any("census" in source for source in row["sources"])
+
+
+def test_methods_fixture_sources_have_attribution():
+    fixture = json.loads(FIXTURE.read_text())
+    for name, source in fixture["sources"].items():
+        assert {"publisher", "dataset", "url", "licence"} <= source.keys(), name
 
 
 def counted(value: int, **kwargs: str) -> Measure:
     return measure(value, **kwargs)
 
 
-def test_c8_published_national_coverage():
-    row = json.loads(FIXTURE.read_text())["published"]["C8"]
-    # Arithmetic fixture lineage, not a receipt for a pinned census file.
-    source = chain(row["sources"][0])
+def test_c8_invented_national_coverage():
+    # INVENTED: restricted census inputs and expected shares stay in the cache.
+    row = json.loads(FIXTURE.read_text())["invented"]["C8"]
+    source = chain()
     result = coverage_share(
         measure(
             row["private"],
@@ -50,8 +65,10 @@ def test_c8_published_national_coverage():
         ),
     )
     percent = result["percent"]
-    assert percent.value == D(row["percent"]) == D("78.9")
-    assert abs(percent.exact_unrounded - Fraction(789, 10)) <= D("0.5")
+    assert percent.value == D(row["percent"]) == D("75.0")
+    assert percent.exact_unrounded == Fraction(75)
+    assert percent.sources == (source,)
+    assert percent.geography == "national"
 
 
 def test_c1_printed_densities_and_lq():
@@ -480,6 +497,7 @@ def test_committed_method_fixture_arithmetic():
         )["value"]
     ) == D(c1["lq"][1])
     c2 = published["C2"]
+    assert c2["method_version"] == C2_METHOD_VERSION
     churn = licence_churn(
         measure(7878),
         {"2024-01": month_count("2024-01", 2510)},

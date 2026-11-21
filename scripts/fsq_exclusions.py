@@ -1,4 +1,7 @@
-"""Bounded, offline audit of the pinned copy's excluded file footers.
+"""Bounded, offline audit of a release's excluded file footers.
+
+The caller supplies the explicit `release` argument; nothing here assumes a
+pinned release constant.
 
 The lead supplies explicit local paths and budgets. Names from the summary
 are comparison keys, never filesystem paths. No CLI, download, receipt or

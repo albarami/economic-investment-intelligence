@@ -12,7 +12,7 @@ from eii_custodian.publicdata.fetch.transport import TransportFault
 SCHOOL_FIELDS = (
     "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,"
     "operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,"
-    "district_name,district_name_en,lat,long_"
+    "district_name,district_name_en,lat,long_,students_n,staff_num"
 ).split(",")
 
 SCHOOL = (

@@ -162,23 +162,31 @@ def test_customs_code_whole_refusals(source, value, literal):
     _whole_text(caught.value, literal)
 
 
-def test_default_municipality_review_and_whole_refusal(tmp_path, monkeypatch):
+def test_municipality_names_read_the_frame_and_reviewed_csv_only(tmp_path, monkeypatch):
     review = _review_root(tmp_path, monkeypatch)
-    path = review / "municipality_aliases.json"
-    row = {
-        "source_name_ar": "SYN-alias",
-        "frame_name_ar": "SYN-frame",
-        "reviewer_role": "SYN-reviewer",
-        "review_date": "2026-11-17",
-    }
-    path.write_text(json.dumps([row]))
+    names = tmp_path / "invented_review"
+    names.mkdir()
+    (names / "municipality_names.csv").write_text(
+        "name,municipality_code\nSYN-crosswalk,SYN-code\nSYN-absent,SYN-other\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(parse, "MUNICIPALITY_NAMES_REVIEW", names)
+    (review / "municipality_aliases.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_name_ar": "SYN-alias",
+                    "frame_name_ar": "SYN-frame",
+                    "reviewer_role": "SYN-reviewer",
+                    "review_date": "2026-11-17",
+                }
+            ]
+        )
+    )
     frame = (parse.Municipality("SYN-code", "SYN-frame"),)
     assert parse.municipality_names(frame) == {
         "SYN-frame": "SYN-code",
-        "SYN-alias": "SYN-code",
+        "SYN-crosswalk": "SYN-code",
     }
-    row["reviewer_role"] = ""
-    path.write_text(json.dumps([row]))
-    with pytest.raises(ValueError) as caught:
-        parse.municipality_names(frame)
-    _whole_text(caught.value, "municipality alias: missing review or frame name")
+    with pytest.raises(TypeError):
+        parse.municipality_names(frame, review)

@@ -12,7 +12,7 @@ from typing import Any
 from .page_html import ShapeError
 
 SCHOOL_FIELDS = tuple(
-    "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,district_name,district_name_en,lat,long_".split(
+    "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,district_name,district_name_en,lat,long_,students_n,staff_num".split(
         ","
     )
 )

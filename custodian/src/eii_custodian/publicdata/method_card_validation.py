@@ -19,12 +19,15 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from typing import Literal, cast
 
 import yaml
+
+from eii_custodian.publicdata.fetch.registry import Entry
 
 Scalar = str | int | bool
 MAKERS = frozenset(
@@ -170,7 +173,56 @@ def _canonical(value: object) -> str:
         raise ValueError("pin_json_invalid") from None
 
 
-def _lineage(value: object) -> tuple[SourceLineageRef, ...]:
+def _registry_by_source(registry: Sequence[Entry]) -> dict[str, tuple[Entry, ...]]:
+    by_source: dict[str, list[Entry]] = {}
+    for row in registry:
+        by_source.setdefault(row.source_id, []).append(row)
+    return {key: tuple(rows) for key, rows in by_source.items()}
+
+
+def _resolve_lineage(
+    lineage: tuple[SourceLineageRef, ...],
+    *,
+    registry_by_source: Mapping[str, tuple[Entry, ...]],
+    receipts_by_key: Mapping[str, Mapping[str, object]],
+) -> None:
+    for ref in lineage:
+        candidates = registry_by_source.get(ref.source_id)
+        if not candidates:
+            raise ValueError("pin_lineage_source_unknown")
+        matches: list[Entry] = []
+        missing_receipt = False
+        wrong_hash = False
+        for entry in candidates:
+            receipt = receipts_by_key.get(entry.key)
+            if not isinstance(receipt, Mapping):
+                missing_receipt = True
+                continue
+            receipt_hash = receipt.get("sha256")
+            if not isinstance(receipt_hash, str):
+                missing_receipt = True
+                continue
+            if receipt_hash == ref.sha256:
+                matches.append(entry)
+            else:
+                wrong_hash = True
+        if len(matches) > 1:
+            raise ValueError("pin_lineage_source_ambiguous")
+        if len(matches) == 1:
+            continue
+        if wrong_hash:
+            raise ValueError("pin_lineage_receipt_mismatch")
+        if missing_receipt:
+            raise ValueError("pin_lineage_receipt_missing")
+        raise ValueError("pin_lineage_source_unknown")
+
+
+def _lineage(
+    value: object,
+    *,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
+    receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
+) -> tuple[SourceLineageRef, ...]:
     if not isinstance(value, list):
         raise ValueError("pin_lineage")
     rows = []
@@ -187,10 +239,22 @@ def _lineage(value: object) -> tuple[SourceLineageRef, ...]:
         rows.append(SourceLineageRef(**fields))
     if len(set(rows)) != len(rows):
         raise ValueError("pin_lineage_duplicate")
-    return tuple(rows)
+    lineage = tuple(rows)
+    if lineage and (registry_by_source is not None and receipts_by_key is not None):
+        _resolve_lineage(
+            lineage,
+            registry_by_source=registry_by_source,
+            receipts_by_key=receipts_by_key,
+        )
+    return lineage
 
 
-def _entry(value: object) -> CheckedPinEntry:
+def _entry(
+    value: object,
+    *,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
+    receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
+) -> CheckedPinEntry:
     row = _mapping(value, set(CheckedPinEntry.__dataclass_fields__))
     pin = _text(row["pin_id"])
     if pin not in REQUIRED_PINS or row["card_anchor"] != pin.split(".")[0]:
@@ -202,7 +266,11 @@ def _entry(value: object) -> CheckedPinEntry:
     if type(checked) is not bool:
         raise ValueError("pin_review_result")
     values = _values(row["values"])
-    lineage = _lineage(row["source_lineage"])
+    lineage = _lineage(
+        row["source_lineage"],
+        registry_by_source=registry_by_source,
+        receipts_by_key=receipts_by_key,
+    )
     if checked:
         reviewer = row["reviewer_maker"]
         if not isinstance(reviewer, str) or reviewer not in MAKERS:
@@ -251,7 +319,12 @@ def _entry(value: object) -> CheckedPinEntry:
     )
 
 
-def _record(path: Path) -> tuple[dict[str, CheckedPinEntry], str]:
+def _record(
+    path: Path,
+    *,
+    registry_by_source: Mapping[str, tuple[Entry, ...]] | None = None,
+    receipts_by_key: Mapping[str, Mapping[str, object]] | None = None,
+) -> tuple[dict[str, CheckedPinEntry], str]:
     try:
         loaded = yaml.safe_load(_read(path))
     except yaml.YAMLError:
@@ -273,7 +346,14 @@ def _record(path: Path) -> tuple[dict[str, CheckedPinEntry], str]:
     pins = record["pins"]
     if not isinstance(pins, list):
         raise ValueError("pin_record_list")
-    entries = [_entry(item) for item in pins]
+    entries = [
+        _entry(
+            item,
+            registry_by_source=registry_by_source,
+            receipts_by_key=receipts_by_key,
+        )
+        for item in pins
+    ]
     by_id = {entry.pin_id: entry for entry in entries}
     if len(by_id) != len(entries) or set(by_id) != REQUIRED_PINS:
         raise ValueError("pin_missing_or_duplicate")
@@ -385,6 +465,9 @@ def validate_source_check_record(
     record_path: Path,
     s2_t08_artifact_path: Path,
     generation_config_path: Path,
+    *,
+    registry: Sequence[Entry] | None = None,
+    receipts: Mapping[str, Mapping[str, object]] | None = None,
 ) -> dict[str, CheckedPinEntry]:
     """Validate all required entries; pending rows do not require live inputs.
 
@@ -392,8 +475,17 @@ def validate_source_check_record(
     the supplied producer artifact and the SHA-256 of the actual config bytes.
     The same schema-valid pending record is deliberately rejected by completion.
     """
-    entries, _ = _record(record_path)
+    registry_by_source = _registry_by_source(registry) if registry is not None else None
+    receipts_by_key = dict(receipts) if receipts is not None else None
+    entries, _ = _record(
+        record_path,
+        registry_by_source=registry_by_source,
+        receipts_by_key=receipts_by_key,
+    )
     checked = [entry for entry in entries.values() if entry.checked_against_source]
+    needs_resolution = any(entry.source_lineage for entry in checked)
+    if needs_resolution and (registry_by_source is None or receipts_by_key is None):
+        raise ValueError("pin_lineage_context_missing")
     if not checked:
         return entries
     config_body = _read(generation_config_path)
@@ -425,7 +517,14 @@ def validate_source_check_record(
             raise ValueError("pin_artifact_missing")
         if _canonical(_values(produced_row["values"])) != _canonical(entry.values):
             raise ValueError("pin_value_mismatch")
-        if _lineage(produced_row["source_lineage"]) != entry.source_lineage:
+        if (
+            _lineage(
+                produced_row["source_lineage"],
+                registry_by_source=registry_by_source,
+                receipts_by_key=receipts_by_key,
+            )
+            != entry.source_lineage
+        ):
             raise ValueError("pin_lineage_mismatch")
         settings = _mapping(settings_by_pin.get(entry.pin_id))
         if _canonical(_mapping(produced_row["settings"])) != _canonical(settings):
@@ -493,11 +592,19 @@ def completion_evidence(
     methods_doc_path: Path,
     *,
     gate: Literal["S2", "S7"],
+    registry: Sequence[Entry] | None = None,
+    receipts: Mapping[str, Mapping[str, object]] | None = None,
 ) -> dict[str, CheckedPinEntry]:
     """The MTH-03 check for either slice gate; an open item never clears it."""
     if gate not in ("S2", "S7"):
         raise ValueError("pin_gate_unknown")
-    entries, _ = _record(record_path)
+    entries, _ = _record(
+        record_path,
+        registry_by_source=_registry_by_source(registry)
+        if registry is not None
+        else None,
+        receipts_by_key=dict(receipts) if receipts is not None else None,
+    )
     if any(not entry.checked_against_source for entry in entries.values()):
         raise ValueError(
             gate
@@ -511,7 +618,11 @@ def completion_evidence(
             )
         )
     entries = validate_source_check_record(
-        record_path, s2_t08_artifact_path, generation_config_path
+        record_path,
+        s2_t08_artifact_path,
+        generation_config_path,
+        registry=registry,
+        receipts=receipts,
     )
     verify_method_cards_sync(record_path, methods_doc_path)
     return entries

@@ -13,6 +13,7 @@ from custodian.tests.fixtures.places.invented import (
     write_buildings,
     write_places,
 )
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_activity_graph import (
     _allowlist_csv,
     _binding_beside,
@@ -23,7 +24,6 @@ from custodian.tests.test_places_fetch import _entry as part_entry
 from custodian.tests.test_publicdata_behaviour import _clock, _sleep
 from custodian.tests.test_publicdata_unblocked_round2 import listing_body
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response

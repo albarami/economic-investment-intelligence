@@ -278,7 +278,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_goods"
@@ -324,7 +324,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_serv"
@@ -370,7 +370,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_size"
@@ -417,7 +417,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "sec_hr_comp_occ"
@@ -487,7 +487,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "wage_act"
@@ -529,7 +529,7 @@ sources:
         type: "integer"
     row_count_min: null
     row_count_max: null
-    reconciliation: "open"
+    reconciliation: "resolved:0025-reconciliation-of-restaurant-and-wage-figures"
     skip_reason: ""
     extension: "json"
   - key: "wage_sector"
@@ -1433,7 +1433,7 @@ sources:
     source_id: "bldg_ovt"
     slug: ""
     kind: "https_file"
-    title_en: "Overture Buildings, release 2026-10-21.0 (named showcase buildings only)"
+    title_en: "Overture Buildings, release 2026-10-21.0 (national building inventory and gazetteer)"
     publisher: "Overture Maps Foundation"
     licence_id: "ODbL"
     licence_basis: "dataset"
@@ -5748,6 +5748,124 @@ sources:
       Qian Shi, et al. A First High-quality Vector Data of Buildings in East Asian Countries Based on a Comprehensive Large-scale Mapping Framework. Zenodo, 22 July 2023, doi:10.5281/zenodo.8174931. Available under CC BY 4.0.
       Work derived from BTN 2024 ign.es. Available under CC BY 4.0.
 
+# S2-T20 — reviewed STAC metadata; unconfirmed item addresses refuse completeness.
+  - key: "bldg_ovt/stac-collection"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC collection"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00288"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00288"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00384"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00384"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+  - key: "bldg_ovt/stac-part-00385"
+    refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "bldg_ovt"
+    slug: ""
+    kind: "https_file"
+    title_en: "Overture buildings release 2026-10-21.0 STAC part-00385"
+    publisher: "Overture Maps Foundation"
+    licence_id: "ODbL"
+    licence_basis: "dataset"
+    licence_url: ""
+    decision_record: ""
+    fetch_host: "stac.overturemaps.org"
+    url: ""
+    terms_url: "https://opendatacommons.org/licenses/odbl/1-0/"
+    terms_words: "\"ODbL-1.0\" [...] \"Keep intact any copyright or Database Right notices and notices that refer to this License.\""
+    terms_read_on: "2026-11-19"
+    landing_url: "https://stac.overturemaps.org/2026-10-21.0/buildings/building/collection.json"
+    nightly_live_fetch: true
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "json"
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+
 # S2-T17 — PUB-103 / C30 source admission, not backtest eligibility.
   - key: "ntl_blackmarble/2024-01"
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -8179,7 +8297,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8231,7 +8350,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8283,7 +8403,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8335,7 +8456,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8387,7 +8509,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8438,7 +8561,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8490,7 +8614,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8542,7 +8667,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8594,7 +8720,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_completions_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8646,7 +8773,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8690,7 +8818,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8739,7 +8868,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8792,7 +8922,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8848,7 +8979,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8896,7 +9028,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -8944,7 +9077,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_coverage_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9069,7 +9203,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_fdi_stats
     caveat_keys: []
     columns:
     - name: period
@@ -9117,7 +9252,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_fdi_stats
     caveat_keys: []
     columns:
     - name: year
@@ -9248,6 +9384,7 @@ sources:
     source_id: gis_imagery_history
     slug: ''
     kind: paged_layer
+    basis_note: 'Decision 0079: dedicated eleven-date tile registry review/gis_snapshot.json; ordinary and nightly tile acquisition false; lead-shell mode only.'
     title_en: gis_imagery_history
     publisher: national GIS centre
     licence_id: ''
@@ -9641,7 +9778,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9691,7 +9829,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: month
@@ -9742,7 +9881,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9792,7 +9932,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9842,7 +9983,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9892,7 +10034,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_hotel_ext
     caveat_keys: []
     columns:
     - name: year
@@ -9946,7 +10089,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10002,7 +10146,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10054,7 +10199,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10110,7 +10256,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10164,7 +10311,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10219,7 +10367,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10273,7 +10422,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10327,7 +10477,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10382,7 +10533,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_jobseekers
     caveat_keys: []
     columns:
     - name: year
@@ -10434,7 +10586,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10484,7 +10637,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10538,7 +10692,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_price_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10592,7 +10747,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10647,7 +10803,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10699,7 +10856,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10752,7 +10910,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10807,7 +10966,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10862,7 +11022,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year_lsn
@@ -10914,7 +11075,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -10967,7 +11129,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_survey_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11022,7 +11185,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: academic_year
@@ -11079,7 +11243,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: academic_year
@@ -11142,7 +11307,8 @@ sources:
     public_splits:
     - nationality
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11197,7 +11363,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11250,7 +11417,8 @@ sources:
     public_splits:
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11308,7 +11476,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11370,7 +11539,8 @@ sources:
     - nationality
     - sex
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_talent_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11463,7 +11633,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11511,7 +11682,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11559,7 +11731,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11621,7 +11794,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_trade_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11682,7 +11856,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11728,7 +11903,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11782,7 +11958,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11834,7 +12011,8 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables:
+    - pub_utilities_ext
     caveat_keys: []
     columns:
     - name: year
@@ -11943,40 +12121,73 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "tif"
+  - key: "bldg_gba"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "bldg_gba"
+    slug: ""
+    kind: "https_file"
+    title_en: "GlobalBuildingAtlas LoD1 building footprints and heights (calibration only)"
+    publisher: "Technical University of Munich (GlobalBuildingAtlas)"
+    licence_id: "CC-BY-NC-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: "data.source.coop"
+    url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
+    terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
+    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
+    terms_read_on: "2026-11-20"
+    landing_url: "https://github.com/zhu-xlab/GlobalBuildingAtlas/"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: "direct_url_unconfirmed"
+    extension: "zip"
 
   - key: "cepii_baci"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cepii_baci"
     slug: ""
     kind: "https_file"
-    title_en: "BACI bilateral trade (unverified source lead)"
+    title_en: "BACI bilateral trade (HS 2017, release 202601)"
     publisher: "CEPII"
-    licence_id: "unconfirmed"
-    licence_basis: "owner_decision"
-    licence_url: ""
-    decision_record: "0026"
-    fetch_host: ""
-    url: ""
-    terms_url: ""
-    terms_words: "terms to be read"
-    terms_read_on: "2026-11-16"
+    licence_id: "Etalab-2.0"
+    licence_basis: "dataset"
+    licence_url: "https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf"
+    decision_record: ""
+    fetch_host: "www.cepii.fr"
+    url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip"
+    terms_url: "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
+    terms_words: "Licence: Etalab 2.0"
+    terms_read_on: "2026-11-20"
     terms_watch: false
-    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Source metadata and configuration await the lead."
-    landing_url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html"
+    basis_note: "Lead publisher-page reading of 2026-11-20, recorded in document 04 S2-T21 part B terms readings; page SHA-256 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60. The saved publisher page links Etalab 2.0 to this licence_url: it is the publisher-link target supplied by the lead. HS 2017, release 202601, period 2017-2024. Lead byte-range archive reading confirms native headers, all eleven member names and exact compressed/uncompressed byte bounds in baci.yaml; inventory evidence SHA-256 c05558932651ca22915f5fca081f8c5ce30697ffcc845553e15763e84226d49f. Native row counts remain pending and are recorded at first fetch. PUB-03 host admission is this reviewed registry/URL change, not the earlier page listing. Fetch remains baci_metadata_unconfirmed: confirmed target/country representation, missing-quantity tokens, decimal limits, access configuration and bounded first-fetch row accounting remain unresolved; no archive or member checksum is inferred from the inventory digest. Earlier P18 metadata reading (incomplete; superseded by the lead reading for the page and archive): review/trade_publisher_readings.yaml#cepii_baci."
+    landing_url: "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
     release_tables: ["pub_baci_trade", "pub_baci_country", "pub_baci_product"]
     caveat_keys: ["baci_separate_series", "baci_coverage_incomplete"]
-    columns: []
+    columns:
+      - {name: "t", type: "integer"}
+      - {name: "i", type: "string"}
+      - {name: "j", type: "string"}
+      - {name: "k", type: "string"}
+      - {name: "v", type: "number"}
+      - {name: "q", type: "number"}
     row_count_min: null
     row_count_max: null
-    period_first: ""
-    period_last: ""
-    period_field: "year"
+    period_first: "2017"
+    period_last: "2024"
+    period_field: "t"
     reconciliation: "open"
     skip_reason: "baci_metadata_unconfirmed"
-    extension: "bin"
+    extension: "zip"
   - key: "cepii_gravity"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cepii_gravity"
@@ -11994,7 +12205,7 @@ sources:
     terms_words: "terms to be read"
     terms_read_on: "2026-11-16"
     terms_watch: false
-    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. The decision 0040 page lead carries a query string and is not stored as a reviewed data URL. Source metadata awaits the lead."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#cepii_gravity. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). Named publisher page (both path casings) and attempted README returned HTTP 404. Publisher version, Etalab lead, country keys, units, coverage, schema and exact bounds remain unverified."
     landing_url: ""
     nightly_live_fetch: true
     public_splits: []
@@ -12027,7 +12238,7 @@ sources:
     terms_words: "terms to be read"
     terms_read_on: "2026-11-16"
     terms_watch: false
-    basis_note: "Decision 0026. Pending record checked on this date; no publisher page was read. Finished country-product-year and country-partner-product-year downloads only. Source metadata awaits the lead."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#atlas_complexity. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://atlas.hks.harvard.edu/data-downloads/ body SHA-256 c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b. Exact words: Atlas trade values are reported in U.S. dollars (USD). HS 1992: data available from 1995 onward HS 2012: data available from 2012 onward HS 2022: data available from 2022 onward Each downloadable data file includes specific citation requirements. https://intl-atlas-downloads.s3.amazonaws.com/index.html body SHA-256 670fcb5e5f4dd5fe3b096f92289a1a701b0504e459b66bfb10f37c3c3aa08c2b. Exact words: The files are split into unilateral (country_product_year) and bilateral (country_partner_product_year) data at the four digit level. Since the bilateral data is much larger, it is split into years. The data is also provided in two different classification systems, HS representing the Harmonized System (revision 1992) and SITC representing the Standardized International Trade Classification (revision 2). country_hsproduct4digit_year.zip (412.14 MB) https://atlas.hks.harvard.edu/faq body SHA-256 e2acf8498c8d410f786ac0b3cbacfb8f110bb82c6389070553f52d7b0716fcf0. Exact words: The Atlas of Economic Complexity is a freely available public resource. Current downloads and legacy index are distinct readings; no file vintage is selected and no version is inferred from a filename. Terms route returned only an application shell; Dataverse returned an empty HTTP 202. File-specific licence and attribution remain pending. Qatar key, exact row/member/byte bounds and native finished-measure schema remain unverified. Rounded MB display is not an exact byte count."
     landing_url: ""
     nightly_live_fetch: true
     public_splits: []
@@ -12103,7 +12314,7 @@ sources:
     reconciliation: "open"
     skip_reason: "metadata_unconfirmed"
     extension: "json"
-    basis_note: "Keyed provider interface under decision 0040 item 2. Terms, hosts, budgets, schema and the selection are unconfirmed."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#un_comtrade. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://uncomtrade.org/docs/un-comtrade-tools/ body SHA-256 6bb66dc8e65d79c24b57ad00fbe31a71949f77929e2817fb28e1dd200540b2c5. Exact words: The bilateral data comparison tool puts the reported data and its mirror data side-by-side, allowing the analysis of bilateral trade asymmetries https://uncomtrade.org/docs/un-comtrade-api/ body SHA-256 5ba69b23be248a928ceb2552832bf4e8e3e1343b13b86b5e17069203ab371692. Exact words: There is no need to create an account nor having API subscription key, the preview APIs would work as is. https://uncomtrade.org/docs/api-subscription-keys/ body SHA-256 27ae45c86f57d7e39016badd602d4fce48a9c1af4e8572e9df430f41e1645027. Exact words: You must be a registered UN Comtrade user before requesting an API subscription key. https://uncomtrade.org/docs/subscriptions/ body SHA-256 65ec76f8be19aeea2cdb465e88bc65373c900785bc97f92717381c12d1a701f3. Exact words: Registration is free, and users can unlock a range of features with a registered UN Comtrade account. These features include data preview, data download of 100K records per call, and data API access for up to 500 calls/day. Limited to 500 records and 1 single period and product per call https://uncomtrade.org/docs/how-to-access/ body SHA-256 867c1d9de7aa143932643abb3ed321d403129b1b5cb1786d62d4acfcf75c7ae7. Exact words: There are two kinds of registration: free and premium. https://comtradeplus.un.org/en/license-agreement body SHA-256 f8266dc77ad64d95ba2f0a7d39e04984f00e70cca816646076bc638e4f896e9d. Exact words: Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation of any material contained on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without the prior written permission of the United Nations. The rights and obligations concerning the use of United Nations COMTRADE in accordance with this Usage Agreement are not transferable. Partial subscription reading: 100K records per registered data download and up to 500 API calls/day; a separate statement limits a call to 500 records, one period and product. Per-call tier binding, reset rule and quota scope remain unverified; no keyed API or public preview cap is confirmed. Owner selection remains PO-S2-80."
     comtrade_policy:
       confirmed: false
 
@@ -12112,18 +12323,18 @@ sources:
     source_id: "wb_wdi"
     slug: ""
     kind: "https_file"
-    title_en: "World Development Indicators (unverified identity lead)"
-    publisher: "World Bank (unverified identity lead)"
+    title_en: "World Development Indicators"
+    publisher: "World Bank"
     landing_url: "https://data.worldbank.org/"
     url: ""
     fetch_host: ""
     terms_url: "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
     licence_url: ""
-    licence_id: "unconfirmed"
+    licence_id: "CC-BY-4.0"
     licence_basis: "portal_terms"
     decision_record: ""
-    terms_words: "\"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below.\""
-    terms_read_on: "2026-11-19"
+    terms_words: "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below."
+    terms_read_on: "2026-11-20"
     terms_watch: false
     nightly_live_fetch: true
     public_splits: []
@@ -12139,25 +12350,25 @@ sources:
     reconciliation: "none"
     skip_reason: "benchmark_metadata_unconfirmed"
     extension: "bin"
-    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#wb_wdi. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://databank.worldbank.org/source/world-development-indicators body SHA-256 2f2b0be5f75bf1fe36fb15c60abba03c330e3cbf0452075b9193ac450a9376fd. Exact words: World Development Indicators | DataBank https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators body SHA-256 421b331f7faab68162209d65b3725dc13dbcbe017cf0c3f3c9b373653b18caa5. Exact words: Metadata last updated on Nov 18, 2026 Version : 132 (Latest) Creative Commons Attribution 4.0 https://www.worldbank.org/ext/en/legal/terms-conditions/datasets body SHA-256 bf7646ed7077968b0652c8ab2a7b91893275ab282dc9a2b769bd85d21b6ce828. Exact words: Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below. Some datasets and indicators are provided by third parties, and may not be redistributed or reused without the consent of the original data provider, or may be subject to terms and conditions that are different from those described above. Qatar country page returned HTTP 403. Country key, selected indicators/history, status boundaries, units and native schema remain unverified. Catalog metadata version does not establish selected data vintage, raw row counts or download byte bounds."
 
   - key: "unctad_fdi"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "unctad_fdi"
     slug: ""
     kind: "https_file"
-    title_en: "UNCTADstat (unverified identity lead)"
-    publisher: "UNCTAD (unverified identity lead)"
+    title_en: "UNCTADstat"
+    publisher: "UNCTAD"
     landing_url: "https://unctadstat.unctad.org/"
     url: ""
     fetch_host: ""
     terms_url: "https://unctadstat.unctad.org/EN/About.html#TERMS_OF_USE"
     licence_url: ""
-    licence_id: "unconfirmed"
+    licence_id: "cc-by-igo"
     licence_basis: "portal_terms"
     decision_record: ""
-    terms_words: "\"Creative Commons Attribution 3.0 IGO license\" [...] \"All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source.\""
-    terms_read_on: "2026-11-19"
+    terms_words: "All materials provided on this website are copyrighted under the Creative Commons Attribution 3.0 IGO license. All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source."
+    terms_read_on: "2026-11-20"
     terms_watch: false
     nightly_live_fetch: true
     public_splits: []
@@ -12173,7 +12384,7 @@ sources:
     reconciliation: "none"
     skip_reason: "benchmark_metadata_unconfirmed"
     extension: "bin"
-    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#unctad_fdi. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). https://unctadstat.unctad.org/EN/ body SHA-256 5cbb1dd81b736354559d55dcf168f58c76609a1dbd737df2ee1bc17b86c3d6d3. Exact words: All statistical indicators compiled by the Statistics Service according to common rules, ensuring comparability between the various datasets. https://unctadstat.unctad.org/EN/About.html body SHA-256 8b2dd2e2778a670f62b0b4b21535bac3f1e2d759e6a358c511c3d076d6ee74fb. Exact words: All materials provided on this website are copyrighted under the Creative Commons Attribution 3.0 IGO license. All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source. https://unctadstat.unctad.org/EN/FAQ.html body SHA-256 926a1fd94a5aa8980de3913f4656b28a91d6e5fc259ce9f103097f00578596a4. Exact words: Access to data is free and there is no registration required. FDI inflows and outflows comprise capital provided (either directly or through other related enterprises) by a foreign direct investor to a FDI enterprise, or capital received by a foreign direct investor from a FDI enterprise. Selected FDI dataset/version, Qatar key, years, units, historical/estimate/forecast flags, schema and row/byte bounds remain unverified. Portal-level free access and licence statements do not establish selected FDI coverage. The indicators-explained page describes concentration and CPI, not the selected FDI metadata."
 
   - key: "imf_weo"
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -12207,7 +12418,7 @@ sources:
     reconciliation: "none"
     skip_reason: "benchmark_metadata_unconfirmed"
     extension: "bin"
-    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#imf_weo. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). Dataset and database documentation pages returned HTTP 403; no challenge was bypassed. Identity remains a lead; vintage, Qatar coverage, historical/forecast boundaries, terms, tier, schema and bounds remain unverified."
 
   - key: "ilostat_qat"
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -12241,7 +12452,7 @@ sources:
     reconciliation: "none"
     skip_reason: "benchmark_metadata_unconfirmed"
     extension: "bin"
-    basis_note: "Pending independent page verification under decision 0026; identity and page lead only."
+    basis_note: "S2-P18, read 2026-11-20; review/trade_publisher_readings.yaml#ilostat_qat. Metadata readings only; activation remains unconfirmed for missing technical metadata, never for pending terms (decision 0059). Dataset and concepts pages returned HTTP 403. The original page redirects to an unreviewed host and was not followed. Qatar coverage, identity, source-native indicators, vintage, terms, tier, schema and bounds remain unverified; unavailable without substitution."
 
   - key: insurance_tables
     source_id: insurance_tables
@@ -12652,6 +12863,138 @@ sources:
     reconciliation: "none"
     skip_reason: "fc_activation_review_pending"
     extension: "json"
+
+  - key: "biz_register"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "biz_register"
+    slug: ""
+    kind: "register_file"
+    title_en: "Public business register file"
+    publisher: "Lead receipt required for public business register publisher"
+    licence_id: "pending"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    basis_note: "Decision 0026; personal local use. Attribution and terms as read come from the lead's key-scoped file receipt."
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: [nationality]
+    commit_allowed: false
+    release_tables: [pub_register_company, pub_register_snapshot]
+    caveat_keys: []
+    columns:
+      - {name: row_key, type: string}
+      - {name: name_ar, type: string}
+      - {name: name_en, type: string}
+      - {name: establishment_type, type: string}
+      - {name: establishment_subtype, type: string}
+      - {name: legal_form, type: string}
+      - {name: business_type, type: string}
+      - {name: business_category, type: string}
+      - {name: classification, type: string}
+      - {name: registration_status, type: string}
+      - {name: registration_issue_date, type: string}
+      - {name: registration_expiry_date, type: string}
+      - {name: licence_status, type: string}
+      - {name: licence_issue_date, type: string}
+      - {name: licence_expiry_date, type: string}
+      - {name: branches, type: string}
+      - {name: municipality, type: string}
+      - {name: zone, type: string}
+      - {name: lon, type: string}
+      - {name: lat, type: string}
+      - {name: registration_number, type: string}
+      - {name: licence_number, type: string}
+      - {name: tax_registered, type: string}
+      - {name: tax_registration_number, type: string}
+      - {name: tax_classification_year, type: string}
+      - {name: tax_type, type: string}
+      - {name: capital_qar, type: string}
+      - {name: establishment_nationality, type: string}
+      - {name: street_number, type: string}
+      - {name: building_number, type: string}
+      - {name: establishment_type_ar, type: string}
+      - {name: establishment_subtype_ar, type: string}
+      - {name: legal_form_ar, type: string}
+      - {name: classification_ar, type: string}
+      - {name: registration_status_ar, type: string}
+      - {name: licence_status_ar, type: string}
+      - {name: municipality_ar, type: string}
+      - {name: district_en, type: string}
+      - {name: district_ar, type: string}
+      - {name: block_en, type: string}
+      - {name: block_ar, type: string}
+      - {name: establishment_nationality_ar, type: string}
+      - {name: points_at_location, type: string}
+    reconciliation: "schema metadata only; registers/contracts.py declares each lexeme format; no category values inferred"
+    skip_reason: "lead_shell_file_input"
+    extension: "csv"
+
+  - key: "fc_register/file"
+    refetch: {value: weekly, family: registers, evidence: "decision 0045 item 4; EII check schedule"}
+    source_id: "fc_register"
+    slug: "file"
+    kind: "register_file"
+    title_en: "Financial-centre register file capture"
+    publisher: "Lead receipt required for financial-centre register publisher"
+    licence_id: "pending"
+    licence_basis: "owner_decision"
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: "terms to be read"
+    terms_read_on: "pending"
+    basis_note: "Decision 0026; personal local use. This key maps to released source_id fc_register; the public-page row remains separate."
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: [pub_register_company, pub_register_snapshot]
+    caveat_keys: []
+    columns:
+      - {name: row_key, type: string}
+      - {name: qfc_number, type: string}
+      - {name: name_en, type: string}
+      - {name: name_ar, type: string}
+      - {name: registered_address, type: string}
+      - {name: licence_status, type: string}
+      - {name: register_order, type: string}
+    reconciliation: "schema metadata only; registers/contracts.py declares companies, geocoded and events; no category values inferred"
+    skip_reason: "lead_shell_file_input"
+    extension: "csv"
+
+  - key: company_web
+    refetch: {value: none, reason: frequency_unconfirmed, evidence: "decision 0076 item 7; refresh cadence unconfirmed"}
+    source_id: company_web
+    slug: ""
+    kind: company_web
+    title_en: Company web pages
+    publisher: Per-host publisher in the uncommitted receipt
+    licence_id: not_stated
+    licence_basis: owner_decision
+    decision_record: "0026"
+    fetch_host: ""
+    url: ""
+    terms_url: ""
+    terms_words: terms to be read
+    terms_read_on: "2026-11-20"
+    landing_url: ""
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: none
+    skip_reason: ""
+    extension: html
 
 forecast_series:
   - key: licence_issues

@@ -103,6 +103,7 @@ class SourceResult:
     state: str
     reason: str
     globfp: tuple[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]], ...]
+    gba: tuple[tuple[str, tuple[tuple[BaseGeometry, Decimal, str], ...]], ...]
     wsf: tuple[tuple[str, WsfGrid], ...]
     files: tuple[dict[str, object], ...]
     rows: tuple[dict[str, str], ...]
@@ -360,6 +361,62 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
     return tuple(heights)
 
 
+def _dbf_text_field(dbf: bytes, field_name: str) -> tuple[str, ...]:
+    """Each live record's fixed-width text field, trimmed and non-empty."""
+    minimum = _DBF_HEADER_BYTES + _DBF_FIELD_BYTES + 2
+    if len(dbf) < minimum or dbf[0:1] != _DBF_VERSION:
+        raise HeightError("structure_mismatch", "class_table")
+    count = int.from_bytes(dbf[4:8], "little")
+    header_len = int.from_bytes(dbf[8:10], "little")
+    record_len = int.from_bytes(dbf[10:12], "little")
+    descriptors = header_len - _DBF_HEADER_BYTES - 1
+    records_end = header_len + count * record_len
+    if (
+        header_len < minimum - 1
+        or descriptors % _DBF_FIELD_BYTES
+        or record_len < 2
+        or len(dbf) < header_len
+        or dbf[header_len - 1] != _DBF_TERMINATOR
+        or len(dbf) < records_end
+    ):
+        raise HeightError("structure_mismatch", "class_header")
+    fields: list[tuple[str, str, int, int]] = []
+    offset = 1
+    for index in range(descriptors // _DBF_FIELD_BYTES):
+        start = _DBF_HEADER_BYTES + index * _DBF_FIELD_BYTES
+        descriptor = dbf[start : start + _DBF_FIELD_BYTES]
+        try:
+            name = descriptor[:11].split(b"\x00", 1)[0].decode("ascii")
+            field_type = descriptor[11:12].decode("ascii")
+        except UnicodeDecodeError:
+            raise HeightError("structure_mismatch", "class_descriptor") from None
+        fields.append((name, field_type, offset, descriptor[16]))
+        offset += descriptor[16]
+    if offset != record_len:
+        raise HeightError("structure_mismatch", "class_record_length")
+    found = [field for field in fields if field[0] == field_name]
+    if len(found) != 1:
+        raise HeightError("structure_mismatch", "class_field_absent")
+    if found[0][1] != "C":
+        raise HeightError("structure_mismatch", "class_field_type")
+    _name, _type, field_offset, field_size = found[0]
+    values: list[str] = []
+    for row in range(count):
+        start = header_len + row * record_len
+        record = dbf[start : start + record_len]
+        if record[0:1] != _DBF_LIVE:
+            raise HeightError("structure_mismatch", "class_record")
+        try:
+            text = record[field_offset : field_offset + field_size].decode("ascii")
+        except UnicodeDecodeError:
+            raise HeightError("structure_mismatch", "class_record") from None
+        stripped = text.strip()
+        if not stripped:
+            raise HeightError("structure_mismatch", "class_record_blank")
+        values.append(stripped)
+    return tuple(values)
+
+
 def _parse_globfp(
     body: bytes, structure: SourceStructure
 ) -> tuple[tuple[BaseGeometry, Decimal], ...]:
@@ -417,6 +474,56 @@ def _parse_globfp(
         ):
             raise HeightError("structure_mismatch")
         rows.append((footprint, height))
+    return tuple(rows)
+
+
+def _parse_gba(
+    body: bytes, structure: SourceStructure
+) -> tuple[tuple[BaseGeometry, Decimal, str], ...]:
+    """The published GBA shapefile with a height and a class field per record."""
+    if not structure.class_field:
+        raise HeightError("structure_mismatch", "class_field_undeclared")
+    bodies = _zip_members(body)
+    if bodies["cpg"].strip() != b"ISO-8859-1":
+        raise HeightError("structure_mismatch")
+    rasterio = import_module("rasterio")
+    shapefile = import_module("shapefile")
+    geometry = import_module("shapely.geometry")
+    try:
+        prj_text = bodies["prj"].decode("utf-8")
+        epsg = rasterio.CRS.from_wkt(prj_text).to_epsg()
+    except (UnicodeDecodeError, rasterio.errors.CRSError):
+        raise HeightError("reference_system") from None
+    if epsg != EPSG_WGS84:
+        raise HeightError("reference_system")
+    heights = _dbf_heights(bodies["dbf"], structure.field)
+    classes = _dbf_text_field(bodies["dbf"], structure.class_field)
+    if len(classes) != len(heights):
+        raise HeightError("structure_mismatch")
+    try:
+        reader = shapefile.Reader(
+            shp=io.BytesIO(bodies["shp"]), shx=io.BytesIO(bodies["shx"])
+        )
+        records = reader.shapes()
+    except (struct.error, shapefile.ShapefileException):
+        raise HeightError("structure_mismatch") from None
+    if len(records) != len(heights):
+        raise HeightError("structure_mismatch")
+    rows: list[tuple[BaseGeometry, Decimal, str]] = []
+    for record, height, class_name in zip(records, heights, classes, strict=True):
+        if record.shapeType != GLOBFP_SHAPE_TYPE:
+            raise HeightError("structure_mismatch")
+        try:
+            footprint = geometry.shape(record.__geo_interface__)
+        except (IndexError, ValueError):
+            raise HeightError("structure_mismatch") from None
+        if (
+            footprint.is_empty
+            or not footprint.is_valid
+            or footprint.geom_type not in ("Polygon", "MultiPolygon")
+        ):
+            raise HeightError("structure_mismatch")
+        rows.append((footprint, height, class_name))
     return tuple(rows)
 
 
@@ -552,9 +659,10 @@ def read_sources(
             key=lambda entry: entry.key,
         )
         terms = rows[0] if rows else None
+        globfp_like = source_id in {"bldg_3dglobfp", "bldg_gba"}
         if (
             structure_unconfirmed(structure)
-            or (source_id == "bldg_3dglobfp" and structure.format != GLOBFP_FORMAT)
+            or (globfp_like and structure.format != GLOBFP_FORMAT)
             or (source_id == "bldg_wsf3d" and structure.format != WSF_FORMAT)
         ):
             results[source_id] = SourceResult(
@@ -562,6 +670,7 @@ def read_sources(
                 state="absent",
                 reason="structure_unconfirmed",
                 globfp=(),
+                gba=(),
                 wsf=(),
                 files=(),
                 rows=tuple(
@@ -579,6 +688,7 @@ def read_sources(
             continue
         _declared_check(structure)
         globfp: list[tuple[str, tuple[tuple[BaseGeometry, Decimal], ...]]] = []
+        gba: list[tuple[str, tuple[tuple[BaseGeometry, Decimal, str], ...]]] = []
         wsf: list[tuple[str, WsfGrid]] = []
         files: list[dict[str, object]] = []
         records: list[dict[str, str]] = []
@@ -602,6 +712,13 @@ def read_sources(
                                 _parse_globfp(body_path.read_bytes(), structure),
                             )
                         )
+                    elif source_id == "bldg_gba":
+                        gba.append(
+                            (
+                                file_name,
+                                _parse_gba(body_path.read_bytes(), structure),
+                            )
+                        )
                     else:
                         wsf.append(
                             (
@@ -612,7 +729,7 @@ def read_sources(
                     state, reason = "read", ""
             records.append({"key": row.key, "reason": reason, "state": state})
         missing = [record["reason"] for record in records if record["state"] != "read"]
-        if globfp or wsf:
+        if globfp or gba or wsf:
             state = "read" if not missing else "partial"
             reason = "" if not missing else missing[0]
         else:
@@ -623,6 +740,7 @@ def read_sources(
             state=state,
             reason=reason,
             globfp=tuple(globfp),
+            gba=tuple(gba),
             wsf=tuple(wsf),
             files=tuple(files),
             rows=tuple(records),

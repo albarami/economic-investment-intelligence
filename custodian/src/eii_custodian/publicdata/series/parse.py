@@ -7,7 +7,6 @@ import json
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
@@ -428,10 +427,8 @@ def _bind(names: dict[str, str], name: str, code: str) -> None:
     names[name] = code
 
 
-def municipality_names(
-    frame: Sequence[Municipality], review: Path | None = None
-) -> dict[str, str]:
-    """Frame names, the reviewed spellings, then explicitly reviewed aliases.
+def municipality_names(frame: Sequence[Municipality]) -> dict[str, str]:
+    """Frame names, then the reviewed spellings of the names file.
 
     Keys are compared after ``normalise_name`` (whitespace only). The reviewed
     spellings are read by ``load_municipality_names`` with the names file's own
@@ -449,7 +446,6 @@ def municipality_names(
     for item in frame:
         _bind(names, normalise_name(item.name_ar), item.code)
     codes = {item.code for item in frame}
-    frame_names = set(names)
     folder = MUNICIPALITY_NAMES_REVIEW
     try:
         csv_rows = read_csv(folder / "municipality_names.csv")
@@ -460,28 +456,4 @@ def municipality_names(
     for row in reviewed:
         if row["municipality_code"] in codes:
             _bind(names, row["name"], row["municipality_code"])
-    path = (
-        review
-        if review is not None
-        else Path(__file__).resolve().parents[4]
-        / "publicdata/review/municipality_aliases.json"
-    )
-    try:
-        for row in json.loads(path.read_text()):
-            if (
-                not row.get("reviewer_role")
-                or not row.get("review_date")
-                or normalise_name(row.get("frame_name_ar") or "") not in frame_names
-            ):
-                raise ValueError("municipality alias: missing review or frame name")
-            date.fromisoformat(row["review_date"])
-            _bind(
-                names,
-                normalise_name(row["source_name_ar"]),
-                names[normalise_name(row["frame_name_ar"])],
-            )
-    except SeriesRefused:
-        raise
-    except (OSError, KeyError, TypeError, AttributeError, ValueError) as exc:
-        raise SeriesRefused("municipality_names_refused", str(exc)) from None
     return names

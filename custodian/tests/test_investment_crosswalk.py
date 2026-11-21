@@ -1,4 +1,4 @@
-"""Invented identifier crosswalks; no fetched name or value is a fixture."""
+"""Invented project crosswalks and a source-receipted code-only target."""
 
 from __future__ import annotations
 
@@ -84,11 +84,189 @@ def test_review_covers_both_sides_and_identifier_lookup(tmp_path: Path):
     assert record["source_country"] == "Inventedland"
     assert record["project_key"] == row["project_key"]
     assert record["crosswalk_sha256"] == sha256_hex(path.read_bytes())
-    assert record["mapping_coverage"]["municipality_code"] == "unmapped"
+    assert record["mapping_coverage"]["municipality_code"] == "not mapped"
     # A different issued ID with the same name must not inherit the mapping.
     other = b.dashboard_page((b.invented_record(project_id=1002),))
-    refused = parse_fdi(other, shape, replace(envelope, page_sha256=sha256_hex(other)))
-    assert getattr(refused, "check", "") == "crosswalk_snapshot"
+    refreshed = parse_fdi(
+        other, shape, replace(envelope, page_sha256=sha256_hex(other))
+    )
+    assert not isinstance(refreshed, InvestmentFailure), refreshed
+    assert refreshed[0][0]["source_country_iso3"] is None
+    assert refreshed[0][0]["mapping_coverage"]["source_country_iso3"] == "not mapped"
+
+
+@pytest.mark.parametrize("refresh", ["page_only", "source_values", "issued_id"])
+def test_refreshed_snapshot_keeps_batch_with_unmapped_slots(tmp_path: Path, refresh):
+    """INVENTED refreshes cannot inherit any slot from the old reviewed page."""
+    c, page, row, document, path, _good = specimen(tmp_path)
+    targets = {
+        "source_country_iso3": "INV",
+        "municipality_code": "SYN-area-AA-0001",
+        "place_key": "SYN-place-AA-0001",
+    }
+    target = json.dumps([{"iso3": targets["source_country_iso3"], **targets}]).encode()
+    (tmp_path / "invented-target.yaml").write_bytes(target)
+    document["mappings"] = [
+        {
+            **row,
+            "column": column,
+            "target_key": key,
+            "target_resource": "invented-target.yaml",
+            "target_sha256": sha256_hex(target),
+        }
+        for column, key in targets.items()
+    ]
+    path.write_text(json.dumps(document), encoding="utf-8")
+    crosswalk = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(crosswalk, InvestmentFailure), crosswalk
+    spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
+    shape = replace(spec.dashboard, crosswalk=crosswalk)
+    envelope = replace(b._envelope(), page_sha256=sha256_hex(page.body))
+    control = parse_fdi(page.body, shape, envelope)
+    assert not isinstance(control, InvestmentFailure), control
+    assert {column: control[0][0][column] for column in targets} == targets
+
+    if refresh == "page_only":
+        body = page.body + b"\n"
+    elif refresh == "source_values":
+        body = b.dashboard_page((b.invented_record(src_country_name="Invented Other"),))
+    else:
+        body = b.dashboard_page((b.invented_record(project_id=1002),))
+    assert sha256_hex(body) != envelope.page_sha256
+    result = parse_fdi(body, shape, replace(envelope, page_sha256=sha256_hex(body)))
+    assert not isinstance(result, InvestmentFailure), result
+    records, empty_coordinates = result
+    assert len(records) == 1
+    assert empty_coordinates == control[1]
+    record = records[0]
+    assert {column: record[column] for column in targets} == dict.fromkeys(targets)
+    assert record["mapping_coverage"] == dict.fromkeys(targets, "not mapped")
+    assert record["crosswalk_sha256"] == crosswalk.sha256
+    assert record["page_sha256"] == sha256_hex(body)
+
+
+def test_current_snapshot_maps_only_reviewed_issued_ids(tmp_path: Path):
+    """INVENTED same-name rows and a stale mapping never borrow a current slot."""
+    c, _page, row, document, path, _good = specimen(tmp_path)
+    body = b.dashboard_page((b.invented_record(), b.invented_record(project_id=1002)))
+    stale = {**row, "project_id": 1002}
+    row["snapshot_sha256"] = sha256_hex(body)
+    document["mappings"].append(stale)
+    path.write_text(json.dumps(document), encoding="utf-8")
+    crosswalk = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(crosswalk, InvestmentFailure), crosswalk
+    spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
+    result = parse_fdi(
+        body,
+        replace(spec.dashboard, crosswalk=crosswalk),
+        replace(b._envelope(), page_sha256=sha256_hex(body)),
+    )
+    assert not isinstance(result, InvestmentFailure), result
+    records, _empty_coordinates = result
+    assert len(records) == 2
+    assert records[0]["source_country_iso3"] == "INV"
+    assert records[0]["mapping_coverage"] == {
+        "source_country_iso3": "reviewed",
+        "municipality_code": "not mapped",
+        "place_key": "not mapped",
+    }
+    assert records[1]["source_country_iso3"] is None
+    assert records[1]["municipality_code"] is None
+    assert records[1]["place_key"] is None
+    assert records[1]["mapping_coverage"] == dict.fromkeys(
+        ("source_country_iso3", "municipality_code", "place_key"), "not mapped"
+    )
+
+
+@pytest.mark.parametrize("digits", [8, 11])
+@pytest.mark.parametrize("prefix", ["", "invented_"])
+def test_review_reference_digit_runs_are_refused(tmp_path: Path, digits, prefix):
+    """INVENTED identifier-shaped references are assembled only at runtime."""
+    c, _page, row, document, path, good = specimen(tmp_path)
+    assert not isinstance(good, InvestmentFailure), good
+    row["review_reference"] = prefix + "1" * digits
+    path.write_text(json.dumps(document), encoding="utf-8")
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == "crosswalk_review"
+
+
+@pytest.mark.parametrize("digits", [7, 9, 10, 12])
+@pytest.mark.parametrize("prefix", ["", "invented_"])
+def test_review_reference_other_digit_runs_are_accepted(tmp_path: Path, digits, prefix):
+    """INVENTED near-miss references stay valid; only eight and eleven refuse."""
+    c, _page, row, document, path, _good = specimen(tmp_path)
+    row["review_reference"] = prefix + "1" * digits
+    path.write_text(json.dumps(document), encoding="utf-8")
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(result, InvestmentFailure), result
+    assert result.mappings[0].review_reference == row["review_reference"]
+
+
+def test_municipality_code_target_source_chain():
+    """PO-S2-108's lead extract supplies codes and receipt fields, never names."""
+    import eii_custodian.publicdata.investment_crosswalk as c
+
+    source_hash = "12226c26959a5aa378bf979ce782c237629e1882d12c00879b62cae5ffac752f"
+    expected = "municipality_code,source_id,source_sha256,retrieved_utc\n" + "".join(
+        f"{code},bnd_zone_2020,{source_hash},2026-11-20T11:27:25Z\n"
+        for code in ("1", "2", "3", "4", "5", "6", "7", "8")
+    )
+    assert (c._REVIEW / "municipality_codes.csv").read_bytes() == expected.encode()
+
+
+@pytest.mark.parametrize(
+    ("plant", "check"),
+    [
+        ("control", None),
+        ("absent_code", "crosswalk_target"),
+        ("manufactured_key", "crosswalk_target"),
+        ("names_file", "name_derived_key"),
+        ("changed_byte", "crosswalk_target_hash"),
+    ],
+)
+def test_municipality_code_target(tmp_path: Path, plant, check):
+    """An invented project uses only a pinned member of the supplied code list."""
+    c, page, row, document, path, _good = specimen(tmp_path)
+    target = (c._REVIEW / "municipality_codes.csv").read_bytes()
+    target_path = tmp_path / "municipality_codes.csv"
+    target_path.write_bytes(target)
+    row.update(
+        column="municipality_code",
+        target_key="3",
+        target_resource=target_path.name,
+        target_sha256=sha256_hex(target),
+    )
+    path.write_text(json.dumps(document), encoding="utf-8")
+    control = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert not isinstance(control, InvestmentFailure), control
+    assert control.mappings[0].target_key == "3"
+    spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
+    parsed = parse_fdi(
+        page.body,
+        replace(spec.dashboard, crosswalk=control),
+        replace(b._envelope(), page_sha256=sha256_hex(page.body)),
+    )
+    assert not isinstance(parsed, InvestmentFailure), parsed
+    assert parsed[0][0]["municipality_code"] == "3"
+    assert parsed[0][0]["mapping_coverage"]["municipality_code"] == "reviewed"
+
+    if plant == "control":
+        return
+    if plant == "absent_code":
+        row["target_key"] = "9"
+    elif plant == "manufactured_key":
+        row["target_key"] = "SYN-area-AA-0001"
+    elif plant == "names_file":
+        # Even identical code-only bytes cannot make the names resource valid.
+        (tmp_path / "municipality_names.csv").write_bytes(target)
+        row["target_resource"] = "municipality_names.csv"
+    else:
+        target_path.write_bytes(target.replace(b"3,bnd_", b"9,bnd_", 1))
+    path.write_text(json.dumps(document), encoding="utf-8")
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == check
 
 
 @pytest.mark.parametrize(
@@ -147,7 +325,7 @@ def test_crosswalk_plants(tmp_path: Path, plant: str, check: str):
     assert getattr(result, "check", "") == check
 
 
-def test_crosswalk_tamper_stale_source_and_changed_value(tmp_path: Path):
+def test_crosswalk_tamper_and_changed_value_are_refused(tmp_path: Path):
     c, page, _row, _document, path, good = specimen(tmp_path)
     assert not isinstance(good, InvestmentFailure)
     digest = sha256_hex(path.read_bytes())
@@ -155,11 +333,9 @@ def test_crosswalk_tamper_stale_source_and_changed_value(tmp_path: Path):
     assert c.read_crosswalk(path, expected_sha256=digest).check == "crosswalk_hash"
     spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
     shape = replace(spec.dashboard, crosswalk=good)
-    envelope = replace(b._envelope(), page_sha256="ef" * 32)
-    assert parse_fdi(page.body, shape, envelope).check == "crosswalk_snapshot"
     changed = b.dashboard_page((b.invented_record(src_country_name="Invented Other"),))
     # Even a caller reusing the old envelope cannot change a mapped source value.
-    envelope = replace(envelope, page_sha256=sha256_hex(page.body))
+    envelope = replace(b._envelope(), page_sha256=sha256_hex(page.body))
     assert parse_fdi(changed, shape, envelope).check == "crosswalk_source_value"
 
 

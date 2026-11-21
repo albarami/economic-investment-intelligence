@@ -212,7 +212,7 @@ sentences), `months` (list of `{month, status}` with status `complete` or `incom
 |---|---|---|
 | DAT-09 | A feed bundle holds `feed_manifest.json`, `coverage.json` and exactly the tables its contract names; every file's SHA-256 and row count match the bundle manifest. | Extra file, missing file, hash mismatch and row-count mismatch fixtures each fail. |
 | DAT-10 | Conformance runs before any record enters the vault. One failed test stops the build. A row-level failure quarantines the row; a feed whose quarantined rows exceed 1% of any table fails (ASSUMPTION: a proposed acceptance threshold). Reports print rule names and row counts only, never record values or identifiers. | A failing fixture stops `./eii build-world`; a 2% placeholder fixture fails the feed; a log scan finds no `SYN-` token and no field value in the report. |
-| DAT-11 | A field whose crossing class is `NEVER`, `LINK` or `QC` never appears as a column, or as a value, in any release table. | The loader check DAT-83 runs over every release; the release builder test also scans every string column for the identifier pattern of section 4, with no exception since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired `firm_list.firm_key`, and checks that a `registration_number` appears only in `register_company_list` and `pub_register_company` (DAT-83, DAT-140). |
+| DAT-11 | A field whose crossing class is `NEVER`, `LINK` or `QC` never appears as a column, or as a value, in any release table. | The loader check DAT-83 runs over every release; the release builder test also scans every string column for the identifier pattern of section 4, with no exception since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired `firm_list.firm_key`, and checks that a `registration_number` appears only in `register_company_list`, `pub_register_company` and `pub_register_snapshot` (DAT-83, DAT-140, DAT-164). |
 
 ## 4. Identifiers for synthetic entities
 
@@ -651,6 +651,16 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_poi_comm` | Public | commercial point | `feature_key` | `publicdata` (from the source `gis_poi_comm`, once the reviewed registry change of PUB-92 names it; decision 0023 item 3) | competitors as counts and distances; the map |
 | `pub_tender` | Public | tender | `tender_key` | `publicdata` (from the source `tenders_pub`, read as a visitor and shown in full in version 1 regardless of its terms, PUB-108; [decision 0026](decisions/0026-public-sources-used-in-full-locally.md)) | the demand signal for business suppliers (D4, PUB-93) |
 | `pub_district_cooling` | Public | municipality × sector × period × indicator | `municipality_code`, `sector_key`, `period`, `indicator` | `publicdata` (from the source `dcool_capacity`; decision 0023 item 10) | D1, D6, beside the utility series |
+| `pub_completions_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `completions_ext`; decision 0023 item A10; [decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 29) | construction pipeline in D6 |
+| `pub_coverage_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `coverage_ext`; decision 0023 item A10; decision 0064 item 29) | coverage context in D2 |
+| `pub_fdi_stats` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `fdi_stats`; decision 0023 item A10; decision 0064 item 29) | national FDI inflows in D1 |
+| `pub_hotel_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `hotel_ext`; decision 0023 item A10; decision 0064 item 29) | hotel supply and demand in D1 and D3 |
+| `pub_jobseekers` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `jobseekers`; decision 0023 item A10; decision 0064 item 29) | Public context in D5 |
+| `pub_price_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `price_ext`; decision 0023 item A10; decision 0064 item 29) | price context in D1 |
+| `pub_survey_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `survey_ext`; decision 0023 item A10; decision 0064 item 29) | sector context in D1 |
+| `pub_talent_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `talent_ext`; decision 0023 item A10; decision 0064 item 29) | Public context in D5 |
+| `pub_trade_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `trade_ext`; decision 0023 item A10; decision 0064 item 29) | trade context in D1 and D7 |
+| `pub_utilities_ext` | Public | registry slug × row × declared field | `source_key`, `slug`, `row_index`, `field_name` | `publicdata` (from the family `utilities_ext`; decision 0023 item A10; decision 0064 item 29) | utility context in D6 |
 | `pub_venue_visits` | Public | venue × period × indicator | `venue_key`, `period`, `indicator` | `publicdata` | named public places (`place_public`) |
 | `pub_building_permits` | Public | municipality × period × document × permit type × building type | `municipality_code`, `period`, `document_type`, `permit_type`, `building_type` | `publicdata` | D6, reverse location view |
 | `pub_establishment_size` | Public | bulletin × activity × size class × year × indicator | `table_code`, `activity_key`, `size_class`, `period`, `indicator` | `publicdata` | D1, D3, S1, cases C1 and C2 |
@@ -749,6 +759,14 @@ two files are not merged. Publisher country and product mappings stay
 `pending`. These contracts do not activate a live source (decision 0040 items
 3 and 4). S2-T26 receives the separate series.
 
+#### Open-data family table contracts (S2-T19, decision 0064 item 29)
+
+The ten families of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A10 each
+have one release table `pub_<source_id>`. Every registry slug in the family unpivots to one row per
+declared column; only registry-declared columns are read (PUB-105, PUB-108). The fetch receipt names
+the table and binds the file hash; `./eii build-public` accumulates every slug of the family into
+that table. No method card or screen reads these tables until document 07 names a series.
+
 ### 7.3 Columns
 
 Types follow section 1.2; a column without a stated type is `string`. Every Public table also has
@@ -797,8 +815,8 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_hotel_monthly` | `period`; `star_class` string; `indicator` (`occupancy`, `adr`, `revpar`, `supply`, `demand`); `value` decimal(14,2); `unit` |
 | `pub_price_index` | `period`; `group_code` string; `index_value` decimal(10,2); `base_period` string |
 | `pub_property_resi` | `district_key`; `municipality_code`; `period` (`YYYY-MM`: the weekly bulletins aggregated by month); `unit_type` (published key); `deal_count` int; `median_price` decimal(14,2) (Y, null when `deal_count` is 0); `price_basis` (`per_m2` when `median_price` is per square metre of floor area, where the bulletin rows carry one; `per_unit` when it is per unit sold; one basis for all the sales of a row, and the fact unit is `qar_per_m2` or `qar` accordingly, as C14 names it); transaction and parcel identifiers are dropped before the release (PUB-14) |
-| `pub_property_quarter` | `district_key`; `municipality_code`; `period` (`YYYY-Qn`); `use_key` (a key of the reviewed use mapping of PUB-107); `unit_type` (`all` on the row of the use as a whole; otherwise a published unit-type key of `prop_resi_units`, card C41); `deal_count` int (the kept deals of the row); `deal_value` decimal(16,2) (the sum of their prices, fact unit `qar`); on an `all` row: `median_price_per_ft2` decimal(12,2) (Y, null when no kept deal has a positive floor area; areas converted by the exact factor of C41; fact unit `qar_per_ft2`), `land_deal_count` int (the kept deals whose reviewed property type is land without a building) and `land_median_price_per_ft2` decimal(12,2) (Y: the same median over those deals only, null when `land_deal_count` is 0); on a unit-type row: `median_price` decimal(14,2) (Y, null when `deal_count` is 0) and `price_basis` (`per_unit` or `per_m2`, one basis for all the sales of a row, as in `pub_property_resi`); a column of the other kind of row is null; no transaction or parcel identifier enters it (PUB-14) |
-| `pub_land_price` | `district_key`; `period` (`YYYY`: the one four-digit year of the service's own name; a service name without exactly one year is refused); `use_category` (published key); `guide_price` decimal(12,2); `price_basis` (`per_ft2`, confirmed by the layer alias in S2-T19; fact unit `qar_per_ft2`); a guide price, never a deal price or a rent |
+| `pub_property_quarter` | `district_key`; `municipality_code`; `period` (`YYYY-Qn`); `use_key` (a key of the reviewed use mapping of PUB-107); `unit_type` (`all` on the row of the use as a whole; otherwise a published unit-type key of `prop_resi_units`, card C41); `deal_count` int (the kept deals of the row); `deal_value` decimal(16,2) (the sum of their prices, fact unit `qar`); on an `all` row: `median_price_per_ft2` decimal(12,2) (Y, null when no kept deal has a positive floor area; areas converted by the exact factor of C41; fact unit `qar_per_ft2`), `land_deal_count` int (the kept deals whose reviewed property type is land without a building) and `land_median_price_per_ft2` decimal(12,2) (Y: the same median over those deals only, null when `land_deal_count` is 0); on a unit-type row: `median_price` decimal(14,2) (Y, null when `deal_count` is 0) and `price_basis` (`per_unit` or `per_m2`, one basis for all the sales of a row, as in `pub_property_resi`); a column of the other kind of row is null; no transaction or parcel identifier enters it (PUB-14); `as_of` (ISO date: the UTC date of `retrieved_utc` on the receipt of the selected snapshot whose hash the row's source names; [decision 0045](decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 4) |
+| `pub_land_price` | `district_key`; `period` (`YYYY`: the one four-digit year of the service's own name; a service name without exactly one year is refused); `use_category` (published key); `guide_price` decimal(12,2); `price_basis` (`per_ft2`, confirmed by the layer alias in S2-T19; fact unit `qar_per_ft2`); a guide price, never a deal price or a rent; `as_of` (ISO date: the UTC date of `retrieved_utc` on the receipt of the selected snapshot whose hash the row's source names; [decision 0045](decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 4) |
 | `pub_bank_credit` | `activity_key` (published key, matched to a sector only through the reviewed sector crosswalk of C41); `period` (as published); `value` decimal(18,2) (outstanding credit as published); `unit`; national, no area figure |
 | `pub_rail_plan` | `feature_key` string (a key the release build assigns to each feature, never the layer's own object identifier, PUB-14; its form is the `fea-` key of the S2-T19 note of the open-questions list, the same for every table of the GIS centre below); `feature_kind` (`line`, `planned_station`, `protection_zone`); `name_en`, `name_ar` string (Y: as published); `geometry` geometry (line, point or polygon); every row is a plan, and no column says that a line or station operates |
 | `pub_health_centre` | `feature_key`; `feature_kind` (`centre`, `catchment`); `name_en`, `name_ar` string (Y: as published); `period` (Y: null; the layers publish no period and the coverage note `period_not_published` counts the rows); `geometry` geometry (point for a centre, polygon for a catchment) |
@@ -808,6 +826,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_poi_comm` | `feature_key`; `name` string (as published); `name_ar` string (Y: only where the source gives one); `category` string (Y: null on `POIs_COMM`, which publishes no category; `POI_KEY` is not mapped to it; any later mapping needs a reviewed configuration); `lon`, `lat` decimal(9,6); `cell` cell; source-given fields only, so that no attribute is invented for a real named business |
 | `pub_tender` | `tender_key` string (assigned from release columns as below, never a portal reference, PUB-14; the release check matches `tnd_` plus sixteen hexadecimal characters and an optional `_n`, and exempts that column from the contact scan; every other string column keeps the contact scan); `buying_entity` string (the card's Ministry in the English read, as published, never looked up), `buying_entity_ar` string (Y); `category`, `category_ar` string (Y: Requested Sector Type, as published); `tender_type`, `tender_type_ar` string (Y: Type, as published); `title`, `title_ar` string (Y: cleaned title-link text); `text_cleaned` boolean; `period` (`YYYY-MM-DD`, Y: Publish date only); `closing_date`, `award_date`, `cancel_date` date (Y); `cancel_reason`, `cancel_reason_ar` string (Y: cleaned); `bond_qar`, `documents_value_qar` decimal(18,2) (Y); `company_size` string (Y: non-empty page-order size words from the English card joined by a vertical bar, blank slots dropped and all-empty slots null; Arabic words only when no English card carries any; a difference within one language is refused); `lists` string (the list memberships in the order available, closed, technically_opened, financially_opened, awarded, cancelled, joined by a vertical bar); no derived state, award value, supplier or source reference number |
 | `pub_district_cooling` | `municipality_code` (through the municipality name map of PUB-27); `sector_key` (published key); `period` (as published); `indicator` (published key; capacity, never consumption); `value` decimal(18,2); `unit`; on the source's own geography |
+| `pub_completions_ext`, `pub_coverage_ext`, `pub_fdi_stats`, `pub_hotel_ext`, `pub_jobseekers`, `pub_price_ext`, `pub_survey_ext`, `pub_talent_ext`, `pub_trade_ext`, `pub_utilities_ext` | `source_key` (registry key `<source_id>/<slug>`); `slug`; `row_index` int (read order in the cached export); `period_label` string (Y: the published period field when the registry names one for that slug; otherwise null); `field_name` (a declared registry column name only); `field_value` (canonical JSON text of the published cell); `source_id` (the family id); `publisher`; `licence_id`; `licence_basis`; `retrieved_utc` (from the slug's receipt); `sha256` (from the slug's receipt); undeclared keys in the export are refused at build time |
 | `pub_venue_visits` | `venue_key` (the key of the committed, reviewed venue crosswalk, PUB-89); `venue_kind` (`museum_or_exhibition`, `health_centre`); `name_en` string; `name_ar` string (Y: null when no public Arabic name exists); `region` string (Y: the health region as published; null for museums and exhibitions); `place_id` (Y: the `pub_place` record that the crosswalk links; null otherwise, and the venue then has no map point); `period` (`YYYY-MM` for museums and exhibitions, `YYYY` for health centres); `indicator` (`visitors`, `patient_visits`); `value` int; `unit` (`visits`) |
 | `pub_building_permits` | `municipality_code`; `period` (`YYYY` or `YYYY-MM`, as published); `document_type` (`building_permit`, `completion_certificate`); `permit_type` (published key, or `all`); `building_type` (published key, or `all`); `document_count` int |
 | `pub_establishment_size` | `table_code` (names the survey bulletin, so the size classes of different bulletins are never mixed: one code for each bulletin of `est_size_act`, and one for the hotels and restaurants size table `sec_hr_size`, whose rows give restaurants (ISIC 561) and the other hotel and restaurant activities by size class, as C24 needs); `activity_key` (published activity, with its ISIC Rev.4 code where the bulletin gives one); `size_class` (as that bulletin publishes it); `period` (`YYYY`); `indicator` (`establishments`, `employees`, `compensation`; no survey benchmark is shown by cards C33 or C35 under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 12); `value` decimal(18,2); `unit` |
@@ -917,6 +936,7 @@ decimal string), `value_unit`, `quantity_unit`, `currency`, `valuation_basis`
 hold `source_id`, `source_name` and nullable `iso3`, only where published.
 Product columns additionally hold `source_id` and `source_description`.
 Leading code zeros and accepted decimal text are preserved unchanged.
+For the exact native BACI headers recorded under document 04 **BACI pending identity and coverage (S2-T24)**, trade/product HS revision comes from the reviewed configuration. The native country ISO2 column is validated but not added to the release columns. The closed text member `Readme.txt` is byte-checked and hashed, without a row count. Unknown row counts stay null in pending configuration and cannot activate parsing; the first-fetch accounting path remains pending.
 
 ASSUMPTION pending the lead's dictionary reading: `total_digits: 18` and
 `fractional_digits: 6` for both value and quantity. Count every written digit,
@@ -1124,10 +1144,12 @@ proof checks or publication. Dates use day/month/year; invalid dates are counted
 The summary records row count, dated/invalid/blank counts, date range and unknown
 completeness. The original scrape date is distinct from the intake UTC date.
 
-The `awards_owner_scrape` archive registry receipt carries `award_check`: lead
+The `awards_owner_scrape` archive registry receipt carries `award_check`, labelled
+by `award_check_scope: sample`: lead
 seed, distinct nonblank URL frame count, selected count, matched/mismatched/failed
 counts, match rate, incomplete status and per-link result. Above thirty links the
-seed selects exactly thirty without replacement; otherwise all links are read.
+seed selects exactly thirty without replacement; otherwise the sample uses the
+whole frame. Sample outcomes are derived from the full check without another fetch.
 The rate is matching selected links divided by all selected links, including
 failed fetches; an empty frame has null rate. Short frames and failed fetches
 are incomplete. Only transport or bounded-read failures count as failed fetches.
@@ -1135,9 +1157,7 @@ The shared `open_https` transport classifies a response-body `HTTPException`
 (including `IncompleteRead`) as `TransportFault("unreachable")`, with no upstream
 diagnostic text; keyed requests retain the same closed fault. Existing registry
 sources now retry this mid-body failure and record `unreachable` after the
-existing attempt limit, instead of letting it crash the build. Award proofs use
-the same retries, count an exhausted read as a failed fetch and mark the check
-incomplete. Certificate refusals retain their exact closed reason even when
+existing attempt limit, instead of letting it crash the build. Award proofs use the same retries, count an exhausted read as a failed fetch with its closed reason and mark the check incomplete. Certificate refusals retain their exact closed reason even when
 raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
@@ -1150,6 +1170,25 @@ name equality after the closed normalization in document 04, section 2.4.
 Whitespace-only registrations never match, and duplicate register entries remain
 ambiguous. Awarded values never become turnover or sales, and identifiers stay in
 the custodian matching boundary. Release consumers remain separate tasks.
+
+Under decision 0064 item 41, the same receipt also carries `award_links`, with
+`method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
+`report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
+`failed_fetches`, `match_rate`, `incomplete`, `status` and `results`. Every link is
+checked once in URL order through the existing bounded retry reader and reviewed proof scope.
+Each result has `report_url`, `result` and `reason`: a match uses `matched`, a
+mismatch uses `proof_mismatch`, and fetch failures use only `proof_fetch_failed`,
+`unreachable`, `http_status` or `body_bytes`. Links whose bounded read fails stay in the checked
+denominator; `match_rate` is matched divided by checked, null for an empty frame.
+Empty frames or any failed fetch set `incomplete` and `award_links_incomplete`;
+otherwise the status is `all_links_recorded`. Publication compares this complete
+frame with the intake, validates every result and recomputes the totals and the
+seeded sample. Missing, skipped, duplicated or inconsistent evidence refuses
+publication. `assembly/final_audit.json` retains the full-link summary under `t29`,
+excluding `results` and `report_urls`; the full per-link record stays on the source
+receipt. The audit explicitly labels the separate sample; assembly refuses absent or incomplete
+full-link evidence even when its sample passed. OI-277's live evidence remains
+the lead's work; invented-response tests do not establish a live match rate.
 
 Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
 rows, are staged together within the cache. A failed write or final validation
@@ -1524,7 +1563,7 @@ validator reads it from the resolved subject and the fact's fields, never from w
 | `register_company` | one real company of the public business register or of the financial centre's public register, a row of `pub_register_company` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | `registration_number`, which the application resolves and never sends to the model or writes to an egress record, a ledger row or a log | Public facts of `pub_register_company` (the fields the register publishes, person names excluded); the Synthetic fact `employee_count` of its row in `register_company_list`; and, in a list, the rank and fit facts that tested code computes over the card fields, the employee count, Public inputs such as free-flow drive time and the user's typed criteria and weights, with the stability facts of DAT-134. Never a Simulated fact, an estimate, share or score, or a wage, wage bill or other labour or residence fact of the company: those appear only in released aggregates of `area` subjects, and in the company's own seat only as its design provides (rule 8 of AGENTS.md; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15 removes the oversight seat). |
 | `fdi_project` | one published investment announcement of `fdi_projects` | `project_key` | Public facts only, read from `fdi_projects` and its source; never a fact computed with a synthetic, protected or simulated input |
 
-The `district` subject accepts Public slots only, identified by the publisher's own district label with its municipality, never a drawn area, never apportioned and never an `area` subject (S2-T17; lead assumption, OI-102).
+The `district` subject accepts Public slots only, identified by the publisher's own district label with its municipality, never a drawn area, never apportioned and never an `area` subject (S2-T17; [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1).
 
 The other subjects of the claim catalogue accept Public facts only, including, for `scenario`, the
 user-input facts of DAT-92 whose provenance is Public; a scenario fact that draws on a Simulated or
@@ -1787,7 +1826,7 @@ refuses admission; portal validation is unchanged (DAT-105, DAT-106).
 - `frame`: `output` literal `frame_s2_t02/municipalities.json`, its `sha256`,
   `method` literal `frame.v1`, `upstream` (ordered `SupportSource` objects for
   `bnd_hdx` and `bnd_zone_2020`) and `review_sha256` (exactly
-  `municipality_names.csv` and `municipality_aliases.json`, each a SHA-256).
+  `municipality_names.csv`, a SHA-256).
 - Each `SupportSource` has exactly nonempty string fields `key`, `source_id`,
   `dataset` (the registry/receipt title), `publisher`, `licence_id`,
   `licence_basis`, `retrieved_utc` (valid UTC timestamp in
@@ -2311,12 +2350,12 @@ the quality measure of DAT-24.
   Titles and cancel reasons replace contact-shaped text with `[...]` (LR-T13), recording
   `text_cleaned`. Missing publication dates stay null; coverage counts them and missing
   language counterparts. The live receipt and display proofs remain for the lead and S2-T08.
-- OPEN ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 10): S2-T19
-  collects the ten families `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`, `talent_ext`,
-  `jobseekers`, `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext` in the cache,
-  with receipts only; no family release table or catalogue row is named in this task (DR5).
-  Tables wait for a use and the columns as really published, then a DAT-120 revision before
-  first load (DAT-83). Sex and nationality splits stay declared Public splits (DAT-141).
+- ANSWERED (S2-T19, decision 0064 item 29, 2026-11-20): the ten families
+  `trade_ext`, `survey_ext`, `price_ext`, `hotel_ext`, `talent_ext`, `jobseekers`,
+  `utilities_ext`, `coverage_ext`, `fdi_stats` and `completions_ext` each have a release table
+  `pub_<source_id>` in sections 7.2 and 7.3, a registry `release_tables` entry and a receipt that
+  names the table with the export hash; only declared registry columns enter the build (DR5). Sex
+  and nationality splits stay declared Public splits (DAT-141).
   `gis_boundaries` stays absent with `direct_url_unconfirmed`; PUB-24's frame geometry is
   unchanged. `gis_context` is `ROADFlowlnA` layer 0 only: street centre lines with class and
   names, no flow, volume, speed or direction field; no release table (LR-G11, LR-G12).
@@ -2341,17 +2380,19 @@ the quality measure of DAT-24.
   open, and it is not on the list of card C30 until a table is held (decision 0019, open questions).
 - OPEN: the Public source of the survival base rate, which the Public licence tables cannot give
   (DAT-159); until then it returns `NO_DATA` with `no_denominator`.
-- ASSUMPTION (S2-T17, OI-102): district price series use the Public-only `district` subject of section 9.1, pending owner confirmation.
+- DECIDED (S2-T17, [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1): district price series use the Public-only `district` subject of section 9.1, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject.
 - OPEN (decision 0022): how the attachment by registration number treats a registration that covers
   several establishments in the register (DAT-01). The legal-entity and employer-group structure is
   settled by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12: the register's main-and-branch structure, otherwise one
   registration alone, and no generated group (6.1). OPEN: the register fields that show the
   main-and-branch structure, the address type and the registration and cancellation dates are
   confirmed when the file is first read, without committing the file or a field value (DAT-164).
-- OPEN (decision 0022): the columns of `pub_register_company` and of the invented stand-in register,
-  and the closed lists of `nationality_group` and `establishment_nationality` in the format of the
-  real records, are fixed with the register's registry row in document 04 and with the calibration
-  table, without committing a real value (6.1, 6.2, 7.3).
+- S2-T49 fixes the register CSV schema metadata and the closed Public projection in
+  **Register file projections (S2-T49)** and document 04 **Register file declarations (S2-T49)**.
+  OPEN (decision 0022): the real-file verification, published-tower basis, missing and ambiguous
+  keys, and the closed lists of `nationality_group` and `establishment_nationality` in the format
+  of the real records remain with the lead and calibration owner; no real value is committed
+  (6.1, 6.2, 7.3). Undeclared card categories remain open text, never inferred from source rows.
 - OPEN (DAT-169): the pooled value of a movement split is named `other`, as elsewhere in the pack; the name is checked against the nationality list when that list is committed.
 - OPEN (decision 0022): whether `employee_count` is rounded or otherwise treated under document 06
   before it crosses (DAT-140).
@@ -2465,6 +2506,7 @@ zero-padded months `YYYY-MM` of one year and orders them by parsed month. For
 that form, text order and chronological order match. An unpadded month is not
 a native period: text order would place `2020-10` before `2020-2`, and the
 sum is refused.
+A closed `deferred_inputs` selection record retains the supplied 2025 portal hash, year and activation reason outside active inputs. Materialisation and pair enumeration use active inputs only. A deferred source cannot also be active, have a binding or appear as an active-year input; activation requires 2025 in the reviewed years, international coverage and reviewed bindings.
 The composite comparison key is the requested cell and both source-role identities.
 The cache manifest pins the selection hash, method, output hash and counts; its
 reader reopens selected native readers and recomputes both collections. An absent
@@ -2501,3 +2543,128 @@ filtering or deduplication. The composition entry point is
 collision. Source, selected snapshot, method, licence and retrieval lineage travel
 with the contribution. S4-T05 supplies other contributions and its configured edit
 distance; this task introduces no new collision threshold or normaliser.
+
+### S2-T48 tooling fields (decision 0076)
+
+Company-web candidates remain outside product and release tables. The closed fields
+are name, address, website and activity; each binds the full-page and declared-fragment
+hashes, source address, retrieval UTC, publisher, local-use basis, parser version and
+deterministic extraction-run identity. Another-maker decisions bind the exact
+candidate digest and reviewer maker/tool/model/session. Pending and rejected fields
+are never retained. Register-published fields remain separate with their lineage;
+conflicts are marked and absent web fields stay empty. The retained web names add a
+`name_inventory.Contribution` to DAT-14/SYN-20 checks. Full source bytes and review
+records remain uncommitted under PUB-04, with explicit archive selections. See
+[the tooling contract](../custodian/src/eii_custodian/publicdata/company_web/README.md)
+and [decision 0076](decisions/0076-company-web-pages-search-fetch-review-and-storage.md).
+
+The review fragment is the parsed source JSON-LD object or serialized selected
+microdata/selector subtree before candidate-field assembly, not a re-dump of the
+candidates. Invalid input names remain counted per company as `input_refused`
+without a search, page or candidate; valid register trading words are checked
+again by the full output guard only when extracted.
+
+## Register file projections (S2-T49)
+
+This schema records the lead's column/type/format metadata, not a source value.
+OPEN (S2-T49): the published-card basis of the tower is confirmed by the lead in
+the lead's shell; an inferred geocoder label is not such a basis.
+The closed `pub_register_company` column list is:
+
+`row_key` is excluded. The retained commerce fields are `name_ar`, `name_en`,
+`establishment_type`, `establishment_subtype`, `legal_form`, `business_type`,
+`business_category`, `classification`, `registration_status`,
+`registration_issue_date`, `registration_expiry_date`, `licence_status`,
+`licence_issue_date`, `licence_expiry_date`, `branches`, `municipality`, `zone`,
+`lon`, `lat`, `registration_number`, `licence_number`, `tax_registered`,
+`tax_registration_number`, `tax_classification_year`, `tax_type`, `capital_qar`,
+`establishment_nationality`, `street_number`, `building_number`,
+`establishment_type_ar`, `establishment_subtype_ar`, `legal_form_ar`,
+`classification_ar`, `registration_status_ar`, `licence_status_ar`,
+`municipality_ar`, `district_en`, `district_ar`, `block_en`, `block_ar` and
+`establishment_nationality_ar`. Additional columns are `registered_address`,
+`event`, `notice_expiration_date`, `registered_cell` and `source_id`.
+
+`capital_qar` is nullable `BIGINT`, a non-negative integer in QAR within that
+storage type's range. `lon` and `lat` are nullable `DOUBLE`; coordinates must be
+finite and within geographic bounds, both present or both null. `registered_cell`
+is nullable `UBIGINT` and must equal the existing frame resolver's result for the
+capture's coordinates. All other columns are nullable `VARCHAR` containing the
+source lexeme, except key `registration_number` and `source_id`, which are non-null.
+The parser validates declared required input fields before writing: the date
+columns hold only complete ISO calendar dates. Declared integer/year lexemes
+other than capital remain strings, including licence and address fields.
+Unknown card categories stay open text until the pack declares their values.
+No category is inferred from observed rows. Null never means a zero or an
+inferred value.
+
+DAT-11 scans every released string column, including licence and address text,
+with only the three registration-key columns exempt from key-membership checks.
+Typed numeric Public values (capital, coordinates, counts and cell keys) are not
+identifier strings. The artefact scan is unchanged. This follows the lead's
+L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifiers
+the project generates; it does not prohibit a typed numeric Public capital.
+The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
+
+The commerce source fills its fields only. `branches` is null under the supplied
+empty-only declaration; a nonempty value requires a branch-structure ruling.
+Its input-only `nationality_group`, `nationality_group_ar` and
+`points_at_location` are excluded alongside `row_key`. The financial-centre
+source fills `registration_number` from `qfc_number`, `name_en`, `name_ar`,
+`licence_status`, `registered_address`, the optional `event` and
+`notice_expiration_date`, and the geocoded `lon`, `lat` and `registered_cell`.
+Other source-inapplicable columns remain null. Internal order, row keys and
+geocoder building/match labels are excluded. Publishing a tower needs a
+confirmed published-card basis; no inferred label substitutes for it.
+
+`pub_register_snapshot` has exactly `registration_number` (`VARCHAR`, non-null),
+`period` (`VARCHAR`, non-null year-month), `source_id` (`VARCHAR`, non-null) and
+`registered_cell` (`UBIGINT`, nullable). Its composite key is the registration and
+month. Each month retains its own source and cell even when the company has
+left today's card table. Missing snapshots return `snapshot_not_kept`; a valid
+empty capture is kept. The keeper floor of 2026-11 applies only to historical
+captures, including empty ones, not to a current capture. Each source's snapshot
+must be no later than that source's current capture; the current retrieval months
+of the two sources need not agree. Neither table invents a registration, cancellation,
+opening or closure month. Expiry and notice dates are not cancellation dates.
+
+The CSV declarations, their lexeme formats and source-specific required/null
+rules are closed in `registers/contracts.py`; a malformed notice date, missing
+registration key, duplicate source key, duplicate company-month, wrong companion
+join or ambiguous cross-source registration refuses by name. Registrations are
+never prefixed or merged. The tables bind to method `register_file_projection`,
+version `v1`, frame ownership hash and key-scoped receipts carrying attribution,
+terms, retrieval time and every input hash. Both release kinds consume the same
+validated tables. The later full-release owner must preserve this manifest
+chain and apply the rest of DAT-83; these reusable builders do not implement the
+placeholder release command or the other tables' privacy checks.
+
+## Structured Public address reader — decision 0079
+
+`structured-address-v1` is a fixed application-schema read of `pub_address_point` under DAT-168: exact equality on the three published address strings, order by `feature_key`, at most six fetched rows to signal truncation, at most five returned candidates. Both stores hold the composite index `(zone_number, street_number, building_number, feature_key)`. It returns no utility account, parcel number, person join, score or guessed match. Its selected source-registry/receipt lineage supplies publisher, dataset, terms/basis, retrieval date and hash. The table is persisted Public data; a query or its response is not persisted. Decision 0079 item 5 adds this separate offline route without changing the keyed-provider route.
+
+
+## Selected national imagery archive integrity — S2-T51
+
+Under decision 0079 items 3 and 4 and document 04 **3.1 Registry and sidecar record**,
+resume and release selection use the same closed receipt schema. Projected and original
+boundary receipts must agree on `source_id`, `key`, `publisher`, `url`, `licence_basis`,
+`licence_id` and `decision_record`; the projected upstream hash equals the original body
+hash. Resume also requires unchanged `upstream_sha256` and `method_version`. Retrieval
+times and terms-reading text/date are excluded from this chain comparison. Consequently,
+`pin_boundary` refuses a changed chain under an unchanged boundary identity: the lead
+must review a new namespace rather than silently replace the retained chain.
+
+At both shard read boundaries, `metadata_sha256`, `boundary_sha256`,
+`enumeration_sha256` and shard number must match the verified enumeration and selected
+shard. Assembly carries the explicitly selected all-date manifest and its receipt once
+through the same verified-object copy path, including an all-gap release.
+A `request_failed` tile gap has HTTP 404 or 410 and one attempt; a
+`response_bytes_or_gap`, `tile_format_or_gap` or `tile_dimensions_refused` gap has HTTP
+200 and one attempt. Other combinations refuse `gap_reason_integrity`. The existing
+`outside_extent` gap retains null status and zero attempts. A present JPEG must pass the
+bounded format/dimension checks and a full rasterio/GDAL JPEG pixel read inside
+`rasterio.Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE")`, treating libjpeg warnings as
+errors. Missing scan/quantization structure and decoder-reported invalid or truncated
+scans become invalid-tile gaps during acquisition, and refuse archive verification
+if planted in a stored member (L-1303).

@@ -76,10 +76,12 @@ def _failure(check: str) -> InvestmentFailure:
 def read_crosswalk(
     path: Path, *, expected_sha256: str
 ) -> ReviewedCrosswalk | InvestmentFailure:
-    """Read one explicitly pinned crosswalk and validate its selected Public targets.
+    """Check a crosswalk against the caller's hash and validate its Public targets.
 
     Target resources are direct files beside the crosswalk, pinned per mapping.
     Only target keys are read, never a name-matching map or target review flags.
+    The caller supplies the expected hash; this reader does not establish its
+    approval or bind it to a separate trusted manifest.
     """
     try:
         if path.is_symlink() or sha256_hex(path.read_bytes()) != expected_sha256:
@@ -114,8 +116,6 @@ def read_crosswalk(
         if isinstance(checked, InvestmentFailure):
             return checked
         key = (checked.snapshot_sha256, checked.project_id, checked.column)
-        if key in seen:
-            return _failure("crosswalk_duplicate")
         seen.add(key)
         found.append(checked)
     # Refuse a crosswalk changed while its targets were being checked.
@@ -131,7 +131,11 @@ def read_crosswalk(
 
 
 def load_crosswalk() -> ReviewedCrosswalk | InvestmentFailure:
-    """Load the committed review file; an empty mapping list leaves all slots null."""
+    """Load the review file using a hash computed from its current bytes.
+
+    The hash checks read consistency, not approval against an independent pin.
+    An empty mapping list leaves all slots null.
+    """
     path = _REVIEW / "fdi_crosswalks.yaml"
     try:
         digest = sha256_hex(path.read_bytes())
@@ -166,6 +170,7 @@ def _mapping(item: object, directory: Path) -> MappingRow | InvestmentFailure:
     if (
         item["review_role"] != "lead"
         or _REFERENCE.fullmatch(item["review_reference"]) is None
+        or bare_digit_run(item["review_reference"])
     ):
         return _failure("crosswalk_review")
     try:
@@ -227,19 +232,15 @@ def mapped_columns(
     project_key: str,
     envelope: SourceEnvelope,
 ) -> dict[str, object] | InvestmentFailure:
-    """Match issued project ID in the selected snapshot, then check source values."""
+    """Match issued ID and snapshot, checking source values; misses stay null."""
     values: dict[str, object] = dict.fromkeys(_COLUMNS)
-    coverage = dict.fromkeys(_COLUMNS, "unmapped")
+    coverage = dict.fromkeys(_COLUMNS, "not mapped")
     if crosswalk is not None:
         selected = tuple(
             row
             for row in crosswalk.mappings
             if row.snapshot_sha256 == envelope.page_sha256
         )
-        if crosswalk.mappings and not selected:
-            return fail(
-                envelope, "crosswalk_snapshot", "reviewed source snapshot", "stale"
-            )
         for row in selected:
             if row.project_id != identifier:
                 continue

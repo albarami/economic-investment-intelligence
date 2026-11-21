@@ -16,6 +16,7 @@ from eii_custodian.publicdata.atlas.config import load_config as load_atlas_conf
 from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
 from eii_custodian.publicdata.benchmarks.config import Policy as BenchmarkPolicy
 from eii_custodian.publicdata.benchmarks.config import load_policies
+from eii_custodian.publicdata.company_web.build import run_company_web
 from eii_custodian.publicdata.fetch.build import CACHE_RELATIVE, run_build, utc_now
 from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
@@ -89,9 +90,21 @@ def run(
 ) -> int:
     """Validate the arguments before any input or credential read.
 
-    No argument, ``--seed N`` (the draw seed) or ``--cdse-backup`` alone;
+    No argument, ``--seed N`` (the draw seed), ``--company-web``,
+    ``--cdse-backup`` alone or ``--gis-imagery-snapshot`` alone;
     anything else is a usage error and opens nothing.
     """
+    if tuple(args) == ("--company-web",):
+        return run_company_web(
+            root,
+            environ,
+            open_https if transport is None else transport,
+            time.sleep if sleep is None else sleep,
+        )
+    if tuple(args) == ("--gis-imagery-snapshot",):
+        from eii_custodian.publicdata.gis.snapshot_runner import run as run_snapshot
+
+        return run_snapshot(environ)
     if tuple(args) == ("--cdse-backup",):
         credentials = cdse_credentials(environ)
         reason = (
@@ -118,7 +131,9 @@ def run(
     slots = slot_secrets(environ, injected=transport is not None)
     try:
         entries = tuple(
-            entry for entry in load_registry() if entry.kind != "cdse_backup"
+            entry
+            for entry in load_registry()
+            if entry.kind not in {"cdse_backup", "company_web"}
         )
     except RegistryError as exc:
         return exits.finish(1, "build-public", exc.detail)

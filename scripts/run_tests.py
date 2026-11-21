@@ -249,12 +249,14 @@ def _main(
     }
     results: list[SuiteResult] = []
     for suite in suites:
+        started = now()
         try:
             result = run_suite(suite, seed, root, parent, secrets)
         except Exception as error:
             result = _internal(suite.name, error)
+        elapsed = now() - started
         results.append(result)
-        _print_suite(stdout, result)
+        _print_suite(stdout, result, elapsed)
     passed = sum(item.counts.passed for item in results if item.counts is not None)
     failed = sum(item.counts.failed for item in results if item.counts is not None)
     skipped = sum(item.counts.skipped for item in results if item.counts is not None)
@@ -276,13 +278,14 @@ def _internal(name: str, error: Exception) -> SuiteResult:
     return SuiteResult(name, None, (line,), ())
 
 
-def _print_suite(stdout: TextIO, result: SuiteResult) -> None:
+def _print_suite(stdout: TextIO, result: SuiteResult, duration: float) -> None:
     if result.counts is None:
-        stdout.write(f"suite {result.name}: counts unavailable\n")
+        stdout.write(f"suite {result.name}: counts unavailable in {duration:.1f} s\n")
     else:
         stdout.write(
             f"suite {result.name}: {result.counts.passed} passed, "
-            f"{result.counts.failed} failed, {result.counts.skipped} skipped\n"
+            f"{result.counts.failed} failed, {result.counts.skipped} skipped "
+            f"in {duration:.1f} s\n"
         )
     stdout.flush()
     for line in result.fail_lines:

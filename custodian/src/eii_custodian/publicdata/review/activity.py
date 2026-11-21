@@ -3,7 +3,8 @@
 Status is always recomputed from the feeds, the ISIC classes and the review
 file; a status written in the review file is never trusted. Only a 7-digit code
 whose four-digit prefix is a known ISIC class, inside the review scope and
-signed by a named reviewer on an ISO date, can be mapped.
+signed by a reviewer on an ISO date, can be mapped. Model decisions additionally
+require a bound, independently audited batch under decision 0075.
 """
 
 from __future__ import annotations
@@ -13,7 +14,7 @@ import hashlib
 import json
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
 
@@ -174,11 +175,13 @@ class ReviewedBinding:
     """The version and input identities an approval was signed against.
 
     Each identity is the input name, its code and the SHA-256 of the
-    meaning-bearing value as it stood when the person signed.
+    meaning-bearing value as it stood when the reviewer signed; model decisions
+    also bind the exact bytes of the independently audited batch file.
     """
 
     code_system_version: str
     input_sha256: tuple[tuple[str, str, str], ...]
+    audit_sha256: str = ""
 
 
 @dataclass(frozen=True)
@@ -459,6 +462,7 @@ def load_activity_inputs(
         supplier_membership=supplier_membership,
         code_system_version=code_system_version,
         reviewed_binding=load_recorded_binding(path, reviews),
+        audit_path=path.with_name("activity_spine_audits.json"),
     )
     manifest = ReviewManifest(
         code_system_version=code_system_version,
@@ -528,6 +532,7 @@ def build_spine(
     supplier_membership: SupplierMembership,
     code_system_version: str = CODE_SYSTEM_VERSION,
     reviewed_binding: ReviewedBinding | None = None,
+    audit_path: Path | None = None,
 ) -> Spine:
     """Derive every status, the coverage counts and the review queue."""
     if not isinstance(supplier_membership, SupplierMembership):
@@ -538,6 +543,13 @@ def build_spine(
     classes = _unique_classes(isic_classes)
     reviewed = _unique_reviews(reviews)
     _require_reviewed_binding(reviewed_binding, classes, code_system_version, reviews)
+    _require_model_audits(
+        reviews,
+        reviewed_binding,
+        audit_path
+        if audit_path is not None
+        else _REVIEW / "activity_spine_audits.json",
+    )
     playbook = tuple(sorted({_code(code) for code in playbook_codes}))
     suppliers = tuple(sorted({_code(code) for code in supplier_membership.codes}))
     for code in playbook:
@@ -718,8 +730,16 @@ def read_review_binding(path: Path) -> ReviewedBinding:
         raise SpineError("review binding is not readable") from error
     if not isinstance(payload, dict):
         raise SpineError("review binding is not an object")
-    if set(payload) != {"code_system_version", "inputs"}:
+    if set(payload) not in (
+        {"code_system_version", "inputs"},
+        {"code_system_version", "inputs", "audit_sha256"},
+    ):
         raise SpineError("review binding fields are not the contract")
+    audit_hash = payload.get("audit_sha256", "")
+    if "audit_sha256" in payload and (
+        not isinstance(audit_hash, str) or _SHA256.fullmatch(audit_hash) is None
+    ):
+        raise SpineError("review binding audit hash is not a sha256")
     version = payload["code_system_version"]
     if not isinstance(version, str) or version.strip() == "":
         raise SpineError("review binding has no code-system version")
@@ -746,8 +766,195 @@ def read_review_binding(path: Path) -> ReviewedBinding:
         seen.add(key)
         found.append((name, code, digest))
     return ReviewedBinding(
-        code_system_version=version, input_sha256=tuple(sorted(found))
+        code_system_version=version,
+        input_sha256=tuple(sorted(found)),
+        audit_sha256=audit_hash,
     )
+
+
+_MODEL_PREFIX = "model review:"
+_MODEL_LIKE = re.compile(r"\s*model[\W_]*review", re.IGNORECASE)
+_MODEL_ROLE = re.compile(
+    r"model review: ([A-Za-z][A-Za-z0-9_-]*) ([^,\r\n]+), ([^,\r\n]+)"
+)
+_MODEL_DECISIONS = frozenset({"mapped", "not_mappable_rejected"})
+_AUDIT_FIELDS = frozenset(
+    {
+        "batch_id",
+        "codes",
+        "review_rows_sha256",
+        "seed",
+        "sampled_codes",
+        "signer_role",
+        "auditor_role",
+        "errors",
+        "audit_date",
+    }
+)
+
+
+@dataclass(frozen=True)
+class ActivityAudit:
+    """One independently audited batch, never a mapping decision itself."""
+
+    batch_id: str
+    codes: tuple[str, ...]
+    review_rows_sha256: str
+    seed: int
+    sampled_codes: tuple[str, ...]
+    signer_role: str
+    auditor_role: str
+    audit_date: date
+
+
+def audit_rows_sha256(reviews: Sequence[ReviewRow]) -> str:
+    """Hash signed rows: code-ordered objects with every ReviewRow field.
+
+    Canonical bytes are UTF-8 JSON, ensure_ascii=False, sort_keys=True,
+    separators=(",", ":"), no trailing newline. Codes use their decoded form.
+    """
+    body = json.dumps(
+        [asdict(row) for row in sorted(reviews, key=lambda row: row.code)],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(body).hexdigest()
+
+
+def audit_sample(codes: Sequence[str], seed: int) -> tuple[str, ...]:
+    """Rank codes by SHA-256 of ASCII seed:code; take thirty, then code-sort.
+
+    Ties break by code. A smaller batch is sampled in full. Input order has
+    no effect, and no process RNG state or Python random algorithm is involved.
+    """
+    ranked = sorted(
+        codes,
+        key=lambda code: (
+            hashlib.sha256(f"{seed}:{code}".encode("ascii")).digest(),
+            code,
+        ),
+    )
+    return tuple(sorted(ranked[: min(30, len(ranked))]))
+
+
+def _audit_maker(role: object) -> str:
+    match = _MODEL_ROLE.fullmatch(role) if isinstance(role, str) else None
+    if match is None or any(part != part.strip() for part in match.groups()):
+        raise SpineError("model audit role is malformed")
+    return match.group(1).casefold()
+
+
+def _audit_codes(value: object, detail: str, *, nonempty: bool) -> tuple[str, ...]:
+    if (
+        not isinstance(value, list)
+        or (nonempty and not value)
+        or any(
+            not isinstance(code, str) or re.fullmatch(r"[0-9]{7}", code) is None
+            for code in value
+        )
+        or len(set(value)) != len(value)
+    ):
+        raise SpineError(detail)
+    return tuple(value)
+
+
+def _audit_record(value: object) -> ActivityAudit:
+    if not isinstance(value, dict) or set(value) != _AUDIT_FIELDS:
+        raise SpineError("model audit record fields are invalid")
+    batch_id = value["batch_id"]
+    if not isinstance(batch_id, str) or not batch_id.strip():
+        raise SpineError("model audit batch id is invalid")
+    codes = _audit_codes(value["codes"], "model audit codes are invalid", nonempty=True)
+    sampled = _audit_codes(
+        value["sampled_codes"], "model audit sampled codes are invalid", nonempty=False
+    )
+    seed = value["seed"]
+    if type(seed) is not int or not 1000000000 <= seed <= 4294967295:
+        raise SpineError("model audit seed is out of range")
+    errors = value["errors"]
+    if type(errors) is not int or errors != 0:
+        raise SpineError("model audit errors are not zero")
+    signer, auditor = value["signer_role"], value["auditor_role"]
+    if _audit_maker(signer) == _audit_maker(auditor):
+        raise SpineError("model audit makers are not different")
+    on = value["audit_date"]
+    try:
+        if not isinstance(on, str) or _ISO_DATE.fullmatch(on) is None:
+            raise ValueError
+        audit_date = date.fromisoformat(on)
+    except ValueError as error:
+        raise SpineError("model audit date is invalid") from error
+    digest = value["review_rows_sha256"]
+    if not isinstance(digest, str) or _SHA256.fullmatch(digest) is None:
+        raise SpineError("model audit review rows hash is invalid")
+    return ActivityAudit(
+        batch_id, codes, digest, seed, sampled, signer, auditor, audit_date
+    )
+
+
+def _require_model_audits(
+    reviews: Sequence[ReviewRow],
+    binding: ReviewedBinding | None,
+    path: Path,
+) -> None:
+    for row in reviews:
+        if (
+            row.status in _MODEL_DECISIONS
+            and _MODEL_LIKE.match(row.reviewed_by_role)
+            and _MODEL_ROLE.fullmatch(row.reviewed_by_role) is None
+        ):
+            raise SpineError("model review role is malformed")
+    signed = {
+        row.code: row
+        for row in reviews
+        if row.status in _MODEL_DECISIONS
+        and row.reviewed_by_role.startswith(_MODEL_PREFIX)
+    }
+    if not signed and (binding is None or not binding.audit_sha256):
+        return
+    if binding is None or not binding.audit_sha256:
+        raise SpineError("model audit binding is missing")
+    try:
+        body = path.read_bytes()
+        payload = json.loads(body)
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise SpineError("model audit file is not readable") from error
+    if hashlib.sha256(body).hexdigest() != binding.audit_sha256:
+        raise SpineError("model audit file hash differs from binding")
+    if not isinstance(payload, list):
+        raise SpineError("model audit list is invalid")
+    if not payload:
+        if signed:
+            raise SpineError("model audit has no records")
+        return
+    batches = tuple(_audit_record(value) for value in payload)
+    if len({batch.batch_id for batch in batches}) != len(batches):
+        raise SpineError("model audit batch id is duplicated")
+    for code in signed:
+        membership = sum(code in batch.codes for batch in batches)
+        if membership == 0:
+            raise SpineError("model review code has no audited batch")
+        if membership > 1:
+            raise SpineError("model review code has multiple audited batches")
+    for batch in batches:
+        if any(code not in signed for code in batch.codes):
+            raise SpineError("model audit code is not a signed model decision")
+        batch_rows = tuple(signed[code] for code in batch.codes)
+        if any(row.reviewed_by_role != batch.signer_role for row in batch_rows):
+            raise SpineError("model audit signer differs from review")
+        if audit_rows_sha256(batch_rows) != batch.review_rows_sha256:
+            raise SpineError("model audit review rows hash differs")
+        if len(batch.sampled_codes) != min(30, len(batch.codes)):
+            raise SpineError("model audit sample size differs")
+        if batch.sampled_codes != audit_sample(batch.codes, batch.seed):
+            raise SpineError("model audit sample differs from seed draw")
+        for row in batch_rows:
+            _require_sign_off(row, "model")
+        if any(
+            batch.audit_date < date.fromisoformat(row.reviewed_on) for row in batch_rows
+        ):
+            raise SpineError("model audit predates signing")
 
 
 def _class_title_identity(code: str, label_en: str, label_ar: str) -> str:

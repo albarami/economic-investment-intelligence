@@ -8,12 +8,12 @@ from pathlib import Path
 
 from custodian.tests.fixtures.frame.invented import invented_archive, invented_layer
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_area_files import _install_road
 from custodian.tests.test_places_stage import _frame_review
 from custodian.tests.test_publicdata_behaviour import _clock, _sleep
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 
@@ -80,14 +80,16 @@ def test_run_build_reaches_the_frame_only_when_ready(tmp_path: Path) -> None:
     from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
     fetched = run_build(tuple(entries), _frame_transport(bodies), cache, _clock, _sleep)
-    assert fetched.failure is None
+    assert fetched.failure is not None
+    assert fetched.failure.check == "building_table_absent"
     assert "stage frame frame_refused" in fetched.lines
     for line in fetched.lines:
         if line.startswith("PASS ") and "sha256=" in line:
             fields = line.split()
             select_fixture(cache, fields[1], fields[2].removeprefix("sha256="))
     ready = run_build(tuple(entries), _frame_transport(bodies), cache, _clock, _sleep)
-    assert ready.failure is None
+    assert ready.failure is not None
+    assert ready.failure.check == "building_part_unregistered"
     assert "areas: nothing to do" in ready.lines
     points = json.loads(
         (cache / "places_s2_t06" / "place_points.json").read_text(encoding="utf-8")
@@ -104,7 +106,8 @@ def test_run_build_reaches_the_frame_only_when_ready(tmp_path: Path) -> None:
     ):
         (cache / "places_s2_t06" / name).unlink()
     held = run_build(tuple(entries), _frame_transport(bodies), cache, _clock, _sleep)
-    assert held.failure is None
+    assert held.failure is not None
+    assert held.failure.check == "building_table_absent"
     assert not (cache / "places_s2_t06" / "place_points.json").exists()
 
 

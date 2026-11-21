@@ -97,7 +97,13 @@ def sidecar_for(
         "key": entry.key,
         "slug": entry.slug,
         "kind": entry.kind,
-        "fetch_mode": "citation_only" if entry.kind == "citation_only" else "fetch",
+        "fetch_mode": (
+            "file_input"
+            if entry.kind == "register_file"
+            else "citation_only"
+            if entry.kind == "citation_only"
+            else "fetch"
+        ),
         "title_en": entry.title_en,
         "publisher": publisher,
         "fetch_host": fetch_host,

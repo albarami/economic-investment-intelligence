@@ -31,6 +31,11 @@ FIXTURES = (
     repository_root(Path(__file__)) / "custodian" / "tests" / "fixtures" / "property"
 )
 USE_MAP = FIXTURES / "use_map.csv"
+_QUARTER_AS_OF = "2026-11-17"
+
+
+def _as_of_map(*source_ids: str) -> dict[str, str]:
+    return dict.fromkeys(source_ids, _QUARTER_AS_OF)
 
 
 def _rows(name: str) -> list[dict[str, object]]:
@@ -130,7 +135,7 @@ def test_worked_example_reproduces_the_card_fixture(tmp_path: Path) -> None:
     parsed = _parse(_rows("worked_example.json"), tmp_path, source_id="prop_sales")
     assert len(parsed.deals) == 2
     assert _blocked(parsed, "repeated_deal_price_disagreement") == 0
-    rows = quarter_aggregates(parsed.deals)
+    rows = quarter_aggregates(parsed.deals, as_of_by_source=_as_of_map("prop_sales"))
     row = _all_row(rows)
     assert row["median_price_per_ft2"] == Decimal("550.00")
     assert row["deal_count"] == 2
@@ -161,7 +166,9 @@ def test_a_deal_in_square_metres_converts_by_the_exact_factor(
         tmp_path,
         source_id="prop_sales",
     )
-    row = _all_row(quarter_aggregates(deals.deals))
+    row = _all_row(
+        quarter_aggregates(deals.deals, as_of_by_source=_as_of_map("prop_sales"))
+    )
     assert row["median_price_per_ft2"] == Decimal("92.90")
 
 
@@ -177,7 +184,10 @@ def test_even_count_median_is_the_mean_of_the_two_central_values(
         for index, price in enumerate((100, 200, 300, 400))
     ]
     row = _all_row(
-        quarter_aggregates(_parse(rows, tmp_path, source_id="prop_sales").deals)
+        quarter_aggregates(
+            _parse(rows, tmp_path, source_id="prop_sales").deals,
+            as_of_by_source=_as_of_map("prop_sales"),
+        )
     )
     assert row["median_price_per_ft2"] == Decimal("250.00")
     assert row["deal_count"] == 4
@@ -200,7 +210,11 @@ def test_only_per_m2_resi_deals_enter_the_ft2_median(tmp_path: Path) -> None:
         area_ft2=None,
         transaction="SYN-TX-LAND",
     )
-    row = _all_row(quarter_aggregates([per_m2, per_unit]))
+    row = _all_row(
+        quarter_aggregates(
+            [per_m2, per_unit], as_of_by_source=_as_of_map("prop_resi_units")
+        )
+    )
     assert row["deal_count"] == 2
     assert row["deal_value"] == Decimal("1700.00")
     assert row["median_price_per_ft2"] == Decimal("0.93")
@@ -220,7 +234,9 @@ def test_agreeing_repeats_are_one_deal_and_value_is_not_doubled(
         tmp_path,
     )
     assert len(parsed.deals) == 1
-    rows = quarter_aggregates(parsed.deals)
+    rows = quarter_aggregates(
+        parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+    )
     assert _all_row(rows)["deal_count"] == 1
     assert _all_row(rows)["deal_value"] == Decimal("800.00")
     assert _unit_row(rows)["deal_count"] == 1
@@ -243,7 +259,9 @@ def test_disagreeing_repeats_block_the_deal_with_a_named_reason(
     )
     assert len(parsed.deals) == 1
     assert _blocked(parsed, "repeated_deal_price_disagreement") == 1
-    rows = quarter_aggregates(parsed.deals)
+    rows = quarter_aggregates(
+        parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+    )
     assert _all_row(rows)["deal_count"] == 1
     assert _all_row(rows)["deal_value"] == Decimal("800.00")
 
@@ -276,7 +294,10 @@ def test_identifiers_never_reach_the_release_rows(tmp_path: Path) -> None:
     resi = _parse([_resi()], tmp_path)
     sale = _parse([_sale()], tmp_path, source_id="prop_sales")
     identifiers = resi.identifiers | sale.identifiers
-    rows = quarter_aggregates(resi.deals + sale.deals)
+    rows = quarter_aggregates(
+        resi.deals + sale.deals,
+        as_of_by_source=_as_of_map("prop_sales", "prop_resi_units"),
+    )
     text = repr(rows)
     for name in IDENTIFIER_FIELDS:
         assert name not in text
@@ -290,7 +311,9 @@ def test_a_planted_identifier_column_or_value_in_a_release_row_fails(
     tmp_path: Path,
 ) -> None:
     parsed = _parse([_resi()], tmp_path)
-    rows = quarter_aggregates(parsed.deals)
+    rows = quarter_aggregates(
+        parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+    )
     refuse_release_identifiers(rows, parsed.identifiers)
     planted_column = [dict(rows[0], encrypted_parcel_number="SYN-PX-Z")]
     with pytest.raises(AdditionError) as column:
@@ -356,14 +379,20 @@ def test_nonpositive_measures_are_blocked_not_kept(tmp_path: Path) -> None:
     assert not resi.deals and not sale.deals
     assert _blocked(resi, "nonpositive_price") == 2
     assert _blocked(sale, "nonpositive_area") == 1
-    assert quarter_aggregates(resi.deals + sale.deals) == ()
+    assert (
+        quarter_aggregates(
+            resi.deals + sale.deals,
+            as_of_by_source=_as_of_map("prop_sales", "prop_resi_units"),
+        )
+        == ()
+    )
 
 
 def test_a_unit_row_refuses_mixed_price_bases(tmp_path: Path) -> None:
     parsed = _parse(_rows("planted_mixed_basis.json"), tmp_path)
     assert len(parsed.deals) == 2
     with pytest.raises(AdditionError) as caught:
-        quarter_aggregates(parsed.deals)
+        quarter_aggregates(parsed.deals, as_of_by_source=_as_of_map("prop_resi_units"))
     assert caught.value.name == "mixed_price_basis"
 
 
@@ -379,10 +408,14 @@ def test_unit_type_rows_carry_their_basis_median_and_count(
         ),
     ]
     parsed = _parse(rows, tmp_path)
-    all_row = _all_row(quarter_aggregates(parsed.deals))
+    all_row = _all_row(
+        quarter_aggregates(parsed.deals, as_of_by_source=_as_of_map("prop_resi_units"))
+    )
     assert all_row["deal_count"] == 2
     assert all_row["deal_value"] == Decimal("2400.00")
-    unit = _unit_row(quarter_aggregates(parsed.deals))
+    unit = _unit_row(
+        quarter_aggregates(parsed.deals, as_of_by_source=_as_of_map("prop_resi_units"))
+    )
     assert unit["median_price"] == Decimal("15.00")
     assert unit["price_basis"] == "per_m2"
     assert unit["deal_count"] == 2
@@ -400,7 +433,10 @@ def test_a_shared_row_carries_no_source_id(tmp_path: Path) -> None:
         tmp_path,
         source_id="prop_sales",
     )
-    rows = quarter_aggregates(resi.deals + sale.deals)
+    rows = quarter_aggregates(
+        resi.deals + sale.deals,
+        as_of_by_source=_as_of_map("prop_sales", "prop_resi_units"),
+    )
     all_row = _all_row(rows)
     assert set(all_row) == {
         "district_key",
@@ -415,6 +451,7 @@ def test_a_shared_row_carries_no_source_id(tmp_path: Path) -> None:
         "land_median_price_per_ft2",
         "median_price",
         "price_basis",
+        "as_of",
     }
     assert all_row["deal_count"] == 2
     assert all_row["deal_value"] == Decimal("1000.00")
@@ -461,8 +498,11 @@ def test_a_malformed_measure_or_label_is_refused(tmp_path: Path) -> None:
 
 def test_no_kept_deal_writes_no_row(tmp_path: Path) -> None:
     parsed = _parse([_resi(price_per_square_meter=0, property_value=0)], tmp_path)
-    assert quarter_aggregates(parsed.deals) == ()
-    assert quarter_aggregates(()) == ()
+    assert (
+        quarter_aggregates(parsed.deals, as_of_by_source=_as_of_map("prop_resi_units"))
+        == ()
+    )
+    assert quarter_aggregates((), as_of_by_source=_as_of_map("prop_resi_units")) == ()
 
 
 def test_forecast_window_counts_the_trailing_contiguous_quarters() -> None:
@@ -497,7 +537,9 @@ def test_a_second_quarter_is_a_second_row(tmp_path: Path) -> None:
     parsed = _parse(rows, tmp_path)
     periods = {
         row["period"]
-        for row in quarter_aggregates(parsed.deals)
+        for row in quarter_aggregates(
+            parsed.deals, as_of_by_source=_as_of_map("prop_resi_units")
+        )
         if row["unit_type"] == "all"
     }
     assert periods == {"2025-Q3", "2025-Q4"}

@@ -461,6 +461,7 @@ def run_build(
     _fetch_only: bool = False,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
+    entries = tuple(entry for entry in entries if entry.kind != "company_web")
     if seed is not None:
         from eii_custodian.publicdata.assembly import AssemblyError
         from eii_custodian.publicdata.assembly_adapters import Production
@@ -512,6 +513,7 @@ def run_build(
             # an existing structured fetch failure and its network exit code.
             if build.fetched is not None and build.fetched.failure is not None:
                 return cast(BuildOutcome, build.fetched)
+            from eii_custodian.publicdata.building_inputs import BuildingError
             from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
             from eii_custodian.publicdata.series.parse import (
                 SERIES_REFUSALS,
@@ -519,6 +521,8 @@ def run_build(
             )
 
             reason = "assembly_build_refused"
+            if isinstance(exc, BuildingError):
+                reason = exc.name
             if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
                 reason = exc.word
             elif (
@@ -530,6 +534,7 @@ def run_build(
                 "snapshot_selection_invalid",
                 "assembly_gate_pending",
                 "assembly_frame_incomplete",
+                "assembly_buildings_incomplete",
                 "assembly_places_incomplete",
                 "assembly_membership_invalid",
                 "assembly_regression_refused",
@@ -596,6 +601,9 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
+        if entry.kind == "register_file":
+            lines.append(skip_line(entry.key, "lead_shell_file_input"))
+            continue
         if not token and _token_file(entry):
             if not told_absent:
                 lines.append(
@@ -1077,13 +1085,29 @@ def run_build(
             lines,
         )
     if failure is None:
+        from eii_custodian.publicdata.building_inputs import BuildingError
+        from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
         from eii_custodian.publicdata.places.integrate import (
             areas_before_stage,
             frame_when_ready,
         )
 
+        selected_build_inputs = reviewed_selections(cache)
         areas_before_stage(cache, lines)
-        frame_when_ready(cache, entries, lines, build_date=build_date)
+        try:
+            frame_when_ready(
+                cache,
+                entries,
+                lines,
+                build_date=build_date,
+                selections=selected_build_inputs,
+            )
+        except BuildingError as error:
+            failure = FetchFailure(
+                1, "buildings", "", error.name, "valid building inputs", error.name
+            )
+            _write_log(cache, lines, previous_terms, terms_attempts)
+            return BuildOutcome(tuple(lines), failure, manifests)
         failure = run_stage(cache, build_entries=entries, build_lines=lines).failure
         stage = run_stage(cache)
         for figure_id in stage.missing:
@@ -1125,7 +1149,9 @@ def run_build(
                 )
             )
         if failure is None:
-            failure = _heights(cache, entries, lines, terms_attempts)
+            failure = _heights(
+                cache, entries, lines, terms_attempts, selections=selected_build_inputs
+            )
 
     if benchmark_obstacles:
         cache.mkdir(parents=True, exist_ok=True)
@@ -1138,7 +1164,14 @@ def run_build(
 
         try:
             selected_comparison = reconciliation_selection or load_selection()
-            if selected_comparison is not None:
+            comparison_block = (
+                selected_comparison.comparison_block_reason()
+                if selected_comparison is not None
+                else None
+            )
+            if comparison_block is not None:
+                lines.append("NO_DATA trade_reconciliation " + comparison_block)
+            elif selected_comparison is not None:
                 from eii_custodian.publicdata.comtrade.policy import (
                     Policy as TradePolicy,
                 )
@@ -1426,8 +1459,11 @@ def _heights(
     entries: tuple[Entry, ...] | list[Entry],
     lines: list[str],
     terms_attempts: list[dict[str, object]],
+    *,
+    selections: Mapping[str, str] | None = None,
 ) -> FetchFailure | None:
-    """Run the heights step after the stage; a missing table only skips (B10)."""
+    """Run the heights step after the stage; a missing table refuses."""
+    from eii_custodian.publicdata.heights.model import HEIGHTS_FILE, MANIFEST_FILE
     from eii_custodian.publicdata.heights.step import (
         BUILDINGS_RELATIVE,
         HEIGHTS_RELATIVE,
@@ -1436,14 +1472,18 @@ def _heights(
     )
 
     root = cache.parent
+    out_dir = root / HEIGHTS_RELATIVE
+    for name in (HEIGHTS_FILE, MANIFEST_FILE):
+        (out_dir / name).unlink(missing_ok=True)
     try:
         build_heights(
             cache,
             entries,
             root / BUILDINGS_RELATIVE,
-            root / HEIGHTS_RELATIVE,
+            out_dir,
             lines,
             terms_attempts=tuple(terms_attempts),
+            selections=selections,
         )
     except HeightError as error:
         lines.append(
@@ -1457,6 +1497,27 @@ def _heights(
         )
         return FetchFailure(
             1, "heights", "", error.name, "valid height inputs", error.name
+        )
+    if (
+        not (out_dir / HEIGHTS_FILE).is_file()
+        or not (out_dir / MANIFEST_FILE).is_file()
+    ):
+        lines.append(
+            fail_line(
+                "heights",
+                "",
+                "heights_output_absent",
+                "heights output files",
+                "heights_output_absent",
+            )
+        )
+        return FetchFailure(
+            1,
+            "heights",
+            "",
+            "heights_output_absent",
+            "heights output files",
+            "heights_output_absent",
         )
     return None
 

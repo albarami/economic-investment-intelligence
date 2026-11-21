@@ -32,7 +32,9 @@ def test_tender_success_binds_adapter_to_confirmation_registry_and_receipt():
         receipt_sha256={"tenders_pub": "a" * 64},
     )
     assert evidence.checks["completion_evidence"] is True
-    assert g.confirmations([evidence], [row], {row.key: fetched})[1] == {
+    rows = g.confirmations([evidence], [row], {row.key: fetched})
+    (tender_row,) = [item for item in rows if item["task"] == "S2-T13"]
+    assert tender_row == {
         "task": "S2-T13",
         "state": "recorded",
         "reason": "",

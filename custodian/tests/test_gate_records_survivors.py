@@ -174,7 +174,7 @@ def confirmation_record(task, **changes):
 
 
 def test_confirmations_exact_missing_and_recorded_records():
-    tasks = ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+    tasks = g.CONFIRMATION_TASKS
     assert g.confirmations([], [], {}) == [confirmation_record(task) for task in tasks]
     row = entry()
     item = g.ConfirmationEvidence(
@@ -186,7 +186,7 @@ def test_confirmations_exact_missing_and_recorded_records():
         receipt_sha256={"invented": "a" * 64},
     )
     expected = [confirmation_record(task) for task in tasks]
-    expected[4] = confirmation_record(
+    expected[tasks.index("S2-T19")] = confirmation_record(
         "S2-T19",
         state="recorded",
         reason="",
@@ -197,6 +197,14 @@ def test_confirmations_exact_missing_and_recorded_records():
     with pytest.raises(ValueError) as error:
         g.confirmations([replace(item, task="invented unknown")], [], {})
     assert_message(error, "confirmation_task_unknown")
+
+
+def test_s2_t12_arabic_evidence_documents_s2_t39_attribution():
+    from eii_custodian.publicdata import gate_report as g
+
+    assert "investqa_pages:arabic_evidence" in g.CONFIRMATION_CHECKS["S2-T12"]
+    note = (g.investment_evidence.__doc__ or "") + (g.__doc__ or "")
+    assert "S2-T39" in note
 
 
 def test_investment_adapter_exact_identity_and_each_check():

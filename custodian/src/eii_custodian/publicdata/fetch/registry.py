@@ -36,6 +36,8 @@ KINDS = frozenset(
         "public_page",
         "awards_intake",
         "cdse_backup",
+        "register_file",
+        "company_web",
     }
 )
 # S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
@@ -393,8 +395,17 @@ def nightly_blocked(
     selected: tuple[str, ...],
 ) -> tuple[str, ...]:
     """Return selected ids whose nightly_live_fetch flag is false."""
-    flags = {entry.source_id: entry.nightly_live_fetch for entry in entries}
-    return tuple(name for name in selected if flags.get(name) is False)
+    # A file declaration and a page declaration may share a released source id.
+    # A source-wide selection must satisfy every row, independent of row order.
+    return tuple(
+        name
+        for name in selected
+        if any(
+            not entry.nightly_live_fetch
+            for entry in entries
+            if entry.source_id == name or entry.key == name
+        )
+    )
 
 
 def read_yaml(path: Path) -> object:
@@ -438,8 +449,48 @@ def _entry(row: object) -> Entry:
             or row.get("licence_basis") != "provider_terms"
         ):
             raise RegistryError("CDSE backup must remain optional and unread")
+    if source_id == "company_web" or kind == "company_web":
+        if (
+            source_id != "company_web"
+            or kind != "company_web"
+            or row.get("key") != source_id
+            or row.get("url") != ""
+            or row.get("fetch_host") != ""
+            or row.get("commit_allowed") is not False
+            or row.get("nightly_live_fetch") is not False
+            or row.get("release_tables") != []
+            or row.get("licence_basis") != "owner_decision"
+            or row.get("decision_record") != "0026"
+        ):
+            raise RegistryError("company web must remain lead-shell-only")
     if kind not in KINDS:
         raise RegistryError("unknown kind")
+    if kind == "register_file":
+        expected_keys = {
+            "biz_register": "biz_register",
+            "fc_register": "fc_register/file",
+        }
+        if (
+            row.get("key") != expected_keys.get(source_id)
+            or source_id not in expected_keys
+            or any(
+                row.get(name) != ""
+                for name in ("url", "fetch_host", "landing_url", "terms_url")
+            )
+            or row.get("nightly_live_fetch") is not False
+            or row.get("commit_allowed") is not False
+            or row.get("skip_reason") != "lead_shell_file_input"
+            or row.get("extension") != "csv"
+            or row.get("refetch")
+            != {
+                "value": "weekly",
+                "family": "registers",
+                "evidence": "decision 0045 item 4; EII check schedule",
+            }
+            or row.get("release_tables")
+            != ["pub_register_company", "pub_register_snapshot"]
+        ):
+            raise RegistryError("register file declaration")
     layer = _layer(row, kind)
     comtrade_policy = _comtrade_policy(row, kind)
     basis = _optional_text(row, "licence_basis")
@@ -478,7 +529,9 @@ def _entry(row: object) -> Entry:
         raise RegistryError("skip_reason names a licence or terms")
     file_fields = _file_fields(row, source_id)
     try:
-        refetch = parse_cadence(row["refetch"], source_id=source_id)
+        refetch = parse_cadence(
+            row["refetch"], source_id=None if kind == "register_file" else source_id
+        )
     except ValueError as exc:
         raise RegistryError(str(exc)) from None
     columns = _columns(row.get("columns"))

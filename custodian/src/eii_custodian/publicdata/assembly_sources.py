@@ -265,7 +265,15 @@ PACK_IDENTITIES: dict[str, tuple[str, ...]] = {
 SOURCE_COMPONENTS: dict[str, frozenset[str]] = {
     "bldg_3dglobfp": frozenset(("bldg_3dglobfp/1636", "bldg_3dglobfp/1639")),
     "bldg_ovt": frozenset(
-        ("bldg_ovt/part-00288", "bldg_ovt/part-00384", "bldg_ovt/part-00385")
+        (
+            "bldg_ovt/part-00288",
+            "bldg_ovt/part-00384",
+            "bldg_ovt/part-00385",
+            "bldg_ovt/stac-collection",
+            "bldg_ovt/stac-part-00288",
+            "bldg_ovt/stac-part-00384",
+            "bldg_ovt/stac-part-00385",
+        )
     ),
     "completions_ext": frozenset(
         (

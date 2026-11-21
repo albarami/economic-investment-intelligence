@@ -18,6 +18,8 @@ from eii_core.calc.building_heights import (
     ORDER_EXHAUSTED,
     HeightChoice,
     choose_height,
+    error_from_pairs,
+    errors_by_class,
     fallback_errors,
     floor_height,
     height_counts,
@@ -129,6 +131,101 @@ def test_fallback_errors_come_from_the_candidate_rows_not_the_chosen_height():
     assert wsf3d.mean_signed == Decimal(-10)
     assert wsf3d.mean_absolute == Decimal(10)
     assert wsf3d.median_absolute == Decimal(10)
+
+
+def test_errors_by_class_refuses_an_empty_class_name() -> None:
+    with pytest.raises(ValueError, match="class name required"):
+        errors_by_class([(Decimal("1"), Decimal("2"), "")])
+
+
+def test_error_from_pairs_matches_fallback_errors_for_one_source() -> None:
+    rows = _rows()
+    pairs = []
+    for candidates in rows.values():
+        raw = candidates.get("3dglobfp")
+        recorded = candidates.get("recorded")
+        if raw is not None and recorded is not None:
+            from eii_core.calc.building_heights import height_value
+
+            usable = height_value(raw)
+            recorded_usable = height_value(recorded)
+            if usable is not None and recorded_usable is not None:
+                pairs.append((usable, recorded_usable))
+    assert error_from_pairs(pairs) == fallback_errors(rows.values())["3dglobfp"]
+
+
+def test_errors_by_class_splits_one_fallbacks_pairs_by_class_name():
+    """GlobalBuildingAtlas calibration groups error statistics by class."""
+    pairs = [
+        (Decimal("90"), Decimal("100"), "tower"),
+        (Decimal("55"), Decimal("50"), "lowrise"),
+    ]
+    found = errors_by_class(pairs)
+    tower = found["tower"]
+    assert tower.count == 1
+    assert tower.mean_signed == Decimal("-10.00")
+    assert tower.mean_absolute == Decimal("10.00")
+    lowrise = found["lowrise"]
+    assert lowrise.count == 1
+    assert lowrise.mean_signed == Decimal("5.00")
+    assert lowrise.mean_absolute == Decimal("5.00")
+
+
+def test_errors_by_class_on_two_pairs_shares_the_even_count_median() -> None:
+    pairs = [
+        (Decimal("91"), Decimal("100"), "tower"),
+        (Decimal("89"), Decimal("100"), "tower"),
+    ]
+    block = errors_by_class(pairs)["tower"]
+    assert block.count == 2
+    assert block.mean_signed == Decimal("-10.00")
+    assert block.median_absolute == Decimal("10.00")
+
+
+def test_error_from_pairs_on_normalized_pairs_matches_fallback_errors() -> None:
+    """The shared core helper only; the GBA caller's own parity is decided by
+    test_gba_calibration_equals_fallback_errors_on_identical_raw_pairs."""
+    rows = _rows()
+    gba_pairs: list[tuple[Decimal, Decimal]] = []
+    for candidates in rows.values():
+        raw = candidates.get("3dglobfp")
+        recorded = candidates.get("recorded")
+        if raw is not None and recorded is not None:
+            gba_raw = height_value(raw)
+            recorded_usable = height_value(recorded)
+            if gba_raw is not None and recorded_usable is not None:
+                gba_pairs.append((gba_raw, recorded_usable))
+    overall = error_from_pairs(gba_pairs)
+    fallback = fallback_errors(rows.values())["3dglobfp"]
+    assert overall.count == fallback.count
+    assert overall.mean_signed == fallback.mean_signed
+    assert overall.mean_absolute == fallback.mean_absolute
+    assert overall.median_absolute == fallback.median_absolute
+
+
+def test_error_from_pairs_on_boundary_pairs_matches_fallback_errors() -> None:
+    """The shared core helper only, at the precision and half-up boundaries."""
+    cases = [
+        (Decimal("100.001"), Decimal("100")),
+        (Decimal("99.995"), Decimal("100")),
+        (Decimal("0.001"), Decimal("30")),
+    ]
+    for raw, recorded in cases:
+        row = _candidates(recorded, None, raw, None)
+        gba_usable = height_value(raw)
+        recorded_usable = height_value(recorded)
+        if gba_usable is None:
+            assert fallback_errors([row])["3dglobfp"].count == 0
+            assert error_from_pairs([]).count == 0
+            continue
+        assert (
+            error_from_pairs([(gba_usable, recorded_usable)])
+            == fallback_errors([row])["3dglobfp"]
+        )
+
+
+def test_errors_by_class_refuses_an_empty_input() -> None:
+    assert errors_by_class(()) == {}
 
 
 def test_errors_over_chosen_heights_alone_lose_the_fallbacks_of_recorded_wins():

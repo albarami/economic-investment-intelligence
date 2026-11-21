@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.building_fixture import world
 from custodian.tests.fixtures.frame.invented import invented_archive, invented_layer
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_stage import _frame_review
@@ -165,6 +166,16 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
     from eii_custodian.publicdata.stage import run_stage
 
     cache = tmp_path / "data" / "public_cache"
+    buildings = world(tmp_path / "inventory")
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    building_entries = [row for row in buildings.entries if row.key != "bnd_hdx"]
+    for row in building_entries:
+        write_cached(
+            cache,
+            row,
+            read_snapshot(buildings.cache / row.key, buildings.selected[row.key]).body,
+        )
     review = tmp_path / "custodian" / "publicdata" / "review"
     review.mkdir(parents=True)
     _frame_review(review)
@@ -175,7 +186,7 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
     ]
     for source in entries:
         body = (
-            invented_archive()
+            invented_archive(bounds=buildings.boundary.bounds)
             if source.source_id == "bnd_hdx"
             else json.dumps(invented_layer(source.source_id)).encode()
         )
@@ -194,6 +205,7 @@ def test_frame_then_stage_supplies_municipalities(tmp_path: Path) -> None:
         )
         commit_pair(cache / source.key, digest, source.extension, body, receipt)
         select_fixture(cache, source.key, digest)
+    entries.extend(building_entries)
     lic_entry, digest = _lic(cache, "lic_issued", _FRAME_NAME)
     entries.append(lic_entry)
     lines = [f"PASS {lic_entry.key} sha256={digest} host=invented"]

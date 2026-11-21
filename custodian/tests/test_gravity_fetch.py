@@ -17,16 +17,18 @@ def no_real_opener(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_gravity_complete_archive(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
     from eii_custodian.publicdata.gravity.contracts import read_selected
 
     outcome = run_build(
         [entry()],
         metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         gravity_stream=stream,
@@ -34,7 +36,7 @@ def test_gravity_complete_archive(tmp_path: Path) -> None:
     )
     assert outcome.failure is None
     assert outcome.manifests["cepii_gravity"]
-    release = read_selected(tmp_path, outcome.manifests["cepii_gravity"])
+    release = read_selected(fixture_cache, outcome.manifests["cepii_gravity"])
     assert len(release.bilateral) == 2
     assert {(row.origin_code, row.destination_code) for row in release.bilateral} == {
         ("00Q", "00A"),
@@ -49,7 +51,7 @@ def test_gravity_complete_archive(tmp_path: Path) -> None:
 
 
 def build(
-    tmp_path,
+    cache,
     *,
     config=None,
     source=None,
@@ -57,14 +59,14 @@ def build(
     stream_transport=stream,
 ):
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
 
     return run_build(
         [entry() if source is None else source],
         byte_transport,
-        tmp_path,
+        cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         gravity_stream=stream_transport,
@@ -75,7 +77,10 @@ def build(
 
 
 def test_gravity_pending_state(tmp_path: Path) -> None:
-    from eii_custodian.publicdata.fetch.build import run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     pending = next(row for row in load_registry() if row.source_id == "cepii_gravity")
@@ -84,30 +89,38 @@ def test_gravity_pending_state(tmp_path: Path) -> None:
         raise AssertionError("pending source requested")
 
     result = run_build(
-        [pending], forbidden, tmp_path, lambda: "2026-11-16T00:00:00Z", lambda _: None
+        [pending],
+        forbidden,
+        fixture_cache,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
     )
     assert not result.manifests
     assert any("gravity_metadata_unconfirmed" in line for line in result.lines)
 
 
 def test_gravity_repeat_publication_is_idempotent(tmp_path: Path) -> None:
-    first = build(tmp_path)
-    second = build(tmp_path)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    first = build(fixture_cache)
+    second = build(fixture_cache)
     assert first.failure is None
     assert second.failure is None
     assert first.manifests == second.manifests
 
 
 def test_gravity_does_not_use_the_baci_stream(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.gravity.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.gravity.config import Config
 
     result = run_build(
         [entry()],
         metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         stream_transport=stream,

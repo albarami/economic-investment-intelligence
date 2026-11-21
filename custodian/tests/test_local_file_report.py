@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 
-from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+from eii_custodian.publicdata.fetch.build import LOG_NAME
 from eii_custodian.publicdata.fetch.transport import Response
 
 EXPECTATIONS = "local_expectations/PUB-71.json"
@@ -31,8 +32,10 @@ def test_build_report_local_file_status_is_value_free(
     An invalid expectations record still raises the stage's existing refusal;
     its status must survive that refusal in the normal build report.
     """
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     if status != "absent":
-        path = tmp_path / target
+        path = fixture_cache / target
         path.parent.mkdir(parents=True)
         if target == EXPECTATIONS:
             body = json.dumps(
@@ -49,7 +52,7 @@ def test_build_report_local_file_status_is_value_free(
 
     def build():
         return run_build(
-            (), unused, tmp_path, lambda: "2026-11-19T00:00:00Z", lambda _: None
+            (), unused, fixture_cache, lambda: "2026-11-19T00:00:00Z", lambda _: None
         )
 
     if target == EXPECTATIONS and status == "invalid":
@@ -60,7 +63,7 @@ def test_build_report_local_file_status_is_value_free(
     else:
         assert build().failure is None
 
-    text = (tmp_path / LOG_NAME).read_text(encoding="utf-8")
+    text = (fixture_cache / LOG_NAME).read_text(encoding="utf-8")
     report = json.loads(text)
     assert report["local_files"] == {
         EXPECTATIONS: status if target == EXPECTATIONS else "absent",

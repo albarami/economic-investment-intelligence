@@ -17,7 +17,9 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.building_fixture import bind_height_table
 from custodian.tests.fixtures.heights import invented
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_publicdata_behaviour import (
     _FILE_TERMS,
     FILE_URL,
@@ -29,7 +31,6 @@ from custodian.tests.test_publicdata_behaviour import (
     _stored_page,
 )
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.report import terms_attempt_record
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 from eii_custodian.publicdata.heights.step import build_heights
@@ -66,18 +67,20 @@ def _refusing(url: str) -> Response:
 def test_an_unread_terms_page_is_recorded_as_an_attempt_only(
     tmp_path: Path, terms_url: str, reason: str, advisory: str, read_on: str
 ) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(
         _entry(),
         terms_url=terms_url,
         terms_read_on=read_on,
         terms_words="invented pending own words",
     )
-    outcome = run_build((entry,), _refusing, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), _refusing, fixture_cache, _clock, _sleep)
     # The data is still admitted and the advisory line is unchanged.
     assert outcome.failure is None
     assert f"TERMS {entry.key} {advisory}" in outcome.lines
-    assert _stored_page(tmp_path, entry.key).read_bytes() == b"invented-bytes"
-    log = _log(tmp_path)
+    assert _stored_page(fixture_cache, entry.key).read_bytes() == b"invented-bytes"
+    log = _log(fixture_cache)
     assert log["terms"] == []
     assert log["terms_attempts"] == [
         {
@@ -90,19 +93,21 @@ def test_an_unread_terms_page_is_recorded_as_an_attempt_only(
         }
     ]
     # No reading date is made from the attempt.
-    side = _sidecar(tmp_path)
+    side = _sidecar(fixture_cache)
     assert side["terms_read_on"] == read_on
     assert side["terms_sha256"] is None
 
 
 def test_a_read_terms_page_records_no_attempt(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = replace(_entry(), terms_url=_FILE_TERMS)
 
     def transport(url: str) -> Response:
         return _ok(url, b"<p>Invented terms.</p>" if url == _FILE_TERMS else b"x")
 
-    assert run_build((entry,), transport, tmp_path, _clock, _sleep).failure is None
-    log = _log(tmp_path)
+    assert run_build((entry,), transport, fixture_cache, _clock, _sleep).failure is None
+    log = _log(fixture_cache)
     assert log["terms_attempts"] == []
     assert len(log["terms"]) == 1
 
@@ -135,7 +140,7 @@ def _heights(tmp_path: Path, attempts: tuple[dict[str, object], ...]) -> dict:
     out_dir = tmp_path / "data" / "assets" / "heights"
     build_heights(
         cache,
-        (globfp_row, wsf_row),
+        bind_height_table(cache, (globfp_row, wsf_row), path),
         path,
         out_dir,
         [],

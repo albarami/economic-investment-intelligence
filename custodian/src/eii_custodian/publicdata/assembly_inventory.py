@@ -43,7 +43,14 @@ INVENTORY = (
     ),
     InventoryItem(
         "frame",
-        ("reviewed_selections", "frame_review", "build_date"),
+        (
+            "reviewed_selections",
+            "frame_review",
+            "build_date",
+            "bldg_ovt_parts",
+            "bldg_ovt_stac",
+            "bnd_hdx",
+        ),
         ("assembly/frame.json",),
     ),
     InventoryItem(
@@ -88,7 +95,13 @@ INVENTORY = (
     ),
     InventoryItem(
         "heights",
-        ("reviewed_selections", "frame", "height_rules"),
+        (
+            "reviewed_selections",
+            "frame",
+            "height_rules",
+            "assets/buildings/buildings.geojson",
+            "assets/buildings/manifest.buildings.json",
+        ),
         ("assembly/heights.json",),
     ),
     InventoryItem(

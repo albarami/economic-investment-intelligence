@@ -1088,7 +1088,7 @@ OPEN items raised by decisions 0016 and 0017 that touch this document:
 OPEN items raised by [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) that touch this document:
 
 - OPEN: the Public source of each series of the owner's list (decision 0019 item 2) for which the public data pack holds no table yet; such a series is listed in document 04 as open and is not on the list of method card C30 until a table exists.
-- ASSUMPTION (S2-T17, OI-102): Public property-price series use `district`, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject, pending owner confirmation.
+- DECIDED (S2-T17, [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1): Public property-price series use `district`, the publisher's own district label with its municipality; Public slots only, never a drawn area, never apportioned and never an `area` subject.
 - OPEN: the apportioning weight for drawn shapes (first item of the list above) is not closed by the grid of `worldpop_qat_agesex`, which is a displayed population and not a weight; document 07 confirms the weight at slice S2.
 
 OPEN items raised by [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) that touch this document:
@@ -1134,3 +1134,9 @@ Every timing and size in this document that is attributed to the design research
 - FastAPI documentation, Server-Sent Events, https://fastapi.tiangolo.com/tutorial/server-sent-events/, retrieved 2026-11-11.
 - Python Software Foundation, `uuid` module documentation for Python 3.14, https://docs.python.org/3.14/library/uuid.html, retrieved 2026-11-11.
 - Valhalla project, Isochrone API, https://valhalla.github.io/valhalla/api/isochrone/, as cited in the EII tech-stack research of 2026-11-11.
+
+## Offline structured address and national imagery readers
+
+Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 4 and 5 (S2-T51), `POST /api/address-search/structured` accepts exactly string fields `zone`, `street`, `building`, with no text, language, limit, URL, utility account, PIN or person field. It reads only `pub_address_point` and returns bounded, feature-key-ordered candidates with published subtype/point and release/source lineage, and found, ambiguous, not-found or missing-source status. Duplicate triples remain ambiguous; nothing guesses a point. The request and result never enter a log, ledger, model payload or persisted query/result store. The fixed read `structured-address-v1` and composite index apply in both stores. The model has no callable tool for this route. Every displayed address numeral uses the Fact chip family.
+
+`GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.

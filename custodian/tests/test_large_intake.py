@@ -36,11 +36,11 @@ class Sink:
         return len(body)
 
 
-def stream(entry, chunks, size=None, etag=None, final=None):
+def stream(entry, chunks, size=None, etag=None, final=None, hops=()):
     @contextmanager
     def read(url):
         assert url == entry.url
-        yield StreamResponse(final or url, (), size, iter(chunks), etag=etag)
+        yield StreamResponse(final or url, hops, size, iter(chunks), etag=etag)
 
     return read
 
@@ -254,8 +254,11 @@ def test_streamed_dataset_without_a_licence_records_pending(entries, tmp_path):
     row whose portal states no licence records the same pending state as the
     ordinary path; the sidecar holds licence_review "pending" with the date in
     retrieved_utc, the build log carries the advisory, and nothing fails."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata import completeness
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.report import licence_unstated_line
 
     entry = _streamed_entry(entries)
@@ -265,14 +268,16 @@ def test_streamed_dataset_without_a_licence_records_pending(entries, tmp_path):
     outcome = run_build(
         (entry,),
         lambda _url: no_licence,
-        tmp_path,
+        fixture_cache,
         lambda: stamp,
         lambda _s: None,
         large_stream=stream(entry, [raw], len(raw)),
     )
     assert outcome.failure is None
     assert licence_unstated_line(entry.key, entry.licence_id, stamp) in outcome.lines
-    side = read_snapshot(tmp_path / entry.key, hashlib.sha256(raw).hexdigest()).sidecar
+    side = read_snapshot(
+        fixture_cache / entry.key, hashlib.sha256(raw).hexdigest()
+    ).sidecar
     assert side["portal_licence"] is None
     assert side["licence_review"] == "pending"
     assert side["retrieved_utc"] == stamp
@@ -284,7 +289,10 @@ def test_streamed_differing_licence_records_pending(entries, tmp_path):
     a differing licence records the same pending state as the ordinary path;
     the build log carries the licence_pending_line advisory, the sidecar keeps
     the observed licence, and nothing fails."""
-    from eii_custodian.publicdata.fetch.build import run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.report import licence_pending_line
 
     entry = _streamed_entry(entries)
@@ -297,7 +305,7 @@ def test_streamed_differing_licence_records_pending(entries, tmp_path):
     outcome = run_build(
         (entry,),
         lambda _url: differing,
-        tmp_path,
+        fixture_cache,
         lambda: stamp,
         lambda _s: None,
         large_stream=stream(entry, [raw], len(raw)),
@@ -306,7 +314,9 @@ def test_streamed_differing_licence_records_pending(entries, tmp_path):
     assert licence_pending_line(entry.key, entry.licence_id, observed, stamp) in (
         outcome.lines
     )
-    side = read_snapshot(tmp_path / entry.key, hashlib.sha256(raw).hexdigest()).sidecar
+    side = read_snapshot(
+        fixture_cache / entry.key, hashlib.sha256(raw).hexdigest()
+    ).sidecar
     assert side["portal_licence"] == observed
     assert "licence_review" not in side
 
@@ -471,6 +481,8 @@ def test_older_imports_keep_planned_card_input_and_strict_period_gate(
 
 
 def test_build_passes_stream_to_both_dispatches(entries, tmp_path, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.build import FetchFailure
 
@@ -485,7 +497,7 @@ def test_build_passes_stream_to_both_dispatches(entries, tmp_path, monkeypatch):
     build.run_build(
         [entries["bldg_wsf3d"]],
         lambda _u: pytest.fail("network"),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-18T00:00:00Z",
         lambda _s: None,
         large_stream=sentinel,
@@ -499,7 +511,7 @@ def test_build_passes_stream_to_both_dispatches(entries, tmp_path, monkeypatch):
     build.run_build(
         [entries["places_ovt/part-00014"]],
         lambda _u: pytest.fail("network"),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-18T00:00:00Z",
         lambda _s: None,
         large_stream=sentinel,
@@ -538,6 +550,30 @@ def test_stream_source_and_hosts_are_closed(entries):
         large.receive(
             entry, stream(entry, [b"x"], final="https://unlisted.invalid/SYN"), Sink()
         )
+
+
+@pytest.mark.parametrize("blocked_hop", [False, True])
+def test_stream_checks_hops_before_writing_with_allowed_final_url(entries, blocked_hop):
+    """Invented hop chain; the final URL alone cannot decide this refusal."""
+    entry = entries["bldg_wsf3d"]
+    hop = "https://unlisted.invalid/SYN-hop" if blocked_hop else entry.url
+    read = stream(entry, [b"SYN"], 3, final=entry.url, hops=(hop,))
+    sink = Sink()
+    if blocked_hop:
+        with pytest.raises(large.IntakeError) as caught:
+            large.receive(entry, read, sink)
+        assert str(caught.value) == "blocked_host"
+        assert sink.count == 0
+        assert sink.digest.hexdigest() == hashlib.sha256(b"").hexdigest()
+    else:
+        received = large.receive(entry, read, sink)
+        assert received.nbytes == sink.count == 3
+        assert (
+            received.sha256
+            == sink.digest.hexdigest()
+            == hashlib.sha256(b"SYN").hexdigest()
+        )
+        assert received.final_url == entry.url
 
 
 def test_redirect_userinfo_is_absent_from_the_failure(entries, tmp_path, monkeypatch):
@@ -727,6 +763,8 @@ def test_older_imports_refuse_undeclared_public_split(entries, tmp_path):
 def test_default_dispatch_keeps_legacy_callback_signatures(
     entries, tmp_path, monkeypatch
 ):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.build import FetchFailure
 
@@ -746,7 +784,7 @@ def test_default_dispatch_keeps_legacy_callback_signatures(
         result = build.run_build(
             [entries[key]],
             lambda _u: pytest.fail("network"),
-            tmp_path,
+            fixture_cache,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
         )

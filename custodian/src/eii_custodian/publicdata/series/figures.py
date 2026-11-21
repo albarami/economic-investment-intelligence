@@ -18,6 +18,7 @@ from urllib.parse import quote
 from eii_core.calc.facts import CalculationFact, Measure, SourceChain
 from eii_core.calc.public_series import (
     C2_CALENDAR,
+    C2_METHOD_VERSION,
     ZERO,
     Group,
     bulk_months,
@@ -134,7 +135,7 @@ def _envelope(
     chain = [{key: receipts[source][key] for key in CHAIN_FIELDS} for source in sources]
     return {
         "method": METHOD,
-        "method_version": VERSION,
+        "method_version": C2_METHOD_VERSION if "lic_cancelled" in sources else VERSION,
         "source_chain": chain,
         "release_tables": sorted(
             {target[0] for source in sources for target in FIELD_MAP[source].values()}

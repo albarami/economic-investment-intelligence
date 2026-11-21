@@ -385,6 +385,16 @@ def test_listing_sign_in_and_metadata_from_another_release_store_nothing(
     assert not (tmp_path / "wrong").exists()
 
 
+def test_readme_s2_t15_paragraph_names_newest_release_at_refresh() -> None:
+    root = repository_root(Path(__file__))
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    paragraph = next(p for p in readme.split("\n\n") if p.startswith("Task S2-T15"))
+    assert "release 2025-01-10" not in paragraph
+    assert "newest dated release" in paragraph
+    assert "keeping the stated pipeline limits" not in paragraph
+    assert "parses hand-made Parquet" in paragraph
+
+
 def test_registry_is_stable_and_dynamic_release_fields_are_not_fixed() -> None:
     row = next(entry for entry in load_registry() if entry.key == _STABLE_KEY)
     assert row.url == COPY_ROOT

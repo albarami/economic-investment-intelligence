@@ -4,12 +4,12 @@ import json
 from dataclasses import replace
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_awards import profile, row
 from custodian.tests.test_s2_t29_pages import BODY, STAMP, URL, page_entry, review
 from custodian.tests.test_s2_t29_transport import pin
 
 from eii_custodian.publicdata.fetch import award_checks, certificate_pins, page_records
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError
 from eii_custodian.publicdata.fetch.transport import Response
@@ -17,6 +17,8 @@ from eii_custodian.publicdata.fetch.transport import Response
 
 @pytest.mark.parametrize("source", ["insurance_tables", "awards_owner_scrape"])
 def test_held_dispatch_continues(tmp_path, source):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     held = replace(
         next(e for e in load_registry() if e.source_id == source),
         skip_reason="SYN-held",
@@ -27,17 +29,19 @@ def test_held_dispatch_continues(tmp_path, source):
         pytest.fail("held entry requested transport")
 
     outcome = run_build(
-        (held, following), forbidden, tmp_path, lambda: STAMP, lambda _: None
+        (held, following), forbidden, fixture_cache, lambda: STAMP, lambda _: None
     )
     assert outcome.failure is None
     assert any(line.startswith(f"SKIP {held.key}") for line in outcome.lines)
     assert any(line.startswith("SKIP SYN-next") for line in outcome.lines)
-    assert not (tmp_path / held.key).exists()
-    assert not (tmp_path / following.key).exists()
+    assert not (fixture_cache / held.key).exists()
+    assert not (fixture_cache / following.key).exists()
 
 
 @pytest.mark.parametrize("source", ["insurance_tables", "awards_owner_scrape"])
 def test_cleared_hold_keeps_evidence_refusal(tmp_path, source, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     if source == "awards_owner_scrape":
         from eii_custodian.publicdata.fetch import awards
 
@@ -49,7 +53,7 @@ def test_cleared_hold_keeps_evidence_refusal(tmp_path, source, monkeypatch):
     outcome = run_build(
         (replace(held, skip_reason=""),),
         lambda _: pytest.fail("request"),
-        tmp_path,
+        fixture_cache,
         lambda: STAMP,
         lambda _: None,
     )
@@ -58,7 +62,7 @@ def test_cleared_hold_keeps_evidence_refusal(tmp_path, source, monkeypatch):
         if source == "insurance_tables"
         else "awards_profile_pending"
     )
-    assert not (tmp_path / held.key).exists()
+    assert not (fixture_cache / held.key).exists()
 
 
 @pytest.mark.parametrize("school", [False, True])
@@ -230,16 +234,18 @@ def award_intake(tmp_path, monkeypatch):
     ],
 )
 def test_awards_intake_security_refuses(tmp_path, monkeypatch, plant, reason):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import awards
     from eii_custodian.publicdata.fetch.transport import TransportFault
 
-    entry, declaration, proof = award_intake(tmp_path, monkeypatch)
+    entry, declaration, proof = award_intake(fixture_cache, monkeypatch)
     if plant == "unreviewed":
         declaration["reviewed_urls"] = []
     if plant == "offhost":
         import hashlib
 
-        folder = tmp_path / "intake" / entry.key
+        folder = fixture_cache / "intake" / entry.key
         body = (
             (folder / "syn.csv")
             .read_bytes()
@@ -270,10 +276,12 @@ def test_awards_intake_security_refuses(tmp_path, monkeypatch, plant, reason):
             else response
         )
 
-    outcome = run_build((entry,), transport, tmp_path, lambda: STAMP, lambda _: None)
+    outcome = run_build(
+        (entry,), transport, fixture_cache, lambda: STAMP, lambda _: None
+    )
     assert outcome.failure is not None
     assert outcome.failure.check == reason
-    assert not (tmp_path / entry.key).exists()
+    assert not (fixture_cache / entry.key).exists()
 
 
 def test_awards_proof_browser_default(tmp_path, monkeypatch):
@@ -348,6 +356,8 @@ def test_awards_retains_parsed_blank(tmp_path, kind):
     ],
 )
 def test_interrupted_publication_has_no_partial(tmp_path, monkeypatch, source, phase):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import awards
 
     if source == "page":
@@ -359,7 +369,7 @@ def test_interrupted_publication_has_no_partial(tmp_path, monkeypatch, source, p
 
         module = page_records
     else:
-        entry, _, transport = award_intake(tmp_path, monkeypatch)
+        entry, _, transport = award_intake(fixture_cache, monkeypatch)
         module = awards
     original = module.publish_snapshot
 
@@ -378,13 +388,15 @@ def test_interrupted_publication_has_no_partial(tmp_path, monkeypatch, source, p
             raise OSError("SYN-secret-write-error")
 
         monkeypatch.setattr(page_records, "archive_auxiliary", terms)
-    outcome = run_build((entry,), transport, tmp_path, lambda: STAMP, lambda _: None)
+    outcome = run_build(
+        (entry,), transport, fixture_cache, lambda: STAMP, lambda _: None
+    )
     assert outcome.failure is not None
     assert outcome.failure.check == (
         "snapshot_write_failed" if phase == "proofs" else "page_validation_failed"
     )
-    assert not (tmp_path / entry.key).exists()
-    assert not list(tmp_path.glob(".page-stage-*"))
+    assert not (fixture_cache / entry.key).exists()
+    assert not list(fixture_cache.glob(".page-stage-*"))
     assert "SYN-secret-write-error" not in repr(outcome)
 
 
@@ -456,12 +468,14 @@ def test_awards_existing_identity_conflict(tmp_path):
 def test_existing_proof_integrity_refusal_preserves_archive(
     tmp_path, monkeypatch, fault
 ):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
 
-    entry, _, proof = award_intake(tmp_path, monkeypatch)
+    entry, _, proof = award_intake(fixture_cache, monkeypatch)
     response = proof(entry.url)
     archived = publish_snapshot(
-        tmp_path / entry.key / "proofs",
+        fixture_cache / entry.key / "proofs",
         "html",
         response.body,
         {
@@ -473,22 +487,22 @@ def test_existing_proof_integrity_refusal_preserves_archive(
     if fault == "tamper":
         archived.path.write_bytes(b"SYN-tampered")
     before = {
-        str(p.relative_to(tmp_path)): p.read_bytes()
-        for p in tmp_path.rglob("*")
+        str(p.relative_to(fixture_cache)): p.read_bytes()
+        for p in fixture_cache.rglob("*")
         if p.is_file()
     }
-    outcome = run_build((entry,), proof, tmp_path, lambda: STAMP, lambda _: None)
+    outcome = run_build((entry,), proof, fixture_cache, lambda: STAMP, lambda _: None)
     assert outcome.failure.check == (
         "snapshot_conflict" if fault == "conflict" else "snapshot_hash_mismatch"
     )
     after = {
-        str(p.relative_to(tmp_path)): p.read_bytes()
-        for p in tmp_path.rglob("*")
+        str(p.relative_to(fixture_cache)): p.read_bytes()
+        for p in fixture_cache.rglob("*")
         if p.is_file() and p.name not in {"build-log.json", "terms_state.json"}
     }
     assert all(after[key] == body for key, body in before.items())
-    assert not list((tmp_path / entry.key / "index").glob("*.json"))
-    assert not list((tmp_path / entry.key / "raw").rglob("*"))
+    assert not list((fixture_cache / entry.key / "index").glob("*.json"))
+    assert not list((fixture_cache / entry.key / "raw").rglob("*"))
 
 
 @pytest.mark.parametrize("kind", ["unreachable", "http", "metadata_bytes"])

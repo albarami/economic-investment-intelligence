@@ -20,6 +20,8 @@ import hashlib
 import json
 
 import yaml
+from custodian.tests.test_source_completeness import entry
+from custodian.tests.test_source_completeness import receipt as build_receipt
 
 from eii_custodian.publicdata.method_card_validation import CONFIGURATION_PINS
 
@@ -230,3 +232,22 @@ def pending(row):
         values={},
         unpinned_reason="awaiting the live public build of S2-T08 part B",
     )
+
+
+def lineage_context(record):
+    """INVENTED registry rows and build receipts for every source lineage row."""
+    links: dict[str, str] = {}
+    for row in record.get("pins", []):
+        if not row.get("checked_against_source"):
+            continue
+        for link in row.get("source_lineage") or []:
+            links[str(link["source_id"])] = str(link["sha256"])
+    registry = []
+    receipts: dict[str, dict[str, object]] = {}
+    for source_id, sha in sorted(links.items()):
+        row = entry(source_id, key=source_id)
+        registry.append(row)
+        sidecar = build_receipt(row)
+        sidecar["sha256"] = sha
+        receipts[row.key] = sidecar
+    return {"registry": registry, "receipts": receipts}

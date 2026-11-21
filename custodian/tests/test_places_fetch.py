@@ -7,9 +7,9 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.allowlist import approve
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
@@ -115,12 +115,14 @@ def test_size_etag_host_and_redirect_plants(tmp_path: Path) -> None:
 
 def test_build_hook_propagates_the_failure(tmp_path: Path) -> None:
     """The places file is fetched after the further source, and a mismatch stops the build."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = _entry(4)
 
     def transport(url: str) -> _Body:
         return _Body(url, b"SYN")
 
-    outcome = run_build((entry,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((entry,), transport, fixture_cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "size_mismatch"
     assert any(line.startswith("FAIL ") for line in outcome.lines)
@@ -268,6 +270,8 @@ def test_etag_that_is_not_text_is_unobserved(tmp_path: Path) -> None:
 
 def test_skip_reason_still_set_fetches_nothing(tmp_path: Path) -> None:
     """With the reason still set, the row is not a place file and the hook fetches nothing."""
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = next(item for item in load_registry() if item.key == FILE_KEYS[0])
     planted = replace(entry, skip_reason="transport_etag_pending_s2_t06_part_b")
     assert is_place_file(planted) is False
@@ -277,7 +281,7 @@ def test_skip_reason_still_set_fetches_nothing(tmp_path: Path) -> None:
         calls.append(url)
         return Response(url, b"SYN", ())
 
-    outcome = run_build((planted,), transport, tmp_path, _clock, _sleep)
+    outcome = run_build((planted,), transport, fixture_cache, _clock, _sleep)
     assert calls == []
     assert outcome.failure is None
     expected = _skipped_lines(planted)

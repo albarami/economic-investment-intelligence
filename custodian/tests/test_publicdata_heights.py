@@ -39,6 +39,12 @@ from eii_custodian.publicdata.fetch.kinds import Prepared, prepare
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.heights.landmarks import (
+    LANDMARK_FIXTURE_PATH,
+    LANDMARK_HEIGHTS_PATH,
+    apply_landmark_heights,
+    load_landmark_heights,
+)
 from eii_custodian.publicdata.heights.manifest import (
     ESTIMATE_LABEL,
     check_row,
@@ -72,6 +78,44 @@ PACKAGE = Path(heights_package.__file__).resolve().parent
 CALC = Path(floor_height.__code__.co_filename).resolve()
 
 
+def fixture_heights(cache, entries, path, *args, **kwargs):
+    """Supply invented inventory lineage to isolated hierarchy/reader plants."""
+    from custodian.tests.building_fixture import bind_height_table
+
+    entries = bind_height_table(cache, entries, path)
+    return build_heights(cache, entries, path, *args, **kwargs)
+
+
+def fixture_fetch_and_heights(entries, transport, cache, clock, sleep, **kwargs):
+    """Exercise acquisition and the real height adapter with invented inventory.
+
+    Full frame/inventory workflow integration is tested separately. These
+    fixtures hold equatorial C47 examples, not a national frame or live table.
+    """
+    from custodian.tests.building_fixture import bind_height_table
+
+    from eii_custodian.publicdata.fetch.build import _heights
+
+    fetched = run_build(
+        entries, transport, cache, clock, sleep, _fetch_only=True, **kwargs
+    )
+    if fetched.failure is not None:
+        return fetched
+    path = cache.parent / "assets/buildings/buildings.geojson"
+    bound_entries = bind_height_table(cache, entries, path)
+    lines = list(fetched.lines)
+    failure = _heights(cache, bound_entries, lines, list(fetched.terms_attempts))
+    return replace(fetched, lines=tuple(lines), failure=failure)
+
+
+def test_landmark_binding_absent_on_refresh_refuses() -> None:
+    rows = load_landmark_heights(LANDMARK_FIXTURE_PATH)
+    with pytest.raises(HeightError) as error:
+        apply_landmark_heights([], rows)
+    assert error.value.name == "landmark_building_absent"
+    assert error.value.detail == rows[0].landmark_id
+
+
 def _clock() -> str:
     return "2026-11-14T00:00:00Z"
 
@@ -102,7 +146,7 @@ def _card_setup(tmp_path):
     path.write_bytes(buildings)
     out_dir = tmp_path / "data" / "assets" / "heights"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, wsf_row),
         path,
@@ -111,6 +155,14 @@ def _card_setup(tmp_path):
         invented.rules_file(tmp_path / "rules.yaml"),
     )
     return out_dir, lines
+
+
+def _ensure_building_table(cache: Path) -> Path:
+    """Write a minimal building table beside the public cache."""
+    from custodian.tests.support.buildings import ensure_minimal_building_table
+
+    path, _ = ensure_minimal_building_table(cache)
+    return path
 
 
 def test_the_card_fixture_end_to_end(tmp_path: Path) -> None:
@@ -202,7 +254,10 @@ def test_the_real_doc04_credit_is_the_real_manifest_credit(tmp_path: Path) -> No
             template = quoted[1:-1]
     assert template == load_rules(RULES_PATH).credit_3dglobfp
     for entry in _heights_entries(load_registry()):
-        assert entry.licence_id == "CC-BY-4.0"
+        if entry.source_id == "bldg_gba":
+            assert entry.licence_id == "CC-BY-NC-4.0"
+        else:
+            assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
     globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
     cache = tmp_path / "cache"
@@ -218,7 +273,7 @@ def test_the_real_doc04_credit_is_the_real_manifest_credit(tmp_path: Path) -> No
         )
     )
     out_dir = tmp_path / "out"
-    build_heights(cache, (globfp_row,), buildings, out_dir, [], RULES_PATH)
+    fixture_heights(cache, (globfp_row,), buildings, out_dir, [], RULES_PATH)
     credit = _manifest(out_dir)["credits"]["bldg_3dglobfp"]["credit"]
     assert credit == template.replace("{date}", "2026-11-14")
 
@@ -248,19 +303,19 @@ def test_the_manifest_files_list_carries_hashes_and_receipt_terms(
     assert globfp["terms_read_on"] == "2026-11-14"
 
 
-def test_an_absent_building_table_is_a_skip_line_not_a_failure(
+def test_an_absent_building_table_refuses_the_heights_step(
     tmp_path: Path,
 ) -> None:
-    """B10: the absent table adds one SKIP line and changes no exit code."""
+    """Decision 0064 item 25: a missing building table refuses the heights step."""
     lines: list[str] = []
-    build_heights(
-        tmp_path / "cache",
-        (),
-        tmp_path / "data" / "assets" / "buildings" / "buildings.geojson",
-        tmp_path / "out",
-        lines,
-    )
-    assert lines == ["SKIP heights building_table_absent"]
+    with pytest.raises(HeightError, match="building_table_absent"):
+        fixture_heights(
+            tmp_path / "cache",
+            (),
+            tmp_path / "data" / "assets" / "buildings" / "buildings.geojson",
+            tmp_path / "out",
+            lines,
+        )
     assert not (tmp_path / "out").exists()
 
 
@@ -283,7 +338,7 @@ def test_the_committed_rules_read_both_sources_not_fetched(
         )
     )
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         tmp_path / "cache",
         (),
         buildings_path,
@@ -315,7 +370,7 @@ def test_the_floor_count_product_reads_the_committed_constant(
     )
     out_dir = tmp_path / "out"
     lines: list[str] = []
-    build_heights(tmp_path / "cache", (), buildings_path, out_dir, lines, RULES_PATH)
+    fixture_heights(tmp_path / "cache", (), buildings_path, out_dir, lines, RULES_PATH)
     row = _rows(out_dir)[0]
     expected = floor_height(Decimal(5), rules.storey_height)
     assert rules.storey_height == Decimal("3.0")
@@ -376,6 +431,12 @@ def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
     assert wsf.scale == "0.1"
     assert wsf.crs == "EPSG:4326"
     assert wsf.dtype == "int16"
+    gba = rules.structures["bldg_gba"]
+    assert gba.format == "to be confirmed"
+    assert gba.field == "to be confirmed"
+    assert gba.class_field == "to be confirmed"
+    assert gba.unit == "m"
+    assert gba.crs == "EPSG:4326"
 
 
 def test_input_contract_refusals(tmp_path: Path) -> None:
@@ -673,7 +734,9 @@ def test_another_declared_format_is_absent_not_refused(tmp_path: Path) -> None:
 
 def _heights_entries(loaded: tuple[Entry, ...]) -> list[Entry]:
     return [
-        entry for entry in loaded if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
+        entry
+        for entry in loaded
+        if entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
     ]
 
 
@@ -684,17 +747,30 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
         "bldg_3dglobfp/1636",
         "bldg_3dglobfp/1639",
         "bldg_wsf3d",
+        "bldg_gba",
     ]
     for entry in entries:
-        assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d"}
-        assert entry.licence_id == "CC-BY-4.0"
+        assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
+        if entry.source_id == "bldg_gba":
+            assert entry.licence_id == "CC-BY-NC-4.0"
+            assert entry.fetch_host == "data.source.coop"
+            assert entry.terms_read_on == "2026-11-20"
+            assert entry.terms_words
+            assert (
+                entry.publisher
+                == "Technical University of Munich (GlobalBuildingAtlas)"
+            )
+            assert entry.skip_reason == "direct_url_unconfirmed"
+        else:
+            assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
         assert entry.decision_record == ""
         assert "credit" not in vars(entry)
         assert entry.kind == "https_file"
         assert entry.commit_allowed is False
         assert entry.nightly_live_fetch is False
-        assert entry.skip_reason == ""
+        if entry.source_id != "bldg_gba":
+            assert entry.skip_reason == ""
         assert entry.row_count_min is None
         assert entry.row_count_max is None
         assert entry.terms_watch is False
@@ -704,6 +780,9 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
     wsf = entries[2]
     assert wsf.fetch_host == "download.geoservice.dlr.de"
     assert wsf.extension == "tif"
+    gba = entries[3]
+    assert gba.fetch_host == "data.source.coop"
+    assert gba.extension == "zip"
     pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text()
     assert '"Che et al. 2024"' in pack
     document = yaml.safe_load(
@@ -712,7 +791,7 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
     rows = [
         row
         for row in document["sources"]
-        if row["source_id"] in {"bldg_3dglobfp", "bldg_wsf3d"}
+        if row["source_id"] in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
     ]
     assert all("credit" not in row for row in rows)
 
@@ -780,7 +859,8 @@ def test_non_commercial_terms_never_block_the_source(
     cache = tmp_path / "data" / "public_cache"
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(wsf))
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    _ensure_building_table(cache)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / "bldg_wsf3d").glob("*.meta.json"))
     receipt = json.loads(receipt_path.read_text())
@@ -794,7 +874,7 @@ def test_non_commercial_terms_never_block_the_source(
         )
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings_path,
@@ -817,20 +897,32 @@ def test_both_rows_fetch_through_run_build_on_an_allowed_host(
         invented.entry("bldg_wsf3d", extension="tif"),
     ]
     seen: list[str] = []
+    bodies = {
+        rows[0].url: invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+        rows[1].url: invented.wsf_bytes(tmp_path / "w.tif", [[180]], 1, 1),
+    }
+    selections = {
+        entry.key: sha256_hex(body) for entry in rows for body in [bodies[entry.url]]
+    }
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.read.reviewed_selections",
+        lambda _cache: selections,
+    )
 
     def transport(url: str) -> Response:
         seen.append(url)
-        return Response(final_url=url, body=b"invented-bytes", hops=())
+        return Response(final_url=url, body=bodies[url], hops=())
 
     cache = tmp_path / "data" / "public_cache"
-    outcome = run_build(tuple(rows), transport, cache, _clock, _sleep)
+    _ensure_building_table(cache)
+    outcome = fixture_fetch_and_heights(tuple(rows), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     assert seen == [entry.url for entry in rows]
-    assert "SKIP heights building_table_absent" in outcome.lines
+    assert any("PASS heights" in line for line in outcome.lines)
     for entry in rows:
-        digest = sha256_hex(b"invented-bytes")
+        digest = selections[entry.key]
         stored_body = cache / entry.key / f"{digest}.{entry.extension}"
-        assert stored_body.read_bytes() == b"invented-bytes"
+        assert stored_body.read_bytes() == bodies[entry.url]
         receipt_path = cache / entry.key / f"{digest}.meta.json"
         receipt = json.loads(receipt_path.read_text())
         assert receipt["switched_off"] is False
@@ -872,7 +964,7 @@ def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
     )
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(globfp))
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
     receipt_text = receipt_path.read_text()
@@ -911,7 +1003,7 @@ def test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error(
         assert url == refused.url
         return Response(final_url=signed_final, body=b"not json, invented", hops=())
 
-    refused_outcome = run_build(
+    refused_outcome = fixture_fetch_and_heights(
         (refused,), refused_transport, tmp_path / "second" / "cache", _clock, _sleep
     )
     assert refused_outcome.failure is not None
@@ -1016,7 +1108,7 @@ def test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns(
     )
     cache.mkdir(parents=True, exist_ok=True)
     select_fixture(cache, row.key, sha256_hex(globfp))
-    outcome = run_build((row,), no_transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), no_transport, cache, _clock, _sleep)
     assert outcome.failure is None
     receipt_path = next((cache / row.key).glob("*.meta.json"))
     receipt_text = receipt_path.read_text()
@@ -1054,22 +1146,25 @@ def test_an_off_list_host_is_refused_before_the_transport(
         seen.append(url)
         return Response(final_url=url, body=b"planted", hops=())
 
-    outcome = run_build((row,), transport, tmp_path / "cache", _clock, _sleep)
+    outcome = fixture_fetch_and_heights(
+        (row,), transport, tmp_path / "cache", _clock, _sleep
+    )
     assert seen == []
     assert outcome.failure is not None
     assert outcome.failure.check == "blocked_host"
 
 
-def test_run_build_skips_heights_on_an_absent_table(tmp_path: Path) -> None:
-    """B10: the absent table gives one SKIP line and no failure."""
+def test_run_build_refuses_heights_on_an_absent_table(tmp_path: Path) -> None:
+    """A missing building table refuses the build-public heights step."""
     cache = tmp_path / "data" / "public_cache"
 
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
-    assert outcome.failure is None
-    assert outcome.lines.count("SKIP heights building_table_absent") == 1
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
+    assert outcome.lines.count("SKIP heights building_table_absent") == 0
 
 
 def test_build_public_requires_assembly_pins_before_the_height_phase(
@@ -1114,7 +1209,7 @@ def test_an_fe50_table_fails_the_build_and_writes_no_heights(
     def transport(url: str) -> Response:
         raise AssertionError(url)
 
-    outcome = run_build((), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert any("FAIL heights" in line for line in outcome.lines)
     assert not (tmp_path / "data" / "assets" / "heights").exists()
@@ -1133,7 +1228,7 @@ def test_a_written_row_reads_back_as_the_same_decimal(tmp_path: Path) -> None:
         )
     )
     out_dir = tmp_path / "out"
-    build_heights(tmp_path / "cache", (), buildings_path, out_dir, [], RULES_PATH)
+    fixture_heights(tmp_path / "cache", (), buildings_path, out_dir, [], RULES_PATH)
     row = _rows(out_dir)[0]
     assert row["height_m"] == "30.13"
     assert Decimal(row["height_m"]) == metres(Decimal("30.127"))
@@ -1163,7 +1258,7 @@ def test_a_long_expansion_statistic_is_written_at_the_stated_decimals(
     cache = tmp_path / "data" / "public_cache"
     invented.store(cache, globfp_row, globfp)
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row,),
         buildings_path,
@@ -1205,7 +1300,7 @@ def test_a_non_positive_wsf_cell_is_counted_and_never_a_crash(
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
     lines: list[str] = []
-    build_heights(
+    fixture_heights(
         cache,
         (wsf_row,),
         buildings,
@@ -1356,7 +1451,7 @@ def test_a_floor_product_too_large_for_the_context_is_refused(
         )
     )
     with pytest.raises(HeightError) as err:
-        build_heights(tmp_path / "cache", (), path, tmp_path / "out", [], rules)
+        fixture_heights(tmp_path / "cache", (), path, tmp_path / "out", [], rules)
     assert err.value.name == "bad_floor_count"
 
 
@@ -1393,7 +1488,7 @@ def test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal(
     def transport(url: str) -> Response:
         return Response(final_url=url, body=b"this is not a raster, invented", hops=())
 
-    outcome = run_build((row,), transport, cache, _clock, _sleep)
+    outcome = fixture_fetch_and_heights((row,), transport, cache, _clock, _sleep)
     assert outcome.failure is not None
     assert outcome.failure.check == "structure_mismatch"
     assert any("FAIL heights" in line for line in outcome.lines)
@@ -1434,7 +1529,7 @@ def test_an_exception_the_step_does_not_own_still_propagates(
         "eii_custodian.publicdata.heights.step.load_buildings", stand_in
     )
     with pytest.raises(KeyError):
-        build_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
+        fixture_heights(tmp_path / "cache", (), buildings, tmp_path / "out", [])
 
 
 def test_a_programming_error_inside_the_shape_reader_propagates(
@@ -1497,7 +1592,7 @@ def test_every_registry_row_of_a_source_is_named_in_the_manifest(
         )
     )
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (globfp_row, missing),
         buildings,
@@ -1516,20 +1611,20 @@ def test_every_registry_row_of_a_source_is_named_in_the_manifest(
     assert _rows(out_dir)[0]["height_source"] == "3dglobfp"
 
 
-def test_a_skip_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
-    """V4: after a good run, a later SKIP leaves no heights file behind."""
+def test_a_missing_table_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None:
+    """V4: after a good run, a later refusal leaves no heights file behind."""
     out_dir, _ = _card_setup(tmp_path)
     assert (out_dir / "heights.json").is_file()
     assert (out_dir / "manifest.heights.json").is_file()
     lines: list[str] = []
-    build_heights(
-        tmp_path / "cache",
-        (),
-        tmp_path / "absent.geojson",
-        out_dir,
-        lines,
-    )
-    assert lines == ["SKIP heights building_table_absent"]
+    with pytest.raises(HeightError, match="building_table_absent"):
+        fixture_heights(
+            tmp_path / "cache",
+            (),
+            tmp_path / "absent.geojson",
+            out_dir,
+            lines,
+        )
     assert not (out_dir / "heights.json").exists()
     assert not (out_dir / "manifest.heights.json").exists()
 
@@ -1552,7 +1647,7 @@ def test_a_refusal_removes_the_outputs_of_an_earlier_run(tmp_path: Path) -> None
         )
     )
     with pytest.raises(HeightError):
-        build_heights(tmp_path / "cache", (), buildings, out_dir, [])
+        fixture_heights(tmp_path / "cache", (), buildings, out_dir, [])
     assert not (out_dir / "heights.json").exists()
     assert not (out_dir / "manifest.heights.json").exists()
 
@@ -1585,9 +1680,12 @@ def test_the_manifest_names_the_tables_source_chain_not_a_licence(
     """V8: the table record points at the asset pipeline's manifest entry."""
     out_dir, _ = _card_setup(tmp_path)
     record = {f["key"]: f for f in _manifest(out_dir)["files"]}["building_table"]
-    assert record["source_chain"] == (
-        "the asset pipeline's own manifest entry of the same key and sha256"
-    )
+    assert record["source_chain"] == {
+        "path": "assets/buildings/manifest.buildings.json",
+        "sha256": sha256_hex(
+            (out_dir.parent / "buildings/manifest.buildings.json").read_bytes()
+        ),
+    }
     for field in ("licence_id", "licence_basis", "url", "terms_words"):
         assert field not in record
 
@@ -2507,7 +2605,7 @@ def test_tied_footprints_with_two_heights_count_one(tmp_path: Path) -> None:
     same = invented.square(0.05, 0.05, 0.6)
     invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "9.5")]))
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings,
@@ -2535,7 +2633,7 @@ def test_tied_footprints_with_the_same_height_count_none(tmp_path: Path) -> None
     same = invented.square(0.05, 0.05, 0.6)
     invented.store(cache, row, invented.globfp_zip([(same, "7.5"), (same, "7.5")]))
     out_dir = tmp_path / "data" / "assets" / "heights"
-    build_heights(
+    fixture_heights(
         cache,
         (row,),
         buildings,
@@ -2678,6 +2776,433 @@ def test_the_height_hosts_join_the_allow_list() -> None:
     ).ok
 
 
+def test_the_committed_landmark_hand_list_is_pending_without_entries() -> None:
+    """Production hand list stays empty until basemap building ids are confirmed."""
+    rows = load_landmark_heights(LANDMARK_HEIGHTS_PATH)
+    assert rows == ()
+    document = yaml.safe_load(LANDMARK_HEIGHTS_PATH.read_text(encoding="utf-8"))
+    assert document["pending"] == "basemap_building_ids_unconfirmed"
+    assert document["entries"] == []
+
+
+def test_the_fixture_landmark_hand_list_carries_a_full_citation() -> None:
+    """Tests load the invented hand list from its fixture, not production."""
+    row = load_landmark_heights(LANDMARK_FIXTURE_PATH)[0]
+    assert row.building_id == "SYN-B-LM01"
+    assert row.citation.page_url.startswith("https://")
+    assert len(row.citation.page_sha256) == 64
+    assert row.citation.height_excerpt
+
+
+def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The hand list sets recorded height; the manifest keeps the citation."""
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_landmark_heights",
+        lambda: load_landmark_heights(LANDMARK_FIXTURE_PATH),
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.verify_landmark_receipts",
+        lambda _cache, _rows: None,
+    )
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0.1, 0.1, 0.5), None, None
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "99")]),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[200]], 1, 1),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    fixture_heights(
+        cache,
+        (globfp_row, wsf_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    rows = {row["building_id"]: row for row in _rows(out_dir)}
+    assert rows["SYN-B-LM01"]["height_m"] == "200.00"
+    assert rows["SYN-B-LM01"]["height_source"] == "recorded"
+    block = _manifest(out_dir)
+    assert len(block["landmark_heights"]) == 1
+    citation = block["landmark_heights"][0]["citation"]
+    assert citation["retrieved_on"] == "2026-11-14"
+    assert any("PASS heights" in line for line in lines)
+
+
+def test_a_landmark_recorded_conflict_is_refused(tmp_path: Path) -> None:
+    """A building that already holds recorded height cannot take a landmark height."""
+    path = tmp_path / "bad.geojson"
+    path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0, 0, 1), 30, None
+                )
+            ]
+        )
+    )
+    buildings = load_buildings(path)
+    with pytest.raises(HeightError, match="landmark_height_conflict"):
+        apply_landmark_heights(buildings, load_landmark_heights(LANDMARK_FIXTURE_PATH))
+
+
+def test_gba_fetches_through_the_allow_list(tmp_path: Path) -> None:
+    """The GBA registry row is read from an invented zip on an allow-listed host."""
+    row = invented.entry(
+        "bldg_gba",
+        extension="zip",
+        fetch_host="data.source.coop",
+        licence_id="CC-BY-NC-4.0",
+        url="https://data.source.coop/SYN/invented-gba.zip",
+    )
+    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
+    results = _sources(tmp_path, (row,), bodies=((row, body),))
+    assert results["bldg_gba"].state == "read"
+    assert len(results["bldg_gba"].gba) == 1
+    _geometry, height, class_name = results["bldg_gba"].gba[0][1][0]
+    assert height == Decimal("90")
+    assert class_name == "tower"
+    assert approve(row.url).ok
+
+
+def test_gba_calibration_measures_error_by_class_in_the_manifest(
+    tmp_path: Path,
+) -> None:
+    """GBA error is computed by class in tested code, not stated in prose."""
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-G01", invented.square(0.1, 0.1, 0.5), 100, None
+                ),
+                invented.building_feature(
+                    "SYN-B-G02", invented.square(2.1, 0.1, 0.5), 50, None
+                ),
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    gba_row = invented.entry(
+        "bldg_gba",
+        extension="zip",
+        fetch_host="data.source.coop",
+        licence_id="CC-BY-NC-4.0",
+        url="https://data.source.coop/SYN/invented-gba.zip",
+    )
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip(
+            [
+                (invented.square(0.05, 0.05, 0.6), "1"),
+                (invented.square(2.05, 0.05, 0.6), "1"),
+            ]
+        ),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[100, 100, 100, 100]], 4, 1),
+    )
+    invented.store(
+        cache,
+        gba_row,
+        invented.gba_zip(
+            [
+                (invented.square(0.05, 0.05, 0.6), "90", "tower"),
+                (invented.square(2.05, 0.05, 0.6), "55", "lowrise"),
+            ]
+        ),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    fixture_heights(
+        cache,
+        (globfp_row, wsf_row, gba_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    calibration = _manifest(out_dir)["gba_calibration"]
+    assert calibration["state"] == "measured"
+    assert calibration["order_status"] == "pending_owner_decision"
+    assert calibration["overall"]["count"] == 2
+    assert calibration["overall"]["mean_signed_error_m"] == "-2.50"
+    by_class = calibration["by_class"]
+    assert by_class["lowrise"]["count"] == 1
+    assert by_class["lowrise"]["mean_signed_error_m"] == "5.00"
+    assert by_class["tower"]["count"] == 1
+    assert by_class["tower"]["mean_signed_error_m"] == "-10.00"
+    assert any("PASS heights" in line for line in lines)
+
+
+def test_a_planted_skip_on_gba_still_runs_the_heights_step(
+    tmp_path: Path,
+) -> None:
+    """A skipped GBA row is absent; the heights step still passes with the table."""
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-0001", invented.square(0.1, 0.1, 0.5), 30, 8
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    wsf_row = invented.entry("bldg_wsf3d", extension="tif")
+    gba_row = replace(
+        invented.entry("bldg_gba", extension="zip"),
+        skip_reason="direct_url_unconfirmed",
+    )
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+    )
+    invented.store(
+        cache,
+        wsf_row,
+        invented.wsf_bytes(tmp_path / "w.tif", [[180]], 1, 1),
+    )
+    out_dir = tmp_path / "out"
+    lines: list[str] = []
+    fixture_heights(
+        cache,
+        (globfp_row, wsf_row, gba_row),
+        buildings_path,
+        out_dir,
+        lines,
+        invented.rules_file(tmp_path / "rules.yaml"),
+    )
+    assert _manifest(out_dir)["sources"]["bldg_gba"]["reason"] == (
+        "direct_url_unconfirmed"
+    )
+    assert any("PASS heights" in line for line in lines)
+    assert not any(line.startswith("SKIP heights") for line in lines)
+
+
+def _landmark_document(**overrides) -> dict:
+    base = yaml.safe_load(LANDMARK_FIXTURE_PATH.read_text(encoding="utf-8"))
+    base.update(overrides)
+    return base
+
+
+def test_a_fictitious_landmark_page_url_is_refused(tmp_path: Path) -> None:
+    """A citation with no registry row is refused before a receipt is checked."""
+    path = tmp_path / "bad.yaml"
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_url"] = (
+        "https://example.invalid/SYN/no-registry-page"
+    )
+    document["entries"][0]["citation"]["publisher"] = "Example Heights Publisher"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    _refused(
+        lambda: load_landmark_heights(path),
+        "landmark_heights_citation",
+        "registry_row",
+    )
+
+
+def test_a_production_landmark_citation_must_match_the_registry(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_url"] = (
+        "https://example.invalid/SYN/no-registry-page"
+    )
+    target = tmp_path / "landmark_heights.yaml"
+    target.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.landmarks.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    _refused(load_landmark_heights, "landmark_heights_citation", "registry_row")
+
+
+def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    row = next(entry for entry in load_registry() if entry.kind == "public_page")
+    document = _landmark_document()
+    citation = document["entries"][0]["citation"]
+    citation["page_url"] = row.url
+    citation["publisher"] = row.publisher
+    citation["licence_basis"] = row.licence_basis
+    target = tmp_path / "landmark_heights.yaml"
+    target.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.landmarks.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.LANDMARK_HEIGHTS_PATH",
+        target,
+    )
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_landmark_heights",
+        load_landmark_heights,
+    )
+    buildings_path = tmp_path / "buildings.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-LM01", invented.square(0.1, 0.1, 0.5), None, None
+                )
+            ]
+        )
+    )
+    globfp_row = invented.entry("bldg_3dglobfp", extension="zip")
+    cache = tmp_path / "cache"
+    invented.store(
+        cache,
+        globfp_row,
+        invented.globfp_zip([(invented.square(0.05, 0.05, 0.6), "24")]),
+    )
+    out_dir = tmp_path / "out"
+    _refused(
+        lambda: fixture_heights(
+            cache,
+            (globfp_row,),
+            buildings_path,
+            out_dir,
+            [],
+            invented.rules_file(tmp_path / "rules.yaml"),
+        ),
+        "landmark_heights_citation",
+        "page_snapshot",
+    )
+    assert not (out_dir / "heights.json").exists()
+
+
+def test_a_planted_omitted_heights_step_refuses_the_build(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A heights step that writes no output refuses the public build."""
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr("eii_custodian.publicdata.heights.step.build_heights", noop)
+    cache = tmp_path / "data" / "public_cache"
+    _ensure_building_table(cache)
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "heights_output_absent"
+
+
+def test_a_planted_omitted_heights_step_refuses_when_outputs_already_exist(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    out_dir = tmp_path / "data" / "assets" / "heights"
+    out_dir.mkdir(parents=True)
+    (out_dir / "heights.json").write_text("[]", encoding="utf-8")
+    (out_dir / "manifest.heights.json").write_text("{}", encoding="utf-8")
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr("eii_custodian.publicdata.heights.step.build_heights", noop)
+    cache = tmp_path / "data" / "public_cache"
+    _ensure_building_table(cache)
+
+    def transport(url: str) -> Response:
+        raise AssertionError(url)
+
+    outcome = fixture_fetch_and_heights((), transport, cache, _clock, _sleep)
+    assert outcome.failure is not None
+    assert outcome.failure.check == "heights_output_absent"
+    assert not (out_dir / "heights.json").exists()
+
+
+def test_the_manifest_records_the_committed_hand_list_hash(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
+    from eii_custodian.publicdata.heights.landmarks import LANDMARK_HEIGHTS_PATH
+
+    out_dir, _ = _card_setup(tmp_path)
+    files = {record["key"]: record for record in _manifest(out_dir)["files"]}
+    record = files["landmark_heights"]
+    assert record["path"] == "publicdata/review/landmark_heights.yaml"
+    assert record["sha256"] == file_sha256(LANDMARK_HEIGHTS_PATH.read_bytes())
+
+
+def test_gba_calibration_drops_subprecision_values(tmp_path: Path) -> None:
+    """GBA and recorded sides use the same usable-height rule before pairing."""
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+    from eii_custodian.publicdata.heights.read import SourceResult
+
+    buildings_path = tmp_path / "one.geojson"
+    buildings_path.write_bytes(
+        invented.buildings_bytes(
+            [
+                invented.building_feature(
+                    "SYN-B-G03", invented.square(0, 0, 1), 100, None
+                )
+            ]
+        )
+    )
+    building = load_buildings(buildings_path)[0]
+    result = SourceResult(
+        source_id="bldg_gba",
+        state="read",
+        reason="",
+        globfp=(),
+        gba=(
+            (
+                "SYN.shp",
+                ((building.geometry, Decimal("0.001"), "tower"),),
+            ),
+        ),
+        wsf=(),
+        files=(),
+        rows=(),
+        terms_read_on="2026-11-14",
+        terms_words="invented",
+        retrieved_utc="2026-11-14T00:00:00Z",
+    )
+    block = gba_calibration([building], result)
+    assert block["overall"]["count"] == 0
+    assert block["overall"]["reason"] == "no_pairs"
+
+
 def test_the_writer_refusal_output_row_is_planted() -> None:
     """V9: a sourced row with no height or with a reason is refused."""
     row = {
@@ -2694,3 +3219,759 @@ def test_the_writer_refusal_output_row_is_planted() -> None:
     with pytest.raises(HeightError) as err:
         check_row(dict(row))
     assert err.value.name == "output_row"
+
+
+# S2-P21 fix 3: every guard test below gets otherwise-valid dependencies (a
+# registry row matching the invented citation, a verified invented page
+# snapshot) and asserts the exact refusal name and detail, so that no other
+# guard can satisfy it.
+
+_PAGE_URL = "https://syn-heights.invalid/SYN/landmark-page"
+_PAGE_BODY = b"<p>SYN showcase tower: height 200.00 m (invented page).</p>"
+
+
+def _page_entry(**overrides) -> Entry:
+    """The invented registry row the fixture citation names."""
+    fields = {
+        "url": _PAGE_URL,
+        "publisher": "Fixture Heights Publisher",
+        "licence_basis": "pending",
+        "extension": "html",
+    }
+    fields.update(overrides)
+    return invented.entry("syn_landmark_page", **fields)
+
+
+def _fixture_registry(monkeypatch: pytest.MonkeyPatch, *rows: Entry) -> None:
+    """Stand the invented page row in for the committed registry."""
+    found = rows or (_page_entry(),)
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.landmarks._registry_by_url",
+        lambda: {row.url: row for row in found},
+    )
+
+
+def _refused(call, name: str, detail: str) -> None:
+    with pytest.raises(HeightError) as err:
+        call()
+    assert (err.value.name, err.value.detail) == (name, detail)
+
+
+def _write_document(path: Path, document: dict) -> Path:
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    return path
+
+
+def _cited_page(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    receipt_publisher: str = "Fixture Heights Publisher",
+    citation: dict | None = None,
+):
+    """A verified invented page snapshot and a hand list citing its bytes."""
+    from eii_custodian.publicdata.heights.landmarks import verify_landmark_receipts
+
+    row = _page_entry()
+    _fixture_registry(monkeypatch, row)
+    cache = tmp_path / "cache"
+    digest = invented.store(cache, row, _PAGE_BODY, publisher=receipt_publisher)
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_sha256"] = digest
+    document["entries"][0]["citation"].update(citation or {})
+    rows = load_landmark_heights(_write_document(tmp_path / "hand.yaml", document))
+    return cache, row, digest, rows, lambda: verify_landmark_receipts(cache, rows)
+
+
+def _rewrite_receipt(
+    cache: Path, key: str, digest: str, changes: dict, drop: tuple = ()
+) -> None:
+    """Plant receipt fields inside a consistent invented snapshot envelope."""
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    directory = cache / key
+    selected = read_snapshot(directory, digest)
+    receipt = dict(selected.sidecar, **changes)
+    for name in drop:
+        receipt.pop(name)
+    selected.receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    index = directory / "index" / (digest + ".json")
+    entry = json.loads(index.read_text(encoding="utf-8"))
+    entry["receipt_sha256"] = sha256_hex(selected.receipt_path.read_bytes())
+    for name in ("source_id", "key"):
+        entry[name] = receipt[name]
+    index.write_text(json.dumps(entry), encoding="utf-8")
+
+
+def test_a_verified_landmark_page_snapshot_binds_the_citation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Positive control: every plant below differs from this in one place."""
+    _cache, _row, digest, rows, verify = _cited_page(tmp_path, monkeypatch)
+    assert rows[0].citation.page_sha256 == digest
+    assert verify() is None
+
+
+def test_a_public_page_citation_resolves_its_raw_page_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A public_page row's page bytes are the raw snapshot under its key."""
+    from eii_custodian.publicdata.fetch.receipts import sidecar_for
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+    from eii_custodian.publicdata.heights.landmarks import verify_landmark_receipts
+
+    row = _page_entry(kind="public_page")
+    _fixture_registry(monkeypatch, row)
+    cache = tmp_path / "cache"
+    side = sidecar_for(
+        row,
+        digest=sha256_hex(_PAGE_BODY),
+        nbytes=len(_PAGE_BODY),
+        fetch_url=row.url,
+        fetch_host=row.fetch_host,
+        retrieved_utc="2026-11-14T00:00:00Z",
+        publisher=row.publisher,
+        source_modified="",
+        row_count=None,
+        terms_sha256="",
+    )
+    publish_snapshot(cache / row.key / "raw", "html", _PAGE_BODY, side)
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_sha256"] = sha256_hex(_PAGE_BODY)
+    rows = load_landmark_heights(_write_document(tmp_path / "hand.yaml", document))
+    assert verify_landmark_receipts(cache, rows) is None
+    (cache / row.key / "raw" / "2026-11-14" / f"{sha256_hex(_PAGE_BODY)}.html").unlink()
+    _refused(
+        lambda: verify_landmark_receipts(cache, rows),
+        "landmark_heights_citation",
+        "page_snapshot",
+    )
+
+
+def test_missing_landmark_page_bytes_refuse(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cache, row, digest, _loaded, verify = _cited_page(tmp_path, monkeypatch)
+    for path in (cache / row.key).rglob(f"{digest}.html"):
+        path.unlink()
+    _refused(verify, "landmark_heights_citation", "page_snapshot")
+
+
+def test_altered_landmark_page_bytes_refuse(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cache, row, digest, _loaded, verify = _cited_page(tmp_path, monkeypatch)
+    for path in (cache / row.key).rglob(f"{digest}.html"):
+        path.write_bytes(_PAGE_BODY.replace(b"200.00", b"300.00"))
+    _refused(verify, "landmark_heights_citation", "page_snapshot")
+
+
+def test_unrelated_metadata_holding_only_the_cited_hash_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A bare metadata object or citation file with the hash is not a page."""
+    from eii_custodian.publicdata.heights.landmarks import verify_landmark_receipts
+
+    row = _page_entry()
+    _fixture_registry(monkeypatch, row)
+    digest = sha256_hex(_PAGE_BODY)
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_sha256"] = digest
+    rows = load_landmark_heights(_write_document(tmp_path / "hand.yaml", document))
+    bare = tmp_path / "bare" / row.key / "2026-11-14" / "syn.meta.json"
+    bare.parent.mkdir(parents=True)
+    bare.write_text(json.dumps({"sha256": digest}), encoding="utf-8")
+    _refused(
+        lambda: verify_landmark_receipts(tmp_path / "bare", rows),
+        "landmark_heights_citation",
+        "page_snapshot",
+    )
+    citation_only = tmp_path / "citation" / row.key / "citation.json"
+    citation_only.parent.mkdir(parents=True)
+    citation_only.write_text(json.dumps({"sha256": digest}), encoding="utf-8")
+    _refused(
+        lambda: verify_landmark_receipts(tmp_path / "citation", rows),
+        "landmark_heights_citation",
+        "page_snapshot",
+    )
+
+
+def test_a_cited_hash_whose_index_holds_another_page_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The index named by the cited hash must hold bytes of that same hash."""
+    from eii_custodian.publicdata.fetch.receipts import sidecar_for
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+    from eii_custodian.publicdata.heights.landmarks import verify_landmark_receipts
+
+    row = _page_entry()
+    _fixture_registry(monkeypatch, row)
+    cache = tmp_path / "cache"
+    other = b"<p>SYN another invented page.</p>"
+    side = sidecar_for(
+        row,
+        digest=sha256_hex(other),
+        nbytes=len(other),
+        fetch_url=row.url,
+        fetch_host=row.fetch_host,
+        retrieved_utc="2026-11-14T00:00:00Z",
+        publisher=row.publisher,
+        source_modified="",
+        row_count=None,
+        terms_sha256="",
+    )
+    cited = sha256_hex(_PAGE_BODY)
+    publish_snapshot(cache / row.key, "html", other, side, identity=cited)
+    document = _landmark_document()
+    document["entries"][0]["citation"]["page_sha256"] = cited
+    rows = load_landmark_heights(_write_document(tmp_path / "hand.yaml", document))
+    _refused(
+        lambda: verify_landmark_receipts(cache, rows),
+        "landmark_heights_citation",
+        "receipt_hash",
+    )
+
+
+@pytest.mark.parametrize(
+    ("changes", "drop", "detail"),
+    [
+        ({"key": "syn_other_page"}, (), "receipt_source"),
+        ({"source_id": "syn_other_page"}, (), "receipt_source"),
+        ({"fetch_url": "https://syn-heights.invalid/SYN/other"}, (), "receipt_url"),
+        ({}, ("fetch_url",), "receipt_url"),
+        ({}, ("publisher",), "receipt_publisher"),
+        ({"licence_basis": "dataset"}, (), "receipt_licence"),
+        ({}, ("licence_basis",), "receipt_licence"),
+    ],
+)
+def test_an_incomplete_or_foreign_page_receipt_refuses(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    changes: dict,
+    drop: tuple,
+    detail: str,
+) -> None:
+    cache, row, digest, _loaded, verify = _cited_page(tmp_path, monkeypatch)
+    _rewrite_receipt(cache, row.key, digest, changes, drop)
+    _refused(verify, "landmark_heights_citation", detail)
+
+
+def test_a_receipt_from_another_publisher_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    *_rest, verify = _cited_page(
+        tmp_path, monkeypatch, receipt_publisher="Another Invented Publisher"
+    )
+    _refused(verify, "landmark_heights_citation", "receipt_publisher")
+
+
+def test_a_citation_retrieval_date_unlike_its_receipt_refuses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    *_rest, verify = _cited_page(
+        tmp_path, monkeypatch, citation={"retrieved_on": "2026-11-15"}
+    )
+    _refused(verify, "landmark_heights_citation", "receipt_date")
+
+
+@pytest.mark.parametrize(
+    ("registry_row", "detail"),
+    [
+        (_page_entry(url="https://syn-heights.invalid/SYN/elsewhere"), "registry_row"),
+        (_page_entry(publisher="Another Invented Publisher"), "registry_publisher"),
+        (_page_entry(licence_basis="dataset"), "registry_licence"),
+    ],
+)
+def test_a_citation_unlike_its_registry_row_refuses_at_load_and_at_verify(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    registry_row: Entry,
+    detail: str,
+) -> None:
+    from eii_custodian.publicdata.heights import landmarks
+
+    *_rest, rows, verify = _cited_page(tmp_path, monkeypatch)
+    _fixture_registry(monkeypatch, registry_row)
+    _refused(
+        lambda: load_landmark_heights(tmp_path / "hand.yaml"),
+        "landmark_heights_citation",
+        detail,
+    )
+    _refused(verify, "landmark_heights_citation", detail)
+    assert landmarks.verify_landmark_receipts is not None
+    assert rows
+
+
+def _gba_result(features) -> object:
+    """An invented read GBA source holding (geometry, height, class) rows."""
+    from eii_custodian.publicdata.heights.read import SourceResult
+
+    return SourceResult(
+        source_id="bldg_gba",
+        state="read",
+        reason="",
+        globfp=(),
+        gba=(("SYN.shp", tuple(features)),),
+        wsf=(),
+        files=(),
+        rows=(),
+        terms_read_on="2026-11-14",
+        terms_words="invented",
+        retrieved_utc="2026-11-14T00:00:00Z",
+    )
+
+
+def _gba_case(pairs):
+    """Invented buildings and GBA rows from (gba text, recorded text, class)."""
+    from eii_custodian.publicdata.heights.model import Building
+
+    buildings = []
+    features = []
+    for index, (gba, recorded, class_name) in enumerate(pairs):
+        footprint = Polygon(invented.square(index * 2 + 0.1, 0.1, 0.5))
+        buildings.append(
+            Building(
+                building_id=f"SYN-B-C{index:02d}",
+                geometry=footprint,
+                recorded=Decimal(recorded),
+                floor_count=None,
+                footprint_source_id="SYN-FOOT",
+            )
+        )
+        features.append((footprint, Decimal(gba), class_name))
+    return buildings, _gba_result(features)
+
+
+def _error_fields(error) -> dict:
+    return {
+        "count": error.count,
+        "mean_absolute_error_m": (
+            None if error.mean_absolute is None else str(error.mean_absolute)
+        ),
+        "mean_signed_error_m": (
+            None if error.mean_signed is None else str(error.mean_signed)
+        ),
+        "median_absolute_error_m": (
+            None if error.median_absolute is None else str(error.median_absolute)
+        ),
+        "reason": error.reason,
+    }
+
+
+# (GBA text, recorded text, class): half-up boundaries on both members, one
+# GBA value below the stated precision, and an even-count class.
+_GBA_PARITY_PAIRS = (
+    ("10.005", "20.004", "tower"),
+    ("0.004", "30", "tower"),
+    ("12.345", "12.344", "lowrise"),
+    ("8.124", "8.005", "lowrise"),
+    ("50", "49.995", "midrise"),
+)
+
+
+def test_gba_calibration_equals_fallback_errors_on_identical_raw_pairs() -> None:
+    """S2-P21 F4: the GBA caller normalizes both members as fallback_errors does."""
+    from eii_core.calc.building_heights import fallback_errors
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    buildings, result = _gba_case(_GBA_PARITY_PAIRS)
+    block = gba_calibration(buildings, result)
+
+    def fallback(rows) -> dict:
+        return _error_fields(
+            fallback_errors(
+                [{"recorded": Decimal(r), "3dglobfp": Decimal(g)} for g, r, _ in rows]
+            )["3dglobfp"]
+        )
+
+    assert block["overall"] == fallback(_GBA_PARITY_PAIRS)
+    for class_name in ("tower", "lowrise", "midrise"):
+        rows = [row for row in _GBA_PARITY_PAIRS if row[2] == class_name]
+        assert block["by_class"][class_name] == fallback(rows)
+    assert block["overall"] == {
+        "count": 4,
+        "mean_absolute_error_m": "2.53",
+        "mean_signed_error_m": "-2.47",
+        "median_absolute_error_m": "0.06",
+        "reason": "",
+    }
+    assert block["by_class"] == {
+        "lowrise": {
+            "count": 2,
+            "mean_absolute_error_m": "0.06",
+            "mean_signed_error_m": "0.06",
+            "median_absolute_error_m": "0.06",
+            "reason": "",
+        },
+        "midrise": {
+            "count": 1,
+            "mean_absolute_error_m": "0.00",
+            "mean_signed_error_m": "0.00",
+            "median_absolute_error_m": "0.00",
+            "reason": "",
+        },
+        "tower": {
+            "count": 1,
+            "mean_absolute_error_m": "9.99",
+            "mean_signed_error_m": "-9.99",
+            "median_absolute_error_m": "9.99",
+            "reason": "",
+        },
+    }
+
+
+def test_gba_calibration_drops_a_recorded_height_below_the_precision() -> None:
+    """The recorded member uses the same usable-height rule; fallback_errors
+    refuses such a recorded input outright, so the GBA caller drops the pair."""
+    from eii_core.calc.building_heights import fallback_errors
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    buildings, result = _gba_case((("40", "0.004", "tower"), ("20", "20", "tower")))
+    block = gba_calibration(buildings, result)
+    assert block["overall"] == {
+        "count": 1,
+        "mean_absolute_error_m": "0.00",
+        "mean_signed_error_m": "0.00",
+        "median_absolute_error_m": "0.00",
+        "reason": "",
+    }
+    assert set(block["by_class"]) == {"tower"}
+    with pytest.raises(ValueError, match="recorded must be positive"):
+        fallback_errors([{"recorded": Decimal("0.004"), "3dglobfp": Decimal("40")}])
+
+
+def _planted_document(tmp_path: Path, change) -> Path:
+    """The fixture hand list with one planted change, written to a test path."""
+    document = _landmark_document()
+    change(document)
+    return _write_document(tmp_path / "planted.yaml", document)
+
+
+def test_the_planted_loader_cases_share_one_valid_baseline(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Control: with the invented registry row the unplanted list loads."""
+    _fixture_registry(monkeypatch)
+    rows = load_landmark_heights(_planted_document(tmp_path, lambda _doc: None))
+    assert [row.landmark_id for row in rows] == ["SYN-LM-0001"]
+
+
+def _set_entry(name: str, value):
+    def change(document: dict) -> None:
+        document["entries"][0][name] = value
+
+    change.__name__ = f"entry_{name}_{value!r}"
+    return change
+
+
+def _set_citation(name: str, value):
+    def change(document: dict) -> None:
+        document["entries"][0]["citation"][name] = value
+
+    change.__name__ = f"citation_{name}_{value!r}"
+    return change
+
+
+def _drop_citation(name: str):
+    def change(document: dict) -> None:
+        del document["entries"][0]["citation"][name]
+
+    change.__name__ = f"citation_without_{name}"
+    return change
+
+
+def _set_document(name: str, value):
+    def change(document: dict) -> None:
+        document[name] = value
+
+    change.__name__ = f"document_{name}_{value!r}"
+    return change
+
+
+@pytest.mark.parametrize(
+    ("change", "name", "detail"),
+    [
+        (_set_document("version", 2), "landmark_heights", "version"),
+        (_set_document("entries", {"SYN": 1}), "landmark_heights", "entries"),
+        (_set_document("pending", "SYN-pending"), "landmark_heights_entry", "pending"),
+        (_set_entry("height_note", "SYN"), "landmark_heights_entry", "keys"),
+        (_set_entry("landmark_id", " "), "landmark_heights_entry", "field"),
+        (_set_entry("building_id", ""), "landmark_heights_entry", "field"),
+        (_set_entry("name_en", 7), "landmark_heights_entry", "field"),
+        (_set_entry("citation", "SYN"), "landmark_heights_citation", "citation_keys"),
+        (_set_citation("note", "SYN"), "landmark_heights_citation", "citation_keys"),
+        (_drop_citation("page_url"), "landmark_heights_citation", "citation_keys"),
+        (_drop_citation("publisher"), "landmark_heights_citation", "citation_keys"),
+        (_drop_citation("retrieved_on"), "landmark_heights_citation", "citation_keys"),
+        (_drop_citation("licence_basis"), "landmark_heights_citation", "citation_keys"),
+        (_drop_citation("page_sha256"), "landmark_heights_citation", "citation_keys"),
+        (
+            _drop_citation("height_excerpt"),
+            "landmark_heights_citation",
+            "citation_keys",
+        ),
+        (
+            _set_citation("licence_basis", "   "),
+            "landmark_heights_citation",
+            "citation_field",
+        ),
+        (
+            _set_citation("height_excerpt", None),
+            "landmark_heights_citation",
+            "citation_field",
+        ),
+        (
+            _set_citation("page_sha256", "abc"),
+            "landmark_heights_citation",
+            "page_sha256",
+        ),
+        (
+            _set_citation("page_sha256", "A" * 64),
+            "landmark_heights_citation",
+            "page_sha256",
+        ),
+        (_set_entry("height_m", 200), "landmark_heights_height", "text"),
+        (_set_entry("height_m", "SYN"), "landmark_heights_height", "text"),
+        (_set_entry("height_m", "NaN"), "landmark_heights_height", "unusable"),
+        (_set_entry("height_m", "Infinity"), "landmark_heights_height", "unusable"),
+        (_set_entry("height_m", "-Infinity"), "landmark_heights_height", "unusable"),
+        (_set_entry("height_m", "0.001"), "landmark_heights_height", "unusable"),
+        (_set_entry("height_m", "-5"), "landmark_heights_height", "unusable"),
+        (_set_entry("height_m", "1e60"), "landmark_heights_height", "unusable"),
+    ],
+)
+def test_each_planted_hand_list_defect_has_its_own_refusal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    change,
+    name: str,
+    detail: str,
+) -> None:
+    _fixture_registry(monkeypatch)
+    path = _planted_document(tmp_path, change)
+    _refused(lambda: load_landmark_heights(path), name, detail)
+
+
+@pytest.mark.parametrize(
+    ("body", "detail"),
+    [
+        ("[]\n", "document"),
+        ("version: [1\n", "document"),
+        ("version: 1\nentries: []\n", "pending"),
+        ("version: 1\npending: SYN-other\nentries: []\n", "pending"),
+    ],
+)
+def test_a_malformed_hand_list_document_has_its_own_refusal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    body: str,
+    detail: str,
+) -> None:
+    _fixture_registry(monkeypatch)
+    path = tmp_path / "planted.yaml"
+    path.write_text(body, encoding="utf-8")
+    _refused(lambda: load_landmark_heights(path), "landmark_heights", detail)
+
+
+@pytest.mark.parametrize(
+    ("field", "detail"),
+    [("landmark_id", "landmark_id"), ("building_id", "building_id")],
+)
+def test_a_duplicate_landmark_identifier_refuses_in_both_orders(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    detail: str,
+) -> None:
+    """Each duplicate guard alone: the other identifier differs."""
+    _fixture_registry(monkeypatch)
+    base = _landmark_document()["entries"][0]
+    second = dict(base, height_m="150.00")
+    other = "building_id" if field == "landmark_id" else "landmark_id"
+    second[other] = base[other] + "-2"
+    for entries in ([base, second], [second, base]):
+        path = _write_document(
+            tmp_path / "dup.yaml", {"version": 1, "entries": entries}
+        )
+        _refused(
+            lambda path=path: load_landmark_heights(path),
+            "landmark_heights_duplicate",
+            detail,
+        )
+
+
+@pytest.mark.parametrize("height", ["NaN", "Infinity", "-Infinity", "0.001", "1e60"])
+def test_an_invalid_landmark_height_refuses_the_build_and_leaves_no_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, height: str
+) -> None:
+    """The step refuses before writing; earlier outputs do not survive."""
+    out_dir, _lines = _card_setup(tmp_path / "card")
+    assert (out_dir / "heights.json").is_file()
+    _fixture_registry(monkeypatch)
+    path = _planted_document(tmp_path, _set_entry("height_m", height))
+    monkeypatch.setattr(
+        "eii_custodian.publicdata.heights.step.load_landmark_heights",
+        lambda: load_landmark_heights(path),
+    )
+    cache = tmp_path / "card" / "data" / "public_cache"
+    lines: list[str] = []
+    _refused(
+        lambda: fixture_heights(
+            cache,
+            (
+                invented.entry("bldg_3dglobfp", extension="zip"),
+                invented.entry("bldg_wsf3d", extension="tif"),
+            ),
+            tmp_path / "card" / "data" / "assets" / "buildings" / "buildings.geojson",
+            out_dir,
+            lines,
+            invented.rules_file(tmp_path / "rules.yaml"),
+        ),
+        "landmark_heights_height",
+        "unusable",
+    )
+    assert not (out_dir / "heights.json").exists()
+    assert not (out_dir / "manifest.heights.json").exists()
+    assert not any(line.startswith("PASS heights") for line in lines)
+
+
+def _gba_rules(tmp_path: Path, **gba) -> Path:
+    document = invented.rules_document()
+    document["sources"]["bldg_gba"].update(gba)
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    return invented.write_rules(tmp_path / "rules.yaml", document)
+
+
+def test_class_field_rules_have_their_own_refusals(tmp_path: Path) -> None:
+    """A class field belongs to the field form only and is text."""
+    base = load_rules(_gba_rules(tmp_path / "ok"))
+    assert base.structures["bldg_gba"].class_field == "SYN_class"
+    document = invented.rules_document()
+    document["sources"]["bldg_wsf3d"]["class_field"] = "SYN_class"
+    path = invented.write_rules(tmp_path / "band.yaml", document)
+    _refused(lambda: load_rules(path), "rules_field_or_band", "class_field")
+    for value in (7, ["SYN_class"], None):
+        path = _gba_rules(tmp_path / f"type-{type(value).__name__}", class_field=value)
+        _refused(lambda path=path: load_rules(path), "rules_class_field", "")
+
+
+def test_a_gba_class_field_still_to_be_confirmed_keeps_the_source_absent(
+    tmp_path: Path,
+) -> None:
+    rules = _gba_rules(tmp_path, class_field="to be confirmed")
+    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
+    row = invented.entry("bldg_gba", extension="zip")
+    results = _sources(tmp_path, (row,), bodies=((row, body),), rules=rules)
+    assert results["bldg_gba"].state == "absent"
+    assert results["bldg_gba"].reason == "structure_unconfirmed"
+    assert results["bldg_gba"].gba == ()
+
+
+def test_gba_rules_without_a_class_field_refuse_before_parse(tmp_path: Path) -> None:
+    rules = _gba_rules(tmp_path, class_field="")
+    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
+    row = invented.entry("bldg_gba", extension="zip")
+    _refused(
+        lambda: _sources(tmp_path, (row,), bodies=((row, body),), rules=rules),
+        "structure_mismatch",
+        "class_field_undeclared",
+    )
+
+
+def _gba_zip_fields(fields, class_values) -> bytes:
+    """An invented GBA tile with its own field list (class column may differ)."""
+    shapes = []
+    records = []
+    for index, class_value in enumerate(class_values):
+        shapes.append([invented.cw(invented.square(index * 2, 0, 1))])
+        record = [str(index + 1), "90"]
+        if class_value is not None:
+            record.append(class_value)
+        record.append("")
+        records.append(record)
+    return invented.shapefile_zip(shapes, records, [list(item) for item in fields])
+
+
+_NO_CLASS_FIELDS = (
+    ("FID", "N", 18, 0),
+    ("Height", "N", 24, 15),
+    ("FID_1", "N", 24, 15),
+)
+_NUMERIC_CLASS_FIELDS = (
+    ("FID", "N", 18, 0),
+    ("Height", "N", 24, 15),
+    ("SYN_class", "N", 8, 0),
+    ("FID_1", "N", 24, 15),
+)
+
+
+@pytest.mark.parametrize(
+    ("body", "detail"),
+    [
+        (lambda: _gba_zip_fields(_NO_CLASS_FIELDS, [None]), "class_field_absent"),
+        (lambda: _gba_zip_fields(_NUMERIC_CLASS_FIELDS, ["5"]), "class_field_type"),
+        (
+            lambda: invented.gba_zip(
+                [
+                    (invented.square(0, 0, 1), "90", "tower"),
+                    (invented.square(2, 0, 1), "40", ""),
+                ]
+            ),
+            "class_record_blank",
+        ),
+    ],
+)
+def test_a_gba_class_column_defect_has_its_own_refusal(
+    tmp_path: Path, body, detail: str
+) -> None:
+    row = invented.entry("bldg_gba", extension="zip")
+    _refused(
+        lambda: _sources(tmp_path, (row,), bodies=((row, body()),)),
+        "structure_mismatch",
+        detail,
+    )
+
+
+def _gba_dbf(class_values=("tower", "lowrise")) -> bytes:
+    members = invented.shapefile_members(
+        [[invented.cw(invented.square(i * 2, 0, 1))] for i in range(len(class_values))],
+        [[str(i + 1), "90", value, ""] for i, value in enumerate(class_values)],
+        [list(item) for item in invented.GBA_FIELDS],
+    )
+    return members["dbf"]
+
+
+def test_the_class_column_reader_refuses_each_malformed_table() -> None:
+    """Direct plants of the class-column reader's own table and record checks."""
+    from eii_custodian.publicdata.heights.read import _dbf_text_field
+
+    dbf = _gba_dbf()
+    assert _dbf_text_field(dbf, "SYN_class") == ("tower", "lowrise")
+    name_offset = 32 + 2 * 32
+    header_len = int.from_bytes(dbf[8:10], "little")
+    record_len = int.from_bytes(dbf[10:12], "little")
+    plants = {
+        "class_table": [dbf[:40], b"\x00" + dbf[1:]],
+        "class_header": [
+            dbf[: header_len - 1] + b"\x00" + dbf[header_len:],
+        ],
+        "class_descriptor": [
+            dbf[:name_offset] + b"\xff" + dbf[name_offset + 1 :],
+        ],
+        "class_record_length": [
+            dbf[:10] + (record_len + 1).to_bytes(2, "little") + dbf[12:] + b"\x20\x20",
+        ],
+    }
+    offset, size = invented.dbf_field_offset(dbf, "SYN_class")
+    plants["class_record"] = [
+        invented.dbf_patch(dbf, 1, 0, b"*"),
+        invented.dbf_patch(dbf, 1, offset, b"\xe9"),
+    ]
+    plants["class_record_blank"] = [invented.dbf_patch(dbf, 1, offset, b" " * size)]
+    for detail, bodies in plants.items():
+        for planted in bodies:
+            _refused(
+                lambda planted=planted: _dbf_text_field(planted, "SYN_class"),
+                "structure_mismatch",
+                detail,
+            )

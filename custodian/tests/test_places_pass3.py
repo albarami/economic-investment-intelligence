@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_area_files import (
     _FRAME,
@@ -21,7 +22,6 @@ from custodian.tests.test_places_pass2 import _empty_review, _Hand
 from custodian.tests.test_publicdata_behaviour import _clock, _entry, _sleep
 from shapely.geometry import Point, Polygon, box
 
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.places import PlacesError
@@ -174,7 +174,8 @@ def test_frame_error_is_one_log_line(
     (cache / hdx.key).mkdir(parents=True)
     (cache / hdx.key / "syn.meta.json").write_text("{}", encoding="utf-8")
     outcome = run_build((hdx,), _unused, cache, _clock, _sleep)
-    assert outcome.failure is None
+    assert outcome.failure is not None
+    assert outcome.failure.check == "building_table_absent"
     assert "stage frame frame_refused" in outcome.lines
     assert all("secret" not in line for line in outcome.lines)
     assert any(line.startswith("COVERAGE ") for line in outcome.lines)

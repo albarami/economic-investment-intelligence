@@ -135,6 +135,7 @@ def test_exact_due_boundary(cadence, start, boundary):
 
 def test_recorded_family_assignments():
     families = {
+        "biz_register": ("registers", "weekly"),
         "fc_register": ("registers", "weekly"),
         "events_visit_qatar": ("event_pages", "daily"),
         "events_qncc": ("event_pages", "daily"),
@@ -232,10 +233,12 @@ def test_family_registry_assignment_refused(source, rule):
 
 @pytest.mark.parametrize("kind", ["atlas", "baci", "gravity"])
 def test_trade_manifest_omits_absent_family(tmp_path, kind):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import importlib
     import json
 
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
 
     fixture = importlib.import_module("custodian.tests.fixtures." + kind + ".invented")
     config = importlib.import_module("eii_custodian.publicdata." + kind + ".config")
@@ -244,7 +247,7 @@ def test_trade_manifest_omits_absent_family(tmp_path, kind):
     outcome = run_build(
         [entry],
         fixture.metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         **{
@@ -255,8 +258,8 @@ def test_trade_manifest_omits_absent_family(tmp_path, kind):
     assert outcome.failure is None
     digest = outcome.manifests[entry.source_id]
     manifest = json.loads(
-        (tmp_path / entry.key / (digest + ".manifest.json")).read_text()
+        (fixture_cache / entry.key / (digest + ".manifest.json")).read_text()
     )
     assert "family" not in manifest["entry"]["refetch"]
     reader = importlib.import_module("eii_custodian.publicdata." + kind + ".contracts")
-    assert reader.read_selected(tmp_path, digest).manifest == manifest
+    assert reader.read_selected(fixture_cache, digest).manifest == manifest

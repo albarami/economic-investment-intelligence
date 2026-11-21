@@ -79,6 +79,16 @@ class SelectedInput:
     publisher: str = ""
     licence_basis: str = ""
     terms_sha256: str = ""
+    pending_fetch: bool = False
+
+
+@dataclass(frozen=True)
+class DeferredInput:
+    source_id: str
+    role: str
+    selected_hash: str
+    year: int
+    reason: str
 
 
 @dataclass(frozen=True)
@@ -112,11 +122,28 @@ class Selection:
     bindings: tuple[Binding, ...]
     causes: tuple[dict[str, Any], ...]
     obstacles: tuple[dict[str, Any], ...]
+    deferred_inputs: tuple[DeferredInput, ...] = ()
+
+    def comparison_block_reason(self) -> str | None:
+        """Selection directives are never interpreted as source-native cells."""
+        if any(item.pending_fetch for item in self.inputs):
+            return "comparison_input_pending_fetch"
+        if any(
+            value in {"pending:all_common_partners_per_year", "pending:all_present_hs2"}
+            for value in (*self.partners, *self.scopes)
+        ):
+            return "comparison_scope_pending_review"
+        return None
 
     @classmethod
     def from_mapping(cls, data: Any) -> Selection:
         require(
-            isinstance(data, dict) and set(data) == {f.name for f in fields(cls)},
+            isinstance(data, dict)
+            and set(data)
+            in (
+                {f.name for f in fields(cls)},
+                {f.name for f in fields(cls)} - {"deferred_inputs"},
+            ),
             "selection_schema",
         )
         require(data["confirmed"] is True, "selection_pending")
@@ -146,8 +173,35 @@ class Selection:
             require(
                 item.source_id in SOURCES
                 and item.role in SOURCES[item.source_id]
+                and type(item.pending_fetch) is bool
                 and (digest_ok(item.selected_hash) or item.selected_hash == ""),
                 "selection_inputs",
+            )
+        deferred = data.get("deferred_inputs", ())
+        require(isinstance(deferred, (list, tuple)), "deferred_input_schema")
+        try:
+            deferred_inputs = tuple(DeferredInput(**v) for v in deferred)
+        except TypeError:
+            raise ValueError("deferred_input_schema") from None
+        require(
+            len({(i.source_id, i.role) for i in deferred_inputs})
+            == len(deferred_inputs),
+            "deferred_input_schema",
+        )
+        for item_deferred in deferred_inputs:
+            require(
+                item_deferred.source_id == "cus_imp_2025"
+                and item_deferred.role == "portal"
+                and type(item_deferred.year) is int
+                and item_deferred.year == 2025
+                and item_deferred.year not in data["years"]
+                and isinstance(item_deferred.selected_hash, str)
+                and digest_ok(item_deferred.selected_hash)
+                and item_deferred.reason
+                == "international_coverage_and_reviewed_bindings_required"
+                and (item_deferred.source_id, item_deferred.role)
+                not in {(i.source_id, i.role) for i in inputs},
+                "deferred_input_schema",
             )
         require(
             len({(b.source_id, b.role, b.row_key) for b in bindings}) == len(bindings),
@@ -249,6 +303,19 @@ class Selection:
                     "price_evidence",
                 )
         for item in inputs:
+            if item.pending_fetch:
+                require(
+                    item.selected_hash == ""
+                    and not any(
+                        (b.source_id, b.role) == (item.source_id, item.role)
+                        for b in bindings
+                    )
+                    and not any(
+                        o["source_id"] == item.source_id for o in data["obstacles"]
+                    ),
+                    "pending_input_evidence",
+                )
+                continue
             if not item.selected_hash:
                 require(
                     any(o["source_id"] == item.source_id for o in data["obstacles"]),
@@ -271,6 +338,7 @@ class Selection:
             bindings,
             tuple(data["causes"]),
             tuple(data["obstacles"]),
+            deferred_inputs,
         )
 
 
@@ -298,6 +366,8 @@ def _materialize(
     import json
     from decimal import Decimal
 
+    reason = selection.comparison_block_reason()
+    require(reason is None, reason or "")
     result = []
     used = set()
     for item in selection.inputs:
@@ -621,6 +691,8 @@ def read_reconciliation(
 
 def owner_report(selection: Selection, pairs: tuple[PairResult, ...]) -> dict[str, Any]:
     """Recorded causes describe differences, never explain an entire numeric gap."""
+    reason = selection.comparison_block_reason()
+    require(reason is None, reason or "")
     return {
         "obstacles": list(selection.obstacles),
         "causes": list(selection.causes),

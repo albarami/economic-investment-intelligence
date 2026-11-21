@@ -8,12 +8,18 @@ from pathlib import Path
 import pytest
 import yaml
 from custodian.tests.repository_root import repository_root
+from custodian.tests.support.fetch_build import run_build
 
 from eii_custodian.publicdata.fetch.allowlist import ALLOWED_HOSTS, approve
-from eii_custodian.publicdata.fetch.build import fetch_entry, run_build
-from eii_custodian.publicdata.fetch.registry import RegistryError, load_registry
+from eii_custodian.publicdata.fetch.build import fetch_entry
+from eii_custodian.publicdata.fetch.registry import (
+    COLLECTED_FAMILIES,
+    RegistryError,
+    load_registry,
+)
 from eii_custodian.publicdata.fetch.snapshots import checked_times, read_snapshot
 from eii_custodian.publicdata.fetch.transport import Response
+from eii_custodian.publicdata.singles.families import family_table_name
 
 REPO = repository_root(Path(__file__))
 EXPECTED = frozenset(
@@ -165,7 +171,9 @@ def test_exact_block_and_metadata():
                 if entry.slug == "producer-price-index-ppi"
                 else "dataset"
             )
-            if entry.source_id not in {"bank_credit_act", "dcool_capacity"}:
+            if entry.source_id in COLLECTED_FAMILIES:
+                assert entry.release_tables == (family_table_name(entry.source_id),)
+            elif entry.source_id not in {"bank_credit_act", "dcool_capacity"}:
                 assert entry.release_tables == ()
         assert entry.terms_read_on == (
             "2026-11-14" if entry.source_id == "tenders_pub" else "2026-11-15"
@@ -198,6 +206,7 @@ def test_exact_hosts_and_pack_list():
         "download.geoservice.dlr.de",
         "44c1cec316ec56bca76dfd65d2882b20.r2.cloudflarestorage.com",
         "besttime.app",
+        "www.cepii.fr",
     }
     added = {
         "eservices.qfc.qa",
@@ -420,7 +429,7 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
         assert json.loads(body.read_text()) == records
         assert receipt["sha256"] == hashlib.sha256(body.read_bytes()).hexdigest()
         assert receipt["retrieved_utc"] == "2026-11-15T00:00:00Z"
-        assert receipt["release_tables"] == []
+        assert receipt["release_tables"] == [family_table_name(original.source_id)]
         assert receipt["public_splits"] == list(entry.public_splits)
         assert receipt["terms_words"] == entry.terms_words
         assert receipt["terms_read_on"] == entry.terms_read_on
@@ -511,6 +520,8 @@ def test_off_list_request_and_short_family_file_store_nothing(tmp_path):
 
 def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
 
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     for kind in ("paged_layer", "https_file", "terms_page"):
         entry = replace(
             _fixture_entry(),
@@ -538,16 +549,16 @@ def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
             fetch_entry(
                 entry,
                 transport,
-                tmp_path,
+                fixture_cache,
                 lambda: "2026-11-15T00:00:00Z",
                 lambda _: None,
             )
             is None
         )
         receipt = json.loads(
-            next((tmp_path / entry.key).glob("*.meta.json")).read_text()
+            next((fixture_cache / entry.key).glob("*.meta.json")).read_text()
         )
-        body = tmp_path / entry.key / (receipt["sha256"] + ".json")
+        body = fixture_cache / entry.key / (receipt["sha256"] + ".json")
         assert receipt["sha256"] == hashlib.sha256(body.read_bytes()).hexdigest()
         assert receipt["retrieved_utc"] == "2026-11-15T00:00:00Z"
     citation = replace(entry, kind="citation_only", key="invented-citation")
@@ -557,11 +568,15 @@ def test_existing_fetch_kinds_have_hashed_receipts(tmp_path):
 
     assert (
         run_build(
-            [citation], never, tmp_path, lambda: "2026-11-15T00:00:00Z", lambda _: None
+            [citation],
+            never,
+            fixture_cache,
+            lambda: "2026-11-15T00:00:00Z",
+            lambda _: None,
         ).failure
         is None
     )
-    receipt = json.loads((tmp_path / citation.key / "citation.json").read_text())
+    receipt = json.loads((fixture_cache / citation.key / "citation.json").read_text())
     assert receipt["sha256"] == "CITATION_ONLY"
     assert receipt["retrieved_utc"] == "2026-11-15T00:00:00Z"
 
@@ -1235,21 +1250,28 @@ def test_no_period_field_cannot_inherit_stale_registry_bounds(tmp_path):
 
 
 def test_build_orchestration_collects_families_without_tables(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     original = _fixture_entry()
     entries = tuple(
-        replace(original, source_id=family, key=family + "/invented")
+        replace(
+            original,
+            source_id=family,
+            key=family + "/invented",
+            release_tables=(family_table_name(family),),
+        )
         for family in sorted(FAMILIES)
     )
     records = [{"year": "2020-01-01", "value": 1}, {"year": "2021-01-01", "value": 2}]
     outcome = run_build(
         entries,
         _transport(original, records),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-15T00:00:00Z",
         lambda _: None,
     )
     assert outcome.failure is None
-    indexes = sorted(tmp_path.glob("**/index/*.json"))
+    indexes = sorted(fixture_cache.glob("**/index/*.json"))
     snapshots = [read_snapshot(path.parent.parent, path.stem) for path in indexes]
     receipts = [snapshot.receipt_path for snapshot in snapshots]
     assert len(receipts) == len(FAMILIES)
@@ -1277,7 +1299,11 @@ def test_build_orchestration_collects_families_without_tables(tmp_path):
         assert receipt_alias.samefile(snapshot.receipt_path)
         assert checked_times(directory) == (snapshot.sidecar["retrieved_utc"],)
     assert {json.loads(p.read_text())["source_id"] for p in receipts} == FAMILIES
-    assert all(json.loads(p.read_text())["release_tables"] == [] for p in receipts)
+    assert all(
+        json.loads(p.read_text())["release_tables"]
+        == [family_table_name(json.loads(p.read_text())["source_id"])]
+        for p in receipts
+    )
     assert not list(tmp_path.rglob("*.parquet"))
 
 

@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
+
+from eii_custodian.publicdata.fetch.registry import COLLECTED_FAMILIES
 
 from .assembly import AssemblyError
 
@@ -31,11 +34,14 @@ def build_layers(build: Production) -> None:
     from .property.use_map import load_use_map
     from .singles.bank_credit import parse_bank_credit
     from .singles.dcool import parse_dcool
+    from .singles.families import family_table_name, parse_family_rows
     from .singles.tenders import publish_tenders, rows_from_pages
 
     grid = build.needed_frame().tables["grid_cell"]
     deals: list[Deal] = []
     deal_sources = []
+    family_rows: dict[str, list[dict[str, object]]] = defaultdict(list)
+    family_sources: dict[str, set[str]] = defaultdict(set)
     parsers: dict[
         str, tuple[str, Callable[[list[dict[str, Any]]], list[dict[str, Any]]]]
     ] = {
@@ -81,11 +87,16 @@ def build_layers(build: Production) -> None:
             else:
                 build.table(table, rows, (entry.key,))
         elif source == "gis_land_price":
+            from .property.price_as_of import as_of_from_receipt, require_price_as_of
+
             payload = build.raw(entry, standard_json=True)
             layers = payload.get("layers") if isinstance(payload, dict) else None
             if not isinstance(layers, list):
                 raise AssemblyError("assembly_gis_shape_invalid")
-            rows = land_price_rows(_features(layers), entry.url)
+            as_of = as_of_from_receipt(build.receipts[entry.key])
+            rows = land_price_rows(_features(layers), entry.url, as_of=as_of)
+            for row in rows:
+                require_price_as_of(row, as_of)
             build.table("pub_land_price", rows, (entry.key,))
         elif source == "gis_context":
             build.raw(entry)
@@ -123,6 +134,20 @@ def build_layers(build: Production) -> None:
             )
             deals.extend(result.deals)
             deal_sources.append(entry.key)
+        elif source in COLLECTED_FAMILIES:
+            payload = build.raw(entry, family_archive=True)
+            if not isinstance(payload, list):
+                raise AssemblyError("assembly_family_shape_invalid")
+            receipt = build.receipts[entry.key]
+            table = family_table_name(source)
+            cells = parse_family_rows(
+                entry,
+                payload,
+                retrieved_utc=str(receipt["retrieved_utc"]),
+                sha256=str(receipt["sha256"]),
+            )
+            family_rows[table].extend(asdict(cell) for cell in cells)
+            family_sources[table].add(entry.key)
         elif source == "tenders_pub":
             payload = build.raw(entry, standard_json=True)
             if not isinstance(payload, dict) or not isinstance(
@@ -141,9 +166,33 @@ def build_layers(build: Production) -> None:
             published = publish_tenders(rows_from_pages(*pages).rows, recorded=True)
             build.table("pub_tender", [asdict(r) for r in published.rows], (entry.key,))
     if deal_sources:
-        build.table(
-            "pub_property_quarter", quarter_aggregates(deals), tuple(deal_sources)
+        from .property.price_as_of import (
+            as_of_from_receipt,
+            require_price_as_of,
+            row_has_price_figure,
         )
+        from .property.quarter import expected_as_of
+
+        as_of_by_source = {
+            entry.source_id: as_of_from_receipt(build.receipts[entry.key])
+            for entry in build.entries
+            if entry.key in deal_sources
+        }
+        quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
+        expected = expected_as_of(deals, as_of_by_source)
+        for row in quarter_rows:
+            if row_has_price_figure(row):
+                key = (
+                    str(row["district_key"]),
+                    str(row["municipality_code"]),
+                    str(row["period"]),
+                    str(row["use_key"]),
+                    str(row["unit_type"]),
+                )
+                require_price_as_of(row, expected[key])
+        build.table("pub_property_quarter", list(quarter_rows), tuple(deal_sources))
+    for table in sorted(family_rows):
+        build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
 
 
 def _features(layers: list[dict[str, Any]]) -> list[dict[str, Any]]:

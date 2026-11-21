@@ -174,11 +174,15 @@ The denominators `a_j` and `a` include every licence-activity, including legacy 
 | Quantity | Value |
 |---|---|
 | National licence-activity total | 249,622 across 4,755 codes |
+| All licence-activities, Al Daayen | 13,600 |
 | Restaurants (code 5610101), Al Daayen / national | 361 / 4,782 |
+| Coffee shops (5630112), national | 1,042 |
 | Residents, 2025, Al Daayen / national | 111,282 / 3,219,982 |
 | Restaurant licences per 10,000 residents, Al Daayen / national | 32 / 15 (one decimal: 32.4 and 14.9) |
 | LQ, restaurants (5610101), Al Daayen | 1.39 |
 | LQ, coffee shops (5630112, 173 licences), Al Daayen | 3.05 |
+
+The all-activity count of Al Daayen and the national coffee-shop count were read from the cached open-licence table `lic_active` (May 2025) and are asserted by `test_pinned_c1`.
 
 Arithmetic for the densities: 361 / 111,282 × 10,000 = 32.440, which rounds to 32.4 and is shown as 32. 4,782 / 3,219,982 × 10,000 = 14.851, which rounds to 14.9 and is shown as 15.
 
@@ -205,6 +209,8 @@ Of the May 2025 active licence-activity count of 249,622 (master design section 
 
 **Inputs.** `pub_licence_cancelled` (dated monthly cancellations by municipality and activity, 2015 to May 2025, plus an undated remainder); `pub_licence_active`.
 
+**Method version.** `C2-v2`, amended by [decision 0078](decisions/0078-c2-bulk-months-by-the-centred-median.md) item 1.
+
 **Formula.**
 
 ```
@@ -212,7 +218,10 @@ calendar   = every month from January 2015 through May 2025 (125 months)
 T_m        = national dated cancellations, all activities, in month m
              a calendar month with no dated rows has T_m = 0
              undated rows are excluded from every T_m
-bulk(m)    = T_m > 3 * median(T over those 125 months)
+window(m)  = months m-6 through m+6, intersected with calendar (7 to 13 months)
+bulk(m)    = T_m > 3 * median(T over window(m))
+             for an even window, median = mean of the two middle sorted counts
+             equality to 3 * median is not bulk
 churn_ijy  = C_ijy / A_ij        C = cancellations in year y; A = active stock, May 2025
 reported twice: including and excluding flagged months
 ```
@@ -227,10 +236,27 @@ Undated cancellations are shown as a separate count. A Wilson interval is shown 
 | Months that must be flagged | July 2020 (40,791), June 2022 (14,212), September 2024 (11,232) |
 | Share of dated cancellations in those three months | 43.1% |
 | Restaurants (5610101), 2024, Doha: 318 / 2,109 active | 15.1% (including flagged months) |
+| Restaurants (5610101), 2024, Doha: 283 / 2,109 active | 13.4% (excluding flagged months) |
 | Restaurants (5610101), 2024, Al Daayen: 49 / 361 active | 13.6% (including flagged months) |
+| Restaurants (5610101), 2024, Al Daayen: 48 / 361 active | 13.3% (excluding flagged months) |
+| All bulk months under C2-v2 | 2015-12, 2017-06, 2020-07, 2020-11, 2021-02, 2021-04, 2021-06, 2022-06, 2024-09 |
+| Share of dated cancellations in all nine bulk months | 54.3% |
 | ISIC 5610, cancellations 2022–2024 / active May 2025 | 2,510 / 7,878 = 0.32 |
 
-Tolerance: counts exact; shares ± 0.1 percentage point. The rule may flag other months as well; the data test lists every flagged month and the method note in the release records them.
+2015-12 holds one cancellation and is flagged because its window median is 0: seven of the thirteen months from 2015-06 to 2016-06 hold no dated cancellation, and any positive count exceeds three times zero.
+
+Tolerance: counts exact; shares ± 0.1 percentage point. The complete list and revised excluding figures above are from the lead's pinned-file comparison of 2026-11-20, recorded in decision 0078 item 2. The lead's data test pins every flagged month; the release method note records them. The three-month share of 43.1% continues to describe only the three named spikes.
+
+**Method note — superseded global rule.** Before decision 0078, C2 used
+`bulk(m) = T_m > 3 * median(T over all 125 calendar months)`. The lead's pinned-file
+comparison gives median 305, threshold 915, and 42 flagged months holding 89.7% of dated
+cancellations. Every month of 2023 and 2024 was flagged. This is retained historical
+method evidence; C2-v2 uses the centred rule above. The superseded 42-month list is:
+
+2017-06, 2020-07, 2020-11, 2021-02, 2021-04, 2021-05, 2021-06, 2021-12, 2022-01, 2022-02, 2022-03,
+2022-04, 2022-06, 2022-12, 2023-01, 2023-02, 2023-03, 2023-04, 2023-05, 2023-06, 2023-07, 2023-08,
+2023-09, 2023-10, 2023-11, 2023-12, 2024-01, 2024-02, 2024-03, 2024-04, 2024-05, 2024-06, 2024-07,
+2024-08, 2024-09, 2024-10, 2024-11, 2024-12, 2025-01, 2025-02, 2025-03, 2025-04
 
 **Provenance and status.** Rates are Public, `observed`, caveat `calculated`. The bulk flag is `observed` (it is a rule); the statement that bulk months are administrative is `inferred`. **Compute cost.** Trivial (feasibility review; no time recorded).
 
@@ -2267,7 +2293,7 @@ The distance and the zone test are Public and `observed` (MTH-05), with the cave
 
 **Purpose.** Give every building of the basemap a height in the order of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A2 (PUB-106), keep the source of each height with it, measure the error of each fallback against the recorded heights, and keep every height visibly an estimate (FE-50, FE-52). The card is computed in the public-data build only (MTH-02) and feeds the 3D view of S3-T16; it draws nothing itself.
 
-**Inputs.** The basemap's building table with, per building, its identifier, its footprint polygon, its recorded height or none, its floor count or none and its footprint source; the open 3D building heights of `bldg_3dglobfp`; the WSF 3D 90 m cell mean of `bldg_wsf3d`; and the stated storey height, held as quoted text in `custodian/publicdata/height_rules.yaml` and read as a `Decimal`, never a float. A recorded height or floor count that is not a usable positive number refuses the whole table, by name (`bad_recorded_height_m`, `bad_floor_count`); a recorded height that rounds to zero refuses the same way.
+**Inputs.** Under [proposed decision 0077](decisions/0077-overture-footprints-as-the-national-building-table.md), the canonical Overture table `assets/buildings/buildings.geojson`, produced in `./eii build-public` and bound by `manifest.buildings.json` to the pinned parts, their STAC metadata and the national boundary, with, per building, its identifier, its footprint polygon, its recorded height or none, its floor count or none and its footprint source; the open 3D building heights of `bldg_3dglobfp`; the WSF 3D 90 m cell mean of `bldg_wsf3d`; and the stated storey height, held as quoted text in `custodian/publicdata/height_rules.yaml` and read as a `Decimal`, never a float. A recorded height or floor count that is not a usable positive number refuses the whole table, by name (`bad_recorded_height_m`, `bad_floor_count`); a recorded height that rounds to zero refuses the same way. Overture `height` and `num_floors` mapping stays off until the official schema reading, a closed recorded-origin list and live counts are complete; present source values become null with counted reason `recorded_field_unconfirmed`, including usable and unusable counts. No floor is inferred from a height. Mapping unusable recorded values to null after activation needs a new decision; the whole-table refusals above do not change. Invalid and underground footprints are excluded and listed before this table is validated, never repaired. Each refreshed landmark binding must exist in this inventory or refuse `landmark_building_absent`.
 
 **Formula.**
 

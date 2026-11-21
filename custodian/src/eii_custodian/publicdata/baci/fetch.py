@@ -71,6 +71,8 @@ def _entry_check(entry: Entry, config: Config) -> None:
             raise BaciError("terms_date") from None
     require(entry.publisher == config.publisher and bool(entry.title_en), "publisher")
     require(entry.landing_url == config.page, "page")
+    require(config.raw_rows is not None, "rows_unconfirmed")
+    assert config.raw_rows is not None
     require(
         entry.row_count_min == config.raw_rows[0]
         and entry.row_count_max == config.raw_rows[1],

@@ -1,10 +1,7 @@
-"""S2-T08 part B, OI-277: count award names unmatched only by a double space.
+"""INVENTED OI-277 names: collapse spaces again after punctuation removal.
 
-The ruled normalisation (compatibility form, case fold, whitespace collapse,
-then punctuation removal) leaves "Al - Rayyan" with a double space, so such a
-name is counted unmatched, in the safe direction. The first live match counts
-those names; matching itself, the ruled order and the registration gate are
-unchanged. Only a count is recorded, never a name. Every name is invented.
+Registration and name-consistency gates stay in force. The retained receipt
+counter counts remaining spacing-only mismatches, never names.
 """
 
 from __future__ import annotations
@@ -13,6 +10,7 @@ from custodian.tests.test_awards_survivors_3 import fetch, setup
 from custodian.tests.test_s2_t29_awards import profile, row
 
 from eii_custodian.publicdata.fetch.award_checks import (
+    check_awards,
     double_space_only,
     match_register,
     normalise_name,
@@ -31,16 +29,28 @@ def _count(company: str, register: list[dict[str, str]]) -> tuple[int, str]:
     return double_space_only(match, profile(), register), match["rows"][0]["reason"]
 
 
-def test_the_ruled_normalisation_is_unchanged() -> None:
-    assert normalise_name("SYN - Rayyan") == "syn  rayyan"
+def test_punctuation_removal_does_not_leave_a_double_space() -> None:
+    assert normalise_name("SYN - Rayyan") == "syn rayyan"
     assert normalise_name("SYN Rayyan") == "syn rayyan"
 
 
-def test_a_name_differing_only_by_a_double_space_stays_unmatched_and_is_counted() -> (
-    None
-):
-    assert _count("SYN - Rayyan", [_register("SYN Rayyan")]) == (1, "name_mismatch")
-    assert _count("SYN Rayyan", [_register("SYN - Rayyan")]) == (1, "name_mismatch")
+def test_a_double_space_pair_matches_only_with_the_same_registration() -> None:
+    assert _count("SYN - Rayyan", [_register("SYN Rayyan")]) == (0, "matched")
+    assert _count("SYN Rayyan", [_register("SYN - Rayyan")]) == (0, "matched")
+
+
+def test_proof_comparison_normalises_spaces_and_keeps_both_consistency_checks() -> None:
+    source = dict(row(), syn_company="SYN - Rayyan")
+    for changes, matched in (
+        ({"syn_company": "SYN Rayyan"}, 1),
+        ({"syn_company": "SYN Rayyan", "syn_reg": "SYN-other"}, 0),
+        ({"syn_company": "SYN Other"}, 0),
+    ):
+        result = check_awards(
+            [source], profile(), 73, lambda _, changes=changes: dict(source, **changes)
+        )
+        assert result["matched"] == matched
+        assert result["mismatched"] == 1 - matched
 
 
 def test_other_unmatched_names_are_not_counted() -> None:
@@ -70,8 +80,9 @@ def test_several_rows_are_counted_once_each() -> None:
         dict(row(3), syn_company="SYN Other"),
     ]
     match = match_register(rows, profile(), register)
-    assert match["matched"] == 1
-    assert double_space_only(match, profile(), register) == 2
+    assert match["matched"] == 3
+    assert match["unmatched"] == 1
+    assert double_space_only(match, profile(), register) == 0
 
 
 def test_the_receipt_records_the_count_and_no_name(tmp_path, monkeypatch) -> None:

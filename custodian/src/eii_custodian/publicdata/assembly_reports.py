@@ -267,11 +267,17 @@ def _optional(build: Production, name: str) -> dict[str, Any]:
 
 
 def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
-    """Retain T29 proof statistics and OI-277 without report rows or firm names."""
+    """Validate complete T29 link evidence and retain labelled sample statistics.
+
+    The gate report retains summary counts, status and rates; per-link URLs and
+    outcomes stay on the source receipt. OI-277 live acceptance stays with the lead.
+    """
     from .fetch.award_checks import AwardError, validate_check_receipt
+    from .fetch.award_links import validate_links_receipt
 
     try:
         validate_check_receipt(receipt)
+        validate_links_receipt(receipt)
     except AwardError:
         raise AssemblyError("assembly_t29_refused") from None
     check = receipt["award_check"]
@@ -279,6 +285,7 @@ def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
     if (
         check["seed"] != seed
         or check["incomplete"] is not False
+        or receipt["award_links"]["incomplete"] is not False
         or type(count) is not int
         or count < 0
     ):
@@ -287,6 +294,12 @@ def awards_evidence(receipt: dict[str, Any], seed: int) -> dict[str, Any]:
         "key": "awards_owner_scrape",
         "sha256": receipt["sha256"],
         "award_check": {key: value for key, value in check.items() if key != "results"},
+        "award_check_scope": "sample",
+        "award_links": {
+            key: value
+            for key, value in receipt["award_links"].items()
+            if key not in {"results", "report_urls"}
+        },
         "registration_double_space_only": count,
     }
 
@@ -346,6 +359,7 @@ def gather_audit(build: Production) -> dict[str, Any]:
         fsq_evidence,
         investment_evidence,
         load_dispositions,
+        method_pin_evidence,
         oi03_line,
         tender_evidence,
         terms_evidence,
@@ -536,6 +550,9 @@ def gather_audit(build: Production) -> dict[str, Any]:
             },
         )
     )
+    evidence.append(
+        method_pin_evidence(build.root, build.cache, build.entries, build.receipts)
+    )
     decision_name = "0025-reconciliation-of-restaurant-and-wage-figures.md"
     decision_path = build.root / "docs/decisions" / decision_name
     decision = decision_path.read_bytes() if decision_path.is_file() else b""
@@ -674,12 +691,18 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
         if len(build.table_sources.get(table, set())) <= 1:
             continue
         bound_files(build.cache, {name: digest})
-        if _draw_row_sources(build, table, read_object(build.cache, name)) is None:
+        data = read_object(build.cache, name)
+        if _draw_row_sources(build, table, data) is None:
+            stored = data.get("row_sources", {}).get(table, [])
             build.draw_exclusions.append(
                 {
                     "table": table,
                     "sources": sorted(build.table_sources[table]),
-                    "reason": "assembly_draw_lineage_ambiguous",
+                    "reason": (
+                        "assembly_draw_table_empty"
+                        if not data["tables"][table] and not stored
+                        else "assembly_draw_lineage_ambiguous"
+                    ),
                 }
             )
     excluded = {item["table"] for item in build.draw_exclusions}

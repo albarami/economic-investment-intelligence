@@ -12,11 +12,19 @@ from eii_core.calc.public_methods import (
     AnnualEnergy,
     TradeRow,
     licence_churn,
+    licence_density,
+    location_quotient,
     supplier_metrics,
     zone_momentum,
 )
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
+from eii_custodian.publicdata.frame.crosswalk import (
+    municipality_key,
+    municipality_keys,
+    read_csv,
+)
+from eii_custodian.publicdata.frame.population import population_rows
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
 _CACHE_NAME = "eii_data_tests_cache"
@@ -42,6 +50,112 @@ def reading(value, unit, period, chain, geography="national"):
         "public",
         (chain,),
     )
+
+
+def c1_replay(active, active_chain, population, population_chain, review, name):
+    """Replay C1 on reviewed source municipalities, counting legacy activities too."""
+    names = read_csv(review / "municipality_names.csv")
+    target = municipality_key(name, names)
+    active_keys = municipality_keys("lic_active", active, ("lbldy",), names, None)
+    if target not in active_keys:
+        raise ValueError("C1:municipality_missing")
+    residents, reason = population_rows(population, review, names, None)
+    if reason.startswith("unreviewed_indicator"):
+        raise ValueError("C1:population_indicator_unreviewed")
+    residents = [
+        row
+        for row in residents
+        if row["period"] == "2025" and row["indicator"] == "residents"
+    ]
+    resident_keys = [row["municipality_code"] for row in residents]
+    if len(set(resident_keys)) != len(resident_keys):
+        raise ValueError("C1:population_duplicate")
+    if set(resident_keys) != set(active_keys):
+        raise ValueError("C1:population_missing")
+
+    def licences(code=None, local=False):
+        return sum(
+            (
+                D(str(row["dd_lrkhs_lnsht"]))
+                for row, key in zip(active, active_keys, strict=True)
+                if (not local or key == target)
+                and (code is None or row["rmz_lnsht_ltjry"] == code)
+            ),
+            D(0),
+        )
+
+    counts = {
+        "local_all": licences(local=True),
+        "national_all": licences(),
+        "local_restaurants": licences("5610101", local=True),
+        "national_restaurants": licences("5610101"),
+        "local_coffee": licences("5630112", local=True),
+        "national_coffee": licences("5630112"),
+        "local_population": sum(
+            (
+                D(str(row["value"]))
+                for row in residents
+                if row["municipality_code"] == target
+            ),
+            D(0),
+        ),
+        "national_population": sum((D(str(row["value"])) for row in residents), D(0)),
+    }
+
+    def m(key):
+        local = key.startswith("local_")
+        chain = population_chain if key.endswith("population") else active_chain
+        return reading(
+            counts[key],
+            "count",
+            "2025",
+            chain,
+            f"municipality:{target}" if local else "national",
+        )
+
+    return {
+        **counts,
+        "density": (
+            licence_density(m("local_restaurants"), m("local_population")),
+            licence_density(m("national_restaurants"), m("national_population")),
+        ),
+        "lq": tuple(
+            location_quotient(
+                m(f"local_{activity}"),
+                m("local_all"),
+                m(f"national_{activity}"),
+                m("national_all"),
+            )["value"]
+            for activity in ("restaurants", "coffee")
+        ),
+    }
+
+
+def test_pinned_c1():
+    active, active_chain = pinned("lic_active")
+    population, population_chain = pinned("pop_muni")
+    result = c1_replay(
+        active,
+        active_chain,
+        population,
+        population_chain,
+        _cache.ROOT / "custodian/publicdata/review",
+        "Al Daayen",
+    )
+    for key, expected in {
+        "local_all": 13600,
+        "national_all": 249622,
+        "local_restaurants": 361,
+        "national_restaurants": 4782,
+        "local_coffee": 173,
+        "national_coffee": 1042,
+        "local_population": 111282,
+        "national_population": 3219982,
+    }.items():
+        assert result[key] == D(expected), key
+    assert tuple(fact.value for fact in result["density"]) == (D(32), D(15))
+    for fact, expected in zip(result["lq"], ("1.39", "3.05"), strict=True):
+        assert abs(fact.value - D(expected)) <= D("0.01")
 
 
 @pytest.mark.parametrize(
@@ -225,53 +339,20 @@ def test_pinned_c9():
 C2_CALENDAR = tuple(f"{2015 + i // 12}-{i % 12 + 1:02}" for i in range(125))
 
 EXPECTED_C2_BULK_MONTHS = (
+    "2015-12",
     "2017-06",
     "2020-07",
     "2020-11",
     "2021-02",
     "2021-04",
-    "2021-05",
     "2021-06",
-    "2021-12",
-    "2022-01",
-    "2022-02",
-    "2022-03",
-    "2022-04",
     "2022-06",
-    "2022-12",
-    "2023-01",
-    "2023-02",
-    "2023-03",
-    "2023-04",
-    "2023-05",
-    "2023-06",
-    "2023-07",
-    "2023-08",
-    "2023-09",
-    "2023-10",
-    "2023-11",
-    "2023-12",
-    "2024-01",
-    "2024-02",
-    "2024-03",
-    "2024-04",
-    "2024-05",
-    "2024-06",
-    "2024-07",
-    "2024-08",
     "2024-09",
-    "2024-10",
-    "2024-11",
-    "2024-12",
-    "2025-01",
-    "2025-02",
-    "2025-03",
-    "2025-04",
 )
 
 C2_MUNICIPAL_EXAMPLES = (
-    ("بلدية الدوحة", "doha", 2109, 318, "15.1"),
-    ("بلدية الظعاين", "al_daayen", 361, 49, "13.6"),
+    ("بلدية الدوحة", "doha", 2109, 318, "15.1", 283, "13.4"),
+    ("بلدية الظعاين", "al_daayen", 361, 49, "13.6", 48, "13.3"),
 )
 
 
@@ -371,8 +452,8 @@ def test_pinned_c2_national_cancellations():
     named_share = D(rounded(ratio(named_three * 100, dated), 1))
     assert abs(named_share - D("43.1")) <= D("0.1")
     assert named_share == D("43.1")
-    assert abs(result["bulk_share_percent"].value - D("89.7")) <= D("0.1")
-    assert result["bulk_share_percent"].value == D("89.7")
+    assert abs(result["bulk_share_percent"].value - D("54.3")) <= D("0.1")
+    assert result["bulk_share_percent"].value == D("54.3")
     assert result["bulk_months_unrounded"] == EXPECTED_C2_BULK_MONTHS
 
 
@@ -383,6 +464,8 @@ def test_pinned_c2_national_cancellations():
         "expected_active",
         "expected_cancelled",
         "expected_percent",
+        "expected_excluded",
+        "expected_excluded_percent",
     ),
     C2_MUNICIPAL_EXAMPLES,
 )
@@ -392,6 +475,8 @@ def test_pinned_c2_municipal_restaurants(
     expected_active: int,
     expected_cancelled: int,
     expected_percent: str,
+    expected_excluded: int,
+    expected_excluded_percent: str,
 ):
     active_rows, active_chain = pinned("lic_active")
     cancelled_rows, cancelled_chain = pinned("lic_cancelled")
@@ -408,6 +493,12 @@ def test_pinned_c2_municipal_restaurants(
     assert result["active_count"].value == D(expected_active)
     assert abs(result["including_percent"].value - D(expected_percent)) <= D("0.1")
     assert result["including_percent"].value == D(expected_percent)
+    # Assert the unrounded numerator as well as its displayed percentage.
+    assert (
+        result["excluding_percent"].exact_unrounded * expected_active
+        == expected_excluded * 100
+    )
+    assert result["excluding_percent"].value == D(expected_excluded_percent)
     geography = f"municipality:{slug}"
     for fact in (
         result["active_count"],

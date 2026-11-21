@@ -156,7 +156,9 @@ def pages(
                 if replay:
                     from ..fetch.certificate_pins import capture_files
 
-                    # A terminal cannot silently discard already supplied pages.
+                    # Terminal replay requires the intake folder to hold exactly
+                    # the continuation receipts (ordinals after any live prefix),
+                    # not a full producer 1..N set left beside a live first page.
                     if capture_files(cache, "fc_register") != captured_ordinals:
                         raise ShapeError("paging_incomplete")
                 return result

@@ -16,7 +16,7 @@ from eii_custodian.publicdata.fetch.bounded import file_hash as shared_file_hash
 from eii_custodian.publicdata.fetch.bounded import within as shared_within
 from eii_custodian.publicdata.fetch.decimals import DecimalRefusal, exact_decimal
 
-from .config import SCHEMAS, TABLES, BaciError, Config, Member, require
+from .config import NATIVE_COLUMNS, TABLES, BaciError, Config, Member, require
 
 
 def decimal_text(value: str, config: Config) -> str:
@@ -59,7 +59,13 @@ def _rows(zipped: ZipFile, member: Member) -> Iterator[dict[str, str]]:
 
 def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]:
     """v1 deterministic transform; outputs go only to caller-owned staging."""
-    require(all(m.kind in SCHEMAS for m in config.members), "member_kind")
+    require(all(m.kind in NATIVE_COLUMNS for m in config.members), "member_kind")
+    require(
+        config.raw_rows is not None
+        and all(m.rows is not None for m in config.members if m.kind != "text"),
+        "rows_unconfirmed",
+    )
+    assert config.raw_rows is not None
     require(
         sum(m.kind == "country" for m in config.members) == 1
         and sum(m.kind == "product" for m in config.members) == 1,
@@ -80,6 +86,12 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
             hashes: dict[str, str] = {}
             for member in config.members:
                 info = zipped.getinfo(member.name)
+                if member.compressed_bytes is not None:
+                    within(
+                        info.compress_size,
+                        member.compressed_bytes,
+                        "member_compressed_bytes",
+                    )
                 within(info.file_size, member.bytes, "member_bytes")
                 size = 0
                 digest = hashlib.sha256()
@@ -101,9 +113,11 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                         "sha256": checksum,
                         "bytes": size,
                         "header": list(member.header),
-                        "rows": 0,
+                        "rows": None if member.kind == "text" else 0,
                     }
                 )
+                if member.compressed_bytes is not None:
+                    receipts[-1]["compressed_bytes"] = info.compress_size
             countries: set[str] = set()
             products: set[str] = set()
             outputs: dict[str, object] = {}
@@ -112,6 +126,7 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                 ("product", products, config.product_width, "hs_code", TABLES[2]),
             ):
                 member = next(m for m in config.members if m.kind == kind)
+                assert member.rows is not None
                 count = 0
                 with (output / f"{table}.jsonl").open("w", encoding="utf-8") as target:
                     for row in _rows(zipped, member):
@@ -130,6 +145,14 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                         )
                         record: dict[str, object] = dict(row)
                         if kind == "country":
+                            if "iso2" in row:
+                                require(
+                                    not row["iso2"]
+                                    or re.fullmatch(r"[A-Z]{2}", row["iso2"])
+                                    is not None,
+                                    "iso2",
+                                )
+                                del record["iso2"]
                             require(
                                 not row["iso3"]
                                 or re.fullmatch(r"[A-Z]{3}", row["iso3"]) is not None,
@@ -138,8 +161,11 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                             record["iso3"] = row["iso3"] or None
                         else:
                             require(
-                                row["hs_revision"] == config.hs_revision, "revision"
+                                row.get("hs_revision", config.hs_revision)
+                                == config.hs_revision,
+                                "revision",
                             )
+                            record["hs_revision"] = config.hs_revision
                         record.update(
                             source_id="cepii_baci", source_version=config.source_version
                         )
@@ -159,13 +185,18 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                 for member in config.members:
                     if member.kind != "trade":
                         continue
+                    assert member.rows is not None
                     count = kept = 0
                     seen: set[tuple[str, ...]] = set()
                     partners: set[str] = set()
                     covered_products: set[str] = set()
                     for row in _rows(zipped, member):
                         require(row["year"] == str(member.year), "year")
-                        require(row["hs_revision"] == config.hs_revision, "revision")
+                        require(
+                            row.get("hs_revision", config.hs_revision)
+                            == config.hs_revision,
+                            "revision",
+                        )
                         exporter, importer, product = (
                             row["exporter_code"],
                             row["importer_code"],
@@ -199,6 +230,7 @@ def parse_archive(path: Path, config: Config, output: Path) -> dict[str, object]
                         record = dict(row)
                         result: dict[str, object] = dict(record)
                         result.update(
+                            hs_revision=config.hs_revision,
                             year=member.year,
                             value=value,
                             quantity=quantity,

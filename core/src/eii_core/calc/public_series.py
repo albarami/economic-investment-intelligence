@@ -32,6 +32,7 @@ CALC_CONTEXT = Context(
 Group = tuple[Decimal, Decimal]
 ZERO = Decimal(0)
 C2_CALENDAR = tuple(f"{2015 + i // 12}-{i % 12 + 1:02}" for i in range(125))
+C2_METHOD_VERSION = "C2-v2"
 
 
 def finite(value: Decimal) -> None:
@@ -390,12 +391,21 @@ def unit_value(
 
 
 def bulk_months(totals: Mapping[str, Decimal]) -> tuple[str, ...]:
-    """C2 calendar includes zero-row months; undated rows never enter it."""
+    """C2-v2: strict triple of the centred, end-cut thirteen-month median.
+
+    Calendar months without rows count as zero; undated rows never enter it.
+    An even window uses the arithmetic mean of its two middle values.
+    """
     calendar = C2_CALENDAR
     for month, value in totals.items():
         finite(value)
         if month not in calendar or value < 0 or value != value.to_integral_value():
             raise ValueError("invalid cancellation month/count")
     with localcontext(CALC_CONTEXT):
-        threshold = 3 * median(totals.get(month, ZERO) for month in calendar)
-        return tuple(month for month in calendar if totals.get(month, ZERO) > threshold)
+        values = tuple(totals.get(month, ZERO) for month in calendar)
+        return tuple(
+            month
+            for index, month in enumerate(calendar)
+            if values[index]
+            > 3 * median(values[max(0, index - 6) : min(len(calendar), index + 7)])
+        )

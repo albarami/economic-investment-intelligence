@@ -16,6 +16,7 @@ import runner_support as support
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
 import run_tests
+import run_tests_counts as counts
 
 ROOT = support.ROOT
 SEED_DETAIL = "seed must be ten decimal digits from 1000000000 to 4294967295"
@@ -166,6 +167,85 @@ class RunnerUsage(unittest.TestCase):
                                 run_tests.suite_timeout(suite, os.environ),
                                 suite.timeout,
                             )
+
+    def test_each_suite_prints_its_own_duration(self) -> None:
+        first = run_tests.SuiteResult("first", counts.Counts(2, 0, 1, (), True), (), ())
+        second = run_tests.SuiteResult(
+            "second", counts.Counts(1, 0, 0, (), True), (), ()
+        )
+        suites = (
+            support.fx_suite("first", "pytest", ".", ()),
+            support.fx_suite("second", "pytest", ".", ()),
+        )
+        with patch.object(run_tests, "run_suite", side_effect=[first, second]):
+            status, out, err = support.call(
+                [],
+                suites,
+                self.root,
+                support.parent_env(),
+                now=iter([1794000123.9, 100.0, 102.5, 200.0, 200.3]).__next__,
+            )
+        self.assertEqual(err, [], err)
+        self.assertEqual(status, 0, out)
+        self.assertEqual(
+            out,
+            [
+                "seed=1794000123",
+                "suite first: 2 passed, 0 failed, 1 skipped in 2.5 s",
+                "suite second: 1 passed, 0 failed, 0 skipped in 0.3 s",
+                "total: 3 passed, 0 failed, 1 skipped in 2 suites, 0 with problems",
+                "RESULT: PASSED",
+            ],
+        )
+
+    def test_unavailable_counts_and_internal_error_print_duration(self) -> None:
+        suites = (
+            support.fx_suite("unavailable", "pytest", ".", ()),
+            support.fx_suite("internal", "pytest", ".", ()),
+        )
+        result = run_tests.SuiteResult(
+            "unavailable", None, ("FAIL invented-no-counts",), ()
+        )
+        with patch.object(
+            run_tests, "run_suite", side_effect=[result, ValueError("invented")]
+        ):
+            status, out, err = support.call(
+                ["--seed", support.FIXTURE_SEED],
+                suites,
+                self.root,
+                support.parent_env(),
+                now=iter([10.0, 11.5, 20.0, 24.25]).__next__,
+            )
+        self.assertEqual(err, [], err)
+        self.assertEqual(status, 1, out)
+        self.assertEqual(
+            out,
+            [
+                f"seed={support.FIXTURE_SEED}",
+                "suite unavailable: counts unavailable in 1.5 s",
+                "FAIL invented-no-counts",
+                "suite internal: counts unavailable in 4.2 s",
+                "FAIL internal-error: internal: ValueError: invented",
+                "total: 0 passed, 0 failed, 0 skipped in 2 suites, 2 with problems",
+                "RESULT: FAILED",
+            ],
+        )
+
+    def test_duration_normalisation_preserves_other_lines(self) -> None:
+        self.assertEqual(
+            support.untimed(
+                [
+                    "suite invented: counts unavailable in 1.5 s",
+                    "FAIL invented in 1.5 s",
+                    "suite invented: counts unavailable in unexpected s",
+                ]
+            ),
+            [
+                "suite invented: counts unavailable",
+                "FAIL invented in 1.5 s",
+                "suite invented: counts unavailable in unexpected s",
+            ],
+        )
 
     def test_usage_errors(self) -> None:
         rows = (

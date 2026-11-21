@@ -43,6 +43,7 @@ from eii_custodian.publicdata.gis.layers import (
 _ROOT = repository_root(Path(__file__))
 _GIS = "https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer"
 _SURVEY_MS = 1579046400000
+_INVENTED_AS_OF = "2026-11-17"
 
 # The registry column vocabulary for each declared service field type.
 _REGISTRY_KIND = {
@@ -121,7 +122,7 @@ def test_land_price_rows_use_field_names_and_per_ft2() -> None:
         },
         "geometry": _square(),
     }
-    rows = land_price_rows([feature], "LandPricing2026")
+    rows = land_price_rows([feature], "LandPricing2026", as_of=_INVENTED_AS_OF)
     assert {row["use_category"] for row in rows} == {
         "ResidentialPrices",
         "ResidentialCityCenter",
@@ -156,11 +157,11 @@ def test_land_price_period_is_exactly_one_year_of_the_service_name() -> None:
         },
         "geometry": _square(),
     }
-    rows = land_price_rows([feature], "LandPricing2026")
+    rows = land_price_rows([feature], "LandPricing2026", as_of=_INVENTED_AS_OF)
     assert {row["period"] for row in rows} == {"2026"}
     for name in ("InventedPricing", "LandPricing2025to2026", "LandPricing12345"):
         with pytest_raises_layer("service name"):
-            land_price_rows([feature], name)
+            land_price_rows([feature], name, as_of=_INVENTED_AS_OF)
 
 
 def test_address_and_parcel_drop_pin_and_keep_published_dates() -> None:
@@ -444,7 +445,7 @@ def test_district_numbers_that_differ_fail() -> None:
         "geometry": _square(),
     }
     try:
-        land_price_rows([feature], "LandPricing2026")
+        land_price_rows([feature], "LandPricing2026", as_of=_INVENTED_AS_OF)
     except LayerError as error:
         assert str(error) == "district numbers differ"
         assert "14" not in str(error)

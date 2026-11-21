@@ -19,7 +19,9 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
     motion: [],
     removed: [],
     overlayUpdates: [],
+    mounts: [],
   };
+  let baseLoaded = false;
   class GPUError extends Error {}
   let held = [];
   const canvas = {
@@ -41,19 +43,43 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
     },
   };
   class MapDouble {
+    listeners = new Map();
     constructor(props) {
       observed.mapOptions = props;
+      this.mounts = observed.mounts;
+      baseLoaded = options.alreadyLoaded ?? false;
+      options.onMap?.(this);
+    }
+    loaded() {
+      return baseLoaded;
     }
     addControl(overlay) {
+      observed.mounts.push({ baseLoaded });
+      if (options.controlError) throw options.controlError;
       held = overlay.props.layers;
     }
     once(event, callback) {
-      if (event === 'idle' && !options.fail) queueMicrotask(callback);
+      const listeners = this.listeners.get(event) ?? new Set();
+      listeners.add(callback);
+      this.listeners.set(event, listeners);
+      if (event === 'load' && !options.fail && !options.deferLoad)
+        queueMicrotask(() => {
+          baseLoaded = true;
+          this.fire(event);
+        });
+      if (event === 'idle' && !options.fail && !options.deferIdle)
+        queueMicrotask(() => this.fire(event));
       if (event === 'error' && options.fail)
-        queueMicrotask(() => callback({ error: options.fail }));
+        queueMicrotask(() => this.fire(event, { error: options.fail }));
     }
-    off(name) {
+    fire(event, detail) {
+      const listeners = [...(this.listeners.get(event) ?? [])];
+      this.listeners.delete(event);
+      for (const callback of listeners) callback(detail);
+    }
+    off(name, callback) {
       observed.removed.push(name);
+      this.listeners.get(name)?.delete(callback);
     }
     getCanvas() {
       return canvas;
@@ -453,4 +479,59 @@ test('initial counts use the layers already rendered at idle without scheduling 
     h.scene.step(125, 27, false);
     assert.equal(h.observed.overlayUpdates.length, 1);
   }
+});
+
+test('initial idle mounts the heavy overlay after the basemap has loaded', async () => {
+  for (const enabled of [false, true]) {
+    const h = await mountFixture(enabled);
+    assert.deepEqual(h.observed.mounts, [{ baseLoaded: true }]);
+    assert.equal(h.observed.overlayUpdates.length, 0);
+    assert.equal(h.scene.hexagonInstances, 1);
+    assert.equal(h.scene.roadInstances, enabled ? h.payload.length : 0);
+  }
+});
+
+test('a deferred overlay mount failure rejects readiness', async () => {
+  let map;
+  await assert.rejects(
+    mountFixture(true, '', undefined, {
+      controlError: new Error('synthetic overlay failure'),
+      deferIdle: true,
+      onMap: (value) => (map = value),
+    }),
+    /^Error: synthetic overlay failure$/,
+  );
+  for (const event of ['load', 'idle', 'error'])
+    assert.equal(map.listeners.get(event)?.size ?? 0, 0);
+});
+
+test('a basemap load failure removes the deferred heavy mount and idle listener', async () => {
+  let map;
+  const pending = mountFixture(true, '', undefined, {
+    deferLoad: true,
+    onMap: (value) => (map = value),
+  });
+  assert.deepEqual(map.mounts, []);
+  const failure = new Error('synthetic basemap failure');
+  map.fire('error', { error: failure });
+  await assert.rejects(pending, (error) => error === failure);
+  for (const event of ['load', 'idle', 'error'])
+    assert.equal(map.listeners.get(event)?.size ?? 0, 0);
+  map.fire('load');
+  map.fire('idle');
+  assert.deepEqual(map.mounts, []);
+});
+
+test('an already loaded basemap mounts without waiting for another load event', async () => {
+  let map;
+  const pending = mountFixture(true, '', undefined, {
+    alreadyLoaded: true,
+    deferLoad: true,
+    onMap: (value) => (map = value),
+  });
+  const mountsBeforeAnotherLoad = [...map.mounts];
+  // Settle the pre-fix promise too, so the red case is an assertion failure.
+  map.fire('load');
+  await pending;
+  assert.deepEqual(mountsBeforeAnotherLoad, [{ baseLoaded: true }]);
 });

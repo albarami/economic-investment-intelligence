@@ -275,7 +275,7 @@ For C19 under MTH-55 and MTH-76, the sealed fixture of indicators 1 to 3 holds, 
 
 | ID | Requirement |
 |---|---|
-| TST-60 | Parse every Python file in all three packages and reject every forbidden edge—`eii_product -> eii_custodian`, `eii_custodian -> eii_product`, and `eii_core -> either`—including direct imports, function-local imports and string arguments to `importlib.import_module`. Fresh-interpreter tests assert no forbidden module is loaded, and package metadata tests assert no forbidden dependency. Supply one planted-violation fixture for each edge and each import mechanism. |
+| TST-60 | Parse every Python file in all three packages and in `product/tests` and reject every forbidden edge—`eii_product -> eii_custodian`, `eii_custodian -> eii_product`, and `eii_core -> either`—including direct imports, function-local imports and string arguments to `importlib.import_module`; product tests also reject `custodian.*` and `eii_gateway` through every judged import form. Fresh-interpreter tests assert no forbidden module is loaded, and package metadata tests assert no forbidden dependency. Supply one planted-violation fixture for each edge and each import mechanism. |
 | TST-61 | Generators cannot read outside the public cache: a test must place a sentinel file outside `data/public_cache/`, run a probe generator inside the bubblewrap sandbox that tries to open it and to open a network connection, and pass only if both attempts fail. Teeth: the same probe run outside the sandbox must succeed in reading the sentinel. |
 | TST-62 | The sandbox test must run in CI and must never be skipped. If the runner blocks unprivileged user namespaces (Ubuntu 24.04 restricts them through AppArmor), the CI job must enable them for bubblewrap in a setup step, preferring the per-binary AppArmor profile over a system-wide switch. |
 | TST-63 | The loader rejects a table not in the manifest: a release directory with an extra Parquet table not named in `release_manifest` must make `./eii load-release` exit non-zero and load nothing into either store. The same must hold for a manifest whose recorded hash does not match a file. A `public_only` fixture must omit all Protected and Simulated tables and every protected-only manifest field, load its listed Public tables into both stores, and write a complete `load_receipt.json` whose `release_id` matches the manifest. A `protected` fixture must load its listed tables and write the same matching receipt fields. |
@@ -395,7 +395,7 @@ All numbers below are targets to be measured, not promises.
 |---|---|
 | TST-140 | `python3 scripts/check_docs.py` must exit 0 on every pull request. It checks required files, identical `AGENTS.md` and `CLAUDE.md`, links, headers, requirement IDs, forbidden patterns (absolute local paths, e-mail addresses, secret-shaped tokens and identifier-shaped numbers) and, when the environment variable `EII_FORBIDDEN_PATTERNS_FILE` names a file, the extra forbidden patterns listed in it, whose hits pass only where TST-263 allows them. Inside a git checkout it scans the files git tracks plus the untracked files git does not ignore. A recorded human review for implied inferiority or endorsement is required before each release. |
 | TST-141 | gitleaks must run as a pre-commit hook and in CI over the full history of the pull request branch. GitHub secret scanning and push protection are enabled under OI-13. |
-| TST-142 | The identifier-pattern scan must also run on every built release and on the built web bundle, so no generated artefact carries a token of exactly eight or eleven digits. A registration, licence or tax number of the register files never enters the repository, a brief, a fixture, a log, a ledger row, an egress record or a model request ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 8). A registration number is the Public key of ARC-03: it stands in the key columns of `register_company_list` and `pub_register_company` and may appear in the API responses, pages and exports that show a company's card or a list, and nowhere else. The scans of PRV-72 and PRV-103 refuse every such number in a model request, an egress record, a ledger row, a log, the built web bundle, a manifest or report, and the release outside those two key columns; their tests plant numbers of the invented stand-in register, never of a register file: a stand-in card response that carries its own registration number passes, and the same number copied into a model payload is a hit. |
+| TST-142 | The identifier-pattern scan must also run on every built release and on the built web bundle, so no generated artefact carries a token of exactly eight or eleven digits. A registration, licence or tax number of the register files never enters the repository, a brief, a fixture, a log, a ledger row, an egress record or a model request ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 8). A registration number is the Public key of ARC-03: it stands in the key columns of `register_company_list`, `pub_register_company` and `pub_register_snapshot` (DAT-83, DAT-164) and may appear in the API responses, pages and exports that show a company's card or a list, and nowhere else. The scans of PRV-72 and PRV-103 refuse every such number in a model request, an egress record, a ledger row, a log, the built web bundle, a manifest or report, and the release outside those three key columns; their tests plant numbers of the invented stand-in register, never of a register file: a stand-in card response that carries its own registration number passes, and the same number copied into a model payload is a hit. |
 | TST-143 | Identifier fixtures and refusal tests must cover all five forms with their pinned record types: `SYN-E-` establishment, `SYN-L-` legal entity, `SYN-G-` employer group, `SYN-P-` person and `SYN-F-` salary file. The world build must fail on a malformed identifier, a valid prefix used for the wrong record type, any other prefix, a realistic identifier, and any collision of a synthetic name, the labels of the two fictional company seats and the four cases included, with a real place or business name in the public cache, the investing companies of `fdi_projects`, the names of the register companies and, once that source is fetched, the places of `places_fsq` included; a register company's name is the register's own and is not a synthetic name. Named synthetic firms are retired ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), so no firm name is generated; the tests run against the invented stand-in register. |
 | TST-144 | Teeth for each scanner: a test must generate, at run time, a forbidden token in a temporary file and confirm that the scanner exits non-zero. |
 | TST-263 | Place-scoped exception to the private name list ([decision 0024](decisions/0024-one-private-name-in-two-places.md); task S1-T14). `scripts/check_docs.py` lets a hit of a pattern from the file named by `EII_FORBIDDEN_PATTERNS_FILE` pass only when the SHA-256 of its matched text, case-folded and encoded as UTF-8, is listed in `scripts/check_docs_place_exceptions.toml`, or when the hit lies inside the listed name as written on that line, and only on a line of one of two places. The first is a source row of [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md): a body row of a table inside its section "2. Source registry" (from the line `## 2. Source registry`, outside a fence and after a blank line, which must be the one line of the file, fenced or not, that carries that heading text in any spelling (tags, character references, marks and punctuation dropped), to the next heading of level one or two, indented by at most three spaces), whose header row `| source_id | ... |` follows a blank line and comes before a delimiter row of as many cells, with as many cells as the header and a first cell (spaces around it allowed) of one or more backticked source ids, all of them listed for the entry. Fences follow CommonMark (backticks or tildes, closed only by the same character at least as long, followed by spaces or tabs only); inside a fence whose opener is indented, a line that is not blank (only spaces and tabs count as blank) indented less than the opener (a line that can end a list item and the fence opened in it) leaves the document with no allowed line. The document has no allowed line when its text holds a vertical tab, a form feed, U+001C to U+001E, U+0085, U+2028, U+2029 or a carriage return not followed by a line feed, when a line up to the end of section 2 holds `<!`, `<?`, `<pre`, `<script`, `<style` or `<textarea` or starts with `<` after up to three spaces, or when section 2 holds a fence or a line made only of `=` or only of `-` directly after a line that is not blank. The second is the map attribution line: the one line of `web/src/stage/attribution.ts` (a leading byte-order mark ignored) that is `export const MAP_ATTRIBUTION`, optionally `: string`, ` = `, one template literal with no backquote, backslash or dollar sign or one quoted string with no backslash and no quote of its own kind, and a semicolon, at column 0, starting outside every comment, string, template and bracket; the file may hold other code and comments, but no second such line, no vertical tab, form feed, U+001C to U+001E, U+0085, U+2028, U+2029 or carriage return not followed by a line feed, no hashbang line, no slash outside comments, no template substitution, no unclosed comment, string or template and no unbalanced bracket ([10_FRONTEND.md](10_FRONTEND.md) section "7. The basemap"). These structures close the place. The configuration holds at most one `[[exception]]` entry, with exactly `sha256` (64 lowercase hexadecimal digits, not the digest of empty text), `reason` (not empty) and `source_ids` (a non-empty list of distinct source ids), never a name; a second name needs a new owner note and a reviewed change of this limit in `scripts/check_docs.py`. It is committed with no entry; the real entry is the first commit of the task that adds the imagery source. When it is missing, not a regular file, unreadable, not UTF-8, not TOML, or breaks the schema, the check fails with one `place-exception-config` line, with or without the private list, and no exception applies. A built-in pattern is never excepted, and the built-in patterns alone skip `scripts/check_docs.py`. Check 8 (`listed-name`) runs whenever a digest is listed, with or without the private list: it reads every line of every regular file git lists (any suffix; a file that is not UTF-8 with replacement characters and once more without zero bytes) outside the allowed lines, every listed path and every link target (a symbolic link is read as its link text only, and its referent is never opened), also with HTML character references and script escapes decoded, Cyrillic and Greek look-alike letters mapped and invisible characters dropped, and refuses a run inside one word, in any letter case and up to 64 bytes, whose digest is listed, and a run of two to four name parts (runs of letters or digits, split where case or digits change) whose digest, joined by a space, by nothing or as written, is listed, also when cut across two lines. The built-in patterns also read every link target. The extra patterns also read every UTF-8 file of any suffix, every listed path and every link target; a pattern file that is named but not readable fails with one `extra-patterns` line that does not show its path, a byte-order mark at its start is ignored, a line of it that is not a valid regular expression or compiles with a warning fails with one fixed `extra-patterns` line, a listed file, link or agent rules file that cannot be read fails with one fixed line, no FAIL line or error shows exception text, a pattern, a digest or a hidden path, nothing is written to standard error, an unexpected error ends in one fixed `internal` line and exit code 2, and a path that is not UTF-8 fails as `path-encoding`. A file whose path holds the name or an extra-pattern hit shows `(path not shown)` in every FAIL line, and a built-in or link FAIL line on a line that the name or an extra pattern hits shows `(matched text not shown)`. The digest stands in for the name but does not hide it: anyone holding a list of candidates can confirm it. No part of the check sees commit messages, branch names or pull-request text, images and other binary files, or translated, transliterated or shortened forms of the name beyond the parts that check 8 hashes. Planted cases in `scripts/tests/test_check_docs_exceptions.py` use invented names built at run time, written to a temporary pattern file outside the scanned tree: the listed name passes in a source row of section 2.1, in a row of section 2.2 with several ids and in the attribution line, in any letter case and case-folded; it fails in section-2 prose, in a source-shaped row outside section 2, inside a fence, after a non-blank line or in a header row, in another source's row, in a row mixing a listed and an unlisted id, in another document, on another line of the attribution file, in a split, indented, repeated, block-commented, braced, template-wrapped or escaped declaration, beside a second statement on its line, in a file with a slash outside comments, a template substitution or a hashbang line at its start, in another web file, in the configuration and in a comment of the check; a form feed, a line separator, an HTML comment or block, a fence in section 2, a fake section hidden by a fence that a tilde or shorter line does not close or that follows a fence ended with its list item by a dedented line, an indented heading and a setext heading each close the place; a second heading line of section 2 before, after or inside an HTML block, a `<pre>` block or a list item, in another spelling or with a character reference, a comment open across the heading, a delimiter row with fewer cells and a cell past the header each close the place or the row; a fence closed by a line with a tab after its marks, an HTML block before the heading that holds a fence-looking line and a no-break space, an ideographic space or a unit separator alone on a line or after the heading, a row or a delimiter row (a line that CommonMark does not call blank) each close the place; the listed name passes with a byte-order mark, a type annotation, a quoted string, other code and comments in the attribution file, a padded first cell, a thematic break after a blank line in section 2, an HTML comment in a later section and a private pattern that matches part of the name; a second invented name that is not listed, and another spelling of the listed one, fail; a run of eight digits with its digest listed fails as an identifier-shaped number; two entries fail; each malformed configuration fails; and check 8 refuses the name in snake case, a setting name, camel case, a dotted host in a `.mjs` file, `.env.example`, a path, the reason field and the check's own copy, and a two-part name in snake and camel case; it also refuses the name in a link target, as a link name, in files that are not UTF-8 (a stray byte, UTF-16), in a file name that is not UTF-8, inside longer words in any suffix and in a file name, in alternating case, cut into four parts by hyphens or zero-width spaces, with a character reference, a script escape or a look-alike letter, cut across two lines, and listed names of four parts; a named pattern file that is missing fails; a pattern file saved with a byte-order mark keeps its first pattern; a second private name fails in a path, an `.svg` file and an `.mjs` file; and no FAIL line shows the name inside an e-mail address, a link target or a local path; a link whose target holds an absolute local path or an eight-digit run fails the built-in patterns; a link to a file outside the scanned tree is read as its text and a spy proves its referent is never opened; malformed private patterns and unreadable files fail closed with fixed lines; a pattern that compiles with a warning, a deeply nested configuration, a zero byte in a link target, a link target whose existence cannot be checked, output in ASCII with a non-ASCII path and an unexpected error each end in fixed lines with nothing on standard error; and every case asserts both output streams whole. |
@@ -655,7 +655,7 @@ OPEN questions raised by decisions 0016, 0017, 0018 and 0019:
 OPEN questions raised by [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md):
 - Settled by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12 (left open by decision 0022): the synthetic firm births and closures are withdrawn, and TST-214 now tests the openings and closures of register companies as Public counts from the register's own dates and monthly snapshots (DAT-164).
 - Settled by decision 0023 item 12 (left open by decision 0022): the negative fixture of TST-31 for a registration joined on the registration alone stays, in the invented stand-in register of the tests beside the planted hidden groups, and a generated legal entity or group that links two real registrations fails (DAT-01, SYN-22, SYN-23).
-- OPEN (decision 0022): the schema that TST-196 enforces for `pub_register_company`, and the shape of the invented stand-in register, are set when the register file is first read.
+- S2-T49 fixes the metadata-only input declarations and the schemas that TST-196 enforces for `pub_register_company` and `pub_register_snapshot`; see **Register file contract checks (S2-T49)** and document 03 **Register file projections (S2-T49)**. OPEN: lead actual-file, attribution, published-tower and retained-snapshot verification; invented fixtures do not close those checks.
 - OPEN (decision 0022): which tests of the headcount protections (PRV-64 and the `register` partition) stay as they are, now that every register company's employee count is released and is attacker knowledge (open in document 06); none is weakened until it is settled.
 
 OPEN questions raised by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md):
@@ -696,7 +696,7 @@ The BACI suites exercise the separate typed trade/dictionary series through
 injected metadata and stream transports, pending metadata refusal, exact decimal
 text and limits, excluded-row validation, schema/inventory/revision/key refusal,
 access obstacles, byte bounds, interrupted streams, immutable publication,
-selected-manifest tampering and command injection. These are invented fixtures,
+selected-manifest tampering and command injection. S2-P29 adds exact native-header/text-member fixtures, compressed-byte and null-count plants, the exact reviewed BACI page selector with alternate/extra-selector and unreviewed-redirect plants, and a resolved-selection regression whose nonempty deferred reader fails if called and whose pairs exclude the deferred source. These are invented fixtures,
 not publisher verification. Full guard-by-guard red evidence and the manual break
 inventory belong to the task return and independent review; this paragraph makes
 no completion claim. TST-50, TST-52 and TST-237 are unchanged.
@@ -793,6 +793,22 @@ a nested source symlink and a failure at the final staged replacement rename,
 asserting closed refusals, no outside copy and byte-identical prior trees. Each
 staging plant fails when its specific guard is removed and passes with it restored.
 
+`test_award_all_links.py` exercises decision 0064 item 41 through the existing
+award build dispatch with invented links and a stub transport. It asserts every
+distinct nonblank link is checked through the existing bounded retry reader; a failure or
+mismatch outside the seeded sample changes the full-check rate. It plants a
+skipped link at publication and missing, duplicated or inconsistent receipt fields
+at assembly, verifies exact sample parity at the frame boundaries, retains all
+winners of a shared proof link and keeps hard trust/archive/schema refusals fatal.
+The durable audit test rejects any `report_url` in `assembly/final_audit.json`,
+retains the full-link summary under `t29` without `results` or `report_urls`, and
+re-reads the source receipt to verify its full per-link details remain. The sample
+remains explicitly labelled. A planted invalid seed refuses before any proof read;
+removing the early guard makes the request-count assertion fail. A transient fault
+recovers within the approved retry bound, and an unlisted response hop or final URL
+refuses even if it appears in the CSV declaration's reviewed scope. The award-specific incomplete-read test retains the existing attempt limit and backoff for each failed link.
+These tests supply no live source result or acceptance of OI-277.
+
 The accident and population-grid test files add bounded acquisition and explicit
 older-snapshot selection plants. Cadence tests extend the closed source assignment
 map. Existing grid fixtures now explicitly select the archived object they create;
@@ -819,3 +835,100 @@ historical confirmation and require the new schema hold and zero requests.
 Commands and their actual results belong in PROGRESS.md and the builder return.
 The lead runs mutation campaigns and live evidence checks; invented fixtures do
 not establish page access, reviewed pins or another-maker approval.
+
+### S2-T48 offline guard evidence
+
+The company-web tests use invented companies, reserved test hosts, invented pages
+and injected transports/time. An autouse socket refusal prevents a test from
+opening a live connection. Plants cover company-only output, all lineage fields,
+request/company bindings, scoped hosts and redirects, manifest hashes, obstacle
+stops, missing access records, robots rules, pacing, batch bounds, declared
+parsers, exact names, independent exact-field review, output identifier runs,
+collision inventory and outcome reconciliation. The unchanged `check_docs.py`
+also runs against temporary git trees with runtime-constructed digit plants.
+These are TST-51/TST-09 fixtures; they establish no live acceptance criterion 1,
+2, 4 or 7 of S2-T48. The lead owns E1–E5 and safe committed counts; E6 records
+scanner exits and E7 reconciles all outcomes. Baseline failures, test corrections
+and actual exits belong in PROGRESS.md and the task return, never a refreshed
+security tolerance. See [the tooling contract](../custodian/src/eii_custodian/publicdata/company_web/README.md).
+
+## Register file contract checks (S2-T49)
+
+`custodian/tests/test_registers.py` and `test_registers_intake.py` enforce TST-196
+for both `pub_register_company` and `pub_register_snapshot` on invented CSV
+stand-ins shaped only by schema metadata. The fixtures never read the two
+ambient register settings. Plants cover unknown/person/labour/residence columns,
+declared date and key formats, missing and duplicate registrations, companion
+joins, ambiguous cross-source keys, wrong frame membership, and a wrong cell
+that is still a valid member. Both release kinds use the same validator and
+publish identical Public tables; an interrupted write preserves the prior set.
+
+DAT-11 and TST-142 follow DAT-83's three allowed registration-key tables,
+including `pub_register_snapshot`. Each has a positive allowed-key fixture.
+The tests compare the validator's closed table names against document 03
+section **7.2 Table catalogue**, and plant both an illegal registration column
+and a copied registration value in every other table. Separate plants cover
+prefixes, digit runs, manifests, reports, logs, ledger, model payload and web
+bundle. Every release string column retains DAT-11 scanning, including a
+licence equal to another key and digits in address text. Typed numeric capital,
+coordinates and counts pass without identifier-text scanning (lead ruling
+L-1288); artefact numeric scanning remains unchanged. Byte content is decoded as
+UTF-8 or refused. Placeholder attribution is refused regardless of case or
+surrounding whitespace. Fixed diagnostics and object representations withhold
+row content.
+
+Snapshot tests preserve an exited company's earlier location, distinguish empty
+from missing captures, refuse duplicate months and verify explicit month/hash
+selection without substituting the current file. The keeper floor applies to
+snapshots only, including empty captures; current captures may predate it and
+the two current months may differ. Each snapshot compares with its own source's
+current month, independently of input order. File-reader plants cover
+tampered bytes, path traversal, symbolic links, missing siblings, byte bounds and
+a file changed during reading. Network and ambient-input plants prohibit both.
+Terms are tested as records; no pending or prohibitive reading turns off intake.
+The lead alone verifies actual files, attribution, geocoding and retained months;
+real-file evidence and another-maker approval are not established by these tests.
+
+## National-centre snapshot and structured-search plants
+
+Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 4 and 5 (S2-T51), `POST /api/address-search/structured` accepts exactly string fields `zone`, `street`, `building`, with no text, language, limit, URL, utility account, PIN or person field. It reads only `pub_address_point` and returns bounded, feature-key-ordered candidates with published subtype/point and release/source lineage, and found, ambiguous, not-found or missing-source status. Duplicate triples remain ambiguous; nothing guesses a point. The request and result never enter a log, ledger, model payload or persisted query/result store. The fixed read `structured-address-v1` and composite index apply in both stores. The model has no callable tool for this route. Every displayed address numeral uses the Fact chip family.
+
+`GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.
+
+Invented offline plants cover rate/retry windows, host/redirect/locator/level refusal, metadata and boundary changes, missing receipts, outer and member hashes, interruption, global lock contention, root unset/traversal/symlink/wrong-drive placement, priority failure, disk breach, overbroad/writable sandbox binding, ordinary-mode isolation, ambiguous search, unknown fields and store binding parity. Tests never read real cache or external-drive inputs, use live keys, or open a network connection. The live fetch and different-maker confirmation remain separate evidence.
+
+
+S2-T51 fix round three adds permanent, envelope-consistent plants for projected boundary
+publisher/allow-listed URL/licence changes at resume and full-release selection, shard
+metadata/boundary/enumeration hash and shard-number changes at both read stages, and
+full-release refusal before forged lineage can reach credits. Source-boundary chain,
+upstream and method changes under an unchanged identity refuse, while later retrieval
+times and terms readings retain the original receipt. The release boundary's independent
+upstream recheck is isolated with an already-verified level result so that its earlier
+transitive check cannot mask removal.
+
+Separate plants pin the production lock's definition-time default and change an opened
+product object after its true digest is computed, demanding refusal before caching.
+Each forbidden gap reason/status/attempt combination is planted with consistent shard
+and completion envelopes and must report `gap_reason_integrity`. Complete and all-gap
+assembly must copy the selected all-date manifest and receipt exactly once, with bytes
+hashing to their object names. The positive JPEG is genuinely encoded in memory; the old
+header-only fixture is retained as `no-scan`, with missing-quantization and invalid-scan
+plants independently rejected by the pinned decoder, recorded as HTTP-200 gaps with no
+member and no served tile. Missing quantization opens successfully but fails the forced
+pixel read, so a marker or open-only substitute is caught. Guard-removal evidence uses
+separate tracked-file archives under the task's workspace temporary folder, and records
+red and restored-green exits. These fixtures supply no live source result.
+
+S2-T51 fix round four promotes the four mixed-history probes to permanent
+`test_mixed_retry_gap_stops_before_publication_and_resumes` cases: 503 then 404,
+410, empty 200 or invalid 200 must retain the actual two attempts and stop before
+publishing a shard tar, receipt, index or selection pointer, with staging cleaned.
+Each case resumes the same key successfully with either an intact tile or a fresh
+first-attempt 404 recorded as a gap under L-1303; the next resume skips the verified
+selection. `test_archive_gap_eligibility_checked_before_immutable_publication`
+also supplies ineligible status/attempt combinations directly to the archive, requires
+no published immutable shard state, and successfully writes the same shard afterward.
+The existing resume/selection gap checks retain their eligibility rules. Separate
+tracked-file archives prove the new plants red on the prior commit and each new
+producer/pre-publication guard red when removed alone, then restored green.

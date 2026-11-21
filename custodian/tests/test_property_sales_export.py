@@ -121,7 +121,13 @@ def test_exact_shape_keeps_a_deal_in_published_square_metres(tmp_path: Path) -> 
     assert deal.area_m2 == Decimal(100)
     assert deal.area_ft2 is None
     assert deal.use_key == "residential"
-    row = next(r for r in quarter_aggregates(parsed.deals) if r["unit_type"] == "all")
+    row = next(
+        r
+        for r in quarter_aggregates(
+            parsed.deals, as_of_by_source={"prop_sales": "2026-11-17"}
+        )
+        if r["unit_type"] == "all"
+    )
     # 100000 * 0.09290304 / 100, the card's factor; no published square feet.
     assert row["median_price_per_ft2"] == Decimal("92.90")
 
@@ -129,7 +135,13 @@ def test_exact_shape_keeps_a_deal_in_published_square_metres(tmp_path: Path) -> 
 def test_published_price_per_square_foot_is_never_read(tmp_path: Path) -> None:
     parsed = _parse([_export(price_per_square_foot=1)], tmp_path)
     assert parsed.deals[0].area_ft2 is None
-    row = next(r for r in quarter_aggregates(parsed.deals) if r["unit_type"] == "all")
+    row = next(
+        r
+        for r in quarter_aggregates(
+            parsed.deals, as_of_by_source={"prop_sales": "2026-11-17"}
+        )
+        if r["unit_type"] == "all"
+    )
     assert row["median_price_per_ft2"] == Decimal("92.90")
 
 

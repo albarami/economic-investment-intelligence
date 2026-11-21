@@ -107,11 +107,14 @@ def test_real_frame_refuses_incomplete_inputs_instead_of_fixture_mode(
 
 
 def test_real_height_seam_absence_is_named_and_not_a_table(tmp_path: Path) -> None:
+    """A missing building table refuses (S2-P21 F3); it is never a NO_DATA record."""
+    from eii_custodian.publicdata.heights.model import HeightError
+
     build = context(tmp_path)
-    build.heights()
-    record = json.loads((tmp_path / "assembly/heights.json").read_text())
-    assert record["state"] == "NO_DATA"
-    assert record["reason"] == "building_table_absent"
+    with pytest.raises(HeightError) as err:
+        build.heights()
+    assert err.value.name == "building_table_absent"
+    assert not (tmp_path / "assembly/heights.json").exists()
     assert "pub_building_height" not in build.tables
 
 
@@ -217,6 +220,17 @@ def test_overture_parent_pin_reads_its_declared_listing_archive(tmp_path: Path) 
     assert build.receipts[row.key]["key"] == stored.key
     assert build.receipts[row.key]["sha256"] == identity
     assert receipt_valid(row, build.receipts[row.key])
+
+
+def test_listing_receipt_is_refused_for_an_invented_other_source() -> None:
+    from custodian.tests.test_source_completeness import receipt
+
+    from eii_custodian.publicdata.completeness import receipt_valid
+
+    row = entry()
+    assert receipt_valid(row, receipt(row)) is True
+    stored = replace(row, key=row.key + "/listing", extension="json")
+    assert receipt_valid(row, receipt(stored)) is False
 
 
 def test_duplicate_table_is_refused_without_replacing_first_output(

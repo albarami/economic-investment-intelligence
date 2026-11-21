@@ -61,7 +61,10 @@ def test_post_header_refusals_precede_opener(header):
     with (
         requests.page_requests((URL,), {p.host: p}),
         requests.delivered_state(fields, TARGETS[0]),
-        patch("urllib.request.build_opener") as build,
+        patch(
+            "urllib.request.build_opener",
+            return_value=SimpleNamespace(open=lambda *a, **k: Body(b"SYN-response")),
+        ) as build,
     ):
         with pytest.raises(transport.TransportFault, match="blocked_host"):
             transport.open_https(
@@ -76,7 +79,10 @@ def test_post_token_and_missing_pin_refuse_before_send():
     with (
         requests.page_requests((URL,), {}),
         requests.delivered_state(fields, TARGETS[0]),
-        patch("urllib.request.build_opener") as build,
+        patch(
+            "urllib.request.build_opener",
+            return_value=SimpleNamespace(open=lambda *a, **k: Body(b"SYN-response")),
+        ) as build,
     ):
         with pytest.raises(transport.TransportFault, match="blocked_host"):
             transport.open_https(
@@ -94,7 +100,11 @@ def test_post_redirect_never_sends_a_second_request(target):
     from urllib.request import Request
 
     guard = transport._redirect_guard([], postback=True)()
-    with pytest.raises(transport.TransportFault, match="blocked_host"):
+    p = pin()
+    with (
+        requests.page_requests((URL,), {p.host: p}),
+        pytest.raises(transport.TransportFault, match="blocked_host"),
+    ):
         guard.redirect_request(
             Request(URL, data=b"SYN-state"), None, 302, "SYN", HTTPMessage(), target
         )
@@ -139,6 +149,8 @@ def test_tls_errors_are_terminal_never_connection_recovery(wrapped):
             ),
         ),
     ):
-        with pytest.raises(PinError, match="certificate_chain_incomplete") as caught:
+        with pytest.raises((PinError, transport.TransportFault)) as caught:
             transport.open_https(requests.PagePostback(URL, fields, TARGETS[0]))
+    assert isinstance(caught.value, PinError)
+    assert str(caught.value) == "certificate_chain_incomplete"
     assert "SYN-upstream-secret" not in str(caught.value)

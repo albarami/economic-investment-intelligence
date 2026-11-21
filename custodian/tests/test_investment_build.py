@@ -1057,14 +1057,16 @@ def _execute(
     # These are source-publication fixtures. The production command now also
     # requires the complete reviewed assembly; exercise its existing fetch seam
     # directly here, retaining every publication and refusal assertion below.
+    from custodian.tests.support.fetch_build import run_build
+
     from commands import exits
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.report import log_line
 
+    cache = root / "data/public_cache"
     outcome = run_build(
         (entry,),
         transport,
-        root / "data/public_cache",
+        cache,
         lambda: RETRIEVED,
         lambda _seconds: None,
     )

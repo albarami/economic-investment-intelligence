@@ -45,7 +45,7 @@ class RunnerVerdicts(unittest.TestCase):
         self.assertEqual(err, [])
         self.assertEqual(status, 0, out)
         self.assertEqual(
-            out,
+            support.untimed(out),
             [
                 f"seed={support.FIXTURE_SEED}",
                 "suite fx-a: 2 passed, 0 failed, 0 skipped",
@@ -216,7 +216,9 @@ class RunnerVerdicts(unittest.TestCase):
             (support.fx_suite("fx-sub", "pytest", ".", ("fx/sub",)),)
         )
         self.assertEqual(status, 0, out)
-        self.assertIn("suite fx-sub: 2 passed, 0 failed, 0 skipped", out)
+        self.assertIn(
+            "suite fx-sub: 2 passed, 0 failed, 0 skipped", support.untimed(out)
+        )
         support.put(
             self.root,
             "fx/subfail/test_sub.py",

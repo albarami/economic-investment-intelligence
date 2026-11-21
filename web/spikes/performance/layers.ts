@@ -84,9 +84,11 @@ function extentRing(): [number, number][] {
   ];
 }
 
-function whenIdle(map: MapLibreMap): Promise<void> {
+function whenIdle(map: MapLibreMap, mount: () => void): Promise<void> {
   return new Promise((resolve, reject) => {
     const fail = (event: { error?: unknown }) => {
+      map.off('error', fail);
+      map.off('load', load);
       map.off('idle', succeed);
       const reason = event.error;
       reject(reason instanceof Error ? reason : new Error('map failed'));
@@ -95,8 +97,17 @@ function whenIdle(map: MapLibreMap): Promise<void> {
       map.off('error', fail);
       resolve();
     };
+    const load = () => {
+      map.once('idle', succeed);
+      try {
+        mount();
+      } catch (error) {
+        fail({ error });
+      }
+    };
     map.once('error', fail);
-    map.once('idle', succeed);
+    if (map.loaded()) load();
+    else map.once('load', load);
   });
 }
 
@@ -251,11 +262,12 @@ export async function mountScene(input: {
     interleaved: true,
     layers: [...current],
   });
-  map.addControl(overlay);
+  // Let the basemap's source/style startup settle before attaching the heavy
+  // overlay, otherwise those startup frames also redraw every data layer.
   // These same layer instances now hold the rendered sublayers and counts.
   // Rebuilding identical props here schedules another full scene before the
   // first sample, which is particularly costly for a software renderer.
-  await whenIdle(map);
+  await whenIdle(map, () => map.addControl(overlay));
   const canvas = map.getCanvas();
   const counts = countLayers(current[0], current[1]);
   return {

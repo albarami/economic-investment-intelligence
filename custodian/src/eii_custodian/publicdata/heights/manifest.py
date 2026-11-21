@@ -143,10 +143,12 @@ def manifest_block(
     input_files: list[dict[str, object]],
     *,
     terms_attempts: tuple[dict[str, object], ...] = (),
+    landmark_citations: list[dict[str, object]] | None = None,
+    gba_calibration: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """The height block of the asset manifest (FE-96)."""
     files: list[dict[str, object]] = list(input_files)
-    for source_id in ("bldg_3dglobfp", "bldg_wsf3d"):
+    for source_id in ("bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"):
         files.extend(results[source_id].files)
     files.sort(key=lambda record: str(record["key"]))
     return {
@@ -169,8 +171,11 @@ def manifest_block(
                 "state": results[source_id].state,
                 "rows": list(results[source_id].rows),
             }
-            for source_id in ("bldg_3dglobfp", "bldg_wsf3d")
+            for source_id in ("bldg_3dglobfp", "bldg_wsf3d", "bldg_gba")
         },
+        "landmark_heights": landmark_citations or [],
+        "gba_calibration": gba_calibration
+        or {"state": "absent", "reason": "not_fetched"},
         "storey_height_m": {
             "basis": rules.basis,
             "label": rules.label,

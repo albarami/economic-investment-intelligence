@@ -96,6 +96,11 @@ def prepare(
     registry_entries: tuple[Entry, ...] | None = None,
 ) -> Prepared:
     """Fetch one row through the transport seam and apply its declared checks."""
+    if entry.kind == "register_file":
+        return _failed(
+            entry,
+            AttemptFailure(1, "", "lead_shell_file_input", "lead shell", "absent"),
+        )
     if entry.kind in {"public_page", "awards_intake"}:
         return _failed(
             entry,

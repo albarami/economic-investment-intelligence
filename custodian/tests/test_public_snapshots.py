@@ -184,16 +184,18 @@ def test_existing_reader_older_of_two_and_tamper(tmp_path, reader, tamper):
 
 
 def test_trade_outputs_metadata_and_manifest_are_dated(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
     from custodian.tests.fixtures.gravity.invented import configuration, entry
     from custodian.tests.test_gravity_fetch import build
 
     outcome = build(
-        tmp_path, source=replace(entry(), terms_url=configuration()["page"])
+        fixture_cache, source=replace(entry(), terms_url=configuration()["page"])
     )
     assert outcome.failure is None
-    directory = tmp_path / "cepii_gravity"
+    directory = fixture_cache / "cepii_gravity"
     assert list((directory / "index").glob("*.json"))
     assert list((directory / "2026-11-16").glob("*.zip"))
     assert list((directory / "metadata" / "index").glob("*.json"))
@@ -242,11 +244,13 @@ def test_comtrade_state_operational(comtrade_archive, name):
 
 
 def test_fetched_terms_bytes_are_archived(tmp_path):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from dataclasses import replace
 
+    from custodian.tests.support.fetch_build import run_build
     from custodian.tests.test_publicdata_fetch import _citation_entry, _clock, _sleep
 
-    from eii_custodian.publicdata.fetch.build import run_build
     from eii_custodian.publicdata.fetch.transport import Response
 
     entry = replace(
@@ -256,10 +260,10 @@ def test_fetched_terms_bytes_are_archived(tmp_path):
     )
     body = b"<p>syn invented terms</p>"
     outcome = run_build(
-        (entry,), lambda url: Response(url, body, ()), tmp_path, _clock, _sleep
+        (entry,), lambda url: Response(url, body, ()), fixture_cache, _clock, _sleep
     )
     assert outcome.failure is None
-    assert list((tmp_path / entry.key / "terms" / "index").glob("*.json"))
+    assert list((fixture_cache / entry.key / "terms" / "index").glob("*.json"))
 
 
 @pytest.mark.parametrize("tamper", [False, True])
@@ -513,12 +517,15 @@ def test_method_selected_receipt_integrity_reason(
 @pytest.mark.parametrize("kind", ["baci", "gravity", "atlas", "comtrade"])
 @pytest.mark.parametrize("tamper", [False, True], ids=["older", "tamper"])
 def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     import re
     from dataclasses import replace
     from decimal import Decimal
     from importlib import import_module
 
-    from eii_custodian.publicdata.fetch.build import run_build
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
     from eii_custodian.publicdata.fetch.transport import SlotSecrets
 
@@ -537,13 +544,13 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
 
         policy = invented_policy()
         entry = invented_entry(policy)
-        directory = tmp_path / entry.key / "manifests"
+        directory = fixture_cache / entry.key / "manifests"
         error = SafeRefusal
         reason = "un_comtrade https://invented.example/cached manifest_hash endpoint=assemble"
 
         def read(digest):
             return assemble(
-                tmp_path,
+                fixture_cache,
                 entry.key,
                 policy,
                 manifest_sha256=digest,
@@ -551,7 +558,7 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
             )
 
         def build_version(index):
-            state = tmp_path / entry.key / "state.json"
+            state = fixture_cache / entry.key / "state.json"
             if index:
                 state.unlink()  # Begin another run; archived snapshots stay untouched.
 
@@ -566,7 +573,7 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
 
             result = fetch_source(
                 entry,
-                tmp_path,
+                fixture_cache,
                 lambda: stamps[index],
                 _sleep,
                 supplied,
@@ -581,12 +588,12 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
         config_module = import_module(f"eii_custodian.publicdata.{kind}.config")
         contracts = import_module(f"eii_custodian.publicdata.{kind}.contracts")
         entry = fixture.entry()
-        directory = tmp_path / entry.key
+        directory = fixture_cache / entry.key
         error = getattr(config_module, kind.title() + "Error")
         reason = "manifest_hash"
 
         def read(digest):
-            return contracts.read_selected(tmp_path, digest)
+            return contracts.read_selected(fixture_cache, digest)
 
         def build_version(index):
             config = fixture.configuration()
@@ -595,7 +602,7 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
             result = run_build(
                 [entry],
                 fixture.metadata,
-                tmp_path,
+                fixture_cache,
                 lambda: stamps[index],
                 lambda _: None,
                 **{
@@ -650,6 +657,19 @@ def test_trade_reader_older_of_two_and_tamper(tmp_path, kind, tamper):
         assert read(newer_id) == newer
     else:
         assert read(older_id) == older
+
+
+def test_pub04_row_describes_s2_t27_dated_archive_and_citation_snapshots():
+    document = Path(__file__).resolve().parents[2] / "docs/04_PUBLIC_DATA_PACK.md"
+    text = document.read_text().splitlines()
+    row = next(line for line in text if line.startswith("| PUB-04 |"))
+    assert "retrieval-date" in row
+    assert "0045" in row
+    assert "0064" in row
+    assert "citation_only" in row
+    assert "when the build records one" not in row
+    assert "no such snapshot is written yet" in row
+    assert "data/public_cache/<source_id>/<sha256>.<ext>" not in row
 
 
 def test_overture_removal_note_is_separate_and_verbatim():

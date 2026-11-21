@@ -1,0 +1,522 @@
+# Metadata readings only; no downloaded values, credentials or bulk files.
+review_version: trade-publisher-readings-v1
+sources:
+  un_comtrade:
+    publisher: United Nations Statistics Division
+    pages:
+    - id: comtrade
+      url: https://uncomtrade.org/docs/un-comtrade-tools/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 6bb66dc8e65d79c24b57ad00fbe31a71949f77929e2817fb28e1dd200540b2c5
+      reading: read
+      sentences:
+      - The bilateral data comparison tool puts the reported data and its mirror data side-by-side, allowing
+        the analysis of bilateral trade asymmetries
+    - id: comtrade_api
+      url: https://uncomtrade.org/docs/un-comtrade-api/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 5ba69b23be248a928ceb2552832bf4e8e3e1343b13b86b5e17069203ab371692
+      reading: read
+      sentences:
+      - There is no need to create an account nor having API subscription key, the preview APIs would
+        work as is.
+    - id: comtrade_keys
+      url: https://uncomtrade.org/docs/api-subscription-keys/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 27ae45c86f57d7e39016badd602d4fce48a9c1af4e8572e9df430f41e1645027
+      reading: read
+      sentences:
+      - You must be a registered UN Comtrade user before requesting an API subscription key.
+    - id: comtrade_subscriptions
+      url: https://uncomtrade.org/docs/subscriptions/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 65ec76f8be19aeea2cdb465e88bc65373c900785bc97f92717381c12d1a701f3
+      reading: read
+      sentences:
+      - Registration is free, and users can unlock a range of features with a registered UN Comtrade account.
+        These features include data preview, data download of 100K records per call, and data API access
+        for up to 500 calls/day.
+      - Limited to 500 records and 1 single period and product per call
+    - id: comtrade_how_access
+      url: https://uncomtrade.org/docs/how-to-access/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 867c1d9de7aa143932643abb3ed321d403129b1b5cb1786d62d4acfcf75c7ae7
+      reading: read
+      sentences:
+      - 'There are two kinds of registration: free and premium.'
+    - id: comtrade_terms
+      url: https://comtradeplus.un.org/en/license-agreement
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: f8266dc77ad64d95ba2f0a7d39e04984f00e70cca816646076bc638e4f896e9d
+      reading: read
+      sentences:
+      - Except as may otherwise be expressly permitted by applicable law, any copying, automated browsing
+        or downloading, redistribution, publication, or commercial exploitation of any material contained
+        on or otherwise made available to you on United Nations COMTRADE is strictly prohibited without
+        the prior written permission of the United Nations.
+      - The rights and obligations concerning the use of United Nations COMTRADE in accordance with this
+        Usage Agreement are not transferable.
+    - id: comtrade_swagger
+      url: https://comtradeapi.un.org/swagger/index.html
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 3494d22a0b9ae1678a72df5841b7a6ec60e75499b91341f9763a556d6b8cb1f9
+      reading: http_error
+      sentences: []
+    facts:
+      registered_download_records_per_call:
+        confirmed: true
+        value: 100K
+        page: comtrade_subscriptions
+        sentence: Registration is free, and users can unlock a range of features with a registered UN
+          Comtrade account. These features include data preview, data download of 100K records per call,
+          and data API access for up to 500 calls/day.
+      registered_api_calls_per_day:
+        confirmed: true
+        value: '500'
+        page: comtrade_subscriptions
+        sentence: Registration is free, and users can unlock a range of features with a registered UN
+          Comtrade account. These features include data preview, data download of 100K records per call,
+          and data API access for up to 500 calls/day.
+      per_call_limit_tier_unstated:
+        confirmed: true
+        value: '500'
+        page: comtrade_subscriptions
+        sentence: Limited to 500 records and 1 single period and product per call
+      per_call_scope_tier_unstated:
+        confirmed: true
+        value: one period and one product per call
+        page: comtrade_subscriptions
+        sentence: Limited to 500 records and 1 single period and product per call
+      keyed_access:
+        confirmed: true
+        value: registration and subscription key
+        page: comtrade_keys
+        sentence: You must be a registered UN Comtrade user before requesting an API subscription key.
+      public_access:
+        confirmed: true
+        value: no account or subscription key
+        page: comtrade_api
+        sentence: There is no need to create an account nor having API subscription key, the preview APIs
+          would work as is.
+      mirror_comparison:
+        confirmed: true
+        value: reporter and mirror figures side by side
+        page: comtrade
+        sentence: The bilateral data comparison tool puts the reported data and its mirror data side-by-side,
+          allowing the analysis of bilateral trade asymmetries
+    pending:
+    - 'API source/redirect host review: attempted Swagger documentation returned HTTP 404; no API request
+      was made.'
+    - Per-call tier binding, reset rule and quota scope remain unverified; no keyed API or public preview
+      cap is confirmed.
+    - Schema, API version, Qatar reporter/mirror keys and selected count/byte bounds remain unverified.
+    - Owner years/partners/product scopes and manifests remain PO-S2-80; no coverage gap or paid-plan
+      price measured.
+    activation: false
+  cepii_baci:
+    publisher: CEPII
+    pages:
+    - id: baci
+      url: https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html
+      read_on: '2026-11-20'
+      status: null
+      complete_body: false
+      body_sha256: ''
+      reading: incomplete
+      sentences: []
+    - id: baci_dataset
+      url: https://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=37
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
+      reading: http_error
+      sentences: []
+    - id: baci_doc
+      url: https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_documentation.html
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
+      reading: http_error
+      sentences: []
+    facts: {}
+    pending:
+    - Dataset page exceeded the fixed metadata intake ceiling; no complete page hash or page statement
+      is asserted.
+    - Alternative dataset/documentation paths returned HTTP 404. Publisher version, Etalab lead, HS revision,
+      units, reconciliation, access and exact bounds remain unverified.
+    activation: false
+  cepii_gravity:
+    publisher: CEPII
+    pages:
+    - id: gravity
+      url: https://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=8
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
+      reading: http_error
+      sentences: []
+    - id: gravity_named
+      url: https://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=8
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
+      reading: http_error
+      sentences: []
+    - id: gravity_doc
+      url: https://www.cepii.fr/DATA_DOWNLOAD/gravity/README.txt
+      read_on: '2026-11-20'
+      status: 404
+      complete_body: true
+      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
+      reading: http_error
+      sentences: []
+    facts: {}
+    pending:
+    - Named publisher page (both path casings) and attempted README returned HTTP 404.
+    - Publisher version, Etalab lead, country keys, units, coverage, schema and exact bounds remain unverified.
+    activation: false
+  atlas_complexity:
+    publisher: Harvard Growth Lab
+    pages:
+    - id: atlas
+      url: https://atlas.hks.harvard.edu/data-downloads/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b
+      reading: read
+      sentences:
+      - Atlas trade values are reported in U.S. dollars (USD).
+      - 'HS 1992: data available from 1995 onward'
+      - 'HS 2012: data available from 2012 onward'
+      - 'HS 2022: data available from 2022 onward'
+      - Each downloadable data file includes specific citation requirements.
+    - id: atlas_index
+      url: https://intl-atlas-downloads.s3.amazonaws.com/index.html
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 670fcb5e5f4dd5fe3b096f92289a1a701b0504e459b66bfb10f37c3c3aa08c2b
+      reading: read
+      sentences:
+      - The files are split into unilateral (country_product_year) and bilateral (country_partner_product_year)
+        data at the four digit level. Since the bilateral data is much larger, it is split into years.
+      - The data is also provided in two different classification systems, HS representing the Harmonized
+        System (revision 1992) and SITC representing the Standardized International Trade Classification
+        (revision 2).
+      - country_hsproduct4digit_year.zip (412.14 MB)
+    - id: atlas_terms
+      url: https://atlas.hks.harvard.edu/terms-of-use
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 680119ab9c9f86c313f237b998f20dc84bff980484bfe8fe875683377d79dff4
+      reading: app_shell
+      sentences: []
+    - id: atlas_faq
+      url: https://atlas.hks.harvard.edu/faq
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: e2acf8498c8d410f786ac0b3cbacfb8f110bb82c6389070553f52d7b0716fcf0
+      reading: read
+      sentences:
+      - The Atlas of Economic Complexity is a freely available public resource.
+    - id: atlas_dataverse
+      url: https://dataverse.harvard.edu/dataverse/atlas
+      read_on: '2026-11-20'
+      status: 202
+      complete_body: true
+      body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      reading: empty
+      sentences: []
+    facts:
+      value_unit:
+        confirmed: true
+        value: USD; vintage-specific current/constant mapping pending
+        page: atlas
+        sentence: Atlas trade values are reported in U.S. dollars (USD).
+      legacy_grains:
+        confirmed: true
+        value: country_product_year and country_partner_product_year, four digits; bilateral split by
+          year
+        page: atlas_index
+        sentence: The files are split into unilateral (country_product_year) and bilateral (country_partner_product_year)
+          data at the four digit level. Since the bilateral data is much larger, it is split into years.
+      legacy_classifications:
+        confirmed: true
+        value: HS 1992 and SITC revision 2
+        page: atlas_index
+        sentence: The data is also provided in two different classification systems, HS representing the
+          Harmonized System (revision 1992) and SITC representing the Standardized International Trade
+          Classification (revision 2).
+      legacy_published_size:
+        confirmed: true
+        value: 'country_hsproduct4digit_year.zip: 412.14 MB (rounded display, not an exact byte bound)'
+        page: atlas_index
+        sentence: country_hsproduct4digit_year.zip (412.14 MB)
+      hs_1992_history:
+        confirmed: true
+        value: HS 1992 from 1995
+        page: atlas
+        sentence: 'HS 1992: data available from 1995 onward'
+      hs_2012_history:
+        confirmed: true
+        value: HS 2012 from 2012
+        page: atlas
+        sentence: 'HS 2012: data available from 2012 onward'
+      hs_2022_history:
+        confirmed: true
+        value: HS 2022 from 2022
+        page: atlas
+        sentence: 'HS 2022: data available from 2022 onward'
+      access_statement:
+        confirmed: true
+        value: freely available public resource; individual file access not exercised
+        page: atlas_faq
+        sentence: The Atlas of Economic Complexity is a freely available public resource.
+      citation:
+        confirmed: true
+        value: download-specific citation requirements
+        page: atlas
+        sentence: Each downloadable data file includes specific citation requirements.
+    pending:
+    - Current downloads and legacy index are distinct readings; no file vintage is selected and no version
+      is inferred from a filename.
+    - Terms route returned only an application shell; Dataverse returned an empty HTTP 202. File-specific
+      licence and attribution remain pending.
+    - Qatar key, exact row/member/byte bounds and native finished-measure schema remain unverified. Rounded
+      MB display is not an exact byte count.
+    activation: false
+  wb_wdi:
+    publisher: World Bank
+    pages:
+    - id: wdi
+      url: https://databank.worldbank.org/source/world-development-indicators
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 2f2b0be5f75bf1fe36fb15c60abba03c330e3cbf0452075b9193ac450a9376fd
+      reading: read
+      sentences:
+      - World Development Indicators | DataBank
+    - id: wdi_catalog
+      url: https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 421b331f7faab68162209d65b3725dc13dbcbe017cf0c3f3c9b373653b18caa5
+      reading: read
+      sentences:
+      - Metadata last updated on Nov 18, 2026
+      - 'Version : 132 (Latest)'
+      - Creative Commons Attribution 4.0
+    - id: wdi_terms
+      url: https://www.worldbank.org/ext/en/legal/terms-conditions/datasets
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: bf7646ed7077968b0652c8ab2a7b91893275ab282dc9a2b769bd85d21b6ce828
+      reading: read
+      sentences:
+      - Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons
+        Attribution 4.0 International License (CC BY 4.0), with the additional terms below.
+      - Some datasets and indicators are provided by third parties, and may not be redistributed or reused
+        without the consent of the original data provider, or may be subject to terms and conditions that
+        are different from those described above.
+    - id: wdi_qatar
+      url: https://data.worldbank.org/country/qatar
+      read_on: '2026-11-20'
+      status: 403
+      complete_body: true
+      body_sha256: ba986b7b6818cfa0bfc794f09e7a129760fbbbaf53ce4e44112393890b34a8b3
+      reading: http_error
+      sentences: []
+    facts:
+      dataset:
+        confirmed: true
+        value: World Development Indicators
+        page: wdi
+        sentence: World Development Indicators | DataBank
+      catalog_metadata_version:
+        confirmed: true
+        value: 132; catalog metadata only, not a selected file vintage
+        page: wdi_catalog
+        sentence: 'Version : 132 (Latest)'
+      metadata_updated:
+        confirmed: true
+        value: Nov 18, 2026
+        page: wdi_catalog
+        sentence: Metadata last updated on Nov 18, 2026
+      catalog_licence:
+        confirmed: true
+        value: Creative Commons Attribution 4.0
+        page: wdi_catalog
+        sentence: Creative Commons Attribution 4.0
+      licence_caveat:
+        confirmed: true
+        value: third-party indicators may have different terms
+        page: wdi_terms
+        sentence: Some datasets and indicators are provided by third parties, and may not be redistributed
+          or reused without the consent of the original data provider, or may be subject to terms and
+          conditions that are different from those described above.
+    pending:
+    - Qatar country page returned HTTP 403. Country key, selected indicators/history, status boundaries,
+      units and native schema remain unverified.
+    - Catalog metadata version does not establish selected data vintage, raw row counts or download byte
+      bounds.
+    activation: false
+  unctad_fdi:
+    publisher: UNCTAD
+    pages:
+    - id: unctad
+      url: https://unctadstat.unctad.org/EN/
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 5cbb1dd81b736354559d55dcf168f58c76609a1dbd737df2ee1bc17b86c3d6d3
+      reading: read
+      sentences:
+      - All statistical indicators compiled by the Statistics Service according to common rules, ensuring
+        comparability between the various datasets.
+    - id: unctad_terms
+      url: https://unctadstat.unctad.org/EN/About.html
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 8b2dd2e2778a670f62b0b4b21535bac3f1e2d759e6a358c511c3d076d6ee74fb
+      reading: read
+      sentences:
+      - All materials provided on this website are copyrighted under the Creative Commons Attribution
+        3.0 IGO license.
+      - All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further
+        distributed provided that United Nations Trade and Development Data Hub is cited as the source.
+    - id: unctad_faq
+      url: https://unctadstat.unctad.org/EN/FAQ.html
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 926a1fd94a5aa8980de3913f4656b28a91d6e5fc259ce9f103097f00578596a4
+      reading: read
+      sentences:
+      - Access to data is free and there is no registration required.
+      - FDI inflows and outflows comprise capital provided (either directly or through other related enterprises)
+        by a foreign direct investor to a FDI enterprise, or capital received by a foreign direct investor
+        from a FDI enterprise.
+    - id: unctad_fdi_docs
+      url: https://unctadstat.unctad.org/EN/IndicatorsExplained.html
+      read_on: '2026-11-20'
+      status: 200
+      complete_body: true
+      body_sha256: 56a723bc4c6398d3ca791fc57e7e274390f1c18b0afa92d556596d29bfa51c54
+      reading: no_relevant_fact
+      sentences: []
+    facts:
+      licence:
+        confirmed: true
+        value: Creative Commons Attribution 3.0 IGO
+        page: unctad_terms
+        sentence: All materials provided on this website are copyrighted under the Creative Commons Attribution
+          3.0 IGO license.
+      attribution:
+        confirmed: true
+        value: cite United Nations Trade and Development Data Hub
+        page: unctad_terms
+        sentence: All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated
+          and further distributed provided that United Nations Trade and Development Data Hub is cited
+          as the source.
+      visitor_access:
+        confirmed: true
+        value: free; no registration required
+        page: unctad_faq
+        sentence: Access to data is free and there is no registration required.
+      flow_definition:
+        confirmed: true
+        value: inflows/outflows comprise capital provided to, or received from, a foreign direct investor
+        page: unctad_faq
+        sentence: FDI inflows and outflows comprise capital provided (either directly or through other
+          related enterprises) by a foreign direct investor to a FDI enterprise, or capital received by
+          a foreign direct investor from a FDI enterprise.
+    pending:
+    - Selected FDI dataset/version, Qatar key, years, units, historical/estimate/forecast flags, schema
+      and row/byte bounds remain unverified.
+    - Portal-level free access and licence statements do not establish selected FDI coverage. The indicators-explained
+      page describes concentration and CPI, not the selected FDI metadata.
+    activation: false
+  imf_weo:
+    publisher: International Monetary Fund (unverified identity lead)
+    pages:
+    - id: weo
+      url: https://www.imf.org/en/Publications/WEO/weo-database/2026/October
+      read_on: '2026-11-20'
+      status: 403
+      complete_body: true
+      body_sha256: a803deb5b96c7bb435160f281a4ee199409b6627047c2572fbc3b3fe6f15e419
+      reading: http_error
+      sentences: []
+    - id: weo_docs
+      url: https://www.imf.org/en/Publications/WEO/weo-database
+      read_on: '2026-11-20'
+      status: 403
+      complete_body: true
+      body_sha256: 0960c90de58264215f9f460704e79fe238e880a53df626e81227400059647c2b
+      reading: http_error
+      sentences: []
+    facts: {}
+    pending:
+    - Dataset and database documentation pages returned HTTP 403; no challenge was bypassed.
+    - Identity remains a lead; vintage, Qatar coverage, historical/forecast boundaries, terms, tier, schema
+      and bounds remain unverified.
+    activation: false
+  ilostat_qat:
+    publisher: International Labour Organization (unverified identity lead)
+    pages:
+    - id: ilostat
+      url: https://ilostat.ilo.org/data/
+      read_on: '2026-11-20'
+      status: 403
+      complete_body: true
+      body_sha256: 6bc4df09709a4b6062eb93d89c00047597780459d6038963f554b0b286eea577
+      reading: http_error
+      sentences: []
+    - id: ilo_docs
+      url: https://ilostat.ilo.org/resources/concepts-and-definitions/
+      read_on: '2026-11-20'
+      status: 403
+      complete_body: true
+      body_sha256: 8b5eb060db5fec9e31a82c998298fcc3336a6eb31d574126d341489b32e372c9
+      reading: http_error
+      sentences: []
+    - id: ilo_named
+      url: https://www.ilo.org/ilostat
+      read_on: '2026-11-20'
+      status: null
+      complete_body: false
+      body_sha256: ''
+      reading: incomplete
+      sentences: []
+    facts: {}
+    pending:
+    - Dataset and concepts pages returned HTTP 403. The original page redirects to an unreviewed host
+      and was not followed.
+    - Qatar coverage, identity, source-native indicators, vintage, terms, tier, schema and bounds remain
+      unverified; unavailable without substitution.
+    activation: false

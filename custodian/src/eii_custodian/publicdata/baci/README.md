@@ -1,20 +1,35 @@
 # BACI separate-series source
 
 S2-T24 implements `eii_custodian.publicdata.baci.parse.parse_archive@v1`.
-The source page, licence, publisher version, access state, HS revision, country
-keys, units and reporter reconciliation are NOT READ. Decision 0040 supplies
-leads only. No host has been admitted for BACI. The registry date records the
-pending-record check, not page verification. `confirmed: false` prevents requests.
+The lead's supplied page reading of 2026-11-20 confirms the selected HS 2017
+edition, release 202601, published period 2017-2024 and "Licence: Etalab 2.0".
+Document 04 **S2-T21 part B terms readings** records the page URL and supplied
+SHA-256. The supplied licence-link reading identifies the publisher's exact
+Etalab PDF link; no PDF text is claimed read here. The supplied byte-range
+archive reading records trade header `t,i,j,k,v,q`, both dictionary headers,
+`Readme.txt`, the eleven-member inventory and exact compressed/expanded byte
+bounds in `baci.yaml`. Its inventory evidence hash is not an archive checksum.
+The Readme supplies thousand USD, metric tons and six-digit HS products.
+Row counts remain null, to be recorded at the first fetch.
 
-The lead must supply the four live steps of the task brief before activation.
-`baci.yaml` is closed: every field is required and unknown fields fail. Pending
-empty metadata and zero bounds are placeholders, never source facts. Activation
-requires the complete yearly member inventory, one country and product dictionary,
-reviewed URLs, page hash, source version, attribution and evidence reference.
-Each member declares its exact ordered header, header-to-logical-field mapping,
-kind, year, inclusive expanded byte and row bounds and optional publisher hash.
-A source without a published valuation records `unknown`. Access obstacles stop
-before archive requests. Reuse terms alone do not exclude a visitor-readable source.
+PUB-03 admits `www.cepii.fr` through this reviewed registry change. Every BACI
+request and redirect still needs an exact `reviewed_urls` entry. Only the literal
+publisher-page query `id=37` has a closed exception; generic query refusal stays.
+`confirmed: false` and `baci_metadata_unconfirmed` still prevent requests:
+target/country representation, missing-quantity tokens, decimal limits, access
+configuration and bounded first-fetch row accounting need lead evidence/work.
+Trade input 4 stays pending. These readings are not a complete fetch.
+
+`baci.yaml` is closed: required fields and unknown-field refusal stay. A member
+may additionally declare reviewed compressed-byte bounds; existing expanded
+bounds always apply. Null counts are accepted only as pending metadata; confirmed
+configuration and parsing require bounds for every data member and all raw rows.
+A text member must be exactly `Readme.txt`, have no columns/header or row count,
+and is fully hashed and byte-checked. Exact native CSV header variants are
+supported alongside the existing complete logical schema. Native trade and product
+rows obtain HS revision from the reviewed configuration. The country ISO2 column
+is validated but not added to the closed release schema. Published code strings
+remain unchanged; no country code or padding convention is guessed.
 
 ASSUMPTION: value and quantity each allow 18 total digits and 6 fractional digits,
 chosen from invented fixtures; the lead must verify this against the dictionary.

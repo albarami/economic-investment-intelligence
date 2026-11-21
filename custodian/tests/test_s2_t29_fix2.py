@@ -8,12 +8,12 @@ from http.client import HTTPMessage, IncompleteRead
 from pathlib import Path
 
 import pytest
+from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_s2_t29_fix import award_intake
 from custodian.tests.test_s2_t29_pages import BODY, STAMP, page_entry, review
 from custodian.tests.test_s2_t29_transport import pin
 
 from eii_custodian.publicdata.fetch import awards, page_records
-from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.fetch.transport import (
@@ -75,10 +75,12 @@ def fake_opener(monkeypatch, *, redirect=None, broken=False):
 def test_real_redirect_pin_refusal(tmp_path, monkeypatch, source, redirect):
     # Invented DER is admitted only at the SSL loading seam. validate_pin,
     # verified_context, open_https and _redirect_guard all execute unchanged.
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     monkeypatch.setattr(ssl.SSLContext, "load_verify_locations", lambda *a, **kw: None)
     calls, redirects = fake_opener(monkeypatch, redirect=redirect)
     if source == "awards":
-        entry, declaration, _ = award_intake(tmp_path, monkeypatch)
+        entry, declaration, _ = award_intake(fixture_cache, monkeypatch)
         declaration["pin"] = {}
         monkeypatch.setattr(awards, "load_pin", lambda *args: pin())
     else:
@@ -88,61 +90,73 @@ def test_real_redirect_pin_refusal(tmp_path, monkeypatch, source, redirect):
         monkeypatch.setattr(page_records, "load_declaration", lambda _: review(entry))
         monkeypatch.setattr(page_records, "load_pin", lambda *args: pin())
     sleeps = []
-    outcome = run_build((entry,), open_https, tmp_path, lambda: STAMP, sleeps.append)
+    outcome = run_build(
+        (entry,), open_https, fixture_cache, lambda: STAMP, sleeps.append
+    )
     assert outcome.failure is not None
     assert outcome.failure.check == "certificate_host_mismatch"
     assert len(calls) == 1
     assert redirects == [redirect]
     assert sleeps == []
-    assert not (tmp_path / entry.key).exists()
-    assert not list(tmp_path.glob(".page-stage-*"))
+    assert not (fixture_cache / entry.key).exists()
+    assert not list(fixture_cache.glob(".page-stage-*"))
     assert "fetch_failed" not in repr(outcome)
-    for path in tmp_path.rglob("*.json"):
+    for path in fixture_cache.rglob("*.json"):
         assert "fetch_failed" not in path.read_text()
 
 
 def test_real_incomplete_awards_proof(tmp_path, monkeypatch, capsys):
-    entry, _, _ = award_intake(tmp_path, monkeypatch)
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    entry, _, _ = award_intake(fixture_cache, monkeypatch)
     calls, _ = fake_opener(monkeypatch, broken=True)
     sleeps = []
-    outcome = run_build((entry,), open_https, tmp_path, lambda: STAMP, sleeps.append)
+    outcome = run_build(
+        (entry,), open_https, fixture_cache, lambda: STAMP, sleeps.append
+    )
     assert outcome.failure is None
-    indices = list((tmp_path / entry.key / "index").glob("*.json"))
+    indices = list((fixture_cache / entry.key / "index").glob("*.json"))
     assert len(indices) == 1
-    snapshot = read_snapshot(tmp_path / entry.key, indices[0].stem)
+    snapshot = read_snapshot(fixture_cache / entry.key, indices[0].stem)
     check = snapshot.sidecar["award_check"]
     assert check["failed_fetches"] == 2
     assert check["incomplete"] is True
     assert check["match_rate"] == "0"
     assert all(item["result"] == "fetch_failed" for item in check["results"])
+    # Each distinct proof link retains the approved bounded retry contract.
     assert len(calls) == 2 * ATTEMPT_LIMIT
+    assert len(set(calls)) == 2
     assert sleeps == list(BACKOFF_S) * 2
-    assert not (tmp_path / entry.key / "proofs").exists()
+    assert not (fixture_cache / entry.key / "proofs").exists()
     diagnostics = repr(outcome) + repr(capsys.readouterr())
     assert "SYN-private-upstream-body" not in diagnostics
     assert "IncompleteRead" not in diagnostics
-    for path in tmp_path.rglob("*"):
+    for path in fixture_cache.rglob("*"):
         if path.is_file():
             assert b"SYN-private-upstream-body" not in path.read_bytes()
             assert b"IncompleteRead" not in path.read_bytes()
 
 
 def test_real_incomplete_registry_source(tmp_path, monkeypatch):
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     entry = next(e for e in load_registry() if e.key == "bnd_geob")
     assert entry.kind == "https_file"
     assert not entry.skip_reason
     calls, _ = fake_opener(monkeypatch, broken=True)
     sleeps = []
-    outcome = run_build((entry,), open_https, tmp_path, lambda: STAMP, sleeps.append)
+    outcome = run_build(
+        (entry,), open_https, fixture_cache, lambda: STAMP, sleeps.append
+    )
     assert outcome.failure is not None
     assert outcome.failure.check == "unreachable"
     assert outcome.failure.code == 6
     assert calls == [entry.url] * ATTEMPT_LIMIT
     assert sleeps == list(BACKOFF_S)
-    assert not (tmp_path / entry.key).exists()
+    assert not (fixture_cache / entry.key).exists()
     assert "SYN-private-upstream-body" not in repr(outcome)
-    assert "unreachable" in (tmp_path / "build-log.json").read_text()
-    for path in tmp_path.rglob("*.json"):
+    assert "unreachable" in (fixture_cache / "build-log.json").read_text()
+    for path in fixture_cache.rglob("*.json"):
         assert "SYN-private-upstream-body" not in path.read_text()
         assert "IncompleteRead" not in path.read_text()
 
@@ -229,8 +243,10 @@ def test_nested_source_symlink_refuses(tmp_path, monkeypatch):
 
 
 def test_final_rename_failure_restores_source(tmp_path, monkeypatch):
-    entry = existing_page(tmp_path, monkeypatch)
-    destination = tmp_path / entry.key
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    entry = existing_page(fixture_cache, monkeypatch)
+    destination = fixture_cache / entry.key
     before = tree_bytes(destination)
     original = Path.rename
     events = []
@@ -254,7 +270,7 @@ def test_final_rename_failure_restores_source(tmp_path, monkeypatch):
     outcome = run_build(
         (entry,),
         lambda url: Response(url, BODY.replace(b">7<", b">9<"), ()),
-        tmp_path,
+        fixture_cache,
         lambda: "2024-02-04T00:00:00Z",
         lambda _: None,
     )
@@ -263,5 +279,5 @@ def test_final_rename_failure_restores_source(tmp_path, monkeypatch):
     assert events == ["backed-up", "staged-failed", "restored"]
     assert destination.is_dir()
     assert tree_bytes(destination) == before
-    assert not list(tmp_path.glob(".page-stage-*"))
+    assert not list(fixture_cache.glob(".page-stage-*"))
     assert "SYN-private-rename-error" not in repr(outcome)

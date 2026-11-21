@@ -205,7 +205,10 @@ def assign_feature_keys(rows: list[dict[str, object]]) -> list[dict[str, object]
 
 
 def land_price_rows(
-    features: list[dict[str, object]], service_name: str
+    features: list[dict[str, object]],
+    service_name: str,
+    *,
+    as_of: str,
 ) -> list[dict[str, object]]:
     """One guide-price row per published price field. The field name is the use.
 
@@ -218,15 +221,15 @@ def land_price_rows(
         attributes = _attributes(feature)
         district = _district_key(attributes)
         for field in _PRICE_FIELDS:
-            rows.append(
-                {
-                    "district_key": district,
-                    "period": period,
-                    "use_category": field,
-                    "guide_price": parse_guide_price(field, attributes.get(field)),
-                    "price_basis": "per_ft2",
-                }
-            )
+            row = {
+                "district_key": district,
+                "period": period,
+                "use_category": field,
+                "guide_price": parse_guide_price(field, attributes.get(field)),
+                "price_basis": "per_ft2",
+            }
+            row["as_of"] = as_of
+            rows.append(row)
     require_release_columns(rows)
     return rows
 

@@ -251,7 +251,7 @@ def read_measure(
     if value is None:
         return MeasureRead(MeasureKind.MISSING, None)
     if isinstance(value, str):
-        if value.strip() == "" or value in missing_forms:
+        if value == "" or value in missing_forms:
             return MeasureRead(MeasureKind.MISSING, None)
         pattern = _DIGITS if integral else _DECIMAL
         if pattern.fullmatch(value):

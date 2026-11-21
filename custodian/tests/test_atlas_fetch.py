@@ -17,23 +17,25 @@ def no_real_opener(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_atlas_complete_archive(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from custodian.tests.fixtures.atlas.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.atlas.config import Config
     from eii_custodian.publicdata.atlas.contracts import read_selected
-    from eii_custodian.publicdata.fetch.build import run_build
 
     outcome = run_build(
         [entry()],
         metadata,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         atlas_stream=stream,
         atlas_config=Config.from_mapping(configuration()),
     )
     assert outcome.failure is None
-    release = read_selected(tmp_path, outcome.manifests["atlas_complexity"])
+    release = read_selected(fixture_cache, outcome.manifests["atlas_complexity"])
     assert len(release.country_product_year) == 1
     assert release.country_product_year[0].finished_measure == "-123456.654321"
     assert release.country_product_year[0].country_code == "00Q"
@@ -51,7 +53,7 @@ def test_atlas_complete_archive(tmp_path: Path) -> None:
 
 
 def build(
-    tmp_path,
+    cache,
     *,
     config=None,
     source=None,
@@ -59,14 +61,14 @@ def build(
     stream_transport=stream,
 ):
     from custodian.tests.fixtures.atlas.invented import configuration
+    from custodian.tests.support.fetch_build import run_build
 
     from eii_custodian.publicdata.atlas.config import Config
-    from eii_custodian.publicdata.fetch.build import run_build
 
     return run_build(
         [entry() if source is None else source],
         byte_transport,
-        tmp_path,
+        cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         atlas_stream=stream_transport,
@@ -75,7 +77,10 @@ def build(
 
 
 def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
-    from eii_custodian.publicdata.fetch.build import run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
     from eii_custodian.publicdata.fetch.registry import load_registry
 
     pending = next(
@@ -86,18 +91,22 @@ def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
         raise AssertionError("pending source requested")
 
     result = run_build(
-        [pending], forbidden, tmp_path, lambda: "2026-11-16T00:00:00Z", lambda _: None
+        [pending],
+        forbidden,
+        fixture_cache,
+        lambda: "2026-11-16T00:00:00Z",
+        lambda _: None,
     )
     assert any("atlas_metadata_unconfirmed" in line for line in result.lines)
     from custodian.tests.fixtures.atlas.invented import configuration
 
     config = configuration()
     config["access"] = "paid_tier"
-    blocked = build(tmp_path / "paid", config=config, byte_transport=forbidden)
+    blocked = build(fixture_cache / "paid", config=config, byte_transport=forbidden)
     assert blocked.failure is not None
     assert blocked.failure.check == "access_obstacle"
     marked = build(
-        tmp_path / "body",
+        fixture_cache / "body",
         byte_transport=lambda url: type(metadata(url))(
             url, b"registration required invented-secret-token", ()
         ),
@@ -108,6 +117,8 @@ def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
 
 
 def test_atlas_retries_without_stale_manifest(tmp_path: Path) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from contextlib import contextmanager
     from types import SimpleNamespace
 
@@ -126,7 +137,7 @@ def test_atlas_retries_without_stale_manifest(tmp_path: Path) -> None:
             final_url=url, hops=(), declared_length=None, chunks=chunks()
         )
 
-    failed = build(tmp_path, stream_transport=broken)
+    failed = build(fixture_cache, stream_transport=broken)
     assert failed.failure is not None
     assert failed.failure.check == "network_exhausted"
     assert len(calls) == ATTEMPT_LIMIT
@@ -136,13 +147,15 @@ def test_atlas_retries_without_stale_manifest(tmp_path: Path) -> None:
 def test_atlas_interrupt_keeps_the_complete_manifest(
     tmp_path: Path, monkeypatch
 ) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.atlas import fetch
     from eii_custodian.publicdata.atlas.contracts import read_selected
 
-    first = build(tmp_path)
+    first = build(fixture_cache)
     digest = first.manifests["atlas_complexity"]
-    manifest = read_selected(tmp_path, digest).manifest
-    directory = tmp_path / "atlas_complexity"
+    manifest = read_selected(fixture_cache, digest).manifest
+    directory = fixture_cache / "atlas_complexity"
     expected = [
         directory / f"{manifest['archives'][grain]['sha256']}.zip"
         for grain in ("country_product_year", "country_partner_product_year")
@@ -164,14 +177,14 @@ def test_atlas_interrupt_keeps_the_complete_manifest(
 
         with monkeypatch.context() as patch:
             patch.setattr(fetch, "_publish", interrupted)
-            result = build(tmp_path)
+            result = build(fixture_cache)
         assert len(seen) == boundary
         assert seen == expected[:boundary]
         assert len(list((directory / "index").glob("*.json"))) == 9
         assert result.failure is not None
         assert result.failure.check == "write_or_stream_failed"
         assert "invented-interruption" not in repr(result)
-        assert len(read_selected(tmp_path, digest).country_product_year) == 1
+        assert len(read_selected(fixture_cache, digest).country_product_year) == 1
 
 
 def test_atlas_hosts_and_binding(tmp_path: Path, monkeypatch) -> None:

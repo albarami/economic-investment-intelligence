@@ -47,6 +47,12 @@ GLOBFP_FIELDS = (
     ("Height", "N", 24, 15),
     ("FID_1", "N", 24, 15),
 )
+GBA_FIELDS = (
+    ("FID", "N", 18, 0),
+    ("Height", "N", 24, 15),
+    ("SYN_class", "C", 8, 0),
+    ("FID_1", "N", 24, 15),
+)
 
 
 def square(x: float, y: float, size: float) -> list:
@@ -217,6 +223,20 @@ def globfp_zip(
         [str(index + 1), height, ""]
         for index, (_geometry, height) in enumerate(features)
     ]
+    return shapefile_zip(shapes, records, fields, stem=stem, **kwargs)
+
+
+def gba_zip(features: list, stem: str = "syn.tile.01", **kwargs) -> bytes:
+    """INVENTED: GBA tile with height and SYN_class per footprint."""
+    shapes = []
+    records = []
+    for geometry, height, class_name in features:
+        if isinstance(geometry[0][0], (int, float)):
+            shapes.append([cw(geometry)])
+        else:
+            shapes.append([cw(ring) for ring in geometry])
+        records.append([str(len(records) + 1), height, class_name, ""])
+    fields = [list(item) for item in GBA_FIELDS]
     return shapefile_zip(shapes, records, fields, stem=stem, **kwargs)
 
 
@@ -411,6 +431,7 @@ def rules_document(
             "bldg_3dglobfp": {
                 "format": globfp_format,
                 "field": globfp_field,
+                "class_field": "",
                 "unit": globfp_unit,
                 "nodata": "",
                 "crs": globfp_crs,
@@ -423,6 +444,15 @@ def rules_document(
                 "scale": wsf_scale,
                 "crs": wsf_crs,
                 "dtype": wsf_dtype,
+                "class_field": "",
+            },
+            "bldg_gba": {
+                "format": "shapefile_zip",
+                "field": "Height",
+                "class_field": "SYN_class",
+                "unit": "m",
+                "nodata": "",
+                "crs": "EPSG:4326",
             },
         },
     }

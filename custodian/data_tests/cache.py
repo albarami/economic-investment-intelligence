@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 
 from eii_core.calc.facts import SourceChain
+from eii_core.calc.public_series import C2_METHOD_VERSION
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.frame.mapping import POP_FIELDS, fields
 from eii_custodian.publicdata.series.parse import confirmed_rows, selected_source
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,12 +27,17 @@ def cached(cache: Path, source: str, digest: str):
         }:
             raise ValueError("public_cache_missing:" + source) from None
         raise
-    rows = confirmed_rows(entry, rows)
+    if source == "pop_muni":
+        # The frame owns this source's confirmed shape, not the series adapter.
+        for row in rows:
+            fields(row, POP_FIELDS, source)
+    else:
+        rows = confirmed_rows(entry, rows)
     chain = SourceChain(
         source,
         entry.release_tables[0],
         "method-card",
-        "S2-T07-v1",
+        C2_METHOD_VERSION if source == "lic_cancelled" else "S2-T07-v1",
         str(receipt["publisher"]),
         entry.slug,
         str(receipt["fetch_url"]),

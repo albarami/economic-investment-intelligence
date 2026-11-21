@@ -21,6 +21,7 @@ from shapely.geometry.base import BaseGeometry
 from eii_core.calc.building_heights import HEIGHT_SOURCES, height_value
 
 BUILDINGS_RELATIVE = "assets/buildings/buildings.geojson"
+LANDMARK_HEIGHTS_RELATIVE = "publicdata/review/landmark_heights.yaml"
 HEIGHTS_RELATIVE = "assets/heights"
 HEIGHTS_FILE = "heights.json"
 MANIFEST_FILE = "manifest.heights.json"
@@ -42,7 +43,7 @@ OUTPUT_COLUMNS = frozenset(
     }
 )
 STRUCTURE_MARKER = "to be confirmed"
-SOURCE_IDS = ("bldg_3dglobfp", "bldg_wsf3d")
+SOURCE_IDS = ("bldg_3dglobfp", "bldg_wsf3d", "bldg_gba")
 RULES_PATH = Path(__file__).resolve().parents[4] / "publicdata" / "height_rules.yaml"
 _RULES_KEYS = frozenset(
     {
@@ -56,7 +57,17 @@ _RULES_KEYS = frozenset(
 )
 _STOREY_KEYS = frozenset({"value", "label", "basis"})
 _STRUCTURE_KEYS = frozenset(
-    {"format", "field", "band", "unit", "nodata", "scale", "crs", "dtype"}
+    {
+        "format",
+        "field",
+        "band",
+        "unit",
+        "nodata",
+        "scale",
+        "crs",
+        "dtype",
+        "class_field",
+    }
 )
 
 
@@ -97,6 +108,7 @@ class SourceStructure:
     scale: str
     crs: str
     dtype: str
+    class_field: str
 
 
 @dataclass(frozen=True)
@@ -160,6 +172,11 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
     nodata = raw["nodata"]
     if not isinstance(nodata, str):
         raise HeightError("rules_nodata")
+    class_field = raw.get("class_field", "")
+    if class_field != "" and not has_field:
+        raise HeightError("rules_field_or_band", "class_field")
+    if class_field != "" and not isinstance(class_field, str):
+        raise HeightError("rules_class_field")
     return SourceStructure(
         format=_require_text(raw["format"], "format"),
         field=_require_text(raw.get("field", ""), "field") if has_field else "",
@@ -169,6 +186,7 @@ def _structure(raw: object, source_id: str) -> SourceStructure:
         scale=_require_text(raw.get("scale", ""), "scale") if has_band else "",
         crs=_require_text(raw["crs"], "crs"),
         dtype=_require_text(raw.get("dtype", ""), "dtype") if has_band else "",
+        class_field=class_field if isinstance(class_field, str) else "",
     )
 
 
@@ -230,6 +248,7 @@ def structure_unconfirmed(structure: SourceStructure) -> bool:
         structure.scale,
         structure.crs,
         structure.dtype,
+        structure.class_field,
     }
 
 

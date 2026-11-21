@@ -1,2 +1,50 @@
-# No live selection is inferred; the lead records reviewed inputs and bindings.
-confirmed: false
+# PO-S2-80; S2-T26. Owner confirmation on 2026-11-20:
+# "for number 4i confirm." (number 4 is this selection).
+# Source: the owner-confirmed selection table supplied to package S2-P29.
+# Confirmation selects coverage; it is not evidence of a completed comparison.
+confirmed: true
+# These reserved directives record the complete, non-ranking selection.
+# The lead replaces them with the reviewed closed country-code list and all
+# source-present chapters after fetch; no top list, size cut or guessed country.
+partners: ["pending:all_common_partners_per_year"]
+years: [2019, 2020, 2021, 2022, 2023, 2024]
+flows: [import]
+scopes: [TOTAL, "pending:all_present_hs2"]
+# Total goods and every present two-digit HS chapter, summed from native lines.
+# One comparison revision: HS 2017. For 2022-2024, compare at chapter level;
+# mark every chapter changed by HS 2022 as a classification cause, with evidence.
+# Every missing year, partner, chapter or value stays missing with its reason.
+# Each source retains its published currency and valuation. Conversion needs
+# a published rate named in the comparison record; none is selected here.
+inputs:
+  # Input 1: supplied content hash, retrieved 2026-11-20; not read by this task.
+  - source_id: cus_imp_2019
+    role: portal
+    selected_hash: 4bc253946b41f065d33e0d8431a36dd27251353aa1d35987b6985a432258924b
+  # Input 3: selected reporter and partner mirror, NOT YET FETCHED.
+  - source_id: un_comtrade
+    role: reporter
+    selected_hash: ""
+    pending_fetch: true
+  - source_id: un_comtrade
+    role: mirror
+    selected_hash: ""
+    pending_fetch: true
+  # Input 4: selected HS 2017 edition, NOT YET FETCHED.
+  - source_id: cepii_baci
+    role: baci
+    selected_hash: ""
+    pending_fetch: true
+# No native row, country, revision-cause or access-obstacle evidence is invented.
+bindings: []
+causes: []
+obstacles: []
+# Input 2 is retained separately and never materialised or paired. Activation
+# requires 2025 in years, international coverage and reviewed native bindings.
+# Partial 2026 stays excluded. The supplied hash is not read by this task.
+deferred_inputs:
+  - source_id: cus_imp_2025
+    role: portal
+    selected_hash: 69ba1b8bd1e2db1ca3e9052a378eb08faa83870ef3a9f594534e71369e89e4c0
+    year: 2025
+    reason: international_coverage_and_reviewed_bindings_required

@@ -133,7 +133,7 @@ class RunnerFailures(unittest.TestCase):
         self.assertEqual(err, [])
         self.assertEqual(status, 1)
         self.assertEqual(
-            out,
+            support.untimed(out),
             [
                 f"seed={support.FIXTURE_SEED}",
                 "suite fx-nowhere: counts unavailable",

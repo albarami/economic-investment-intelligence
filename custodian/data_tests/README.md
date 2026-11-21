@@ -13,6 +13,49 @@ of `cache.CACHE`. The lead uses `data/public_cache/`; no agent reads that cache.
 No fetching takes place here. Keep pytest's default traceback and short summary;
 never enable locals. Safe failures contain a fixed case ID and reason only.
 
+## National building inventory (S2-T20)
+
+`test_national_buildings.py` is lead-shell-only. After the complete public build,
+it rechecks the current pins and receipts, independently reconciles each part's
+selected IDs to the canonical table and every table ID to a height row, and
+checks exclusions and the per-part sorted-ID hashes. It repeats the building
+and height producers with no network and compares their hashes (FE-98). This
+replay rewrites only the producers' documented generated asset files, under
+`data/assets/buildings/` and `data/assets/heights/`. It prints public aggregate
+counts, optional-field coverage, boundary-review state and hashes, not IDs.
+It was not run by the worker. STAC item addresses/schema, frame-box coverage,
+invalid-footprint and in-box-outside-boundary review, and the pack's historical
+Lusail-box count still require the lead's source reading. No box is guessed for
+that historical comparison. A refusal is a failure, never a skip.
+
+## Pinned method replays (P05)
+
+`test_pinned_c1` reads `lic_active` and `pop_muni` through `cache.pinned`.
+The population reader uses the frame's confirmed field schema. The replay
+uses the reviewed municipality names and population indicators, the 2025
+resident rows, and every licence-activity in the stock denominators, including
+legacy codes. Missing or duplicate municipal resident counts fail. The test
+checks both newly printed C1 denominators, both densities and both location
+quotients. Its invented-cache tests are in
+`custodian/tests/test_pinned_method_replays.py`.
+
+The registry's `est_census` entry for `pub_census_national` describes business
+establishments, not employed residents. PO-S2-48 stays open for the lead to
+confirm the intended national employment source, its raw schema and its complete
+receipt metadata before `test_pinned_c8` can be written through `cache.pinned`.
+No publisher, retrieval date or employment-source identity is guessed for the
+removed orphan fixture entry. The committed C8 arithmetic uses only the existing
+invented stand-ins. The existing PUB-71 replay below remains the sole owner of
+the local national sum over reported zones; duplicating it under C8 would both
+substitute a different source and duplicate the wrong-value plant's failure,
+which the strict summary accounting correctly refuses.
+
+PO-S2-51 still needs the lead's real-cache run. PO-S2-52 remains open for the
+signed activity spine and its input binding (OI-16 and OI-203, after the basket
+confirmation OI-172). There is no skipped or prefix-based C2 class replay.
+The new pinned C1 test was not run by P05; helper tests use invented temporary
+snapshots only. No task or slice gate is closed by those helper tests.
+
 ## Inventory and preparation
 
 `restricted_cases.CASES` is the metadata-only inventory, version `S2-T35-v1`.

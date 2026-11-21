@@ -7,8 +7,10 @@ beside the old one.
 
 from __future__ import annotations
 
+import codecs
 import json
 import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
@@ -479,6 +481,33 @@ def _publish_agency(
     )
 
 
+_CHARSET_PARAM = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def header_charset(headers: Mapping[str, str]) -> str:
+    """Read the charset parameter of ``Content-Type`` exactly as sent."""
+    value = headers.get("Content-Type") or headers.get("content-type") or ""
+    if not value:
+        return ""
+    match = re.search(r'charset\s*=\s*(?:"([^"]*)"|([^;]+))', value, re.IGNORECASE)
+    if match is None:
+        return ""
+    raw = match.group(1) if match.group(1) is not None else match.group(2)
+    return raw.strip()
+
+
+def header_charset_accepted(charset: str) -> bool:
+    """True when the header charset is a known text encoding."""
+    if not charset:
+        return True
+    if not _CHARSET_PARAM.fullmatch(charset):
+        return False
+    try:
+        return bool(codecs.lookup(charset)._is_text_encoding)
+    except LookupError:
+        return False
+
+
 def _fetch_page(
     entry: Entry,
     cache: Path,
@@ -510,6 +539,13 @@ def _fetch_page(
         row_count=None,
         terms_sha256=terms,
     )
+    charset = header_charset(response.headers)
+    if charset and not header_charset_accepted(charset):
+        return InvestmentFailure(
+            1, entry.source_id, url, "page_decode", "known charset", "refused"
+        )
+    if charset:
+        side["charset"] = charset
     try:
         commit_pair(directory, page_digest, entry.extension, response.body, side)
         snapshot = read_snapshot(directory, page_digest)
@@ -970,6 +1006,8 @@ def _agency_spec(row: Mapping[str, object], url: str) -> SourceSpec | Investment
 def _pages(
     value: object, url: str, rules: Mapping[str, KindRule]
 ) -> tuple[PageSpec, ...] | InvestmentFailure:
+    from urllib.parse import urlsplit
+
     if not isinstance(value, list) or not value:
         return InvestmentFailure(
             1, "investqa_pages", url, "missing_page", "page family", "missing"
@@ -1011,6 +1049,16 @@ def _pages(
                 "page_language",
                 "en or ar",
                 "missing or unknown",
+            )
+        try:
+            segment = urlsplit(page_url).path.strip("/").split("/", 1)[0].casefold()
+        except ValueError:
+            return InvestmentFailure(
+                1, "investqa_pages", url, "missing_page", "valid page URL", "unreadable"
+            )
+        if segment in {"en", "ar"} and segment != language:
+            return InvestmentFailure(
+                1, "investqa_pages", url, "page_language", language, segment
             )
         found.append(PageSpec(kind, page_url, blocks, paragraphs, language))
     return tuple(found)

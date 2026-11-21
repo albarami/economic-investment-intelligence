@@ -19,10 +19,10 @@ from custodian.tests.test_s2_t29_live_shapes import (
 from eii_custodian.publicdata.fetch.page_records import fetch_page
 from eii_custodian.publicdata.fetch.transport import Response
 
-FIELDS = "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,district_name,district_name_en,lat,long_".split(
+FIELDS = "objectid,name,aname,category,category_a,eng_type,type,adoptedcurriculum,operationalstatus,mncp_code,mncp_name,mncp_name_en,district_code,district_name,district_name_en,lat,long_,students_n,staff_num".split(
     ","
 )
-FORBIDDEN = "subcategor subcateg_a streetname arbstreetn buildingn qars elec_num w_num pin_plotn createdate date_modfd remarks coord_x coord_y pobox email email_p website floor_num area students_n staff_num secname secnum source emp_num owner owner_tel director ncc_id studentno schoolno gis_comment finalplotarea_m2 final_plotpin students2014 currentlevelofservice mappingno designedcap allocationstatus vacancy schoollocation coord_x_qng coord_y_qng zone_code zone_name zone_name_en streetnum zonenum haseducationalvouchers phone phone2 mobile fax director_t".split()
+FORBIDDEN = "subcategor subcateg_a streetname arbstreetn buildingn qars elec_num w_num pin_plotn createdate date_modfd remarks coord_x coord_y pobox email email_p website floor_num area secname secnum source emp_num owner owner_tel director ncc_id studentno schoolno gis_comment finalplotarea_m2 final_plotpin students2014 currentlevelofservice mappingno designedcap allocationstatus vacancy schoollocation coord_x_qng coord_y_qng zone_code zone_name zone_name_en streetnum zonenum haseducationalvouchers phone phone2 mobile fax director_t".split()
 
 
 def school():
@@ -31,6 +31,8 @@ def school():
         objectid="integer",
         mncp_code="integer",
         district_code="integer",
+        students_n="integer",
+        staff_num="integer",
         lat="number",
         long_="number",
     )
@@ -45,6 +47,8 @@ def school():
         "district_name_en",
         "lat",
         "long_",
+        "students_n",
+        "staff_num",
     }
     dec = declaration(
         "arcgis_query",
@@ -78,8 +82,21 @@ def school():
         long_=2.5,
         eng_type=None,
         type=None,
+        students_n=None,
+        staff_num=None,
     )
     return dec, attrs
+
+
+def test_schools_private_directory_declaration_includes_count_columns():
+    from eii_custodian.publicdata.fetch.page_records import load_declaration
+    from eii_custodian.publicdata.fetch.page_schema import validate
+
+    declaration = load_declaration("schools_private_directory")
+    validate(declaration)
+    columns = {(name, kind) for name, kind in declaration["columns"]}
+    assert ("students_n", "integer") in columns
+    assert ("staff_num", "integer") in columns
 
 
 def test_non_capture_source_accepts_registration_required_text(tmp_path):

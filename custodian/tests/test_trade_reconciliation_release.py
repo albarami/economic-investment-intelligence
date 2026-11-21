@@ -333,14 +333,19 @@ def test_native_comtrade_retains_unit_not_api_price(tmp_path, monkeypatch):
 
 
 def test_pending_selection_and_dispatch(tmp_path, monkeypatch):
-    from eii_custodian.publicdata.fetch.build import run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
 
-    assert tr.load_selection() is None
+    pending = tr.load_selection()
+    assert pending is not None
+    assert pending.confirmed is True
+    assert pending.comparison_block_reason() == "comparison_input_pending_fetch"
     monkeypatch.setattr(tr, "read_portal", portal)
     outcome = run_build(
         (),
         lambda _: pytest.fail("no network"),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         reconciliation_selection=selection(),
@@ -348,7 +353,7 @@ def test_pending_selection_and_dispatch(tmp_path, monkeypatch):
     assert outcome.failure is None
     assert "trade_reconciliation" in outcome.manifests
     assert tr.read_reconciliation(
-        tmp_path, outcome.manifests["trade_reconciliation"]
+        fixture_cache, outcome.manifests["trade_reconciliation"]
     ).inputs
 
 
@@ -397,7 +402,11 @@ def native_selection(source, role):
 
 @pytest.mark.parametrize("plant", ["comtrade", "baci", "decimal"])
 def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
-    from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
+    from eii_custodian.publicdata.fetch.build import LOG_NAME
 
     from .fixtures.comtrade.invented import invented_entry
 
@@ -412,7 +421,7 @@ def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
         p = native_selection("un_comtrade", "reporter")
     elif plant == "baci":
         p = native_selection("cepii_baci", "baci")
-        directory = tmp_path / "cepii_baci"
+        directory = fixture_cache / "cepii_baci"
         directory.mkdir()
         body = b"not json"
         digest = hashlib.sha256(body).hexdigest()
@@ -421,7 +430,9 @@ def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
     else:
         monkeypatch.setattr(tr, "read_portal", portal)
         assert (
-            tr.read_reconciliation(tmp_path, tr.build_reconciliation(tmp_path, p))
+            tr.read_reconciliation(
+                fixture_cache, tr.build_reconciliation(fixture_cache, p)
+            )
             .inputs[0]
             .figure.value
             == "12.50"
@@ -437,7 +448,7 @@ def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
     result = run_build(
         entries,
         forbidden,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         forbidden,
         reconciliation_selection=p,
@@ -451,7 +462,9 @@ def test_dispatch_reader_failure(tmp_path, monkeypatch, plant):
     )
     assert expected in result.lines
     assert "trade_reconciliation" not in result.manifests
-    assert json.loads((tmp_path / LOG_NAME).read_text())["lines"] == list(result.lines)
+    assert json.loads((fixture_cache / LOG_NAME).read_text())["lines"] == list(
+        result.lines
+    )
 
 
 @pytest.mark.parametrize("body", [b"not json", b"\xff"], ids=["json", "unicode"])
@@ -719,7 +732,11 @@ def test_selection_unreadable_plant(tmp_path):
     ids=["policy", "binding"],
 )
 def test_dispatch_comparison_invalid(tmp_path, monkeypatch, plant, reason):
-    from eii_custodian.publicdata.fetch.build import LOG_NAME, run_build
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
+    from custodian.tests.support.fetch_build import run_build
+
+    from eii_custodian.publicdata.fetch.build import LOG_NAME
 
     monkeypatch.setattr(tr, "read_portal", portal)
     p = (
@@ -736,16 +753,18 @@ def test_dispatch_comparison_invalid(tmp_path, monkeypatch, plant, reason):
         monkeypatch.setattr(
             tr, "assemble", lambda *args, **kwargs: SimpleNamespace(rows=())
         )
-        assert tr.build_reconciliation(tmp_path, p, comtrade_policy=invented_policy())
+        assert tr.build_reconciliation(
+            fixture_cache, p, comtrade_policy=invented_policy()
+        )
     else:
-        assert tr.build_reconciliation(tmp_path, p)
+        assert tr.build_reconciliation(fixture_cache, p)
         p = replace(p, bindings=(replace(p.bindings[0], year=2021),))
     with pytest.raises(ValueError, match=rf"^{reason}$"):
-        tr.build_reconciliation(tmp_path, p)
+        tr.build_reconciliation(fixture_cache, p)
     result = run_build(
         (),
         lambda _: pytest.fail("no network"),
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-16T00:00:00Z",
         lambda _: None,
         reconciliation_selection=p,
@@ -756,4 +775,6 @@ def test_dispatch_comparison_invalid(tmp_path, monkeypatch, plant, reason):
     assert (
         "FAIL trade_reconciliation comparison_invalid expected=verified inputs observed=NO_DATA"
     ) in result.lines
-    assert json.loads((tmp_path / LOG_NAME).read_text())["lines"] == list(result.lines)
+    assert json.loads((fixture_cache / LOG_NAME).read_text())["lines"] == list(
+        result.lines
+    )

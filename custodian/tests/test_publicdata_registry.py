@@ -178,7 +178,15 @@ def test_committed_registry_follows_decision_0026() -> None:
         else:
             assert entry.decision_record == ""
         assert entry.terms_words.strip()
-        assert _DATE_TEXT.fullmatch(entry.terms_read_on)
+        if entry.kind == "register_file":
+            # S2-T49: declarations contain no invented reading. Decision 0059
+            # permits pending terms; the lead supplies the actual file receipt.
+            assert entry.key in {"biz_register", "fc_register/file"}
+            assert entry.terms_words == _MARKER
+            assert entry.terms_read_on == "pending"
+            assert entry.commit_allowed is False
+        else:
+            assert _DATE_TEXT.fullmatch(entry.terms_read_on)
 
 
 def test_none_stated_basis_is_refused(tmp_path: Path) -> None:
@@ -970,13 +978,18 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
     entries = load_registry()
-    assert len(entries) == 285 + 4 + 4 + 8 + 1 + 1  # S2-T41 backup; S2-T36 register.
+    assert (
+        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1
+    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations; S2-T20L STAC metadata; S2-T48 company web.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
-    assert len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2
+    # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
+    assert (
+        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1
+    )  # S2-T49 files; S2-T48 company web.
     assert {
         entry.key
         for entry in entries
@@ -1124,14 +1137,43 @@ def test_cache_path_is_gitignored(tmp_path: Path) -> None:
 
 
 def test_baci_registry_pending_and_nightly_policy() -> None:
-    """BACI stays eligible; citation-only metadata is not a live fetch exclusion."""
+    """BACI's page is read; archive metadata remains pending and nightly eligible."""
     from dataclasses import replace
 
     entries = load_registry()
     baci = next(entry for entry in entries if entry.source_id == "cepii_baci")
     assert baci.skip_reason == "baci_metadata_unconfirmed"
     assert baci.commit_allowed is False
-    assert baci.url == ""
+    assert baci.url == (
+        "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip"
+    )
+    assert baci.fetch_host == "www.cepii.fr"
+    page = "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37"
+    assert baci.landing_url == baci.terms_url == page
+    assert baci.title_en == "BACI bilateral trade (HS 2017, release 202601)"
+    assert baci.licence_id == "Etalab-2.0"
+    assert baci.licence_basis == "dataset"
+    assert baci.licence_url == (
+        "https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf"
+    )
+    assert baci.decision_record == ""
+    assert baci.terms_words == "Licence: Etalab 2.0"
+    assert baci.terms_read_on == "2026-11-20"
+    assert baci.extension == "zip"
+    assert (baci.period_first, baci.period_last) == ("2017", "2024")
+    # Supplied archive reading confirms the native header, but no row counts.
+    assert baci.columns == (
+        ("t", "integer"),
+        ("i", "string"),
+        ("j", "string"),
+        ("k", "string"),
+        ("v", "number"),
+        ("q", "number"),
+    )
+    assert baci.row_count_min is baci.row_count_max is None
+    assert baci.period_field == "t"
+    assert "row counts remain pending" in baci.basis_note
+    assert "publisher-link target" in baci.basis_note
     assert nightly_blocked([replace(baci, skip_reason="")], ("cepii_baci",)) == ()
 
     def exclusions(rows):
@@ -1142,7 +1184,9 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         } | BANNED_SOURCE_IDS
 
     expected = {
+        "company_web",
         "satellite_cdse_backup",
+        "biz_register",
         "fc_register",
         "bldg_3dglobfp",
         "bldg_wsf3d",
@@ -1163,6 +1207,7 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         "monaqasat_classified",
         "schools_private_directory",
         "awards_owner_scrape",
+        "bldg_gba",
     }
     assert exclusions(entries) == expected
     planted = [

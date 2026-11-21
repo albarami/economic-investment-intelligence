@@ -62,7 +62,9 @@ class RunnerEnvironment(unittest.TestCase):
             support.parent_env(extra),
         )
         self.assertEqual(status, 0, out)
-        self.assertIn("suite fx-env: 1 passed, 0 failed, 0 skipped", out)
+        self.assertIn(
+            "suite fx-env: 1 passed, 0 failed, 0 skipped", support.untimed(out)
+        )
         control = subprocess.run(
             [
                 sys.executable,
@@ -196,7 +198,9 @@ class RunnerEnvironment(unittest.TestCase):
             support.parent_env(),
         )
         self.assertEqual(status, 0, out)
-        self.assertIn("suite fx-names: 2 passed, 0 failed, 0 skipped", out)
+        self.assertIn(
+            "suite fx-names: 2 passed, 0 failed, 0 skipped", support.untimed(out)
+        )
         proc = subprocess.run(
             [
                 sys.executable,

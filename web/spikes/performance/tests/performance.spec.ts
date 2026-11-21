@@ -1,4 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type ConsoleMessage, type Page } from '@playwright/test';
+import { EventEmitter } from 'node:events';
+import { setImmediate } from 'node:timers/promises';
 import {
   ARABIC_REDUCED,
   FULL,
@@ -42,7 +44,309 @@ function liesOnCoarseClockGrid(stamp: number): boolean {
 
 type Spike = NonNullable<Window['__spike']>;
 
+type ReadinessDiagnostics = { report: () => void; dispose: () => void };
+const readinessLogs = new WeakMap<Page, ReadinessDiagnostics>();
+
+function keepReadinessDiagnostics(page: Page): ReadinessDiagnostics {
+  const existing = readinessLogs.get(page);
+  if (existing) return existing;
+  const started = performance.now();
+  const events: { event: string; detail: string; elapsedMs: number }[] = [];
+  const retain = (event: string, detail = '') => {
+    events.push({ event, detail, elapsedMs: performance.now() - started });
+  };
+  const onConsole = (message: ConsoleMessage) =>
+    retain('console', `${message.type()}: ${message.text()}`);
+  const onError = (error: Error) => retain('pageerror', error.message);
+  const onCrash = () => retain('crash');
+  const onClose = () => retain('close');
+  const onDisconnect = () => retain('disconnected');
+  const browser = page.context().browser();
+  page.on('console', onConsole);
+  page.on('pageerror', onError);
+  page.on('crash', onCrash);
+  page.on('close', onClose);
+  browser?.on('disconnected', onDisconnect);
+  let disposed = false;
+  const diagnostics = {
+    report() {
+      // Use only host-held events: a diagnostic evaluate could itself hang or
+      // replace the original rejection after a crashed/disconnected browser.
+      if (!disposed) console.error('READINESS FAILURE', JSON.stringify(events));
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      page.off('console', onConsole);
+      page.off('pageerror', onError);
+      page.off('crash', onCrash);
+      page.off('close', onClose);
+      browser?.off('disconnected', onDisconnect);
+      readinessLogs.delete(page);
+    },
+  };
+  readinessLogs.set(page, diagnostics);
+  return diagnostics;
+}
+
+// INVENTED event sources: exercise failure reporting without closing the shared
+// browser or consuming the real readiness deadline.
+function diagnosticPage(fail: boolean) {
+  const page = new EventEmitter();
+  const browser = new EventEmitter();
+  const failure = new Error('INVENTED readiness evaluation failure');
+  const value = { phase: 'done' } as Spike;
+  const fixture = Object.assign(page, {
+    context: () => ({ browser: () => browser }),
+    route: async () => {},
+    url: () => 'http://127.0.0.1/',
+    goto: async () => {
+      page.emit('pageerror', new Error('INVENTED navigation error'));
+    },
+    evaluate: async () => {
+      page.emit('console', {
+        type: () => 'warning',
+        text: () => 'INVENTED console before failure',
+      });
+      if (fail) {
+        page.emit('pageerror', new Error('INVENTED page error'));
+        page.emit('crash');
+        page.emit('close');
+        browser.emit('disconnected');
+        throw failure;
+      }
+      return value;
+    },
+  });
+  return {
+    page: fixture as unknown as Page,
+    events: page,
+    browser,
+    failure,
+    value,
+  };
+}
+
+test('readiness diagnostics retain failure events and the original rejection', async () => {
+  const fixture = diagnosticPage(true);
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    await ready(fixture.page);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+  }
+  expect(caught).toBe(fixture.failure);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]?.[0]).toBe('READINESS FAILURE');
+  const events = JSON.parse(String(reports[0]?.[1])) as {
+    event: string;
+    detail: string;
+    elapsedMs: number;
+  }[];
+  expect(events.map(({ event, detail }) => [event, detail])).toEqual([
+    ['console', 'warning: INVENTED console before failure'],
+    ['pageerror', 'INVENTED page error'],
+    ['crash', ''],
+    ['close', ''],
+    ['disconnected', ''],
+  ]);
+  for (const event of events) expect(event.elapsedMs).toBeGreaterThanOrEqual(0);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics are silent and release listeners after success', async () => {
+  const fixture = diagnosticPage(false);
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  try {
+    expect(await ready(fixture.page)).toBe(fixture.value);
+  } finally {
+    console.error = original;
+  }
+  expect(reports).toEqual([]);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics keep events observed before the readiness call', async () => {
+  const fixture = diagnosticPage(true);
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  try {
+    keepReadinessDiagnostics(fixture.page);
+    fixture.events.emit('pageerror', new Error('INVENTED navigation error'));
+    try {
+      await ready(fixture.page);
+    } catch (error) {
+      expect(error).toBe(fixture.failure);
+    }
+  } finally {
+    console.error = original;
+  }
+  expect(reports).toHaveLength(1);
+  const first = JSON.parse(String(reports[0]?.[1]))[0];
+  expect(first.event).toBe('pageerror');
+  expect(first.detail).toBe('INVENTED navigation error');
+  expect(first.elapsedMs).toBeGreaterThanOrEqual(0);
+});
+
+test('readiness diagnostics in open retain navigation events and the original readiness rejection', async () => {
+  const fixture = diagnosticPage(true);
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    await open(fixture.page, '/en/_perf', SMALL);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+  }
+  expect(caught).toBe(fixture.failure);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]?.[0]).toBe('READINESS FAILURE');
+  const first = JSON.parse(String(reports[0]?.[1]))[0];
+  expect(first.event).toBe('pageerror');
+  expect(first.detail).toBe('INVENTED navigation error');
+  expect(first.elapsedMs).toBeGreaterThanOrEqual(0);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics in open report a rejected navigation once', async () => {
+  const fixture = diagnosticPage(false);
+  const failure = new Error('INVENTED navigation rejection');
+  Object.assign(fixture.page, {
+    goto: async () => {
+      fixture.events.emit('pageerror', failure);
+      throw failure;
+    },
+  });
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    await open(fixture.page, '/en/_perf', SMALL);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+  }
+  expect(caught).toBe(failure);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]?.[0]).toBe('READINESS FAILURE');
+  const events = JSON.parse(String(reports[0]?.[1]));
+  expect(events).toHaveLength(1);
+  expect(events[0].event).toBe('pageerror');
+  expect(events[0].detail).toBe(failure.message);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics in open abandon readiness when a foreign request wins navigation', async () => {
+  const fixture = diagnosticPage(false);
+  let finishNavigation = () => {};
+  const navigation = new Promise<void>((resolve) => {
+    finishNavigation = resolve;
+  });
+  let evaluations = 0;
+  Object.assign(fixture.page, {
+    goto: async () => {
+      fixture.events.emit('request', {
+        url: () => 'https://assets.invalid/INVENTED.js',
+      });
+      await navigation;
+    },
+    evaluate: async () => {
+      evaluations += 1;
+      throw fixture.failure;
+    },
+  });
+  const reports: unknown[][] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => reports.push(args);
+  try {
+    await expect(open(fixture.page, '/en/_perf', SMALL)).rejects.toThrow(
+      /non-same-origin request:.*assets\.invalid/,
+    );
+  } finally {
+    finishNavigation();
+    // Drain the pending navigation and its rejection handler without a sleep.
+    await setImmediate();
+    console.error = original;
+  }
+  expect(evaluations).toBe(0);
+  expect(reports).toEqual([]);
+  for (const event of ['console', 'pageerror', 'crash', 'close']) {
+    expect(fixture.events.listenerCount(event)).toBe(0);
+  }
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
+test('readiness diagnostics report a host timeout without awaiting the hung page', async () => {
+  const fixture = diagnosticPage(false);
+  Object.assign(fixture.page, {
+    evaluate: () => new Promise<Spike>(() => {}),
+  });
+  const reports: unknown[][] = [];
+  const original = console.error;
+  const originalTimer = globalThis.setTimeout;
+  const originalClear = globalThis.clearTimeout;
+  const delays: number[] = [];
+  const cleared: unknown[] = [];
+  // INVENTED clock: fire the unchanged host deadline deterministically.
+  const handle = { invented: 'timer' } as unknown as ReturnType<
+    typeof setTimeout
+  >;
+  globalThis.setTimeout = ((callback: () => void, delay: number) => {
+    delays.push(delay);
+    queueMicrotask(callback);
+    return handle;
+  }) as typeof setTimeout;
+  globalThis.clearTimeout = ((timer: unknown) => {
+    cleared.push(timer);
+  }) as typeof clearTimeout;
+  console.error = (...args: unknown[]) => reports.push(args);
+  let caught: unknown;
+  try {
+    keepReadinessDiagnostics(fixture.page);
+    fixture.events.emit('pageerror', new Error('INVENTED stalled page'));
+    await ready(fixture.page);
+  } catch (error) {
+    caught = error;
+  } finally {
+    console.error = original;
+    globalThis.setTimeout = originalTimer;
+    globalThis.clearTimeout = originalClear;
+  }
+  expect(caught).toEqual(new Error('spike readiness timed out'));
+  expect(delays).toEqual([170000]);
+  expect(cleared).toEqual([handle]);
+  expect(reports).toHaveLength(1);
+  expect(String(reports[0]?.[1])).toContain('INVENTED stalled page');
+  expect(fixture.browser.listenerCount('disconnected')).toBe(0);
+});
+
 async function ready(page: Page): Promise<Spike> {
+  const diagnostics = keepReadinessDiagnostics(page);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let value: Spike;
   try {
@@ -68,11 +372,15 @@ async function ready(page: Page): Promise<Spike> {
         );
       }),
     ]);
+    if (value === undefined) throw new Error('spike diagnostics are absent');
+    return value;
+  } catch (error) {
+    diagnostics.report();
+    throw error;
   } finally {
     clearTimeout(timer);
+    diagnostics.dispose();
   }
-  if (value === undefined) throw new Error('spike diagnostics are absent');
-  return value;
 }
 
 async function tracePosts(page: Page): Promise<number> {
@@ -87,6 +395,8 @@ async function open(
   canvas: string = FULL,
 ): Promise<Spike> {
   await prepareCanvas(page, canvas);
+  // Start before navigation so parse/initialisation errors are retained too.
+  const diagnostics = keepReadinessDiagnostics(page);
   const seen: string[] = [];
   let settled = false;
   let rejectForeign: (error: Error) => void = () => {};
@@ -105,7 +415,13 @@ async function open(
     }
   });
   const pending = (async () => {
-    await page.goto(path);
+    try {
+      await page.goto(path);
+    } catch (error) {
+      diagnostics.report();
+      throw error;
+    }
+    if (settled) throw new Error('readiness abandoned after a foreign request');
     return ready(page);
   })();
   void pending.catch(() => undefined);
@@ -116,6 +432,7 @@ async function open(
     return spike;
   } finally {
     settled = true;
+    diagnostics.dispose();
   }
 }
 

@@ -2,6 +2,7 @@
 
 import json
 import shutil
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -77,19 +78,82 @@ def test_graph_calls_existing_spine_and_graph_in_release_mode(
         build.final_audit()
 
 
-def test_frame_invokes_real_nested_build_and_refuses_missing_places(
+def test_frame_invokes_real_nested_build_and_refuses_missing_inventory(
     tmp_path: Path,
 ) -> None:
     from custodian.tests.test_frame_live_survivors import _world
+
+    from eii_custodian.publicdata.buildings import BuildingError
 
     prepared = _world(tmp_path)
     build = context(prepared.cache, prepared.entries)
     build.review = prepared.review
     build.selected = reviewed_selections(prepared.cache)
-    with pytest.raises(AssemblyError, match="assembly_places_incomplete"):
+    with pytest.raises(BuildingError, match="building_part_unregistered"):
         build.frame()
-    assert build.frame_result.tables["grid_cell"]
+    assert build.frame_result is None
+    assert "FAIL buildings check=building_part_unregistered" in build.lines
     assert not (prepared.cache / "assembly/frame.json").exists()
+
+
+def test_frame_keeps_stac_lineage_without_claiming_a_metadata_release_table(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from custodian.tests.building_fixture import PARTS, world
+
+    from eii_custodian.publicdata import assembly_adapters
+
+    prepared = world(tmp_path)
+    names = ("municipality", "zone", "district", "grid_cell", "gazetteer")
+    prepared.entries = tuple(
+        replace(
+            row,
+            release_tables=("gazetteer",)
+            if row.key in PARTS
+            else names
+            if row.source_id == "bnd_hdx"
+            else (),
+        )
+        for row in prepared.entries
+    )
+    build = context(prepared.cache, prepared.entries)
+    build.selected = prepared.selected
+    build.reviewed_selections()
+
+    def frame(*_args, **_kwargs):
+        # Use the real pinned building producer and manifest verifier. The
+        # administrative frame and unrelated places outputs are invented here.
+        prepared.produce()
+        directory = prepared.cache / "places_s2_t06"
+        directory.mkdir()
+        for filename in (
+            "pub_place.jsonl",
+            "pub_place_verification.jsonl",
+            "place_points.json",
+            "build_report.json",
+            "flagship_check.json",
+        ):
+            (directory / filename).write_text("[]")
+        return FrameResult(
+            {
+                name: [
+                    {"municipality_code": "SYN-M", "name_en": "SYN", "name_ar": "SYN"}
+                ]
+                for name in names
+            },
+            [],
+            {"bnd_hdx": {"sha256": "a" * 64}, "bnd_zone_2020": {"sha256": "b" * 64}},
+        )
+
+    monkeypatch.setattr(assembly_adapters, "build_public_frame", frame)
+    build.frame()
+    record = json.loads((prepared.cache / "assembly/frame.json").read_text())
+    for row in prepared.entries:
+        if row.source_id != "bldg_ovt":
+            continue
+        assert row.key in record["source_chain"]
+        assert build.source_tables.get(row.key, []) == list(row.release_tables)
+        assert (row.key in build.table_sources["gazetteer"]) == (row.key in PARTS)
 
 
 def test_additions_runs_real_bulletin_and_indexes_its_written_table(
@@ -264,6 +328,7 @@ def test_gather_audit_on_registered_sources_without_cache_is_pending(
     assert any(row["state"] == "failed" for row in audit["completeness"])
     assert audit["oi03"]["state"] == "pending"
     assert {row["task"] for row in audit["confirmations"]} == {
+        "S2-T09",
         "S2-T12",
         "S2-T13",
         "S2-T15",
@@ -271,6 +336,10 @@ def test_gather_audit_on_registered_sources_without_cache_is_pending(
         "S2-T19",
         "S2-T20",
     }
+    assert (
+        next(row for row in audit["confirmations"] if row["task"] == "S2-T09")["state"]
+        == "pending"
+    )
 
 
 def test_series_calls_real_builder_and_preserves_regression_refusal(
@@ -327,9 +396,12 @@ def test_confirmation_adapters_read_pending_t19_and_height_absence(
 ) -> None:
     from eii_custodian.publicdata.assembly_reports import gather_audit
     from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.heights.model import HeightError
 
     build = context(tmp_path, load_registry())
-    build.heights()
+    with pytest.raises(HeightError) as err:
+        build.heights()
+    assert err.value.name == "building_table_absent"
     rows = {row["task"]: row for row in gather_audit(build)["confirmations"]}
     assert rows["S2-T19"]["state"] == "pending"
     assert rows["S2-T19"]["references"] == ["s2_t19_confirmation.yaml"]
@@ -440,6 +512,69 @@ def test_busyness_actual_table_is_indexed_as_an_index_not_a_people_count(
     assert all(figure.figure_id.endswith(":busyness_index") for figure in figures)
 
 
+def test_height_adapter_refuses_a_missing_building_table(tmp_path: Path) -> None:
+    from custodian.tests.fixtures.heights import invented
+
+    from eii_custodian.publicdata.heights.step import HeightError
+
+    cache = tmp_path / "data/public_cache"
+    rows = (
+        invented.entry("bldg_3dglobfp", extension="zip"),
+        invented.entry("bldg_wsf3d", extension="tif"),
+    )
+    state = context(cache, rows)
+    with pytest.raises(HeightError) as err:
+        state.heights()
+    assert err.value.name == "building_table_absent"
+    assert not (cache / "assembly/heights.json").exists()
+    assert state.data_files == {}
+
+
+def test_a_noop_height_producer_over_earlier_valid_outputs_refuses(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """S2-P21 F3: outputs left by an earlier run never stand for this run's."""
+    from custodian.tests.fixtures.heights import invented
+
+    from eii_custodian.publicdata.heights import step
+
+    buildings, globfp, wsf = invented.card_fixture(tmp_path)
+    cache = tmp_path / "data/public_cache"
+    rows = (
+        invented.entry("bldg_3dglobfp", extension="zip"),
+        invented.entry("bldg_wsf3d", extension="tif"),
+    )
+    for row, body in zip(rows, (globfp, wsf), strict=True):
+        invented.store(cache, row, body)
+    path = cache.parent / "assets/buildings/buildings.geojson"
+    path.parent.mkdir(parents=True)
+    path.write_bytes(buildings)
+    from custodian.tests.building_fixture import bind_height_table
+
+    rows = bind_height_table(cache, rows, path)
+    initial = context(cache, rows)
+    initial.selected = reviewed_selections(cache)
+    initial.heights()
+    output = cache.parent / "assets/heights"
+    assert (output / "heights.json").is_file()
+    assert (output / "manifest.heights.json").is_file()
+    (cache / "assembly/heights.json").unlink()
+
+    def noop(*_args, **_kwargs) -> None:
+        return None
+
+    monkeypatch.setattr(step, "build_heights", noop)
+    state = context(cache, rows)
+    state.selected = reviewed_selections(cache)
+    with pytest.raises(AssemblyError) as err:
+        state.heights()
+    assert str(err.value) == "assembly_heights_incomplete"
+    assert not (output / "heights.json").exists()
+    assert not (output / "manifest.heights.json").exists()
+    assert not (cache / "assembly/heights.json").exists()
+    assert state.data_files == {}
+
+
 def test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering(
     tmp_path: Path,
 ) -> None:
@@ -458,13 +593,19 @@ def test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering(
     path = cache.parent / "assets/buildings/buildings.geojson"
     path.parent.mkdir(parents=True)
     path.write_bytes(buildings)
+    from custodian.tests.building_fixture import bind_height_table
+
+    rows = bind_height_table(cache, rows, path)
     state = context(cache, rows)
+    state.selected = reviewed_selections(cache)
     state.heights()
     result = json.loads((cache / "assembly/heights.json").read_text())
     assert result["state"] == "built"
     assert set(state.data_files) == {
         "assets/heights/heights.json",
         "assets/heights/manifest.heights.json",
+        "assets/buildings/buildings.geojson",
+        "assets/buildings/manifest.buildings.json",
     }
     bound_files(cache.parent, state.data_files)
     (cache.parent / "assets/heights/heights.json").write_text("[]")

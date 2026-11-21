@@ -795,6 +795,10 @@ sources:
       - number
     - - long_
       - number
+    - - students_n
+      - integer
+    - - staff_num
+      - integer
     as_of: retrieval_date
     publisher_date: null
     period_fields: []
@@ -837,6 +841,8 @@ sources:
       - district_name_en
       - lat
       - long_
+      - students_n
+      - staff_num
       record_path:
       - features
       attribute_path:
@@ -917,6 +923,14 @@ sources:
             optional: false
           long_:
             kind: number
+            nullable: true
+            optional: false
+          students_n:
+            kind: integer
+            nullable: true
+            optional: false
+          staff_num:
+            kind: integer
             nullable: true
             optional: false
   awards_owner_scrape:
@@ -1079,4 +1093,5 @@ gis_confirmation:
     QatarOrtho: [4000000, 500]
     QatarSatelitte2024: [4000000, 500]
     QatarSatelitte: [4000000, 500]
+  # Decision 0079: the separate closed gis_snapshot.json governs snapshot acquisition.
   export_tiles_allowed: false

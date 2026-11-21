@@ -1,31 +1,251 @@
-# Pending placeholders only. No publisher metadata or host is confirmed.
-# Decimal limits are ASSUMPTION from invented fixtures, awaiting lead verification.
+# Supplied lead readings of 2026-11-20; no archive fetched here.
+# Exact byte bounds and native headers are reviewed; row counts are unknown.
+# Still unconfirmed: target/country representation, missing-quantity tokens,
+# decimal limits, access configuration and first-fetch bounded row accounting.
+# Decimal limits and country_width below remain fixture assumptions.
 config_version: baci-v1
 method_version: v1
-source_version: ""
-hs_revision: ""
+source_version: '202601'
+hs_revision: HS17
 access: unconfirmed
 confirmed: false
-reviewed_urls: []
-publisher: ""
-page: ""
-page_sha256: ""
-attribution: ""
-evidence: ""
-qatar_key: ""
+reviewed_urls:
+- https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
+- https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS17_V202601.zip
+publisher: CEPII
+page: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
+page_sha256: 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60
+attribution: 'CEPII, BACI HS 2017, release 202601, Licence: Etalab 2.0; publisher
+  page read 2026-11-20.'
+evidence: Lead publisher-page and byte-range archive readings, 2026-11-20; archive
+  inventory SHA-256 c05558932651ca22915f5fca081f8c5ce30697ffcc845553e15763e84226d49f;
+  document 04 BACI pending identity and coverage (S2-T24). This is an inventory evidence
+  digest, not an archive checksum.
+qatar_key: ''
 country_width: 1
-product_width: 1
-value_unit: ""
-quantity_unit: ""
-currency: ""
+product_width: 6
+value_unit: thousand USD
+quantity_unit: metric tons
+currency: USD
 valuation_basis: unknown
 reconciliation: unknown
 missing_quantity: []
-period_first: 1
-period_last: 1
-archive_bytes: [0, 0]
-raw_rows: [0, 0]
+period_first: 2_017
+period_last: 2_024
+archive_bytes:
+- 794_583_540
+- 794_583_540
+raw_rows: null
 total_digits: 18
 fractional_digits: 6
-publisher_sha256: ""
-members: []
+publisher_sha256: ''
+members:
+- name: BACI_HS17_Y2017_V202601.csv
+  kind: trade
+  year: 2_017
+  bytes:
+  - 324_485_600
+  - 324_485_600
+  rows: null
+  sha256: ''
+  columns: &id001
+    t: year
+    i: exporter_code
+    j: importer_code
+    k: hs_code
+    v: value
+    q: quantity
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 89_426_357
+  - 89_426_357
+- name: BACI_HS17_Y2018_V202601.csv
+  kind: trade
+  year: 2_018
+  bytes:
+  - 352_137_922
+  - 352_137_922
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 96_882_092
+  - 96_882_092
+- name: BACI_HS17_Y2019_V202601.csv
+  kind: trade
+  year: 2_019
+  bytes:
+  - 365_060_090
+  - 365_060_090
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 100_037_104
+  - 100_037_104
+- name: BACI_HS17_Y2020_V202601.csv
+  kind: trade
+  year: 2_020
+  bytes:
+  - 357_505_759
+  - 357_505_759
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 97_687_183
+  - 97_687_183
+- name: BACI_HS17_Y2021_V202601.csv
+  kind: trade
+  year: 2_021
+  bytes:
+  - 377_609_211
+  - 377_609_211
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 103_041_055
+  - 103_041_055
+- name: BACI_HS17_Y2022_V202601.csv
+  kind: trade
+  year: 2_022
+  bytes:
+  - 380_985_070
+  - 380_985_070
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 103_981_559
+  - 103_981_559
+- name: BACI_HS17_Y2023_V202601.csv
+  kind: trade
+  year: 2_023
+  bytes:
+  - 382_952_885
+  - 382_952_885
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 104_272_449
+  - 104_272_449
+- name: BACI_HS17_Y2024_V202601.csv
+  kind: trade
+  year: 2_024
+  bytes:
+  - 363_762_242
+  - 363_762_242
+  rows: null
+  sha256: ''
+  columns: *id001
+  header:
+  - t
+  - i
+  - j
+  - k
+  - v
+  - q
+  compressed_bytes:
+  - 99_143_798
+  - 99_143_798
+- name: product_codes_HS17_V202601.csv
+  kind: product
+  year: null
+  bytes:
+  - 598_831
+  - 598_831
+  rows: null
+  sha256: ''
+  columns:
+    code: hs_code
+    description: source_description
+  header:
+  - code
+  - description
+  compressed_bytes:
+  - 106_837
+  - 106_837
+- name: country_codes_V202601.csv
+  kind: country
+  year: null
+  bytes:
+  - 5_346
+  - 5_346
+  rows: null
+  sha256: ''
+  columns:
+    country_code: country_code
+    country_name: source_name
+    country_iso2: iso2
+    country_iso3: iso3
+  header:
+  - country_code
+  - country_name
+  - country_iso2
+  - country_iso3
+  compressed_bytes:
+  - 3_121
+  - 3_121
+- name: Readme.txt
+  kind: text
+  year: null
+  bytes:
+  - 571
+  - 571
+  rows: null
+  sha256: ''
+  columns: {}
+  header: []
+  compressed_bytes:
+  - 389
+  - 389

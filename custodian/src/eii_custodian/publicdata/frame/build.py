@@ -4,7 +4,7 @@ Tests and real builds use build_frame and the same raw-source assembler.
 """
 
 import json
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from datetime import date
@@ -37,7 +37,11 @@ class FrameResult:
 
 
 def read_cached(
-    cache: Path, entry: Entry, *, digest: str
+    cache: Path,
+    entry: Entry,
+    *,
+    digest: str,
+    decode: Callable[[bytes], Any] | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     """Read a reviewed hash and verify its dated receipt and bytes."""
     try:
@@ -62,6 +66,8 @@ def read_cached(
     receipt["method"] = "frame.v1"
     if entry.extension == "zip":
         return body, receipt
+    if decode is not None:
+        return decode(body), receipt
     return json.loads(body, parse_float=Decimal), receipt
 
 
@@ -167,5 +173,44 @@ def build_frame(
         propose_reviews(review, output, set(), result.inventory, report)
         return FrameResult(result.tables, report, result.sources, result.inventory)
     return build_live_frame(
-        cache, registry, review, output, result, selected, build_date=build_date
+        cache,
+        registry,
+        review,
+        output,
+        result,
+        selected,
+        build_date=build_date,
     )
+
+
+def build_public_frame(
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    output: Path | None = None,
+    *,
+    selections: Mapping[str, str] | None = None,
+    build_date: date | None = None,
+) -> FrameResult:
+    """Required frame plus inventory dependency for both public-build paths.
+
+    The frame-only geometry API remains useful independently. A public build
+    always uses this composition, which has no inventory-skip option.
+    """
+    from shapely.ops import unary_union
+
+    from eii_custodian.publicdata.buildings import BuildingError, build_buildings
+
+    selected = reviewed_selections(cache) if selections is None else selections
+    result = build_frame(
+        cache, registry, review, output, selections=selected, build_date=build_date
+    )
+    if not isinstance(result, FrameResult) or not result.tables.get("municipality"):
+        raise BuildingError("building_frame_absent")
+    build_buildings(
+        cache,
+        registry,
+        selected,
+        unary_union([row["geometry"] for row in result.tables["municipality"]]),
+    )
+    return result

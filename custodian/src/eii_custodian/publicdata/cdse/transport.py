@@ -1,7 +1,7 @@
-"""Closed injected exchanges. No environment reader, socket or live endpoint.
+"""Closed injected exchanges. No environment reader or socket.
 
-The Process/metadata envelopes are internal placeholders, never asserted to be
-provider wire schemas. Official review must replace them before a live run.
+Process JSON follows the official readings in README. Live endpoint admission
+remains separate from documentation reading and requires the lead's review.
 """
 
 from __future__ import annotations
@@ -10,10 +10,14 @@ import json
 import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 from urllib.parse import quote, quote_plus, urlsplit
 
+if TYPE_CHECKING:
+    from eii_custodian.publicdata.cdse.wire import ProcessSpec
+
 REVIEWED_ENDPOINTS: Mapping[str, str] = {}
-KINDS = frozenset({"token", "metadata", "process"})
+KINDS = frozenset({"token", "process"})
 HASH = re.compile(r"[a-f0-9]{64}")
 
 
@@ -37,7 +41,7 @@ class Credentials:
 class Request:
     kind: str
     url: str
-    body: dict[str, str]
+    body: dict[str, Any]
     headers: dict[str, str]
 
     def __repr__(self) -> str:
@@ -82,15 +86,16 @@ def validate_request(request: Request) -> None:
             and request.body.get("grant_type") == "client_credentials"
             and bool(request.body.get("client_id"))
             and bool(request.body.get("client_secret"))
-            and not request.headers
+            and request.headers == {"Content-Type": "application/x-www-form-urlencoded"}
         )
     else:
-        # Deliberately internal: no remembered Process evalscript or date API.
+        from eii_custodian.publicdata.cdse.wire import validate_process_body
+
+        validate_process_body(request.body)
         valid = (
-            set(request.body) == {"request_sha256", "contract"}
-            and request.body.get("contract") == "pending.v1"
-            and HASH.fullmatch(request.body.get("request_sha256", "")) is not None
-            and set(request.headers) == {"Authorization"}
+            set(request.headers) == {"Authorization", "Content-Type", "Accept"}
+            and request.headers.get("Content-Type") == "application/json"
+            and request.headers.get("Accept") == "application/x-tar"
             and request.headers.get("Authorization", "").startswith("Bearer ")
             and len(request.headers["Authorization"]) > len("Bearer ")
         )
@@ -138,7 +143,7 @@ class Session:
             text = text.replace(value, "[redacted]")
         return text
 
-    def _send(self, kind: str, body: dict[str, str]) -> bytes:
+    def _send(self, kind: str, body: dict[str, Any]) -> bytes:
         if self._stopped:
             raise CdseError("run_stopped_fresh_budget_required")
         try:
@@ -149,7 +154,13 @@ class Session:
             if kind != "token" and not self._token:
                 raise CdseError("authentication_required")
             headers = (
-                {} if kind == "token" else {"Authorization": "Bearer " + self._token}
+                {"Content-Type": "application/x-www-form-urlencoded"}
+                if kind == "token"
+                else {
+                    "Authorization": "Bearer " + self._token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/x-tar",
+                }
             )
             request = Request(kind, REVIEWED_ENDPOINTS.get(kind, ""), body, headers)
             validate_request(request)
@@ -196,10 +207,16 @@ class Session:
             self._stopped = True
             raise CdseError("authentication_schema_refused") from None
 
-    def _asset(self, kind: str, request_sha256: str) -> bytes:
-        body = self._send(
-            kind, {"request_sha256": request_sha256, "contract": "pending.v1"}
-        )
+    def _asset(self, kind: str, spec: ProcessSpec) -> bytes:
+        from eii_custodian.publicdata.cdse.wire import ProcessSpec, process_body
+
+        try:
+            if not isinstance(spec, ProcessSpec):
+                raise CdseError("request_schema_refused")
+            body = self._send(kind, process_body(spec))
+        except ValueError:
+            self._stopped = True
+            raise
         if self.redact(body.decode("utf-8", errors="replace")) != body.decode(
             "utf-8", errors="replace"
         ):
@@ -207,10 +224,11 @@ class Session:
             raise CdseError("response_contains_secret")
         return body
 
-    def picture(self, request_sha256: str) -> bytes:
-        """Read only the explicitly budgeted picture; no retries or refresh implicit."""
-        return self._asset("process", request_sha256)
+    def picture(self, spec: ProcessSpec) -> bytes:
+        """Read one budgeted raster/metadata tar; no retries or refresh implicit."""
+        return self._asset("process", spec)
 
-    def metadata(self, request_sha256: str) -> bytes:
-        """A metadata attempt must have its own enumerated slot."""
-        return self._asset("metadata", request_sha256)
+    def metadata(self, spec: ProcessSpec) -> bytes:
+        """Extra metadata-only endpoint remains pending; Process returns its dates."""
+        self._stopped = True
+        raise CdseError("metadata_endpoint_pending_use_process_userdata")

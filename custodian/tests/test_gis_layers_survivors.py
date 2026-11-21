@@ -91,7 +91,9 @@ def test_feature_keys_exclude_previous_key_and_number_duplicates() -> None:
 def test_land_price_refusal_keeps_field_name() -> None:
     _refusal(
         lambda: subject.land_price_rows(
-            [{"attributes": {"DIST_NO": 3, "District_No": 3}}], "Invented2026"
+            [{"attributes": {"DIST_NO": 3, "District_No": 3}}],
+            "Invented2026",
+            as_of="2026-11-17",
         ),
         "ResidentialPrices: not-a-string",
     )

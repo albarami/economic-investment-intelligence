@@ -38,16 +38,23 @@ from eii_custodian.publicdata.gis import layers as subject
             ),
             "health layer",
         ),
-        (lambda: subject.land_price_rows([], "SYN"), "service name year"),
+        (
+            lambda: subject.land_price_rows([], "SYN", as_of="2026-11-17"),
+            "service name year",
+        ),
         (
             lambda: subject.land_price_rows(
-                [{"attributes": {"DIST_NO": True, "District_No": True}}], "SYN2026"
+                [{"attributes": {"DIST_NO": True, "District_No": True}}],
+                "SYN2026",
+                as_of="2026-11-17",
             ),
             "district numbers differ",
         ),
         (
             lambda: subject.land_price_rows(
-                [{"attributes": {"DIST_NO": "3", "District_No": "3"}}], "SYN2026"
+                [{"attributes": {"DIST_NO": "3", "District_No": "3"}}],
+                "SYN2026",
+                as_of="2026-11-17",
             ),
             "district numbers differ",
         ),

@@ -128,7 +128,15 @@ def _complete_audit() -> dict[str, object]:
         "oi03": {"state": "recorded"},
         "confirmations": [
             {"task": task, "state": "recorded"}
-            for task in ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
         ],
         "regressions": {"missing": [], "mismatch": ""},
     }
@@ -172,7 +180,15 @@ def test_each_missing_or_pending_gate_is_refused() -> None:
         "oi03": {"state": "recorded"},
         "confirmations": [
             {"task": task, "state": "recorded"}
-            for task in ("S2-T12", "S2-T13", "S2-T15", "S2-T17", "S2-T19", "S2-T20")
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
         ],
         "regressions": {"missing": [], "mismatch": ""},
     }
@@ -261,6 +277,31 @@ def test_untagged_multisource_table_is_excluded_and_recorded(tmp_path: Path) -> 
 
 
 @pytest.mark.parametrize("series", [False, True])
+def test_empty_multisource_table_is_excluded_as_empty(
+    tmp_path: Path, series: bool
+) -> None:
+    state = _multisource_build(tmp_path, series=series)
+    state.tables["pub_invented"] = []
+    state.table("pub_checkable", [{"value": i} for i in range(25)], ("invented",))
+    state.record(
+        "series_stage" if series else "gis_property_singles",
+        {"tables": state.tables, "row_sources": {"pub_invented": []}},
+    )
+    assert set(draw_tables(state)) == {"pub_checkable"}
+    write_record(tmp_path, "assembly/build.json", {})
+    state.draw()
+    record = json.loads((tmp_path / "assembly/draw.json").read_text())
+    assert record["excluded_tables"] == [
+        {
+            "table": "pub_invented",
+            "sources": ["invented", "second/key" if series else "second"],
+            "reason": "assembly_draw_table_empty",
+        }
+    ]
+    assert all(key.startswith("pub_checkable:") for key in record["figure_ids"])
+
+
+@pytest.mark.parametrize("series", [False, True])
 def test_partly_tagged_multisource_table_refuses(tmp_path: Path, series: bool) -> None:
     state = _multisource_build(tmp_path, series=series)
     if series:
@@ -291,18 +332,178 @@ def test_nonfinite_stored_measure_is_refused(tmp_path: Path, value: str) -> None
         draw_tables(state)["pub_invented"]()
 
 
-def test_duplicate_confirmations_do_not_cover_six_tasks() -> None:
+def test_pending_method_pin_blocks_otherwise_complete_audit() -> None:
     from eii_custodian.publicdata.assembly_reports import require_complete
 
     audit = {
         "completeness": [{"state": "in use"}],
         "terms": [{"own_words_state": "recorded"}],
         "oi03": {"state": "recorded"},
-        "confirmations": [{"task": "S2-T12", "state": "recorded"}] * 6,
+        "confirmations": [
+            {"task": task, "state": "recorded" if task != "S2-T09" else "pending"}
+            for task in (
+                "S2-T09",
+                "S2-T12",
+                "S2-T13",
+                "S2-T15",
+                "S2-T17",
+                "S2-T19",
+                "S2-T20",
+            )
+        ],
         "regressions": {"missing": [], "mismatch": ""},
     }
     with pytest.raises(AssemblyError, match="assembly_gate_pending"):
         require_complete(audit)
+
+
+def test_checked_method_pin_reaches_require_complete_through_gather_audit(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(tmp_path)
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "recorded"
+    require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+def test_missing_method_pin_record_refused_at_require_complete(
+    tmp_path: Path,
+) -> None:
+    """Only the source-check record is absent; every other S2-T09 input is valid."""
+    from custodian.tests.method_card_pin_fixtures import write_yaml
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, record, _ = stage_method_pin_gather_build(tmp_path, stage_record=False)
+    record_path = build.review / "s2_t09_source_checks.yaml"
+    assert not record_path.exists()
+    assert (build.cache / "assembly/s2_t09_pin_artifact.json").is_file()
+    assert (build.cache / "assembly/s2_t09_pin_generation_config.json").is_file()
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+    # The same staged inputs pass once the record alone is restored.
+    write_yaml(record_path, record)
+    restored = gathered_s2_t09_confirmation(build)
+    assert restored["state"] == "recorded"
+    require_complete(otherwise_complete_audit_with_s2_t09(restored))
+
+
+def test_missing_method_pin_outputs_refused_at_require_complete(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(tmp_path, stage_outputs=False)
+    assert not (build.cache / "assembly/s2_t09_pin_artifact.json").exists()
+    assert not (build.cache / "assembly/s2_t09_pin_generation_config.json").exists()
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+def test_schema_valid_pending_method_pin_refused_at_require_complete(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.method_card_pin_fixtures import pending
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    build, *_ = stage_method_pin_gather_build(
+        tmp_path,
+        mutate=lambda _paths, rec, _artifact, _config: pending(rec["pins"][0]),
+    )
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+@pytest.mark.parametrize(
+    "plant",
+    ["corrupt_artifact", "corrupt_receipt"],
+)
+def test_invalid_method_pin_evidence_refused_at_require_complete(
+    tmp_path: Path, plant: str
+) -> None:
+    from custodian.tests.method_card_pin_fixtures import digest, lineage_context
+    from custodian.tests.method_pin_gather_fixtures import (
+        gathered_s2_t09_confirmation,
+        otherwise_complete_audit_with_s2_t09,
+        stage_method_pin_gather_build,
+    )
+
+    from eii_custodian.publicdata.assembly_reports import require_complete
+
+    def corrupt_artifact(_paths, _record, artifact, _config):
+        artifact["pins"][0]["values"]["value"] = "invented-corrupt"
+
+    mutate = corrupt_artifact if plant == "corrupt_artifact" else None
+
+    build, record, *_ = stage_method_pin_gather_build(tmp_path, mutate=mutate)
+    if plant == "corrupt_receipt":
+        key = next(iter(lineage_context(record)["receipts"]))
+        build.receipts[key] = {**build.receipts[key], "sha256": digest(b"corrupt body")}
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "pending"
+    assert s2_t09["reason"] == "confirmation_pending"
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+def test_duplicate_confirmations_do_not_cover_the_confirmation_tasks() -> None:
+    """Seven recorded duplicates pass the count; task membership alone refuses."""
+    from eii_custodian.publicdata.assembly_reports import require_complete
+    from eii_custodian.publicdata.gate_report import CONFIRMATION_TASKS
+
+    def audit(confirmations: list[dict[str, str]]) -> dict[str, object]:
+        return {
+            "completeness": [{"state": "in use"}],
+            "terms": [{"own_words_state": "recorded"}],
+            "oi03": {"state": "recorded"},
+            "confirmations": confirmations,
+            "regressions": {"missing": [], "mismatch": ""},
+        }
+
+    assert len(CONFIRMATION_TASKS) == 7
+    # Control: one recorded row per task with the same other criteria passes.
+    require_complete(
+        audit([{"task": task, "state": "recorded"} for task in CONFIRMATION_TASKS])
+    )
+    duplicates = [{"task": "S2-T12", "state": "recorded"} for _ in CONFIRMATION_TASKS]
+    assert len(duplicates) == len(CONFIRMATION_TASKS)
+    assert all(row["state"] == "recorded" for row in duplicates)
+    with pytest.raises(AssemblyError, match="assembly_gate_pending"):
+        require_complete(audit(duplicates))
 
 
 def test_reports_refuse_a_changed_draw_envelope(tmp_path: Path) -> None:

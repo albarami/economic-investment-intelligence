@@ -1,11 +1,13 @@
 """B7: `build_heights` — read, match, call the calc functions, write.
 
-A missing building table is a skip line, never a failure (B10). A refused
-input raises `HeightError`, whose name is the check the FAIL line carries.
+A missing building table refuses with `building_table_absent` (decision 0064
+item 25). A refused input raises `HeightError`, whose name is the check the
+FAIL line carries.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -19,10 +21,18 @@ from eii_core.calc.building_heights import (
     height_counts,
     largest_overlap,
 )
+from eii_custodian.publicdata.building_inputs import verify_building_manifest
 from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
-from eii_custodian.publicdata.fetch.report import skip_line
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 
+from .calibration import gba_calibration
+from .landmarks import (
+    LANDMARK_HEIGHTS_PATH,
+    apply_landmark_heights,
+    load_landmark_heights,
+    verify_landmark_receipts,
+)
 from .manifest import (
     dump_sorted,
     manifest_block,
@@ -40,6 +50,7 @@ from .model import (
     BUILDINGS_RELATIVE,
     HEIGHTS_FILE,
     HEIGHTS_RELATIVE,
+    LANDMARK_HEIGHTS_RELATIVE,
     MANIFEST_FILE,
     RULES_PATH,
     Building,
@@ -137,19 +148,25 @@ def build_heights(
     rules_path: Path | None = None,
     *,
     terms_attempts: tuple[dict[str, object], ...] = (),
+    selections: Mapping[str, str] | None = None,
 ) -> None:
-    """Run the heights step: skip on an absent table, refuse on a bad input.
+    """Run the heights step; refuse on a bad input or a missing building table.
 
     The step's own earlier outputs are removed before anything is read, so a
-    later skip or refusal never leaves an old heights file behind.
+    later refusal never leaves an old heights file behind.
     """
     for name in (HEIGHTS_FILE, MANIFEST_FILE):
         (out_dir / name).unlink(missing_ok=True)
     if not buildings_path.is_file():
-        lines.append(skip_line("heights", "building_table_absent"))
-        return
+        raise HeightError("building_table_absent")
+    selected = reviewed_selections(cache) if selections is None else selections
+    source_chain = verify_building_manifest(cache, entries, selected, buildings_path)
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
-    buildings = load_buildings(buildings_path)
+    landmarks = load_landmark_heights()
+    verify_landmark_receipts(cache, landmarks)
+    buildings, landmark_citations = apply_landmark_heights(
+        load_buildings(buildings_path), landmarks
+    )
     results = read_sources(cache, entries, rules, bounds=_table_bounds(buildings))
     index = globfp_index(results["bldg_3dglobfp"].globfp)
     rows, candidates, choices, globfp_matches = _resolve(
@@ -158,15 +175,20 @@ def build_heights(
     counts = height_counts(choices, globfp_matches)
     errors = fallback_errors(candidates)
     heights_body = dump_sorted(rows)
+    landmark_bytes = LANDMARK_HEIGHTS_PATH.read_bytes()
     input_files: list[dict[str, object]] = [
         {
             "key": "building_table",
             "path": BUILDINGS_RELATIVE,
             "role": "read",
             "sha256": file_sha256(buildings_path.read_bytes()),
-            "source_chain": (
-                "the asset pipeline's own manifest entry of the same key and sha256"
-            ),
+            "source_chain": source_chain,
+        },
+        {
+            "key": "landmark_heights",
+            "path": LANDMARK_HEIGHTS_RELATIVE,
+            "role": "read",
+            "sha256": file_sha256(landmark_bytes),
         },
         {
             "key": "heights",
@@ -182,6 +204,8 @@ def build_heights(
         errors,
         input_files,
         terms_attempts=terms_attempts,
+        landmark_citations=landmark_citations,
+        gba_calibration=gba_calibration(buildings, results["bldg_gba"]),
     )
     write_outputs(
         out_dir,

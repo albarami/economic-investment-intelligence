@@ -433,11 +433,13 @@ def test_owned_missing_check_blocks_success(tmp_path: Path) -> None:
 
 @pytest.mark.public_data
 def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> None:
+    fixture_cache = tmp_path / "data" / "public_cache"
+    fixture_cache.mkdir(parents=True)
     from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.report import pass_line
     from eii_custodian.publicdata.series.figures import finish_build
 
-    entry, digest = series_cache(tmp_path, "sec_hr_ind", [])
+    entry, digest = series_cache(fixture_cache, "sec_hr_ind", [])
     observed = []
 
     def fetched(*args, registry_entries=None):
@@ -454,7 +456,7 @@ def test_fetch_build_runs_selected_cache_checks(tmp_path: Path, monkeypatch) -> 
     result = build.run_build(
         [entry],
         lambda url: None,
-        tmp_path,
+        fixture_cache,
         lambda: "2026-11-14T00:00:00Z",
         lambda n: None,
     )
@@ -504,7 +506,8 @@ def test_independent_checks_and_contract_values() -> None:
             ("2025", "71", 10),
         ]
     ]
-    # Median=3, strict threshold=9. Dated=59+2+62*3=247; 59/247*100 -> 24.
+    # Each named month has local median 3, strict threshold 9.
+    # Dated=59+2+62*3=247; 59/247*100 -> 24.
     from eii_core.calc.public_series import C2_CALENDAR
 
     from .test_series_exact_regressions import cancellation
@@ -516,9 +519,17 @@ def test_independent_checks_and_contract_values() -> None:
         cancellation("2020", 1, 2),
         cancellation(None, None, 9),
     ]
-    other = [
-        m for m in C2_CALENDAR if m not in {"2020-07", "2022-06", "2024-09", "2020-01"}
-    ][:62]
+    # Keep 62 baseline rows, now around the named months so this fixture
+    # still checks strict equality (June) and just below it (September).
+    neighbours = {
+        month
+        for peak in ("2020-07", "2022-06", "2024-09")
+        for month in C2_CALENDAR[
+            C2_CALENDAR.index(peak) - 6 : C2_CALENDAR.index(peak) + 7
+        ]
+    } - {"2020-07", "2022-06", "2024-09", "2020-01"}
+    other = sorted(neighbours | set(C2_CALENDAR[:27]))
+    assert len(other) == 62
     fixtures["lic_cancelled"].extend(cancellation(m[:4], int(m[5:]), 3) for m in other)
     assert compute_checks(
         {
@@ -1322,42 +1333,67 @@ def test_r3_licence_periods_and_reports(tmp_path):
 def test_r3_reference_review_remains_explicit():
     import csv
 
-    path = Path(__file__).resolve().parents[1] / "publicdata/review/country_iso3.csv"
-    with path.open() as stream:
+    review = Path(__file__).resolve().parents[1] / "publicdata/review"
+    with (review / "country_iso3.csv").open() as stream:
         rows = list(csv.DictReader(stream))
     assert rows and all(r["human_reviewed"] == "false" for r in rows)
-    assert (
-        json.loads(
-            (
-                Path(__file__).resolve().parents[1]
-                / "publicdata/review/municipality_aliases.json"
-            ).read_text()
-        )
-        == []
+    assert not (review / "municipality_aliases.json").exists()
+    assert (review / "municipality_names.csv").is_file()
+
+
+def test_r3_planted_legacy_alias_is_never_read(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.series import parse
+    from eii_custodian.publicdata.series.figures import build_series
+
+    module = tmp_path / "src/eii_custodian/publicdata/series/parse.py"
+    module.parent.mkdir(parents=True)
+    review = tmp_path / "publicdata/review"
+    review.mkdir(parents=True)
+    monkeypatch.setattr(parse, "__file__", str(module))
+    (review / "country_iso3.csv").write_text(
+        "name_en,iso3\ninvented-country,SYN\n", encoding="utf-8"
     )
+    (review / "country_aliases.csv").write_text(
+        "name_en,iso3,reason\n", encoding="utf-8"
+    )
+    names = tmp_path / "invented_review"
+    names.mkdir()
+    (names / "municipality_names.csv").write_text(
+        "name,municipality_code\nبلدية تجريبية,invented-frame-code\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(parse, "MUNICIPALITY_NAMES_REVIEW", names)
+    legacy = review / "municipality_aliases.json"
+    legacy.write_text(
+        json.dumps(
+            [
+                {
+                    "source_name_ar": "بلدية تجريبيه",
+                    "frame_name_ar": "بلدية تجريبية",
+                    "reviewer_role": "invented-reviewer",
+                    "review_date": "2026-11-14",
+                }
+            ]
+        )
+    )
+    original_open = Path.open
 
+    def refuse_legacy_read(path, *args, **kwargs):
+        if path == legacy:
+            raise AssertionError("legacy municipality alias file was read")
+        return original_open(path, *args, **kwargs)
 
-def test_r3_reviewed_municipality_alias_only(tmp_path):
-    from eii_custodian.publicdata.series.parse import Municipality, municipality_names
-
-    frame = (Municipality("invented-frame-code", "بلدية تجريبية"),)
-    review = tmp_path / "aliases.json"
+    monkeypatch.setattr(Path, "open", refuse_legacy_read)
+    frame = (parse.Municipality("invented-frame-code", "بلدية تجريبية"),)
     row = {
-        "source_name_ar": "بلدية تجريبيه",
-        "frame_name_ar": "بلدية تجريبية",
-        "reviewer_role": "invented-reviewer",
-        "review_date": "2026-11-14",
+        "lbldy": "بلدية تجريبيه",
+        "rmz_lnsht_ltjry": "invented-code",
+        "lnsht_ltjry": "invented-name",
+        "dd_lrkhs_lnsht": 7,
     }
-    review.write_text(json.dumps([row]))
-    assert municipality_names(frame, review)["بلدية تجريبيه"] == "invented-frame-code"
-    for bad in (
-        {**row, "reviewer_role": ""},
-        {**row, "review_date": ""},
-        {**row, "frame_name_ar": "unknown"},
-    ):
-        review.write_text(json.dumps([bad]))
-        with pytest.raises(ValueError, match="municipality alias"):
-            municipality_names(frame, review)
+    entry, digest = series_cache(tmp_path, "lic_active", [row])
+    with pytest.raises(parse.SeriesRefused) as caught:
+        build_series(tmp_path, [entry], {entry.key: digest}, municipalities=frame)
+    assert caught.value.word == "unmapped_municipality_spelling"
 
 
 def test_r3_exact_pub64_registry_mapping():
@@ -1534,26 +1570,6 @@ def test_confirmed_registry_field_refused():
     entry = replace(entry, columns=(*entry.columns, ("invented_field", "string")))
     with pytest.raises(ValueError, match="util_elec registry fields: invented_field"):
         confirmed_rows(entry, [{"year": "2021", "zone_number": "69", "value": 12}])
-
-
-def test_municipality_invalid_nonempty_review_date(tmp_path):
-    from eii_custodian.publicdata.series.parse import Municipality, municipality_names
-
-    review = tmp_path / "aliases.json"
-    review.write_text(
-        json.dumps(
-            [
-                {
-                    "source_name_ar": "بلدية تجريبيه",
-                    "frame_name_ar": "بلدية تجريبية",
-                    "reviewer_role": "invented-reviewer",
-                    "review_date": "2026-13-40",
-                }
-            ]
-        )
-    )
-    with pytest.raises(ValueError, match=r"month must be in 1\.\.12"):
-        municipality_names((Municipality("invented", "بلدية تجريبية"),), review)
 
 
 def test_unknown_contract_source_refused():
@@ -1927,3 +1943,27 @@ def test_real_stage_names_the_figure_of_a_blocked_source(
     assert build["mismatch"] == figure
     assert failure is not None and failure.source_id == figure
     assert lines[-1] == "FAIL " + figure + " public_data selected-cache check"
+
+
+def test_c2_method_version_is_bumped_without_changing_other_cards():
+    from eii_custodian.publicdata.series.figures import _envelope
+
+    receipt = {
+        key: "INVENTED"
+        for key in (
+            "source_id",
+            "publisher",
+            "slug",
+            "licence_id",
+            "licence_basis",
+            "retrieved_utc",
+            "sha256",
+            "fetch_url",
+        )
+    }
+    assert (
+        _envelope(["lic_cancelled"], {"lic_cancelled": receipt})["method_version"]
+        == "C2-v2"
+    )
+    assert _envelope(["lic_active"], {"lic_active": receipt})["method_version"] == "1"
+    assert _envelope(["util_elec"], {"util_elec": receipt})["method_version"] == "1"

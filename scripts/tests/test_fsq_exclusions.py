@@ -312,6 +312,14 @@ class ExclusionTests(unittest.TestCase):
                 with self.assertRaisesRegex(PlacesFsqError, "^metadata_unreadable$"):
                     _read_footer(Path("invented"), 4096)
 
+    def test_module_docstring_names_explicit_release_not_pinned_copy(self) -> None:
+        import fsq_exclusions
+
+        doc = fsq_exclusions.__doc__ or ""
+        self.assertNotIn("pinned copy", doc)
+        self.assertIn("explicit", doc.lower())
+        self.assertIn("release", doc.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

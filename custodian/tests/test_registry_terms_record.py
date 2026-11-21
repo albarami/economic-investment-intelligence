@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.registry import (
     LICENCE_BASIS_PENDING,
@@ -46,6 +47,47 @@ def _assert_terms_records(path: Path) -> None:
 
 def test_committed_terms_records() -> None:
     _assert_terms_records(registry_path())
+
+
+def _assert_baci_terms_reading(pack: str) -> None:
+    """Require BACI's own terms-table row, including its supplied page digest."""
+    rows = [
+        line
+        for line in pack.splitlines()
+        if line.startswith("| `cepii_baci` |") and len(line.split("|")) == 7
+    ]
+    assert len(rows) == 1, "BACI terms-reading row missing or duplicated"
+    cells = [cell.strip() for cell in rows[0].split("|")[1:-1]]
+    assert cells[1] == '"Licence: Etalab 2.0"'
+    assert cells[2] == "2026-11-20"
+    assert cells[3] == "`dataset`"
+    assert (
+        "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37" in cells[4]
+    )
+    # Supplied lead reading, reproduced in document 04; not an archive hash.
+    assert (
+        "0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60" in cells[4]
+    )
+
+
+def test_baci_publisher_terms_reading_is_recorded() -> None:
+    pack = repository_root(Path(__file__)) / "docs" / "04_PUBLIC_DATA_PACK.md"
+    _assert_baci_terms_reading(pack.read_text(encoding="utf-8"))
+
+
+def test_planted_removal_of_baci_terms_reading_is_detected() -> None:
+    pack = repository_root(Path(__file__)) / "docs" / "04_PUBLIC_DATA_PACK.md"
+    text = pack.read_text(encoding="utf-8")
+    _assert_baci_terms_reading(text)
+    planted = "\n".join(
+        line
+        for line in text.splitlines()
+        if not (line.startswith("| `cepii_baci` |") and len(line.split("|")) == 7)
+    )
+    # The quote elsewhere in the pack cannot mask removal of this table row.
+    planted += '\n"Licence: Etalab 2.0"\n'
+    with pytest.raises(AssertionError, match="BACI terms-reading row missing"):
+        _assert_baci_terms_reading(planted)
 
 
 @pytest.mark.parametrize(

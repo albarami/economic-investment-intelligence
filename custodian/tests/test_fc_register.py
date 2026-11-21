@@ -96,6 +96,23 @@ def live(folder, pages, ent=None, dec=None):
     return result, sent
 
 
+def test_full_capture_set_beside_live_prefix_refuses(tmp_path):
+    from custodian.tests.test_fc_register_capture import prepared, replay
+
+    p, bodies = prepared(tmp_path)
+    sent = []
+
+    def send(request):
+        sent.append(request)
+        if len(sent) == 1:
+            return Response(str(request), bodies[0], ())
+        raise TransportFault("unreachable", URL)
+
+    with pytest.raises(PageError, match="paging_incomplete"):
+        replay(tmp_path, p, send)
+    no_private_outputs(tmp_path)
+
+
 def test_live_same_target_empty_argument_advances_and_projects(tmp_path):
     result, sent = live(tmp_path, [page(1), page(2), page(3, True)])
     assert len(sent) == 3
@@ -245,6 +262,22 @@ def test_frame_and_path_refusals(address):
 
     with page_requests((URL,), {}), pytest.raises(TransportFault, match="blocked_host"):
         check_target(address)
+
+
+def test_active_register_exact_url_guard_without_a_frame(monkeypatch):
+    from eii_custodian.publicdata.fetch import page_requests
+    from eii_custodian.publicdata.fetch.allowlist import approve
+
+    # Isolate the register guard from the broader frame check. Invented path
+    # on the declared host passes approve(), but is not the exact register URL.
+    assert page_requests._FRAME.get() is None
+    monkeypatch.setattr(page_requests, "active", lambda: True)
+    address = URL.rsplit("/", 1)[0] + "/SYN-other-page"
+    assert address != URL and approve(address).ok
+    page_requests.check_target(URL)
+    with pytest.raises(TransportFault) as caught:
+        page_requests.check_target(address)
+    assert caught.value.kind == "blocked_host"
 
 
 def test_committed_declaration_matches_kind_and_retains_activation_hold():

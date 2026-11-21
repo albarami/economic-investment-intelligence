@@ -16,11 +16,12 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from decimal import ROUND_HALF_UP, Decimal
 
 from eii_custodian.publicdata.additions.common import AdditionError
 from eii_custodian.publicdata.property.bulletin import SQ_M_PER_SQ_FT, Deal
+from eii_custodian.publicdata.property.price_as_of import group_as_of, stamp_price_as_of
 
 _CENT = Decimal("0.01")
 _QUARTER = re.compile(r"^(\d{4})-Q([1-4])$")
@@ -37,6 +38,7 @@ QUARTER_COLUMNS = (
     "land_median_price_per_ft2",
     "median_price",
     "price_basis",
+    "as_of",
 )
 
 
@@ -45,8 +47,35 @@ def square_feet(area_m2: Decimal) -> Decimal:
     return (area_m2 / SQ_M_PER_SQ_FT).quantize(_CENT, rounding=ROUND_HALF_UP)
 
 
+def expected_as_of(
+    deals: Iterable[Deal],
+    as_of_by_source: Mapping[str, str],
+) -> dict[tuple[str, ...], str]:
+    """Map each quarter row key to the snapshot date of its contributing deals."""
+    cells: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
+    units: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
+    for deal in deals:
+        cell = (
+            deal.district_key,
+            deal.municipality_code,
+            deal.period,
+            deal.use_key,
+        )
+        cells[cell].append(deal)
+        if deal.unit_type is not None:
+            units[(*cell, deal.unit_type)].append(deal)
+    expected: dict[tuple[str, ...], str] = {}
+    for all_cell, group in cells.items():
+        expected[(*all_cell, "all")] = group_as_of(group, as_of_by_source)
+    for unit_cell, group in units.items():
+        expected[unit_cell] = group_as_of(group, as_of_by_source)
+    return expected
+
+
 def quarter_aggregates(
     deals: Iterable[Deal],
+    *,
+    as_of_by_source: Mapping[str, str],
 ) -> tuple[dict[str, object], ...]:
     """Return the ``pub_property_quarter`` rows over the kept deals."""
     cells: dict[tuple[str, ...], list[Deal]] = defaultdict(list)
@@ -66,34 +95,32 @@ def quarter_aggregates(
         prices = [p for p in map(_square_foot_price, group) if p is not None]
         land = [deal for deal in group if deal.land]
         land_prices = [p for p in map(_square_foot_price, land) if p is not None]
-        rows.append(
-            _row(
-                all_cell,
-                "all",
-                len(group),
-                _sum(group),
-                median_price_per_ft2=_median(prices) if prices else None,
-                land_deal_count=len(land),
-                land_median_price_per_ft2=(
-                    _median(land_prices) if land_prices else None
-                ),
-            )
+        built = _row(
+            all_cell,
+            "all",
+            len(group),
+            _sum(group),
+            median_price_per_ft2=_median(prices) if prices else None,
+            land_deal_count=len(land),
+            land_median_price_per_ft2=(_median(land_prices) if land_prices else None),
         )
+        built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
+        rows.append(built)
     for unit_cell, group in units.items():
         bases = {deal.basis for deal in group}
         if len(bases) != 1:
             raise AdditionError("mixed_price_basis")
         prices = [deal.price for deal in group if deal.price is not None]
-        rows.append(
-            _row(
-                unit_cell[:-1],
-                unit_cell[-1],
-                len(group),
-                _sum(group),
-                median_price=(_median(prices) if len(prices) == len(group) else None),
-                price_basis=next(iter(bases)),
-            )
+        built = _row(
+            unit_cell[:-1],
+            unit_cell[-1],
+            len(group),
+            _sum(group),
+            median_price=(_median(prices) if len(prices) == len(group) else None),
+            price_basis=next(iter(bases)),
         )
+        built = stamp_price_as_of(built, group_as_of(group, as_of_by_source))
+        rows.append(built)
     return tuple(
         sorted(
             rows,

@@ -311,10 +311,15 @@ def test_pub64_requires_receipt_lineage(violation):
     expected = {
         "missing_source": "PUB-64 receipts required",
         "wrong_source": "PUB-64 receipt source mismatch",
+        "empty_publisher": "incomplete source_chain",
+        "bad_hash": "invalid source_chain hash",
+        "bad_date": "day 30 must be in range 1..28 for month 2 in year 2026",
+        "bad_timestamp": "Invalid isoformat string: '2026-11-14Tnot-a-time'",
+        "bad_url": "incomplete source chain",
+        "missing_licence": "incomplete source_chain",
         "absent_field": "PUB-64 incomplete receipt",
     }
-    if violation in expected:
-        assert str(caught.value) == expected[violation]
+    assert str(caught.value) == expected[violation]
 
 
 @pytest.mark.public_data

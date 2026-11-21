@@ -29,6 +29,92 @@ REAL_NOTE_PATHS = (
 
 
 class RealNotes(unittest.TestCase):
+    def test_p24_summary_rows_match_local_reading_closures(self) -> None:
+        text = (REPO / "OPEN_ITEMS.md").read_text()
+        expected = (
+            "| OI-200 | **CLOSED LOCALLY 2026-11-20 (P24)**. DuckDB P13/P14 and S29\u2013S32 of docs/REFERENCE_NOTES.md record the two official Parquet-page readings with publisher, quotations, date and fetched-body hashes; R10/S28 stay OBSERVED. Independent another-maker confirmation remains with the lead. Source: OI-200 P24 closure block. |",
+            "| OI-224 | **CLOSED LOCALLY 2026-11-20 (P24)**. The `_GEOPARQUET` comment in read.py names publisher, page URL and retrieval date; DuckDB P15/S33 record the quotation and fetched-body hash. Supplies the P2 reading only; OI-202 and the real-file check stay open. Independent another-maker confirmation remains with the lead. Source: OI-224 P24 closure block. |",
+        )
+        for row in expected:
+            with self.subTest(item=row.split(" | ")[0]):
+                self.assertEqual(
+                    [line for line in text.splitlines() if line.startswith(row[:10])],
+                    [row],
+                )
+
+    def test_p24_terms_cell_preserves_only_remaining_attribution_hold(self) -> None:
+        text = (REPO / "docs/04_PUBLIC_DATA_PACK.md").read_text()
+        rows = [
+            line
+            for line in text.splitlines()
+            if line.startswith("| `satellite_cdse_backup` |")
+            and "Owner-requested Sentinel-2 L2A" in line
+        ]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(
+            rows[0].split(" | ")[-1],
+            "Imagery notice and interface terms read 2026-11-20 (CDSE README D15/D12, fetched-body hashes recorded); complete attribution pending: the read pages supply no complete service-specific display line; `provider_terms`, empty decision_record, commit false; proposed decision 0066 |",
+        )
+
+    def test_configuration_repeat_reading_is_explicit(self) -> None:
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        self.assertIn("P15 intentionally records a separate dated reading of P9", block)
+        self.assertIn("both addresses resolve to the same Configuration page", block)
+
+    def test_parquet_official_readings(self) -> None:
+        """OI-200: observations cannot stand in for the four owed READ rows."""
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        for ident, source, subject in (
+            ("S29", "P13", "reading and writing Parquet"),
+            ("S30", "P14", "parquet_metadata"),
+            ("S31", "P14", "parquet_kv_metadata"),
+            ("S32", "P14", "geo key"),
+        ):
+            with self.subTest(ident=ident):
+                rows = [
+                    line
+                    for line in block.splitlines()
+                    if line.startswith(f"| {ident} |")
+                ]
+                self.assertEqual(len(rows), 1, ident)
+                self.assertIn(f"| READ | {source} |", rows[0])
+                self.assertIn(subject, rows[0])
+        for digest in (
+            "86eb8f97b400242d4a7682cf5a8f9d5cbdaafb0da18a117319a7cf86a805a51e",
+            "931be889d0d0c0e9305e172246bb68bfbb4e56e3a5630fa0f9bd0c59abe11c11",
+        ):
+            self.assertIn(digest, block)
+
+    def test_geoparquet_setting_official_reading(self) -> None:
+        """OI-224: require attributable setting evidence, separate from R10."""
+        text = (REPO / tables.DOCS).read_text()
+        start, stop = sup.section_span(text, "DuckDB 2.0")
+        block = "\n".join(text.splitlines()[start:stop])
+        self.assertRegex(
+            block,
+            r"\| S33 \| [^\n]*enable_geoparquet_conversion[^\n]*\| READ \| P15 \|",
+        )
+        self.assertIn(
+            "50e69320eb7def5d284ba29b92b2082c679d97c1532a7c7413c2663012b8f86f",
+            block,
+        )
+        code = (
+            REPO / "custodian/src/eii_custodian/publicdata/places/read.py"
+        ).read_text()
+        comment = code.split('_GEOPARQUET = "enable_geoparquet_conversion"')[
+            0
+        ].splitlines()[-4:]
+        for attribution in (
+            "DuckDB Foundation",
+            "https://duckdb.org/docs/2.0/configuration/overview.html",
+            "2026-11-20",
+        ):
+            self.assertIn(attribution, "\n".join(comment))
+
     def test_real_notes_pass(self) -> None:
         lines = sup.run(REPO)
         self.assertEqual(len(lines), 1)
