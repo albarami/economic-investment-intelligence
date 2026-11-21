@@ -7,13 +7,20 @@ import json
 import ssl
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from custodian.tests.fixtures.invented_chain import intermediate_pem
 
 from commands import build_public
 from eii_custodian.publicdata.assembly_adapters import Production
-from eii_custodian.publicdata.fetch import allowlist, page_requests
+from eii_custodian.publicdata.fetch import (
+    allowlist,
+    certificate_pins,
+    page_acquire,
+    page_records,
+    page_requests,
+)
 from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
 from eii_custodian.publicdata.fetch.certificate_pins import PinError
 from eii_custodian.publicdata.fetch.kinds import prepare, read_bounded
@@ -27,6 +34,12 @@ URL = f"https://{HOST}/SYN-data.bin"
 TERMS = f"https://{HOST}/SYN-terms"
 STAMP = "2026-11-21T00:00:00Z"
 INCOMPLETE = "certificate_chain_incomplete"
+CLOSED_REASONS = (
+    INCOMPLETE,
+    "certificate_host_mismatch",
+    "certificate_review_pending",
+    "tls_verification_disabled",
+)
 
 
 def entry(key: str = "SYN-source", **changes: object) -> Entry:
@@ -70,9 +83,164 @@ def invented_hosts(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(page_requests, "PIN_HOSTS", frozenset({HOST}))
 
 
+def test_page_acquire_pin_failure_never_uses_available_capture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from custodian.tests.test_s2_t29_live_acquire import school
+
+    review, _ = school()
+    review.update(
+        url=URL + "?f=json", reviewed_urls=[URL + "?f=json"], pins=[{"host": HOST}]
+    )
+    review["shape"]["layer"] = URL
+    row = entry(
+        "schools_private_directory",
+        kind="public_page",
+        url=URL + "?f=json",
+        terms_url="",
+        columns=tuple(tuple(column) for column in review["columns"]),
+    )
+    der = ssl.PEM_cert_to_DER_cert(intermediate_pem().decode())
+    pin = certificate_pins.Pin(HOST, hashlib.sha256(der).hexdigest(), der, True)
+    capture = certificate_pins.Capture(
+        b"SYN-capture",
+        row.url,
+        row.url,
+        (),
+        "SYN-browser",
+        STAMP,
+        hashlib.sha256(b"SYN-capture").hexdigest(),
+        pin,
+        True,
+        "visitor",
+    )
+    assert certificate_pins.admit_capture(capture, row.url)[0].body == b"SYN-capture"
+    load = Mock(return_value=capture)
+    admit = Mock(
+        side_effect=AssertionError("certificate failure must not admit capture")
+    )
+    record = Mock(wraps=page_records.record_failure)
+    monkeypatch.setattr(page_acquire, "load_pin", lambda *args: pin)
+    monkeypatch.setattr(page_acquire, "PIN_HOSTS", frozenset({HOST}))
+    monkeypatch.setattr(certificate_pins, "load_capture", load)
+    monkeypatch.setattr(certificate_pins, "admit_capture", admit)
+    monkeypatch.setattr(page_records, "record_failure", record)
+    calls: list[str] = []
+
+    def refused(url: str) -> Response:
+        calls.append(url)
+        raise PinError("certificate_host_mismatch")
+
+    with pytest.raises(PinError, match=r"^certificate_host_mismatch$"):
+        page_acquire.fetch(
+            row,
+            review,
+            refused,
+            tmp_path,
+            lambda: STAMP,
+            lambda _: pytest.fail("no retry"),
+        )
+    assert calls == [row.url]
+    load.assert_not_called()
+    admit.assert_not_called()
+    record.assert_called_once_with(tmp_path, row, STAMP, "certificate_host_mismatch")
+    assert not list((tmp_path / row.key / "inputs").rglob("*"))
+    assert not list((tmp_path / row.key / "index").glob("*.json"))
+
+
+def test_terms_https_refuses_other_host_before_opening_request(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    chain = tmp_path / "SYN-chain.pem"
+    pem = intermediate_pem()
+    chain.write_bytes(pem)
+    row = entry(
+        "tenders_pub", chain_intermediate_sha256=hashlib.sha256(pem).hexdigest()
+    )
+    monkeypatch.setattr(tenders, "TENDER_HOST", HOST)
+    monkeypatch.setattr(tenders, "PIN_HOSTS", frozenset({HOST}))
+    monkeypatch.setattr(tenders, "CHAIN_PATH", chain)
+    opened = Mock(return_value=Response(TERMS, b"SYN-terms", ()))
+    low_opened = Mock(return_value=Response(TERMS, b"SYN-terms", ()))
+    monkeypatch.setattr(tenders, "open_https", opened)
+    monkeypatch.setattr(tenders, "_open_https", low_opened)
+    # Positive control: the invented chain is accepted for its registered host.
+    assert tenders.chain_context(chain, row.chain_intermediate_sha256, host=HOST)
+    with pytest.raises(PinError, match=f"^{INCOMPLETE}$"):
+        tenders.terms_https(row, f"https://{OTHER}/SYN-terms")
+    opened.assert_not_called()
+    low_opened.assert_not_called()
+
+
+@pytest.mark.parametrize("reason", (*CLOSED_REASONS, "SYN-private-error"))
+@pytest.mark.parametrize("fault_at", ["page", "terms"])
+def test_page_own_terms_pin_failure_is_advisory_with_its_closed_reason(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, reason: str, fault_at: str
+) -> None:
+    from custodian.tests.test_s2_t29_pages import BODY
+
+    row = entry(
+        "schools_private_directory",
+        kind="public_page",
+        extension="html",
+        columns=(("syn_name", "string"), ("syn_count", "integer")),
+    )
+    review = {
+        "url": URL,
+        "reviewed_urls": [URL, TERMS],
+        "table_id": "syn",
+        "columns": [[name, kind] for name, kind in row.columns],
+        "as_of": "2026-11-21",
+        "period": "2026",
+        "bounds_basis": "unconfirmed",
+    }
+    der = ssl.PEM_cert_to_DER_cert(intermediate_pem().decode())
+    pin = certificate_pins.Pin(HOST, hashlib.sha256(der).hexdigest(), der, True)
+    monkeypatch.setattr(page_records, "load_declaration", lambda _: review)
+    monkeypatch.setattr(page_records, "load_pin", lambda *args: pin)
+    calls: list[str] = []
+
+    def transport(url: str) -> Response:
+        calls.append(url)
+        assert certificate_pins.current_pin() is pin
+        if url == (TERMS if fault_at == "terms" else URL):
+            raise PinError(reason)
+        assert url == URL
+        return Response(url, BODY, ())
+
+    expected = INCOMPLETE if reason == "SYN-private-error" else reason
+    if fault_at == "page":
+        with pytest.raises(PinError, match=f"^{expected}$"):
+            page_records.fetch_page(
+                row,
+                transport,
+                tmp_path,
+                lambda: STAMP,
+                lambda _: pytest.fail("no retry"),
+            )
+        assert calls == [URL]
+        assert not list(tmp_path.rglob("*.json"))
+        return
+    snapshot = page_records.fetch_page(
+        row,
+        transport,
+        tmp_path,
+        lambda: STAMP,
+        lambda _: pytest.fail("no retry"),
+    )
+    assert calls == [URL, TERMS]
+    assert json.loads(snapshot.body)["rows"] == [
+        {"syn_name": "SYN-item", "syn_count": 7}
+    ]
+    assert snapshot.sidecar["terms_sha256"] is None
+    assert snapshot.sidecar["terms_unread"] == expected
+    assert not (tmp_path / row.key / "terms").exists()
+
+
 @pytest.mark.parametrize("kind", ["https_file", "terms_page"])
+@pytest.mark.parametrize("reason", (*CLOSED_REASONS, "SYN-private-error"))
 def test_terms_pin_failure_keeps_build_and_other_source_intact(
-    tmp_path: Path, kind: str
+    tmp_path: Path, kind: str, reason: str
 ) -> None:
     row = entry(kind=kind)
     other = entry("SYN-other", url=f"https://{OTHER}/SYN-other.bin", terms_url="")
@@ -82,7 +250,7 @@ def test_terms_pin_failure_keeps_build_and_other_source_intact(
     def transport(url: str) -> Response:
         seen.append(url)
         if url == TERMS:
-            raise PinError(INCOMPLETE)
+            raise PinError(reason)
         assert url in {URL, other.url}
         return Response(url, b"SYN-data", ())
 
@@ -97,7 +265,8 @@ def test_terms_pin_failure_keeps_build_and_other_source_intact(
     assert outcome.failure is None
     assert seen == [URL, TERMS, other.url]
     assert sleeps == []
-    assert f"TERMS {row.key} not read: {INCOMPLETE} ({TERMS})" in outcome.lines
+    expected = INCOMPLETE if reason == "SYN-private-error" else reason
+    assert f"TERMS {row.key} not read: {expected} ({TERMS})" in outcome.lines
     assert sum(line.startswith(f"PASS {other.key} ") for line in outcome.lines) == 1
     log = json.loads((tmp_path / "build-log.json").read_text())
     assert log["terms"] == []
@@ -106,7 +275,7 @@ def test_terms_pin_failure_keeps_build_and_other_source_intact(
             "key": row.key,
             "terms_url": TERMS,
             "terms_attempted_utc": STAMP,
-            "terms_unread_reason": INCOMPLETE,
+            "terms_unread_reason": expected,
             "terms_read_on": "pending",
             "terms_words": "SYN-pending words",
         }
@@ -120,9 +289,7 @@ def test_terms_pin_failure_keeps_build_and_other_source_intact(
 @pytest.mark.parametrize(
     "kind", ["https_file", "terms_page", "portal_dataset", "paged_layer"]
 )
-@pytest.mark.parametrize(
-    "reason", [INCOMPLETE, "tls_verification_disabled", "SYN-private-error"]
-)
+@pytest.mark.parametrize("reason", (*CLOSED_REASONS, "SYN-private-error"))
 def test_pin_failure_on_every_call_url_kind_is_structured(
     kind: str, reason: str
 ) -> None:
@@ -136,14 +303,14 @@ def test_pin_failure_on_every_call_url_kind_is_structured(
     prepared = prepare(entry(kind=kind, layer=0), refused, sleeps.append)
     assert prepared.body == b""
     assert prepared.failure is not None
-    assert prepared.failure.check == INCOMPLETE
+    expected = INCOMPLETE if reason == "SYN-private-error" else reason
+    assert prepared.failure.check == expected
     assert prepared.failure.code == 1
     assert prepared.failure.url == seen[0]
     assert len(seen) == 1 and sleeps == []
     assert "SYN-private-error" not in repr(prepared.failure)
     from eii_custodian.publicdata.fetch.kinds import require_verified_chain
 
-    expected = INCOMPLETE if reason == "SYN-private-error" else reason
     with pytest.raises(PinError, match=f"^{expected}$"):
         require_verified_chain(prepared.failure)
 

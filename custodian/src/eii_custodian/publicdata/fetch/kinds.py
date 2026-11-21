@@ -236,7 +236,7 @@ def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure |
         return None, PinFailure(
             1,
             url,
-            "certificate_chain_incomplete",
+            reason,
             "complete verified certificate chain",
             "unavailable",
             reason,

@@ -1091,14 +1091,19 @@ to disable certificate verification. A technically absent `paged_layer` may omit
 Terms reads for the host with the existing tender-chain pin reuse the tender
 adapter's registry hash, chain inspection and verifying context. The command
 supplies that chain only for that host's registered terms URLs. A `PinError` at
-the shared bounded URL reader becomes a `certificate_chain_incomplete` attempt
-failure without a retry or upstream error
-text. An unread terms page retains its advisory and one attempt record, apart
-from the recorded reading date, while the data fetch continues. The same error
-on a dataset remains a structured fetch failure with its exit code.
-The failure also retains a closed TLS diagnostic: reviewed page and proof
-adapters enforce it before any capture or unavailable-proof path, preserving
-their blocking security refusals. Invented offline tests in
+the shared bounded URL reader becomes an attempt failure with code `1` and its
+own closed reason: `certificate_chain_incomplete`, `certificate_host_mismatch`,
+`certificate_review_pending` or `tls_verification_disabled`; an unknown reason
+is clamped to `certificate_chain_incomplete`. There is no retry or upstream
+error text. Terms advisories and terms-attempt records retain that same closed
+reason without changing the recorded reading date. In the version-one `fetch_page`
+adapter, a certificate error on the row's own terms read is recorded as
+`terms_unread`, archives no terms bytes and does not block the page (PUB-12).
+Data fetches still fail on a certificate error with their existing exit code;
+reviewed page and proof adapters still enforce the closed diagnostic on data
+requests before any capture or unavailable-proof path. The version-two
+`page_acquire.fetch` guarded reader also keeps its certificate refusal on its
+reviewed terms requests. Invented offline tests in
 `custodian/tests/test_terms_pin_failures.py` cover these paths;
 they establish no live acquisition or slice-gate result (PUB-12, PUB-97).
 
