@@ -1015,3 +1015,407 @@ def test_same_size_same_mtime_edit_is_rehashed(tmp_path: Path) -> None:
     path.write_text("B = 2\n", "utf-8")
     os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
     assert _sha256(path) != first
+
+
+# --- review CF2 planted attacks --------------------------------------------
+#
+# The confirmation-2 review's attack tests, planted on the same invented
+# stubs. Every scripts/ module loaded before begin() is bound by hash on
+# the real roots, each missed dynamic form refuses the scan, and the held
+# attacks keep their assertions. The two runtime-dirs boundary probes are
+# stated limits of decision 0081 item 4.
+
+
+def _clean_syn_modules() -> None:
+    for name in [
+        n
+        for n in sys.modules
+        if n.startswith(("syn_hidden", "synhid", "syn_pre", "syn_side"))
+    ]:
+        del sys.modules[name]
+
+
+def test_scripts_modules_loaded_before_begin_are_bound_on_the_real_roots() -> None:
+    """The nine scripts/ modules commands.main loads pre-begin are hashed.
+
+    preflight_cmd.py, up_cmd.py and database.py import them at module level,
+    so they run in the fetch process before begin(); the loaded-module
+    digest binds each of them like the launcher and assembly modules.
+    """
+    roots = default_roots()
+    sys.path.insert(0, str(roots.code_root / "scripts"))
+    try:
+        import commands.main  # noqa: F401  (as ./eii loads it)
+
+        scan = scan_run((), roots, large=True)
+    finally:
+        sys.path.pop(0)
+    wanted = [
+        roots.code_root / "scripts" / name
+        for name in (
+            "preflight.py",
+            "preflight_database.py",
+            "preflight_proc.py",
+            "preflight_rows.py",
+            "preflight_store.py",
+            "pack_anchors.py",
+            "versions_inputs.py",
+            "versions_record.py",
+            "versions_tools.py",
+        )
+    ]
+    loaded = {
+        Path(m.__file__).resolve()
+        for m in list(sys.modules.values())
+        if getattr(m, "__file__", None)
+    }
+    missing = [p.name for p in wanted if p not in loaded]
+    assert not missing, f"not loaded by import commands.main: {missing}"
+    for path in wanted:
+        assert path in scan.baseline, f"{path.name} outside the baseline"
+        assert path in scan.hashes, f"{path.name} bound by no digest"
+        assert path in scan.union
+
+
+MISSED_FORMS = {
+    "star_import_importlib": 'from importlib import *\nH = import_module("syn_hidden")\n',
+    "star_import_importlib_nonliteral": (
+        'from importlib import *\nN = "syn_" + "hidden"\nH = import_module(N)\n'
+    ),
+    "star_import_sys": 'from sys import *\nH = modules["syn_hidden"]\n',
+    "sys_dict": 'import sys\nH = sys.__dict__["modules"]["syn_hidden"]\n',
+    "vars_sys": 'import sys\nH = vars(sys)["modules"]["syn_hidden"]\n',
+    "dunder_builtins": 'H = __builtins__["__import__"]("syn_hidden")\n',
+    "bootstrap_gcd": (
+        "import importlib._bootstrap\n"
+        'H = importlib._bootstrap._gcd_import("syn_hidden")\n'
+    ),
+    "loader_load_module": (
+        "import importlib.util\n"
+        'H = importlib.util.find_spec("syn_hidden").loader.load_module("syn_hidden")\n'
+    ),
+    "exec_module_unregistered": (
+        "import importlib.util, types\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\nS.loader.exec_module(H)\n'
+    ),
+    "function_type_compile": (
+        "import types\n"
+        'H = types.FunctionType(compile(open("syn_hidden.py").read(), "h", "exec"), {})\n'
+    ),
+}
+
+REFUSED_MISSED = sorted(MISSED_FORMS)
+
+SWEEP_FORMS = {
+    "os_sys_modules": 'import os\nH = os.sys.modules["syn_hidden"]\n',
+    "sys_getframe": (
+        "import sys\n"
+        'H = sys._getframe().f_globals["__builtins__"]["__import__"]("syn_hidden")\n'
+    ),
+    "sys_current_frames": (
+        "import sys\n"
+        'H = list(sys._current_frames().values())[0].f_globals["__builtins__"]["__import__"]("syn_hidden")\n'
+    ),
+    "inspect_currentframe": (
+        "import inspect\n"
+        'H = inspect.currentframe().f_globals["__builtins__"]["__import__"]("syn_hidden")\n'
+    ),
+    "getattr_exec_module": (
+        "import importlib.util, types\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\ngetattr(S.loader, "exec_module")(H)\n'
+    ),
+    "getattr_load_module": (
+        "import importlib.util\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = getattr(S.loader, "load_module")("syn_hidden")\n'
+    ),
+    "star_import_machinery": (
+        "from importlib.machinery import *\n"
+        'H = SourceFileLoader("syn_hidden", "syn_hidden.py")\n'
+    ),
+    "star_import_bootstrap": (
+        'from importlib._bootstrap import *\nH = _gcd_import("syn_hidden")\n'
+    ),
+    "star_import_pkgutil": 'from pkgutil import *\nH = resolve_name("syn_hidden")\n',
+    "star_import_runpy": 'from runpy import *\nH = run_module("x")\n',
+    "star_import_zipimport": 'from zipimport import *\nH = zipimporter("x")\n',
+    "star_import_builtins": 'from builtins import *\nH = __import__("syn_hidden")\n',
+    "star_import_util": (
+        "from importlib.util import *\n"
+        'H = find_spec("syn_hidden").loader.load_module("syn_hidden")\n'
+    ),
+    "importlib_dict": (
+        'import importlib\nH = importlib.__dict__["import_module"]("syn_hidden")\n'
+    ),
+    "builtins_dict": 'import builtins\nH = builtins.__dict__["__import__"]("syn_hidden")\n',
+    "vars_importlib": (
+        'import importlib\nH = vars(importlib)["import_module"]("syn_hidden")\n'
+    ),
+    "vars_builtins": 'import builtins\nH = vars(builtins)["__import__"]("syn_hidden")\n',
+    "builtins_dunder_attr": 'H = __builtins__.__import__("syn_hidden")\n',
+    "dunder_loader_load_module": (
+        'import syn_hidden\nH = syn_hidden.__loader__.load_module("syn_hidden")\n'
+    ),
+    "builtins_compile": (
+        'import builtins\nH = builtins.compile("x = 1", "h", "exec")\n'
+    ),
+    "marshal_function": (
+        'import marshal, types\nH = types.FunctionType(marshal.loads(b"\\xe3"), {})\n'
+    ),
+    "code_interactive": (
+        'import code\nH = code.InteractiveConsole().push("import syn_hidden")\n'
+    ),
+    "codeop_compile": 'import codeop\nH = codeop.compile_command("x = 1")\n',
+    "meta_path_insert": "import sys\nsys.meta_path.insert(0, object())\n",
+    "path_hooks_append": "import sys\nsys.path_hooks.append(object())\n",
+    "inspect_getmodule": "import inspect\nH = inspect.getmodule(H)\n",
+    "module_type_exec": (
+        "import importlib.util, types\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\n'
+        "S.loader.exec_module(H)\n"
+    ),
+    "pickle_loads": 'import pickle\nH = pickle.loads(b"\\x80\\x05.")\n',
+    "shelve_open": 'import shelve\nH = shelve.open("syn.db")\n',
+    "operator_attrgetter": (
+        "import importlib.util, operator, types\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\n'
+        'operator.attrgetter("loader.exec_module")(S)(H)\n'
+    ),
+    "operator_methodcaller": (
+        "import importlib.util, operator\n"
+        'S = importlib.util.find_spec("syn_hidden")\n'
+        'H = operator.methodcaller("load_module", "syn_hidden")(S.loader)\n'
+    ),
+    "getattribute_exec_module": (
+        "import importlib.util, types\n"
+        'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\n'
+        'S.loader.__getattribute__("exec_module")(H)\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("form", REFUSED_MISSED)
+def test_missed_form_is_refused_by_the_scan(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, form: str
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    (tmp_path / "code" / "syn_hidden.py").write_text("P = 1\n", "utf-8")
+    (tmp_path / "code" / "syn_machinery.py").write_text(MISSED_FORMS[form], "utf-8")
+    with pytest.raises(FingerprintUnavailable):
+        closure_files(roots, ("syn_machinery",), scoped=False)
+
+
+@pytest.mark.parametrize("form", sorted(SWEEP_FORMS))
+def test_sweep_dynamic_form_is_refused_by_the_scan(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, form: str
+) -> None:
+    """Forms beyond the reviewer's ten, found in the class sweep."""
+    roots = _stub_roots(tmp_path, monkeypatch)
+    (tmp_path / "code" / "syn_hidden.py").write_text("P = 1\n", "utf-8")
+    (tmp_path / "code" / "syn_machinery.py").write_text(SWEEP_FORMS[form], "utf-8")
+    with pytest.raises(FingerprintUnavailable):
+        closure_files(roots, ("syn_machinery",), scoped=False)
+
+
+@pytest.mark.parametrize("form", REFUSED_MISSED)
+def test_refused_missed_form_gives_no_fingerprint_and_refetches(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, form: str
+) -> None:
+    """A refused second-round form in a scanned module leaves no proof."""
+    _clean_syn_modules()
+    roots = _stub_roots(tmp_path, monkeypatch)
+    code = tmp_path / "code"
+    (code / "syn_hidden.py").write_text("PACING_SECONDS = 1\n", "utf-8")
+    (code / "syn_machinery.py").write_text(MISSED_FORMS[form], "utf-8")
+    importlib.import_module("syn_hidden")
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    assert "fingerprint" not in item
+    assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+    _rewrite(code / "syn_hidden.py", "PACING_SECONDS = 0")
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert outcome.failure is None
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+    assert harness.seen == [e.url for e in harness.entries]
+
+
+CF2_ORIGINAL_FORMS = {
+    "importlib_dunder_import": 'import importlib\nH = importlib.__import__("syn_hidden")\n',
+    "getattr_import_module": (
+        'import importlib\nH = getattr(importlib, "import_module")("syn_hidden")\n'
+    ),
+    "bound_alias_of_import_module": (
+        'import importlib\nload = importlib.import_module\nH = load("syn_hidden")\n'
+    ),
+    "sys_modules_lookup": 'import sys\nH = sys.modules["syn_hidden"]\n',
+    "pkgutil_resolve_name": 'import pkgutil\nH = pkgutil.resolve_name("syn_hidden")\n',
+    "source_file_loader": (
+        "from importlib.machinery import SourceFileLoader\n"
+        'H = SourceFileLoader("syn_hidden", "syn_hidden.py")\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("form", sorted(CF2_ORIGINAL_FORMS))
+def test_refused_form_in_scanned_module_gives_no_fingerprint_and_refetches(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, form: str
+) -> None:
+    """The builder's move, judged: a refused form in a scanned module."""
+    _clean_syn_modules()
+    roots = _stub_roots(tmp_path, monkeypatch)
+    code = tmp_path / "code"
+    (code / "syn_hidden.py").write_text("PACING_SECONDS = 1\n", "utf-8")
+    (code / "syn_machinery.py").write_text(CF2_ORIGINAL_FORMS[form], "utf-8")
+    importlib.import_module("syn_hidden")
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    assert "fingerprint" not in item
+    assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+    _rewrite(code / "syn_hidden.py", "PACING_SECONDS = 0")
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert outcome.failure is None
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+    assert harness.seen == [e.url for e in harness.entries]
+
+
+@pytest.mark.xfail(
+    reason=(
+        "stated limit: a repository module under code_root but outside the "
+        "runtime roots is bound by nothing; the real-roots test proves "
+        "production keeps every loaded module under the runtime roots "
+        "(decision 0081 item 4)"
+    ),
+    strict=False,
+)
+def test_preloaded_repo_module_outside_runtime_dirs_is_bound(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """scripts/preflight.py in production: under code_root, outside
+    runtime_dirs, loaded at process start by a bound launcher module
+    (preflight_cmd.py)."""
+    _clean_syn_modules()
+    roots = _stub_roots(tmp_path, monkeypatch)
+    side = tmp_path / "side"
+    side.mkdir()
+    (side / "syn_side.py").write_text("PACING_SECONDS = 1\n", "utf-8")
+    monkeypatch.syspath_prepend(str(side))
+    (tmp_path / "code" / "syn_preload.py").write_text("import syn_side\n", "utf-8")
+    importlib.import_module("syn_preload")
+    _interrupt(harness, code_roots=roots)
+    assert "fingerprint" in record(harness)["entries"]["SYN-first"]
+    _rewrite(side / "syn_side.py", "PACING_SECONDS = 0")
+    outcome = harness.run(resume=True, code_roots=roots)
+    stale = [line for line in outcome.lines if line.startswith("REUSE SYN-first ")]
+    assert not stale, f"stale reuse after editing syn_side.py: {stale}"
+
+
+@pytest.mark.xfail(
+    reason=(
+        "stated limit: the run-time guard watches the runtime roots only; "
+        "production keeps every loaded module under them (decision 0081 "
+        "item 4)"
+    ),
+    strict=False,
+)
+def test_module_outside_runtime_dirs_loaded_after_begin_trips_the_guard(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    side = tmp_path / "side"
+    side.mkdir()
+    smuggled = side / "syn_side_late.py"
+    smuggled.write_text("S = 1\n", "utf-8")
+    original = harness.transport
+
+    def planting(url):  # type: ignore[no-untyped-def]
+        module = types.ModuleType("syn_side_late")
+        module.__file__ = str(smuggled)
+        sys.modules["syn_side_late"] = module
+        return original(url)
+
+    harness.transport = planting  # type: ignore[method-assign]
+    try:
+        _interrupt(harness, code_roots=roots)
+    finally:
+        sys.modules.pop("syn_side_late", None)
+    item = record(harness)["entries"]["SYN-first"]
+    assert item.get("reuse_unavailable") == "resume_fingerprint_unproven", item.keys()
+
+
+def test_named_file_edit_between_runs_refetches(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    launcher = tmp_path / "syn_eii"
+    launcher.write_text("#!/bin/sh\nexec python -I a.py\n", "utf-8")
+    roots = replace(roots, named_files={"eii": launcher})
+    _interrupt(harness, code_roots=roots)
+    assert "fingerprint" in record(harness)["entries"]["SYN-first"]
+    launcher.write_text("#!/bin/sh\nexec python -E a.py\n", "utf-8")
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+    assert harness.entries[0].url in harness.seen
+
+
+def test_named_file_edit_mid_run_leaves_item_unproven(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    launcher = tmp_path / "syn_eii"
+    launcher.write_text("#!/bin/sh\nexec python -I a.py\n", "utf-8")
+    roots = replace(roots, named_files={"eii": launcher})
+    original = harness.transport
+
+    def editing(url):  # type: ignore[no-untyped-def]
+        time.sleep(0.05)
+        launcher.write_text("#!/bin/sh\nexec python -E a.py\n", "utf-8")
+        return original(url)
+
+    harness.transport = editing  # type: ignore[method-assign]
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    assert "fingerprint" not in item, item
+
+
+def test_preloaded_module_edit_mid_run_leaves_item_unproven(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clean_syn_modules()
+    roots = _stub_roots(tmp_path, monkeypatch)
+    pre = tmp_path / "code" / "syn_preload.py"
+    pre.write_text("P = 1\n", "utf-8")
+    importlib.import_module("syn_preload")
+    original = harness.transport
+
+    def editing(url):  # type: ignore[no-untyped-def]
+        time.sleep(0.05)
+        pre.write_text("P = 2\n", "utf-8")
+        return original(url)
+
+    harness.transport = editing  # type: ignore[method-assign]
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    assert "fingerprint" not in item, item
+
+
+def test_loaded_set_change_between_runs_refetches(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _clean_syn_modules()
+    roots = _stub_roots(tmp_path, monkeypatch)
+    (tmp_path / "code" / "syn_preload.py").write_text("P = 1\n", "utf-8")
+    _interrupt(harness, code_roots=roots)
+    importlib.import_module("syn_preload")  # now part of the baseline
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+
+
+def test_old_file_same_size_same_mtime_edit_is_seen(tmp_path: Path) -> None:
+    """The production shape: the file is older than one tick when hashed."""
+    path = tmp_path / "syn_old.py"
+    path.write_text("A = 1\n", "utf-8")
+    time.sleep(0.05)
+    first = _sha256(path)
+    stat = path.stat()
+    path.write_text("B = 2\n", "utf-8")
+    os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+    assert _sha256(path) != first

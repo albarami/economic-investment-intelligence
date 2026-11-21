@@ -34,7 +34,8 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    dispatch branch (including the explicit `grid` and `large` selections), the
    interpreter version, the `uv.lock` SHA-256, a hash of the computed code
    closure of the machinery and the branch, a loaded-module digest of every
-   repository module loaded before the run begins that lies outside that
+   repository module under the runtime roots loaded before the run begins
+   that lies outside that
    closure, the named `eii` shell launcher, and one canonical hash of every
    git-tracked file under `custodian/publicdata/` (the global data input;
    `sources.yaml` rows stay bound per registry row and
@@ -55,15 +56,38 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    runs before the fetch loop and is bound through the loaded-module digest of
    item 4; the rest run only after the fetch loop or only for note-only rows,
    an unlisted scope is machinery by default, `.venv`, `.git` and
-   `node_modules` are excluded code roots, and every dynamic form refuses the
-   fingerprint: any reference — call or not — to `__import__`, `exec`, `eval`,
-   `runpy`, `pkgutil`, `zipimport`, `importlib.machinery`, `importlib.reload`,
-   `importlib.util.module_from_spec`, `importlib.util.spec_from_loader` or
-   `importlib.util.spec_from_file_location`, any `sys.modules` access (the one
+   `node_modules` are excluded code roots, and this closed set of dynamic
+   forms refuses the fingerprint: any reference — call or not — to
+   `__import__`, `exec`, `eval`, `compile`, `runpy`, `codeop`, `pkgutil`,
+   `zipimport`, `pickle`, `shelve`, `importlib.machinery`, `importlib.reload`,
+   `importlib._bootstrap`, `importlib.util.module_from_spec`,
+   `importlib.util.spec_from_loader` or
+   `importlib.util.spec_from_file_location`, `types.CodeType`,
+   `types.FunctionType`, `types.LambdaType`, `code.interact`,
+   `code.InteractiveConsole` and `code.InteractiveInterpreter`,
+   `sys.meta_path` and `sys.path_hooks`, frame or module-object access
+   through `sys._getframe`, `sys._current_frames` or `inspect.currentframe`,
+   `inspect.stack`, `inspect.getouterframes`, `inspect.getinnerframes`,
+   `inspect.getframeinfo`, `inspect.trace` and `inspect.getmodule` (the bare
+   name `inspect` stays legal), `__builtins__`, the `__dict__` of `sys`,
+   `importlib` or `builtins`, `os.sys`, any attribute named `load_module`,
+   `exec_module`, `__getattr__` or `__getattribute__`,
+   `operator.attrgetter` and `operator.methodcaller`,
+   a `*` import from `sys`, `builtins`, `codeop`, `pickle`,
+   `shelve`, `pkgutil`, `runpy`, `zipimport`, `importlib` or anything under
+   it, a `getattr` on `importlib`, `builtins` or `sys`, a `getattr` anywhere
+   with a literal attribute from the same loading and module-state set, a
+   `vars()` on the same three roots, any `sys.modules` access (the one
    named exception is `fingerprint.py`'s own baseline read in
-   `_qualifying_modules`), a `getattr` on `importlib`, `builtins` or `sys`,
-   and any `importlib.import_module` reference that is not the direct callee
-   of a call with a literal first argument. In this checkout the machinery
+   `_qualifying_modules`), and any `importlib.import_module` reference that
+   is not the direct callee of a call with a literal first argument. Stated
+   limits: execution that leaves the process the scan and guard can see —
+   `subprocess`, `os.system`, `ctypes` and the other FFI or process-spawning
+   forms (`fingerprint.py` itself uses `subprocess` for `git ls-files`),
+   deserializers that execute code other than `pickle` and `shelve` (for
+   example `dill`), a `getattr` with a computed attribute name, and
+   execution of a file that never enters `sys.modules` through a form this
+   list does not name. In this checkout the machinery
    computes to **195 modules** at build time (the review's static scan
    estimated 188 plus
    `cdse_key`; the difference is environment-dependent resolution, not scope).
@@ -71,16 +95,32 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    measures the same 195; an added lazy import inside a kept scope invalidates
    every entry.
 4. **Runtime guard.** At each recorded `fetched()` the loaded modules whose
-   origin file lies under the runtime roots are compared with the union computed
-   at run start; anything new and in-repository makes the item
-   `resume_fingerprint_unproven` instead of silently binding it. Modules loaded
+   origin file lies under the runtime roots — `custodian/src`, `core/src`,
+   `product/src`, `gateway/src` and `scripts/` — are compared with the union
+   computed at run start; anything new and in-repository makes the item
+   `resume_fingerprint_unproven` instead of silently binding it. Modules
+   loaded
    before the run begins — `scripts/commands/main.py`, the pre-fetch
    `_seeded_assembly` import chain and the test runner's own imports, for
    example — are the recorded baseline; they do not trip the guard, and each
    baseline file outside the computed closure is hashed at run start and folded
-   into every record's loaded-module digest, so an edit to one refetches. The
+   into every record's loaded-module digest, so an edit to one refetches. In
+   the production shape **20** module files are bound by that digest: the five
+   launcher modules (`scripts/commands/main.py`, `database.py`,
+   `placeholder.py`, `preflight_cmd.py`, `up_cmd.py`), the six assembly
+   modules of `_seeded_assembly` and nine `scripts/` modules (`preflight.py`,
+   `preflight_database.py`, `preflight_proc.py`, `preflight_rows.py`,
+   `preflight_store.py`, `pack_anchors.py`, `versions_inputs.py`,
+   `versions_record.py`, `versions_tools.py`) that `preflight_cmd.py`,
+   `up_cmd.py` and `database.py` import at module level. The
    `eii` shell launcher, no Python module, is bound as a named hashed file of
-   every record.
+   every record. Stated limit: a module whose file lies under the checkout
+   but outside the runtime roots is bound by nothing — the baseline and the
+   guard both stay inside the runtime roots, since widening them to the whole
+   checkout makes the hash read stale or missing files under scratch folders
+   and refuse the proof; the planted real-roots test proves the production
+   process keeps every loaded module under the runtime roots (the unbound
+   remainder is the review probe itself and the test harness).
 5. **Fail closed.** A missing or tampered fingerprint, an unresolvable first-party
    import, a dynamic import form, an unsupported `Entry` field type, an untracked
    file under `custodian/publicdata/`, a tracked input missing from the working
@@ -117,10 +157,12 @@ modules (assembly family of 6, `draw`, `gate_report`, the `heights` family,
 `property` family of 5, `places_fsq.assemble`, `review.graph`,
 `singles.families`, `method_card_validation`, `gis.layers`, `atlas.contracts`,
 `gravity.contracts`) lie outside the machinery unbound; `busyness.*` is inside
-it. Six assembly modules — `assembly.py`, `assembly_adapters.py`,
+it. Twenty modules — the six assembly modules `assembly.py`,
+`assembly_adapters.py`,
 `assembly_intake.py`, `assembly_inventory.py`, `assembly_io.py` and
-`assembly_profile.py` — are loaded before the run begins through
-`_seeded_assembly` and bound by the loaded-module digest, so an edit to one
+`assembly_profile.py`, the five launcher modules of `scripts/commands/` and
+the nine `scripts/` modules the command modules import — are loaded before
+the run begins and bound by the loaded-module digest, so an edit to one
 refetches everything.
 
 ## Limits and consequences

@@ -272,10 +272,13 @@ class _ImportScan(ast.NodeVisitor):
     read in ``_qualifying_modules``.
     """
 
-    _REFUSE_NAMES: ClassVar[frozenset[str]] = frozenset({"__import__", "exec", "eval"})
+    _REFUSE_NAMES: ClassVar[frozenset[str]] = frozenset(
+        {"__import__", "compile", "exec", "eval"}
+    )
     _REFUSE_EXACT: ClassVar[frozenset[str]] = frozenset(
         {
             "builtins.__import__",
+            "builtins.compile",
             "builtins.exec",
             "builtins.eval",
             "importlib.util.spec_from_file_location",
@@ -284,28 +287,90 @@ class _ImportScan(ast.NodeVisitor):
     _REFUSE_REFERENCES: ClassVar[frozenset[str]] = frozenset(
         {
             "__import__",
+            "compile",
             "exec",
             "eval",
             "builtins.__import__",
+            "builtins.compile",
             "builtins.exec",
             "builtins.eval",
+            "code.InteractiveConsole",
+            "code.InteractiveInterpreter",
+            "code.interact",
             "importlib.__import__",
             "importlib.reload",
             "importlib.util.module_from_spec",
             "importlib.util.spec_from_loader",
             "importlib.util.spec_from_file_location",
+            "operator.attrgetter",
+            "operator.methodcaller",
+            "sys.meta_path",
+            "sys.path_hooks",
+            "types.CodeType",
+            "types.FunctionType",
+            "types.LambdaType",
         }
     )
     _REFUSE_REFERENCE_ROOTS: ClassVar[frozenset[str]] = frozenset(
         {
+            "codeop",
             "importlib.machinery",
+            "pickle",
             "pkgutil",
             "runpy",
+            "shelve",
             "zipimport",
+        }
+    )
+    # Frame and module-object access reaches globals the static scan cannot
+    # see. The bare name ``inspect`` is a legal local name in real modules,
+    # so the refusal names the members, not the module.
+    _REFUSE_FRAME_ACCESS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "inspect.currentframe",
+            "inspect.getframeinfo",
+            "inspect.getinnerframes",
+            "inspect.getmodule",
+            "inspect.getouterframes",
+            "inspect.stack",
+            "inspect.trace",
+            "sys._current_frames",
+            "sys._getframe",
         }
     )
     _GETATTR_ROOTS: ClassVar[frozenset[str]] = frozenset(
         {"builtins", "importlib", "sys"}
+    )
+    _REFUSE_ATTRS: ClassVar[frozenset[str]] = frozenset(
+        {"load_module", "exec_module", "__getattr__", "__getattribute__"}
+    )
+    # getattr(x, "name") with a literal attribute from this set reaches the
+    # same loading and module-state surfaces the named references refuse.
+    _REFUSE_GETATTR_ATTRS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "__builtins__",
+            "__dict__",
+            "__import__",
+            "__loader__",
+            "__spec__",
+            "_current_frames",
+            "_gcd_import",
+            "_getframe",
+            "__getattr__",
+            "__getattribute__",
+            "currentframe",
+            "exec_module",
+            "import_module",
+            "load_module",
+            "module_from_spec",
+            "modules",
+            "reload",
+            "resolve_name",
+            "run_module",
+            "run_path",
+            "spec_from_file_location",
+            "spec_from_loader",
+        }
     )
 
     def __init__(self, module: str, is_package: bool) -> None:
@@ -352,8 +417,17 @@ class _ImportScan(ast.NodeVisitor):
             for alias in node.names:
                 bound = alias.asname or alias.name
                 self.aliases[bound] = base + "." + alias.name
-                if alias.name != "*":
-                    self.edges.append((base + "." + alias.name, self._top()))
+                if alias.name == "*":
+                    # A star import binds names the scan cannot enumerate;
+                    # refuse it on every root that can load or reach module
+                    # state.
+                    if (
+                        base.split(".", 1)[0] in self._GETATTR_ROOTS
+                        or base in self._REFUSE_REFERENCE_ROOTS
+                    ):
+                        self._refuse(f"{base}.*")
+                    continue
+                self.edges.append((base + "." + alias.name, self._top()))
         self.generic_visit(node)
 
     def _from_base(self, node: ast.ImportFrom) -> str | None:
@@ -384,6 +458,10 @@ class _ImportScan(ast.NodeVisitor):
         """Refuse a resolved reference that can load or reach unseen code."""
         if id(node) in self._permitted:
             return
+        if isinstance(node, ast.Attribute) and node.attr in self._REFUSE_ATTRS:
+            # Loader entry points refuse on the attribute name alone: the
+            # chain may sit on a call or subscript the scan cannot resolve.
+            self._refuse(node.attr)
         name = self._dotted(node)
         if name is None:
             return
@@ -398,6 +476,19 @@ class _ImportScan(ast.NodeVisitor):
             or any(name.startswith(root + ".") for root in self._REFUSE_REFERENCE_ROOTS)
             or name == "importlib.import_module"
             or name.endswith(".import_module")
+            or name.endswith(".load_module")
+            or name.endswith(".exec_module")
+            or name == "__builtins__"
+            or name.startswith("__builtins__.")
+            or name == "importlib._bootstrap"
+            or name.startswith("importlib._bootstrap.")
+            or name == "os.sys"
+            or name.startswith("os.sys.")
+            or name in self._REFUSE_FRAME_ACCESS
+            or any(
+                name == root + ".__dict__" or name.startswith(root + ".__dict__.")
+                for root in self._GETATTR_ROOTS
+            )
         ):
             self._refuse(name)
 
@@ -414,13 +505,24 @@ class _ImportScan(ast.NodeVisitor):
         if name is None:
             self.generic_visit(node)
             return
+        if name in {"getattr", "builtins.getattr"} and node.args:
+            target = self._dotted(node.args[0])
+            if target is not None and target.split(".", 1)[0] in self._GETATTR_ROOTS:
+                self._refuse(f"getattr:{target}")
+            if (
+                len(node.args) >= 2
+                and isinstance(node.args[1], ast.Constant)
+                and isinstance(node.args[1].value, str)
+                and node.args[1].value in self._REFUSE_GETATTR_ATTRS
+            ):
+                self._refuse(f"getattr:{target or '?'}:{node.args[1].value}")
         if (
-            name in {"getattr", "builtins.getattr"}
+            name in {"vars", "builtins.vars"}
             and node.args
             and (target := self._dotted(node.args[0])) is not None
             and target.split(".", 1)[0] in self._GETATTR_ROOTS
         ):
-            self._refuse(f"getattr:{target}")
+            self._refuse(f"vars:{target}")
         if (
             name in self._REFUSE_NAMES
             or name in self._REFUSE_EXACT
@@ -525,7 +627,7 @@ def default_roots() -> CodeRoots:
             root / "core/src",
             root / "product/src",
             root / "gateway/src",
-            root / "scripts/commands",
+            root / "scripts",
         )
         if path.is_dir()
     )
