@@ -42,19 +42,17 @@ def _same_reviewed_origin(url: str, origin: str) -> bool:
     """Bind a reviewed URL to the HTTPS endpoint of the registered fetch URL."""
     if not safe_https_shape(url) or not safe_https_shape(origin):
         return False
-    try:
-        parts, registered = urlsplit(url), urlsplit(origin)
-        return (
-            # O11-O14 backslash/ASCII checks are parser-differential defence in depth.
-            "\\" not in parts.netloc
-            and "\\" not in registered.netloc
-            and parts.netloc.isascii()
-            and registered.netloc.isascii()
-            and bool(host_of(origin))
-            and host_of(url) == host_of(origin)
-        )
-    except ValueError:
-        return False
+    parts, registered = urlsplit(url), urlsplit(origin)
+    return (
+        # Backslash checks are parser-differential defence in depth.
+        "\\" not in parts.netloc
+        and "\\" not in registered.netloc
+        # Non-ASCII netloc checks refuse casefold-equivalent hosts.
+        and parts.netloc.isascii()
+        and registered.netloc.isascii()
+        and bool(host_of(origin))
+        and host_of(url) == host_of(origin)
+    )
 
 
 @dataclass(frozen=True)

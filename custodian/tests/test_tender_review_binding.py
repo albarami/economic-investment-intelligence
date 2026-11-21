@@ -378,6 +378,10 @@ def test_each_host_and_key_guard_has_a_single_field_plant(tmp_path, plant):
         pytest.param(
             "page", "https://other.invalid\uff20invented.invalid/", id="page_nonascii"
         ),
+        pytest.param("page", "https://ﬀ.invalid/", id="page_casefold_nonascii"),
+        pytest.param(
+            "registry", "https://ﬀ.invalid/x", id="registry_casefold_nonascii"
+        ),
         pytest.param(
             "terms_url", "https://invented.invalid:8443/terms", id="terms_port"
         ),
@@ -401,6 +405,18 @@ def test_reviewed_endpoint_must_be_same_safe_origin(field, value):
     review = tender()
     entry = registry_record(review)
     receipt = invented_receipt(review, entry)
+    if "ﬀ.invalid" in value:
+        review = replace(
+            review, page="https://ff.invalid/", terms_url="https://ff.invalid/terms"
+        )
+        entry = replace(
+            entry,
+            url="https://ff.invalid/x",
+            fetch_host="ff.invalid",
+            terms_url=review.terms_url,
+        )
+        receipt["fetch_url"] = entry.url
+        receipt["fetch_host"] = entry.fetch_host
     if field == "registry":
         from eii_custodian.publicdata.fetch.allowlist import host_of
 
