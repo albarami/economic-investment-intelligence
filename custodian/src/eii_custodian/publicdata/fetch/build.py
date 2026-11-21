@@ -696,7 +696,16 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
-        if is_tender_entry(entry) and not entry.skip_reason:
+        if is_tender_entry(entry) and entry.skip_reason:
+            # Decision 0084: a row the registry names as the tender source is
+            # never fetched by the ordinary run; a changed row with a skip
+            # reason is refused by name before any adapter is called.
+            failure = FetchFailure(
+                1, entry.source_id, "", "own_run_row_changed", "", entry.skip_reason
+            )
+            lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
+            break
+        if is_tender_entry(entry):
             # Decision 0084: no list, page or terms request for the source
             # that has its own run, whatever its row's kind; its absence is
             # recorded at assembly.

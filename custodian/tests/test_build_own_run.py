@@ -428,6 +428,36 @@ def test_own_run_journal_note_failure_is_named(tmp_path: Path) -> None:
     assert f"FAIL {row.key} resume_record_write_failed" in outcome.lines
 
 
+def test_tender_row_with_a_skip_reason_refuses_before_any_request(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """CF1-F1: the skip reason changed alone; no adapter or transport is called."""
+    calls: list[str] = []
+    monkeypatch.setattr(kinds, "_paged_cards", lambda *_: calls.append("list"))
+    monkeypatch.setattr(
+        fetch_build, "read_terms_page", lambda *_: calls.append("terms")
+    )
+    monkeypatch.setattr(
+        fetch_build, "_read_terms_apart", lambda *_, **__: calls.append("apart")
+    )
+    row = replace(tender_entry(), skip_reason="unavailable")
+    outcome = fetch_build.run_build(
+        (row,),
+        lambda url: calls.append(url),
+        tmp_path,
+        lambda: "2026-11-21T00:00:00Z",
+        lambda _: None,
+        _fetch_only=True,
+    )
+    assert calls == []
+    assert outcome.failure is not None
+    assert outcome.failure.check == "own_run_row_changed"
+    assert outcome.failure.source_id == row.source_id
+    assert any(
+        line.startswith(f"FAIL {row.key} own_run_row_changed") for line in outcome.lines
+    )
+
+
 @given(st.text(), st.text())
 def test_tender_identity_is_key_or_source_id(key: str, source_id: str) -> None:
     row = replace(tender_entry(), key=key, source_id=source_id)
