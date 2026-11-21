@@ -749,6 +749,45 @@ def test_night_absent_key_continues_and_omits_the_layer(tmp_path, monkeypatch, c
     )
 
 
+def test_night_absent_key_build_succeeds(tmp_path, monkeypatch, capsys):
+    """A keyless build completes: exit 0, one OMIT, no request, layer left out.
+
+    The assembly stage is bound to its own fetch stage through the existing
+    ``Production.fetch_archive`` method, so the run needs no reviewed pins.
+    """
+    import commands.build_public as build_public
+    from eii_custodian.publicdata.assembly_adapters import Production
+
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        return Response(url, b"invented", ())
+
+    second = replace(_radiance_row(), key="ntl_blackmarble/2024-02", period="2024-02")
+    monkeypatch.setattr(
+        build_public, "load_registry", lambda: (_radiance_row(), second)
+    )
+    monkeypatch.setattr(build_public, "utc_now", lambda: "2026-11-14T00:00:00Z")
+    monkeypatch.setattr(Production, "run", Production.fetch_archive)
+    code = build_public.run(tmp_path, {}, (), transport=transport, sleep=_sleep)
+    captured = capsys.readouterr()
+    assert code == 0
+    omit = "OMIT ntl_blackmarble: EARTHDATA_API_KEY absent; night-lights layer left out"
+    assert captured.out.splitlines().count(omit) == 1
+    assert captured.out.count("OMIT") == 1
+    assert captured.out.count("EARTHDATA_API_KEY") == 1
+    assert "FAIL" not in captured.out
+    assert seen == []
+    cache = tmp_path / "data" / "public_cache"
+    log = (cache / "build-log.json").read_text()
+    assert omit in log
+    assert "assembly_build_refused" not in log
+    assert "snapshot_selection_invalid" not in log
+    assert not (cache / "grids").exists()
+    assert list((cache / "ntl_blackmarble").glob("*")) == []
+
+
 def test_skipped_month_keeps_its_skip_line_and_one_omit(tmp_path, monkeypatch, capsys):
     """A skipped month still gets its skip line; other months share one omit line."""
     import commands.build_public as build_public
