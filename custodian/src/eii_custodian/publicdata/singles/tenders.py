@@ -501,16 +501,38 @@ def tender_https(
     )
 
     def transport(call: PageCall) -> PageBody:
-        token = _TENDER_CHAIN.set((context, entry.chain_intermediate_sha256))
-        try:
-            response = open_https(
-                call.url, headers=dict(call.headers), ssl_context=context
-            )
-        finally:
-            _TENDER_CHAIN.reset(token)
+        response = _chain_response(
+            call.url, context, entry.chain_intermediate_sha256, dict(call.headers)
+        )
         return PageBody(status=200, body=response.body, final_url=response.final_url)
 
     return transport
+
+
+def terms_https(entry: Entry, url: str) -> Response:
+    """Read this host's terms with the same inspected chain as its page reader."""
+    if urlsplit(url).hostname != TENDER_HOST:
+        raise PinError("certificate_chain_incomplete")
+    try:
+        context = chain_context(
+            CHAIN_PATH, entry.chain_intermediate_sha256, host=entry.fetch_host
+        )
+    except TenderError:
+        raise PinError("certificate_chain_incomplete") from None
+    return _chain_response(url, context, entry.chain_intermediate_sha256)
+
+
+def _chain_response(
+    url: str,
+    context: ssl.SSLContext,
+    pin: str,
+    headers: Mapping[str, str] | None = None,
+) -> Response:
+    token = _TENDER_CHAIN.set((context, pin))
+    try:
+        return open_https(url, headers=headers, ssl_context=context)
+    finally:
+        _TENDER_CHAIN.reset(token)
 
 
 def chain_context(path: Path, pin: str, *, host: str = TENDER_HOST) -> ssl.SSLContext:

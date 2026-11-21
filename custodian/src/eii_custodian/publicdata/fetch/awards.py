@@ -434,7 +434,7 @@ def fetch_awards(
     """Normal build dispatch; the lead supplies the reviewed intake manifest."""
     from dataclasses import replace
 
-    from .kinds import read_bounded
+    from .kinds import read_bounded, require_verified_chain
     from .page_records import _obstacle
 
     declaration = load_declaration(SOURCE)
@@ -476,6 +476,7 @@ def fetch_awards(
             )
             with scope, limit, page_transport(None if version_two else pin):
                 response, failure = read_bounded(transport, sleep, url)
+            require_verified_chain(failure)
             if (
                 version_two
                 and response is not None

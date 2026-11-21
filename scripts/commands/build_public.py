@@ -17,7 +17,9 @@ from eii_custodian.publicdata.baci.config import BaciError, Config, load_config
 from eii_custodian.publicdata.benchmarks.config import Policy as BenchmarkPolicy
 from eii_custodian.publicdata.benchmarks.config import load_policies
 from eii_custodian.publicdata.company_web.build import run_company_web
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.build import CACHE_RELATIVE, run_build, utc_now
+from eii_custodian.publicdata.fetch.certificate_pins import PinError
 from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
     load_registry,
@@ -35,6 +37,7 @@ from eii_custodian.publicdata.fetch.transport import (
 from eii_custodian.publicdata.gravity.config import Config as GravityConfig
 from eii_custodian.publicdata.gravity.config import GravityError
 from eii_custodian.publicdata.gravity.config import load_config as load_gravity_config
+from eii_custodian.publicdata.singles import tenders
 
 from . import exits, table
 
@@ -201,15 +204,27 @@ def run(
         groups.append(benchmark_urls)
         if benchmark_bound is None:
             benchmark_bound = partial(open_https_stream, reviewed_urls=benchmark_urls)
-        if groups:
+        terms_urls = frozenset(entry.terms_url for entry in entries if entry.terms_url)
 
-            def reviewed_metadata(url: str) -> Response:
-                for reviewed in groups:
-                    if url in reviewed:
-                        return open_https(url, token=token, reviewed_urls=reviewed)
-                return open_https(url, token=token)
+        def reviewed_metadata(url: str) -> Response:
+            if url in terms_urls and host_of(url) == tenders.TENDER_HOST:
+                # Reuse the tender adapter's inspected, registry-pinned chain
+                # for this host's terms only. A missing chain stays a refusal.
+                chain_rows = [
+                    entry
+                    for entry in entries
+                    if entry.key == "tenders_pub"
+                    and entry.fetch_host == tenders.TENDER_HOST
+                ]
+                if len(chain_rows) != 1:
+                    raise PinError("certificate_chain_incomplete")
+                return tenders.terms_https(chain_rows[0], url)
+            for reviewed in groups:
+                if url in reviewed:
+                    return open_https(url, token=token, reviewed_urls=reviewed)
+            return open_https(url, token=token)
 
-            opener = reviewed_metadata
+        opener = reviewed_metadata
     outcome = run_build(
         entries,
         opener,

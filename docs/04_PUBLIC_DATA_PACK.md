@@ -1088,6 +1088,20 @@ fetch kinds; the source registry's public-dataset/document classification below 
 to disable certificate verification. A technically absent `paged_layer` may omit its unconfirmed
 `layer`; an available row must declare a non-negative layer id (LA-2 of S2-T19).
 
+Terms reads for the host with the existing tender-chain pin reuse the tender
+adapter's registry hash, chain inspection and verifying context. The command
+supplies that chain only for that host's registered terms URLs. A `PinError` at
+the shared bounded URL reader becomes a `certificate_chain_incomplete` attempt
+failure without a retry or upstream error
+text. An unread terms page retains its advisory and one attempt record, apart
+from the recorded reading date, while the data fetch continues. The same error
+on a dataset remains a structured fetch failure with its exit code.
+The failure also retains a closed TLS diagnostic: reviewed page and proof
+adapters enforce it before any capture or unavailable-proof path, preserving
+their blocking security refusals. Invented offline tests in
+`custodian/tests/test_terms_pin_failures.py` cover these paths;
+they establish no live acquisition or slice-gate result (PUB-12, PUB-97).
+
 S2-T29 keeps the `public_page` and `awards_intake` dispatch kinds; reviewed
 parser kinds are separate and closed. Its v2 `as_of` is the retrieval date,
 `publisher_date` is optional provenance and observation periods come from parsed
