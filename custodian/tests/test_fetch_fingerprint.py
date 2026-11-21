@@ -5,7 +5,9 @@ from __future__ import annotations
 import importlib
 import json
 import os
+import subprocess
 import sys
+import textwrap
 import time
 import types
 from dataclasses import replace
@@ -29,6 +31,7 @@ from eii_custodian.publicdata.fetch.fingerprint import (
     EXCLUDED_SCOPES,
     CodeRoots,
     FingerprintUnavailable,
+    _ImportScan,
     _sha256,
     closed_encode,
     closure_files,
@@ -1077,6 +1080,48 @@ def test_scripts_modules_loaded_before_begin_are_bound_on_the_real_roots() -> No
         assert path in scan.union
 
 
+def test_production_shape_loads_no_checkout_module_outside_the_bound_set() -> None:
+    """Under the production shape (`python -I`, `import commands.main`,
+    `scan_run` on `default_roots()`), every loaded module file under
+    `code_root` and outside the excluded roots is in `scan.hashes`: the set
+    of loaded checkout modules outside the bound set is empty. This is the
+    tracked proof of decision 0081 item 4's stated-limit premise; a
+    `python -I` interpreter holds only `scripts/` and the `src` roots, so a
+    checkout module loaded outside the runtime roots would show up here.
+    """
+    roots = default_roots()
+    code = textwrap.dedent(
+        """
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, sys.argv[1] + "/scripts")
+        import commands.main
+        from eii_custodian.publicdata.fetch import fingerprint as fp
+        roots = fp.default_roots()
+        scan = fp.scan_run((), roots, large=True)
+        unbound = []
+        for module in list(sys.modules.values()):
+            file = getattr(module, "__file__", None)
+            if not file:
+                continue
+            path = Path(file).resolve()
+            if (path.is_relative_to(roots.code_root)
+                    and not any(path.is_relative_to(x) for x in roots.code_excludes)
+                    and path not in scan.hashes):
+                unbound.append(str(path.relative_to(roots.code_root)))
+        print(sorted(unbound))
+        """
+    )
+    done = subprocess.run(
+        [sys.executable, "-I", "-c", code, str(roots.code_root)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert done.returncode == 0, done.stderr[-400:]
+    assert done.stdout.strip() == "[]", done.stdout
+
+
 MISSED_FORMS = {
     "star_import_importlib": 'from importlib import *\nH = import_module("syn_hidden")\n',
     "star_import_importlib_nonliteral": (
@@ -1190,6 +1235,31 @@ SWEEP_FORMS = {
         'S = importlib.util.find_spec("syn_hidden")\nH = types.ModuleType("h")\n'
         'S.loader.__getattribute__("exec_module")(H)\n'
     ),
+    "code_interact": "import code\nH = code.interact\n",
+    "code_interpreter": "import code\nH = code.InteractiveInterpreter()\n",
+    "types_codetype": "import types\nH = types.CodeType\n",
+    "types_lambdatype": "import types\nH = types.LambdaType\n",
+    "inspect_stack": "import inspect\nH = inspect.stack()\n",
+    "inspect_trace": "import inspect\nH = inspect.trace()\n",
+    "inspect_getframeinfo": "import inspect\nH = inspect.getframeinfo\n",
+    "inspect_getinnerframes": "import inspect\nH = inspect.getinnerframes\n",
+    "inspect_getouterframes": "import inspect\nH = inspect.getouterframes\n",
+    "dunder_getattr_member": "H = X.__getattr__\n",
+    "loader_exec_module_unresolved": (
+        "import importlib.util\n"
+        'importlib.util.find_spec("syn_hidden").loader.exec_module(H)\n'
+    ),
+    "bare_exec": "H = exec\n",
+    "bare_eval": "H = eval\n",
+    "bare_compile": "H = compile\n",
+    "bare_dunder_import": "H = __import__\n",
+    "bare_builtins_import": "import builtins\nH = builtins.__import__\n",
+    "bare_builtins_compile": "import builtins\nH = builtins.compile\n",
+    "bare_builtins_exec": "import builtins\nH = builtins.exec\n",
+    "bare_builtins_eval": "import builtins\nH = builtins.eval\n",
+    "bare_spec_from_file_location": (
+        "import importlib.util\nH = importlib.util.spec_from_file_location\n"
+    ),
 }
 
 
@@ -1212,6 +1282,51 @@ def test_sweep_dynamic_form_is_refused_by_the_scan(
     roots = _stub_roots(tmp_path, monkeypatch)
     (tmp_path / "code" / "syn_hidden.py").write_text("P = 1\n", "utf-8")
     (tmp_path / "code" / "syn_machinery.py").write_text(SWEEP_FORMS[form], "utf-8")
+    with pytest.raises(FingerprintUnavailable):
+        closure_files(roots, ("syn_machinery",), scoped=False)
+
+
+def test_refuse_getattr_attrs_is_the_closed_set() -> None:
+    """Pin the set the parametrized test reads: a removed member shrinks the
+    parametrize list, so membership needs its own deciding row."""
+    assert _ImportScan._REFUSE_GETATTR_ATTRS == frozenset(
+        {
+            "__builtins__",
+            "__dict__",
+            "__import__",
+            "__loader__",
+            "__spec__",
+            "_current_frames",
+            "_gcd_import",
+            "_getframe",
+            "__getattr__",
+            "__getattribute__",
+            "currentframe",
+            "exec_module",
+            "import_module",
+            "load_module",
+            "module_from_spec",
+            "modules",
+            "reload",
+            "resolve_name",
+            "run_module",
+            "run_path",
+            "spec_from_file_location",
+            "spec_from_loader",
+        }
+    )
+
+
+@pytest.mark.parametrize("attr", sorted(_ImportScan._REFUSE_GETATTR_ATTRS))
+def test_literal_getattr_member_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, attr: str
+) -> None:
+    """Every literal attribute of the closed getattr set refuses, one row
+    per member (class sweep L-1384)."""
+    roots = _stub_roots(tmp_path, monkeypatch)
+    (tmp_path / "code" / "syn_machinery.py").write_text(
+        f'X = object()\nH = getattr(X, "{attr}", None)\n', "utf-8"
+    )
     with pytest.raises(FingerprintUnavailable):
         closure_files(roots, ("syn_machinery",), scoped=False)
 
@@ -1284,7 +1399,7 @@ def test_refused_form_in_scanned_module_gives_no_fingerprint_and_refetches(
         "production keeps every loaded module under the runtime roots "
         "(decision 0081 item 4)"
     ),
-    strict=False,
+    strict=True,
 )
 def test_preloaded_repo_module_outside_runtime_dirs_is_bound(
     harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -1314,7 +1429,7 @@ def test_preloaded_repo_module_outside_runtime_dirs_is_bound(
         "production keeps every loaded module under them (decision 0081 "
         "item 4)"
     ),
-    strict=False,
+    strict=True,
 )
 def test_module_outside_runtime_dirs_loaded_after_begin_trips_the_guard(
     harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

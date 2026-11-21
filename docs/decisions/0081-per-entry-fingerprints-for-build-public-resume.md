@@ -118,9 +118,11 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    but outside the runtime roots is bound by nothing — the baseline and the
    guard both stay inside the runtime roots, since widening them to the whole
    checkout makes the hash read stale or missing files under scratch folders
-   and refuse the proof; the planted real-roots test proves the production
-   process keeps every loaded module under the runtime roots (the unbound
-   remainder is the review probe itself and the test harness).
+   and refuse the proof; the tracked test
+   `test_production_shape_loads_no_checkout_module_outside_the_bound_set`
+   proves the production process keeps every loaded module under the runtime
+   roots (the unbound remainder is the review probe itself and the test
+   harness).
 5. **Fail closed.** A missing or tampered fingerprint, an unresolvable first-party
    import, a dynamic import form, an unsupported `Entry` field type, an untracked
    file under `custodian/publicdata/`, a tracked input missing from the working
