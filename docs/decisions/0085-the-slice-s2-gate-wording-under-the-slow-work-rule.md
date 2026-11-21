@@ -5,7 +5,7 @@
 | Status | Accepted, 2026-11-21 |
 | Date | 2026-11-21 |
 | Owner | The owner |
-| Decided by | The owner's words of 2026-11-21 (22:16, 22:18, 22:28, 22:30 and 22:32, quoted below; OWNER_RULES 34), applied row by row by the advisor under that delegation; the gate reviewer judges the wording |
+| Decided by | The owner's words of 2026-11-21 (22:16, 22:18, 22:28, 22:30, 22:32 and 23:07, quoted below; OWNER_RULES 34), applied row by row by the advisor under that delegation; the gate reviewer judges the wording |
 | Amends | [document 14](../14_IMPLEMENTATION_PLAN.md): new PLN-32, section 10 "Slice S2" gate bullet on the tender portal, and **ENHANCEMENT BACKLOG**; [document 12](../12_TESTING_AND_QUALITY.md): TST-168, new TST-280 and the slice S2 row of section 5; [document 15](../15_REVIEWER_CHECKLIST.md): REV-33 and REV-41; [TASKS.md](../../TASKS.md): S2-T44, S2-T10 and the slice S2 gate paragraph; [OPEN_ITEMS.md](../../OPEN_ITEMS.md): appended lines for OI-319, OI-341, PO-S2-129 and OI-360. It does not amend PLN-02, PLN-25, TST-165 to TST-167, TST-169, AGENTS.md rules 12, 33, 36, 37 and 39, decision 0055, decision 0069, decision 0071 or decision 0084 |
 | Purpose | Reword, in one record, the slice S2 gate rows that were written before the slow-work rule, so that a slow item no later work needs moves to after go-live and a slow item later work needs runs in the background, with no check, test, plant or bound changed |
 | Read first | Decision 0084, which lands with its code in the sibling task of the same train that builds the tenders own run; [decision 0055](0055-mutation-testing-moves-to-after-go-live.md) and TST-278, the earlier record of the same kind; [decision 0071](0071-after-go-live-operations-and-continuous-promotion.md) item 3; [decision 0079](0079-dated-gis-snapshot-and-structured-address-search.md) item 3; TASKS.md S2-T44, S2-T10, S2-T13 and S7-T09; OPEN_ITEMS.md OI-319, OI-341 and PO-S2-129 |
@@ -45,11 +45,22 @@ Evidence read in this checkout:
   cut-off, pages read, stop page, actual continuity-page count and last page read"; three of those exist only
   after the tenders own run, so that sentence, not PLN-25, is what needs new words.
 
-**"Go-live" in this record** means the go-live of decision 0055 and of document 14 "Priority before go-live —
-decision 0070": the hand-over go-live that follows the version 1 slices. It does not mean the first-map start
-of decision 0071 item 1, which comes at the slice S3 gate. Under this reading S7-T09 is before go-live, as the
-advisor's tenders ruling assumes. This record uses that later hand-over sense throughout; under the other
-reading tenders would have no dependent before go-live and item 3 would be judged again.
+**Two stages of going live.** The owner's words of 23:07 settle the two senses:
+
+> thats the first go live but the enhancements start after the final complete go live. so after s3 the portal will launch and we will keep updating it with features as we move forward s4 s5 s6 and so on and when all the s are complete enhancements will start and will keep updating the portal with features and enhancements.
+
+1. **First go-live**: the portal launches at the slice S3 gate (decision 0071 item 1). Slices S4, S5, S6 and on
+   then add features to the live portal, each through its own slice gate.
+2. **Final go-live**: when every slice is complete. Only then do the enhancements start (decisions 0055 and 0070,
+   document 14 **ENHANCEMENT BACKLOG**).
+
+In this record "go-live" alone, and "after go-live" for a moved item, mean the **final** go-live: a moved item is
+released after the last slice, never at the slice S3 gate. A slow item's dependency is judged against the slice
+that needs it, and a background item is picked up before that slice's gate. Anything the first go-live itself
+needs at the slice S3 gate is never moved past that gate. Under this reading S7-T09 needs the tenders own run, so
+tenders run in the background and are picked up before S7-T09 starts (item 3); S2-T44 criterion 1 is needed by no
+slice, the S3 launch included (the regression fix and the loaded and normal passes of its criteria 2 to 6 are
+already in), so it moves to after the final go-live (item 2).
 
 ## Decision
 
@@ -227,14 +238,15 @@ TST-167 and TST-169; decisions 0055, 0069 and 0071. No command is added by this 
 
 - A task, release step or reader before go-live that is found to read the S2-T44 trace: the criterion returns
   to the background, picked up before that dependent.
-- The owner reading "go-live" as the first-map start of decision 0071 item 1.
+- A slice, the S3 launch included, found to need an item moved here: that item comes back before that
+  slice's gate.
 - A recurrence of the load-sensitive timeout frequent enough to block merges: the moved row is brought forward.
 - Any wish to move a row of the "stays with the owner" table: the owner's own words and a new record.
 
 ## Sources
 
 - The owner's words of 2026-11-21 quoted above, relayed exactly in the advisor's notes of 22:16, 22:18, 22:28,
-  22:30 and 22:32; OWNER_RULES 34.
+  22:30, 22:32 and 23:07; OWNER_RULES 34.
 - The slice S2 gate checklist (r5), rows C-P1 to C-P8 and C-01 to C-27; decision 0084 items 1 to 6
   and its plan, sections 2 and 5.
 - [TASKS.md](../../TASKS.md): S2-T10, S2-T13, S2-T14, S2-T16, S2-T20, S2-T23, S2-T27, S2-T29, S2-T32, S2-T41,
