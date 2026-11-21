@@ -44,7 +44,9 @@ quotients. Its invented-cache tests are in
 verified receipt reader and the existing named-sheet OOXML reader. National
 coverage comes from sheet `76`, the "Both Sexes" block row itself,
 selected by its unique English label in column B. There is no separate "Total"
-row in this table. This is not the separate establishment source `est_census`
+row in this table.
+The header row is read at row 7; a moved header refuses with `C8:national_header`.
+This is not the separate establishment source `est_census`
 or a sum over zones. Missing, duplicate or misplaced sex-block labels fail;
 both Male and Female blocks are required. Each block ends at the next sex
 label (or sheet end), and its activity rows have nonempty ISIC codes in column

@@ -2,6 +2,7 @@
 
 import io
 import json
+import re
 from dataclasses import replace
 from decimal import Decimal as D
 from fractions import Fraction
@@ -147,6 +148,30 @@ def workbook(*, both_row=8, plant=""):
             formula_cells.remove(ref)
         else:
             del cells[ref]
+    elif plant.startswith("count_"):
+        _, scope, kind = plant.split("_")
+        delta = D("-4" if kind == "negative" else "0.5")
+
+        def transfer(number, amount):
+            for column, change in (("C", amount), ("D", -amount)):
+                ref = f"{column}{number}"
+                cells[ref] = str(D(cells[ref]) + change)
+
+        # Preserve all block/activity, sex and sector sums. Without count
+        # validation these invalid values would pass every reconciliation.
+        if scope == "national":
+            for offset in (0, 1, 21, 22):
+                transfer(both_row + offset, delta)
+        elif scope in {"male", "female"}:
+            offset = 21 if scope == "male" else 42
+            other = 42 if scope == "male" else 21
+            for step in (0, 1):
+                transfer(both_row + offset + step, delta)
+                transfer(both_row + other + step, -delta)
+        else:
+            offset = int(scope.removeprefix("activity"))
+            transfer(both_row + offset + 1, delta)
+            transfer(both_row + offset + 2, -delta)
     elif plant.startswith("activity_"):
         _, offset, column, kind = plant.split("_")
         ref = f"{column}{both_row + int(offset) + 1}"
@@ -397,6 +422,26 @@ def test_c8_activity_counts_are_required(tmp_path, monkeypatch, offset, kind):
         methods.test_pinned_c8()
 
 
+@pytest.mark.parametrize(
+    "scope,reason",
+    [
+        ("national", "national_count"),
+        ("male", "sex_count"),
+        ("female", "sex_count"),
+        *[(f"activity{offset}", "activity_count") for offset in (0, 21, 42)],
+    ],
+)
+@pytest.mark.parametrize("kind", ["negative", "fraction"])
+def test_c8_counts_are_nonnegative_whole_numbers(
+    tmp_path, monkeypatch, scope, reason, kind
+):
+    plant = f"count_{scope}_{kind}"
+    assert _fixture_equalities(plant) == (True, True, True)
+    invented_cache(tmp_path, monkeypatch, plant=plant)
+    with pytest.raises(ValueError, match=f"^C8:{reason}$"):
+        methods.test_pinned_c8()
+
+
 @pytest.mark.parametrize("column", list("CDEFGHIJ"))
 def test_c8_sex_totals_reconcile_every_column(tmp_path, monkeypatch, column):
     invented_cache(tmp_path, monkeypatch, plant=f"sex_sum_{column}")
@@ -505,7 +550,7 @@ def test_c8_null_zone_must_never_return_a_share(tmp_path, monkeypatch):
         return original(row, chain)
 
     monkeypatch.setattr(methods, "c8_zone_share", wrong)
-    with pytest.raises(ValueError, match="C8:null_zone_mismatch"):
+    with pytest.raises(ValueError, match=r"^C8:null_zone_mismatch$"):
         methods.test_pinned_c8()
 
 
@@ -575,7 +620,8 @@ def test_c8_planted_wrong_calculated_value_fails(tmp_path, monkeypatch, slot):
             return result
 
         monkeypatch.setattr(methods, "coverage_share", wrong)
-    with pytest.raises(ValueError, match=r"C8:.*mismatch"):
+    reason = "range_low" if slot == "range" else slot
+    with pytest.raises(ValueError, match=f"^C8:{reason}_mismatch$"):
         methods.test_pinned_c8()
 
 
@@ -595,5 +641,11 @@ def test_c8_each_pin_and_receipt_is_required(tmp_path, monkeypatch, key, plant):
         receipt = json.loads(path.read_text())
         receipt["source_id"] = "est_census"
         path.write_text(json.dumps(receipt))
-    with pytest.raises(ValueError):
+    source_id = next(row.source_id for row in load_registry() if row.key == key)
+    reason = (
+        f"public_cache_missing:{key}"
+        if plant == "pin"
+        else f"{source_id}: snapshot_hash_mismatch"
+    )
+    with pytest.raises(ValueError, match=f"^{re.escape(reason)}$"):
         methods.test_pinned_c8()

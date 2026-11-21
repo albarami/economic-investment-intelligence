@@ -251,11 +251,14 @@ def _c8_check_sex_totals(sheet, both_row):
 
     def counts(number, reason):
         try:
-            return tuple(
+            values = tuple(
                 Fraction(sheet.cells[f"{column}{number}"]) for column in "CDEFGHIJ"
             )
         except (KeyError, ValueError, ZeroDivisionError):
             raise ValueError("C8:" + reason) from None
+        if any(value < 0 or value.denominator != 1 for value in values):
+            raise ValueError("C8:" + reason)
+        return values
 
     totals = {
         start: counts(start, "national_count" if start == both_row else "sex_count")
