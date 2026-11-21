@@ -45849,3 +45849,169 @@ S2-T44 round 2B — Return and final scope/self-audit:
 - `node .overnight/tmp/run-command.mjs return-write . taskset -c 8-9 python3 .overnight/tmp/write-return.py` exited 0 and wrote `.overnight/RETURN.md`, with maker/model, builder/strict self-review personas, both complete final-source loaded runs, before/after phase tables and subphases, cause, exact source hashes, command exits, red/green/plant results, limitations and proposed open-item dispositions. Its last line is MARKER-S2-T44-R2B. No source changed during report writing.
 - `node .overnight/tmp/run-command.mjs audit-final . taskset -c 8-9 python3 .overnight/tmp/final-audit.py` exited 0: original PROGRESS prefix 5132479 bytes retained, HEAD unchanged, no staged changes, exactly four authorized tracked files changed, report/appended records free of private paths or e-mail addresses, marker correct, every required command green, both final-source controlled runs with four loops alive to the end, matching source/test fingerprints, and byte-unchanged task/open-item/rule/config/spec files. No existing assertion was removed. The report was read back completely; its historical and unclassified cost limitations are explicit.
 - Muhasabah PASS for the bounded local implementation/evidence handoff: claims resolve to actual files, output and hashes; uncontrolled background load, the second-scene Map-construction wait, missing P02 rejection text, the separate historical 1800-second whole-suite timeout and independent-review/hosted/whole-test limits remain explicit. No formal approval, native frame-rate result, arbitrary-starvation guarantee or whole-item OI-319 closure is invented. Closing proposals remain for the lead; no acceptance box or open-item entry was edited.
+
+
+## S2-T44 round 3 — Review corrections and competing-core protocol
+
+- Date: 2026-11-21. Base: `1218607c13450ef05cdb4fa8aa7672308697e55f`; no commit or push. Builder maker OpenAI, model Codex GPT-6 family (exact serving identifier unavailable). Senior web test-infrastructure engineer; strict self-review rejects relaxed limits, retries, skips, assertions, plants, counts or evidence. Independent other-maker review is pending.
+- Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer, webapp-testing, muhasabah-gate. The specifically named systematic-debugging, test-driven-development, receiving-code-review and verification-before-completion skill packages were not found in the installed skill roots; their equivalent rules are supplied by the task brief: measurements before diagnosis, deciding red/green regressions, exact reviewer fixes, real exits and verification before completion. Existing pinned repository Playwright infrastructure is retained.
+- Correction to “S2-T44 round 2B — Basemap startup before overlay mount”: the word “removed” in its cause bullet is UNVERIFIED as a claim of net work reduction. The earlier evidence establishes that work moved out of first idle; it does not establish that total work or the following scene's construction fell. The earlier return's “busier host” explanation is an UNVERIFIED hypothesis. The review identifies the non-competing CPU partition and cross-session comparison; neither earlier explanation is used as a proved cause here. Source: supplied round-2B independent review, findings F2/F3 and Records-only points. Earlier rows are retained unchanged.
+- F1: the exact review fix adds `deferIdle` to the map double and enables it for a throwing overlay mount. The two previously surviving deletion plants now each exit 1 (14 passed, 1 failed with the added F4 test; zero skips), failing the existing idle-listener cleanup assertion. F4: an already-loaded map test first exits 1 (14 passed, 1 failed); `map.loaded()` guarding the load listener makes the same suite exit 0 (15 passed). Removing that guard on an in-memory copy exits 1 (14 passed, 1 failed). The source under test is not edited by the plant loader. Commands and retained output: `.overnight/tmp/r3-plants.mjs`, `r3-commands.jsonl`, `r3-plant-*.log`.
+- Measurement environment: Linux, Node v22.22.3, npm 10.9.8, assigned `CORES=22-25`, scene seed 1. Both browser/probe and each of four owned Node busy loops use `taskset -c "$CORES"`; no split allocation. Normal means no owned loops, not an idle host. Only the installed browser under `data/tools/playwright/` is used. Temporary files remain under `.overnight/tmp`; no network/download or whole `./eii test` is run.
+- Setup correction, not a product failure: the initial probe derived no fixture count and incorrectly expected eight fixture links; its actual complete full-street trace reported 250004 roads, then its scratch assertion failed. The run was interrupted with exit 130 before any controlled-load loop was started. Its output is retained as `r3-paired.jsonl` / `r3-paired-console.log`, its script as `r3-measure-setup0.mjs`; it supplies no comparison evidence. The replacement probe derives the fixture count from `road-data.json`; the uninterrupted comparison uses `SESSION=paired-main`. A separate attempted process-affinity read from another command namespace returned no matching browser; it is not used as affinity evidence. The comparison script records its actual browser child's affinity inside its own namespace.
+
+
+### S2-T44 round 3 — One-session alternating phase results
+
+- Base: `1218607c13450ef05cdb4fa8aa7672308697e55f` plus the scoped F1/F4 working changes; run by the local OpenAI builder on 2026-11-21. The measurement deliberately substitutes the exact old `c171b9e5fc74979d10b9fd65ee50a7cdeb45b264` and exact HEAD versions of `layers.ts` at Vite's pre-transform seam. Old SHA-256 `c35af3fb3bfc8b69fad0ee07dbc85b6916ac38b82dde50c585d6c3a505e6b1b0`; HEAD SHA-256 `4fcf3132ab45d38de860f1ee8e462178b5ae2f9fb730702485bf193da3875a0b`. The working-tree F4 guard is covered separately by the final checks and complete loaded suites; the comparison is not labelled a phase trace of that additional guard. The page coordinator is unchanged, SHA-256 `d64c9fe9d73d365e307a443e1c66a3153b46e11d3a8346d66016073b473b1c45`.
+- Command: `PLAYWRIGHT_BROWSERS_PATH="$PWD/data/tools/playwright" TMPDIR="$PWD/.overnight/tmp" SESSION=paired-main taskset -c "$CORES" node .overnight/tmp/r3-measure.mjs`; actual process exit **0**. One uninterrupted session, three old/HEAD pairs without owned loops followed by three old/HEAD pairs with four owned loops. Each run opens a fresh browser and measures full street followed by the shared road scene inside that browser. Seed 1, full wall, existing cap, 170000 ms readiness timer, samples and counts retained. Every measured scene reports its complete phase marks, actual renderer, rendered counts, all 512 reads, no page/submission failure and loop survival; 24 scenes pass those validations. Four loops are alive at the end and are individually stopped/reaped. Every loop and every recorded browser child has affinity `22-25`.
+- Environment: Linux x64 / WSL2 kernel 6.6.114.1-microsoft-standard-WSL2; Node v22.22.3, npm 10.9.8; `nproc` reports 1 while Node `availableParallelism()` reports 4. MapLibre 6.17.0, deck.gl 9.4.1, Playwright 1.65.0. Renderer is the retained ANGLE/SwiftShader software string, not a native frame-rate result. Host load averages and run times are retained per run; external host activity is uncontrolled. All assigned cores are shared by the load and browser; there is no separate load half.
+- Evidence: `.overnight/tmp/r3-paired-main.jsonl`, SHA-256 `8af1a03c9f636a7dc19b1499d550e0e3328dcc98f11cdb83d86cb72ee9ce0e58`; probe `.overnight/tmp/r3-measure.mjs`, SHA-256 `2bbdce16715363aec44ea85d112fe1d44e66ff5cae9ff3105c66eee504044454`. `.overnight/tmp/r3-summary.py` computes medians/ranges and `.overnight/tmp/r3-facts.py` validates the complete paired coverage and computes comparison facts (both captured exits 0). Tables use milliseconds, median [minimum, maximum], each cell n=3. Phase medians need not sum to median readiness. The following scene's Map construction is the `map-create` row of the second table.
+
+hexagons-particles-roads-250k — ms; median [min, max]
+
+| Phase | old normal | head normal | old four shared-core loops | head four shared-core loops |
+| --- | ---: | ---: | ---: | ---: |
+| generation | 177.1 [172.4, 185.3] (n=3) | 180.1 [170.1, 180.1] (n=3) | 358.2 [304.5, 366.5] (n=3) | 333.5 [227.9, 349.1] (n=3) |
+| map-create | 18.5 [18.0, 19.3] (n=3) | 19.9 [12.8, 20.6] (n=3) | 28.7 [24.2, 74.0] (n=3) | 20.9 [17.3, 24.6] (n=3) |
+| idle | 33267.7 [31570.4, 36026.4] (n=3) | 771.0 [605.2, 1137.3] (n=3) | 31783.6 [28925.4, 33777.7] (n=3) | 999.8 [982.4, 1083.5] (n=3) |
+| sample-1 | 11547.5 [10506.4, 13035.6] (n=3) | 11073.7 [6737.3, 11711.1] (n=3) | 9897.1 [9253.9, 11236.7] (n=3) | 10489.5 [10230.1, 12006.5] (n=3) |
+| renderer | 3.9 [3.6, 4.6] (n=3) | 5.8 [5.5, 6.0] (n=3) | 6.3 [4.2, 7.2] (n=3) | 15.7 [15.1, 18.8] (n=3) |
+| orbit | 10864.6 [10435.2, 12293.6] (n=3) | 22999.3 [12277.5, 23722.1] (n=3) | 10271.2 [10084.4, 11609.4] (n=3) | 20512.4 [19653.1, 22687.0] (n=3) |
+| sample-2 | 11106.0 [10648.7, 13431.4] (n=3) | 11694.8 [7062.5, 12141.8] (n=3) | 9530.3 [8941.9, 10462.8] (n=3) | 10435.2 [10017.4, 11845.0] (n=3) |
+| post | 11544.9 [10529.9, 13914.6] (n=3) | 12773.4 [6691.2, 13298.7] (n=3) | 10293.2 [9370.8, 10625.2] (n=3) | 11178.6 [10693.1, 11688.1] (n=3) |
+| other | 126.8 [110.3, 140.0] (n=3) | 94.1 [90.8, 99.4] (n=3) | 233.0 [178.4, 266.0] (n=3) | 169.6 [155.3, 175.1] (n=3) |
+| readiness | 78199.1 [74452.6, 89051.0] (n=3) | 60950.7 [33671.4, 60959.8] (n=3) | 74253.5 [68036.4, 75624.6] (n=3) | 54288.4 [52371.0, 59365.0] (n=3) |
+| margin | 91800.9 [80949.0, 95547.4] (n=3) | 109049.3 [109040.2, 136328.6] (n=3) | 95746.5 [94375.4, 101963.6] (n=3) | 115711.6 [110635.0, 117629.0] (n=3) |
+
+hexagons-particles-roads — ms; median [min, max]
+
+| Phase | old normal | head normal | old four shared-core loops | head four shared-core loops |
+| --- | ---: | ---: | ---: | ---: |
+| generation | 151.4 [150.4, 169.3] (n=3) | 186.0 [155.3, 191.3] (n=3) | 359.4 [349.1, 394.2] (n=3) | 367.9 [338.4, 379.9] (n=3) |
+| map-create | 12.9 [12.3, 13.2] (n=3) | 1441.9 [12.5, 2437.1] (n=3) | 20.4 [16.1, 27.7] (n=3) | 2384.2 [1786.5, 11747.2] (n=3) |
+| idle | 18793.4 [17806.6, 19917.4] (n=3) | 617.4 [518.5, 642.2] (n=3) | 19443.1 [19147.5, 20672.6] (n=3) | 972.1 [818.5, 1275.4] (n=3) |
+| sample-1 | 5914.4 [5468.1, 6359.0] (n=3) | 6339.1 [4230.6, 7500.8] (n=3) | 5959.6 [5862.3, 6559.3] (n=3) | 6428.7 [4769.9, 6954.6] (n=3) |
+| renderer | 4.5 [3.8, 4.6] (n=3) | 9.0 [7.4, 35.3] (n=3) | 19.9 [8.3, 37.5] (n=3) | 19.5 [10.9, 39.7] (n=3) |
+| orbit | 6172.7 [4034.6, 6178.5] (n=3) | 11251.9 [7196.7, 12795.1] (n=3) | 6300.4 [5972.4, 6734.0] (n=3) | 11609.2 [10395.2, 13490.7] (n=3) |
+| sample-2 | 6100.8 [3776.8, 6223.5] (n=3) | 5859.1 [3711.3, 6126.1] (n=3) | 5945.6 [5652.6, 6769.2] (n=3) | 6029.7 [5369.0, 6271.3] (n=3) |
+| post | 5849.2 [3796.0, 6290.1] (n=3) | 5747.0 [3724.4, 6911.3] (n=3) | 6002.9 [5869.6, 6996.7] (n=3) | 6076.4 [5937.7, 6155.5] (n=3) |
+| other | 108.7 [96.5, 122.8] (n=3) | 91.1 [85.9, 917.4] (n=3) | 203.3 [190.9, 221.9] (n=3) | 178.8 [157.7, 192.4] (n=3) |
+| readiness | 42118.9 [38193.7, 43218.9] (n=3) | 32543.1 [21102.9, 35095.9] (n=3) | 46010.2 [43299.3, 46427.0] (n=3) | 37111.4 [29743.6, 43302.0] (n=3) |
+| margin | 127881.1 [126781.1, 131806.3] (n=3) | 137456.9 [134904.1, 148897.1] (n=3) | 123989.8 [123573.0, 126700.7] (n=3) | 132888.6 [126698.0, 140256.4] (n=3) |
+
+Individual runs (milliseconds):
+
+| Condition | Pair | Variant | Scene | Readiness | Margin |
+| --- | ---: | --- | --- | ---: | ---: |
+| normal | 1 | old | hexagons-particles-roads-250k | 78199.1 | 91800.9 |
+| normal | 1 | old | hexagons-particles-roads | 42118.9 | 127881.1 |
+| normal | 1 | head | hexagons-particles-roads-250k | 60950.7 | 109049.3 |
+| normal | 1 | head | hexagons-particles-roads | 32543.1 | 137456.9 |
+| normal | 2 | old | hexagons-particles-roads-250k | 74452.6 | 95547.4 |
+| normal | 2 | old | hexagons-particles-roads | 43218.9 | 126781.1 |
+| normal | 2 | head | hexagons-particles-roads-250k | 60959.8 | 109040.2 |
+| normal | 2 | head | hexagons-particles-roads | 35095.9 | 134904.1 |
+| normal | 3 | old | hexagons-particles-roads-250k | 89051.0 | 80949.0 |
+| normal | 3 | old | hexagons-particles-roads | 38193.7 | 131806.3 |
+| normal | 3 | head | hexagons-particles-roads-250k | 33671.4 | 136328.6 |
+| normal | 3 | head | hexagons-particles-roads | 21102.9 | 148897.1 |
+| load | 1 | old | hexagons-particles-roads-250k | 75624.6 | 94375.4 |
+| load | 1 | old | hexagons-particles-roads | 46427.0 | 123573.0 |
+| load | 1 | head | hexagons-particles-roads-250k | 52371.0 | 117629.0 |
+| load | 1 | head | hexagons-particles-roads | 29743.6 | 140256.4 |
+| load | 2 | old | hexagons-particles-roads-250k | 68036.4 | 101963.6 |
+| load | 2 | old | hexagons-particles-roads | 46010.2 | 123989.8 |
+| load | 2 | head | hexagons-particles-roads-250k | 59365.0 | 110635.0 |
+| load | 2 | head | hexagons-particles-roads | 43302.0 | 126698.0 |
+| load | 3 | old | hexagons-particles-roads-250k | 74253.5 | 95746.5 |
+| load | 3 | old | hexagons-particles-roads | 43299.3 | 126700.7 |
+| load | 3 | head | hexagons-particles-roads-250k | 54288.4 | 115711.6 |
+| load | 3 | head | hexagons-particles-roads | 37111.4 | 132888.6 |
+
+Failures: []
+Last record: {"type": "SESSION_END", "time": "2026-11-21T05:57:02.558Z", "exit": 0}
+
+Additional spill/total accounting, ms, median [minimum, maximum]:
+
+| Measure | Old normal | HEAD normal | Old shared-core load | HEAD shared-core load |
+| --- | ---: | ---: | ---: | ---: |
+| Full-street readiness plus following Map construction | 78211.4 [74465.5, 89064.2] | 60972.3 [35113.3, 63387.9] | 74269.6 [68064.0, 75645.0] | 56672.7 [54157.5, 71112.2] |
+| Both scenes' readiness, paired sum | 120318.0 [117671.5, 127244.7] | 93493.8 [54774.3, 96055.7] | 117552.9 [114046.6, 122051.6] | 91399.9 [82114.6, 102667.0] |
+| Whole two-scene run wall, including diagnostic collection and teardown | 137603.0 [136036.0, 144063.0] | 110994.0 [65173.0, 114066.0] | 133687.0 [129471.0, 139663.0] | 108965.0 [97437.0, 120360.0] |
+
+The last row is derived from each RUN_START timestamp to the following RUN_START or load-boundary timestamp after browser close. It includes browser launch, diagnostic reads and teardown outside readiness. The last normal run also includes starting the next condition's first loop; this is an observed script-wall measure, not a readiness-bound measurement. No phase after readiness is silently treated as zero.
+
+**Cause verdict and limits.** HEAD lowers full-street host readiness in all three loaded pairs: paired HEAD-minus-old median -19965.1 ms, range [-23253.6, -8671.4]. Its loaded median is 54288.4 ms and its worst measured loaded margin is 110635.0 ms. First idle falls while orbit and following Map construction grow; the paired readiness sums and whole-run walls also fall. This supports the existing load-event ordering as a bounded readiness improvement. It does not support an unconditional claim that startup work was removed: following Map construction does not fall.
+
+The old full-street implementation **does not slow toward or past the bound in this session**: its loaded median 74253.5 ms is below its normal median 78199.1 ms, and its worst loaded readiness 75624.6 ms stays below 170000 ms. Generation grows with the owned load, but that does not establish the cause of a historical GPU/readiness failure. P02's retained 191918 ms is a whole-test failure with no retained rejection text; no missing error or exact readiness is reconstructed. The conditional additional phase-fix branch is not triggered because HEAD readiness falls in every loaded pair. No speculative additional performance change is made. S2-T44#1's causal accounting of P02 and the deferred-work concern remain unproved; closure is not proposed on these observations alone.
+
+Scratch audit corrections retained: the first assertion-preservation audit exited 1 because it treated the exact required F1 fixture option inside `assert.rejects` as a changed assertion. The corrected audit permits only that exact single fixture insertion and preserves the original assertion calls/expected values. Its next run exited 1 on Node's default child-output buffer reading the existing large ledger; it now verifies the ledger prefix by its stored byte length and SHA-256, without increasing a buffer or test bound. The corrected audit exits 0: 83 prior assertions retained, one new assertion, unchanged initial ledger prefix of 5158243 bytes, exactly the four scoped tracked files and no staged changes. The scratch table formatter also initially exited 1 on the renderer-name/renderer-phase key collision; selecting the numeric phase field corrects that report-only error. None is a random product/test failure or a hidden retry.
+
+
+### S2-T44 round 3 — Final complete loaded suites and checks
+
+Base `1218607c13450ef05cdb4fa8aa7672308697e55f` plus the same scoped working changes; local OpenAI builder, 2026-11-21, seed 1. Both browser and four owned loops share all assigned `CORES=22-25`; each run keeps four loops alive and reaps them. Full return: `.overnight/RETURN.md`. No commit, push, network, browser download or whole test.
+
+| Final run | Child / wrapper exit | Node counts | Browser counts | Wall seconds |
+| --- | ---: | --- | --- | ---: |
+| performance-loaded-final-1 | 0 / 0 | {"tests": 142, "pass": 142, "fail": 0, "cancelled": 0, "skipped": 0, "todo": 0, "browserPassed": 62} | {"expected": 62, "unexpected": 0, "skipped": 0, "flaky": 0} | 839.2 |
+| performance-loaded-final-2 | 0 / 0 | {"tests": 142, "pass": 142, "fail": 0, "cancelled": 0, "skipped": 0, "todo": 0, "browserPassed": 62} | {"expected": 62, "unexpected": 0, "skipped": 0, "flaky": 0} | 1108.1 |
+
+| Final run / browser case | Status | Whole-test ms | Retry |
+| --- | --- | ---: | ---: |
+| performance-loaded-final-1 / roads paused playback plant is refused by name | passed | 45286 | 0 |
+| performance-loaded-final-1 / roads full street load draws every link and carries the Simulated mark | passed | 115852 | 0 |
+| performance-loaded-final-2 / roads paused playback plant is refused by name | passed | 43920 | 0 |
+| performance-loaded-final-2 / roads full street load draws every link and carries the Simulated mark | passed | 157184 | 0 |
+
+The case durations are whole browser-test times, not reconstructed phase readiness.
+
+| Label / cwd | Command | Exit | Result |
+| --- | --- | ---: | --- |
+| plant-drop-idle / . | `taskset -c 22-25 node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | {"tests": 15, "pass": 14, "fail": 1, "cancelled": 0, "skipped": 0, "todo": 0} |
+| plant-idle-after-mount / . | `taskset -c 22-25 node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | {"tests": 15, "pass": 14, "fail": 1, "cancelled": 0, "skipped": 0, "todo": 0} |
+| plant-loaded-guard / . | `taskset -c 22-25 node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | {"tests": 15, "pass": 14, "fail": 1, "cancelled": 0, "skipped": 0, "todo": 0} |
+| parity / . | `cmp AGENTS.md CLAUDE.md` | 0 | byte-identical |
+| tree / . | `python3 scripts/check_tree.py` | 0 | 8 rules OK |
+| invariants / . | `node .overnight/tmp/r3-invariants.mjs` | 1 | see retained labelled log |
+| layers-final / . | `node --test web/spikes/performance/tests/layers.node-test.mjs` | 0 | {"tests": 15, "pass": 15, "fail": 0, "cancelled": 0, "skipped": 0, "todo": 0} |
+| typecheck / web | `npm run typecheck` | 0 | tsc passes |
+| format-check / web | `npm run format:check` | 0 | Prettier passes |
+| docs / . | `python3 scripts/check_docs.py` | 0 | 1234 text / 134 Markdown OK |
+| lint / web | `npm run lint` | 0 | no warnings |
+| invariants-corrected / . | `node .overnight/tmp/r3-invariants.mjs` | 1 | see retained labelled log |
+| invariants-final / . | `node .overnight/tmp/r3-invariants.mjs` | 0 | 83 prior assertions, one new; scoped files and unchanged ledger prefix |
+| measurement-facts / . | `python3 .overnight/tmp/r3-facts.py` | 0 | 24 complete scenes validated |
+| measurement-table / . | `python3 .overnight/tmp/r3-summary.py` | 0 | per-phase medians/ranges computed |
+
+PROPOSED OPEN ITEMS
+
+- OI-319 — **STAYS OPEN; no closing line proposed.** This session does not reproduce the old code approaching the readiness bound and cannot account causally for P02's 191918 ms whole-test failure. Its rejection text is still absent; the separate 1800-second whole-suite timeout is also unclassified. Preserve the earlier revisions/seeds and all original evidence. Need a phase/process capture of a matching failure and a deciding regression/remedy for that phase.
+- OI-341 — **STAYS OPEN; no closing line proposed.** The paired startup improvement and passing local runs do not identify the cause of the moved-head/ledger paused-playback and full-street failures. Preserve their seeds/revisions and obtain a matching causal trace. A green rerun is not closure.
+- PO-S2-129 — **STAYS OPEN under the brief's closure condition.** Current readiness margins and both full loaded runs are returned for the owner, but S2-T44#1's historical causal accounting remains unproved and the next-map cost still grows. The prior 154371.4 ms observation remains history. No bound, retry or assertion change is proposed.
+
+S2-T44#3 has the returned local loaded-run/margin evidence; S2-T44#1 is not claimed complete. TASKS.md and OPEN_ITEMS.md are unchanged. The current code lowered readiness, so the conditional further phase fix was not triggered. No out-of-scope product change is proposed. Independent other-maker approval remains pending.
+
+The full per-phase table and source hashes are in the preceding round-3 entry; task boxes and open-item files remain unchanged. Final implementation and test SHA-256: {"web/spikes/performance/layers.ts": "3580aa42655a97af02fa2205962a2d1f074a572e3fe11eb2b64fa709d84e826a", "web/spikes/performance/tests/layers.node-test.mjs": "5ee48a72de6c46ec79380da04f4636d6a18a01912d48cff2473be9bbc935af45", "web/spikes/performance/main.ts": "d64c9fe9d73d365e307a443e1c66a3153b46e11d3a8346d66016073b473b1c45"}.
+
+
+### S2-T44 round 3 — Final record verification and invocation clarification
+
+Base `1218607c13450ef05cdb4fa8aa7672308697e55f`, unchanged scoped source, local OpenAI builder, 2026-11-21. Seed 1. After the complete suite records and return were written, the following direct checks completed:
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `python3 scripts/check_docs.py` | 0 | 1234 text files / 134 Markdown files OK |
+| `python3 scripts/check_tree.py` | 0 | 8 rules OK |
+| `cmp AGENTS.md CLAUDE.md` | 0 | byte-identical |
+| `git diff --check` | 0 | no whitespace errors |
+| `python3 .overnight/tmp/r3-audit.py` | 0 | scope, original ledger prefix, all checks, exact phase record hash, both complete loaded exits, CPU affinity, loop cleanup and return marker verified |
+
+Invocation clarification: the earlier plant rows list child arguments; their inherited `PLANT` environment differs. Full root invocations, all observed exit 1 with 14 passed / 1 failed / zero skipped, are:
+
+- `PLANT=drop-off-idle-in-fail python3 .overnight/tmp/r3-run.py plant-drop-idle . taskset -c "$CORES" node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs`
+- `PLANT=idle-after-mount python3 .overnight/tmp/r3-run.py plant-idle-after-mount . taskset -c "$CORES" node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs`
+- `PLANT=drop-loaded-guard python3 .overnight/tmp/r3-run.py plant-loaded-guard . taskset -c "$CORES" node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs`
+
+No earlier row is rewritten. The refreshed return includes these environment prefixes and the post-record check exits. Historical-cause closure is still not proposed.

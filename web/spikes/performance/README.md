@@ -81,6 +81,10 @@ startup frames do not also render the full data layers. Its error listener
 covers that wait and the deferred mount; a failure removes the pending load
 and idle listeners. A lifecycle regression holds the basemap load pending and
 plants a load failure, and a mount-error case requires readiness to reject.
+The mount-error double holds idle pending so an automatic idle cannot hide a
+leaked listener; deleting its cleanup or registering it after a failed mount
+fails that case. An already-loaded basemap mounts immediately through the
+`map.loaded()` guard, without waiting for another load event.
 The scene keeps the layer instances supplied to the initial overlay and reads
 its rendered counts after the following map idle event. It does not submit identical
 layers and wait for a second idle before sampling: that update caused another

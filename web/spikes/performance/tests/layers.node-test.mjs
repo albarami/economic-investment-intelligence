@@ -47,7 +47,11 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
     constructor(props) {
       observed.mapOptions = props;
       this.mounts = observed.mounts;
+      baseLoaded = options.alreadyLoaded ?? false;
       options.onMap?.(this);
+    }
+    loaded() {
+      return baseLoaded;
     }
     addControl(overlay) {
       observed.mounts.push({ baseLoaded });
@@ -63,7 +67,7 @@ async function mountFixture(enabled, plant = '', pixel, options = {}) {
           baseLoaded = true;
           this.fire(event);
         });
-      if (event === 'idle' && !options.fail)
+      if (event === 'idle' && !options.fail && !options.deferIdle)
         queueMicrotask(() => this.fire(event));
       if (event === 'error' && options.fail)
         queueMicrotask(() => this.fire(event, { error: options.fail }));
@@ -492,6 +496,7 @@ test('a deferred overlay mount failure rejects readiness', async () => {
   await assert.rejects(
     mountFixture(true, '', undefined, {
       controlError: new Error('synthetic overlay failure'),
+      deferIdle: true,
       onMap: (value) => (map = value),
     }),
     /^Error: synthetic overlay failure$/,
@@ -515,4 +520,18 @@ test('a basemap load failure removes the deferred heavy mount and idle listener'
   map.fire('load');
   map.fire('idle');
   assert.deepEqual(map.mounts, []);
+});
+
+test('an already loaded basemap mounts without waiting for another load event', async () => {
+  let map;
+  const pending = mountFixture(true, '', undefined, {
+    alreadyLoaded: true,
+    deferLoad: true,
+    onMap: (value) => (map = value),
+  });
+  const mountsBeforeAnotherLoad = [...map.mounts];
+  // Settle the pre-fix promise too, so the red case is an assertion failure.
+  map.fire('load');
+  await pending;
+  assert.deepEqual(mountsBeforeAnotherLoad, [{ baseLoaded: true }]);
 });

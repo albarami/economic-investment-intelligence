@@ -106,7 +106,8 @@ function whenIdle(map: MapLibreMap, mount: () => void): Promise<void> {
       }
     };
     map.once('error', fail);
-    map.once('load', load);
+    if (map.loaded()) load();
+    else map.once('load', load);
   });
 }
 
