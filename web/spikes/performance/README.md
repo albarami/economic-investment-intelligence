@@ -76,8 +76,13 @@ Run the local web mutation check with `uv run --locked python scripts/mutation_w
 
 ## Browser test fixtures
 
+The scene attaches the overlay after the basemap's load event, so source/style
+startup frames do not also render the full data layers. Its error listener
+covers that wait and the deferred mount; a failure removes the pending load
+and idle listeners. A lifecycle regression holds the basemap load pending and
+plants a load failure, and a mount-error case requires readiness to reject.
 The scene keeps the layer instances supplied to the initial overlay and reads
-its rendered counts after the first map idle event. It does not submit identical
+its rendered counts after the following map idle event. It does not submit identical
 layers and wait for a second idle before sampling: that update caused another
 full render of the same scene on the headless software renderer. The layer regression
 requires no overlay update until the first real playback step; its failing run

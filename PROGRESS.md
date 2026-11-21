@@ -45691,3 +45691,161 @@ checks 912 files, and original progress bytes remain unchanged.
 | 2026-11-21 | Apply the independent records audit of d5ab3131 at train head `26d3255e69a4b413d747e6ba04400f4cdc7e6f93`: audit verdict REJECTED; 81 PROVED and 20 UNPROVED acceptance boxes; 22 PROVED, 2 PROVED-ELSEWHERE and 5 UNPROVED items | Reviewer: Anthropic Claude Opus 5.5 (`claude-opus-5-5`), supplied RECON-AUDIT.md, “Exact fixes for every UNPROVED row”; TASKS.md reopens exactly the 20 named boxes with one-sentence NEEDED notes (14 physical lines); OPEN_ITEMS.md appends reopening dispositions for OI-103, PO-S2-22, PO-S2-81, PO-S2-128 and OI-323, and new OI-359 for the OI-210 robots-disallowed /api/ paths; all earlier item/ledger lines preserved; no code/test change or commit; `python3 scripts/check_docs.py` exit 0 (1234 text files, 134 Markdown files), `python3 scripts/check_tree.py` exit 0 (8 rules), `cmp AGENTS.md CLAUDE.md` exit 0; `uv run --locked python -m pytest scripts/tests/test_reference_notes_real.py scripts/tests/test_pin_rulings.py scripts/tests/test_register_company_task_replan.py scripts/tests/test_reference_notes_rows.py scripts/tests/test_check_docs_exceptions.py custodian/tests/test_trade_publisher_readings.py custodian/tests/test_method_card_pins.py custodian/tests/test_assembly_reports.py -vv -p no:cacheprovider --hypothesis-seed=1054819758` exit 0 (395 passed, 191 subtests passed); Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, `UV_OFFLINE=1`, `UV_PYTHON_DOWNLOADS=never`, `EII_DECISION_PROVIDER=none`, temporary/cache writes inside the workspace; independent diff proof and full command exits: .overnight/RETURN.md and .overnight/tmp/reopen/prove.py | OpenAI Codex, GPT-6; builder persona: careful records keeper of an acceptance programme; strict reviewer persona: acceptance-evidence reviewer (self-check only, no independent approval claimed); skills: project-orientation, task-standards, sanad-provenance, muhasabah-gate, strict-reviewer; verification-before-completion skill unavailable locally, equivalent rules supplied by brief DO 4; records-only task, lead retains commit/review gates |
 | 2026-11-21 | Second reader of the same 29 closures at `26d3255e69a4b413d747e6ba04400f4cdc7e6f93`: verdict REJECTED; UNPROVED OI-103, OI-286, PO-S2-36, PO-S2-128 and OI-323; the lead re-opens OI-286 and PO-S2-36 as well (stricter of the two readings) | Reviewer: SpaceXAI Grok 4.7, read-only; OPEN_ITEMS.md "Train S2-11 records audit — second reader's re-opening dispositions" | lead |
 | 2026-11-21 | S2-T35 box 2 (no unpinned expected value in the repository, a fixture, a brief or a document): the lead's value-free scan from its own shell of every expected value of four or more digits in the uncommitted expectation files, against the files git tracks at `26d3255e69a4b413d747e6ba04400f4cdc7e6f93` and the run's briefs, exit 1: two values hit, both national counts of card C8, found only in three PROGRESS.md rows appended 2026-11-15 and 2026-11-16 (pull requests 60 and 61) and in one run brief outside the repository; no other tracked file holds them. Rule 38 keeps those earlier rows unchanged; the box stays open | lead-only scan output, case identifiers and hit counts only, no value printed | lead |
+
+
+## S2-T44 round 2B — Basemap startup before overlay mount
+
+- Date: 2026-11-21. Maker: OpenAI; model: Codex, GPT-6 family (exact serving identifier unavailable). Base and current HEAD: `c171b9e5fc74979d10b9fd65ee50a7cdeb45b264`; supplied isolated workspace, detached HEAD; initially clean tracked tree. No commit, stage or push.
+- Builder persona: senior web test-infrastructure engineer, Playwright/headless Chromium/MapLibre/deck.gl and load-sensitive suites. Strict self-review persona: rejects raised bounds/time limits/retries, skips, loosened assertions/plants/counts, and a green rerun presented as a fix. Other-maker review remains with the lead.
+- Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate. The named systematic-debugging, test-driven-development and verification-before-completion packages were not installed; the brief supplies their working rules: measure first, test a specific cause, prove red before implementation and verify actual exits afterwards.
+- Scope/readings: complete `.overnight/BRIEF.md`; AGENTS.md, README.md, docs/README.md, TASKS.md **S2-T44**, document 14 **slice S2**, document 12 testing rules, task history in PROGRESS.md, supplied reconciliation **Exact fixes S2-T44#1 and S2-T44#3**, and the supplied OI-319/OI-341/PO-S2-129 records; existing spike code, tests and map-library reference notes. No package or API pin changed. Installed upstream `map.ts`, `evented.ts` and the overlay implementation corroborate the existing load/idle/control API behavior; no external request or browser download was made.
+- Environment: Linux, Node v22.22.3, npm 10.9.8, `nproc` 1, shell affinity/CORES `8-11`. Normal means no owned added load, not an idle shared host; load samples during this pass included 4.30/11.20/14.09 and 32.37/26.10/20.04. Every controlled run starts four owned Node busy loops, each `taskset -c 8-9`, with probe/browser or suite `taskset -c 10-11`. Same split before/after; all four children remained alive until each measured loaded command ended and were individually terminated by owned PID and reaped. Scene seed 1; existing full wall, DPR/cap, layer counts and plants retained. TMPDIR is workspace-relative `.overnight/tmp`. Browser selected from the documented `data/tools/playwright/` location.
+- Measurement: scratch `.overnight/tmp/measure.mjs` uses a Vite pre-transform for marks around generation, first idle, both samples, orbit and submission, plus render-event marks and actual WebGL2 readPixels timings. An init script only times each read. The unchanged 170000 ms host race starts before navigation. Build, page creation and browser launch precede that race. No committed code is instrumented and no evidence/trace is edited. Baseline-normal console results were retained as a summary in `before-normal.log`; subsequent phase logs were written by the probe. The loaded after trace additionally partitions map creation and renderer display: full street 19.2/6.1 ms, shared roads 15.3/7.9 ms. The tables' residual consistently includes those subphases; it is not attributed to one operation. After-normal shared roads has a 9637.8 ms unpartitioned startup/renderer/navigation remainder; do not infer a second causal diagnosis from it.
+
+Full street load:
+
+| Phase (ms) | Before normal | Before four loops | After normal | After four loops |
+| --- | ---: | ---: | ---: | ---: |
+| Generation | 169.4 | 180.1 | 215.0 | 183.5 |
+| First idle | 26592.9 | 31095.4 | 752.6 | 796.4 |
+| Initial 256-point sample | 9857.5 | 9904.9 | 10101.2 | 10260.3 |
+| Orbit | 8789.9 | 9711.5 | 19235.9 | 18201.7 |
+| Final 256-point sample | 8896.5 | 9811.1 | 10285.1 | 8938.2 |
+| Trace submission | 7.0 | 8.6 | 45.4 | 72.2 |
+| Other startup / renderer / navigation | 152.2 | 205.1 | 126.7 | 133.1 |
+| Host readiness | 54465.4 | 60916.7 | 40761.9 | 38585.3 |
+| Margin to unchanged 170000 ms bound | 115534.6 | 109083.3 | 129238.1 | 131414.7 |
+
+Shared road load:
+
+| Phase (ms) | Before normal | Before four loops | After normal | After four loops |
+| --- | ---: | ---: | ---: | ---: |
+| Generation | 157.5 | 161.6 | 206.0 | 157.1 |
+| First idle | 15092.9 | 15822.2 | 620.2 | 617.5 |
+| Initial 256-point sample | 5019.6 | 4829.1 | 5505.0 | 5328.1 |
+| Orbit | 4979.6 | 4873.4 | 10067.1 | 9756.4 |
+| Final 256-point sample | 5053.6 | 4925.7 | 5399.9 | 4867.8 |
+| Trace submission | 5.8 | 5.6 | 26.4 | 21.9 |
+| Other startup / renderer / navigation | 137.9 | 121.4 | 9637.8 | 114.3 |
+| Host readiness | 30447.1 | 30739.0 | 31462.4 | 20863.1 |
+| Margin to unchanged 170000 ms bound | 139552.9 | 139261.0 | 138537.6 | 149136.9 |
+
+- Cause: the heavy overlay was attached while the basemap's source/style startup was still active. Basemap startup frames therefore also redrew the entire data scene. The old first-idle interval was 26592.9/31095.4 ms without/with owned load. A loaded scratch change attaching on the basemap load event gave 705.0 ms first idle and 40712.1 ms readiness for full street. The implemented load-event ordering gives 752.6/796.4 ms first idle and 40761.9/38585.3 ms readiness. The slow per-frame intervals in the retained render marks disappear from startup, rather than being hidden by a new readiness condition. Some rendering moves to the existing orbit interval; total host readiness is recorded above. Both actual samples still make all 256 reads, 512 per scene, and only each sample's first read is slow. All measured scenes retain 110000 hexagons, 50000 particles, 250004 or 100004 roads and positive hex/particle/road samples. This is a tested startup-order cause, not per-point read overhead.
+- Implementation: `web/spikes/performance/layers.ts` registers the existing error guard before waiting on basemap load, then mounts the unchanged overlay and waits for idle before reading rendered counts. A load failure removes deferred load and idle callbacks; a synchronous overlay-mount exception rejects the same readiness promise. Existing success listener-removal expectation, sampling, layer-count code, browser specs/config, time limits and evidence remain unchanged. `web/spikes/performance/README.md` explains this lifecycle.
+- Red before implementation: `TMPDIR="$PWD/.overnight/tmp" taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` exited 1: 11 passed, one assertion failure, zero skipped/cancelled/todo. The new test observed `baseLoaded: false`, expected true. The first implementation run exited 0: 13 passed. Final fixture/lifecycle coverage exits 0: 14 passed.
+- Deciding replays use VM source substitution, never a worktree rollback: final 14 tests against the exact HEAD layers.ts exit 1, 12 passed/two assertion failures (early overlay mount and failure before load); drop only the new load-listener cleanup and the tests exit 1, 13 passed/one failed; replace mount-error rejection with success and they exit 1, 13 passed/one failed (`Missing expected rejection`). All have zero skipped/cancelled/todo. Logs and real command statuses: `.overnight/tmp/commands.jsonl`, `layers-final-red.log`, `cleanup-plant.log`, `mount-error-plant.log`, `layers-lifecycle.log`.
+- P02/historical limit: P02's 191918 ms is a whole-test failure with no retained rejection text, not an exact readiness measurement. Its post-round-1 code still mounted the overlay during startup; this pass identifies and removes that additional redundant work under the same controlled before/after load. The current before measurement did not reproduce a timeout. Earlier 154371.4 ms readiness, OI-319's seed/revision, OI-341's moved-head/ledger occurrences at shared-host load about 60–122 and the separate 1800-second whole-suite timeout are preserved history. No arbitrary-starvation guarantee or retrospective proof that every historical timeout has this cause is claimed. Closing proposals, including the unresolved runner-timeout limitation, belong to the return report and lead review; OPEN_ITEMS.md and all acceptance boxes remain unchanged.
+
+
+S2-T44 round 2B — Additional self-review correction and probe setup exits:
+
+- The initial scratch launch command, `TMPDIR="$PWD/.overnight/tmp" taskset -c 10-11 node .overnight/tmp/measure.mjs`, exited 1 before any scene ran: setting the browser cache after importing Playwright was too late. Setting `PLAYWRIGHT_BROWSERS_PATH="$PWD/data/tools/playwright"` in the launching environment fixed that deterministic probe setup error; no browser was downloaded, and no missing-cache failure is treated as a readiness failure. The subsequent normal, controlled-load, loaded load-event experiment, after-normal and after-loaded probes all exited 0, two scenes each. Each loaded probe ended with four owned loops alive and then four stopped/reaped.
+- One apply_patch attempt to extend the test double was rejected because its context did not match; it changed no file. The corrected patch applied. This is a tool validation error, not a test result or an invented process exit.
+- Self-review found that the direct synchronous-mount-exception path called the failure callback without firing its one-shot error event, retaining that listener. Strengthened only the new mount-failure test to require all load/idle/error listeners gone. `node .overnight/tmp/run-command.mjs mount-cleanup-red . taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` exited 1: 13 passed, one failed, zero skipped/cancelled/todo; pending error-listener size was one, expected zero. Added `map.off('error', fail)` to the failure callback; `node .overnight/tmp/run-command.mjs layers-final-green . taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` exited 0: 14 passed, zero failed/skipped/cancelled/todo. Successful rendering and every measured successful-path statement are unchanged by this cleanup correction.
+- The first complete loaded performance command had already built its page and passed its layer tests before that additional error-path assertion/correction. Its result is retained as exploratory evidence, separately from the planned two complete final-source loaded runs. Initial lint, format:check and typecheck each exited 0; final-source checks follow separately. These read-only static checks used cores 8-9 while the exploratory suite remained on 10-11, not during the phase probes.
+
+
+S2-T44 round 2B — Completed full-run evidence so far:
+
+- `performance-loaded-1`: from web/, `taskset -c 10-11 npm run test:spike:performance`, launched by `node .overnight/tmp/run-command.mjs performance-loaded-1 web --load taskset -c 10-11 npm run test:spike:performance`; child and wrapper exit 0; tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (11.2m); command wall 683792.7 ms. Four owned loops on 8-9 stayed alive through the command, then were stopped by owned PID and reaped. Seed 1. Log: `.overnight/tmp/performance-loaded-1.log`.
+- `performance-loaded-2`: from web/, `taskset -c 10-11 npm run test:spike:performance`, launched by `node .overnight/tmp/run-command.mjs performance-loaded-2 web --load taskset -c 10-11 npm run test:spike:performance`; child and wrapper exit 0; tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (20.7m); command wall 1259051.6 ms. Four owned loops on 8-9 stayed alive through the command, then were stopped by owned PID and reaped. Seed 1. Log: `.overnight/tmp/performance-loaded-2.log`.
+- `performance-loaded-1` is the exploratory run before the final error-listener cleanup, not one of the two final-source confirmations. `performance-loaded-2` is the first final-source confirmation: implementation SHA-256 `4fcf3132ab45d38de860f1ee8e462178b5ae2f9fb730702485bf193da3875a0b`, test SHA-256 `7df0279f4e583aaebbe681a11bc7fe7a56f6cfdd25c764fe94c3693b87ab1ebc`, identical at start/end; sourceUnchanged true. Full-street list-reporter duration 2.6m; browser wall 1244837.9 ms. These are whole-test/suite observations, not reconstructed readiness timings.
+- Independent hash calculation of the exact HEAD layers.ts copy produced `c35af3fb3bfc8b69fad0ee07dbc85b6916ac38b82dde50c585d6c3a505e6b1b0`, matching the corrected P02 record in the supplied OI-319/OI-341 notes. It is the post-round-1 baseline, not the pre-double-submission-fix code. Command: Python hashlib over `.overnight/tmp/layers.before.ts`, the implementation and test; exit 0. During the first final-source run the host-load snapshot was 60.91/54.54/40.04; at the start of the second it was 54.43/60.53/54.57. These are point samples, not controlled host-wide averages.
+- Final-source `npm run lint`, `npm run format:check` and `npm run typecheck` from web/ all exited 0. The checks used cores 8-9 beside the loaded browser on 10-11; their own wrapper did not start extra loops. Both source fingerprints were identical before/after each check. Logs: `.overnight/tmp/lint-final.log`, `format-final.log`, `typecheck-final.log`.
+- Additional skill used for final browser verification: webapp-testing, applied to the brief-required pinned npm/Playwright scripts and their existing loopback server, headless browser, DOM assertions and browser shutdown. No second server harness or dependency was added.
+
+
+S2-T44 round 2B — Second final-source complete loaded confirmation:
+
+- `node .overnight/tmp/run-command.mjs performance-loaded-3 web --load taskset -c 10-11 npm run test:spike:performance`: child/wrapper exit 0/0; tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (17.8m); wall 1082141.1 ms. Browser wall 1068328.2 ms; full-street list-reporter duration 2.8m. Four owned loops pinned to 8-9 were alive through command end and then stopped by owned PID and reaped. Scene seed 1. Source/test SHA-256 values are the same as performance-loaded-2, identical at start/end; sourceUnchanged true. No bound, retry, skip, assertion, plant, count or committed trace changed.
+- The complete final-source pair is performance-loaded-2 and performance-loaded-3: both exit 0 with 141 Node tests and all 62 browser tests passed, zero failed/cancelled/skipped/todo. Logs and exact commands are in `.overnight/tmp/commands.jsonl` and their labelled logs. This is the required repeat under the same controlled load, with no source edits between runs.
+- A final-assertion replay, `node .overnight/tmp/run-command.mjs baseline-final-assertions . taskset -c 10-11 node --import ./.overnight/tmp/use-baseline.mjs --test web/spikes/performance/tests/layers.node-test.mjs`, exits 1 with 12 passed/two assertion failures and zero cancelled/skipped/todo against the original HEAD implementation. The strengthened final assertions retain their teeth; no worktree file was rolled back or modified by the replay.
+
+
+S2-T44 round 2B — Final-source phase confirmation (after the failure-listener correction):
+
+- Both commands exited 0, two scenes each: `PHASE_LOG=final-normal.log PLAYWRIGHT_BROWSERS_PATH="$PWD/data/tools/playwright" TMPDIR="$PWD/.overnight/tmp" taskset -c 10-11 node .overnight/tmp/measure.mjs`; the same command with `PHASE_LOG=final-loaded.log` and `--load`. The loaded probe kept all four owned 8-9 loops alive until both scenes finished, then stopped/reaped them; normal started/stopped none. Both ENV records name implementation SHA-256 `4fcf3132ab45d38de860f1ee8e462178b5ae2f9fb730702485bf193da3875a0b`. Seed 1, all counts/colours retained, 512 actual reads per scene. Renderer: ANGLE/Vulkan SwiftShader Device (Subzero).
+- Final normal host-load snapshots: 54.71/58.35/56.66 at start, 58.12/58.70/57.13 at end. Final loaded snapshots: 53.27/57.39/56.75 at start, 64.61/61.59/58.56 at end. The prescribed owned load matches the baseline; host-wide background load is uncontrolled. Wall times are conditional observations; the regression and first-idle marks identify the removed startup work.
+
+Full street load:
+
+| Phase (ms) | Before normal | Before four loops | After normal | After four loops |
+| --- | ---: | ---: | ---: | ---: |
+| Generation | 169.4 | 180.1 | 179.1 | 190.3 |
+| First idle | 26592.9 | 31095.4 | 874.6 | 925.9 |
+| Initial 256-point sample | 9857.5 | 9904.9 | 21913.2 | 22789.3 |
+| Orbit | 8789.9 | 9711.5 | 43032.3 | 44679.0 |
+| Final 256-point sample | 8896.5 | 9811.1 | 20768.0 | 21759.4 |
+| Trace submission | 7.0 | 8.6 | 42.5 | 42.1 |
+| Other startup / renderer / navigation | 152.2 | 205.1 | 127.9 | 154.7 |
+| Host readiness | 54465.4 | 60916.7 | 86937.5 | 90540.6 |
+| Margin to unchanged 170000 ms bound | 115534.6 | 109083.3 | 83062.5 | 79459.4 |
+
+Shared road load:
+
+| Phase (ms) | Before normal | Before four loops | After normal | After four loops |
+| --- | ---: | ---: | ---: | ---: |
+| Generation | 157.5 | 161.6 | 187.5 | 219.4 |
+| First idle | 15092.9 | 15822.2 | 742.8 | 808.0 |
+| Initial 256-point sample | 5019.6 | 4829.1 | 10577.6 | 10173.2 |
+| Orbit | 4979.6 | 4873.4 | 19725.5 | 18702.5 |
+| Final 256-point sample | 5053.6 | 4925.7 | 9756.1 | 9898.3 |
+| Trace submission | 5.8 | 5.6 | 22.2 | 25.0 |
+| Other startup / renderer / navigation | 137.9 | 121.4 | 18615.4 | 21550.2 |
+| Host readiness | 30447.1 | 30739.0 | 59627.1 | 61376.6 |
+| Margin to unchanged 170000 ms bound | 139552.9 | 139261.0 | 110372.9 | 108623.4 |
+
+Subphases inside Other, not additional elapsed time:
+
+| Scene / run | Map construction ms | Renderer-display frame ms | Remaining navigation/setup ms |
+| --- | ---: | ---: | ---: |
+| hexagons-particles-roads-250k / final-normal | 21.7 | 5.9 | 100.3 |
+| hexagons-particles-roads / final-normal | 18518.1 | 6.3 | 91.0 |
+| hexagons-particles-roads-250k / final-loaded | 17.7 | 5.9 | 131.1 |
+| hexagons-particles-roads / final-loaded | 21454.5 | 6.6 | 89.1 |
+
+- The second-scene Map-construction cost is explicitly measured at 18518.1/21454.5 ms without/with owned loops; its driver-level cause is not isolated. It is retained as a measured cost, not called a fixed driver issue or hidden inside first idle. First idle on the final full-street source is 874.6/925.9 ms; the samples and orbit still reflect rendering cost under contention. Full-street loaded readiness 90540.6 ms leaves 79459.4 ms margin to the unchanged 170000 ms bound. No arbitrary-starvation, historical phase-recovery or native frame-rate claim follows.
+- Broad `web-checks` is now running on 8-11 with no owned busy loops; it is separate from the controlled phase experiments and the two completed final-source loaded performance runs.
+
+
+S2-T44 round 2B — Required broad checks complete and command ledger:
+
+- From web/, `taskset -c 8-11 npm run test:checks`, through `node .overnight/tmp/run-command.mjs web-checks web taskset -c 8-11 npm run test:checks`: child/wrapper exit 0/0; tests 881; pass 881; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (22.3m); command wall 1381089.8 ms. No owned busy loops; same final implementation/test hashes before/after. This is the requested standalone command, not a claimed exact-merge-result whole test.
+- Required final-source lint, format:check and typecheck exited 0; document check exited 0 (1234 text files, 134 Markdown files); tree check exited 0 (8 rules); cmp AGENTS.md CLAUDE.md and git diff --check exited 0. No test/gate output was piped, refreshed or retried.
+- Owned untracked Playwright test-report metadata contained the workspace path. `node .overnight/tmp/run-command.mjs redact-test-report . taskset -c 8-9 python3 .overnight/tmp/redact-test-report.py` exited 0: removed ten local-path metadata strings, with exact before/after numeric-result and test-outcome comparisons. The report metadata had only actualWorkers; no captured author metadata was present. This was a Playwright report, not a committed native evidence file or a performance trace; none of those were edited.
+- The following child-command ledger preserves every captured test/plant/check exit. Every wrapper exit matches its child exit. Wrappers use workspace TMPDIR, relative labelled logs, direct child-status capture and source/load survival checks; complete invocation metadata is `.overnight/tmp/commands.jsonl`. Earlier focused red-before-implementation and all phase-probe commands/results are recorded above and in the return.
+
+| Label / cwd | Child command | Exit | Actual result |
+| --- | --- | ---: | --- |
+| layers-green / . | `taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` | 0 | tests 13; pass 13; fail 0; cancelled 0; skipped 0; todo 0 |
+| layers-lifecycle / . | `taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` | 0 | tests 14; pass 14; fail 0; cancelled 0; skipped 0; todo 0 |
+| layers-final-red / . | `taskset -c 10-11 node --import ./.overnight/tmp/use-baseline.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | tests 14; pass 12; fail 2; cancelled 0; skipped 0; todo 0 |
+| cleanup-plant / . | `env PLANT=drop-load-cleanup taskset -c 10-11 node --import ./.overnight/tmp/use-mutant.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | tests 14; pass 13; fail 1; cancelled 0; skipped 0; todo 0 |
+| mount-error-plant / . | `env PLANT=swallow-mount-error taskset -c 10-11 node --import ./.overnight/tmp/use-mutant.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | tests 14; pass 13; fail 1; cancelled 0; skipped 0; todo 0 |
+| typecheck / web | `taskset -c 8-9 npm run typecheck` | 0 | no output |
+| format-check / web | `taskset -c 8-9 npm run format:check` | 0 | All matched files use Prettier code style! |
+| lint / web | `taskset -c 8-9 npm run lint` | 0 | no output |
+| mount-cleanup-red / . | `taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | tests 14; pass 13; fail 1; cancelled 0; skipped 0; todo 0 |
+| layers-final-green / . | `taskset -c 10-11 node --test web/spikes/performance/tests/layers.node-test.mjs` | 0 | tests 14; pass 14; fail 0; cancelled 0; skipped 0; todo 0 |
+| performance-loaded-1 / web | `taskset -c 10-11 npm run test:spike:performance` | 0 | tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (11.2m) |
+| typecheck-final / web | `taskset -c 8-9 npm run typecheck` | 0 | no output |
+| format-final / web | `taskset -c 8-9 npm run format:check` | 0 | All matched files use Prettier code style! |
+| lint-final / web | `taskset -c 8-9 npm run lint` | 0 | no output |
+| performance-loaded-2 / web | `taskset -c 10-11 npm run test:spike:performance` | 0 | tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (20.7m) |
+| performance-loaded-3 / web | `taskset -c 10-11 npm run test:spike:performance` | 0 | tests 141; pass 141; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (17.8m) |
+| baseline-final-assertions / . | `taskset -c 10-11 node --import ./.overnight/tmp/use-baseline.mjs --test web/spikes/performance/tests/layers.node-test.mjs` | 1 | tests 14; pass 12; fail 2; cancelled 0; skipped 0; todo 0 |
+| parity-final / . | `taskset -c 8-9 cmp AGENTS.md CLAUDE.md` | 0 | no output |
+| diff-final / . | `taskset -c 8-9 git diff --check` | 0 | no output |
+| tree-final / . | `taskset -c 8-9 python3 scripts/check_tree.py` | 0 | checked 8 rules: OK |
+| docs-final / . | `taskset -c 8-9 python3 scripts/check_docs.py` | 0 | checked 1234 text files, 134 Markdown files: OK |
+| web-checks / web | `taskset -c 8-11 npm run test:checks` | 0 | tests 881; pass 881; fail 0; cancelled 0; skipped 0; todo 0; browser 62 passed (22.3m) |
+| redact-test-report / . | `taskset -c 8-9 python3 .overnight/tmp/redact-test-report.py` | 0 | Redacted 10 local-path metadata strings in the owned untracked Playwright report; every numeric result, status and test entry retained. No native evidence or performance trace edited. |
+
+- No task box or OPEN_ITEMS.md line was changed. The return carries proposed OI-319/OI-341/PO-S2-129 closing dispositions. The attached, unclassified historical 1800-second whole-suite timeout prevents an unconditional whole-item OI-319 closure in this builder report. Other-maker approval, hosted checks and a merged-result whole ./eii test remain outside this local pass.
+
+
+S2-T44 round 2B — Return and final scope/self-audit:
+
+- `node .overnight/tmp/run-command.mjs return-write . taskset -c 8-9 python3 .overnight/tmp/write-return.py` exited 0 and wrote `.overnight/RETURN.md`, with maker/model, builder/strict self-review personas, both complete final-source loaded runs, before/after phase tables and subphases, cause, exact source hashes, command exits, red/green/plant results, limitations and proposed open-item dispositions. Its last line is MARKER-S2-T44-R2B. No source changed during report writing.
+- `node .overnight/tmp/run-command.mjs audit-final . taskset -c 8-9 python3 .overnight/tmp/final-audit.py` exited 0: original PROGRESS prefix 5132479 bytes retained, HEAD unchanged, no staged changes, exactly four authorized tracked files changed, report/appended records free of private paths or e-mail addresses, marker correct, every required command green, both final-source controlled runs with four loops alive to the end, matching source/test fingerprints, and byte-unchanged task/open-item/rule/config/spec files. No existing assertion was removed. The report was read back completely; its historical and unclassified cost limitations are explicit.
+- Muhasabah PASS for the bounded local implementation/evidence handoff: claims resolve to actual files, output and hashes; uncontrolled background load, the second-scene Map-construction wait, missing P02 rejection text, the separate historical 1800-second whole-suite timeout and independent-review/hosted/whole-test limits remain explicit. No formal approval, native frame-rate result, arbitrary-starvation guarantee or whole-item OI-319 closure is invented. Closing proposals remain for the lead; no acceptance box or open-item entry was edited.
