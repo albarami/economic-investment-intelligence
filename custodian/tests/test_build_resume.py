@@ -216,7 +216,13 @@ def test_unproven_completed_bytes_are_refetched(harness: Harness, plant: str) ->
         ("missing", "resume_record_missing"),
         ("complete", "resume_not_interrupted"),
         ("seed", "resume_seed_mismatch"),
-        ("head", "resume_head_mismatch"),
+        # A version-1 journal bound reuse to the whole-checkout HEAD; the
+        # per-entry fingerprints of version 2 replaced that gate. A version-1
+        # record keeps its old refusal names: a different recorded head is
+        # resume_head_mismatch, anything else is resume_record_unproven.
+        ("v1_head", "resume_head_mismatch"),
+        ("v1_same_head", "resume_record_unproven"),
+        ("v1_malformed", "resume_record_unproven"),
         ("invalid", "resume_record_invalid"),
     ],
 )
@@ -233,8 +239,14 @@ def test_resume_refuses_unmatched_run_without_fetch(
             row["state"] = "complete"
         elif plant == "seed":
             row["seed"] = 18
-        elif plant == "head":
+        elif plant == "v1_head":
+            row["version"] = 1
             row["head"] = HEAD if row["head"] != HEAD else "b" * 40
+        elif plant == "v1_same_head":
+            row["version"] = 1
+        elif plant == "v1_malformed":
+            row["version"] = 1
+            row["head"] = "not-a-head"
         if plant == "invalid":
             path.write_text("[]")
         else:

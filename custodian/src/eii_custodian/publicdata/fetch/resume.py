@@ -1,7 +1,10 @@
-"""Durable fetch progress, scoped to one interrupted seeded build and checkout.
+"""Durable fetch progress, scoped to one interrupted seeded build.
 
-Only receipt- or page-meta-proven inputs can be reused. The journal is never
-an assembly result or a substitute for an existing receipt's own hash.
+Version 2 binds each reuse-capable entry to a per-entry fingerprint of the
+code and inputs that produced it, replacing the whole-checkout HEAD gate:
+only receipt- or page-meta-proven inputs with a matching fingerprint can be
+reused, and any doubt refetches. The journal is never an assembly result or
+a substitute for an existing receipt's own hash.
 """
 
 from __future__ import annotations
@@ -9,7 +12,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
@@ -17,10 +20,18 @@ from typing import Any, cast
 from eii_custodian.publicdata.busyness.security import assert_clean
 
 from .bounded import file_hash
+from .fingerprint import (
+    CodeRoots,
+    FingerprintUnavailable,
+    RunScan,
+    default_roots,
+    scan_run,
+)
 from .registry import Entry
 from .snapshots import read_snapshot, utc
 
 RUN_NAME = "build-run.json"
+JOURNAL_VERSION = 2
 
 
 class ResumeError(ValueError):
@@ -86,6 +97,8 @@ class RunRecord:
     resuming: bool
     fetch_lines: list[str] = field(default_factory=list, repr=False)
     environ: Mapping[str, str] = field(default_factory=dict, repr=False)
+    clock: Callable[[], str] = field(default=lambda: "", repr=False)
+    scan: RunScan | None = field(default=None, repr=False)
 
     @classmethod
     def begin(
@@ -97,6 +110,9 @@ class RunRecord:
         *,
         resume: bool,
         environ: Mapping[str, str] | None = None,
+        clock: Callable[[], str] | None = None,
+        roots: CodeRoots | None = None,
+        large: bool = False,
     ) -> RunRecord:
         head = repository_head()
         path = cache / RUN_NAME
@@ -105,8 +121,24 @@ class RunRecord:
                 raise ResumeError("resume_record_missing")
             try:
                 row = _object(path)
+            except (OSError, ValueError, TypeError):
+                raise ResumeError("resume_record_invalid") from None
+            if row.get("version") == 1:
+                # A version-1 journal binds reuse to a whole-checkout HEAD that
+                # is no longer the rule. A different recorded head keeps its
+                # old refusal name; any other version-1 record simply cannot
+                # prove per-entry reuse and is refetched.
+                old_head = row.get("head")
                 if (
-                    row.get("version") != 1
+                    isinstance(old_head, str)
+                    and re.fullmatch(r"[a-f0-9]{40}", old_head) is not None
+                    and old_head != head
+                ):
+                    raise ResumeError("resume_head_mismatch")
+                raise ResumeError("resume_record_unproven")
+            try:
+                if (
+                    row.get("version") != JOURNAL_VERSION
                     or not isinstance(row.get("entries"), dict)
                     or type(row.get("seed")) is not int
                     or not isinstance(row.get("head"), str)
@@ -129,14 +161,27 @@ class RunRecord:
                 raise ResumeError("resume_not_interrupted")
             if row["seed"] != seed:
                 raise ResumeError("resume_seed_mismatch")
-            if row["head"] != head:
-                raise ResumeError("resume_head_mismatch")
-            return cls(cache, row, True, environ=environ or {})
+            try:
+                scan = scan_run(entries, roots or default_roots(), large=large)
+            except (FingerprintUnavailable, OSError):
+                raise ResumeError("resume_fingerprint_unavailable") from None
+            return cls(
+                cache,
+                row,
+                True,
+                environ=environ or {},
+                clock=clock or (lambda: ""),
+                scan=scan,
+            )
         utc(started)
+        try:
+            scan = scan_run(entries, roots or default_roots(), large=large)
+        except (FingerprintUnavailable, OSError):
+            raise ResumeError("resume_fingerprint_unavailable") from None
         run = cls(
             cache,
             {
-                "version": 1,
+                "version": JOURNAL_VERSION,
                 "started_utc": started,
                 "seed": seed,
                 "head": head,
@@ -147,6 +192,8 @@ class RunRecord:
             },
             False,
             environ=environ or {},
+            clock=clock or (lambda: ""),
+            scan=scan,
         )
         run.write()
         return run
@@ -178,16 +225,31 @@ class RunRecord:
         self.write()
 
     def fetched(self, entry: Entry, state: dict[str, object]) -> None:
-        """Bind the fetched result to immutable primary and auxiliary receipts."""
+        """Bind the fetched result to receipts and its code/input fingerprint."""
         item: dict[str, Any] = {"completed": True}
-        if entry.kind == "paged_cards":
+        fingerprint, refusal = self._fingerprint(entry)
+        if refusal is not None:
+            item["reuse_unavailable"] = refusal
+        elif entry.kind == "paged_cards":
             try:
                 item.update(fetch=state, page_meta=self._page_meta(entry, state))
             except (OSError, ValueError, KeyError, TypeError):
                 item["reuse_unavailable"] = "page_receipt_unproven"
-            self.row["entries"][entry.key] = item
-            self.write()
-            return
+            else:
+                item["fingerprint"] = fingerprint
+        else:
+            self._fetch_proofs(entry, item, state, fingerprint)
+        self.row["entries"][entry.key] = item
+        self.write()
+
+    def _fetch_proofs(
+        self,
+        entry: Entry,
+        item: dict[str, Any],
+        state: dict[str, object],
+        fingerprint: dict[str, Any] | None,
+    ) -> None:
+        """Bind the fetched result to immutable primary and auxiliary receipts."""
         try:
             directory = self._local(entry.key, entry)
             if entry.key in {"places_ovt", "bldg_ovt"}:
@@ -233,14 +295,70 @@ class RunRecord:
                     }
                 )
             item.update(
-                fetch=state, proofs=proofs, publisher=primary.sidecar["publisher"]
+                fetch=state,
+                proofs=proofs,
+                publisher=primary.sidecar["publisher"],
+                fingerprint=fingerprint,
             )
         except (OSError, ValueError, KeyError, TypeError):
             # No proof means no reuse. Fetch success itself remains recorded;
             # an adapter with a different receipt layout must refetch.
             item["reuse_unavailable"] = "receipt_unproven"
-        self.row["entries"][entry.key] = item
-        self.write()
+
+    def _fingerprint(self, entry: Entry) -> tuple[dict[str, Any] | None, str | None]:
+        """The begin-time fingerprint, re-proved at fetched() before storing."""
+        scan = self.scan
+        if scan is None:
+            return None, "resume_fingerprint_unavailable"
+        record = scan.records.get(entry.key)
+        if record is None:
+            return None, "resume_fingerprint_unavailable"
+        if not scan.closure_intact() or scan.unexpected_loaded():
+            return None, "resume_fingerprint_unproven"
+        if entry.source_id == "tenders_pub":
+            triple = self._intake_triple(entry)
+            if triple is None:
+                return None, "resume_fingerprint_unproven"
+            record = {**record, "intake": triple}
+        return record, None
+
+    def _intake_triple(self, entry: Entry) -> list[Any] | None:
+        """The intake triple stored in the awarded list's own receipts."""
+        values = []
+        for language in ("en", "ar"):
+            receipt = self._local(f"{entry.key}/awarded/{language}.receipt.json", entry)
+            try:
+                reading = _object(receipt)
+            except (OSError, ValueError, TypeError):
+                return None
+            values.append(
+                [
+                    reading.get("award_cutoff"),
+                    reading.get("cutoff_reason"),
+                    reading.get("workbook_sha256"),
+                ]
+            )
+        return values[0] if values[0] == values[1] else None
+
+    def _fingerprint_matches(self, entry: Entry, item: dict[str, Any]) -> bool:
+        """The stored fingerprint must equal this run's begin-time record."""
+        if self.scan is None:
+            return False
+        stored = item.get("fingerprint")
+        if not isinstance(stored, dict):
+            return False
+        current = self.scan.records.get(entry.key)
+        if current is None:
+            return False
+        if entry.source_id == "tenders_pub":
+            try:
+                from .awards import intake_cutoff
+
+                cutoff, reason, workbook = intake_cutoff(self.cache, self.clock())
+            except Exception:
+                return False
+            current = {**current, "intake": [cutoff, reason, workbook]}
+        return stored == current
 
     def reuse(self, entry: Entry, lines: list[str]) -> dict[str, Any] | None:
         """Rehash all selected input bytes; stale or unproven input is refetched."""
@@ -248,6 +366,9 @@ class RunRecord:
             return None
         item = self.row["entries"][entry.key]
         if not item["completed"]:
+            return None
+        if not self._fingerprint_matches(entry, item):
+            self._invalidate(entry, lines)
             return None
         if entry.kind == "paged_cards":
             return self._reuse_pages(entry, item, lines)

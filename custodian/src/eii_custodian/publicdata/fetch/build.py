@@ -26,6 +26,7 @@ from eii_custodian.publicdata.benchmarks.config import load_policies
 from eii_custodian.publicdata.benchmarks.contracts import TABLES as BENCHMARK_TABLES
 from eii_custodian.publicdata.benchmarks.fetch import fetch_benchmark, owner_obstacle
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
+from eii_custodian.publicdata.fetch.fingerprint import CodeRoots
 from eii_custodian.publicdata.fetch.kinds import (
     TERMS_HOST_UNLISTED,
     prepare,
@@ -434,6 +435,178 @@ def _fetch_row(
     )
 
 
+def _seeded_assembly(
+    entries: tuple[Entry, ...],
+    transport: Transport,
+    cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+    *,
+    stream_transport: StreamTransport | None,
+    baci_config: Config | None,
+    gravity_config: GravityConfig | None,
+    atlas_config: AtlasConfig | None,
+    gravity_stream: StreamTransport | None,
+    atlas_stream: StreamTransport | None,
+    opener: Opener | None,
+    slots: SlotReader | None,
+    token: str,
+    key_name: str,
+    benchmark_policies: dict[str, BenchmarkPolicy] | None,
+    benchmark_stream: StreamTransport | None,
+    reconciliation_selection: Selection | None,
+    environ: Mapping[str, str] | None,
+    large_stream: StreamTransport | None,
+    seed: int | None,
+    resume: bool,
+    code_roots: CodeRoots | None,
+) -> BuildOutcome:
+    """Open the run journal, fetch under it, then run the production assembly."""
+    from eii_custodian.publicdata.assembly import AssemblyError
+    from eii_custodian.publicdata.assembly_adapters import Production
+
+    if type(seed) is not int or seed < 0:
+        raise AssemblyError("figure_seed_invalid")
+
+    try:
+        _run = RunRecord.begin(
+            cache,
+            entries,
+            seed,
+            clock(),
+            resume=resume,
+            environ=environ,
+            clock=clock,
+            roots=code_roots,
+            large=large_stream is not None,
+        )
+    except ResumeError as exc:
+        resume_failure = FetchFailure(1, "build-public", "", str(exc), "", "")
+        return BuildOutcome(
+            (fail_line("build-public", "", resume_failure.check, "", ""),),
+            resume_failure,
+        )
+    except OSError:
+        resume_failure = FetchFailure(
+            1, "build-public", "", "resume_record_write_failed", "", ""
+        )
+        return BuildOutcome(
+            (fail_line("build-public", "", resume_failure.check, "", ""),),
+            resume_failure,
+        )
+
+    def fetch_only() -> BuildOutcome:
+        return run_build(
+            entries,
+            transport,
+            cache,
+            clock,
+            sleep,
+            stream_transport=stream_transport,
+            baci_config=baci_config,
+            gravity_config=gravity_config,
+            atlas_config=atlas_config,
+            gravity_stream=gravity_stream,
+            atlas_stream=atlas_stream,
+            opener=opener,
+            slots=slots,
+            token=token,
+            key_name=key_name,
+            benchmark_policies=benchmark_policies,
+            benchmark_stream=benchmark_stream,
+            environ=environ,
+            large_stream=large_stream,
+            _fetch_only=True,
+            _run=_run,
+        )
+
+    build = Production(
+        tuple(entries),
+        cache,
+        _review_dir(),
+        cache.parent.parent,
+        transport,
+        clock,
+        sleep,
+        seed,
+        environ or {},
+        fetcher=fetch_only,
+        reconciliation_selection=reconciliation_selection,
+    )
+    try:
+        build.run()
+    except Exception as exc:
+        # No exception text crosses the source/credential boundary. Preserve
+        # an existing structured fetch failure and its network exit code.
+        if build.fetched is not None and build.fetched.failure is not None:
+            return cast(BuildOutcome, build.fetched)
+        if build.fetched is None:
+            from eii_custodian.publicdata.busyness.security import assert_clean
+
+            assert_clean(environ or {}, _run.fetch_lines)
+            build.lines.extend(_run.fetch_lines)
+        from eii_custodian.publicdata.building_inputs import BuildingError
+        from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
+        from eii_custodian.publicdata.series.parse import (
+            SERIES_REFUSALS,
+            SeriesRefused,
+        )
+
+        reason = "assembly_build_refused"
+        if isinstance(exc, BuildingError):
+            reason = exc.name
+        if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
+            reason = exc.word
+        elif (
+            isinstance(exc, MunicipalityFrameRefused) and exc.reason in SERIES_REFUSALS
+        ):
+            reason = exc.reason
+        if isinstance(exc, AssemblyError) and str(exc) in {
+            "snapshot_selection_invalid",
+            "assembly_gate_pending",
+            "assembly_frame_incomplete",
+            "assembly_buildings_incomplete",
+            "assembly_places_incomplete",
+            "assembly_membership_invalid",
+            "assembly_regression_refused",
+            "assembly_intake_invalid",
+            "assembly_tender_pages_incomplete",
+        }:
+            reason = str(exc)
+        assembly_failure = FetchFailure(
+            1,
+            "assembly",
+            "",
+            reason,
+            "verified ordered outputs",
+            "NO_DATA",
+        )
+        build.lines.append(
+            fail_line(
+                "assembly",
+                "",
+                assembly_failure.check,
+                assembly_failure.expected,
+                assembly_failure.observed,
+            )
+        )
+        _write_log(
+            cache,
+            build.lines,
+            list(build.fetched.terms) if build.fetched else [],
+            list(build.fetched.terms_attempts) if build.fetched else [],
+        )
+        return BuildOutcome(tuple(build.lines), assembly_failure)
+    _write_log(
+        cache,
+        build.lines,
+        list(build.fetched.terms) if build.fetched else [],
+        list(build.fetched.terms_attempts) if build.fetched else [],
+    )
+    _run.finish()
+    return BuildOutcome(tuple(build.lines), None)
+
+
 def run_build(
     entries: tuple[Entry, ...] | list[Entry],
     transport: Transport,
@@ -463,146 +636,36 @@ def run_build(
     _fetch_only: bool = False,
     resume: bool = False,
     _run: RunRecord | None = None,
+    code_roots: CodeRoots | None = None,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
     entries = tuple(entry for entry in entries if entry.kind != "company_web")
     if seed is not None:
-        from eii_custodian.publicdata.assembly import AssemblyError
-        from eii_custodian.publicdata.assembly_adapters import Production
-
-        if type(seed) is not int or seed < 0:
-            raise AssemblyError("figure_seed_invalid")
-
-        try:
-            _run = RunRecord.begin(
-                cache, entries, seed, clock(), resume=resume, environ=environ
-            )
-        except ResumeError as exc:
-            resume_failure = FetchFailure(1, "build-public", "", str(exc), "", "")
-            return BuildOutcome(
-                (fail_line("build-public", "", resume_failure.check, "", ""),),
-                resume_failure,
-            )
-        except OSError:
-            resume_failure = FetchFailure(
-                1, "build-public", "", "resume_record_write_failed", "", ""
-            )
-            return BuildOutcome(
-                (fail_line("build-public", "", resume_failure.check, "", ""),),
-                resume_failure,
-            )
-
-        def fetch_only() -> BuildOutcome:
-            return run_build(
-                entries,
-                transport,
-                cache,
-                clock,
-                sleep,
-                stream_transport=stream_transport,
-                baci_config=baci_config,
-                gravity_config=gravity_config,
-                atlas_config=atlas_config,
-                gravity_stream=gravity_stream,
-                atlas_stream=atlas_stream,
-                opener=opener,
-                slots=slots,
-                token=token,
-                key_name=key_name,
-                benchmark_policies=benchmark_policies,
-                benchmark_stream=benchmark_stream,
-                environ=environ,
-                large_stream=large_stream,
-                _fetch_only=True,
-                _run=_run,
-            )
-
-        build = Production(
-            tuple(entries),
-            cache,
-            _review_dir(),
-            cache.parent.parent,
+        return _seeded_assembly(
+            entries,
             transport,
+            cache,
             clock,
             sleep,
-            seed,
-            environ or {},
-            fetcher=fetch_only,
+            stream_transport=stream_transport,
+            baci_config=baci_config,
+            gravity_config=gravity_config,
+            atlas_config=atlas_config,
+            gravity_stream=gravity_stream,
+            atlas_stream=atlas_stream,
+            opener=opener,
+            slots=slots,
+            token=token,
+            key_name=key_name,
+            benchmark_policies=benchmark_policies,
+            benchmark_stream=benchmark_stream,
             reconciliation_selection=reconciliation_selection,
+            environ=environ,
+            large_stream=large_stream,
+            seed=seed,
+            resume=resume,
+            code_roots=code_roots,
         )
-        try:
-            build.run()
-        except Exception as exc:
-            # No exception text crosses the source/credential boundary. Preserve
-            # an existing structured fetch failure and its network exit code.
-            if build.fetched is not None and build.fetched.failure is not None:
-                return cast(BuildOutcome, build.fetched)
-            if build.fetched is None:
-                from eii_custodian.publicdata.busyness.security import assert_clean
-
-                assert_clean(environ or {}, _run.fetch_lines)
-                build.lines.extend(_run.fetch_lines)
-            from eii_custodian.publicdata.building_inputs import BuildingError
-            from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
-            from eii_custodian.publicdata.series.parse import (
-                SERIES_REFUSALS,
-                SeriesRefused,
-            )
-
-            reason = "assembly_build_refused"
-            if isinstance(exc, BuildingError):
-                reason = exc.name
-            if isinstance(exc, SeriesRefused) and exc.word in SERIES_REFUSALS:
-                reason = exc.word
-            elif (
-                isinstance(exc, MunicipalityFrameRefused)
-                and exc.reason in SERIES_REFUSALS
-            ):
-                reason = exc.reason
-            if isinstance(exc, AssemblyError) and str(exc) in {
-                "snapshot_selection_invalid",
-                "assembly_gate_pending",
-                "assembly_frame_incomplete",
-                "assembly_buildings_incomplete",
-                "assembly_places_incomplete",
-                "assembly_membership_invalid",
-                "assembly_regression_refused",
-                "assembly_intake_invalid",
-                "assembly_tender_pages_incomplete",
-            }:
-                reason = str(exc)
-            assembly_failure = FetchFailure(
-                1,
-                "assembly",
-                "",
-                reason,
-                "verified ordered outputs",
-                "NO_DATA",
-            )
-            build.lines.append(
-                fail_line(
-                    "assembly",
-                    "",
-                    assembly_failure.check,
-                    assembly_failure.expected,
-                    assembly_failure.observed,
-                )
-            )
-            _write_log(
-                cache,
-                build.lines,
-                list(build.fetched.terms) if build.fetched else [],
-                list(build.fetched.terms_attempts) if build.fetched else [],
-            )
-            return BuildOutcome(tuple(build.lines), assembly_failure)
-        _write_log(
-            cache,
-            build.lines,
-            list(build.fetched.terms) if build.fetched else [],
-            list(build.fetched.terms_attempts) if build.fetched else [],
-        )
-        _run.finish()
-        return BuildOutcome(tuple(build.lines), None)
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
     if (
