@@ -94,7 +94,8 @@ def run(
     """Validate the arguments before any input or credential read.
 
     No argument, ``--seed N`` (the draw seed), ``--company-web``,
-    ``--cdse-backup`` alone or ``--gis-imagery-snapshot`` alone;
+    ``--seed N --resume``, ``--cdse-backup`` alone or
+    ``--gis-imagery-snapshot`` alone;
     anything else is a usage error and opens nothing.
     """
     if tuple(args) == ("--company-web",):
@@ -116,9 +117,10 @@ def run(
         print(f"satellite_cdse_backup omitted: {reason}")
         return 0
     seed = 0
+    resume = len(args) == 3 and args[2] == "--resume"
     if args:
         if (
-            len(args) != 2
+            (len(args) != 2 and not resume)
             or args[0] != "--seed"
             or re.fullmatch(r"[0-9]{1,20}", args[1]) is None
         ):
@@ -250,6 +252,7 @@ def run(
         key_name=VARIABLE,
         environ=environ,
         seed=seed,
+        resume=resume,
     )
     for line in outcome.lines:
         print(line)

@@ -13,7 +13,9 @@ from .fetch.snapshots import publish_snapshot
 from .singles.tenders import AWARD_CONTINUITY_PAGES, LIST_PATHS, TenderError
 
 
-def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
+def archive_pages(
+    cache: Path, entry: Entry, stamp: str, *, retrieved_utc: str | None = None
+) -> str:
     pages = []
     readings = []
     for list_name, _ in LIST_PATHS:
@@ -113,7 +115,7 @@ def archive_pages(cache: Path, entry: Entry, stamp: str) -> str:
         nbytes=len(body),
         fetch_url=entry.url,
         fetch_host=entry.fetch_host,
-        retrieved_utc=stamp,
+        retrieved_utc=stamp if retrieved_utc is None else retrieved_utc,
         publisher=entry.publisher,
         source_modified="",
         row_count=None,

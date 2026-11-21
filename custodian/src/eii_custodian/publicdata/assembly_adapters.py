@@ -235,9 +235,18 @@ class Production:
         pages = {}
         for entry in self.entries:
             if entry.kind == "paged_cards" and not entry.skip_reason:
-                pages[entry.key] = archive_pages(
-                    self.cache, entry, self.stamp or self.clock()
-                )
+                reused_times = getattr(self.fetched, "reused_times", {})
+                if entry.key in reused_times:
+                    pages[entry.key] = archive_pages(
+                        self.cache,
+                        entry,
+                        self.stamp or self.clock(),
+                        retrieved_utc=reused_times[entry.key],
+                    )
+                else:
+                    pages[entry.key] = archive_pages(
+                        self.cache, entry, self.stamp or self.clock()
+                    )
         return self.record(
             "fetch_archive",
             {
