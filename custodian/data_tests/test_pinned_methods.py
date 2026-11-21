@@ -251,12 +251,52 @@ def _c8_agrees(actual, expected, reason):
         raise ValueError("C8:" + reason + "_mismatch")
 
 
+def _c8_check_sex_totals(sheet, both_row):
+    """Independent cached-value reconciliation; never evaluate workbook formulas."""
+    labels = ({"male", "males"}, {"female", "females"})
+    starts = [
+        [
+            number
+            for number, row in sheet.rows.items()
+            if any(_c8_label(cell) in names for cell in row[:2])
+        ]
+        for names in labels
+    ]
+    if any(len(block) != 1 for block in starts):
+        raise ValueError("C8:sex_block")
+    sex_rows = []
+    for (start,) in starts:
+        end = min(
+            (number for (number,) in starts if number > start),
+            default=max(sheet.rows) + 1,
+        )
+        totals = [
+            number
+            for number, row in sheet.rows.items()
+            if start <= number < end
+            and any(_c8_label(cell) == "total" for cell in row[:2])
+        ]
+        if len(totals) > 1:
+            raise ValueError("C8:sex_total_label")
+        sex_rows.append(totals[0] if totals else start)
+    for column in "FJ":
+        values = [sheet.cells.get(f"{column}{row}", "") for row in sex_rows]
+        if all(values):
+            try:
+                expected = sum((Fraction(value) for value in values), Fraction(0))
+            except (ValueError, ZeroDivisionError):
+                raise ValueError("C8:sex_count") from None
+            if Fraction(sheet.cells[f"{column}{both_row}"]) != expected:
+                raise ValueError("C8:sex_sum_mismatch")
+
+
 def test_pinned_c8():
     """Lead-only: compare calc to plain raw-file division, never store its values."""
     national_body, national_chain = _cache.pinned_body(C8_SOURCES["national"])
     zone_body, zone_chain = _cache.pinned_body(C8_SOURCES["zone"])
-    sheet = read_sheet(national_body, "76")
+    sheet = read_sheet(national_body, "76", cached_formulas=True)
     number, private, total = c8_national_counts(sheet)
+    _c8_check_sex_totals(sheet, number)
     national = _c8_share(private, total, national_chain, "national")
     # Independent plain arithmetic on the original cells, without calc helpers.
     expected_national = (

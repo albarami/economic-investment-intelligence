@@ -4,6 +4,7 @@ import io
 import json
 from dataclasses import replace
 from decimal import Decimal as D
+from xml.etree import ElementTree as ET
 from xml.sax.saxutils import escape
 from zipfile import ZipFile
 
@@ -11,6 +12,8 @@ import pytest
 from custodian.data_tests import test_pinned_methods as methods
 
 from eii_core.calc.facts import NoData
+from eii_custodian.publicdata.fetch.page_html import ShapeError
+from eii_custodian.publicdata.fetch.page_workbook import NS, read_sheet
 from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame import census
@@ -34,19 +37,31 @@ def workbook(*, total_row=12, plant=""):
         "J2": "Table No (76)",
         "B8": "Both Sexes",
         "B9": "INVENTED activity",
-        "F9": "1",
-        "J9": "100",
         f"B{total_row}": "Total",
-        f"F{total_row}": "30",
-        f"J{total_row}": "60",
         f"B{total_row + 2}": "Males",
         f"B{total_row + 3}": "Total",
-        f"F{total_row + 3}": "9",
-        f"J{total_row + 3}": "10",
+        f"B{total_row + 5}": "Females",
+        f"B{total_row + 6}": "Total",
         **{
             f"{column}7": text for column, text in zip("CDEFGHIJ", headers, strict=True)
         },
     }
+    # INVENTED values only. Every C..J value is a formula with a cached value,
+    # as in the published shape described by the lead; no formula is evaluated.
+    values = {
+        9: (0, 0, 0, 1, 0, 0, 99, 100),
+        total_row: (3, 2, 4, 30, 5, 7, 9, 60),
+        total_row + 3: (1, 2, 3, 9, 4, 5, 6, 30),
+        total_row + 6: (2, 0, 1, 21, 1, 2, 3, 30),
+    }
+    formula_cells = {f"{column}{number}" for number in values for column in "CDEFGHIJ"}
+    cells.update(
+        {
+            f"{column}{number}": str(value)
+            for number, row in values.items()
+            for column, value in zip("CDEFGHIJ", row, strict=True)
+        }
+    )
     if plant == "header":
         cells["F7"] = "INVENTED wrong column"
     elif plant == "missing_total":
@@ -59,16 +74,47 @@ def workbook(*, total_row=12, plant=""):
         cells["B8"] = "Males"
     elif plant == "national_denominator":
         cells[f"J{total_row}"] = "0"
+    elif plant == "sex_private":
+        cells[f"F{total_row + 3}"] = "10"
+    elif plant == "sex_total":
+        cells[f"J{total_row + 6}"] = "31"
+    elif plant == "sex_duplicate_total":
+        cells[f"B{total_row + 4}"] = "Total"
+    elif plant == "sex_duplicate_block":
+        cells[f"B{total_row + 7}"] = "Females"
+    elif plant == "sex_non_numeric":
+        cells[f"F{total_row + 3}"] = "INVENTED invalid value"
+        formula_cells.remove(f"F{total_row + 3}")
+    elif plant in {"sex_summary_rows", "sex_values_absent"}:
+        for offset in (3, 6):
+            for column in "CDEFGHIJ":
+                ref = f"{column}{total_row + offset}"
+                value = cells.pop(ref)
+                formula_cells.remove(ref)
+                if plant == "sex_summary_rows":
+                    summary_ref = f"{column}{total_row + offset - 1}"
+                    cells[summary_ref] = value
+                    formula_cells.add(summary_ref)
+            if plant == "sex_summary_rows":
+                del cells[f"B{total_row + offset}"]
     rows = {}
     for reference, value in cells.items():
         number = int("".join(c for c in reference if c.isdigit()))
         rows.setdefault(number, []).append((reference, value))
+
+    def cell_xml(ref, value):
+        if ref in formula_cells:
+            cached = (
+                ""
+                if plant == "uncached_formula" and ref == f"F{total_row}"
+                else f"<v>{value}</v>"
+            )
+            return f'<c r="{ref}"><f>SUM({value},0)</f>{cached}</c>'
+        return f'<c r="{ref}" t="inlineStr"><is><t>{escape(value)}</t></is></c>'
+
     row_xml = "".join(
         f'<row r="{number}">'
-        + "".join(
-            f'<c r="{ref}" t="inlineStr"><is><t>{escape(value)}</t></is></c>'
-            for ref, value in sorted(row)
-        )
+        + "".join(cell_xml(ref, value) for ref, value in sorted(row))
         + "</row>"
         for number, row in sorted(rows.items())
     )
@@ -192,11 +238,58 @@ def test_c8_full_pinned_replay_on_invented_cache(
 
 
 @pytest.mark.parametrize("total_row", [12, 18])
-def test_c8_total_is_selected_by_label_in_both_sexes_block(total_row):
-    from eii_custodian.publicdata.fetch.page_workbook import read_sheet
+def test_c8_invented_values_are_cached_formulas(total_row):
+    body = workbook(total_row=total_row)
+    with ZipFile(io.BytesIO(body)) as archive:
+        root = ET.fromstring(archive.read("xl/worksheets/sheet1.xml"))
+    cells = {cell.get("r"): cell for cell in root.findall("s:sheetData/s:row/s:c", NS)}
+    for row in (9, total_row, total_row + 3, total_row + 6):
+        for column in "CDEFGHIJ":
+            cell = cells[f"{column}{row}"]
+            assert cell.find("s:f", NS) is not None
+            assert cell.findtext("s:v", "", NS)
+    with pytest.raises(ShapeError, match=r"^schema_missing$"):
+        read_sheet(body, "76")
 
-    sheet = read_sheet(workbook(total_row=total_row), "76")
+
+@pytest.mark.parametrize("total_row", [12, 18])
+def test_c8_total_is_selected_by_label_in_both_sexes_block(total_row):
+    sheet = read_sheet(workbook(total_row=total_row), "76", cached_formulas=True)
     assert methods.c8_national_counts(sheet) == (total_row, D(30), D(60))
+
+
+def test_c8_formula_without_cached_value_refuses(tmp_path, monkeypatch):
+    invented_cache(tmp_path, monkeypatch, plant="uncached_formula")
+    with pytest.raises(ShapeError, match=r"^schema_missing$"):
+        methods.test_pinned_c8()
+
+
+@pytest.mark.parametrize("plant", ["sex_private", "sex_total"])
+@pytest.mark.parametrize("total_row", [12, 18])
+def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, total_row):
+    invented_cache(tmp_path, monkeypatch, plant=plant, total_row=total_row)
+    with pytest.raises(ValueError, match=r"^C8:sex_sum_mismatch$"):
+        methods.test_pinned_c8()
+
+
+@pytest.mark.parametrize(
+    "plant,reason",
+    [
+        ("sex_duplicate_total", "sex_total_label"),
+        ("sex_duplicate_block", "sex_block"),
+        ("sex_non_numeric", "sex_count"),
+    ],
+)
+def test_c8_sex_reconciliation_schema_plants(tmp_path, monkeypatch, plant, reason):
+    invented_cache(tmp_path, monkeypatch, plant=plant)
+    with pytest.raises(ValueError, match="^C8:" + reason + "$"):
+        methods.test_pinned_c8()
+
+
+@pytest.mark.parametrize("plant", ["sex_summary_rows", "sex_values_absent"])
+def test_c8_sex_reconciliation_available_layouts(tmp_path, monkeypatch, plant):
+    invented_cache(tmp_path, monkeypatch, plant=plant)
+    methods.test_pinned_c8()
 
 
 def test_c8_zone_null_and_lineage_are_observable(tmp_path, monkeypatch):

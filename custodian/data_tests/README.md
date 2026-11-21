@@ -44,7 +44,14 @@ quotients. Its invented-cache tests are in
 verified receipt reader and the existing named-sheet OOXML reader. National
 coverage comes from sheet `76`, the total row selected by label within the
 "Both Sexes" block; it is not the separate establishment source `est_census`
-or a sum over zones. The test recomputes each complete zone, checks the seven
+or a sum over zones. The sheet reader explicitly accepts stored formula caches;
+formulas are never evaluated, and a formula without a cached value still fails
+with `schema_missing`. Where both sex blocks provide values, plain `Fraction`
+arithmetic checks that national Private and Total each equal Males plus Females,
+using labelled totals within each block (or the sex heading's own values when
+there is no labelled total). A column without values for both sexes omits only
+that reconciliation; the national and zone replay checks still run.
+The test recomputes each complete zone, checks the seven
 sector counts sum to its total, returns `NO_DATA` for every zone with a null
 sector count, and compares the national share, zone shares and range to plain
 raw-file arithmetic within the unchanged half-percentage-point tolerance.
