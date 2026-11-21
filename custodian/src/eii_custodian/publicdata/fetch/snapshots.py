@@ -121,7 +121,14 @@ def read_snapshot(directory: Path, identity: str) -> Snapshot:
         _refuse("snapshot_hash_mismatch")
     if type(row.get("bytes")) is not int or row["bytes"] != size:
         _refuse("snapshot_hash_mismatch")
-    for key in ("source_id", "key", "retrieved_utc", "sha256", "bytes"):
+    for key in (
+        "source_id",
+        "key",
+        "retrieved_utc",
+        "source_modified",
+        "sha256",
+        "bytes",
+    ):
         if side.get(key) != row.get(key):
             _refuse("snapshot_index_invalid")
     return Snapshot(receipt_path=receipt, path=path, sha256=digest, sidecar=side)

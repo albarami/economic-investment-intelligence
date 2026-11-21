@@ -147,6 +147,11 @@ def test_gravity_access_and_terms(tmp_path: Path) -> None:
         )
         assert result.failure is not None
         assert result.failure.check == "access_obstacle"
+        assert result.failure.source_id == "cepii_gravity"
+        assert result.lines[-1] == (
+            "FAIL cepii_gravity access_obstacle "
+            "expected=validated source observed=NO_DATA"
+        )
         assert "invented-secret-token" not in repr(result)
     for index, words in enumerate(
         ("terms to be read", "invented absent terms", "invented prohibitive terms")
@@ -163,6 +168,10 @@ def test_gravity_access_and_terms(tmp_path: Path) -> None:
     )
     assert marked.failure is not None
     assert marked.failure.check == "access_obstacle"
+    assert marked.failure.source_id == "cepii_gravity"
+    assert marked.lines[-1] == (
+        "FAIL cepii_gravity access_obstacle expected=validated source observed=NO_DATA"
+    )
     assert "invented-secret-token" not in repr(marked)
 
 

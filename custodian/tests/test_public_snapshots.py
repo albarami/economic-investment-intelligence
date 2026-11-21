@@ -719,3 +719,38 @@ def test_reused_body_date_tamper_is_confined(tmp_path):
     with pytest.raises(SnapshotError, match=r"^snapshot_path_invalid$"):
         read_snapshot(tmp_path, newer_id)
     assert read_snapshot(tmp_path, older_id).body == body
+
+
+@pytest.mark.parametrize("plant", ["changed", "missing", "added"])
+def test_index_records_source_modified(tmp_path, plant):
+    from eii_custodian.publicdata.fetch.snapshots import (
+        SnapshotError,
+        publish_snapshot,
+        read_snapshot,
+    )
+
+    side = {
+        "source_id": "syn_source",
+        "key": "syn_source",
+        "retrieved_utc": "2024-01-31T00:00:00Z",
+    }
+    if plant != "added":
+        side["source_modified"] = "syn-publisher-version"
+    ref = publish_snapshot(tmp_path, "json", b"syn-body", side)
+    index = tmp_path / "index" / f"{ref.sha256}.json"
+    row = json.loads(index.read_text())
+    assert row.get("source_modified") == side.get("source_modified")
+    assert read_snapshot(tmp_path, ref.sha256).sidecar == ref.sidecar
+    before = index.read_bytes()
+    receipt_before = ref.receipt_path.read_bytes()
+    body_before = ref.path.read_bytes()
+    if plant == "missing":
+        del row["source_modified"]
+    else:
+        row["source_modified"] = "syn-other-version"
+    index.write_text(json.dumps(row))
+    assert index.read_bytes() != before
+    assert ref.receipt_path.read_bytes() == receipt_before
+    assert ref.path.read_bytes() == body_before
+    with pytest.raises(SnapshotError, match=r"^snapshot_index_invalid$"):
+        read_snapshot(tmp_path, ref.sha256)

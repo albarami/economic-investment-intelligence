@@ -3975,3 +3975,34 @@ def test_the_class_column_reader_refuses_each_malformed_table() -> None:
                 "structure_mismatch",
                 detail,
             )
+
+
+def assert_nc_height_sources_listed(entries, document):
+    section = document.split(
+        "### 6.1 One list of permissions and licences before real use", 1
+    )[1]
+    section = section.split("\n## ", 1)[0]
+    source_cells = [
+        line.split("|", 2)[1] for line in section.splitlines() if line.startswith("|")
+    ]
+    for row in entries:
+        if row.key.startswith("bldg_") and "-NC-" in row.licence_id:
+            if not any(f"`{row.key}`" in cell for cell in source_cells):
+                raise AssertionError(row.key)
+
+
+def test_every_nc_height_registry_row_appears_in_dha102():
+    document = (REPO / "docs/17_DEPLOYMENT_HARDENING.md").read_text()
+    assert_nc_height_sources_listed(load_registry(), document)
+
+
+def test_invented_nc_height_missing_from_dha102_is_refused():
+    document = (REPO / "docs/17_DEPLOYMENT_HARDENING.md").read_text()
+    row = replace(
+        load_registry()[0],
+        key="bldg_syn_missing",
+        source_id="bldg_syn_missing",
+        licence_id="CC-BY-NC-4.0",
+    )
+    with pytest.raises(AssertionError, match=r"^bldg_syn_missing$"):
+        assert_nc_height_sources_listed((row,), document)
