@@ -48619,3 +48619,10 @@ Invocation clarification: the earlier plant rows list child arguments; their inh
 - `PLANT=drop-loaded-guard python3 .overnight/tmp/r3-run.py plant-loaded-guard . taskset -c "$CORES" node --import ./.overnight/tmp/r3-plants.mjs --test web/spikes/performance/tests/layers.node-test.mjs`
 
 No earlier row is rewritten. The refreshed return includes these environment prefixes and the post-record check exits. Historical-cause closure is still not proposed.
+
+## Train S2-11 records correction after ledger3 — 2026-11-21
+
+Appended correction; no earlier row is rewritten. Source: the join confirmation jc4c records findings F2 and F3 and the lead's ledger3 run.
+
+- F2: the S2-T44 paragraph of this train's ledger records says "Independent cf4 and final-head ledger3 remain owed". Correct state: cf4 (Anthropic Claude Opus 5.5) is CONFIRMED at `4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c`, and final-head ledger3 at that commit passed: 145 command rows with exit 0 or 0 failed, the whole test 13896 passed, 0 failed, 0 skipped, seed 3391827465. This closes no random-failure item and does not prove S2-T44 criterion 1.
+- F3: the S2-T44 cf4 line cites `.overnight/evidence/S2-T44.cf4.return.md`; the path form the other returns of this ledger use is `.overnight/IN/evidence/S2-T44.cf4.return.md`.
