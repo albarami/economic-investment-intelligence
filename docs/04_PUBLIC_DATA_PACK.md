@@ -935,7 +935,7 @@ items; the insurer-nationality candidate and the other title matches are exclude
 | `trade_ext/imports-by-nature-of-items-and-year` | National Planning Council | 30 | `year`; 2013-01-01; 2022-01-01 | none |
 | `trade_ext/imports-by-utilization-of-items-and-year` | National Planning Council | 30 | `year`; 2013-01-01; 2022-01-01 | none |
 | `trade_ext/qatar-export-statistics-2019-2024` | National Planning Council | 142720 | `year`; 2014-01-01; 2026-01-01 | none |
-| `trade_ext/qatar-imports-2014-2018` | National Planning Council | 644486 | `year`; 2014-01-01; 2018-01-01 | none |
+| `trade_ext/qatar-imports-2014-2018` | National Planning Council | 644486 | `year`; 2014; 2018 | none |
 | `utilities_ext/operational-peak-district-cooling-load` | KAHRAMAA | 6 | `year`; 2019-01-01; 2024-01-01 | none |
 | `utilities_ext/sectoral-electricity-consumption-mwh` | KAHRAMAA | 2 | `year`; 2023-01-01; 2024-01-01 | none |
 | `utilities_ext/total-electricity-consumption-by-sectors` | KAHRAMAA | 576 | `year`; 2020-01-01; 2025-01-01 | none |

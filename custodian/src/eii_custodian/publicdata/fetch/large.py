@@ -222,9 +222,9 @@ def _check_imports(entry: Entry, staged: Path) -> RowSummary:
     if entry.key == "trade_ext/qatar-imports-2014-2018":
         try:
             rule = parse_period_rule(entry.period_field)
-        except AdditionError as error:
-            raise IntakeError(error.name) from None
-        if rule.sit != "row" or rule.form != "date":
+        except AdditionError:
+            raise IntakeError("stream_contract_changed") from None
+        if rule.sit != "row" or rule.form != "year_text":
             raise IntakeError("stream_contract_changed")
     count = 0
     first, last = "", ""

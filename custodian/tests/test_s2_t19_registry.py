@@ -108,6 +108,17 @@ def test_all_s2_t19_sources_are_registered():
     assert EXPECTED <= actual, f"missing S2-T19 rows: {sorted(EXPECTED - actual)}"
 
 
+def test_older_imports_keep_counts_with_evidenced_text_years():
+    entries = {entry.key: entry for entry in load_registry()}
+    entry = entries["trade_ext/qatar-imports-2014-2018"]
+    assert (entry.row_count_min, entry.row_count_max) == (644486, 644486)
+    assert (entry.period_field, entry.period_first, entry.period_last) == (
+        "sit=row;form=year_text;field=year",
+        "2014",
+        "2018",
+    )
+
+
 def test_absent_layer_needs_no_invented_id(tmp_path):
 
     document = yaml.safe_load((REPO / "custodian/publicdata/sources.yaml").read_text())
@@ -403,7 +414,8 @@ def test_each_family_cache_and_receipt_preserve_published_shape(tmp_path):
             "form=" in entry.period_field
             and parse_period_rule(entry.period_field).form == "published_label"
         )
-        # S2-T08 part B mismatch 2: annual-text rows carry a four-digit year.
+        # S2-T08 part B mismatch 2 and S2-P38's separately evidenced imports
+        # export: annual-text fixtures carry a four-digit year.
         annual = (
             "form=" in entry.period_field
             and parse_period_rule(entry.period_field).form == "year_text"

@@ -438,13 +438,46 @@ def test_places_dispatch_uses_stream(entries, tmp_path):
     assert fetched.digest == hashlib.sha256(b"SYN").hexdigest()
 
 
+def test_older_imports_stream_observes_text_year_bounds(entries, tmp_path):
+    """S2-P38: lead-probe.txt evidences text years in the portal export."""
+    entry = replace(
+        entries["trade_ext/qatar-imports-2014-2018"],
+        row_count_min=5,
+        row_count_max=5,
+    )
+    rows = [
+        {
+            name: {"string": "SYN", "integer": 2, "number": 2.5}[kind]
+            for name, kind in entry.columns
+        }
+        for _ in range(5)
+    ]
+    for row, year in zip(rows, ("2016", "2014", "2017", "2018", "2015"), strict=True):
+        row["year"] = year
+    raw = json.dumps(rows).encode()
+    result = large.fetch_large(
+        entry,
+        lambda _url: meta(entry),
+        stream(entry, [raw]),
+        tmp_path,
+        lambda: "2026-11-21T00:00:00Z",
+        lambda _s: None,
+    )
+    stored = read_snapshot(tmp_path / entry.key, result.digest)
+    assert stored.body == raw
+    assert (stored.sidecar["period_first"], stored.sidecar["period_last"]) == (
+        "2014",
+        "2018",
+    )
+
+
 @pytest.mark.parametrize(
     "years,reason",
     [
-        (["2014-01-01", "2018-01-01"], None),
-        (["2018-01-01", "2014-01-01"], None),
-        (["2014-01-01", "2017-01-01"], "period_last"),
-        (["2014-01-01", "2018"], "period_form"),
+        (["2014", "2018"], None),
+        (["2018", "2014"], None),
+        (["2014", "2017"], "period_last"),
+        (["2014", "2018-01-01"], "period_form"),
     ],
 )
 def test_older_imports_keep_planned_card_input_and_strict_period_gate(
@@ -476,8 +509,8 @@ def test_older_imports_keep_planned_card_input_and_strict_period_gate(
         result = build()
         stored = read_snapshot(tmp_path / entry.key, result.digest)
         assert stored.body == raw
-        assert stored.sidecar["period_first"] == "2014-01-01"
-        assert stored.sidecar["period_last"] == "2018-01-01"
+        assert stored.sidecar["period_first"] == "2014"
+        assert stored.sidecar["period_last"] == "2018"
 
 
 def test_build_passes_stream_to_both_dispatches(entries, tmp_path, monkeypatch):
@@ -677,6 +710,33 @@ def test_changed_import_period_contract_refuses(entries, tmp_path):
         )
 
 
+@pytest.mark.parametrize("form", ["date", "year_number", "SYN-unknown"])
+def test_older_imports_refuse_other_period_contracts(entries, tmp_path, form):
+    entry = replace(
+        entries["trade_ext/qatar-imports-2014-2018"],
+        columns=(("year", "string"),),
+        row_count_min=2,
+        row_count_max=2,
+        period_field=f"sit=row;form={form};field=year",
+        period_first="2014-01-01" if form == "date" else "2014",
+        period_last="2018-01-01" if form == "date" else "2018",
+    )
+    raw = json.dumps(
+        [{"year": entry.period_first}, {"year": entry.period_last}]
+    ).encode()
+    with pytest.raises(large.IntakeError, match=r"^stream_contract_changed$"):
+        large.fetch_large(
+            entry,
+            lambda _url: meta(entry),
+            stream(entry, [raw]),
+            tmp_path,
+            lambda: "2026-11-21T00:00:00Z",
+            lambda _s: None,
+        )
+    assert not list((tmp_path / entry.key).rglob("*.json"))
+    assert not list(tmp_path.glob(".large-*"))
+
+
 _JSON_VALUES = st.recursive(
     st.none() | st.booleans() | st.integers() | st.text(max_size=20),
     lambda child: (
@@ -752,7 +812,7 @@ def test_older_imports_refuse_undeclared_public_split(entries, tmp_path):
         large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [b'[{"year":"2018-01-01","gender":"SYN"}]']),
+            stream(entry, [b'[{"year":"2018","gender":"SYN"}]']),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
