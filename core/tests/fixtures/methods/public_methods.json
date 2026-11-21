@@ -2,6 +2,26 @@
   "method_version": "S2-T07-v1",
   "rounding": "ROUND_HALF_UP at output only",
   "sources": {
+    "census_2020_workbook": {
+      "publisher": "Planning and Statistics Authority",
+      "dataset": "Census 2020 detailed results workbook, Tables 1, 2, 76, 151 and 152",
+      "url": "https://web.archive.org/web/20240422094401id_/https://www.psa.gov.qa/Style%20Library/PSA/CensusDetailedResults/documents/Qatar_Census_2022_Final_Results.xlsx",
+      "licence": "none-stated",
+      "licence_basis": "owner_decision",
+      "licence_url": "",
+      "terms_read_on": "2026-11-14",
+      "retrieval_date": "pinned receipt: retrieved_utc"
+    },
+    "census_zone_sector": {
+      "publisher": "statistics authority public map service",
+      "dataset": "Census 2020 employed population by major economic sector, by zone",
+      "url": "https://services7.arcgis.com/mffQJB8rpVa5We20/arcgis/rest/services/Population_by_Major_Economic_Sectors_by_Zone_2020_WFL1/FeatureServer",
+      "licence": "none-stated",
+      "licence_basis": "owner_decision",
+      "licence_url": "",
+      "terms_read_on": "2026-11-14",
+      "retrieval_date": "pinned receipt: retrieved_utc"
+    },
     "lic_active": {
       "publisher": "Ministry of Commerce and Industry",
       "dataset": "moci-active-certificates-by-municipality-and-business-activity",
@@ -437,6 +457,10 @@
       "fixed_composition_change": "4"
     },
     "C8": {
+      "sources": {
+        "national": "census_2020_workbook",
+        "zone": "census_zone_sector"
+      },
       "private": 3,
       "employed": 4,
       "percent": "75.0"

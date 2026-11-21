@@ -107,7 +107,9 @@ def due_source(
     if checked is None:
         return Due("due", "never_fetched", None, None)
     if rule.value == "daily":
-        due = checked + timedelta(days=1)
+        due = checked.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
+            days=1
+        )
     elif rule.value == "weekly":
         due = checked + timedelta(weeks=1)
     else:

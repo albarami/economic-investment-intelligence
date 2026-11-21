@@ -215,6 +215,64 @@ SALES_SNAPSHOT_AS_OF = "2026-11-17"
 RESI_SNAPSHOT_AS_OF = "2026-11-18"
 
 
+@pytest.mark.parametrize(
+    ("field", "identifier"),
+    (
+        ("encrypted_transaction_number", "SYN-TX-Z"),
+        ("price_basis", "SYN-TX-S1"),
+        ("price_basis", "SYN-PX-S1"),
+        ("price_basis", "SYN-TX-1"),
+        ("price_basis", "SYN-PX-1"),
+    ),
+)
+def test_assembly_refuses_quarter_identifier_before_writing_table(
+    tmp_path, monkeypatch: pytest.MonkeyPatch, field: str, identifier: str
+) -> None:
+    """PUB-14: neither bulletin's identifiers may cross the assembly boundary."""
+    import json
+    import shutil
+    from dataclasses import replace
+
+    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_property_quarter import USE_MAP, _frame, _resi
+    from custodian.tests.test_property_sales_export import _export
+
+    import eii_custodian.publicdata.property.quarter as quarter_mod
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.build import FrameResult
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    registry = load_registry()
+    entries = tuple(
+        replace(next(e for e in registry if e.source_id == source), key=source)
+        for source in ("prop_sales", "prop_resi_units")
+    )
+    _frame(tmp_path)
+    shutil.copy(USE_MAP, tmp_path / "property_use_map.csv")
+    selected = {
+        row.key: write_cached(tmp_path, row, json.dumps([raw]).encode()).stem
+        for row, raw in zip(entries, (_export(), _resi()), strict=True)
+    }
+    original = quarter_mod.quarter_aggregates
+
+    def leak_identifier(*args, **kwargs):
+        rows = original(*args, **kwargs)
+        assert rows
+        return (dict(rows[0], **{field: identifier}), *rows[1:])
+
+    monkeypatch.setattr(quarter_mod, "quarter_aggregates", leak_identifier)
+    build = context(tmp_path, entries)
+    build.review = tmp_path
+    build.selected = selected
+    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    with pytest.raises(AdditionError, match="identifier_leak") as caught:
+        build.gis_property_singles()
+    assert caught.value.name == "identifier_leak"
+    assert "pub_property_quarter" not in build.tables
+    assert "pub_property_quarter" not in build.table_sources
+    assert not (tmp_path / "assembly" / "gis_property_singles.json").exists()
+
+
 def test_assembly_refuses_quarter_foreign_source_as_of(
     tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

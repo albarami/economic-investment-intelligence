@@ -182,7 +182,7 @@ def read_investment(
         or table["row_count"] != len(table["rows"])
     ):
         raise AssemblyError("assembly_investment_refused")
-    spec = load_source_spec(entry.source_id, url=entry.url)
+    spec = load_source_spec(entry.source_id, url=entry.url, cache=build.cache)
     if isinstance(spec, InvestmentFailure):
         raise AssemblyError("assembly_investment_refused")
     envelope = SourceEnvelope(

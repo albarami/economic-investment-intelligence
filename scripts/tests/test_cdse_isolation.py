@@ -11,6 +11,26 @@ import import_boundary_guard as guard
 
 
 class UnreadBackup(unittest.TestCase):
+    def test_map_adapter_cache_read_refused(self) -> None:
+        for cache in ("satellite_cdse_backup/tile.tif", "data/public_cache/tile.tif"):
+            with self.subTest(cache=cache), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                cases.make_tree(root)
+                adapter = cases.package_dir(root, "eii_product") / "map_adapter.py"
+                adapter.write_text(
+                    f'from pathlib import Path\nimage = Path("{cache}").read_bytes()\n',
+                    encoding="utf-8",
+                )
+                failures, notes = guard.check_imports(root)
+                self.assertEqual(
+                    failures,
+                    [
+                        "FAIL cdse-cache: product/src/eii_product/map_adapter.py: "
+                        "optional backup must remain unread outside its cache tooling"
+                    ],
+                )
+                self.assertEqual(notes, [])
+
     def test_product_cache_read_serve_config_and_fact_refused(self) -> None:
         plants = (
             'open("data/public_cache/satellite_cdse_backup/tile.tif", "rb")',

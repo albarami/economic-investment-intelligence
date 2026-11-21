@@ -1,13 +1,13 @@
 # Supplied lead readings of 2026-11-20; no archive fetched here.
 # Exact byte bounds and native headers are reviewed; row counts are unknown.
 # Still unconfirmed: target/country representation, missing-quantity tokens,
-# decimal limits, access configuration and first-fetch bounded row accounting.
+# decimal limits and first-fetch bounded row accounting.
 # Decimal limits and country_width below remain fixture assumptions.
 config_version: baci-v1
 method_version: v1
 source_version: '202601'
 hs_revision: HS17
-access: unconfirmed
+access: visitor
 confirmed: false
 reviewed_urls:
 - https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
@@ -16,11 +16,13 @@ publisher: CEPII
 page: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
 page_sha256: 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60
 attribution: 'CEPII, BACI HS 2017, release 202601, Licence: Etalab 2.0; publisher
-  page read 2026-11-20.'
-evidence: Lead publisher-page and byte-range archive readings, 2026-11-20; archive
+  page read 2026-11-21.'
+evidence: 'Lead publisher-page and byte-range archive readings, 2026-11-20; archive
   inventory SHA-256 c05558932651ca22915f5fca081f8c5ce30697ffcc845553e15763e84226d49f;
   document 04 BACI pending identity and coverage (S2-T24). This is an inventory evidence
-  digest, not an archive checksum.
+  digest, not an archive checksum. Lead access reading 2026-11-21: no registration,
+  no key, no paid tier; free direct download under Etalab 2.0. Anonymous HEAD of the
+  reviewed archive returned HTTP 200 with no redirect to a sign-in page.'
 qatar_key: ''
 country_width: 1
 product_width: 6

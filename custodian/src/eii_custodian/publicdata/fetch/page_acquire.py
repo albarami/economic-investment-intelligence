@@ -12,7 +12,7 @@ from urllib.parse import quote, urlencode, urljoin
 
 from .allowlist import approve, host_of
 from .certificate_pins import Pin, PinError, load_pin, page_transport
-from .kinds import read_bounded
+from .kinds import read_bounded, require_verified_chain
 from .page_archive import staged_source
 from .page_html import Node, ShapeError, Tree
 from .page_requests import PIN_HOSTS, check_target, page_context, page_requests
@@ -195,6 +195,7 @@ def fetch(
                 page_context(host_of(url))
             with metadata_limit(review["max_bytes"]):
                 response, failure = read_bounded(transport, sleep, url)
+            require_verified_chain(failure)
             from ..fc_register.acquire import eligible, obstacle
             from . import certificate_pins
 

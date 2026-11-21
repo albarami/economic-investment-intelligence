@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import sys
 import tempfile
 import unittest
@@ -14,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import cdse_key
 import commands.build_public as command
+from eii_custodian.publicdata.fetch.build import BuildOutcome
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.transport import Response
 
@@ -100,6 +102,36 @@ class CdseWiring(unittest.TestCase):
             self.assertFalse(
                 any(e.source_id == "satellite_cdse_backup" for e in selected)
             )
+
+    def test_default_without_environment_never_reads_backup_credentials(self) -> None:
+        def offline(url: str) -> Response:
+            return Response(url, b"", ())
+
+        with (
+            tempfile.TemporaryDirectory() as folder,
+            patch.dict(os.environ, {}, clear=True),
+            patch("socket.socket", side_effect=AssertionError("network")),
+            patch("subprocess.Popen", side_effect=AssertionError("child")),
+            patch.object(
+                command, "cdse_credentials", side_effect=AssertionError("backup reader")
+            ) as reader,
+            patch.object(
+                command, "run_build", return_value=BuildOutcome((), None)
+            ) as build,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            root = Path(folder)
+            self.assertEqual(list(root.iterdir()), [])
+            self.assertEqual(command.run(root, {}, (), transport=offline), 0)
+            reader.assert_not_called()
+            build.assert_called_once()
+            selected = build.call_args.args[0]
+            self.assertTrue(selected)
+            self.assertFalse(
+                any(e.source_id == "satellite_cdse_backup" for e in selected)
+            )
+            self.assertIs(build.call_args.args[1], offline)
+            self.assertEqual(list(root.iterdir()), [])
 
     def test_unknown_extra_flags_refused_before_reader(self) -> None:
         with (

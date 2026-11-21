@@ -26,12 +26,15 @@ GEOGRAPHY = {
 SOURCES = {
     "pop_muni": "pub_population_municipality",
     "est_census": "pub_census_national",
+    "census_2020_workbook": "pub_census_national",
     "census_zone_sector": "pub_census_zone",
     "census_zone_occ": "pub_census_zone",
     "census_zone_hh": "pub_census_zone",
     "census_zone_lab": "pub_census_zone",
     "census_district_pop": "pub_census_district",
 }
+# C8 is employed residents; est_census remains the separate establishment input.
+C8_SOURCES = {"national": "census_2020_workbook", "zone": "census_zone_sector"}
 BASE_FIELDS = {"period", "indicator", "value", "unit"}
 
 

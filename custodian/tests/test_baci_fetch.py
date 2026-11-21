@@ -658,6 +658,10 @@ def _baci_refused_fetch(
         )
         assert result.failure is not None
         assert result.failure.check == reason
+        assert result.failure.source_id == "cepii_baci"
+        assert result.lines[-1] == (
+            f"FAIL cepii_baci {reason} expected=validated source observed=NO_DATA"
+        )
         assert result.manifests == {}
         assert "invented-secret-marker" not in repr(result)
         assert payload.decode() not in repr(result)

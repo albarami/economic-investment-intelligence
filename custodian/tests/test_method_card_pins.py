@@ -53,6 +53,46 @@ def _complete(paths, record, *, gate):
 ROOT = Path(__file__).resolve().parents[2]
 COMMITTED_RECORD = ROOT / "custodian/publicdata/review/s2_t09_source_checks.yaml"
 COMMITTED_METHODS = ROOT / "docs/07_ECONOMIC_METHODS.md"
+COMMITTED_OPEN_ITEMS = ROOT / "OPEN_ITEMS.md"
+
+
+def _assert_unpinned_have_open_items(open_items):
+    """Keep pending source-check pins attributable to an OPEN ledger item."""
+    record = yaml.safe_load(COMMITTED_RECORD.read_text(encoding="utf-8"))
+    sections = re.split(r"(?m)^#{1,3} ", open_items.read_text(encoding="utf-8"))
+    open_sections = [
+        section
+        for section in sections[1:]
+        if re.match(r"(?:OI-\d+|PO-S2-\d+)\b", section)
+        and re.search(r"(?m)^- TYPE: OPEN\s*$", section)
+    ]
+    missing = [
+        row["pin_id"]
+        for row in record["pins"]
+        if row["unpinned_reason"]
+        and not any(f"`{row['pin_id']}`" in section for section in open_sections)
+    ]
+    if missing:
+        raise AssertionError("unpinned_without_open_item:" + ",".join(missing))
+
+
+def test_committed_unpinned_pins_have_open_items():
+    _assert_unpinned_have_open_items(COMMITTED_OPEN_ITEMS)
+
+
+def test_plant_unpinned_pin_removed_from_open_items(tmp_path):
+    # Use the ledger's own bytes; removing one pin must break its attribution.
+    pin = "wilson.period"
+    original = COMMITTED_OPEN_ITEMS.read_text(encoding="utf-8")
+    assert f"`{pin}`" in original
+    planted = tmp_path / "OPEN_ITEMS.md"
+    planted.write_text(original.replace(f"`{pin}`", "`removed-pin`"), encoding="utf-8")
+    with pytest.raises(
+        AssertionError, match="^" + re.escape(f"unpinned_without_open_item:{pin}") + "$"
+    ):
+        _assert_unpinned_have_open_items(planted)
+
+
 # B1: the sixteen "none named" pins of the pass-1 source map, written out
 # literally so neither the membership check nor the plants derives from the
 # module's own set: dropping a pin from CONFIGURATION_PINS must fail a test,

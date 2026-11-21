@@ -753,3 +753,190 @@ def test_live_frame_retains_reviewed_older_snapshot(seventh_build):
         FrameError, match=rf"^{entry.source_id}: snapshot_hash_mismatch$"
     ):
         seventh_build()
+
+
+@pytest.fixture
+def snapshot_frame(seventh_build):
+    """Activate every live cached-read branch with invented archive objects."""
+    import json
+
+    from custodian.tests.fixtures.frame.invented import invented_layer
+    from custodian.tests.test_frame_census import entry
+
+    from eii_custodian.publicdata.frame.build import inspect_cache
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    extra = (
+        "census_district_pop",
+        "census_zone_sector",
+        "census_zone_occ",
+        "census_zone_hh",
+        "census_zone_lab",
+    )
+    entries = seventh_build.entries + tuple(entry(name) for name in extra)
+    for source in entries:
+        if source.source_id in extra:
+            payload = invented_layer(source.source_id)
+            if source.source_id == "census_zone_sector":
+                # Match the invented occupation counts, excluding its Other cell.
+                payload["features"][0]["attributes"]["Total_Economic_active___15"] = 16
+            write_cached(
+                seventh_build.cache,
+                source,
+                json.dumps(payload).encode(),
+                retrieved_utc="2024-01-31T00:00:00Z",
+            )
+    columns = ("bnd_hdx", "bnd_zone_2020", "bnd_district_2020", *extra)
+    (seventh_build.review / "zone_crosswalk.csv").write_text(
+        "zone_code,"
+        + ",".join(columns)
+        + ",status\n"
+        + ",".join(["42"] * (len(columns) + 1))
+        + ",matched\n"
+    )
+    selected = reviewed_selections(seventh_build.cache)
+    inspected = inspect_cache(
+        seventh_build.cache, entries, seventh_build.review, selected
+    )
+    return seventh_build.cache, entries, seventh_build.review, selected, inspected
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    [
+        "bnd_zone_2020",
+        "bnd_district_2020",
+        "census_district_pop",
+        "pop_muni",
+        "census_zone_sector",
+        "census_zone_occ",
+        "census_zone_hh",
+        "census_zone_lab",
+        "est_census",
+    ],
+)
+@pytest.mark.parametrize("tamper", [False, True], ids=["older", "tamper"])
+def test_each_live_cached_read_pins_and_verifies(
+    snapshot_frame, monkeypatch, source_id, tamper
+):
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+    from eii_custodian.publicdata.frame import live
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    cache, entries, review, selected, inspected = snapshot_frame
+    source = next(row for row in entries if row.source_id == source_id)
+    old = read_snapshot(cache / source.key, selected[source.key])
+    # Whitespace gives a second valid source object with a distinct hash.
+    newer = write_cached(
+        cache,
+        source,
+        old.body + b"\n ",
+        select=False,
+        retrieved_utc="2026-11-15T00:00:00Z",
+    )
+    assert newer.stem != old.sha256
+    reads = []
+    original = live.read_cached
+
+    def record_read(cache, entry, **kwargs):
+        payload, receipt = original(cache, entry, **kwargs)
+        if entry.source_id == source_id:
+            reads.append(receipt["sha256"])
+        return payload, receipt
+
+    monkeypatch.setattr(live, "read_cached", record_read)
+
+    def run():
+        # Inspection happened before the plant: this proves the live caller's
+        # own verification, without an earlier inspect_cache masking a defect.
+        return live.build_live_frame(cache, entries, review, None, inspected, selected)
+
+    if tamper:
+        old.path.write_bytes(old.body + b" ")
+        with pytest.raises(FrameError, match=rf"^{source_id}: snapshot_hash_mismatch$"):
+            run()
+    else:
+        result = run()
+        assert reads == [old.sha256]
+        assert result.sources[source_id]["sha256"] == old.sha256
+        assert read_snapshot(cache / source.key, newer.stem).path == newer
+
+
+@pytest.mark.parametrize("tamper", [False, True], ids=["older", "tamper"])
+def test_build_public_frame_pins_and_verifies(seventh_build, monkeypatch, tamper):
+    from eii_custodian.publicdata import buildings
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+    from eii_custodian.publicdata.frame.build import build_public_frame
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    cache, entries, review = (
+        seventh_build.cache,
+        seventh_build.entries,
+        seventh_build.review,
+    )
+    selected = reviewed_selections(cache)
+    source = next(row for row in entries if row.source_id == "est_census")
+    old = read_snapshot(cache / source.key, selected[source.key])
+    write_cached(
+        cache,
+        source,
+        old.body + b"\n ",
+        select=False,
+        retrieved_utc="2026-11-15T00:00:00Z",
+    )
+    building_calls = []
+    # This test owns frame selection; the unrelated building inventory producer
+    # is observed at its composition boundary rather than supplied live inputs.
+    monkeypatch.setattr(
+        buildings, "build_buildings", lambda *args: building_calls.append(args)
+    )
+
+    def run():
+        return build_public_frame(cache, entries, review)
+
+    if tamper:
+        old.path.write_bytes(old.body + b" ")
+        with pytest.raises(FrameError, match=r"^est_census: snapshot_hash_mismatch$"):
+            run()
+        assert building_calls == []
+    else:
+        result = run()
+        assert result.sources[source.source_id]["sha256"] == old.sha256
+        assert len(building_calls) == 1
+        assert building_calls[0][2] == selected
+        assert [row["value"] for row in result.tables["pub_census_national"]] == [12, 7]
+
+
+@pytest.mark.parametrize("standard_json", [False, True])
+@pytest.mark.parametrize("tamper", [False, True], ids=["older", "tamper"])
+def test_assembly_raw_pins_and_verifies(tmp_path, standard_json, tamper):
+    from dataclasses import replace
+
+    from custodian.tests.test_frame_census import entry
+    from custodian.tests.test_production_adapters import context
+
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    source = replace(entry("est_census"), key="syn_source", source_id="syn_source")
+    old = write_cached(
+        tmp_path, source, b'[{"syn_value":17}]', retrieved_utc="2024-01-31T00:00:00Z"
+    )
+    newer = write_cached(
+        tmp_path,
+        source,
+        b'[{"syn_value":23}]',
+        select=False,
+        retrieved_utc="2024-02-29T00:00:00Z",
+    )
+    build = context(tmp_path, (source,))
+    build.selected = reviewed_selections(tmp_path)
+    assert build.selected == {source.key: old.stem}
+    assert newer.stem != old.stem
+    if tamper:
+        old.write_bytes(b'[{"syn_value":19}]')
+        with pytest.raises(FrameError, match=r"^syn_source: snapshot_hash_mismatch$"):
+            build.raw(source, standard_json=standard_json)
+        assert build.receipts == {}
+    else:
+        assert build.raw(source, standard_json=standard_json) == [{"syn_value": 17}]
+        assert build.receipts[source.key]["sha256"] == old.stem

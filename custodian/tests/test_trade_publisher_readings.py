@@ -142,6 +142,73 @@ def test_registry_rows_resolve_to_independent_publisher_readings(source):
     assert entry.commit_allowed is False
 
 
+@pytest.mark.parametrize(
+    ("source", "page_id", "url", "body_hash", "access", "licence", "licence_page"),
+    [
+        (
+            "cepii_baci",
+            "baci_dataset",
+            "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37",
+            "0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60",
+            "no registration, no key, no paid tier; free direct download under Etalab 2.0",
+            "Etalab 2.0",
+            "baci_dataset",
+        ),
+        (
+            "cepii_gravity",
+            "gravity",
+            "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8",
+            "7d9a401b1714f633fecc8bf35b66bb81f9bd1ade15ee3d5ea8d1747cf87da6e6",
+            "no registration, no key, no paid tier; free direct download under Etalab 2.0",
+            "Etalab 2.0",
+            "gravity",
+        ),
+        (
+            "atlas_complexity",
+            "atlas",
+            "https://atlas.hks.harvard.edu/data-downloads",
+            "c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b",
+            "no registration, no key, no paid tier; CC0 1.0 for the Dataverse files; "
+            "the guestbook is a form of the web interface only, not met on the anonymous API path",
+            "CC0 1.0",
+            "atlas_dataverse",
+        ),
+    ],
+)
+def test_access_readings_are_dated_and_quote_backed(
+    source, page_id, url, body_hash, access, licence, licence_page
+):
+    record = readings()["sources"][source]
+    page = next(item for item in record["pages"] if item["id"] == page_id)
+    assert page["url"] == url
+    assert page["read_on"] == "2026-11-21"
+    assert page["body_sha256"] == body_hash
+    assert record["facts"]["visitor_access"] == {
+        "confirmed": True,
+        "value": access,
+        "page": page_id,
+        "sentence": page["sentences"][-1],
+    }
+    assert record["facts"]["licence"]["value"] == licence
+    assert record["facts"]["licence"]["page"] == licence_page
+    check_source(record)
+
+
+@pytest.mark.parametrize(
+    ("source", "wrong_licence"),
+    [
+        ("cepii_baci", "CC BY 4.0"),
+        ("cepii_gravity", "CC BY 4.0"),
+        ("atlas_complexity", "Etalab 2.0"),
+    ],
+)
+def test_access_reading_rejects_a_licence_word_not_on_the_page(source, wrong_licence):
+    record = deepcopy(readings()["sources"][source])
+    record["facts"]["licence"]["sentence"] = wrong_licence
+    with pytest.raises(AssertionError):
+        check_source(record)
+
+
 @pytest.mark.parametrize("plant", ["hash", "sentence", "failed_page", "activation"])
 def test_review_rejects_unbacked_confirmation(plant):
     record = deepcopy(readings()["sources"]["un_comtrade"])
@@ -363,3 +430,71 @@ def test_partial_readings_do_not_activate_downloads():
         c.confirmed for c in (atlas_config(), baci_config(), gravity_config())
     )
     assert all(not policy.confirmed for policy in load_policies().values())
+
+
+# Lead access reading 2026-11-21, data-downloads page, quoted exactly.
+ATLAS_DATA_DOWNLOAD_SENTENCES = (
+    "The Atlas of Economic Complexity is a freely available public resource. "
+    "Its data and tools are widely used in research, policy analysis, and "
+    "applied projects. We encourage reuse and adaptation, provided that users "
+    "cite the Atlas and underlying data sources appropriately.",
+    "Each downloadable data file includes specific citation requirements.",
+    "Atlas users can query data directly through our GraphQL API.",
+)
+DATAVERSE_API_LICENCE_VALUE = "CC0 1.0"
+
+
+def atlas_quoted_terms(
+    sentences: tuple[str, ...] = ATLAS_DATA_DOWNLOAD_SENTENCES,
+) -> str:
+    """Return the data-downloads sentences as one quoted terms excerpt."""
+    return " [...] ".join(f'"{sentence}"' for sentence in sentences)
+
+
+def atlas_terms_cells(document: str) -> tuple[str, str, str]:
+    """Return the Atlas quoted terms, basis and evidence cells from document 04."""
+    section = document.split("### S2-T21 part B terms readings", 1)[1]
+    section = section.split("\n## ", 1)[0]
+    row = next(
+        line
+        for line in section.splitlines()
+        if line.startswith("| `atlas_complexity` |")
+    )
+    cells = [cell.strip() for cell in row.split("|")]
+    return cells[2], cells[4], cells[5]
+
+
+def check_atlas_terms(terms_words: str, quoted_terms: str) -> None:
+    """Bind registry terms and the document row to the reading's exact sentences."""
+    expected = atlas_quoted_terms()
+    assert terms_words == expected
+    assert quoted_terms == expected
+
+
+def test_atlas_terms_bind_the_reading_and_reject_an_altered_word() -> None:
+    """Quoted Atlas terms are the data-downloads sentences; an altered word fails."""
+    document = (ROOT / "docs/04_PUBLIC_DATA_PACK.md").read_text()
+    quoted, basis, evidence = atlas_terms_cells(document)
+    entry = next(item for item in load_registry() if item.key == "atlas_complexity")
+    record = readings()["sources"]["atlas_complexity"]
+    page = next(item for item in record["pages"] if item["id"] == "atlas")
+    check_atlas_terms(entry.terms_words, quoted)
+    assert basis == "`dataset`"
+    assert f'Dataverse API licence value "{DATAVERSE_API_LICENCE_VALUE}"' in evidence
+    assert DATAVERSE_API_LICENCE_VALUE not in entry.terms_words
+    assert DATAVERSE_API_LICENCE_VALUE not in quoted
+    assert record["facts"]["licence"] == {
+        "confirmed": True,
+        "value": DATAVERSE_API_LICENCE_VALUE,
+        "page": "atlas_dataverse",
+        "sentence": DATAVERSE_API_LICENCE_VALUE,
+    }
+    for sentence in ATLAS_DATA_DOWNLOAD_SENTENCES:
+        assert sentence in page["sentences"]
+    assert "guestbook is a form of the web interface only" in entry.basis_note
+    assert "not met on the anonymous API path" in entry.basis_note
+    assert "guestbook" not in entry.terms_words
+    assert "guestbook" not in quoted
+    planted = entry.terms_words.replace("freely", "openly", 1)
+    with pytest.raises(AssertionError):
+        check_atlas_terms(planted, quoted.replace("freely", "openly", 1))

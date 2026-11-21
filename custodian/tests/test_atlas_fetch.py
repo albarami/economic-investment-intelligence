@@ -105,6 +105,11 @@ def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
     blocked = build(fixture_cache / "paid", config=config, byte_transport=forbidden)
     assert blocked.failure is not None
     assert blocked.failure.check == "access_obstacle"
+    assert blocked.failure.source_id == "atlas_complexity"
+    assert blocked.lines[-1] == (
+        "FAIL atlas_complexity access_obstacle "
+        "expected=validated source observed=NO_DATA"
+    )
     marked = build(
         fixture_cache / "body",
         byte_transport=lambda url: type(metadata(url))(
@@ -113,6 +118,11 @@ def test_atlas_pending_access_and_secret(tmp_path: Path) -> None:
     )
     assert marked.failure is not None
     assert marked.failure.check == "access_obstacle"
+    assert marked.failure.source_id == "atlas_complexity"
+    assert marked.lines[-1] == (
+        "FAIL atlas_complexity access_obstacle "
+        "expected=validated source observed=NO_DATA"
+    )
     assert "invented-secret-token" not in repr(marked)
 
 

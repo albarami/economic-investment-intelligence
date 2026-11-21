@@ -294,6 +294,58 @@ def test_movement_gender_passes_and_a_worker_gender_fails() -> None:
     assert validate_table_dimensions(sex_on_movement).reason == "forbidden_dimension"
 
 
+@pytest.mark.parametrize(
+    ("table", "reason"),
+    (
+        (
+            TableSpec("salary_record", "movement_split", (ColumnSpec("gender"),)),
+            "table_kind_mismatch",
+        ),
+        (
+            TableSpec(
+                "worker_split",
+                "movement_split",
+                (ColumnSpec("gender"), ColumnSpec("nationality_group")),
+            ),
+            "movement_table_unlisted",
+        ),
+    ),
+)
+def test_movement_split_refuses_unlisted_and_disguised_record_tables(
+    table: TableSpec, reason: str
+) -> None:
+    """DAT-169's exception is closed; a record cannot select it by changing kind."""
+    control = next(
+        item for item in workspace_descriptors() if item.name == "presence_split_hourly"
+    )
+    assert validate_table_dimensions(control) == Verdict(True, "admitted")
+    assert validate_table_dimensions(table) == Verdict(False, reason)
+
+
+@pytest.mark.parametrize(
+    ("name", "kind"),
+    (
+        ("employment_spell", "worker_source"),
+        ("salary_record", "worker_source"),
+        ("salary_file", "worker_source"),
+        ("residence", "residence_source"),
+        ("legal_entity", "company_source"),
+        ("establishment", "company_source"),
+        ("establishment_activity", "company_source"),
+        ("Salary_Record", "worker_source"),
+    ),
+)
+@pytest.mark.parametrize(
+    "declared", ("movement_split", "public_split", "protected_derived")
+)
+def test_record_tables_refuse_another_kind(name: str, kind: str, declared: str) -> None:
+    clean = (ColumnSpec("occupation_code"),)
+    assert validate_table_dimensions(TableSpec(name, kind, clean)).admitted
+    assert validate_table_dimensions(TableSpec(name, declared, clean)) == Verdict(
+        False, "table_kind_mismatch"
+    )
+
+
 def test_protected_and_generator_descriptors_refuse_a_planted_column() -> None:
     """Tables that are not in this workspace yet are still refused by an explicit descriptor."""
     protected = TableSpec("resident_pay", "protected_derived", (ColumnSpec("sex"),))

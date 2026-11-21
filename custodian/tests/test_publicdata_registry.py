@@ -987,8 +987,9 @@ def test_registry_counts_follow_decision_0026() -> None:
     confirmed = {"wage_bands_priv", "work_hours_act", "accident"}
     # S2-T21 part B records the two benchmark families' read portal terms.
     # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
+    # S2-P35 moves Gravity and Atlas to dataset basis on the lead's readings.
     assert (
-        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1
+        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1 - 2
     )  # S2-T49 files; S2-T48 company web.
     assert {
         entry.key
@@ -1228,6 +1229,12 @@ def test_gravity_and_atlas_registry_pending_and_nightly_policy() -> None:
         "traffic_tomtom_flow",
         "traffic_tomtom_range",
     }
+    pages = {
+        "cepii_gravity": (
+            "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8"
+        ),
+        "atlas_complexity": "https://atlas.hks.harvard.edu/data-downloads",
+    }
     for source_id, reason in (
         ("cepii_gravity", "gravity_metadata_unconfirmed"),
         ("atlas_complexity", "atlas_metadata_unconfirmed"),
@@ -1237,8 +1244,9 @@ def test_gravity_and_atlas_registry_pending_and_nightly_policy() -> None:
         assert row.commit_allowed is False
         assert row.nightly_live_fetch is True
         assert row.url == ""
-        assert row.landing_url == ""
-        assert "?" not in row.basis_note
+        assert row.landing_url == row.terms_url == pages[source_id]
+        assert row.terms_read_on == "2026-11-21"
+        assert "no registration, no key, no paid tier" in row.basis_note
         assert nightly_blocked([replace(row, skip_reason="")], (source_id,)) == ()
     planted = [
         replace(entry, nightly_live_fetch=False)

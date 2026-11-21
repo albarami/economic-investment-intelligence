@@ -139,13 +139,16 @@ sources:
       reading: incomplete
       sentences: []
     - id: baci_dataset
-      url: https://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=37
-      read_on: '2026-11-20'
-      status: 404
+      url: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
+      read_on: '2026-11-21'
+      status: 200
       complete_body: true
-      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
-      reading: http_error
-      sentences: []
+      body_sha256: 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60
+      reading: read
+      sentences:
+      - 'Licence:'
+      - Etalab 2.0
+      - Download
     - id: baci_doc
       url: https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_documentation.html
       read_on: '2026-11-20'
@@ -154,27 +157,41 @@ sources:
       body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
       reading: http_error
       sentences: []
-    facts: {}
+    facts:
+      licence:
+        confirmed: true
+        value: Etalab 2.0
+        page: baci_dataset
+        sentence: Etalab 2.0
+      visitor_access:
+        confirmed: true
+        value: no registration, no key, no paid tier; free direct download under Etalab 2.0
+        page: baci_dataset
+        sentence: Download
     pending:
-    - Dataset page exceeded the fixed metadata intake ceiling; no complete page hash or page statement
-      is asserted.
-    - Alternative dataset/documentation paths returned HTTP 404. Publisher version, Etalab lead, HS revision,
-      units, reconciliation, access and exact bounds remain unverified.
+    - Target/country representation, missing-quantity tokens, decimal limits, native row counts,
+      checksums and bounded first-fetch row accounting remain unverified.
+    - The earlier incomplete page and alternative documentation path are retained above; they do
+      not supersede the live 2026-11-21 dataset-page reading.
     activation: false
   cepii_gravity:
     publisher: CEPII
     pages:
     - id: gravity
-      url: https://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=8
-      read_on: '2026-11-20'
-      status: 404
+      url: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8
+      read_on: '2026-11-21'
+      status: 200
       complete_body: true
-      body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
-      reading: http_error
-      sentences: []
+      body_sha256: 7d9a401b1714f633fecc8bf35b66bb81f9bd1ade15ee3d5ea8d1747cf87da6e6
+      reading: read
+      sentences:
+      - Scroll down to the "Archives" section to download legacy versions.
+      - 'Licence:'
+      - Etalab 2.0
+      - Download
     - id: gravity_named
       url: https://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=8
-      read_on: '2026-11-20'
+      read_on: '2026-11-21'
       status: 404
       complete_body: true
       body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
@@ -188,17 +205,29 @@ sources:
       body_sha256: 741847197c7f54910983e3b9c4d674de980c0b5d4ddd2144416de2d9c8456e58
       reading: http_error
       sentences: []
-    facts: {}
+    facts:
+      licence:
+        confirmed: true
+        value: Etalab 2.0
+        page: gravity
+        sentence: Etalab 2.0
+      visitor_access:
+        confirmed: true
+        value: no registration, no key, no paid tier; free direct download under Etalab 2.0
+        page: gravity
+        sentence: Download
     pending:
-    - Named publisher page (both path casings) and attempted README returned HTTP 404.
-    - Publisher version, Etalab lead, country keys, units, coverage, schema and exact bounds remain unverified.
+    - Country keys, units, coverage, schema, rows, members, year selection, digits and exact
+      bounds remain unverified.
+    - Document 04's former presentation.asp URL returned HTTP 404 on 2026-11-21; the live
+      bdd_modele_item.asp page above supersedes it for access, version and licence.
     activation: false
   atlas_complexity:
     publisher: Harvard Growth Lab
     pages:
     - id: atlas
-      url: https://atlas.hks.harvard.edu/data-downloads/
-      read_on: '2026-11-20'
+      url: https://atlas.hks.harvard.edu/data-downloads
+      read_on: '2026-11-21'
       status: 200
       complete_body: true
       body_sha256: c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b
@@ -209,6 +238,11 @@ sources:
       - 'HS 2012: data available from 2012 onward'
       - 'HS 2022: data available from 2022 onward'
       - Each downloadable data file includes specific citation requirements.
+      - Atlas users can query data directly through our GraphQL API.
+      - The Atlas of Economic Complexity is a freely available public resource. Its data and
+        tools are widely used in research, policy analysis, and applied projects. We encourage
+        reuse and adaptation, provided that users cite the Atlas and underlying data sources
+        appropriately.
     - id: atlas_index
       url: https://intl-atlas-downloads.s3.amazonaws.com/index.html
       read_on: '2026-11-20'
@@ -241,14 +275,29 @@ sources:
       sentences:
       - The Atlas of Economic Complexity is a freely available public resource.
     - id: atlas_dataverse
-      url: https://dataverse.harvard.edu/dataverse/atlas
-      read_on: '2026-11-20'
-      status: 202
+      url: https://dataverse.harvard.edu/api/dataverses/atlas/contents
+      read_on: '2026-11-21'
+      status: 200
       complete_body: true
-      body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-      reading: empty
-      sentences: []
+      body_sha256: 08dc40ed5ce9d861caac4e2c0feaadb078ef6edc49b566b4e3c87889b928ffb1
+      reading: read
+      sentences:
+      - CC0 1.0
     facts:
+      licence:
+        confirmed: true
+        value: CC0 1.0
+        page: atlas_dataverse
+        sentence: CC0 1.0
+      visitor_access:
+        confirmed: true
+        value: no registration, no key, no paid tier; CC0 1.0 for the Dataverse files;
+          the guestbook is a form of the web interface only, not met on the anonymous API path
+        page: atlas
+        sentence: The Atlas of Economic Complexity is a freely available public resource.
+          Its data and tools are widely used in research, policy analysis, and applied projects.
+          We encourage reuse and adaptation, provided that users cite the Atlas and underlying
+          data sources appropriately.
       value_unit:
         confirmed: true
         value: USD; vintage-specific current/constant mapping pending
@@ -300,11 +349,10 @@ sources:
         sentence: Each downloadable data file includes specific citation requirements.
     pending:
     - Current downloads and legacy index are distinct readings; no file vintage is selected and no version
-      is inferred from a filename.
-    - Terms route returned only an application shell; Dataverse returned an empty HTTP 202. File-specific
-      licence and attribution remain pending.
-    - Qatar key, exact row/member/byte bounds and native finished-measure schema remain unverified. Rounded
-      MB display is not an exact byte count.
+      is inferred from a filename. Download-specific citation requirements remain to be recorded.
+    - Qatar key, rows, members, version selections, digits, exact byte bounds and native finished-measure
+      schema remain unverified. Rounded MB display is not an exact byte count.
+    - The guestbook is a web-interface observation, not an obstacle on the anonymous API path.
     activation: false
   wb_wdi:
     publisher: World Bank

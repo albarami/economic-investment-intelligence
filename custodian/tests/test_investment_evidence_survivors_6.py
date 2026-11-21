@@ -123,7 +123,9 @@ def test_content_key_collision_requires_stable_published_identity(
     )
     first = replace(first, rows=({**first.rows[0], "project_key": "SYN-COLLISION"},))
     second = replace(second, rows=({**second.rows[0], "project_key": "SYN-COLLISION"},))
-    monkeypatch.setattr(evidence, "_metadata_failure", lambda item: item.snapshot)
+    monkeypatch.setattr(
+        evidence, "_metadata_failure", lambda item, *, cache=None: item.snapshot
+    )
     assert evidence.build_project_evidence((first, second)) == failure(
         PROJECT,
         DASHBOARD_URL,
@@ -178,7 +180,9 @@ def test_revision_linker_keeps_source_histories_separate(tmp_path: Path, monkeyp
         ),
         rows=({**second.rows[0], "source_id": "SYN-SECOND"},),
     )
-    monkeypatch.setattr(evidence, "_metadata_failure", lambda item: item.snapshot)
+    monkeypatch.setattr(
+        evidence, "_metadata_failure", lambda item, *, cache=None: item.snapshot
+    )
     result = evidence.build_project_evidence((first, second))
     assert isinstance(result, ProjectEvidence)
     assert result.absences == ()

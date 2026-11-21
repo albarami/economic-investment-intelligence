@@ -1,8 +1,10 @@
 """MTH-03 replays, explicitly invoked by the lead on pinned public-cache receipts."""
 
 import importlib.util
+import json
 import sys
 from decimal import Decimal as D
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -11,6 +13,7 @@ from eii_core.calc.facts import Measure, NoData
 from eii_core.calc.public_methods import (
     AnnualEnergy,
     TradeRow,
+    coverage_share,
     licence_churn,
     licence_density,
     location_quotient,
@@ -19,11 +22,14 @@ from eii_core.calc.public_methods import (
 )
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
+from eii_custodian.publicdata.fetch.page_workbook import read_sheet
+from eii_custodian.publicdata.frame.census import C8_SOURCES
 from eii_custodian.publicdata.frame.crosswalk import (
     municipality_key,
     municipality_keys,
     read_csv,
 )
+from eii_custodian.publicdata.frame.layers import COUNTS, layer_rows
 from eii_custodian.publicdata.frame.population import population_rows
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
@@ -156,6 +162,166 @@ def test_pinned_c1():
     assert tuple(fact.value for fact in result["density"]) == (D(32), D(15))
     for fact, expected in zip(result["lq"], ("1.39", "3.05"), strict=True):
         assert abs(fact.value - D(expected)) <= D("0.01")
+
+
+def _c8_label(value):
+    return " ".join(value.replace("\\", " ").replace("/", " ").split()).casefold()
+
+
+def _c8_block_rows(sheet):
+    """Exactly one English label per block, in column B only; mirrors are text."""
+    starts = []
+    for labels, reason in (
+        ({"both sexes"}, "national_block"),
+        ({"male", "males"}, "sex_block"),
+        ({"female", "females"}, "sex_block"),
+    ):
+        found = [
+            (number, index)
+            for number, row in sheet.rows.items()
+            for index, cell in enumerate(row)
+            if _c8_label(cell) in labels
+        ]
+        if len(found) != 1 or found[0][1] != 1:
+            raise ValueError("C8:" + reason)
+        starts.append(found[0][0])
+    return tuple(starts)
+
+
+def c8_national_counts(sheet):
+    """Table 76 totals live on the uniquely labelled Both Sexes block row."""
+    headers = (
+        "Household",
+        "Non-Profit",
+        "Diplomatic International Regional",
+        "Private",
+        "Mixed",
+        "Government Establishment Company",
+        "Ministry Government Department",
+        "Total",
+    )
+    if tuple(
+        _c8_label(sheet.cells.get(f"{column}7", "")) for column in "CDEFGHIJ"
+    ) != tuple(_c8_label(label) for label in headers):
+        raise ValueError("C8:national_header")
+    both_row, _, _ = _c8_block_rows(sheet)
+    try:
+        private, total = (D(sheet.cells[f"{column}{both_row}"]) for column in "FJ")
+    except (KeyError, ArithmeticError):
+        raise ValueError("C8:national_count") from None
+    if (
+        any(
+            not value.is_finite() or value < 0 or value != int(value)
+            for value in (private, total)
+        )
+        or total == 0
+    ):
+        raise ValueError("C8:national_denominator")
+    return both_row, private, total
+
+
+def _c8_share(private, total, chain, geography):
+    return coverage_share(
+        reading(private, "count", "2020", chain, geography),
+        reading(total, "count", "2020", chain, geography),
+    )
+
+
+def c8_zone_share(row, chain):
+    """A null in any sector makes this zone unavailable, never partially summed."""
+    counts = [row[field] for field in COUNTS[C8_SOURCES["zone"]]]
+    if any(value is None for value in counts):
+        return coverage_share(None, None)
+    if sum(counts[1:]) != counts[0]:
+        raise ValueError("C8:sector_sum")
+    if counts[0] <= 0 or any(value < 0 for value in counts):
+        raise ValueError("C8:zone_denominator")
+    return _c8_share(row["Private"], counts[0], chain, "zone:" + str(row["ZONE_NO"]))
+
+
+def _c8_agrees(actual, expected, reason):
+    # Safe failure: no source value, share or zone identifier reaches the log.
+    if abs(Fraction(actual) - expected) > Fraction(1, 2):
+        raise ValueError("C8:" + reason + "_mismatch")
+
+
+def _c8_check_sex_totals(sheet, both_row):
+    """Independent Fraction checks on cached cells; never use calc or formulas."""
+    starts = _c8_block_rows(sheet)
+
+    def counts(number, reason):
+        try:
+            values = tuple(
+                Fraction(sheet.cells[f"{column}{number}"]) for column in "CDEFGHIJ"
+            )
+        except (KeyError, ValueError, ZeroDivisionError):
+            raise ValueError("C8:" + reason) from None
+        if any(value < 0 or value.denominator != 1 for value in values):
+            raise ValueError("C8:" + reason)
+        return values
+
+    totals = {
+        start: counts(start, "national_count" if start == both_row else "sex_count")
+        for start in starts
+    }
+    for start in starts:
+        end = min(
+            (number for number in starts if number > start), default=max(sheet.rows) + 1
+        )
+        activities = [
+            counts(number, "activity_count")
+            for number in sheet.rows
+            if start < number < end and sheet.cells.get(f"A{number}", "").strip()
+        ]
+        for index, value in enumerate(totals[start]):
+            if value != sum((row[index] for row in activities), Fraction(0)):
+                raise ValueError("C8:activity_sum_mismatch")
+    both, male, female = (totals[start] for start in starts)
+    if any(b != m + f for b, m, f in zip(both, male, female, strict=True)):
+        raise ValueError("C8:sex_sum_mismatch")
+    if both[-1] != sum(both[:-1], Fraction(0)):
+        raise ValueError("C8:national_sector_sum")
+
+
+def test_pinned_c8():
+    """Lead-only: compare calc to plain raw-file division, never store its values."""
+    national_body, national_chain = _cache.pinned_body(C8_SOURCES["national"])
+    zone_body, zone_chain = _cache.pinned_body(C8_SOURCES["zone"])
+    sheet = read_sheet(national_body, "76", cached_formulas=True)
+    number, private, total = c8_national_counts(sheet)
+    _c8_check_sex_totals(sheet, number)
+    national = _c8_share(private, total, national_chain, "national")
+    # Independent plain arithmetic on the original cells, without calc helpers.
+    expected_national = (
+        Fraction(sheet.cells[f"F{number}"]) * 100 / Fraction(sheet.cells[f"J{number}"])
+    )
+    _c8_agrees(national["percent"].value, expected_national, "national")
+    if national["percent"].sources != (national_chain,):
+        raise ValueError("C8:national_lineage")
+
+    payload = json.loads(zone_body)
+    rows = layer_rows(C8_SOURCES["zone"], payload)
+    if not rows or len({row["ZONE_NO"] for row in rows}) != len(rows):
+        raise ValueError("C8:zone_keys")
+    actual_shares, expected_shares = [], []
+    for row, feature in zip(rows, payload["features"], strict=True):
+        raw = feature["attributes"]
+        result = c8_zone_share(row, zone_chain)
+        if any(raw[field] is None for field in COUNTS[C8_SOURCES["zone"]]):
+            if result != NoData("no_denominator"):
+                raise ValueError("C8:null_zone_mismatch")
+            continue
+        expected = Fraction(raw["Private"] * 100, raw["Total_Economic_active___15"])
+        _c8_agrees(result["percent"].value, expected, "zone")
+        if result["percent"].sources != (zone_chain,):
+            raise ValueError("C8:zone_lineage")
+        actual_shares.append(result["percent"].value)
+        expected_shares.append(expected)
+    if not actual_shares:
+        raise ValueError("C8:no_complete_zones")
+    low, high = share_range(actual_shares)
+    _c8_agrees(low, min(expected_shares), "range_low")
+    _c8_agrees(high, max(expected_shares), "range_high")
 
 
 @pytest.mark.parametrize(

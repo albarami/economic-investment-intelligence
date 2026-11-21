@@ -6,7 +6,7 @@ import json
 import os
 import re
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict, cast
@@ -61,6 +61,7 @@ from eii_custodian.publicdata.fetch.report import (
     terms_host_line,
     terms_unread_line,
 )
+from eii_custodian.publicdata.fetch.resume import ResumeError, RunRecord
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import (
     Opener,
@@ -152,6 +153,7 @@ class BuildOutcome:
     investment_attempts: tuple[FetchAttempt, ...] = ()
     terms: tuple[dict[str, object], ...] = ()
     terms_attempts: tuple[dict[str, object], ...] = ()
+    reused_times: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -459,6 +461,8 @@ def run_build(
     large_stream: StreamTransport | None = None,
     seed: int | None = None,
     _fetch_only: bool = False,
+    resume: bool = False,
+    _run: RunRecord | None = None,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
     entries = tuple(entry for entry in entries if entry.kind != "company_web")
@@ -468,6 +472,25 @@ def run_build(
 
         if type(seed) is not int or seed < 0:
             raise AssemblyError("figure_seed_invalid")
+
+        try:
+            _run = RunRecord.begin(
+                cache, entries, seed, clock(), resume=resume, environ=environ
+            )
+        except ResumeError as exc:
+            resume_failure = FetchFailure(1, "build-public", "", str(exc), "", "")
+            return BuildOutcome(
+                (fail_line("build-public", "", resume_failure.check, "", ""),),
+                resume_failure,
+            )
+        except OSError:
+            resume_failure = FetchFailure(
+                1, "build-public", "", "resume_record_write_failed", "", ""
+            )
+            return BuildOutcome(
+                (fail_line("build-public", "", resume_failure.check, "", ""),),
+                resume_failure,
+            )
 
         def fetch_only() -> BuildOutcome:
             return run_build(
@@ -491,6 +514,7 @@ def run_build(
                 environ=environ,
                 large_stream=large_stream,
                 _fetch_only=True,
+                _run=_run,
             )
 
         build = Production(
@@ -513,6 +537,11 @@ def run_build(
             # an existing structured fetch failure and its network exit code.
             if build.fetched is not None and build.fetched.failure is not None:
                 return cast(BuildOutcome, build.fetched)
+            if build.fetched is None:
+                from eii_custodian.publicdata.busyness.security import assert_clean
+
+                assert_clean(environ or {}, _run.fetch_lines)
+                build.lines.extend(_run.fetch_lines)
             from eii_custodian.publicdata.building_inputs import BuildingError
             from eii_custodian.publicdata.series.frame import MunicipalityFrameRefused
             from eii_custodian.publicdata.series.parse import (
@@ -572,6 +601,7 @@ def run_build(
             list(build.fetched.terms) if build.fetched else [],
             list(build.fetched.terms_attempts) if build.fetched else [],
         )
+        _run.finish()
         return BuildOutcome(tuple(build.lines), None)
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
@@ -585,7 +615,8 @@ def run_build(
     except ValueError:
         raise ValueError("invalid build-start UTC timestamp") from None
     manifests: dict[str, str] = {}
-    lines: list[str] = []
+    reused_times: dict[str, str] = {}
+    lines: list[str] = _run.fetch_lines if _run is not None else []
     pending: list[Entry] = []
     terms: list[dict[str, object]] = []
     terms_attempts: list[dict[str, object]] = []
@@ -631,6 +662,15 @@ def run_build(
                 benchmark_result = fetch_benchmark(
                     entry, policy, transport, benchmark_stream, cache, clock, sleep
                 )
+                if _run is not None:
+                    try:
+                        _run.note(entry)
+                    except OSError:
+                        failure = FetchFailure(
+                            1, entry.source_id, "", "resume_record_write_failed", "", ""
+                        )
+                        lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                        break
                 manifests[entry.source_id] = benchmark_result.digest
                 lines.append(
                     pass_line(entry.key, benchmark_result.digest, benchmark_result.host)
@@ -660,6 +700,15 @@ def run_build(
                 baci_result = fetch_baci(
                     entry, config, transport, stream_transport, cache, clock, sleep
                 )
+                if _run is not None:
+                    try:
+                        _run.note(entry)
+                    except OSError:
+                        failure = FetchFailure(
+                            1, entry.source_id, "", "resume_record_write_failed", "", ""
+                        )
+                        lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                        break
                 manifests[entry.source_id] = baci_result.digest
                 lines.append(pass_line(entry.key, baci_result.digest, baci_result.host))
                 if baci_result.terms_sha256:
@@ -712,6 +761,15 @@ def run_build(
                     clock,
                     sleep,
                 )
+                if _run is not None:
+                    try:
+                        _run.note(entry)
+                    except OSError:
+                        failure = FetchFailure(
+                            1, entry.source_id, "", "resume_record_write_failed", "", ""
+                        )
+                        lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                        break
                 manifests[entry.source_id] = gravity_result.digest
                 lines.append(
                     pass_line(entry.key, gravity_result.digest, gravity_result.host)
@@ -760,6 +818,15 @@ def run_build(
                 atlas_result = fetch_atlas(
                     entry, atlas_loaded, transport, atlas_stream, cache, clock, sleep
                 )
+                if _run is not None:
+                    try:
+                        _run.note(entry)
+                    except OSError:
+                        failure = FetchFailure(
+                            1, entry.source_id, "", "resume_record_write_failed", "", ""
+                        )
+                        lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                        break
                 manifests[entry.source_id] = atlas_result.digest
                 lines.append(
                     pass_line(entry.key, atlas_result.digest, atlas_result.host)
@@ -843,6 +910,15 @@ def run_build(
                     if entry.kind == "awards_intake"
                     else fetch_page(entry, transport, cache, clock, sleep)
                 )
+                if _run is not None:
+                    try:
+                        _run.note(entry)
+                    except OSError:
+                        failure = FetchFailure(
+                            1, entry.source_id, "", "resume_record_write_failed", "", ""
+                        )
+                        lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                        break
                 manifests[entry.key] = page.sha256
                 lines.append(pass_line(entry.key, page.sha256, entry.fetch_host))
             except (PageError, AwardError, PinError, SnapshotError) as exc:
@@ -868,6 +944,15 @@ def run_build(
             continue
         if entry.kind == "citation_only":
             _write_citation(entry, cache, clock())
+            if _run is not None:
+                try:
+                    _run.note(entry)
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
             lines.append(citation_line(entry.key))
             continue
         if entry.kind == "comtrade_api":
@@ -877,6 +962,15 @@ def run_build(
             if traded_failure is not None:
                 failure = traded_failure
                 break
+            if _run is not None:
+                try:
+                    _run.note(entry)
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
             continue
         if is_release_entry(entry):
             released, refused = fetch_release(entry, transport, cache, clock, sleep)
@@ -900,6 +994,15 @@ def run_build(
                 )
                 break
             assert released is not None
+            if _run is not None:
+                try:
+                    _run.note(entry)
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
             lines.append(pass_line(entry.key, released.digest, released.host))
             continue
         if is_place_file(entry):
@@ -926,6 +1029,15 @@ def run_build(
                 )
                 break
             assert placed is not None
+            if _run is not None:
+                try:
+                    _run.note(entry)
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
         row_transport = transport
@@ -947,16 +1059,38 @@ def run_build(
                     fail_line(entry.key, "", str(exc), "reviewed byte span", "NO_DATA")
                 )
                 break
-        fetched, result = _fetch_row(
-            entry,
-            row_transport,
-            cache,
-            clock,
-            sleep,
-            token,
-            registry_entries=tuple(entries),
-            **_stream_options(large_stream),
-        )
+        fetched: _Fetched | None
+        try:
+            reused = _run.reuse(entry, lines) if _run is not None else None
+        except OSError:
+            failure = FetchFailure(
+                1, entry.source_id, "", "resume_record_write_failed", "", ""
+            )
+            lines.append(fail_line(entry.key, "", failure.check, "", ""))
+            break
+        if reused is not None:
+            fetched, result = _Fetched(**reused), None
+            reused_times[entry.key] = fetched.retrieved_utc
+        else:
+            fetched, result = _fetch_row(
+                entry,
+                row_transport,
+                cache,
+                clock,
+                sleep,
+                token,
+                registry_entries=tuple(entries),
+                **_stream_options(large_stream),
+            )
+            if _run is not None and fetched is not None and result is None:
+                try:
+                    _run.fetched(entry, asdict(fetched))
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
         if result is not None:
             if entry.source_id in INVESTMENT_SOURCES:
                 investment_attempts.append(
@@ -1068,6 +1202,7 @@ def run_build(
             tuple(investment_attempts),
             tuple(terms),
             tuple(terms_attempts),
+            reused_times=reused_times,
         )
     attempt_failure = _archive_investment_attempts(
         entries, investment_attempts, cache, clock, lines

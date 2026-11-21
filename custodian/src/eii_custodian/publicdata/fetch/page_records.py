@@ -26,7 +26,7 @@ from .certificate_pins import (
     page_transport,
     validate_pin,
 )
-from .kinds import read_bounded, read_terms_page
+from .kinds import read_bounded, read_terms_page, require_verified_chain
 from .page_archive import staged_source
 from .receipts import archive_auxiliary, sha256_hex, sidecar_for
 from .registry import LICENCE_BASES, Entry, read_yaml
@@ -321,6 +321,7 @@ def fetch_page(
     evidence: dict[str, object] = {}
     with page_transport(pin, browser=entry.source_id == "schools_private_directory"):
         response, failure = read_bounded(transport, sleep, entry.url)
+    require_verified_chain(failure)
     if failure is not None or response is None:
         if entry.source_id != "schools_private_directory":
             raise PageError(failure.check if failure else "access_failed")

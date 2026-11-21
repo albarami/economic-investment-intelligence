@@ -203,16 +203,37 @@ def test_review_reference_other_digit_runs_are_accepted(tmp_path: Path, digits, 
     assert result.mappings[0].review_reference == row["review_reference"]
 
 
-def test_municipality_code_target_source_chain():
-    """PO-S2-108's lead extract supplies codes and receipt fields, never names."""
-    import eii_custodian.publicdata.investment_crosswalk as c
+def invented_municipality_codes() -> bytes:
+    """Code-only source shape with invented values, never the fetched extract."""
+    return (
+        "municipality_code,source_id,source_sha256,retrieved_utc\n"
+        + f"SYN042,bnd_zone_2020,{'a' * 64},2024-01-31T15:00:00Z\n"
+    ).encode()
 
-    source_hash = "12226c26959a5aa378bf979ce782c237629e1882d12c00879b62cae5ffac752f"
-    expected = "municipality_code,source_id,source_sha256,retrieved_utc\n" + "".join(
-        f"{code},bnd_zone_2020,{source_hash},2026-11-20T11:27:25Z\n"
-        for code in ("1", "2", "3", "4", "5", "6", "7", "8")
+
+def test_municipality_code_target_source_chain(tmp_path: Path):
+    from custodian.tests.fixtures.frame.invented import invented_layer
+
+    import eii_custodian.publicdata.investment_crosswalk as c
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    entry = next(row for row in load_registry() if row.key == "bnd_zone_2020")
+    cache = tmp_path / "cache"
+    payload = invented_layer("bnd_zone_2020")
+    payload["features"][0]["attributes"]["MUNICIPAL_CODE"] = "SYN042"
+    body = json.dumps(payload).encode()
+    write_cached(cache, entry, body, retrieved_utc="2024-01-31T15:00:00Z")
+    newer = json.dumps({**payload, "invented_unselected": True}).encode()
+    write_cached(cache, entry, newer, retrieved_utc="2024-02-01T15:00:00Z")
+    digest = c.write_municipality_codes(cache, entry, digest=sha256_hex(body))
+    expected = invented_municipality_codes().replace(
+        b"a" * 64, sha256_hex(body).encode()
     )
-    assert (c._REVIEW / "municipality_codes.csv").read_bytes() == expected.encode()
+    target = cache / "review/municipality_codes.csv"
+    assert target.read_bytes() == expected
+    assert digest == sha256_hex(expected)
+    assert not (c._REVIEW / "municipality_codes.csv").exists()
 
 
 @pytest.mark.parametrize(
@@ -228,19 +249,23 @@ def test_municipality_code_target_source_chain():
 def test_municipality_code_target(tmp_path: Path, plant, check):
     """An invented project uses only a pinned member of the supplied code list."""
     c, page, row, document, path, _good = specimen(tmp_path)
-    target = (c._REVIEW / "municipality_codes.csv").read_bytes()
-    target_path = tmp_path / "municipality_codes.csv"
+    target = invented_municipality_codes()
+    cache = tmp_path / "cache"
+    (cache / "review").mkdir(parents=True)
+    target_path = cache / "review/municipality_codes.csv"
     target_path.write_bytes(target)
     row.update(
         column="municipality_code",
-        target_key="3",
+        target_key="SYN042",
         target_resource=target_path.name,
         target_sha256=sha256_hex(target),
     )
     path.write_text(json.dumps(document), encoding="utf-8")
-    control = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    control = c.read_crosswalk(
+        path, expected_sha256=sha256_hex(path.read_bytes()), cache=cache
+    )
     assert not isinstance(control, InvestmentFailure), control
-    assert control.mappings[0].target_key == "3"
+    assert control.mappings[0].target_key == "SYN042"
     spec = b.load_source_spec("fdi_projects", url=b.DASHBOARD_URL)
     parsed = parse_fdi(
         page.body,
@@ -248,13 +273,13 @@ def test_municipality_code_target(tmp_path: Path, plant, check):
         replace(b._envelope(), page_sha256=sha256_hex(page.body)),
     )
     assert not isinstance(parsed, InvestmentFailure), parsed
-    assert parsed[0][0]["municipality_code"] == "3"
+    assert parsed[0][0]["municipality_code"] == "SYN042"
     assert parsed[0][0]["mapping_coverage"]["municipality_code"] == "reviewed"
 
     if plant == "control":
         return
     if plant == "absent_code":
-        row["target_key"] = "9"
+        row["target_key"] = "SYN099"
     elif plant == "manufactured_key":
         row["target_key"] = "SYN-area-AA-0001"
     elif plant == "names_file":
@@ -262,9 +287,11 @@ def test_municipality_code_target(tmp_path: Path, plant, check):
         (tmp_path / "municipality_names.csv").write_bytes(target)
         row["target_resource"] = "municipality_names.csv"
     else:
-        target_path.write_bytes(target.replace(b"3,bnd_", b"9,bnd_", 1))
+        target_path.write_bytes(target.replace(b"SYN042,bnd_", b"SYN099,bnd_", 1))
     path.write_text(json.dumps(document), encoding="utf-8")
-    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    result = c.read_crosswalk(
+        path, expected_sha256=sha256_hex(path.read_bytes()), cache=cache
+    )
     assert isinstance(result, InvestmentFailure), result
     assert result.check == check
 
@@ -443,3 +470,172 @@ def test_crosswalk_integrity_change_during_read_is_refused(
         else "crosswalk_hash"
     )
     assert getattr(result, "check", "") == expected
+
+
+def test_municipality_target_has_no_committed_fallback(tmp_path: Path):
+    c, _page, row, document, path, _good = specimen(tmp_path)
+    target = invented_municipality_codes()
+    row.update(
+        column="municipality_code",
+        target_key="SYN042",
+        target_resource="municipality_codes.csv",
+        target_sha256=sha256_hex(target),
+    )
+    # A target beside the tracked crosswalk must never substitute for the cache.
+    (tmp_path / "municipality_codes.csv").write_bytes(target)
+    path.write_text(json.dumps(document))
+    result = c.read_crosswalk(path, expected_sha256=sha256_hex(path.read_bytes()))
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == "crosswalk_target"
+
+
+def test_municipality_cache_reaches_publication(tmp_path: Path, monkeypatch):
+    c, page, row, document, path, _good = specimen(tmp_path)
+    root = tmp_path / "run"
+    cache = root / "data/public_cache"
+    target = cache / "review/municipality_codes.csv"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(invented_municipality_codes())
+    row.update(
+        column="municipality_code",
+        target_key="SYN042",
+        target_resource=target.name,
+        target_sha256=sha256_hex(target.read_bytes()),
+    )
+    path.write_text(json.dumps(document))
+    monkeypatch.setattr(c, "_REVIEW", tmp_path)
+    assert b._run(root, monkeypatch, b._fdi_entry(), {b.DASHBOARD_URL: page.body}) == 0
+    _, _, table = b._batch(root, "fdi_projects")
+    assert table["rows"][0]["municipality_code"] == "SYN042"
+
+
+def test_municipality_cache_reaches_native_assembly(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.assembly_adapters import Production
+    from eii_custodian.publicdata.assembly_native import read_investment
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    c, page, row, document, path, _good = specimen(tmp_path)
+    root = tmp_path / "run"
+    cache = root / "data/public_cache"
+    target = cache / "review/municipality_codes.csv"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(invented_municipality_codes())
+    row.update(
+        column="municipality_code",
+        target_key="SYN042",
+        target_resource=target.name,
+        target_sha256=sha256_hex(target.read_bytes()),
+    )
+    path.write_text(json.dumps(document))
+    monkeypatch.setattr(c, "_REVIEW", tmp_path)
+    # A dropped cache argument must fail without reading the repository cache.
+    monkeypatch.setattr(c, "_CACHE", tmp_path / "unused-cache")
+    entry = b._fdi_entry()
+    with monkeypatch.context() as publication:
+        assert b._run(root, publication, entry, {b.DASHBOARD_URL: page.body}) == 0
+    pointer, _, table = b._batch(root, entry.source_id)
+    raw_identity = sha256_hex(page.body)
+    build = Production(
+        entries=(entry,),
+        cache=cache,
+        review=tmp_path,
+        root=root,
+        transport=lambda _url: pytest.fail("native assembly must stay offline"),
+        clock=lambda: b.RETRIEVED,
+        sleep=lambda _seconds: None,
+        seed=0,
+        environ={},
+    )
+    build.receipts[entry.key] = read_snapshot(cache / entry.key, raw_identity).sidecar
+
+    read_investment(build, entry, raw_identity, pointer["manifest_sha256"])
+
+    assert build.tables["fdi_projects"] == table["rows"]
+    assert build.tables["fdi_projects"][0]["municipality_code"] == "SYN042"
+    assert build.tables["fdi_projects"][0]["mapping_coverage"]["municipality_code"] == (
+        "reviewed"
+    )
+
+
+@pytest.mark.parametrize("plant", ["missing", "file_symlink", "directory_symlink"])
+def test_municipality_cached_target_refuses_missing_or_link(tmp_path: Path, plant):
+    c, _page, row, document, path, _good = specimen(tmp_path)
+    body = invented_municipality_codes()
+    # Valid adjacent bytes cannot satisfy an explicitly supplied empty cache.
+    adjacent = tmp_path / "municipality_codes.csv"
+    adjacent.write_bytes(body)
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    review = cache / "review"
+    if plant == "directory_symlink":
+        review.symlink_to(tmp_path, target_is_directory=True)
+    else:
+        review.mkdir()
+        if plant == "file_symlink":
+            (review / adjacent.name).symlink_to(adjacent)
+    row.update(
+        column="municipality_code",
+        target_key="SYN042",
+        target_resource=adjacent.name,
+        target_sha256=sha256_hex(body),
+    )
+    path.write_text(json.dumps(document))
+    result = c.read_crosswalk(
+        path, expected_sha256=sha256_hex(path.read_bytes()), cache=cache
+    )
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == "crosswalk_target"
+
+
+@pytest.mark.parametrize(
+    "plant",
+    [
+        "wrong_source",
+        "directory_symlink",
+        "file_symlink",
+        "partial_symlink",
+        "source_tamper",
+    ],
+)
+def test_municipality_code_writer_refusals(tmp_path: Path, plant):
+    from custodian.tests.fixtures.frame.invented import invented_layer
+
+    import eii_custodian.publicdata.investment_crosswalk as c
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.frame.checks import FrameError
+    from eii_custodian.publicdata.review.cache_fixture import write_cached
+
+    entry = next(row for row in load_registry() if row.key == "bnd_zone_2020")
+    cache = tmp_path / "cache"
+    body = json.dumps(invented_layer(entry.source_id)).encode()
+    stored = write_cached(cache, entry, body)
+    if plant == "wrong_source":
+        with pytest.raises(ValueError, match=r"^municipality_codes_source$"):
+            c.write_municipality_codes(
+                cache, replace(entry, source_id="invented"), digest=sha256_hex(body)
+            )
+        return
+    if plant == "source_tamper":
+        stored.write_bytes(body + b" ")
+        with pytest.raises(FrameError, match="snapshot_hash_mismatch"):
+            c.write_municipality_codes(cache, entry, digest=sha256_hex(body))
+        assert not (cache / "review/municipality_codes.csv").exists()
+        return
+    outside = tmp_path / "invented-untouched"
+    outside.mkdir()
+    sentinel = outside / "municipality_codes.csv"
+    sentinel.write_bytes(b"invented sentinel")
+    review = cache / "review"
+    if plant == "directory_symlink":
+        review.symlink_to(outside, target_is_directory=True)
+    else:
+        review.mkdir()
+        filename = (
+            "municipality_codes.csv"
+            if plant == "file_symlink"
+            else ".municipality_codes.csv.partial"
+        )
+        (review / filename).symlink_to(sentinel)
+    with pytest.raises(ValueError, match=r"^municipality_codes_path$"):
+        c.write_municipality_codes(cache, entry, digest=sha256_hex(body))
+    assert sentinel.read_bytes() == b"invented sentinel"

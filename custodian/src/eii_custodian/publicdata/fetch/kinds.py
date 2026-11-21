@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 from zipfile import BadZipFile, ZipFile
 
 from eii_custodian.publicdata.fetch.allowlist import approve, host_of
+from eii_custodian.publicdata.fetch.certificate_pins import PinError
 from eii_custodian.publicdata.fetch.checks import (
     AttemptFailure,
     count_failure,
@@ -48,6 +49,23 @@ _TRADE_AUXILIARY_SOURCES = frozenset(
 )
 
 Read = Callable[[str], Response]
+
+
+@dataclass(frozen=True)
+class PinFailure(AttemptFailure):
+    """A normalized fetch failure retaining a closed, blocking TLS diagnostic.
+
+    Reviewed page adapters must not treat a certificate failure as an access
+    obstacle eligible for a capture or an unavailable proof.
+    """
+
+    reason: str
+
+
+def require_verified_chain(failure: AttemptFailure | None) -> None:
+    """Preserve the page adapters' security refusal before any access fallback."""
+    if isinstance(failure, PinFailure):
+        raise PinError(failure.reason)
 
 
 class _TenderOptions(TypedDict, total=False):
@@ -206,6 +224,23 @@ def _call_url(url: str, reader: Read) -> tuple[Response | None, AttemptFailure |
         return None, AttemptFailure(1, url, "blocked_host", "allow-listed host", url)
     try:
         return reader(url), None
+    except PinError as exc:
+        reason = str(exc)
+        if reason not in {
+            "certificate_chain_incomplete",
+            "certificate_host_mismatch",
+            "certificate_review_pending",
+            "tls_verification_disabled",
+        }:
+            reason = "certificate_chain_incomplete"
+        return None, PinFailure(
+            1,
+            url,
+            reason,
+            "complete verified certificate chain",
+            "unavailable",
+            reason,
+        )
     except _HopRefused as exc:
         return None, AttemptFailure(
             1, exc.url, "blocked_host", "allow-listed host", exc.url

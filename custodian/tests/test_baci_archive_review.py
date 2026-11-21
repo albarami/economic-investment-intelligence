@@ -187,6 +187,9 @@ def test_native_iso2_is_validated(tmp_path):
 def test_lead_archive_reading_is_configured_without_guessed_counts():
     config = load_config()
     assert config.confirmed is False
+    assert config.access == "visitor"
+    assert "no registration, no key, no paid tier" in config.evidence
+    assert "2026-11-21" in config.attribution
     assert config.source_version == "202601"
     assert config.hs_revision == "HS17"
     assert config.archive_bytes == (794_583_540, 794_583_540)

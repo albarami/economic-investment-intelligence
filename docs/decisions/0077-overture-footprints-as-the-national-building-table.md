@@ -2,11 +2,12 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted, 2026-11-21; the owner's decision of 2026-11-21 05:32 |
 | Date | 2026-11-20 |
+| Decided by | The owner, 2026-11-21 05:32, on the lead's S2 gate question for item C-20 |
 | Scope | S2-T20 national building producer; task-owned document under rule 33 and lead ruling L-1285 |
 
-## Decision proposed
+## Decision
 
 1. The pinned Overture buildings release supplies the canonical building inventory,
    using the three concrete `bldg_ovt` parts of PUB-17. The national municipality
@@ -75,3 +76,11 @@ Live schema/release metadata, all STAC item URLs, national boundary coverage,
 exclusion review, counts and repeatability remain the lead's work. This proposed
 record claims neither owner acceptance, independent build approval nor live
 national coverage.
+
+## Acceptance
+
+The owner accepted this decision as written on 2026-11-21 at 05:32, in answer to the
+S2 gate question on item C-20 (lead ruling L-1319). The acceptance adds nothing to the
+decision. The live evidence named above (release metadata, STAC item addresses,
+national coverage, exclusion review, counts and repeatability) is still owed before
+gate item C-20 closes.

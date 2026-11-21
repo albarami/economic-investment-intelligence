@@ -28,9 +28,24 @@ def test_gravity_closed_configuration_and_pending_file() -> None:
     assert Config.from_mapping(raw).publisher_mapping == "pending"
     pending = load_config()
     assert pending.confirmed is False
+    assert pending.access == "visitor"
     assert pending.bound_origin == "pending"
-    assert pending.reviewed_urls == ()
-    assert pending.page == ""
+    assert pending.source_version == "202211"
+    assert pending.reviewed_urls == (
+        "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8",
+        "https://www.cepii.fr/DATA_DOWNLOAD/gravity/data/Gravity_csv_V202211.zip",
+        "https://www.cepii.fr/DATA_DOWNLOAD/gravity/doc/Gravity_documentation.pdf",
+    )
+    assert pending.page == pending.reviewed_urls[0]
+    assert pending.page_sha256 == (
+        "7d9a401b1714f633fecc8bf35b66bb81f9bd1ade15ee3d5ea8d1747cf87da6e6"
+    )
+    assert pending.licence_words == "Licence: Etalab 2.0"
+    assert "no registration, no key, no paid tier" in pending.evidence
+    assert "2026-11-21" in pending.attribution
+    assert pending.year_selection == "pending"
+    assert pending.archive_bytes == (0, 0)
+    assert pending.members == ()
     for key in raw:
         broken = deepcopy(raw)
         del broken[key]
