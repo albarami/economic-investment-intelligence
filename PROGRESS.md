@@ -43023,6 +43023,244 @@ Seed:      1624931084
 Notes:     Runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
 ```
 
+Prepared by: Anthropic, Claude Opus 5.5 (claude-opus-5-5), the lead. Persona: release coordinator who traces every commit, verdict and count to a git object, log line or file. Self-review persona: records reviewer who rejects any claim without a source. Skills: project-orientation, task-standards, sanad-provenance, verification-before-completion, muhasabah-gate.
+
+# S2-P41 — ledger input log
+
+Pull request https://github.com/albarami/economic-investment-intelligence/pull/113. BASE `7ef9dc96c7ccccfc8f2709bb139db44da452638f` (the squash merge of train S2-12, pull request 112). WORK `9df561af6d1f5ed6b445d8b10e641dc927d3250c`, one work commit.
+
+Why alone: main's hosted tests job failed twice on the same tree, the hosted run of main at 7ef9dc96, attempts 1 and 2. Custodian part 2 reported "counts unavailable in 600.1 s" while every other suite passed. A rerun cannot fix a limit fault, so S2-P41 leaves the S2 gate train and merges first as its own pull request (lead ruling L-1410).
+
+## Commit inventory
+
+- `9df561af6d1f5ed6b445d8b10e641dc927d3250c`: ci(tests): custodian tests run in three parts with a 1200 s limit each and a 720 s hosted watch (S2-P41, decision 0086).
+  - Builder: OpenAI Codex GPT-6 Sol on login B. Round 1 was S2-P41.b1 (2056 s); round 2 was S2-P41.r2 (1696 s), applying the owner's limit decision relayed at 23:11 (lead ruling L-1404).
+  - Committed by the lead after the lead's own verification.
+
+## Review trail
+
+- **S2-P41.rv1: APPROVED** on `9df561af6d1f5ed6b445d8b10e641dc927d3250c`, by Anthropic Claude Opus 5.5 on login B (916 s). The maker differs from the builder.
+- The reviewer's own plants ran in a scratch copy and each was restored:
+  - a module dropped from every part: exit 1, "custodian parts do not cover the whole collection";
+  - a module kept in every part: exit 1, "custodian parts overlap";
+  - a new test module added: exit 0, and its two tests land in exactly one part;
+  - the kill on timeout disabled: exit 1 after 60.24 s, then exit 0 in 10.02 s once restored.
+- Local part times were 235.10 s, 289.56 s and 264.81 s, for 3,690, 3,533 and 3,552 passed. That is 10,775 in total, equal to the whole collection.
+- Two findings, neither rejecting:
+  - F1, a nit: the printed share uses the suite's own timeout field, while the kill uses the per-runner limit function. Recorded as OI-371.
+  - F2, documents: decision 0086 amends decision 0060 items 1 to 4, not only items 2 and 4. Recorded as OI-372, with the reviewer's proposed items 2, 3 and 5.
+- The reviewer's proposed item 4 (the hosted job's 90-minute cap against the summed suite limits) is recorded as OI-373.
+
+## Evidence
+
+The rows below are the lead's commands, run by the ledger script at WORK. Their counts and exits are written by the script. The six hosted checks and the lead's whole test on the exact merge result remain separate gates.
+
+#### Evidence for the work commit `9df561af6d1f5ed6b445d8b10e641dc927d3250c`
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_custodian_parts.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M): the part completeness guard with dropped, duplicate and empty-part plants.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M): the 1200 s limit, the printed share and the kill on timeout.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "79 passed in 10.82s" (Full pytest passed summary; failed, error and skip summaries refused.)
+Seed:      none
+Notes:     Changed test file (M).
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "917 files already formatted"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 489 source files"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1240 text files, 135 Markdown files: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 components: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 367 rows: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte-identical rule files.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    982 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole scripts discovery.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','7ef9dc96c7ccccfc8f2709bb139db44da452638f...9df561af6d1f5ed6b445d8b10e641dc927d3250c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0086-custodian-part-limit-and-watch.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:custodian/tests/test_restricted_expectation_guards.py M:docs/12_TESTING_AND_QUALITY.md M:docs/README.md M:scripts/pytest_custodian_part.py M:scripts/run_tests.py M:scripts/tests/custodian_part_support.py M:scripts/tests/mutation_runner.py M:scripts/tests/runner_support.py M:scripts/tests/test_custodian_parts.py M:scripts/tests/test_runner_usage.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "14 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact read-only Git BASE..WORK name-status; 14 paths.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','7ef9dc96c7ccccfc8f2709bb139db44da452638f..9df561af6d1f5ed6b445d8b10e641dc927d3250c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     One work commit, a Conventional Commit.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   ./eii test --seed 1526138952
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    14286 passed, 0 failed, 0 skipped
+Seed:      1526138952
+Notes:     Fresh runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

@@ -3081,6 +3081,42 @@ These lines close the three entries of the section "S2-P30 — Audit-box disposi
 - CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T14#8: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T14#8 as a box that may be ticked, and the train ticks it. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and point 2.
 - CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T19#7: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T19#7 as a box that may be ticked, and the train ticks it. Its point 1 (case-fold the listed-table lookup) and point 4 (short identifiers) do not reject and stay as review notes. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and points 1, 2 and 4.
 
+## OI-371 — S2-P41 review nit: the printed share of a suite's limit
+
+- ID: OI-371
+- TYPE: OPEN
+- RAISED BY: lead, from review S2-P41.rv1 finding F1 (pull request 113), 2026-11-22
+- CONCERNS: `scripts/run_tests.py`. It prints each suite's time as a share of `suite.timeout`, while the kill uses `suite_timeout(suite, parent)`.
+- EVIDENCE: the two agree today, because every runner has one limit under decision 0086. If a per-runner limit came back, the printed share would no longer match the enforced limit.
+- NEEDED: pass `suite_timeout(suite, parent)` to the print, with a test whose runner limit differs from the suite field.
+- NEEDED BY: the next change to `scripts/run_tests.py`.
+
+## OI-372 — Decision 0086 records: amended items of decision 0060, the reading of ruling L-1404, the OI-285 closing line
+
+- ID: OI-372
+- TYPE: OPEN
+- RAISED BY: lead, from review S2-P41.rv1 finding F2 and proposed items 2, 3 and 5 (pull request 113), 2026-11-22
+- CONCERNS: decision 0086's "Amends" row and item 1; the decision 0060 row of `docs/README.md`; the OI-285 update line of 2026-11-22; the TASKS.md S2-T34 section.
+- EVIDENCE:
+  - Decision 0086 lists items 2 and 4 of decision 0060 as amended, but items 1 and 3 are changed too. Item 1 is "two named parts … same 600-second limit"; item 3 is "the two parts … neither is empty".
+  - Lead ruling L-1404 reads, in its words, as applying the limit "instead of the three-part split". The lead's reading of 2026-11-21 23:43 kept three parts and the 1200-second limit. It is recorded in the lead's log, and the round-2 brief names three parts as its subject.
+  - The OI-285 update line says "The owner-approved response keeps three parts". The owner approved the limit and the watch; keeping three parts was the builder's and the lead's choice. This item corrects that line, append-only.
+  - S2-T34's ticked criterion still reads "two parts … 600-second". It is historical and stays unedited.
+- NEEDED: a documents-only change, reviewed by a maker other than its writer:
+  - write "decision 0060 items 1, 2, 3 and 4" in decision 0086, and "items 1 to 4 amended" in the index row;
+  - add a pointer from S2-T34 to decision 0086.
+- NEEDED BY: the S2 gate record.
+
+## OI-373 — Hosted tests job cap against the summed suite limits
+
+- ID: OI-373
+- TYPE: OPEN (watch)
+- RAISED BY: lead, from review S2-P41.rv1 proposed item 4 (pull request 113), 2026-11-22
+- CONCERNS: the hosted `tests` job in `.github/workflows/ci.yml`, capped at `timeout-minutes: 90` (5,400 s).
+- EVIDENCE: the suite limits now sum to 10,800 s, and the custodian worst case rose from 1,200 s to 3,600 s. On a very slow runner the job cap could cancel the run before any per-suite kill reports. The same gap held before this change (8,400 s summed), and `ci.yml` was left unchanged.
+- NEEDED: read each green hosted run's job time against the cap. If a run comes within 15 minutes of it, a recorded change to the cap or to the parts.
+- NEEDED BY: watched at every merge until the S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
