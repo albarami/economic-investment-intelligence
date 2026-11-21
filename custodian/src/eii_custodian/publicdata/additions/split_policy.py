@@ -97,6 +97,9 @@ _EMPLOYMENT_GENDER = frozenset(
     }
 )
 _MOVEMENT_COLUMNS = frozenset({"age_band", "gender", "nationality_group"})
+_MOVEMENT_TABLES = frozenset(
+    {"presence_split_hourly", "od_split_hourly", "presence_split", "flow_split"}
+)
 _PRESENCE_SPLIT_FIELDS = (
     "observation_start",
     "observation_end",
@@ -210,6 +213,12 @@ def validate_table_dimensions(table: TableSpec) -> Verdict:
     refused = _unreadable_names(table)
     if refused is not None:
         return refused
+    expected_kind = _KIND_BY_TABLE.get(table.name.casefold())
+    if (
+        expected_kind in {"worker_source", "residence_source", "company_source"}
+        and table.kind != expected_kind
+    ):
+        return Verdict(False, "table_kind_mismatch")
     if table.kind in _RECORD_KINDS:
         return _record(table)
     if table.kind == "movement_split":
@@ -281,6 +290,8 @@ def _record(table: TableSpec) -> Verdict:
 
 
 def _movement(table: TableSpec) -> Verdict:
+    if table.name not in _MOVEMENT_TABLES:
+        return Verdict(False, "movement_table_unlisted")
     expected = _MOVEMENT_FIELDS.get(table.name)
     if expected is not None:
         found = tuple(_folded(column.name) for column in table.columns)

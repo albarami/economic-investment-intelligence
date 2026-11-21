@@ -29,7 +29,12 @@ def build_layers(build: Production) -> None:
         rail_rows,
         zoning_rows,
     )
-    from .property.bulletin import Deal, parse_bulletin, sales_export_rows
+    from .property.bulletin import (
+        Deal,
+        parse_bulletin,
+        refuse_release_identifiers,
+        sales_export_rows,
+    )
     from .property.quarter import quarter_aggregates
     from .property.use_map import load_use_map
     from .singles.bank_credit import parse_bank_credit
@@ -39,6 +44,7 @@ def build_layers(build: Production) -> None:
 
     grid = build.needed_frame().tables["grid_cell"]
     deals: list[Deal] = []
+    identifiers: set[str] = set()
     deal_sources = []
     family_rows: dict[str, list[dict[str, object]]] = defaultdict(list)
     family_sources: dict[str, set[str]] = defaultdict(set)
@@ -133,6 +139,7 @@ def build_layers(build: Production) -> None:
                 },
             )
             deals.extend(result.deals)
+            identifiers.update(result.identifiers)
             deal_sources.append(entry.key)
         elif source in COLLECTED_FAMILIES:
             payload = build.raw(entry, family_archive=True)
@@ -179,6 +186,7 @@ def build_layers(build: Production) -> None:
             if entry.key in deal_sources
         }
         quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
+        refuse_release_identifiers(quarter_rows, frozenset(identifiers))
         expected = expected_as_of(deals, as_of_by_source)
         for row in quarter_rows:
             if row_has_price_figure(row):
