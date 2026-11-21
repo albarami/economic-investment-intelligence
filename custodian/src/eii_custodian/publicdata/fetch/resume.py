@@ -188,11 +188,11 @@ class RunRecord:
             self.row["entries"][entry.key] = item
             self.write()
             return
-        directory = self._local(entry.key, entry)
-        if entry.key in {"places_ovt", "bldg_ovt"}:
-            directory /= "listing"
-        digest = state["digest"]
         try:
+            directory = self._local(entry.key, entry)
+            if entry.key in {"places_ovt", "bldg_ovt"}:
+                directory /= "listing"
+            digest = state["digest"]
             if not isinstance(digest, str):
                 raise ValueError("digest_required")
             primary = read_snapshot(directory, digest)
@@ -372,7 +372,14 @@ class RunRecord:
                     self._local(f"{prefix}/{number}.html", entry)
                     for number in range(1, count + 1)
                 )
-        html = sorted(self._local(entry.key, entry).rglob("*.html"))
+        html = sorted(
+            path
+            for name, _ in LIST_PATHS
+            for language in ("en", "ar")
+            for path in self._local(f"{entry.key}/{name}/{language}", entry).glob(
+                "*.html"
+            )
+        )
         if {p for p in paths if p.suffix == ".html"} != set(html):
             raise ValueError("page_inventory_invalid")
         return {

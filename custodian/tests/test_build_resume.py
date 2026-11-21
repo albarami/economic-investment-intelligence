@@ -19,6 +19,7 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
 START = "2026-11-21T00:00:00Z"
+EARLIER = "2026-11-20T00:00:00Z"
 LATER = "2026-11-21T01:00:00Z"
 HEAD = "a" * 40
 
@@ -754,3 +755,207 @@ def test_paged_archive_retains_original_retrieval_time(
     index = next((folder / "index").glob("*.json"))
     snapshot = read_snapshot(folder, index.stem)
     assert snapshot.sidecar["retrieved_utc"] == START
+
+
+def test_review_auxiliary_retrieved_before_start_is_refetched(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Fresh mtimes cannot override an auxiliary receipt's older retrieval."""
+    from eii_custodian.publicdata.fetch import build
+    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
+
+    original = build._fetch_row
+
+    def fetch(*args: Any, **kwargs: Any) -> Any:
+        fetched, failure = original(*args, **kwargs)
+        if fetched is not None:
+            source = args[0]
+            archive_auxiliary(
+                source,
+                harness.cache / source.key,
+                "inputs",
+                b"SYN auxiliary bytes",
+                EARLIER,
+                source.url,
+            )
+        return fetched, failure
+
+    monkeypatch.setattr(build, "_fetch_row", fetch)
+    harness.interrupt()
+    outcome = harness.run(resume=True)
+    assert outcome.failure is None
+    assert harness.entries[0].url in harness.seen
+    assert not any(line.startswith("REUSE SYN-first ") for line in outcome.lines)
+
+
+@pytest.mark.parametrize("terms_url", [False, True])
+def test_review_paged_portal_with_archived_terms_is_reused(
+    paged: Harness, terms_url: bool
+) -> None:
+    """Earlier terms and terms read after page fetch are outside its inventory."""
+    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
+
+    url = "https://www.data.gov.qa/SYN/terms"
+    if terms_url:
+        paged.entries = (replace(paged.entries[0], terms_url=url), paged.entries[1])
+    source = paged.entries[0]
+    archive_auxiliary(
+        source,
+        paged.cache / source.key,
+        "terms",
+        b"SYN earlier terms page",
+        EARLIER,
+        url,
+    )
+    paged.interrupt()
+    result = paged.run(resume=True)
+    assert result.failure is None
+    assert paged.seen == ([url] if terms_url else []) + [paged.entries[1].url]
+    assert any(line.startswith("REUSE SYN-first ") for line in result.lines)
+
+
+@pytest.mark.parametrize("operation", ["fetched", "paged_fetched", "reuse"])
+def test_later_journal_write_failure_is_named(
+    harness: Harness, paged: Harness, monkeypatch: pytest.MonkeyPatch, operation: str
+) -> None:
+    from eii_custodian.publicdata.fetch.resume import RunRecord
+
+    # The paged fixture shares the harness; restore the standard source for
+    # the other cases, so both fetched() branches get exercised.
+    if operation != "paged_fetched":
+        harness.entries = (entry("SYN-first"), harness.entries[1])
+    if operation == "reuse":
+        harness.interrupt()
+        row = record(harness)
+        row["entries"]["SYN-first"]["proofs"] = []
+        (harness.cache / "build-run.json").write_text(json.dumps(row))
+    original = RunRecord.write
+    attempts = []
+
+    def fail_later(self: RunRecord) -> None:
+        attempts.append(self.row["entries"]["SYN-first"]["completed"])
+        if operation == "reuse" or len(attempts) > 1:
+            raise OSError("SYN journal write failure")
+        original(self)
+
+    monkeypatch.setattr(RunRecord, "write", fail_later)
+    result = harness.run(resume=operation == "reuse")
+    assert len(attempts) == (1 if operation == "reuse" else 2)
+    assert result.failure is not None
+    assert result.failure.code == 1
+    assert result.failure.source_id == harness.entries[0].source_id
+    assert result.failure.check == "resume_record_write_failed"
+    assert any("resume_record_write_failed" in line for line in result.lines)
+    assert harness.entries[1].url not in harness.seen
+    assert record(harness)["state"] == "interrupted"
+
+
+@pytest.mark.parametrize(
+    "adapter",
+    [
+        "benchmark",
+        "baci",
+        "gravity",
+        "atlas",
+        "page",
+        "citation",
+        "comtrade",
+        "release",
+        "place",
+    ],
+)
+def test_note_journal_write_failure_is_named(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch, adapter: str
+) -> None:
+    """Every specialised fetch seam stops on a failed completion write."""
+    from types import SimpleNamespace
+
+    from eii_custodian.publicdata.fetch import build, page_records
+    from eii_custodian.publicdata.fetch.resume import RunRecord
+
+    source = harness.entries[0]
+    if adapter == "benchmark":
+        monkeypatch.setattr(build, "BENCHMARK_TABLES", {source.source_id: "SYN-table"})
+        monkeypatch.setattr(
+            build,
+            "load_policies",
+            lambda: {source.source_id: SimpleNamespace(confirmed=True)},
+        )
+        monkeypatch.setattr(build, "owner_obstacle", lambda policy: None)
+        monkeypatch.setattr(build, "fetch_benchmark", lambda *args: object())
+    elif adapter in {"baci", "gravity", "atlas"}:
+        source = replace(
+            source,
+            source_id={
+                "baci": "cepii_baci",
+                "gravity": "cepii_gravity",
+                "atlas": "atlas_complexity",
+            }[adapter],
+        )
+        monkeypatch.setattr(
+            build,
+            "load_config" if adapter == "baci" else f"load_{adapter}_config",
+            lambda: None,
+        )
+        monkeypatch.setattr(build, f"fetch_{adapter}", lambda *args: object())
+    elif adapter == "page":
+        source = replace(source, kind="public_page")
+        monkeypatch.setattr(page_records, "fetch_page", lambda *args: object())
+    elif adapter == "citation":
+        source = replace(source, kind="citation_only")
+    elif adapter == "comtrade":
+        source = replace(source, kind="comtrade_api")
+        monkeypatch.setattr(build, "_comtrade_dispatch", lambda *args: None)
+    else:
+        monkeypatch.setattr(
+            build,
+            "is_release_entry" if adapter == "release" else "is_place_file",
+            lambda entry: True,
+        )
+        monkeypatch.setattr(
+            build,
+            "fetch_release" if adapter == "release" else "fetch_place_file",
+            lambda *args, **kwargs: (object(), None),
+        )
+    harness.entries = (source, harness.entries[1])
+    original = RunRecord.write
+    attempts = []
+
+    def fail_later(self: RunRecord) -> None:
+        attempts.append(self.row["entries"][source.key]["completed"])
+        if len(attempts) > 1:
+            raise OSError("SYN journal write failure")
+        original(self)
+
+    monkeypatch.setattr(RunRecord, "write", fail_later)
+    result = harness.run()
+    assert attempts == [False, True]
+    assert result.failure is not None
+    assert result.failure.code == 1
+    assert result.failure.source_id == source.source_id
+    assert result.failure.check == "resume_record_write_failed"
+    assert any("resume_record_write_failed" in line for line in result.lines)
+    assert harness.entries[1].url not in harness.seen
+    assert record(harness)["state"] == "interrupted"
+
+
+def test_fetched_symlink_outside_cache_records_unavailable_proof(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from eii_custodian.publicdata.fetch import build
+
+    original = build._fetch_row
+
+    def fetch(*args: Any, **kwargs: Any) -> Any:
+        fetched, failure = original(*args, **kwargs)
+        if fetched is not None:
+            folder = harness.cache / args[0].key
+            destination = harness.cache.parent / "SYN-outside-cache"
+            folder.rename(destination)
+            folder.symlink_to(destination, target_is_directory=True)
+        return fetched, failure
+
+    monkeypatch.setattr(build, "_fetch_row", fetch)
+    harness.interrupt()
+    completed = record(harness)["entries"]["SYN-first"]
+    assert completed == {"completed": True, "reuse_unavailable": "receipt_unproven"}
