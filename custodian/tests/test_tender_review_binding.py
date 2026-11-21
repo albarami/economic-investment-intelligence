@@ -14,6 +14,8 @@ from hypothesis import strategies as st
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.assembly_tenders import archive_pages, terms_body_hash
 from eii_custodian.publicdata.confirm_s2_t13 import (
+    Confirmation,
+    WeightConfirmation,
     completion_evidence,
     load_confirmation,
 )
@@ -352,25 +354,82 @@ def test_each_host_and_key_guard_has_a_single_field_plant(tmp_path, plant):
 @pytest.mark.parametrize(
     ("field", "value"),
     [
-        ("page", "https://monaqasat.mof.gov.qa:8443/"),
-        ("page", "http://monaqasat.mof.gov.qa/"),
-        ("page", "https://evil.com\\@monaqasat.mof.gov.qa/"),
-        ("page", "https://evil.com\uff20monaqasat.mof.gov.qa/"),
-        ("terms_url", "https://monaqasat.mof.gov.qa:8443/TermsOfUse"),
-        ("terms_url", "http://monaqasat.mof.gov.qa/TermsOfUse"),
-        ("terms_url", "https://evil.com\\@monaqasat.mof.gov.qa/TermsOfUse"),
-        ("terms_url", "https://evil.com\uff20monaqasat.mof.gov.qa/TermsOfUse"),
+        pytest.param("page", "http://invented.invalid/", id="page_scheme"),
+        pytest.param("registry", "http://invented.invalid/x", id="registry_scheme"),
+        pytest.param("registry", "https://invented.invalid:8443/x", id="registry_port"),
+        pytest.param("page", "https://@invented.invalid/", id="page_userinfo"),
+        pytest.param("registry", "https://@invented.invalid/x", id="registry_userinfo"),
+        pytest.param("page", "https://invented.invalid/?a=1", id="page_query"),
+        pytest.param(
+            "page", "https://invented.invalid/?a=1&a=2", id="page_duplicate_query"
+        ),
+        pytest.param("registry", "https://invented.invalid/x?a=1", id="registry_query"),
+        pytest.param("page", "https://invented.invalid/#f", id="page_fragment"),
+        pytest.param(
+            "registry", "https://invented.invalid/x#f", id="registry_fragment"
+        ),
+        pytest.param("page", "https://invented.invalid/a b", id="page_space"),
+        pytest.param("page", "https://invented.invalid/a\tb", id="page_control"),
+        pytest.param("registry", "https:///x", id="registry_empty_host"),
+        pytest.param("page", "https://invented.invalid:8443/", id="page_port"),
+        pytest.param(
+            "page", "https://other.invalid\\@invented.invalid/", id="page_backslash"
+        ),
+        pytest.param(
+            "page", "https://other.invalid\uff20invented.invalid/", id="page_nonascii"
+        ),
+        pytest.param(
+            "terms_url", "https://invented.invalid:8443/terms", id="terms_port"
+        ),
+        pytest.param("terms_url", "http://invented.invalid/terms", id="terms_scheme"),
+        pytest.param(
+            "terms_url",
+            "https://other.invalid\\@invented.invalid/terms",
+            id="terms_backslash",
+        ),
+        pytest.param(
+            "terms_url",
+            "https://other.invalid\uff20invented.invalid/terms",
+            id="terms_nonascii",
+        ),
     ],
 )
-def test_reviewed_endpoint_must_be_same_safe_origin(tmp_path, field, value):
-    confirmation, entry, receipt = _fresh(tmp_path)
-    confirmation = replace(
-        confirmation, tender=replace(confirmation.tender, **{field: value})
-    )
-    if field == "terms_url":
-        entry = replace(entry, terms_url=value)
+def test_reviewed_endpoint_must_be_same_safe_origin(field, value):
+    from custodian.tests.test_s2_t13_confirmation import receipt as invented_receipt
+    from custodian.tests.test_s2_t13_confirmation import registry_record, tender
+
+    review = tender()
+    entry = registry_record(review)
+    receipt = invented_receipt(review, entry)
+    if field == "registry":
+        from eii_custodian.publicdata.fetch.allowlist import host_of
+
+        entry = replace(entry, url=value, fetch_host=host_of(value))
+        receipt["fetch_url"] = value
+        receipt["fetch_host"] = entry.fetch_host
+        if not entry.fetch_host:
+            review = replace(review, page="https:///a", terms_url="https:///terms")
+            entry = replace(entry, terms_url=review.terms_url)
+    else:
+        review = replace(review, **{field: value})
+        if field == "terms_url":
+            entry = replace(entry, terms_url=value)
     with pytest.raises(ValueError, match="do not confirm tender"):
-        completion_evidence(confirmation, entry, receipt)
+        completion_evidence(Confirmation(review, WeightConfirmation()), entry, receipt)
+
+
+@pytest.mark.parametrize(
+    ("page", "registry"),
+    [
+        ("https://invented.invalid/a", "https://invented.invalid/x"),
+        ("HTTPS://INVENTED.INVALID./a", "https://invented.invalid:443/x"),
+        ("https://invented.invalid/a%20b", "https://invented.invalid/x"),
+    ],
+)
+def test_reviewed_origin_valid_spelling_controls(page, registry):
+    from eii_custodian.publicdata.confirm_s2_t13 import _same_reviewed_origin
+
+    assert _same_reviewed_origin(page, registry)
 
 
 @pytest.mark.parametrize(
@@ -424,6 +483,57 @@ def test_reviewed_page_origin_oracle(scheme, host, port, path):
     assert (
         tender_disposition(replace(review, page=page), entry, sidecar).shown is expected
     )
+
+
+_ORIGIN_CASE = st.tuples(
+    st.sampled_from(["https", "HTTPS", "http"]),
+    st.sampled_from(
+        [
+            "invented.invalid",
+            "INVENTED.INVALID",
+            "invented.invalid.",
+            "other.invalid",
+            "",
+            "other.invalid\\@invented.invalid",
+            "other.invalid\uff20invented.invalid",
+        ]
+    ),
+    st.sampled_from(["", ":443", ":8443"]),
+    st.sampled_from(["", "u@", ":p@"]),
+    st.sampled_from(["/a", "/a b", "/a%20b"]),
+    st.sampled_from(["", "?a=1"]),
+    st.sampled_from(["", "#f"]),
+)
+
+
+@given(page=_ORIGIN_CASE, registry=_ORIGIN_CASE)
+def test_reviewed_origin_component_oracle(page, registry):
+    from eii_custodian.publicdata.confirm_s2_t13 import _same_reviewed_origin
+
+    def url(case):
+        scheme, host, port, userinfo, path, query, fragment = case
+        return f"{scheme}://{userinfo}{host}{port}{path}{query}{fragment}"
+
+    def valid(case):
+        scheme, host, port, userinfo, path, query, fragment = case
+        return (
+            scheme.casefold() == "https"
+            and host.casefold().removesuffix(".")
+            in {"invented.invalid", "other.invalid"}
+            and port in {"", ":443"}
+            and not userinfo
+            and path != "/a b"
+            and not query
+            and not fragment
+        )
+
+    expected = (
+        valid(page)
+        and valid(registry)
+        and page[1].casefold().removesuffix(".")
+        == registry[1].casefold().removesuffix(".")
+    )
+    assert _same_reviewed_origin(url(page), url(registry)) is expected
 
 
 def test_missing_tender_terms_has_named_build_refusal(tmp_path, monkeypatch):

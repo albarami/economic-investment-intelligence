@@ -17,7 +17,7 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from eii_custodian.publicdata.fetch.allowlist import host_of
+from eii_custodian.publicdata.fetch.allowlist import host_of, safe_https_shape
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import utc
 
@@ -40,20 +40,13 @@ CAVEAT = "No public tender source is recorded"
 
 def _same_reviewed_origin(url: str, origin: str) -> bool:
     """Bind a reviewed URL to the HTTPS endpoint of the registered fetch URL."""
+    if not safe_https_shape(url) or not safe_https_shape(origin):
+        return False
     try:
         parts, registered = urlsplit(url), urlsplit(origin)
         return (
-            parts.scheme.casefold() == registered.scheme.casefold() == "https"
-            and parts.port in (None, 443)
-            and registered.port in (None, 443)
-            and parts.username is None
-            and parts.password is None
-            and registered.username is None
-            and registered.password is None
-            and not parts.query
-            and not parts.fragment
-            and not any(ord(char) <= 32 for char in url + origin)
-            and "\\" not in parts.netloc
+            # O11-O14 backslash/ASCII checks are parser-differential defence in depth.
+            "\\" not in parts.netloc
             and "\\" not in registered.netloc
             and parts.netloc.isascii()
             and registered.netloc.isascii()

@@ -69,7 +69,7 @@ def safe_text(field_name: str, value: object) -> str:
 
 
 def checked_url(url: str, *, query: bool = False) -> str:
-    from ..fetch.allowlist import approve_closed, host_of
+    from ..fetch.allowlist import approve_closed
 
     try:
         if not isinstance(url, str):
@@ -89,7 +89,9 @@ def checked_url(url: str, *, query: bool = False) -> str:
         else:
             raise WebError("url_refused")
         if (
-            not approve_closed(url, hosts=frozenset({host_of(url)}), selectors=()).ok
+            not approve_closed(
+                url, hosts=frozenset({(parts.hostname or "").casefold()}), selectors=()
+            ).ok
             and not query
         ) or (
             parts.scheme != "https"
