@@ -3023,6 +3023,64 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED: ledger3 at 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c, with actual outcomes for the retained command rows and a fresh whole-test seed. Preserve ledger2's failed evidence and keep the CONFIRMED cf4 verdict at 4f1606b6 with the ledger3 result. A green rerun alone does not close OI-319, OI-341 or PO-S2-129 or prove criterion 1.
 - NEEDED BY: train S2-11's exact-head ledger and acceptance review of S2-T44 criterion 3 in that context.
 
+## OI-365 — S2-T35 box 2: the owner's wording for the census totals already in the repository
+
+- ID: OI-365
+- TYPE: OPEN
+- RAISED BY: lead, merge train S2-12 (pull request 112), 2026-11-21
+- CONCERNS: TASKS.md S2-T35 acceptance box 2 ("no such value enters the repository, a fixture, a brief or a document; …"), which stays open in this train.
+- EVIDENCE: the proposed wording file `.overnight/IN/S2-T35.box2.wording.txt` (one line) reads: "[ ] no such value enters the repository, a fixture, a brief or a document; the two published national census totals already in the PROGRESS.md rows of 2026-11-15 and 2026-11-16, in the core methods fixture of the train merged 2026-11-15 and in one earlier brief stay where they are by the owner's decision of 2026-11-21 05:36 (public figures may appear), and the lead's value-free guard, run before every push, refuses any new copy; where the expected values are kept is settled in the plan within AGENTS.md rules 13 and 14 and recorded". The box at WORK `1d90cdaaedf31b11b1ac8dfb950c1bce1169f372` still holds the shorter text. No value of the totals is written here.
+- NEEDED: a documents-only change that replaces the box 2 text with the wording above word for word, citing the owner's decision of 2026-11-21 05:36, reviewed by a maker other than its writer; the box stays unticked until a review return proves it.
+- NEEDED BY: closure of S2-T35 and the S2 gate.
+
+## OI-366 — test_clean_environment fails with no space left on device when /tmp is a small tmpfs
+
+- ID: OI-366
+- TYPE: OPEN (random failure, rule 39; environment)
+- RAISED BY: lead, merge train S2-12 (pull request 112), 2026-11-21
+- CONCERNS: `scripts/tests/test_clean_environment.py` when its hostile `UV_RESOLUTION` variants copy the uv cache under `TMPDIR`.
+- EVIDENCE: lead log 2026-11-21 09:04 (S2-P36.b1): "scripts suite 977 tests 1 error = test_clean_environment hostile UV_RESOLUTION copy hit Errno 28 on the 48 GB /tmp tmpfs (2.1 GB uv cache copied per variant while other whole tests ran); rerun ONLY that module with TMPDIR on disk: 16 OK (OWNER_RULES 32) -> environment random failure, open item proposed for the S2 ledger (rule 39)". An earlier instance, lead log 2026-11-20 15:42 (S6-2.ledger1): "two test_clean_environment cases failed only in the lead's /tmp run, ENOSPC copying the 22 GB uv cache to tmpfs; with TMPDIR on disk as the ledger runs it: 16 passed". Separately, lead log 2026-11-21 05:56 (S2-P32.b2) records that the S2-P32 builder's 7 test_clean_environment failures came from "its sandbox offline cache (pyyaml absent)", not from free space; S2-P32.rv1 (`evidence/S2-P32.rv1.return.md`) found all 16 tests passing in its own run. A green rerun alone does not close this item.
+- NEEDED: a decision on where the test's copies are placed or how much space it checks for before copying, so the failure is an explicit, named refusal rather than Errno 28; until then the lead runs the scripts suite with `TMPDIR` on disk and records it in each ledger row's environment.
+- NEEDED BY: the next train ledger after S2-12.
+
+## OI-367 — the S2-P36-F1 PROGRESS rows still say "uncommitted"
+
+- ID: OI-367
+- TYPE: OPEN (records; rule 38)
+- RAISED BY: lead, merge train S2-12 (pull request 112), 2026-11-21; S2-P36.cf1 records point 1
+- CONCERNS: the two PROGRESS.md rows headed "S2-P36-F1" (the append-only correction row "uncommitted round-one repair" and the final-files verification row "plus the uncommitted repair").
+- EVIDENCE: `evidence/S2-P36.cf1.return.md` (Anthropic Claude Opus 5.5, CONFIRMED (APPROVED) `eaa2c5ffc150149ac33f03f91483c291f437998e`) records point 1: the S2-P36-F1 rows still say uncommitted; the repair is commit `eaa2c5ffc150149ac33f03f91483c291f437998e`, joined in this train as `9af08bc3ceef374479d8c64d9a02a36c20c8f560`. The earlier S2-P36 row's "uncommitted repair" (S2-P36.rv1 records point 5, `evidence/S2-P36.rv1.return.md`) is already corrected by the S2-P36-F1 correction row, which names `812f499c62d78e683cb1b753165c8ccd5e2cc8f5`.
+- NEEDED: an appended PROGRESS correction row (never an edit of the earlier rows) stating that the round-one repair the two S2-P36-F1 rows call uncommitted is commit `eaa2c5ffc150149ac33f03f91483c291f437998e`, picked as `9af08bc3ceef374479d8c64d9a02a36c20c8f560`; the S2-12 log section carries that correction. Closed when the row is on main.
+- NEEDED BY: merge of train S2-12.
+
+## OI-368 — S2-P37 cf1 nit N2: the resume journal failure block repeats eleven times
+
+- ID: OI-368
+- TYPE: OPEN (nit; no behaviour change)
+- RAISED BY: S2-P37.cf1 reviewer (Anthropic Claude Opus 5.5), recorded by the lead for merge train S2-12 (pull request 112), 2026-11-21
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/build.py`.
+- EVIDENCE: `evidence/S2-P37.cf1.return.md`, N2 (simplification): "`build.py` repeats the same five-line `OSError` → `resume_record_write_failed` block eleven times. A small helper would cut the duplication, for example `_journal_failure(entry, lines) -> FetchFailure`. Behaviour is correct as it is." The verdict is CONFIRMED (APPROVED) `a94680281f0ec3e23feb032fe1b39d2efbfd0f62`; the nit does not block.
+- NEEDED: a later task that extracts the helper with its own plan, red-then-green test and other-maker review, keeping every planted resume failure red for its exact reason; or a recorded decision to keep the repetition.
+- NEEDED BY: no gate; before further change to the resume journal in `build.py`.
+
+## OI-369 — lead process: every timed job reserves its own cores
+
+- ID: OI-369
+- TYPE: OPEN (lead process)
+- RAISED BY: lead, merge train S2-12 (pull request 112), 2026-11-21
+- CONCERNS: timings and long ledger runs on the build machine; the core reservation file `tmp/cores.reserved` and a brief's `IN/CORES` file.
+- EVIDENCE: lead log 2026-11-21 09:54: S5RC-J1.f2's "timings are void: with no IN/CORES file it fell back to cores 0-3, the cores S2-11.ledger2 held, at host load ~42 (parts 1-3 hit 600 s). CAUSE FOUND for the ledger2 slowness too: two heavy jobs shared cores 0-3. FIX (OWNER_RULES 21): every brief that measures time gets an IN/C…" (the supplied log line ends there; the rest of the fix text is not in the evidence). Earlier launches already reserved cores in `tmp/cores.reserved` (lead log 2026-11-20 00:18, 2026-11-20 06:04; 2026-11-21 09:56 for LIVE-S2.r15).
+- NEEDED: the lead's written rule, in full, that every timed job's brief carries an `IN/CORES` file naming cores recorded in `tmp/cores.reserved` and that a job with no such file refuses rather than falling back to cores 0-3; S5RC-J1's timings rerun on reserved cores before any timing is used.
+- NEEDED BY: the next timed job (S5RC-J1 timings rerun) and the next train ledger.
+
+## S2-P30 — Audit-box dispositions: closing lines — 2026-11-21
+
+These lines close the three entries of the section "S2-P30 — Audit-box dispositions — 2026-11-21" further below, which say they await a different maker's confirmation; the entries themselves are not edited.
+
+- CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T11#5: the different-maker confirmation is S2-P30.rv1 (Anthropic Claude Opus 5.5; builder OpenAI Codex), **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, picked as `790455908bace46cef3bd23db2af7942a8a01314`; it names S2-T11#5 as a box that may be ticked, and the train ticks it. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and point 2.
+- CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T14#8: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T14#8 as a box that may be ticked, and the train ticks it. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and point 2.
+- CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T19#7: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T19#7 as a box that may be ticked, and the train ticks it. Its point 1 (case-fold the listed-table lookup) and point 4 (short identifiers) do not reject and stay as review notes. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and points 1, 2 and 4.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
