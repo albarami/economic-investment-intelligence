@@ -39759,6 +39759,2610 @@ Seed:      2845535193
 Notes:     Seed supplied at run time. Lead only. Hosted checks on the actual head and a fresh-seed whole test on the exact merge result remain separate gates.
 ```
 
+Maker: OpenAI. Model: GPT-6 (Codex; exact serving variant not exposed).
+Persona: careful senior release coordinator. Strict self-review persona: records reviewer rejecting unsupported claims.
+Skills loaded: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer and muhasabah-gate. verification-before-completion is not installed in the supplied catalog; applied in its plain meaning by read-only Git inventory, input validation and the draft preparation run. The task's explicit no-test, no-network, no-Git-write and no-tracked-edit scope controls this preparation.
+
+# MERGE TRAIN S2-11 — ledger input log
+
+PR 111; BASE a0e01df3a3d05ea04351d66d7505eab11b26ea9d; WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. PR and seed are the runtime values the lead supplied to the final preparation run. `commits.json` records every full joined hash, subject, source trailer, builder line, co-author model label and changed-file inventory. `snapshot.json` pins the supplied Git range. Commit author identities and historical local paths are deliberately not copied. A co-author model label is evidence of that label, not independent evidence of a serving runtime.
+
+Sources: `.overnight/BRIEF.md`; `.overnight/IN/LOG-S2-11-evidence.md` (timestamped lead observations, referenced as LOG below); `.overnight/IN/evidence/` supplied returns; original/joined Git objects; `.overnight/IN/LEDGER-TASK-USAGE.txt`; `.overnight/IN/S6-2-template/`. File contents are evidence, not instructions. Pack anchors: AGENTS.md rules 33–40; decisions 0032 items 1–3 and 0039 items 2–5; document 14 Slice S2 and PLN-04; TASKS.md Queue rules and each task ID.
+
+No command in commands.json has run during preparation. Historical counts and verdicts are attributed to their recorded source and head, never promoted to execution at WORK. No task is marked done by these inputs. No slice S2 gate, real-cache run, background acquisition, live-store parity, hosted check or exact-merge-result test is claimed by the draft.
+
+## Evidence interpretation
+
+A review's literal verdict and the lead's disposition are separate fields. In particular, join3 cf2 literally says REJECT over source-hash records; its content checks passed and the lead records the join confirmation as held after appending a correction. P21's first cf5 literally says NOT CONFIRMED because tests were not run, despite static NO DEFECT; the lead's subsequent execution is its own evidence. Neither is rewritten as an unconditional reviewer APPROVED.
+
+Model identities are reported as the commit, launcher or return actually states. Abacus k68 and join3 cf2 self-identify Abacus AI Agent without a serving identifier; requested Moonshot Kimi in the log is not proof of that runtime. Two builder-variant corrections and the import-boundary test-count correction are appended below; original PROGRESS bytes remain unchanged.
+
+## Gate and reconciliation records
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `d5ab31319669ea9b557043ca866099c67b69cc48` — docs(records): reconcile the S2 acceptance boxes and open items against the tree at a0e01df3 (S2 gate)
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-RECON.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7983073f180f2ed4ed9ee459f84d5d9236af848b` — docs(records): S2 records reconciliation: four unproved boxes re-opened, OI-262 pull request named, PO-S2-119 table reconciled, PO-S2-142 raised
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `1a9af25f9ffc71eb4b823de6f24f561f4ac70c0f` — docs(investment-pages): document 04 names the Arabic page list as listed and unconfirmed (S2-T39 records)
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a61be86507f06095273467063d686bc2be144229` — docs(records): OI-03 closed; decision 0025 Accepted under the advisor's signature at 9e90ef54; six registry rows resolved (S2 gate item)
+  - Builder: the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **triage/sample check — NOT READY**, target `d5ab3131`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:03. Return: `.overnight/IN/evidence/S2-triage.c1.md`. Four sampled ticks failed and were reopened in 7983073f; no blanket approval of the reconciliation.
+
+The lead recorded S2-RECON.b1 by OpenAI GPT-6.1 Sol at LOG 2026-11-20 17:41. Anthropic triage at 18:03 found four unsupported ticks; 7983073f reopens them at 19:09. Decision-0025/OI-03 acceptance is carried by a61be865 under the advisor signature at 9e90ef54 (LOG 21:24); this does not provide a blanket independent reconciliation approval. 1a9af25f corrects the Arabic-inventory description after a pilot observation verified by the lead (LOG 19:16).
+
+## P01
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `9db6d2bac4d77e89b81c978b5f8811fa00343856` — docs(s2): wording and contract-text sweep closes six gate holds (S2-T10, package P01)
+  - Original reviewed-work object: `74bddd3f18f0dabb7fb042c6f7810c88b8737bc1`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P01.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7bb043bf46c5341ac138a627dc34963f88e2a3d3` — docs(s2): wording sweep fix round 1, every sentence true of the code (S2-T10, package P01)
+  - Original reviewed-work object: `27efa1ab475b6847d7a9a3d2bd03cb3a2292dbc7`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P01.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `8b8f755b35704dc42f807b2bc751dd4615b12139` — docs(records): apply the P01 reviewers' record notes RN1 to RN4 (S2-T10, package P01)
+  - Original reviewed-work object: `87ba2237870c018fff9c7e76b14e0b4e8741fa8a`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `74bddd3f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:14. Return: `.overnight/IN/evidence/S2-P01.r1.md`. F1-F4; record notes preserved.
+- **c1 — APPROVED**, target `27efa1ab`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:21. Return: `.overnight/IN/evidence/S2-P01.c1.md`. Records-only 87ba2237 follows; log says verdict stands.
+
+Records helper: LOG 2026-11-20 18:41 launch and 18:43 result names Droid GLM-5.3 Flash for 87ba2237; the package review remains Anthropic. Source records-only diff: `.overnight/IN/evidence/S2-P01.records-diff.txt`.
+
+## P03
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `8a51d2921d32ec79f6857fef549ad50b372b8a97` — test(s2): planted violations for four intake guards without a deciding case (S2-T10, package P03)
+  - Original reviewed-work object: `5c5fd5dbb4c965f4aa01cd4b901111216c7260df`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P03.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `04678a95b8d3d093a3b712b1d909a3b5857e17a7` — docs(records): apply the P03 reviewer's record notes 1 to 3 (S2-T10, package P03)
+  - Original reviewed-work object: `f066fe3f0483b4c6f131733b83108e6b0efa926c`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `5c5fd5db`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:21. Return: `.overnight/IN/evidence/S2-P03.r1.md`. Records-only f066fe3f follows; log says verdict stands.
+
+Records helper: LOG 2026-11-20 18:41 launch and 18:44 result names Droid GLM-5.3 Flash for f066fe3f. Source records-only diff: `.overnight/IN/evidence/S2-P03.records-diff.txt`.
+
+## P04
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `280091f3417bafbf3432c689b83f36492f20365d` — fix(investment): crosswalk refresh leaves unmapped slots null and refuses bare digit runs in review references (S2-T39, package P04)
+  - Original reviewed-work object: `44e5e4d76ee5708d54349f932f293539d1b61e6b`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P04.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a501377d3835e9ea93cc2f1abddf09fd66122bbd` — fix(fdi): near-miss reference controls; source-receipted municipality-code target (S2-T39, package P04 fix round one, PO-S2-108)
+  - Original reviewed-work object: `efefbe124344f48a2d9c0515c09c41f1b76571c9`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P04.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `44e5e4d7`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:22. Return: `.overnight/IN/evidence/S2-P04.r1.md`. F1 near-miss controls.
+- **cf1 — CONFIRMED**, target `efefbe12`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:35. Return: `.overnight/IN/evidence/S2-P04.cf1.md`. P04 APPROVED is the lead disposition in this log entry.
+
+## P05
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `59998298aa6a9599a536fa5cd8aa8aca891d267e` — fix(methods): the methods fixture holds no census counts; card C1 prints both denominators with a pinned replay (S2-T10, package P05)
+  - Original reviewed-work object: `b5677c56ee9ed59bbf10b541180060b460e92e8b`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P05.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7501ea7af65eede7df25eb98a99aa0f26e981fcf` — test(methods): the no-census guard covers every census source and undeclared sources; reasons pinned per plant (S2-T10, package P05, review finding F1)
+  - Original reviewed-work object: `f28fec81d58db50e5a411fa5d8010b91ca868b1b`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `b5677c56`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:29. Return: `.overnight/IN/evidence/S2-P05.r1.md`. Lead applied exact F1 fix as f28fec81.
+- **cf1c — CONFIRMED**, target `f28fec81`. Maker: Cognition. Model: Devin SWE-2 High. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:35. Return: `.overnight/IN/evidence/S2-P05.cf1c.md`. P05 APPROVED is the lead disposition. Earlier cf1/cf1b routed attempts failed without a verdict.
+
+## P09
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `fc3b07d2e966cd989c0435bca6ec14f1eb509e26` — test(spine-triage): thin hand break pass, every return, continue and closed request field decided by a test (S2-T10, package P09, PO-S2-44)
+  - Original reviewed-work object: `6352bd097be559f647e423199108c953676a7e6f`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P09.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `fc71b168503b86b8f9fc8bd8e55bb17544d43c37` — test(spine-triage): the missing provider variable defaults to none, decided by a test (S2-T10, package P09 fix 1)
+  - Original reviewed-work object: `35a155ab3b8675b8240de1e73552249d3e324223`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P09.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1c — REJECTED**, target `6352bd09`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:50. Return: `.overnight/IN/evidence/S2-P09.r1c.md`. Provider-none deciding test missing; failed relay attempt r1b supplies no review.
+- **cf2 — CONFIRMED**, target `35a155ab`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:56. P09 APPROVED lead disposition; cf1 was stopped for a wrong commit in the brief.
+
+## P10
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `bf4084aa10ba39381479582d3a2e389c15fbf0bd` — test(assembly): every admitted registry slot reaches assembly whatever its terms; technical absences keep their reason and caveat to the final report (S2-T08, S2-T21; package P10, OI-164, OI-211)
+  - Original reviewed-work object: `3e8f7bdbf1b4387b62ad7af92892da1b89007e62`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P10.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `3e8f7bdb`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:45. Return: `.overnight/IN/evidence/S2-P10.r1.md`. Static review only; reviewer had no shell.
+
+## P12 / P14 — award spacing and declared museum field
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `ab04ee1e2db13a4cdf480a86c780f5869a4bb261` — fix(s2): award names collapse spaces after punctuation removal; museum rows read the declared measure field (S2-T29, S2-T11; packages P12, P14)
+  - Original reviewed-work object: `36f9de2d9d726e429b89df8b82caa8176b6b187f`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P12.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `36f9de2d`. Maker: Cursor. Model: Composer 2.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:24. Return: `.overnight/IN/evidence/S2-P12.r1.md`. P12/P14 combined; shared measure change approved; live coverage risk retained.
+
+## P19
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `ac65558dcf75dc7fa02a4ac175c213a0279448ab` — feat(publicdata): the ten open-data family tables, each with its contract (S2-T19, decision 0064 item 29; package P19)
+  - Original reviewed-work object: `486c993f5726a34c95422a43d7eb122ed7feba4a`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P19.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `488c3cb7e697216d8d95d131d2c66f5e134b68d8` — fix(publicdata): family tables keep Decimal cells, refuse wrong measure types and duplicate members (S2-T19, package P19 fix 1)
+  - Original reviewed-work object: `d52046e1bb2cd501944360d6e15d2438df481cf3`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P19.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `486c993f`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:45. Return: `.overnight/IN/evidence/S2-P19.r1.md`. F1-F3; criterion unticked.
+- **cf1 — CONFIRMED**, target `d52046e1`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:55.
+
+## P23
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `a3ccd934ef746daef8b6137b6661d5acf2a793c6` — feat(investment-pages): the Arabic page list and its kind rules, language-segment refusal (S2-T39, package P23, OI-181 offline part)
+  - Original reviewed-work object: `d76318af3567540b94f4c6e20b94b1a32a49b966`; source: exact cherry-pick trailer.
+  - Builder: Cognition Devin SWE-2 High (S2-P23.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `b399ea338a27acaccd121cd7b2018947472b8d22` — fix(investment-pages): a malformed inventory URL is refused by name (S2-T39, package P23 fix 1)
+  - Original reviewed-work object: `073239d42acdffdc96523ceedb4bbd7e83a7bbc8`; source: exact cherry-pick trailer.
+  - Builder: Cognition Devin SWE-2 High (S2-P23.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `d76318af`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:51. Return: `.overnight/IN/evidence/S2-P23.r1.md`. F1 malformed inventory URL.
+- **cf1 — CONFIRMED**, target `073239d4`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:58. Return: `.overnight/IN/evidence/S2-P23.cf1.md`. P23 APPROVED lead disposition.
+
+## P03b
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `2ccf429d3b7fff7e96b13e8aaf01f40bb5a75296` — test(fc-register): one deciding test per guard; 82 single-guard removal probes, 81 red on a named assertion (S2-T36, package P03b, PO-S2-113)
+  - Original reviewed-work object: `cde44fc546e0e845032c5fd503477e6042333b34`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P03b.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `1b90c7a6cc42d961363a4f52e2fa1d1e4a012be7` — test(fc-register): deciding plant for the duplicate request identity guard; PO-S2-113 closed (S2-T03, package P03b fix 1)
+  - Original reviewed-work object: `0e62c8e637bd9c60db7fd801329f716466369fc3`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P03b.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `cde44fc5`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:50. PO-S2-113 remains open at this review.
+- **r2 — APPROVED**, target `cde44fc5`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:58. Return: `.overnight/IN/evidence/S2-P03b.r2.md`. F-1 blocks closure of the item until the deciding plant.
+- **cf1 — CONFIRMED**, target `0e62c8e6`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:12. PO-S2-113 closed; records notes non-blocking.
+
+## P12b
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `56508e65d6323ee7ac40581371ffe737a01304d1` — fix(awards): record every award-link check with its closed reason and matched rate (S2-T29, package P12b)
+  - Original reviewed-work object: `f8f1dce2269a2e778152eb27ec3f1edb2d1ac9da`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P12b.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `947f726447e191ea46d4bbdc84a330454aa818f7` — fix(awards): bounded retries restored, early seed guard restored, final audit keeps counts and reasons only (S2-T29, package P12b fix 1, findings F1-F3)
+  - Original reviewed-work object: `0f3fcc2e0850e10b269a31bb317443b0d35fac87`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P12b.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `f8f1dce2`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:55. Return: `.overnight/IN/evidence/S2-P12b.r1.md`. F1/F2; lead ruling on F3 keeps final audit counts/reasons only.
+- **cf1 — CONFIRMED**, target `0f3fcc2e`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:12.
+
+## P15 / P20 / P22 — charset, price dates and school counts
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `836f82b759f42b10f3b91baa5cf4a4c368e3152d` — fix(s2): agency receipts carry the header charset; price figures carry their snapshot as_of; school count fields taken as published (S2-T39, S2-T19, S2-T29; packages P15, P20, P22)
+  - Original reviewed-work object: `99c6dfea33c280298444f60320e4d26e5a25d48b`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P15.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7a80eca553f4a8e30b6524e4a4cbee5807193560` — fix(publicdata): transport carries the charset header, validated; as_of guards wired into assembly; count and declaration tests (S2-T19/T29, package P15 fix 1)
+  - Original reviewed-work object: `cad38d49b919b3a9eee9bf43ee363f56af5f298a`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P15.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `ad336917a5c5da2c1f566b42a97d767b1e32dea5` — fix(investment-pages): header charset decides through the build, quarter rows checked against their own snapshots, school counts deciding test (S2-T39, S2-T19, package P15 fix 2, O1-O3)
+  - Original reviewed-work object: `93fec708c5efb1ac82336f487cc3929acba95dcc`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P15.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `99c6dfea`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:50. Return: `.overnight/IN/evidence/S2-P15.r1.md`. P15/P20/P22 combined; F1-F8.
+- **cf1 — NOT CONFIRMED**, target `cad38d49`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:12. Return: `.overnight/IN/evidence/S2-P15.cf1.md`. O1-O3 still open.
+- **cf2 — CONFIRMED**, target `93fec708`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:25. Return: `.overnight/IN/evidence/S2-P15.cf2.md`. P15 APPROVED lead disposition; notes N1-N4 applied at join.
+
+## Joins and integration fixes
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `500368f6f07fc7a3c1cd93cfe3a095c55f5538ba` — chore(records): package P15 joined; join resolution of assembly_layers and the item 46 line; PO-S2-133 closed; S2-T19 decision 0045 item 4 ticked (S2 join)
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `88d8ee02eedbddea69c6e4015a8cf32f99c20250` — chore(records): packages P11 and P06 joined; P11 review record notes applied; PO-S2-106 and OI-264 rows reconciled (S2 join)
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `9533fc496fb3ac80f4bd548d2cbf3c09177bc9bd` — test(join): forced test differences of the S2 join: awards receipt carries the link fields of P12b; tender gate row selected by task after P06 adds S2-T09
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `53c24050d2bc55ff0c719844f6b92bcff3e40703` — fix(join): the P18 host-delta check and the BACI basis note follow P29's lead-read host admission (S2 join, P18 x P29)
+  - Builder: the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `b2bcd06f8feeef8573a2fc1fa7c6e948d9cbbe18` — fix(join): the shared building fixtures supply the building manifest and its registered parts, and the four join conflicts are settled without widening a check (S2 join 3)
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `8ba3e4e1b1a9a6a8e5c0a5c6d9a6530cd49cc2d6` — fix(join): two lines of join fix 1 that the join did not force are removed: the building manifest path widened the build-boundary write allowlist, and a recorded-family entry no register-file row consults (S2 join 3, confirmation cf1 F1 and F2)
+  - Builder: the lead (Anthropic), applying cf1's exact fixes; needs another Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `8fdb23df4f06b90544dc0a1de05609859cc66ed0` — fix(join): the company-web command test imports the build command through the configured scripts path, so it collects under the isolated test runner (S2 join 3, lead whole test)
+  - Builder: the lead (Anthropic); needs confirmation by another maker (rule 33). Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a875fa985341393481d517042ddb69e619fb44bc` — fix(publicdata): the Overture listing check selects only whole-file parts, and building metadata stays out of the parquet stage and the gazetteer credit (S2 join 3, fix 1)
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `732550b5d1b908e0395c755b5fdf5592afcb896b` — fix(publicdata): the listing check skips only declared STAC metadata children and refuses every other non-part child before a request (S2 join 3, fix 2)
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a761a10520ba39ac53a10660548d4a3656eb0ae8` — test(publicdata): a misnamed json child under an Overture parent refuses before the listing request (S2 join 3, fix 3)
+  - Builder: OpenAI Codex GPT-6.1 Sol (test text from the confirming reviewer); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **S2-J1.cf1 — CONFIRMED**, target `9533fc49`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:08. Static confirmation of awards receipt and tender gate-row fixes.
+- **S2-JOIN.p18p29 — CONFIRMED**, target `53c24050`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:28. Static exact-host/basis-note confirmation.
+- **S2-join3.cf1 — REJECTED**, target `b2bcd06f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 23:51. Return: `.overnight/IN/evidence/S2-join3.cf1.return.md`. F1/F2 removed in 8ba3e4e1; other port/header/cadence/host plants hold.
+- **S2-join3.cf2 — REJECT (records-only F1); content checks passed**, target `8ba3e4e1`. Maker: Abacus.AI (self-report); requested Moonshot Kimi in launcher. Model: Abacus AI Agent; exact serving model NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 00:24. Return: `.overnight/IN/evidence/S2-join3.cf2.return.md`. Lead treats content as CONFIRMED under standing records-only rule after appended correction. This is the lead disposition, not a rewritten reviewer verdict.
+- **S2-join3.cf3 (initial) — CONFIRMED statically; NOT COUNTED by lead**, target `8fdb23df`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 00:19. Review sandbox ran no test; cf3b replaces this confirmation.
+- **S2-join3.cf3b — CONFIRMED**, target `8fdb23df`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 00:23. Return: `.overnight/IN/evidence/S2-join3.cf3b.return.md`. Execution and module-identity plants; maker differs from lead Anthropic.
+- **fx1cf — REJECTED**, target `a875fa98`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 01:34. Return: `.overnight/IN/evidence/S2-join3.fx1cf.return.md`. Malformed/unknown children skipped; other consumer fixes pass.
+- **fx2cf — REJECTED**, target `732550b5`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 01:58. Return: `.overnight/IN/evidence/S2-join3.fx2cf.return.md`. Code correct; missing STAC-name guard plant.
+- **fx3cf — CONFIRMED**, target `a761a105`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 02:10. Return: `.overnight/IN/evidence/S2-join3.fx3cf.return.md`. Source unchanged; nine-key plant; model-name correction owed.
+- **S2-join4.jc1 — CONFIRMED**, target `7ad369aa`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 03:23. Return: `.overnight/IN/evidence/S2-join4.jc1.return.md`. Six picks and one forced command docstring; no tests run by this confirmer.
+
+## P11 / P13 / P16 — alias removal, series reasons and suite timings
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `a07bf5cff7f9f9a6f52f0e924f6128bf92edebf8` — fix(series): the municipality alias file retired (frame and reviewed names only), empty multi-source tables keep their own exclusion reason, each test suite prints its own time (S2-T08, S2-T10, package P11: OI-174 code, PO-S2-106, OI-264)
+  - Original reviewed-work object: `4891a69ff2bf1615d17bc4f5cea03e12968caecd`; source: exact cherry-pick trailer.
+  - Builders: Moonshot Kimi K3.1 Pro via Abacus (S2-P11.b1, partial tree) and OpenAI GPT-6.1 Sol via Codex (S2-P11.f1, finished and judged every inherited hunk); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `4891a69f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:28. Third maker after partial Moonshot tree and OpenAI completion; two nits and five notes; lead scripts suite rc0. Return file not supplied, log is the source.
+
+Builder history correction: the 19:06 claim that the Moonshot partial session had already ended was corrected at LOG 19:20 (UTC/local-time and launcher-detection error). Moonshot partial work was inherited and every hunk judged by OpenAI; the commit explicitly names both builders. The copied in-progress return was not a genuine Moonshot completion report. Anthropic was the third maker. Lead scripts exit evidence: `.overnight/IN/evidence/S2-P11.lead-scripts.txt`; no sandbox-error blanket is used as an approval.
+
+## P06
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `6dfb8a23bd2e7f4a1673b6b1f2f8a8134b67c220` — feat(method-cards): resolve method-pin lineage and add the pin producer (S2-T09, package P06, OI-282 code part)
+  - Original reviewed-work object: `01b5cbd3086b50222eca6bc946abf5d5d032c65f`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P06.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `5db5d8a8a3941e8b288de6181195fc85852c3803` — fix(method-cards): registry families by source, method-pin completion wired into S2 acceptance, every pin guard planted (S2-T09, package P06 fix 1)
+  - Original reviewed-work object: `9fe796080efb744ef3bfba90e75eb374ec4096df`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P06.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `913c518b93342f5a12a2f1ba2084b849147a2c60` — test(method-pins): checked method-pin evidence reaches require_complete through the production gather path; missing, pending and corrupt evidence refused (S2-T09, package P06 fix 2, finding F2)
+  - Original reviewed-work object: `a2b70dffff9675142ab4f09da0bc2e80e33123fb`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P06.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `aa5a2cefb887ddf24fcf361b793aeede8e6e1774` — test(method-cards): missing-record plant unmasked, direct producer schema-version plants, artifact_matches_config positive and mismatch pair, confirmation-task plant restored to full strength (S2-T09, package P06 fix 3)
+  - Original reviewed-work object: `b604163b3a54def0b596101d8d750e38bcbc4200`; source: exact cherry-pick trailer.
+  - Builder: Anthropic Claude Opus 5.5 via Claude Code (S2-P06.f3); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `01b5cbd3`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:54. Return: `.overnight/IN/evidence/S2-P06.r1.md`. F1-F3.
+- **cf1 — NOT CONFIRMED**, target `9fe79608`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:05. Return: `.overnight/IN/evidence/S2-P06.cf1.md`. F2 still open.
+- **cf2 — NOT CONFIRMED**, target `a2b70dff`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:20. Return: `.overnight/IN/evidence/S2-P06.cf2.md`. Masked missing-record plant and missing pairs.
+- **cf3 — CONFIRMED**, target `b604163b`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:28. Return: `.overnight/IN/evidence/S2-P06.cf3.md`. Final fix maker Anthropic differs from confirmer OpenAI; P06 APPROVED lead disposition.
+
+## P24 / P08 — official reference readings and satellite contract
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `2c6911ba7df873ab6a3ca6f449b161e0a1fd7845` — docs(reference-notes): official-page readings for the engine READ rows and the satellite backup provider contract, with quotations and body hashes (S2, package P24: P08 OI-200, OI-224; P24)
+  - Original reviewed-work object: `94bb9e20aab121124d0dbe4d4bb9c20f920187e8`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P24.b2); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a20042f30b548fe57dd751255c2976670a1a8fc6` — fix(reference-notes): satellite backup refusal plants for raster masks and coverage, notes and records corrected (S2, package P24 fix 1)
+  - Original reviewed-work object: `ee2f53eda962a18c75395f9c7fbaa41cb7fa5eaa`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P24.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `94bb9e20`. Maker: Cognition. Model: Devin SWE-2 High. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:28. Return: `.overnight/IN/evidence/S2-P24.r1.md`. Includes P08 reference readings; F1/F2.
+- **cf1 — CONFIRMED**, target `ee2f53ed`. Maker: Cognition. Model: Devin SWE-2 High. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:48. Row counts/allowances remain live evidence.
+
+## P18
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `d4147e4ae30239252d9a4899519c2f10bc8e3b68` — feat(trade-sources): publisher readings recorded with page hashes and exact words; trade free budgets as publisher facts; unverified items left open (S2-T23, S2-T24, S2-T25, package P18)
+  - Original reviewed-work object: `7e7b216f87b3fdecbf659f8346bb8ecf337b026d`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P18.b2); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `91d49de5c3dcb6a7ad77032b2ce0f33bdc61faf0` — fix(trade-sources): tier words not over-claimed and S2-T23 criterion 4 left open, terms words restored, read hosts never admitted to the fetch list, host set bound to pages fetched, licence tokens (S2-T23 to S2-T26, package P18 fix 1, ruling L-1270)
+  - Original reviewed-work object: `d989f0e722d2debec5b72f0b2eac8e69138a91db`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P18.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `5d784895d6a9bcbfe3f3226351bbf516b63ff328` — test(trade-sources): the partial-budget test pins each recorded figure to its quoted value (S2 package P18, confirmation finding F6)
+  - Original reviewed-work object: `23d40cf2cef54b7dfafc9ad6fc7f9c0034e4f75f`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `7e7b216f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:20. Return: `.overnight/IN/evidence/S2-P18.r1.md`. F1-F5; L-1270 read-host versus fetch-host distinction.
+- **cf1 — NOT CONFIRMED**, target `d989f0e7`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:48. Return: `.overnight/IN/evidence/S2-P18.cf1.md`. F6 only; lead exact test fix 23d40cf2.
+- **cf2 — CONFIRMED**, target `23d40cf2`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:59. No closed tier-limit criterion is inferred.
+
+## P21
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `2640b427a3a3e092886522ff069a5bc3dcb66093` — feat(heights): cited landmark hand list, building-atlas registry row and calibration by class, non-skippable heights step (S2-T20, package P21)
+  - Original reviewed-work object: `c74d904b20c640c76be23285ce0b9a34b4fa5378`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P21.b1); committed by the lead. The lead unticked the decision 0064 item 25 box (live measurement pending). Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `dd1a2624daaa89f8379abf61aa9273819f0e63ae` — fix(heights): invented values only in fixtures; real atlas registry row pending its direct URL; landmark list pending; heights step refuses a missing table; one calibration policy; non-finite and duplicate refusals (S2-T20, package P21 fix 1)
+  - Original reviewed-work object: `9dd4af495c2807209094322ebdcb8d2a22c5f65a`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P21.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `36af3629abe2cac8afea09ef69526c76db501a84` — fix(heights): citations bound to registry and receipt, manifest hand-list hash, stale outputs cleared, missing building table propagates, atlas calibration parity and negative cases (S2-T20, package P21 fix 2)
+  - Original reviewed-work object: `0b7aec34c9d55a778a92357a813728407866a57a`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P21.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `9cace1114311f55d8c0aa29c989a48589d813d57` — fix(heights): deciding tests for the calibration and boundary paths, records name only what fix 3 proves (S2 package P21 fix 3)
+  - Original reviewed-work object: `9aed1d638f7058c01f130f1a2b84276295927543`; source: exact cherry-pick trailer.
+  - Builder: Anthropic Claude Opus 5.5 via Claude C (S2-P21.f3); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `48f63c0fc633317e299641b497e1e0ff0e475df5` — fix(heights): the building-atlas registry row counted, quoted and listed as pending (S2 package P21, lead fix)
+  - Original reviewed-work object: `93e64014d2577f7ad6f6be305c0c87efccdd28a6`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7b6577c4658684f72bc900867884baaa623b3e37` — docs(heights): the building-atlas terms row moved into the terms-readings table (S2 package P21, cf4 finding)
+  - Original reviewed-work object: `da34671ea2e381caf1eda889e2262d37216d85b7`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `2b09203efc5fff82a3c97a8992eb9ab83792c6e6` — test(heights): one shared invented building table for every build fixture; the refusal of a missing table kept and proved (S2 package P21, fix 4)
+  - Original reviewed-work object: `1b15b7207a25f2cf9f3fdfeaf5b211a21aba855a`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P21.f4); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `18c3b0692c067edd482bdee9f7c8d8ba5a3e48cd` — test(heights): fixtures keep their data root inside their own temporary folder, cleanup removes only the table it created, and the write check names the exact height outputs (S2 package P21, fix 5)
+  - Original reviewed-work object: `280e8f14964a500dd6ca166ca9a87df002dd2391`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P21.f5); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `67261c66a3d82eecda19be5b14c05a05587aa984` — test(heights): every build fixture keeps its data root and height outputs inside its own temporary folder, the cleanup plant uses the original triggering layout, and the write scan covers the whole fixture folder again (S2 package P21, fix 6)
+  - Original reviewed-work object: `101cb6bf2addfd26de527c2d9eadd43e0381ae88`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-P21.f6); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `c74d904b`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 18:53. Return: `.overnight/IN/evidence/S2-P21.r1.md`. F1-F7.
+- **cf1 — NOT CONFIRMED**, target `9dd4af49`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:12. Return: `.overnight/IN/evidence/S2-P21.cf1.md`. Code versus live halves kept separate under L-1268.
+- **cf2 — NOT CONFIRMED**, target `0b7aec34`. Maker: OpenAI. Model: GPT-6 (Codex return; launcher variant only where separately sourced). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:25. Return: `.overnight/IN/evidence/S2-P21.cf2.md`. Deciding tests still owed.
+- **cf3 — CONFIRMED**, target `9aed1d63`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:59. Static confirmation.
+- **cf4 — NOT CONFIRMED**, target `93e64014`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:08. Terms row in wrong table; lead fixes da34671e.
+- **cf5 (first use of label) — NOT CONFIRMED**, target `da34671e`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:15. Static NO DEFECT; tests not run. Lead then ran registry/heights and plant and treated lead fixes as confirmed; do not rewrite reviewer verdict.
+- **cf5 (label reused for fix 4) — REJECTED**, target `1b15b720`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:14. Logged late; finished 21:49. Cleanup/write allowance F1/F2.
+- **cf6 — REJECTED**, target `280e8f14`. Maker: OpenAI. Model: Codex; exact variant not specified in this result line. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:41. False deciding plant, escaped fixture outputs and narrowed scan.
+- **cf7 — CONFIRMED**, target `101cb6bf`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 23:02. Return: `.overnight/IN/evidence/S2-P21.cf7.return.md`. Final fix maker OpenAI; P21 APPROVED locally is lead disposition. N1 carried as proposed item.
+
+Builder switches: initial build and fixes 1/2/4/5 are Cursor Composer 2.5; fix 3 is Anthropic Claude Opus 5.5; final fix 6 is OpenAI GPT-6.1 Sol. Those switches matter to the different-maker confirmations. Live landmark, atlas and national-height proof remains open; fixture test counts are not public coverage. LOG reuses cf5 for two different reviews; both are retained above with their actual targets.
+
+## P26
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `cda5204c516f20a4f6b1c63a40e0f7b81095f719` — docs(decisions): decision 0073, the owner's S2 gate decisions on the district subject, the venue-visit notes and the spike assertion; OI-102 and PO-S2-116 closed, S2-T44 box 5 ticked with its exception (S2 package P26)
+  - Original reviewed-work object: `2f0edc25c0c56cca97390a41d831aaaabe337f84`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P26.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `2f0edc25`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:09.
+
+## P27
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `09a12a0de984d334edfcb46b18f59abf9c580d76` — docs(decisions): decision 0074, company-level fields of the owner's company workbook read in the lead's shell only; OI-186, OI-187 and OI-190 decided; new task S2-T48 for company web pages (S2 package P27)
+  - Original reviewed-work object: `c13e8d1fc4530d62f2abdee917643a6e903584cf`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P27.b1, b2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `189703677d70f70e06e76b7a489238c022a442c4` — docs(records): review r1 record notes of decision 0074 applied; S2-T48 names a planted test for every guard (S2 package P27)
+  - Original reviewed-work object: `bdde2060b25698fc109a3105024e84f02b4f507d`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — APPROVED**, target `c13e8d1f`. Maker: Cognition. Model: Devin SWE-2 High. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:19. Five records notes applied in bdde2060.
+
+## P17
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `70ad67d1a6ca5fb309a1784ca3b3d1309e65c484` — docs(tasks): task S2-T49, the commerce and financial-centre register Public tables; OI-162 closed (S2 package P17)
+  - Original reviewed-work object: `4f7bd371daa417cb5c8de2865a25f317c23ccb8f`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P17.b2); committed by the lead because the builder does not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `97155b0978b845b3375442f7af4aa598998b80c3` — fix(tasks): S2-T49 names the three registration-number tables; the S3-T12 amendment keeps the permitted employee count; a test guards the amendment (S2 package P17, review r1 findings 1-3)
+  - Original reviewed-work object: `e39fdce11c3bcfcbcf41b0b9b5604518ff2f35c2`; source: exact cherry-pick trailer.
+  - Builder: Cursor Composer 2.5 (S2-P17.b3); committed by the lead because the builder does not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `4f7bd371`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:18. F1-F3; first uncommitted proposal held pending owner decision at 18:33.
+- **cf1 — CONFIRMED**, target `e39fdce1`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:23.
+
+## P25
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `8e5364b2de3c3448aadb008cae45c1eae5e21563` — feat(activity-review): activity mappings signed by model review admit only an audited batch of another maker; baskets confirmed, OI-16 closed (decision 0075; S2 package P25)
+  - Original reviewed-work object: `91d7c9ae787df8e9b26cf85a41318276de2824cb`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P25.b1); committed by the lead because the builder's sandbox could not commit. The lead renumbered the record 0072 to 0075 (0072 is taken on the S3 stack); 393 focused tests passed after the renumbering. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7c40b74a7e051daa22766aafb0c7ba2ee5ecb174` — fix(activity-review): the committed binding removed so the triage stays green; any case or spacing of the model-review role meets the audit (S2 package P25, review r1 F1 and F2)
+  - Original reviewed-work object: `270edc4ec316e457b085817d276ce5ecd49a5f5f`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P25.f1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `57c123c811ccc3327e46f69a2c14435856a43a63` — fix(activity-review): an underscore spelling of the model-review role meets the audit too (S2 package P25, confirmation cf1 F2)
+  - Original reviewed-work object: `28f5aa116f0def144e282fc8a78918e0d7f40f15`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P25.f2); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `4edfe1ea9d21a686cd79172d998c1fbf2f0bc757` — docs(records): the maker of the P25 fix round 2 corrected by an appended line (S2 package P25, confirmation cf2 note 1)
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `91d7c9ae`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:08. F1/F2; lead renumbered decision 0072 to 0075 before review.
+- **cf1 — NOT CONFIRMED (F2)**, target `270edc4e`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:18. F1 and N1-N3 closed; underscore spelling bypass remains.
+- **cf2 — CONFIRMED**, target `28f5aa11`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:26. Maker correction already appended in 4edfe1ea.
+
+## P02
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `0fc401d84a3c73b90f10e213d58b7502606375f0` — test(performance-spike): readiness diagnostics kept per page; random-failure cause records for OI-163, OI-227, OI-319, OI-341 and PO-S2-23 (S2 package P02)
+  - Original reviewed-work object: `db1e26f8adeeefd7e27595c93adcdd9683a8b216`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P02.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a754757de8fd0116e621c1e65b5174a6315094bc` — test(performance-spike): open() registration, the settled check after goto and the rejected-goto report each decided by a test (S2 package P02, fix 1)
+  - Original reviewed-work object: `21526c419de1e8e9c7d0bbe82701bdf23412d512`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-P02.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `5bc7c1843afab34d13af0fd76a13606b947a0c70` — docs(records): P02 confirmation notes N1 and N2 appended (S2 package P02, confirmation cf1)
+  - Builder: the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `db1e26f8`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:24. F1-F3; source is log only.
+- **cf1 launch — NOT FOUND IN EVIDENCE**, target `21526c41`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:52. Log launches confirmation, and 21:24 joins with notes N1/N2. Neither supplied return nor explicit final verdict found; notes do not prove APPROVED.
+
+The supplied LOG records the cf1 launch and later joined notes, but has no explicit final cf1 verdict. The return is absent. This gap is G01, regardless of the brief describing all packages as approved. Git 5bc7c184 carries a commit-attribution correction, not an independent final verdict.
+
+## P29
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `dfe46db9432ea12ed7624294910e1952beb6f123` — feat(trade): the owner-confirmed trade selection recorded; inputs selected and not yet fetched can never be compared (S2 package P29, PO-S2-80)
+  - Original reviewed-work object: `cc6788f8202481ec72b53d37c62db709a4cca2ba`; source: exact cherry-pick trailer.
+  - Builder: OpenAI GPT-6.1 Sol via Codex (S2-P29.b1); committed by the lead because the builder's sandbox could not commit. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `038785741d17e492b9e066916bc6a2db5e89fdd0` — feat(trade): BACI registry row from the publisher's page; fetch stays pending its archive configuration (S2 package P29, round 2)
+  - Original reviewed-work object: `b04402473dcf7277879b54fcfba4c8c65430d6ec`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-P29.b2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `accb6bae7bfa21e2266a3cd96289071b95d705f7` — fix(trade): deferred 2025 portal file kept out of comparison, BACI licence link from the publisher page, the one reviewed page selector, archive member inventory configured (S2 package P29, fix 1)
+  - Original reviewed-work object: `b68d8b9cf907771030701586842e3ed828e00856`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-P29.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **r1 — REJECTED**, target `b0440247`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:46. Package/diff/readings absent from review tool context.
+- **r2 — REJECTED**, target `b0440247`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:50. F1 deferred 2025, F2 licence link evidence, F3 reviewed URL.
+- **cf1 — CONFIRMED**, target `b68d8b9c`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:14. Static only; no shell. Archive activation still blocked.
+
+## S2-T49
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `4fecee18fdd34ccaad6a38ba3e326b298b7a30dc` — feat(registers): the two public register tables as closed contracts, monthly snapshots kept, release and egress guards (S2-T49)
+  - Original reviewed-work object: `77cb59a962da56d61dad80ca4d9a5bc62579cbf4`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T49.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `c1b62bfec637fbff6e4f6964f15c9b56355e1378` — fix(registers): cross-source key guard decided by its own plant, identifier scan as DAT-11 says, own-source snapshot months, document 03 row restored (S2-T49, fix 1)
+  - Original reviewed-work object: `d4b3e3c854f99df2e1b6d71dcac3cc87d9f986e3`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T49.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `e0a85758b79899380e5ad4ba8f280291e9fe4c34` — fix(registers): the release-wide scan keeps nested, bytes and unknown-type values and the digest exemption; invented licence values the lead found in the real files replaced (S2-T49, fix 2)
+  - Original reviewed-work object: `3f4a1dbafad746cb7b24f5168e6b509698f3fb20`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T49.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **dr1 — REJECTED (design)**, target `plan r1`. Maker: Cognition. Model: Devin SWE-2 High. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:28. Findings bind build.
+- **r1 — REJECTED**, target `77cb59a9`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:27. F1-F6 under L-1288.
+- **cf1 — REJECTED**, target `d4b3e3c8`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:45. C1 release-wide scan narrowing.
+- **cf2 — CONFIRMED**, target `3f4a1dba`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:55. No real register value is reproduced in this log.
+
+## S2-T50
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `52fc71eeb947493b62db1a2e25a8e4771f399d91` — feat(calc): C2 bulk months by the centred thirteen-month median (decision 0078, S2-T50)
+  - Original reviewed-work object: `cdad4afbce8fea18d8532d519b23d0874704f989`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T50.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `8cb42025c24969b161a1a7ddbe59cb5fc0443b78` — test(calc): the C2 fixture's method version is asserted; review r1 notes applied (S2-T50, follow-up)
+  - Original reviewed-work object: `10ba2d2c714c8bc08bad2a9b86bb7f5eb41e9498`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T50.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `982c645cf41b96429a30c1ff2f9c98bed838482f` — docs(methods): the 2015-12 C2 sentence states the full window, seven of its months zero (S2-T50, confirmation finding A)
+  - Original reviewed-work object: `d2720ed34f77a1a19731b948dd00aae1cf2dea15`; source: exact cherry-pick trailer.
+  - No explicit Builder line in the commit. Lead/records authorship, where recorded, is in the join or package log entries below; no runtime identity inferred.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **dr1 — REJECTED (design)**, target `plan r1`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:29. Recomputation match; two test gaps bind build.
+- **lens B — APPROVED (recomputation)**, target `cdad4afb`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:45.
+- **r1 — APPROVED**, target `cdad4afb`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:48. Non-blocking findings carried into follow-up.
+- **cf1 — CONFIRMED findings 1, 2, 4; A raised**, target `10ba2d2c`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:54. Lead applies exact document fix d2720ed3; do not claim all findings confirmed on this head.
+- **cf2 — CONFIRMED**, target `d2720ed3`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:56. Document fix only. Pinned method run and failing wider data tests are separate lead evidence.
+
+Lead real-cache observations, not preparation runs: LOG 2026-11-20 21:50 reports pinned methods exit 0, 9 passed on cdad4afb; at 21:57 the wider data_tests reports 9 passed and 13 failed in restricted findings. Supplied sources: `.overnight/IN/evidence/S2-T50.data_tests.pinned_methods.txt` and `S2-T50.data_tests.all.txt`. The wider failure is not silently removed. At 22:17 the lead records set-B expectation/plant/restore runs with remaining named failures, sources `S2-T35.lead_restricted.run1.txt`, `.plant.txt`, `.after.txt`; no values or local digests are copied here. Final-head reruns remain owed.
+
+## S2-T20L — national building-table producer
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `3430f4ae3486d088f986c2218bda910feaf94abb` — feat(buildings): the building-table producer from the three pinned footprint parts, with its manifest bound into the frame and height records (S2-T20L, decision 0077)
+  - Original reviewed-work object: `b4faa2c427e225fc9fdf0089f7f695c95d3e42f7`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T20L.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `b7d2dbcf21456cfa1a9939ef368f139202a7ea51` — fix(buildings): staged-table failure refuses as building_table_invalid on both callers, manifest-last and places-incomplete decided by tests, counts of kept rows (S2-T20L, fix 1)
+  - Original reviewed-work object: `424639020be7eff3ffb899f88eb704b78aa26e73`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T20L.f1); records adjusted by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `5474500b96d62f6359c83fa7f7dcf3e41bfa07c7` — fix(registry): the four STAC rows of the building release carry the licence fields of the release's own row, and the decision 0026 count includes them (S2-T20L, fix 2)
+  - Original reviewed-work object: `8d5d30720563d6123f6b5d16209d2a1effc0057a`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T20L.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **dr1 — REJECTED (design)**, target `plan r1`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:50. F1-F8; L-1285 binds build.
+- **lens B — APPROVED**, target `b4faa2c4`. Maker: Zhipu (GLM model family; launch names GLM). Model: GLM-5.3 via relay. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:52. Four record notes carried into fix round.
+- **r1 — REJECTED**, target `b4faa2c4`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:58. R1-R3 plus R4/R5.
+- **cf1 — CONFIRMED**, target `424639020be7`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:12. Later lead registry check reproduced two failures on the task head; fix 2 follows.
+- **cf2 — CONFIRMED**, target `8d5d3072`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:28. Static. Manifest/fixture integration subsequently fixed at join; decision 0077 remains Proposed at HEAD.
+
+## S2-T48
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `8965c54a6b34ea9168a5f3ee34ac97b51d395f1a` — feat(company-web): company web pages found by search, fetched whole, extracted and reviewed under decision 0076 (S2-T48)
+  - Original reviewed-work object: `ec1e228556a45b807626ea5bf2acda112bfdf6be`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T48.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `ca686fe1db1982e9dcd92b9907154b8ce3450094` — fix(company-web): search obeys robots, source fragments hashed before field assembly, trading names pass the input boundary (S2-T48, fix 1)
+  - Original reviewed-work object: `2d792f237e4de6bdd1e619c05e0eea7af1e4791e`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T48.f1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `0f5431796d7ab734d98287eb5b98ccf60d9da4e8` — fix(company-web): a refused field carries no candidates, per-candidate fragment binding planted, numeric host spellings and contact blocks refused (S2-T48, fix 2)
+  - Original reviewed-work object: `9812c1db7797964192b35a21262cf5f10a319cc1`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T48.f2); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `2d255755b1f34620c4b63929ce457b173d80db86` — fix(company-web): every text run of a fragment is checked on its own, so fused neighbours cannot slip the person and contact guard; the selector-path check decided by its own plant (S2-T48, fix 3)
+  - Original reviewed-work object: `3154a0a9f159ddac596d225d86ea51206cf26a2c`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T48.f3); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `8b9679f708734b873980efb7802caff354fec827` — fix(company-web): every contiguous span of adjacent text runs within a bounded window is checked, so a word split across inline tags and fused to a neighbour is refused (S2-T48, fix 4)
+  - Original reviewed-work object: `20e93dc6acfc137f4e18c54eaf79555bbfd26c3f`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T48.f4); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `92f813177d77936cd9bea9c32d7a2349fa795f3a` — fix(company-web): the span scan cuts each long run to twice the window at its far edge, with a neutral stand-in of the same class, so the guard stays complete and its cost bounded (S2-T48, fix 5)
+  - Original reviewed-work object: `3a0548f07a09ed0ca70e7d69a97bf4bdd070e88b`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **dr1 — REJECTED (design)**, target `plan r1`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:29. Fourteen findings; plan revised under L-1281.
+- **r1 — REJECTED**, target `ec1e2285`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:28. F1-F3, N1-N4, R1-R5.
+- **cf1 — REJECTED**, target `2d792f23`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:53. C1/C2, CN1/CN2 and records.
+- **cf2 — earlier items closed; D1/D2 raised**, target `9812c1db`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:06. Do not convert partial closure to task approval.
+- **cf3 — REJECTED**, target `3154a0a9`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:37. E1/E2.
+- **cf4 — REJECTED**, target `20e93dc6`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 23:13. Return: `.overnight/IN/evidence/S2-T48.cf4.return.md`. Correctness closed; blocking cost finding F1; P1 residual scanner proposal.
+- **cf5 — CONFIRMED**, target `3a0548f0`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 23:27. Return: `.overnight/IN/evidence/S2-T48.cf5.return.md`. Lead disposition APPROVED locally; nits N1/N2 and P1 remain.
+
+## S2-T51
+
+Commit inventory (full Git objects; the subject is exact):
+
+- `416c2939e5dc34ea9b477e1f48071ad9de8e1f03` — feat(gis): dated imagery snapshot in its own lead-shell mode with a verified release seam, and an offline structured address search over the published address points (S2-T51, decision 0079)
+  - Original reviewed-work object: `a3fcc720ffd32f0d9023c29043b9a7c1c9dbfc58`; source: exact cherry-pick trailer.
+  - Builder: Codex GPT-6.1 Sol (S2-T51.b1); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `198f9e64ed27d3dcbde7abb1ebe3146a860af64c` — fix(gis): one machine-wide run lock, persistent missing tiles recorded as gaps, a strict imagery folder check in the sandbox, and one closed Public-chain receipt schema checked at resume and at release selection (S2-T51, fix 1)
+  - Original reviewed-work object: `5945b0a816462424d4a8598700dc29e9bb7d31f4`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `75453225d0f9ce1ff84ae9453b45dd37553b060f` — fix(gis): outages and throttling stop the snapshot resumably instead of becoming gaps, the product hash cache ignores access time, tests use their own lock name, and four existing guards gain their own plants (S2-T51, fix 2)
+  - Original reviewed-work object: `b21af69f5c31adffb032e32a36a51342909032e3`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `a577166d3c13f56b567e1c6ef4a25768725623a4` — fix(gis): boundary chain and shard lineage are checked at resume and selection, assembly carries the all-date manifest and receipt, tiles must decode, and gap records carry consistent status and attempts (S2-T51, fix 3)
+  - Original reviewed-work object: `709e67e41f3cd690f1a958d69bfe949b10100a07`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `6b8d073d93861567d2b725e5ae6252669023f2a3` — fix(gis): a tile gap that follows earlier retries stops resumably before any shard is published, and a fresh first-attempt 404 on resume is the recorded gap (S2-T51, fix 4)
+  - Original reviewed-work object: `87cfa295676f3af7d5e0f58ecc2da3990f3e35b0`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `7ad369aa63758008f9a145578ff14a38e6627d54` — fix(gis): a truncated or scan-less JPEG tile fails the decode and is recorded as an invalid-tile gap (S2-T51, fix 5)
+  - Original reviewed-work object: `c2cfc9199b5fc0b4df40e53564b257e63efff001`; source: exact cherry-pick trailer.
+  - Builder: OpenAI Codex GPT-6.1 Sol (fix from the confirming reviewer); committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `3c3cb5c9c64314bf9be02aef798d7e79dba12f62` — fix(gis): the released-imagery product test reads an invented fixture and no custodian code; a custodian test keeps the fixture equal to the assembled release (S2-T51, fix 6)
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+- `26d3255e69a4b413d747e6ba04400f4cdc7e6f93` — test(boundary): the import guard scans the product plane's tests (S2-T51, fix 6b)
+  - Builder: OpenAI Codex GPT-6.1 Sol; committed by the lead. Source: commit body.
+  - Commit co-author model label: Claude Opus 5.5 (label only).
+
+Review and confirmation trail:
+
+- **dr1 — REJECTED (design)**, target `plan r1`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 21:50. F1/F2 ruled partly non-binding; binding part incorporated L-1296.
+- **rA — REJECTED**, target `a3fcc720`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 23:07. Return: `.overnight/IN/evidence/S2-T51.rA.return.md`. Lens A F1-F9; L-1303 distinguishes eligible gaps.
+- **rB — REJECTED**, target `a3fcc720`. Maker: Moonshot. Model: Kimi K3.1 Pro (launch/log attribution). Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 22:57. Return: `.overnight/IN/evidence/S2-T51.rB.return.md`. Return identifies Factory Droid / Kimi K3.1 Pro; log says relay; underlying maker attribution is launch-based. Public-chain F1.
+- **cf1 — REJECTED**, target `5945b0a8`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 00:27. Return: `.overnight/IN/evidence/S2-T51.cf1.return.md`. C1 outage gaps, C2 atime cache, C3 lock contention; earlier lens B F1 closed.
+- **cf2 — CONFIRMED**, target `b21af69f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 01:05. Return: `.overnight/IN/evidence/S2-T51.cf2.return.md`. C1-C7 closed, N1-N3 retained for further round.
+- **k68 — 2 REAL / 4 checked**, target `b21af69f`. Maker: Abacus.AI (return self-identification); requested Moonshot in log. Model: Abacus AI Agent; exact serving model NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 01:17. Return: `.overnight/IN/evidence/S2-T51.k68.return.md`. Items 6 and 8 real, 3 and 7 not real. Do not assert requested Kimi actually served.
+- **c12 — 2 REAL / 2 checked**, target `b21af69f`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 01:15. Return: `.overnight/IN/evidence/S2-T51.c12.return.md`. CF1/CF2; enumeration hash subpoint already checked.
+- **cf3 — REJECTED**, target `87cfa295`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 02:15. Return: `.overnight/IN/evidence/S2-T51.cf3.return.md`. All earlier items closed except R1 truncated JPEG.
+- **cf4 — CONFIRMED**, target `c2cfc919`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 02:46. Return: `.overnight/IN/evidence/S2-T51.cf4.return.md`. Lead disposition APPROVED locally; later whole-test boundary escape still follows.
+- **cf6 — CONFIRMED**, target `3c3cb5c9`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 04:10. Return: `.overnight/IN/evidence/S2-T51.cf6.return.md`. Product-side invented fixture and custodian equality guard; base64 judged fair encoding.
+- **cf6b — CONFIRMED**, target `26d3255e`. Maker: Anthropic. Model: Claude Opus 5.5. Source: .overnight/IN/evidence/S2-T51.cf6b.return.md. Different-maker guard confirmation, two records-only notes; no result timestamp in supplied log.
+
+Pilot contribution, not same-maker task approval: LOG 2026-11-21 01:02/01:10 records OpenAI gpt-6.2-astra and gpt-6-astra candidate/baseline reviews on 5945b0a8, both REJECTED. Their returned self-identities are less specific; their findings were checked on fix 2 by c12 and k68. Sources: `P62.R6.cand.return.md`, `P62.R6.base.return.md`, c12 and k68 under the supplied evidence folder. Item-level true/false findings above are the checked results, not all pilot allegations. Fix 3 self-review found a mixed-retry stuck stop and fix 4 repairs it; cf3 rejects truncated JPEG decoding; cf4 confirms the decoder correction. The later product-test boundary escape is preserved as closed OI-361 with fixes 6/6b, not erased by the earlier local approval.
+
+## Join chronology, joiners and confirmations
+
+- Join 1, lead: LOG 2026-11-20 19:02 starts from d5ab3131 and carries approved P01/P03/P04/P05/P09/P10/P12/P14/P19/P23 picks; 19:12 adds P03b/P12b; 19:27 adds P15/P20/P22; 19:29 adds P11/P06; 19:52 adds P08/P24; 19:59 adds P18/P21; 20:10–20:26 adds P26/P27/P17/P25; 21:24 adds OI-03 records, P02/P29 and the P18/P29 join fix; 21:55–21:56 adds T49/T50. Lead Git scripts are mechanical preservation evidence, not other-maker verdicts. No single full join1 independent verdict is supplied.
+- Join 2 is a trial, not a second set of delivered commits: LOG 2026-11-20 22:32 and 22:42 records P21 fixture/T20L interaction failures. OpenAI port/integration work follows; final delivered ancestry is join3. Aborted joins and trial hashes are not counted as delivered commits.
+- Join 3: lead joins P21 fixes 4–6 and T20L at LOG 23:03; OpenAI GPT-6.1 Sol ports the fixture integration and L-1304 changes as b2bcd06f at 23:38. Anthropic cf1 REJECTED two lines at 23:51. Lead Anthropic exact removals are ccbaac87, delivered as 8ba3e4e1. T48's six commits are joined by OpenAI GPT-6.1 Sol through a private-clone/bundle path, LOG 23:57. Abacus cf2 content audit passes and records-hash rejection is handled by the lead's appended correction at 2026-11-21 00:24. This is the lead's stated interpretation, not an invented APPROVED return.
+- Join3 command-test import repair: lead Anthropic 8fdb23df at LOG 2026-11-21 00:17. Initial OpenAI static cf3 is explicitly not counted at 00:19; executed cf3b CONFIRMED at 00:23.
+- Join3 listing/consumer fixes: OpenAI GPT-6.1 Sol a875fa98, 732550b5 and a761a105; Anthropic confirmations reject fx1, reject fx2's missing plant and finally CONFIRM fx3. Each scoped verdict and its actual target appears in the integration section above.
+- Join 4: OpenAI GPT-6.1 Sol joins six S2-T51 commits onto a761a105, ending 7ad369aa, LOG 2026-11-21 03:20. Anthropic jc1 CONFIRMED at 03:23. The first join attempt was blocked by read-only Git metadata and changed nothing; the log at 02:49 says the worker's self-named GPT-6.2 conflicts with the launcher gpt-6.1-sol. The launcher attribution is kept as such, not a model-runtime inference by preparation.
+- Final boundary repairs: OpenAI GPT-6.1 Sol fixes 6 and 6b were committed by the lead as 3c3cb5c9 and 26d3255e; Anthropic cf6 and cf6b separately CONFIRMED. cf6b's supplied return has no matching timestamped result in the extract. No separate whole-train exact-WORK confirmation is invented; G04 remains for the lead.
+
+## Forced differences and who confirmed them
+
+`identity-proof.json` is generated read-only from every original/pick pair, file by file. Each file records status, signed patch equality, full source/joined objects, exact differing block offsets, lengths and hashes. It hashes raw lines rather than reproducing historical local paths or fixture contact literals. It does not ignore whitespace, infer approval, or excuse differences because a filename is a document. `commits.json` records every direct integration commit's complete changed-file inventory. The script refuses a changed original/pick path list. It is a reproducible inventory for lead review, not a blanket proof that every difference has a valid approval.
+
+The preservation reasons and confirmation scopes that the evidence actually supplies are:
+
+- PROGRESS.md and OPEN_ITEMS.md append/separator unions: lead LOG 19:02 and subsequent join rows. TASKS.md task-status unions retain all package records; P19's premature criterion tick is removed, and the four failed sample ticks are reopened by 7983073f. Records-only does not mean a discarded code/test difference. Pack document row unions below are listed separately.
+- P15 `custodian/src/eii_custodian/publicdata/assembly_layers.py` and TASKS item-46 conflict: LOG 19:27 reports the manual combination of approved P15 changes with P19 family code and removal of a duplicate TASKS line; lead script checks each added/removed line. A dedicated other-maker confirmation of this forced executable union is NOT FOUND IN EVIDENCE (G03). P15 cf2 confirms its original head, not automatically this later union.
+- P27/P25 docs/README.md: LOG 20:20/20:26 preserves decision 0073/0074/0075 bullets and rows and fixes the lead's missing comma. P26/P17 OPEN_ITEMS gate-hold line: LOG 20:23 corrects the lead's duplicate line and keeps the intended removals. These are records/document merge reasons, not executable exceptions.
+- P25 `scripts/tests/test_spine_triage.py`: LOG 20:26 says P09's csv import and P25's hashlib import both remain. Dedicated different-maker confirmation of that forced test union is NOT FOUND IN EVIDENCE (G03).
+- P29 `custodian/publicdata/sources.yaml` and document 04 PUB-03/BACI rows: LOG 21:24 records lead resolutions preserving source configuration and both readings. The separate 53c24050 host-delta/basis-note fix is CONFIRMED by Moonshot Kimi at LOG 21:28. Its scope is the named host/basis fix; it is not expanded into an unrecorded blanket P29 merge approval.
+- T49 registry owner-count assertion: LOG 21:55 says retain P29's subtraction and T49's additions. T20L later retains its STAC additions, LOG 23:03; T48 later retains its own count changes. T48 cf2 return expressly audits both symbolic count assertions and reconstructs their resolution; attribute that final count-union confirmation to Abacus's supplied cf2 content checks, with the literal records-only REJECT disposition preserved.
+- P21 `custodian/tests/test_s2_t19_registry.py`: LOG 23:03 says keep the P21 cache path, P19 release-table assertion and wider no-Parquet scan. b2bcd06f subsequently changes this file for the exact-host test; cf1 confirms that changed-file host guard but its report does not explicitly state an independent proof of the earlier orchestration merge. Do not substitute a focused passing count for the complete forced-change proof; retain G04.
+- 9533fc49: P10 awards receipt gains P12b-required link fields; tender gate-row test selects by task after P06 adds S2-T09. LOG 20:03 gives causes and 20:08 OpenAI static confirmation. Every changed path is in commits.json; source is the commit plus those timestamps.
+- b2bcd06f fixture port: shared building helper supplies the T20L table manifest and registered parts; frame/tests keep both the newer P21 containment controls and manifest/pin/receipt guards. The four L-1304 repairs are register header/drop handling, weekly register declarations/registry contract, DAT-141 refusal plants, and exact reviewed BACI host. Source: b2bcd06f and Anthropic cf1 Checks (a)–(d). The code/test paths are listed per commit in commits.json; cf1 independently reconstructs the fixture port and executes its plants.
+- cf1 finds two unforced lines in b2bcd06f: building-manifest write allowlist in `test_publicdata_behaviour.py` and `biz_register` recorded-family mapping in `fetch/cadence.py`. The lead removes both in 8ba3e4e1; Abacus cf2 verifies the exact two removals plus one PROGRESS append. No widened allowlist or unneeded production line is accepted as a forced difference.
+- T48 join: LOG 23:57 lists ledgers, registry YAML/Python, count test and documents 03/04/12/README as task-file differences. cf2 independently reconstructs every T48 file and the supplied forced blocks; do not infer an executed-model identity from its requested Kimi route. `S2-join3.t48-join-report-correction.md` withdraws three wrong source hashes. 8fdb23df then changes only the command-test import to the configured scripts path; executed OpenAI cf3b confirms module identity, plants and collection under isolation.
+- fx1/fx2/fx3: listing distinguishes actual parts from declared STAC children and refuses unknown/malformed children; `places/integrate.py` stages Parquet parts only and assembly credit requires a declared table. Anthropic fx1cf confirms consumer fixes but rejects a widened listing classification; fx2cf confirms corrected code but rejects missing STAC-name plant; fx3cf confirms the nine-case deciding test and unchanged source. A series of rejected intermediate heads is not described as green approval.
+- T51 pick 1: AGENTS/CLAUDE rule 44 keeps the existing company-web sentence then adds the decision-0079 sentence; document 04 keeps decision-0076 and adds decision-0079; record appends retain both sides. `scripts/commands/build_public.py` combines the command-form docstring and retains the byte-identical company-web and snapshot branches. T51 jc1 expressly confirms this docstring-only forced code-file difference and all six picks. Clean picks 2–6 retain their signed changes. Source: `S2-join4.jc1.return.md`, Checks 2–5 and F1.
+- Fixes 6/6b after join4 are new task fixes, not hidden join adjustments: product-only invented release fixture; custodian parity contract; product-tests import boundary and deciding plants. Anthropic cf6 and cf6b explicitly confirm them. Historical boundary-test assertions remain, as cf6 records.
+
+No original/pick mismatch outside these stated scopes is silently declared approved. The machine inventory lists all differences; any unmatched or broader proof/confirmation still belongs to G04.
+
+## Historical integration and live results retained
+
+These are LOG observations, not new executions. The exact source timestamps and heads delimit their meaning:
+
+- 2026-11-20 20:03: early join test on 88d8ee02 failed due to awards receipt and tender gate-row interaction; fixed by 9533fc49. At 20:36, whole test on 9533fc49 has 224 failures from the P21 missing-building-table fixture interaction; P21 fixture repairs and T20L integration follow. Trial join2 also fails at 22:42; no failure is hidden by a later passing count.
+- 2026-11-21 00:17: whole test on 8ba3e4e1 fails isolated company-web test collection. At 00:48 whole test on 8fdb23df reports exit 0, 13501 passed, seed 3899993748. These counts do not apply to later heads.
+- 01:48: a875fa98 whole test exit 0, 13513 passed, seed 3088150051; 02:17: 732550b5 exit 0, 13526 passed, seed 1393666535; 02:45: a761a105 exit 0, 13535 passed, seed 4176814252.
+- 03:48: 7ad369aa whole test fails product collection for the forbidden custodian import. Fix 6b final-head whole test at 26d3255e is only launched/queued at LOG 04:18; its result is NOT FOUND IN EVIDENCE. cf6b's own focused/discovery results do not replace that whole test.
+- LIVE r9 fails for an absent pinned intermediate in the fresh checkout, LOG 2026-11-20 14:55; r10/r11 fail from a tender archive HTTP refusal, LOG 19:05 and 23:54. r12 fails building-child listing at LOG 2026-11-21 00:55, leading to fx1–fx3. r13 is a hang, per corrected 04:25 entry, not a nonexistent run; r14 is running in that entry, not proven successful. Proposed OI-360/OI-362 retain unknown causes. No public cache was read by this preparation.
+
+## Ledger command inventory and status replacements
+
+Each changed ordinary Python test file receives its own command, with AST-derived changed-function anchors. Core/custodian/product tests use pytest -q -p no:cacheprovider; unittest-style scripts/tests files use unittest -v. One scripts file, test_gis_snapshot_binding.py, uses pytest fixtures and needs its pytest row (G08). Pytest summary regex preserves actual passed/subtest/warning text and refuses failure, skip, xfail and deselection summaries; no expected count is invented. Changed Python support/fixture files have a separate descriptive inventory; they are not independently collected tests. Web performance.spec.ts and its changed scene-size fixture helper receive npm rows naming their executing consumers and anchors.
+
+Two changed real-cache test files, custodian/data_tests/test_pinned_methods.py and test_national_buildings.py, have commands and anchors in lead-only-commands.json. AGENTS.md rule 44 and that folder's README forbid selecting them in a test, ledger, gate or CI. They are deliberately absent from spec.commands; G07 explicitly records the conflict with the brief's blanket test-row request. No given row invents a successful real-cache run or imports the failed wider run as a passing ledger result.
+
+Shared rows include ruff, formatter check, mypy, docs, tree, versions, reference-note anchors, lock, AGENTS/CLAUDE cmp, sandbox check-enforcement, scripts unittest discovery, exact scope, Conventional Commit history and ./eii test with runtime seed. Commands, exit codes and actual case counts are owed to the lead's later execution, separately from hosted and exact-merge-result checks.
+
+`tasks_md.json` holds exact old Delivery text from HEAD and proposed replacement Delivery text naming train S2-11 and runtime PR. It preserves historical merged status and outstanding live/acceptance holds, corrects stale independent-review claims for T48/T49/T50/T51 and stale OI-03 sign-off wording, and changes no checkbox. T50's earlier pinned-method result remains attributed to its earlier head; no final real-cache run is invented. New train text is proposed replacement text, not claimed to already stand at HEAD.
+
+`po_items.md` is the complete proposed OPEN_ITEMS insertion input and correction register. Numbered headings continue the supplied tree's maximum numeric PO-S2 and OI headings. Existing task-local T51 proposal names remain untouched. Closed boundary escape and open random failures have different dispositions. Append-only model/count/source-hash corrections follow; historical rows are never replaced.
+
+## Append-only evidence corrections to carry in PROGRESS
+
+
+These are correction rows for the later ledger log, repeated here as requested. They amend attribution/count claims, without rewriting historical evidence or asserting a new review verdict.
+
+- Correction (S2-join3 fx3, 2026-11-21): the original `S2-join3-fx3` PROGRESS row says GPT-6 with exact runtime unavailable. Commit a761a105 records OpenAI Codex GPT-6.1 Sol, with test text from the confirming reviewer; fx3cf CONFIRMED the test-only fix. Source: `.overnight/IN/evidence/S2-join3.fx3cf.return.md`, Records-only note; a761a105 commit body; proposed-open-items.txt.
+- Correction (S2-T51 fix 5, 2026-11-21): the fix return and PROGRESS row say GPT-6 with a more specific variant unavailable. Original c2cfc919 and joined 7ad369aa record OpenAI Codex GPT-6.1 Sol, applying the confirming reviewer's fix. Source: `.overnight/IN/evidence/S2-T51.cf4.return.md`, Maker/model record differs; both commit bodies; proposed-open-items.txt. The historical self-report remains unchanged.
+- Correction (S2-T51 fix 6b, 2026-11-21): import-boundary tests in discovery = 36, comprising the 35 at 3c3cb5c9 plus `test_product_tests_every_forbidden_mechanism`; the PROGRESS/return claim of 37 is withdrawn. Source: `.overnight/IN/evidence/S2-T51.cf6b.return.md`, records note 1. This is the reviewer's recorded count, not a test run by preparation.
+- Correction (S2-T48 join report, 2026-11-21): joined 0f543179, 2d255755 and 8b9679f7 map to original 9812c1db, 3154a0a9 and 20e93dc6 respectively; withdraw the three nonexistent source mappings in the earlier report. Source: `.overnight/IN/evidence/S2-join3.t48-join-report-correction.md`, cf2 and actual Git cherry-pick trailers. Full hashes are in commits.json. The lead's appended correction already exists in the supplied evidence; this row carries it into the train record.
+- Already appended at HEAD, not newly owed: P12b RN1 builder variant correction is in PROGRESS.md under its review correction (joined fix 947f7264); P25 fix-round-1 and fix-round-2 maker corrections are under their dated correction rows, the latter in 4edfe1ea. Sources: `.overnight/IN/evidence/S2-P12b.r1.md`, RN1; Git 947f7264 and 4edfe1ea; PROGRESS.md corresponding stable headings. No duplicate closure or replacement of the old rows is requested.
+
+Numbering basis: the highest existing numbered headings at WORK are PO-S2-142 and OI-359 (OI-359 added by the records audit commit c171b9e5). New proposals continue PO-S2-143 through PO-S2-147; new ordinary items continue OI-360 through OI-362. Existing task-local PO-S2-T51 names are retained, not treated as numeric PO-S2 identifiers. All proposed sections are ledger inputs only; OPEN_ITEMS.md remains unchanged.
+
+
+## NOT FOUND IN EVIDENCE — lead action register
+
+- **G01** — S2-P02 cf1 final verdict on 21526c41: NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 20:52 and 21:24; Git 5bc7c184 Needed: Attach explicit other-maker confirmation/approval; joined notes N1/N2 alone do not establish it.
+- **G02** — Blanket independent approval of S2-RECON d5ab3131 and its complete closure inventory: NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 17:41, 18:03 and 19:09; S2-triage.c1.md Needed: Lead supplies review of all claimed closures; sample check found four bad ticks subsequently reopened.
+- **G03** — Dedicated different-maker confirmation of P15 assembly_layers.py forced union and P25 test_spine_triage.py import union: NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-20 19:27 and 20:26; original/pick deltas in identity-proof.json Needed: Identify an existing scoped confirmation or obtain it under decision 0032 item 2; do not treat a lead script as another-maker verdict.
+- **G04** — One confirmation explicitly holding the whole 95-commit S2-11 train at 26d3255e: NOT FOUND IN EVIDENCE. Source: Join3 cf2 return scopes 8ba3e4e1; join4 jc1 scopes 7ad369aa; T51 cf6/cf6b separately scope boundary repairs. Needed: Lead assembles complete file-by-file unchanged-change proof and exact-head other-maker train confirmation. Existing scoped confirmations remain attributed.
+- **G05** — Whole-test completion at final head 26d3255e, final-head hosted checks, assigned PR and exact-merge-result fresh-seed test: NOT FOUND IN EVIDENCE. Source: .overnight/IN/LOG-S2-11-evidence.md @ 2026-11-21 04:18 launches wt3; supplied extract ends 04:25. Needed: Actual lead runs and hosted results on the candidate; PR 111 and seed 1234567890 are draft placeholders.
+- **G06** — Exact serving model for Abacus join3 cf2 and T51 k68: NOT FOUND IN EVIDENCE. Source: .overnight/IN/evidence/S2-join3.cf2.return.md and S2-T51.k68.return.md self-identify Abacus AI Agent; launch log requests Kimi. Needed: Keep requested model distinct from observed runtime; underlying maker/model cannot be inferred from a requested route.
+- **G07** — Brief runner-form conflict: two changed custodian/data_tests test files are forbidden in ledger/test/gate/CI by rule 44. Source: custodian/data_tests/README.md Lead-only restricted findings; .overnight/BRIEF.md TASK item 1 Needed: Commands are listed in lead-only-commands.json, not scheduled in spec.commands. Lead shell alone owns these real-cache runs. This is an explicit exception to the requested one-ledger-row-per-test inventory.
+- **G08** — Brief runner-form conflict: scripts/tests/test_gis_snapshot_binding.py contains pytest fixture functions; unittest collects none of them. Source: AST of that file at HEAD; scripts/run_tests.py SUITES; .overnight/BRIEF.md TASK item 1 Needed: Use the generated pytest row for this one script test file; other scripts/tests files use unittest as requested; discovery and whole suite remain included.
+- **G09** — Actual public-source coverage, company-web live E1–E7, optional acquisition completeness, live-store parity and slice S2 gate approval: NOT FOUND IN EVIDENCE for final HEAD. Source: TASKS.md S2-T48 to S2-T51; .overnight/IN/evidence/S2-gateprep.c1.return.md; log @ 2026-11-21 04:06 and 04:25 Needed: Retain live/owner/integration holds, including Proposed decision 0077; do not infer closure from draft generation or earlier test counts.
+- **G10** — Exact runtime model of lead-authored records/fixes is not independently established by commit co-author model labels. Source: commits.json builder_record and coauthor_model_label, original Git bodies; log identifies lead actions. Needed: Use Anthropic where the commit explicitly says so; otherwise keep lead identity and model-label evidence distinct from a serving-model assertion.
+
+## Preparation verification scope
+
+The requested draft preparation run and its exact exit are recorded in `.overnight/RETURN.md` and `draft-run.txt`. An exit 0 means only that the inputs were generated and static Git/status/text checks passed. It is not ledger execution, test success or independent approval. `preparation.json` records actual inventory counts and unresolved evidence gaps. Self-audit is limited to truthful, scoped preparation; no missing gate is waived.
+
+## Lead closure of the preparation gaps (2026-11-21)
+
+The lead's dispositions of gaps G01 to G05; G06 to G10 stay as written above.
+
+- **G01 closed.** S2-P02's final verdict: Anthropic Claude Opus 5.5 (S2-P02.cf1) CONFIRMED `21526c41` at 2026-11-20 21:05; the lead logged it late, at 2026-11-21 04:5x (a lead record slip). The second join confirmation below holds that the P02 picks equal the approved commits plus records.
+- **G02 closed by an audit that rejected and a records commit that applies it.** Two readers of other makers than the records builder audited `d5ab3131` at `26d3255e`: Anthropic Claude Opus 5.5 (S2-RECON.rv1, six read-only sub-agents of the same model; every acceptance box and closure) REJECTED: 81 boxes PROVED, 20 UNPROVED; 22 + 2 items PROVED, 5 UNPROVED. SpaceXAI Grok 4.7 (S2-RECON.rv2, read-only; the 29 closures) REJECTED: 24 PROVED, 5 UNPROVED. Commit `c171b9e5` (records only) re-opens the 20 boxes and the union of the unproved items (OI-103, PO-S2-22, PO-S2-81, PO-S2-128, OI-323, OI-286, PO-S2-36; the stricter reading where the two readers differ) and adds OI-359. Moonshot Kimi K3.1 Pro (S2-11.jc3, relay) CONFIRMED `c171b9e5`: only the three record files change, exactly the 20 boxes flip with matching notes, the other two files only gain lines, every unproved item re-opens, no item closes. Two of the unproved boxes are code gaps (S2-T11 box 5 and S2-T14 box 8, the movement-split table list; S2-T19 box 7, the identifier refusal in the quarter table build); they are built for the next train, not in this one.
+- **G03 and G04 closed.** Moonshot Kimi K3.1 Pro (S2-11.jc2, relay) CONFIRMED `26d3255e` as holding exactly the approved commits and records: P02 by S2-P02.cf1; the P15 net union over `1a9af25f..500368f6` is forced and byte-identical to an independent three-way union with P19 (lead ruling L-1317: a squash-merged train judges each task on its net joined change); a plant of the old unvalidated write fails two tests; seven other forced code or test differences accepted; 46 record differences. `c171b9e5` adds records only (G02).
+- **G05 in part.** The lead's whole test S2-join4.wt3 at `26d3255e`, seed 3351092874: exit 0; guards 1033, core 770, custodian 5525 + 4869, product 816, web-checks 878, web-unit 1; 0 failed, 0 skipped. `c171b9e5` differs from it in the three record files only. This ledger's own run at WORK, the six hosted checks on the pull request head and the lead's fresh-seed whole test on the exact merge result follow, as separate gates.
+- **S2-T35 box 2** (the lead's value-free scan) is recorded at WORK in PROGRESS.md: two national counts of card C8 are in three earlier PROGRESS.md rows (2026-11-15 and 2026-11-16) that rule 38 keeps unchanged; the box stays open.
+
+
+## T44
+
+Commit inventory (full Git objects; exact subjects):
+
+- `1218607c13450ef05cdb4fa8aa7672308697e55f` — fix(spike): mount the performance overlay after the basemap load (S2-T44)
+  - Builder: OpenAI Codex GPT-6.1 Sol (round 2B); committed by the lead. Source: commit body; `.overnight/IN/LOG-S2-T44.md`, 2026-11-21 08:14 RESULT S2-T44.r2b.
+- `4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c` — fix(spike): mount the overlay on an already-loaded map; deciding fixture (S2-T44)
+  - Builder: OpenAI Codex GPT-6.1 Sol (round 3); committed by the lead. Source: commit body; `.overnight/IN/LOG-S2-T44.md`, 2026-11-21 09:37 RESULT S2-T44.r3. The builder return identifies the GPT-6 family without an exact serving identifier; the precise Sol attribution is the lead's and commit's record.
+
+Review and confirmation trail:
+
+- Earlier history, retained as history: OpenAI GPT-6.1 Sol build1 at `85a8affacf88b3a927d6cf51579b793bca3d7653`; xAI Grok 4.7 High via Cursor rev1 REJECTED on the tool path at 2026-11-19 19:26, then rev1b APPROVED that head on supplied lead evidence at 19:31. The lead whole test at 19:58 failed the hostile-surroundings test; the task subsequently joined S2-7, merged in pull request 104 as recorded at 2026-11-20 07:18. Source: `.overnight/IN/LOG-S2-T44.md`, those exact RESULT entries. These dispositions do not approve the new T44 commits.
+- Round 2 was BLOCKED before measurement at 2026-11-21 06:19 by the brief's browser-path restriction; the lead amended the browser clause and launched round 2B. Source: `.overnight/IN/LOG-S2-T44.md`, 06:19 RESULT S2-T44.r2 and 06:31 LAUNCH S2-T44.r2b. No blocked run is called a successful measurement.
+- **rv3 — REJECTED**, target `1218607c`. Maker: Anthropic. Model: Claude Opus 5.5. Source: `.overnight/IN/S2-T44.rv3.md`; `.overnight/IN/LOG-S2-T44.md`, 2026-11-21 08:19 RESULT. F1: fixture auto-fires idle, leaving two cleanup plants undecided; F2: load loops used separate cores; F3: unfair separate-session comparison and deferred work; F4: already-loaded-map guard missing. Criteria 1 and 3 remained open at that review.
+- **round 3 — builder return, no independent verdict**, resulting commit `4f1606b6`. Maker: OpenAI. Model: Codex GPT-6.1 Sol per lead/commit. Source: `.overnight/IN/S2-T44.r3.return.md`, FINDINGS AND CHANGES, CAUSE VERDICT, FINAL COMPLETE SUITES, CHECKS WITH REAL EXITS and PROPOSED OPEN ITEMS; `.overnight/IN/LOG-S2-T44.md`, 2026-11-21 09:37 RESULT. F1's two plants and the F4 guard plant each fail (14 passed / 1 failed); current node suite passes 15 with no skipped cases. Three alternating old/HEAD pairs per condition use four competing loops on the browser's cores, with both scenes and the following map construction retained. The phase table compares c171b9e5 with the round-2B 1218607c snapshot; the return separately identifies the final layer source with the extra round-3 guard. The final complete suites use that final source. The phase table is not relabelled as a measurement of the extra guard. Both final loaded suites report child/wrapper exit 0/0, 142 node tests passed and 62 browser cases passed, with no skips. These are attributed local builder outcomes, not executions by this specification maker or at the joined train's final head.
+- **cf4 — CONFIRMED (APPROVED)**, target `4f1606b6`. Maker: Anthropic. Model: Claude Opus 5.5. Source: lead LOG 2026-11-21 09:4x. Return: `.overnight/evidence/S2-T44.cf4.return.md`. F1-F4 closed; criterion 3 on its second branch (worst loaded readiness 59365.0 ms, margin 110635.0 ms under the 170 s bound); criterion 1, OI-319, OI-341 and PO-S2-129 stay open.
+
+Acceptance and unresolved evidence:
+
+- Criterion 1 stays `[ ]`: the return explicitly does not reproduce the old code approaching the readiness bound and does not account causally for the historical P02 failure. OI-319, OI-341 and PO-S2-129 remain OPEN. The startup improvement is not a claim that net work was removed; next-map construction still grows. Source: round 3 CAUSE VERDICT and PROPOSED OPEN ITEMS.
+- Criterion 3 becomes `[x]` for its local evidence alternative: two final complete suites under the same shared-core load pass, and the paired measurement states readiness and margin under the unchanged bound. The return explicitly says S2-T44#3 has the local loaded-run/margin evidence. Criterion 2 and criteria 4–6 stay ticked; no other criterion changes. Independent cf4 and final-head ledger3 remain owed; this tick closes no random-failure item. Source: round 3 FINAL COMPLETE SUITES and final acceptance paragraph; review rv3 Boxes (check 2) for the retained ticks.
+- Ledger2 at `c171b9e5` failed rows 129 and 130 with three and five readiness scene failures respectively, and row 144's whole test failed. The excerpts alone do not prove that the T44 changes explain every historical failure. Source: `.overnight/IN/ledger2-row129-failures.txt`, `ledger2-row130-failures.txt`, `ledger2-row144-failures.txt`; `.overnight/IN/LOG-S2-11.md`, 2026-11-21 09:40 RESULT. OI-364 requires ledger3 at `4f1606b6`.
+- Row 129 also failed the fake-server test with HPE_INVALID_CONSTANT. The lead reports another process answered its port and that the test passed alone; the collision remains unexplained under rule 39. Source: row-129 excerpt and the same 09:40 RESULT. OI-363 records the needed port-isolation proof or causal explanation.
+
+Join identity and specification corrections:
+
+- This head extends `c171b9e5fc74979d10b9fd65ee50a7cdeb45b264` by exactly the two T44 commits above, each with one unchanged parent. The train takes the existing objects by fast-forward, so T44 introduces no forced patch difference. `identity-proof.json` retains the original/pick proof; `spec3-verification.json` additionally binds the four affected paths at the join target to those same Git blobs, without reading PROGRESS contents.
+- Correction to the current brief's count: the literal Git BASE..WORK history has 98 commits, not 97. The earlier final specification already counted 96 through `c171b9e5`; adding the two T44 commits produces the inventory checked by make_spec.py. `commits.json` previously stopped at 95 and is now complete, including the records-only `c171b9e5` commit. This is a count correction, not a new commit or approval.
+- Preserve all 144 prior ledger2 command rows, including the eight unittest discovery corrections recorded at 2026-11-21 06:28 in `.overnight/IN/LOG-S2-11.md`. Add one focused node row for the changed layers test; the two retained npm rows cover it too, as `web/package.json` shows. The final suite row uses the newly supplied seed. Every execution result at the new head is owed to the lead.
+- OPEN_ITEMS.md at HEAD ends at OI-359; the existing train insertion already reserves OI-360–362. New entries therefore continue with OI-363 and OI-364, preserving all earlier prepared entries and avoiding duplicate insertion numbers.
+- Validation limitation: a ledger_task.py docstring or LEDGER-TASK-USAGE.txt copy is NOT FOUND in the supplied workspace inputs. The current brief references it, but the earlier named file is absent. No lead-only precheck or external-path read is substituted. Structural compatibility with the supplied prior spec and the generator's own checks is verified separately; exact docstring validation remains owed until that source is supplied.
+
+#### Evidence for the work commit `4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c`
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest core/tests/test_building_heights.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "81 passed in 0.09s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_error_from_pairs_matches_fallback_errors_for_one_source; test_error_from_pairs_on_boundary_pairs_matches_fallback_errors; test_error_from_pairs_on_normalized_pairs_matches_fallback_errors; test_errors_by_class_on_two_pairs_shares_the_even_count_median; test_errors_by_class_refuses_an_empty_class_name; test_errors_by_class_refuses_an_empty_input; test_errors_by_class_splits_one_fallbacks_pairs_by_class_name. Source: core/tests/test_building_heights.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest core/tests/test_c2_centred_bulk.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "12 passed in 0.02s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_absent_months_count_as_zero_and_undated_is_refused; test_asymmetric_window_edges_have_exact_pinned_medians; test_centred_window_distinguishes_a_level_change_from_a_bulk_month; test_equality_is_not_bulk_and_one_more_is_bulk; test_even_window_is_independent_of_the_callers_decimal_context; test_even_window_uses_the_mean_of_both_middle_values; test_flat_series_and_single_spike; test_negative_and_fractional_counts_still_refuse; test_window_is_cut_at_both_calendar_ends. Source: core/tests/test_c2_centred_bulk.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest core/tests/test_public_methods.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "27 passed in 0.05s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_c8_invented_national_coverage; test_committed_method_fixture_arithmetic; test_methods_fixture_has_no_census_counts; test_methods_fixture_sources_have_attribution. Source: core/tests/test_public_methods.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest core/tests/test_third_pass.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "21 passed in 0.08s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_c2_invented_125_month_series_uses_local_baselines. Source: core/tests/test_third_pass.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_activity_model_audits.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "58 passed in 0.65s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_audit_date_covers_latest_signing; test_audit_planted_refusals; test_audited_batch_is_admitted; test_binding_reader_preserves_audit_hash; test_bound_audit_hash_is_checked_before_any_model_signing; test_changed_audit_bytes_refused_by_binding; test_changed_rejected_row_refused; test_closed_audit_schema; test_duplicate_batch_id_refused; test_empty_committed_audits_admit_nothing; test_loader_reads_adjacent_bound_audit_file; test_malformed_audit_record_refused; test_malformed_model_role_cannot_bypass_audit; test_missing_audit_file_refused; test_model_signature_without_audit_is_refused; test_person_signature_keeps_existing_path; test_seed_endpoints_admitted; test_seed_type_and_bounds_refused; test_separate_batches_and_person_review_admitted; test_unsigned_batch_member_refused. Source: custodian/tests/test_activity_model_audits.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_additions_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 1.21s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_a_later_pass_without_a_parser_is_pending; test_a_repeated_period_key_is_unreadable; test_a_visitors_market_without_nationality_is_refused; test_addition_rows_declare_columns_periods_and_splits; test_an_incomplete_family_row_is_refused; test_an_open_row_count_range_is_refused; test_an_undeclared_period_or_month_field_is_refused; test_empty_period_bounds_are_refused; test_est_size_declares_year_and_activity_code_first; test_fetch_publishes_venue_rows_and_a_parser_failure_publishes_nothing; test_measure_text_outside_the_reviewed_list_stores_nothing; test_receipt_records_the_observed_period_not_the_modified_date; test_schema_checks_every_row_and_allows_null; test_unconfirmed_period_field_does_not_copy_the_declared_bounds. Source: custodian/tests/test_additions_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_native.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "18 passed in 3.10s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_gravity_numeric_measures_are_not_omitted_from_the_draw; test_reviewed_native_manifest_runs_real_reader. Source: custodian/tests/test_assembly_native.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "22 passed in 2.68s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_noop_height_producer_over_earlier_valid_outputs_refuses; test_confirmation_adapters_read_pending_t19_and_height_absence; test_frame_invokes_real_nested_build_and_refuses_missing_inventory; test_frame_keeps_stac_lineage_without_claiming_a_metadata_release_table; test_gather_audit_on_registered_sources_without_cache_is_pending; test_height_adapter_binds_real_asset_outputs_and_refuses_later_tampering; test_height_adapter_refuses_a_missing_building_table. Source: custodian/tests/test_assembly_producers.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_reports.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "34 passed in 1.27s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_checked_method_pin_reaches_require_complete_through_gather_audit; test_duplicate_confirmations_do_not_cover_the_confirmation_tasks; test_each_missing_or_pending_gate_is_refused; test_empty_multisource_table_is_excluded_as_empty; test_invalid_method_pin_evidence_refused_at_require_complete; test_missing_method_pin_outputs_refused_at_require_complete; test_missing_method_pin_record_refused_at_require_complete; test_pending_method_pin_blocks_otherwise_complete_audit; test_schema_valid_pending_method_pin_refused_at_require_complete. Source: custodian/tests/test_assembly_reports.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 0.27s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_awards_audit_checks_actual_receipt_and_retains_normalisation_count. Source: custodian/tests/test_assembly_source_review.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_terms_boundary.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "49 passed in 4.54s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_absence_without_caveat_or_based_on_terms_still_fails_the_report; test_actual_producer_rows_and_terms_survive_through_final_reports; test_every_admitted_registry_slot_reaches_assembly_whatever_terms; test_technical_absence_reaches_final_report_with_exact_reason_and_caveat. Source: custodian/tests/test_assembly_terms_boundary.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_atlas_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "5 passed in 1.37s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_atlas_complete_archive; test_atlas_interrupt_keeps_the_complete_manifest; test_atlas_pending_access_and_secret; test_atlas_retries_without_stale_manifest. Source: custodian/tests/test_atlas_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_award_all_links.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "48 passed in 6.07s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_awards_all_link_check_never_converts_hard_refusals_to_fetch_failures; test_awards_all_link_check_requires_every_winner_on_a_shared_link; test_awards_all_link_failure_uses_closed_reasons_only; test_awards_all_link_frame_rejects_an_off_host_link_before_any_fetch; test_awards_build_checks_all_links_once_and_labels_the_sample; test_awards_derived_sample_equals_the_original_seeded_sample; test_awards_failure_outside_sample_is_counted_once_with_reason; test_awards_final_audit_excludes_report_urls_and_retains_receipt_details; test_awards_gate_refuses_incomplete_or_inconsistent_all_link_receipt; test_awards_mismatch_outside_sample_changes_full_match_rate; test_awards_publication_refuses_a_planted_skipped_link; test_awards_publication_rejects_invalid_seed_before_any_proof_read; test_awards_refuses_unlisted_response_url_even_in_reviewed_scope; test_awards_transient_failure_recovers_before_recording_outcome. Source: custodian/tests/test_award_all_links.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_award_double_space.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "7 passed in 0.30s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_double_space_pair_matches_only_with_the_same_registration; test_proof_comparison_normalises_spaces_and_keeps_both_consistency_checks; test_punctuation_removal_does_not_leave_a_double_space; test_several_rows_are_counted_once_each. Source: custodian/tests/test_award_double_space.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_survivors_3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "29 passed in 1.79s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_proof_null_and_nonnull_projection. Source: custodian/tests/test_awards_survivors_3.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_baci.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "88 passed in 4.57s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_baci_archive_hash_guard; test_baci_manifest_archive_checksum_guard; test_baci_manifest_configuration_guard; test_baci_manifest_content_guard; test_baci_manifest_hash_guard; test_baci_manifest_retrieval_date_guard; test_baci_selected_manifest_guard; test_baci_selected_manifest_tampering; test_baci_source_chain_guard; test_baci_terms_fingerprint_guard. Source: custodian/tests/test_baci.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_archive_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "16 passed in 0.06s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_lead_archive_reading_is_configured_without_guessed_counts; test_native_headers_text_member_and_compressed_bounds; test_native_iso2_is_validated; test_pending_row_counts_never_activate; test_readme_record_is_closed; test_reviewed_archive_plants. Source: custodian/tests/test_baci_archive_review.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_contracts_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 1.55s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_baci_manifest_messages; test_baci_output_corruption_message; test_baci_registry_and_lineage; test_baci_selected_explicit_encoding; test_baci_terms_receipt_present; test_baci_verification_stays_in_cache. Source: custodian/tests/test_baci_contracts_survivors.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "54 passed in 5.36s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_baci_cache_creation_failure_is_safe; test_baci_complete_archive; test_baci_declared_length_type_guard; test_baci_entry_decision_record_guard; test_baci_entry_plants; test_baci_entry_source_id_guard; test_baci_entry_terms_url_guard; test_baci_incomplete_http_read_is_bounded; test_baci_manifest_atomicity; test_baci_metadata_bytes_guard; test_baci_metadata_response_obstacle_guard; test_baci_pending_state; test_baci_pending_terms_state_still_fetches_and_reads; test_baci_publish_cache_integrity_guard; test_baci_publisher_archive_checksum_guard; test_baci_retrieval_clock_guard; test_baci_safe_failure; test_baci_stream_chunk_guard; test_baci_stream_stops_at_upper_bound; test_baci_terms_unread_network_path; test_baci_terms_unread_refuses_other_errors; test_baci_transport_failure; test_baci_transport_refusal_is_not_retried. Source: custodian/tests/test_baci_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_baci_reviewed_urls.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "15 passed in 0.15s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_baci_page_selector_plants; test_exact_page_still_requires_host_admission; test_reviewed_cepii_host_and_exact_page_configuration; test_unreviewed_intermediate_redirect_never_passes; test_unreviewed_metadata_redirect_never_passes. Source: custodian/tests/test_baci_reviewed_urls.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmark_access.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "39 passed in 1.88s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_dispatch_records_owner_obstacle. Source: custodian/tests/test_benchmark_access.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_benchmarks_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "106 passed in 1.49s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_dispatch_pending_no_transport. Source: custodian/tests/test_benchmarks_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_building_workflow.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "12 passed in 1.69s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_assembly_build_outcome_preserves_inventory_refusal; test_assembly_build_outcome_preserves_missing_inventory_refusal; test_frame_refuses_missing_places_after_inventory; test_legacy_build_outcome_preserves_inventory_refusal; test_named_inventory_failure_stops_both_callers; test_omitted_inventory_over_valid_old_artifacts_fails; test_real_inventory_precedes_heights_and_binds_every_selected_id. Source: custodian/tests/test_building_workflow.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_buildings_support.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "8 passed in 1.56s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_atlas_fixture_contains_its_height_outputs; test_minimal_building_table_satisfies_run_build; test_missing_part_registration_still_refuses; test_run_build_leaves_unrelated_assets_in_non_pytest_named_dir; test_run_build_restores_fixture_pins_and_preserves_existing_receipts; test_run_build_verifies_the_shared_helper_manifest; test_shared_helper_manifest_is_required_and_verified. Source: custodian/tests/test_buildings_support.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_cache.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "15 passed in 0.98s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_bulk_budget_requires_positive_explicit_tile_sample_bound; test_bulk_budget_reserves_wire_bands_and_explicit_tile_samples; test_documented_unrounded_units_and_nominal_allowance; test_evalscript_tracks_contributing_dates_and_masks; test_process_reply_binds_raster_and_dates; test_quota_unknown_insufficient_rounding_and_enumeration; test_raster_mask_and_coverage_refusal_plants. Source: custodian/tests/test_cdse_cache.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_cdse_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "11 passed in 0.21s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_bulk_enumeration_and_unbudgeted_metadata; test_documented_process_shape_and_nested_plants; test_pending_contract_and_closed_shapes; test_pending_envelope_is_not_a_provider_request; test_refusal_redacts_echoes_and_stops; test_refusal_redacts_every_issued_token_after_refresh; test_token_picture_third_request_refused_before_send; test_typed_process_input_plants_stop_before_send. Source: custodian/tests/test_cdse_transport.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_command.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "13 passed in 0.35s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_extra_command_arguments_refused_before_inputs; test_family_registry; test_input_adapters_use_both_pinned_sources_once_per_company; test_manifest_outside_documented_cache_is_not_read; test_missing_inputs_no_network_or_private_diagnostics; test_offline_end_to_end_search_fetch_review; test_opt_in_does_not_dispatch_other_sources; test_ordinary_command_never_selects_family; test_register_adapter_refuses_undeclared_columns_before_other_input. Source: custodian/tests/test_company_web_command.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_evidence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 0.05s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_missing_fields_are_counted_without_an_invented_fill; test_omitted_duplicate_and_invented_outcomes_refused; test_pending_is_never_retained_and_counts_reconcile; test_search_failures_remain_in_company_denominator; test_unrelated_review_is_not_counted_as_retained. Source: custodian/tests/test_company_web_evidence.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "38 passed in 0.12s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_access_none_found_records_and_robots_slower_pace; test_access_obstacles_stop_host_without_retry; test_archive_complete_mixed_page_and_explicit_read; test_auth_not_permitted_in_company_context; test_equal_page_recheck_does_not_overwrite; test_manifest_guards_have_plants; test_manifest_hash_pins_review; test_missing_archive_lineage_refused; test_nested_scope_may_only_narrow; test_no_block_is_archived; test_obstacle_body_is_archived_before_host_stops; test_obstacle_stops_only_its_host_not_other_results; test_outside_another_company_and_query_refused_before_open; test_pace_cannot_be_skipped; test_redirect_guard_and_final_url_are_checked_without_network; test_robots_and_unavailable_terms_have_distinct_outcomes; test_scope_does_not_escape; test_scope_resets_after_exception_and_manifest_mutation_is_refused; test_snapshot_interruption_never_yields_a_readable_page; test_streams_cannot_use_the_company_scope; test_unread_terms_never_masks_a_security_refusal. Source: custodian/tests/test_company_web_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_fields.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "42 passed in 0.07s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_address_metadata_digit_plant_is_not_proposed; test_contact_person_and_encoded_digit_plants; test_duplicate_json_properties_are_not_silently_selected; test_foreign_vocabulary_is_not_schema_org; test_identifier_runs_refused_everywhere; test_jsonld_full_page_fragment_and_absence; test_match_only_inside_declared_block; test_microdata; test_missing_lineage_refused; test_multiple_organizations_ambiguous; test_no_declared_block; test_organization_nested_in_person_refused; test_personal_or_unknown_field_refused; test_projection_cannot_substitute_for_upstream_body; test_reviewed_selector_positive_and_unreviewed_refusal. Source: custodian/tests/test_company_web_fields.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_output.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "2 passed in 0.22s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_unchanged_check_docs_refuses_planted_bare_run_in_git_tree. Source: custodian/tests/test_company_web_output.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_properties.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "2 passed in 0.23s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_identifier_refusal_survives_unicode_and_nested_encoding; test_request_roundtrip_keeps_exact_typed_name_and_country. Source: custodian/tests/test_company_web_properties.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "25 passed in 0.07s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_extra_register_fields_cannot_be_disclosed; test_inventory_build_fails_on_a_retained_web_name_collision; test_missing_reviewer_identity_refused; test_pending_rejected_and_independent_acceptance; test_register_file_object_is_not_a_reviewer_input; test_register_web_conflict_and_name_inventory; test_review_replay_into_another_extraction_run_refused; test_review_replay_refused; test_reviewer_bundle_cannot_disclose_register_row; test_reviewer_can_bind_decision_without_a_register_key; test_same_maker_relabel_refused. Source: custodian/tests/test_company_web_review.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_revision.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "103 passed in 5.60s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_adjacent_personal_or_contact_run_refused_in_microdata; test_adjacent_personal_or_contact_run_refused_in_selected_block; test_adjacent_run_microdata_control_matches; test_cf4_cut_control_matches; test_cf4_long_run_refused_micro; test_cf4_long_run_refused_selected; test_contact_property_refuses_fragment_at_extraction; test_extracted_fields_redump_is_refused_as_reviewer_fragment; test_html_fragment_preserves_selected_subtree_context; test_jsonld_fragment_preserves_source_parts_before_assembly; test_malformed_manifest_has_only_fixed_diagnostic; test_nonpublic_address_hosts_refused_before_manifest_admission; test_one_candidate_with_foreign_fragment_hash_is_refused; test_person_titles_in_description_refused; test_provider_robots_stops_search_before_send_and_counts_each_company; test_refused_bundle_name_is_counted_without_aborting_review; test_refused_input_name_is_counted_without_aborting_other_companies; test_register_name_uses_input_checks_only; test_run_window_bounds_cost; test_selected_jsonld_object_keeps_inherited_schema_context; test_selector_block_contact_refused_at_extraction; test_selector_host_lookup_survives_case_and_default_port_in_both_stages; test_spaced_split_run_control_refused; test_split_and_fused_run_refused_in_microdata; test_split_and_fused_run_refused_in_reviewer_bundle; test_split_and_fused_run_refused_in_selected_block. Source: custodian/tests/test_company_web_revision.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_search.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 0.07s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_ambiguous_input_not_guessed; test_both_register_inputs_and_separate_namespaces; test_invented_search_returns_addresses_only; test_metacharacter_names_refused; test_no_shell_or_second_opener_in_company_tooling; test_query_cannot_be_changed_or_rebound. Source: custodian/tests/test_company_web_search.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_comtrade_plants.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "10 passed in 0.37s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_assembly_identity_plants; test_canonical_host_and_path_are_refused; test_dispatcher_refuses_an_uninjected_transport; test_fetch_status_echo_terms_and_signal; test_ledger_shape_and_slot; test_opener_refuses_host_http_network_and_redirect; test_parser_shape_plants; test_perform_refuses_a_non_descriptor; test_policy_shape_plants; test_registry_policy_placement. Source: custodian/tests/test_comtrade_plants.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_dat141_schema_scan.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "48 passed in 1.19s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_register_company_nationality_group_declaration_still_fails. Source: custodian/tests/test_dat141_schema_scan.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "33 passed in 2.36s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_active_register_exact_url_guard_without_a_frame; test_full_capture_set_beside_live_prefix_refuses. Source: custodian/tests/test_fc_register.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_guards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "85 passed in 0.31s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_capture_eligibility_is_a_closed_decision; test_capture_filename_is_a_closed_ordinal_contract; test_capture_loader_rejects_bad_evidence_before_admission; test_capture_replay_finishes_without_manufacturing_a_live_post; test_checked_response_checks_allowlist_without_request_frame; test_checked_response_raises_its_classified_obstacle; test_control_the_same_three_page_chain_completes_with_real_identities; test_direct_capture_admission_revalidates_projection_evidence; test_fragment_guards_have_canonical_plants; test_frame_membership_is_independent_of_register_exact_path; test_inventory_independent_revalidation; test_missing_capture_has_a_closed_error_before_admission; test_obstacle_classification_is_independent_of_parser; test_page_context_rejects_unverified_supplied_context_with_valid_pin; test_paged_capture_requires_identity_even_without_an_intake; test_paging_refuses_a_repeated_request_identity; test_paging_revalidates_the_admitted_upstream_digest; test_postback_cannot_switch_to_the_other_valid_delivered_target; test_postback_closed_contract_with_matching_delivered_state; test_postback_requires_active_frame_even_with_delivered_state; test_producer_checks_closed_declaration_before_any_visitor_request; test_producer_checks_timestamp_before_any_visitor_request; test_producer_missing_evidence_refuses_before_visitor; test_producer_overwrite_refuses_before_any_partial_output; test_project_guards_have_otherwise_valid_pages; test_projection_refusals_do_not_depend_on_a_later_request; test_projection_validates_its_reconstructed_fragment; test_required_register_pin_cannot_fall_back_to_system_context; test_reviewed_pin_context_is_available_and_verifying; test_terminal_refusal_is_not_converted_to_capture; test_unavailable_page_cannot_load_capture_without_permission_or_pin. Source: custodian/tests/test_fc_register_guards.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_fc_register_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 0.24s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_post_header_refusals_precede_opener; test_post_redirect_never_sends_a_second_request; test_post_token_and_missing_pin_refuse_before_send; test_tls_errors_are_terminal_never_connection_recovery. Source: custodian/tests/test_fc_register_transport.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "33 passed in 0.07s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_confirmations_exact_missing_and_recorded_records; test_s2_t12_arabic_evidence_documents_s2_t39_attribution. Source: custodian/tests/test_gate_records_survivors.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors_tender.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 0.06s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_tender_success_binds_adapter_to_confirmation_registry_and_receipt. Source: custodian/tests/test_gate_records_survivors_tender.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_imagery_views.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "32 passed in 0.44s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_absent_imagery_row_makes_no_request. Source: custodian/tests/test_gis_imagery_views.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_layers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "16 passed in 0.24s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_district_numbers_that_differ_fail; test_land_price_period_is_exactly_one_year_of_the_service_name; test_land_price_rows_use_field_names_and_per_ft2. Source: custodian/tests/test_gis_layers.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_layers_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "17 passed in 0.25s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_land_price_refusal_keeps_field_name. Source: custodian/tests/test_gis_layers_survivors.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_layers_survivors_refusals.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "68 passed in 0.19s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_row_refusals. Source: custodian/tests/test_gis_layers_survivors_refusals.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "296 passed, 192 warnings in 107.58s (0:01:47)" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_acquire_checks_finished_shard_before_completion_or_any_tile_request; test_acquire_resumes_and_paces_metadata_and_tiles; test_all_dates_mode_is_separate_complete_and_explicitly_selected; test_archive_gap_eligibility_checked_before_immutable_publication; test_assembled_release_equals_product_imagery_fixture; test_boundary_input_requires_its_public_chain_and_archives_original_bytes; test_boundary_recheck_time_and_terms_reading_are_not_chain_identity; test_cf1_full_release_projected_lineage_must_match_original; test_cf1_resume_projected_lineage_must_match_original; test_cf2_full_release_shard_hash_must_match_and_never_reach_credits; test_cf2_shard_number_and_enumeration_must_match; test_cf2_shard_source_hash_must_match_enumeration; test_changed_bytes_publish_new_objects_without_overwriting_selected_shard; test_closed_contract_and_rate_includes_retries; test_command_root_unset_refuses_without_any_connection; test_coverage_guards_refuse_independently_with_valid_hashes; test_dated_extents_may_differ_but_grid_origins_may_not; test_disk_watch_does_not_credit_other_jobs_consuming_the_drive; test_enumeration_includes_island_and_coastal_intersections; test_every_rolling_second_contains_at_most_ten_starts; test_foreign_public_receipt_refuses; test_gap_reason_status_and_attempt_integrity; test_host_path_and_locator_refused; test_immutable_shard_receipt_and_resume; test_incomplete_public_receipt_refuses_semantically; test_interruption_retains_complete_shards_and_resumes_only_the_gap; test_ionice_failure_is_blocking_and_priority_children_receive_no_keys; test_jpeg_dimensions_must_match_the_declared_tile_size; test_level_and_date_refused_before_transport; test_level_eleven_refused_before_send_with_or_without_keys_and_offline_control; test_lock_does_not_relabel_body_io_errors; test_lock_is_global_and_nonblocking; test_long_server_wait_covers_metadata_retry; test_machine_lock_refuses_two_different_roots; test_member_hash_guard_independent_of_outer_shard_hash; test_metadata_scheme_incompatibilities; test_mixed_retry_gap_stops_before_publication_and_resumes; test_only_declared_levels_through_the_cap_are_required; test_ordinary_build_with_snapshot_variable_never_enters_the_mode; test_ordinary_registry_has_no_unenforced_snapshot_switches; test_partial_service_extent_keeps_country_and_records_uncovered_geometry; test_persistent_tile_gap_completes_and_resume_never_refetches; test_pin_boundary_refuses_changed_chain_under_same_identity; test_priority_and_disk_are_fail_closed; test_production_lock_name_is_constant_across_processes; test_real_transport_installs_a_redirect_refusal_before_any_second_send; test_redirect_is_not_followed_and_retries_are_bounded; test_registry_is_closed_and_ordinary_build_never_selects_snapshot; test_resume_never_skips_corruption_or_incomplete_publish; test_resume_refuses_symlinked_index_before_reading_target; test_root_requires_the_invented_drive_to_be_mounted; test_root_unset_wrong_drive_traversal_and_symlink; test_run_passes_exact_machine_lock_name; test_run_reports_disk_and_io_errors_without_paths; test_safe_child_refuses_symlink_whose_target_is_inside_root; test_selection_rechecks_projected_upstream_after_level_verification; test_shard_publisher_is_required_at_each_read_stage; test_transient_tile_failure_stops_without_shard_and_retries_same_key; test_unknown_metadata_receipt_field_is_refused. Source: custodian/tests/test_gis_snapshot.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_atlas_review.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "37 passed in 1.57s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_traceback_redaction. Source: custodian/tests/test_gravity_atlas_review.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_gravity_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 2.64s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_gravity_complete_archive; test_gravity_does_not_use_the_baci_stream; test_gravity_pending_state; test_gravity_repeat_publication_is_idempotent. Source: custodian/tests/test_gravity_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_arabic_list.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "20 passed in 2.04s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_a_listed_page_url_in_the_other_language_is_refused; test_a_malformed_listed_page_url_is_refused; test_arabic_evidence_flags_stay_pending_until_the_live_read; test_arabic_list_mirrors_the_confirmed_english_pages; test_arabic_page_stating_english_or_cut_is_refused; test_arabic_plants_name_their_refusal; test_each_kind_rule_parses_the_arabic_page; test_each_language_covers_every_page_family. Source: custodian/tests/test_investment_arabic_list.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_bilingual.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "37 passed in 3.88s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_fetch_page_keeps_header_charset_casing; test_fetch_page_receipt_carries_header_charset; test_fetch_page_refuses_unknown_header_charset; test_investment_page_header_charset_beats_meta; test_investment_page_without_header_charset_refuses_when_meta_invalid. Source: custodian/tests/test_investment_bilingual.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "64 passed in 4.41s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_a_missing_terms_reading_is_pending_and_publishes; test_agency_batch_folder_prints_counts_only; test_agency_batch_names_usage_and_an_unknown_kind; test_agency_batch_same_path_names_duplicate_key; test_agency_pages_load_six_record_types; test_agency_plants_fail; test_agency_registry_declares_page_release_beside_unchanged_records; test_audit_snapshot_rejects_correctly_named_empty_manifest; test_audit_snapshot_rejects_replaced_manifest_before_page_audit; test_bounds_lineage_confirmation_and_public_only; test_changed_page_is_kept_and_terms_stay_admitted; test_dashboard_loads_every_mapped_field_on_successive_builds; test_decimal_overflow_truncated_page_and_redirect; test_drift_plants_publish_nothing; test_equal_byte_agency_recheck_uses_archived_retrieval; test_fail_fast_archives_failed_and_unattempted_inputs; test_failed_audit_leaves_the_earlier_pointer; test_fixtures_reject_realistic_identifiers_and_tracked_cache; test_nullable_precision_and_duplicate_keys; test_page_encoding_bom_precedes_receipt_and_meta; test_page_extractor_refuses_incomplete_source; test_page_receipt_charset_precedes_meta; test_page_release_reextracts_and_refuses_candidate; test_page_rows_contribute_source_only_public_totals; test_page_text_determinism_and_bilingual_roundtrip; test_page_text_hash_language_and_version_refusals; test_page_text_refusals_are_named; test_parsed_revision_archive_survives_failed_refresh; test_parser_accepts_null_date_without_padding; test_publication_guards; test_refused_refresh_keeps_the_earlier_snapshot; test_removing_either_caveat_publishes_nothing; test_same_page_path_is_still_a_duplicate_key; test_shared_last_segment_publishes_one_batch; test_yaml_reader_is_the_registry_and_adds_no_suppression. Source: custodian/tests/test_investment_build.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_crosswalk.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "49 passed in 0.57s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_crosswalk_tamper_and_changed_value_are_refused; test_current_snapshot_maps_only_reviewed_issued_ids; test_municipality_code_target; test_municipality_code_target_source_chain; test_refreshed_snapshot_keeps_batch_with_unmapped_slots; test_review_covers_both_sides_and_identifier_lookup; test_review_reference_digit_runs_are_refused; test_review_reference_other_digit_runs_are_accepted. Source: custodian/tests/test_investment_crosswalk.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_investment_transport_charset.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "1 passed in 0.05s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_open_https_passes_content_type_charset. Source: custodian/tests/test_investment_transport_charset.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_large_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "67 passed in 3.99s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_passes_stream_to_both_dispatches; test_default_dispatch_keeps_legacy_callback_signatures; test_stream_checks_hops_before_writing_with_allowed_final_url; test_streamed_dataset_without_a_licence_records_pending; test_streamed_differing_licence_records_pending. Source: custodian/tests/test_large_intake.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_local_file_report.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "6 passed in 0.75s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_report_local_file_status_is_value_free. Source: custodian/tests/test_local_file_report.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_method_card_pins.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "172 passed in 3.76s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_artifact_matches_config_accepts_matching_artifact; test_artifact_matches_config_refuses_mismatched_settings; test_c6_release_sha256_source_pin_needs_no_settings_value; test_checked_fixture_and_sync; test_closed_record_schema; test_committed_registry_does_not_refuse_duplicate_source_families; test_method_pin_evidence_records_staged_s2_outputs; test_method_pin_gate_calls_completion_evidence; test_method_pin_gate_pending_when_completion_refused; test_mixed_basket_parent_review_accepts_one_clean_and_one_contaminated_line; test_pending_fixture_needs_no_live_file; test_plant_artifact_lineage_mismatch; test_plant_artifact_lineage_receipt_mismatch; test_plant_artifact_row_duplicated; test_plant_artifact_row_missing; test_plant_c5_clean_parent_with_withheld_treatment; test_plant_c5_latest_window_substitute; test_plant_c5_parent_review_missing; test_plant_c5_value_lines_do_not_match_parent_review; test_plant_c5_withheld_with_value; test_plant_checked_row_without_evidence; test_plant_contaminated_c5_parent; test_plant_contamination_label_not_recorded_with_value; test_plant_half_year_or_2019_substitute; test_plant_lineage_context_missing_for_checked_source_pin; test_plant_lineage_date_without_timezone; test_plant_lineage_receipt_hash_mismatch; test_plant_lineage_receipt_missing; test_plant_lineage_row_duplicated; test_plant_maker_not_in_closed_set; test_plant_missing_same_maker_or_variant_reviewer; test_plant_mixed_basket_clean_line_carrying_a_marker; test_plant_mixed_basket_includes_line_without_visible_label; test_plant_mixed_basket_withheld_line_carrying_a_value; test_plant_pending_row_carries_evidence; test_plant_record_governed_sections_mismatch; test_plant_schema_version; test_plant_setting_removed_from_both_artifact_and_config; test_plant_source_pin_with_empty_lineage; test_plant_tampered_value; test_plant_unknown_configuration_pin; test_plant_unknown_lineage_source_id; test_plant_unpinned_at_gate_even_with_open_item; test_plant_unrecorded_setting; test_plant_wrong_card_anchor; test_plant_wrong_configuration_hash; test_producer_guard_plants; test_producer_refuses_schema_version; test_producer_writes_pin_artifact_from_generation_config; test_registry_source_family_ambiguous_hash; test_registry_source_family_resolves_matching_key; test_reviewed_contaminated_parent_must_label_or_withhold_values. Source: custodian/tests/test_method_card_pins.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_method_card_pins_data.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "16 passed in 0.38s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_checked_c5_and_c14_values_match_second_replay_without_producer; test_plant_record_and_artifact_agree_but_differ_from_source_replay. Source: custodian/tests/test_method_card_pins_data.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_museum_missing_forms.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "59 passed in 3.80s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_invalid_yaml_measure_field_is_refused; test_null_and_empty_cells_stay_missing; test_parser_reads_the_yaml_declared_measure_field; test_whitespace_only_cell_is_refused_at_fetch_and_build. Source: custodian/tests/test_museum_missing_forms.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_page_acquire_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "61 passed in 0.34s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_school_count_fields_taken_as_published_integers; test_school_personal_field_refused; test_school_published_count_integers_on_rows; test_school_published_count_nulls_on_rows; test_school_published_count_refused. Source: custodian/tests/test_page_acquire_survivors_2.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_page_requests_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "30 passed in 0.37s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_default_context_trust_is_only_the_invented_root; test_exact_school_queries_pass_without_frame; test_exact_school_query_passes_inside_its_frame; test_frame_refuses_unlisted_url_with_closed_fault; test_full_chain_context_keeps_default_flags_without_partial_chain; test_school_query_refusals; test_school_query_refused_inside_its_frame; test_school_rule_binds_host_and_exact_path_only. Source: custodian/tests/test_page_requests_survivors_1.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_page_schema_survivors_1.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "32 passed in 0.20s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_json_body_types_and_constants; test_keys_refusals_and_identity; test_parse_hold_refusal_name; test_path_token_and_value_refusals; test_period_accepts_years_quarters_and_datetimes; test_period_refusals; test_scalar_conversion_contract; test_tariff_parse_reaches_the_block_contract; test_typed_array_branches; test_typed_nullability_is_declared_not_assumed; test_typed_object_branches; test_typed_scalar_kinds; test_validate_accepts_the_reviewed_shapes; test_validate_arcgis_contract; test_validate_as_of_gate; test_validate_blocks_contract; test_validate_columns_contract; test_validate_columns_each_disjunct_refused; test_validate_discovery_contract; test_validate_embedded_contract; test_validate_evidence_max_bytes_and_profile; test_validate_hold_vocabulary; test_validate_period_fields; test_validate_publisher_date; test_validate_record_schema_hold_release; test_validate_schema_array_branch; test_validate_schema_nullable_optional_types; test_validate_schema_object_branch; test_validate_schema_scalars_and_unknown_kind; test_validate_table_contract; test_validate_version_and_kind; test_validate_xlsx_contract. Source: custodian/tests/test_page_schema_survivors_1.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_pinned_method_replays.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 2.21s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_c1_card_prints_both_missing_denominators; test_c1_national_population_requires_other_municipalities; test_c1_population_cache_refuses_wrong_shape; test_c1_population_plants; test_c1_population_uses_pinned_older_snapshot; test_c1_replay_requires_reviewed_target_and_indicator; test_c1_replay_uses_population_schema_and_all_activities; test_c2_cancelled_chain_uses_the_current_card_version. Source: custodian/tests/test_pinned_method_replays.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 0.74s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_hook_propagates_the_failure; test_skip_reason_still_set_fetches_nothing. Source: custodian/tests/test_places_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "23 passed in 2.73s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_metadata_with_no_file_for_the_frame_fetches_nothing. Source: custodian/tests/test_places_fsq.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "5 passed in 0.62s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_skipped_fsq_preserves_other_build_stages. Source: custodian/tests/test_places_fsq_join.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_fsq_releases.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "62 passed in 0.69s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_readme_s2_t15_paragraph_names_newest_release_at_refresh. Source: custodian/tests/test_places_fsq_releases.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_b.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "8 passed in 0.34s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_frame_build_hands_its_log_to_the_places_stage; test_a_frame_build_publishes_a_log_even_when_it_has_none. Source: custodian/tests/test_places_partb_survivors_b.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_partb_survivors_d.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 2.64s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_stac_receipts_never_enter_the_parquet_stage. Source: custodian/tests/test_places_partb_survivors_d.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "20 passed in 2.24s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_build_public_leaves_other_stages; test_byte_order_and_srid_branches; test_duplicate_place_key_is_reraise; test_empty_tables_are_zero_lines; test_engine_index_and_key_errors_are_engine_failed; test_engine_non_bytes_is_polygon_form; test_manifest_form_each_branch; test_manifest_road_digest_operand_is_unreceipted; test_method_version_operand_is_area_inputs_hash; test_object_both_branches; test_producer_nothing_to_do_and_missing_engine; test_producer_writes_then_does_nothing; test_provider_uses_the_shared_request_text; test_request_of_three_operands; test_stale_digest_stale_manifest_and_failed_candidate; test_two_road_files_are_road_file_missing; test_unreadable_road_receipt_is_unreceipted; test_west_south_and_north_bounds_are_area_polygon_form; test_wkb_both_branches; test_wrong_road_name_is_unreceipted. Source: custodian/tests/test_places_pass2.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "15 passed in 2.08s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_frame_error_is_one_log_line. Source: custodian/tests/test_places_pass3.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_places_pass3_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "1 passed in 0.78s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_run_build_reaches_the_frame_only_when_ready. Source: custodian/tests/test_places_pass3_build.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_production_adapters.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "16 passed in 0.49s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_listing_receipt_is_refused_for_an_invented_other_source; test_real_height_seam_absence_is_named_and_not_a_table. Source: custodian/tests/test_production_adapters.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_property_price_as_of.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "11 passed in 0.52s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_as_of_from_receipt_uses_snapshot_retrieval_date; test_assembly_land_price_rows_carry_receipt_as_of; test_assembly_property_quarter_carries_receipt_as_of; test_assembly_refuses_land_price_missing_as_of; test_assembly_refuses_quarter_foreign_source_as_of; test_assembly_refuses_quarter_wrong_snapshot_as_of; test_land_price_rows_carry_as_of; test_quarter_refuses_mismatched_source_snapshot_dates; test_quarter_refuses_missing_as_of; test_quarter_refuses_other_snapshot_as_of; test_quarter_rows_carry_snapshot_as_of. Source: custodian/tests/test_property_price_as_of.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_property_quarter.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "28 passed in 0.12s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_deal_in_square_metres_converts_by_the_exact_factor; test_a_planted_identifier_column_or_value_in_a_release_row_fails; test_a_second_quarter_is_a_second_row; test_a_shared_row_carries_no_source_id; test_a_unit_row_refuses_mixed_price_bases; test_agreeing_repeats_are_one_deal_and_value_is_not_doubled; test_disagreeing_repeats_block_the_deal_with_a_named_reason; test_even_count_median_is_the_mean_of_the_two_central_values; test_identifiers_never_reach_the_release_rows; test_no_kept_deal_writes_no_row; test_nonpositive_measures_are_blocked_not_kept; test_only_per_m2_resi_deals_enter_the_ft2_median; test_unit_type_rows_carry_their_basis_median_and_count; test_worked_example_reproduces_the_card_fixture. Source: custodian/tests/test_property_quarter.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_property_sales_export.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "39 passed in 0.19s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_exact_shape_keeps_a_deal_in_published_square_metres; test_published_price_per_square_foot_is_never_read. Source: custodian/tests/test_property_sales_export.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_property_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "40 passed in 0.14s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_property_aggregate_rows_sort_by_each_cell_key; test_property_aggregate_rows_sort_unit_keys; test_property_missing_unit_price_has_no_partial_median; test_property_null_value_sums_to_decimal_zero; test_property_odd_median_uses_the_middle_value; test_property_per_unit_deal_has_no_square_foot_median; test_property_square_foot_price_boundaries; test_property_sum_and_median_round_half_up. Source: custodian/tests/test_property_survivors.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_public_cadence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "44 passed in 4.31s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_recorded_family_assignments; test_trade_manifest_omits_absent_family. Source: custodian/tests/test_public_cadence.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_public_data_stage.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "13 passed in 0.45s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_planted_wrong_figure_fails_the_stage; test_pub71_matching_record_passes_the_build; test_pub71_no_figure_leaves_the_build_unfailed; test_pub71_present_figure_without_record_fails_the_build. Source: custodian/tests/test_public_data_stage.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_public_series.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "118 passed in 4.76s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_c2_method_version_is_bumped_without_changing_other_cards; test_fetch_build_runs_selected_cache_checks; test_independent_checks_and_contract_values; test_r3_planted_legacy_alias_is_never_read; test_r3_reference_review_remains_explicit. Source: custodian/tests/test_public_series.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_public_snapshots.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "43 passed in 3.13s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_fetched_terms_bytes_are_archived; test_pub04_row_describes_s2_t27_dated_archive_and_citation_snapshots; test_trade_outputs_metadata_and_manifest_are_dated; test_trade_reader_older_of_two_and_tamper. Source: custodian/tests/test_public_snapshots.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_behaviour.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "48 passed in 3.31s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_skipped_row_and_unreadable_metadata; test_build_writes_only_under_the_cache; test_changed_terms_hash_is_logged_and_the_row_is_still_fetched; test_changed_terms_on_a_skipped_row_store_nothing; test_changed_terms_on_an_unwatched_file_are_stored_both_times; test_citation_only_with_a_terms_url_calls_nothing; test_citation_only_writes_metadata_and_does_not_fetch; test_dataset_portal_without_a_licence_is_fetched_and_used; test_failed_check_records_the_reason_and_stores_nothing; test_forbidding_terms_leave_the_source_fetched_and_stored; test_owner_decision_portal_licence_difference_is_recorded_pending; test_skipped_row_retries_its_terms_page; test_skipped_watched_row_hashes_terms_and_does_not_switch_off; test_terms_host_off_the_allow_list_is_not_contacted; test_terms_page_host_off_the_list_is_not_contacted; test_terms_page_unread_names_the_check_and_stores_no_hash; test_terms_page_without_a_terms_url_stores_no_fingerprint; test_terms_redirect_off_the_list_does_not_fail_the_row; test_undeclared_asset_write_fails_build_boundary_guard; test_undeclared_write_outside_data_fails_build_boundary_guard; test_unread_terms_page_does_not_fail_the_row; test_watched_row_with_the_old_forbidding_words_is_fetched. Source: custodian/tests/test_publicdata_behaviour.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_besttime_build.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "52 passed in 9.50s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_besttime_build_failure_names_missing_place; test_besttime_dispatch_passes_environment; test_besttime_input_secret_is_not_logged; test_besttime_missing_keys_failure_log_is_key_free. Source: custodian/tests/test_publicdata_besttime_build.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_buildings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "85 passed in 14.12s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_a_failed_rebuild_removes_earlier_completion_marker; test_axis_range_and_malformed_source_flag_refuse; test_duplicate_stac_part_assets_refuse; test_each_part_dependency_refuses_by_name; test_explicit_crs84_and_absent_optional_columns_are_supported; test_explicit_pin_wins_over_cache_review; test_footprint_attribution_counts_record_level_datasets_only; test_frame_early_returns_and_noop_never_reuse_old_buildings; test_full_polygon_holes_and_multipolygons_are_preserved; test_geoparquet_encoding_and_axes_are_not_guessed; test_heights_manifest_uses_building_manifest_path_and_hash; test_heights_rejects_stale_or_altered_building_chain_before_read; test_identical_pins_produce_identical_bytes_and_sorted_ids; test_identifier_and_axis_plants; test_incomplete_or_switched_off_receipt_refuses; test_incomplete_stac_collection_never_proves_completeness; test_invalid_and_underground_footprints_are_excluded_without_repair; test_lead_boundary_review_is_bound_to_input_chain_and_count; test_legacy_frame_wrapper_preserves_named_producer_failure; test_malformed_or_noncovering_stac_item_refuses; test_national_selection_is_unrounded_with_island_hole_and_separate_counts; test_optional_field_counts_separate_kept_rows_from_all_read; test_part_registry_identity_is_closed; test_present_fields_are_null_and_counted_including_unusable_and_modelled; test_receipted_nonparquet_refuses_with_producer_name; test_registered_stac_collection_uses_existing_transport_and_receipt; test_reversed_source_rows_keep_table_bytes_and_id_hash; test_stac_part_set_and_national_box_are_deciding_guards; test_staged_table_validation_refuses_by_name_before_publication; test_stale_or_malformed_boundary_review_refuses; test_table_replace_failure_never_publishes_manifest; test_unknown_schema_crs_and_missing_columns_refuse; test_unmapped_height_coverage_uses_c47_usable_precision; test_unregistered_stac_item_never_proves_completeness. Source: custodian/tests/test_publicdata_buildings.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_fetch.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "5 passed in 0.76s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_skipped_citation_fingerprints_terms_without_citation; test_skipped_citation_writes_no_citation; test_unskipped_citation_writes_citation_and_line. Source: custodian/tests/test_publicdata_fetch.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_heights.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "157 passed in 6.20s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_citation_retrieval_date_unlike_its_receipt_refuses; test_a_citation_unlike_its_registry_row_refuses_at_load_and_at_verify; test_a_cited_hash_whose_index_holds_another_page_refuses; test_a_duplicate_landmark_identifier_refuses_in_both_orders; test_a_fictitious_landmark_page_url_is_refused; test_a_floor_product_too_large_for_the_context_is_refused; test_a_gba_class_column_defect_has_its_own_refusal; test_a_gba_class_field_still_to_be_confirmed_keeps_the_source_absent; test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build; test_a_landmark_height_reaches_the_manifest_and_wins_the_order; test_a_landmark_recorded_conflict_is_refused; test_a_long_expansion_statistic_is_written_at_the_stated_decimals; test_a_malformed_hand_list_document_has_its_own_refusal; test_a_missing_table_removes_the_outputs_of_an_earlier_run; test_a_non_positive_wsf_cell_is_counted_and_never_a_crash; test_a_planted_omitted_heights_step_refuses_the_build; test_a_planted_omitted_heights_step_refuses_when_outputs_already_exist; test_a_planted_skip_on_gba_still_runs_the_heights_step; test_a_production_landmark_citation_must_match_the_registry; test_a_public_page_citation_resolves_its_raw_page_snapshot; test_a_receipt_from_another_publisher_refuses; test_a_refusal_removes_the_outputs_of_an_earlier_run; test_a_signed_redirect_query_reaches_no_receipt_manifest_log_or_error; test_a_verified_landmark_page_snapshot_binds_the_citation; test_a_written_row_reads_back_as_the_same_decimal; test_a_wsf_body_that_is_not_a_raster_is_a_named_refusal; test_altered_landmark_page_bytes_refuse; test_an_absent_building_table_refuses_the_heights_step; test_an_exception_the_step_does_not_own_still_propagates; test_an_fe50_table_fails_the_build_and_writes_no_heights; test_an_incomplete_or_foreign_page_receipt_refuses; test_an_invalid_landmark_height_refuses_the_build_and_leaves_no_output; test_an_off_list_host_is_refused_before_the_transport; test_both_rows_fetch_through_run_build_on_an_allowed_host; test_class_field_rules_have_their_own_refusals; test_committed_rows_load_with_their_basis_and_no_credit; test_each_planted_hand_list_defect_has_its_own_refusal; test_every_registry_row_of_a_source_is_named_in_the_manifest; test_fetch_row_stores_no_query_whatever_address_the_fetcher_returns; test_gba_calibration_drops_a_recorded_height_below_the_precision; test_gba_calibration_drops_subprecision_values; test_gba_calibration_equals_fallback_errors_on_identical_raw_pairs; test_gba_calibration_measures_error_by_class_in_the_manifest; test_gba_fetches_through_the_allow_list; test_gba_rules_without_a_class_field_refuse_before_parse; test_landmark_binding_absent_on_refresh_refuses; test_missing_landmark_page_bytes_refuse; test_non_commercial_terms_never_block_the_source; test_run_build_refuses_heights_on_an_absent_table; test_the_class_column_reader_refuses_each_malformed_table; test_the_committed_landmark_hand_list_is_pending_without_entries; test_the_committed_rules_file_loads_with_the_declared_structures; test_the_committed_rules_read_both_sources_not_fetched; test_the_fixture_landmark_hand_list_carries_a_full_citation; test_the_floor_count_product_reads_the_committed_constant; test_the_manifest_names_the_tables_source_chain_not_a_licence; test_the_manifest_records_the_committed_hand_list_hash; test_the_planted_loader_cases_share_one_valid_baseline; test_the_real_doc04_credit_is_the_real_manifest_credit; test_tied_footprints_with_the_same_height_count_none; test_tied_footprints_with_two_heights_count_one; test_unrelated_metadata_holding_only_the_cited_hash_refuses. Source: custodian/tests/test_publicdata_heights.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_licence.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "4 passed in 0.45s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_any_other_portal_statement_is_recorded_pending; test_cc_by_4_accepts_only_the_portal_statement_and_records_it; test_fail_line_names_check_expected_and_observed; test_publisher_folds_case_and_space_and_names_a_different_publisher. Source: custodian/tests/test_publicdata_licence.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_listing_survivors.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "56 passed in 0.24s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_malformed_key_child_refuses_before_request; test_misnamed_json_child_refuses_before_request; test_mixed_registry_lists_only_whole_file_parts; test_mixed_registry_malformed_part_still_refuses; test_non_json_stac_child_refuses_before_request; test_stac_child_is_not_required_in_parquet_listing. Source: custodian/tests/test_publicdata_listing_survivors.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "80 passed in 25.56s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_baci_registry_pending_and_nightly_policy; test_committed_registry_follows_decision_0026; test_registry_counts_follow_decision_0026. Source: custodian/tests/test_publicdata_registry.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "42 passed in 0.97s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_accident_awaits_byte_bound_without_fetching; test_listing_build_keeps_existing_part_fetch. Source: custodian/tests/test_publicdata_unblocked_round2.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_publicdata_unblocked_round3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "4 passed in 1.65s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_listing_build_fresh_cache_uses_registered_parts; test_listing_build_preserves_parent_graph; test_listing_build_preserves_parent_rows_and_receipt. Source: custodian/tests/test_publicdata_unblocked_round3.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_registers.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "113 passed in 1.98s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_ambiguous_keys_and_periods_refused; test_both_card_shapes_preserve_public_fields_and_frame; test_both_release_kinds_consume_equal_validated_tables; test_content_bytes_are_decoded_or_refused; test_content_bytes_without_card_text_pass; test_current_capture_can_predate_snapshot_keeper; test_declared_formats_have_planted_violations; test_declared_registration_shapes_and_open_categories; test_duplicate_registration_and_row_key_refused; test_empty_frame_and_missing_coordinates_never_relocate; test_empty_snapshot_before_keeper_floor_refuses; test_every_string_card_column_keeps_dat11_scan; test_extra_and_person_columns_are_refused; test_failures_and_repr_hide_source_values; test_fc_companion_joins_and_malformed_notices; test_history_keeps_exited_company_and_earlier_location; test_identifier_allowed_in_each_key_only; test_input_only_nationality_is_header_checked_and_dropped; test_no_identifier_in_non_table_artefact; test_no_network_or_ambient_setting_read; test_numeric_capital_storage_range_and_small_coordinate; test_numeric_public_values_are_not_identifier_strings; test_receipt_chain_is_complete_and_key_scoped; test_registry_file_declarations_and_dispatch_are_closed; test_release_schema_and_identifier_egress_plants; test_release_value_artefact_plants; test_release_value_nested_typed_public_values_pass; test_release_value_sha256_exemption; test_snapshot_uses_own_sources_current_month; test_stale_two_table_wording_is_gone; test_typed_numeric_card_loader_plants. Source: custodian/tests/test_registers.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_registers_intake.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "81 passed in 1.90s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_atomic_failure_preserves_entire_previous_set; test_build_and_source_applicability_plants; test_build_dispatch_never_opens_a_register_file_or_transport; test_card_name_cannot_be_copied_to_metadata; test_changed_file_during_read_and_byte_bound; test_company_count_nullability_is_preserved; test_csv_boundary_and_lexeme_plants; test_empty_snapshot_is_kept_not_missing; test_every_retired_identifier_prefix_is_refused; test_explicit_older_pin_no_latest_substitution; test_fc_location_and_full_notice_are_preserved; test_file_registry_shape_cannot_become_a_transport; test_frames_refuse_stored_parent_and_child; test_intake_current_months_are_independent_and_may_predate_keeper; test_intake_refuses_snapshot_before_keeper_floor; test_lead_cli_invented_end_to_end_only; test_loader_contract_plants; test_overwritten_index_and_receipt_cannot_repin_history; test_placeholder_publisher_cannot_claim_completed_lineage; test_prohibitive_or_pending_terms_remain_records; test_protected_list_reference_period_predates_public_snapshot_keeper; test_published_parquet_roundtrip_hashes_and_file_receipt_mode; test_raw_bundle_bytes_and_unserializable_artefact_refuse; test_registry_headers_are_exact_metadata_contracts; test_release_wrong_container_types_have_fixed_refusals; test_remaining_receipt_format_plants; test_reserved_path_is_rejected_before_open; test_sibling_selection_integrity_plants; test_table_catalogue_drift_and_every_other_table_identifier_plant; test_unpinned_index_is_not_a_trusted_snapshot_selection. Source: custodian/tests/test_registers_intake.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_registry_terms_record.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "15 passed in 0.89s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_baci_publisher_terms_reading_is_recorded; test_planted_removal_of_baci_terms_reading_is_detected. Source: custodian/tests/test_registry_terms_record.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t10_reader_retrieval_date.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "3 passed in 0.49s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_unparseable_retrieval_date_names_the_field. Source: custodian/tests/test_s2_t10_reader_retrieval_date.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_family_tables.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "11 passed in 0.77s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_boolean_measure_in_number_column_is_refused; test_decimal_measure_encodes_for_release; test_declared_columns_reach_release_shape; test_each_family_registry_names_its_release_table; test_family_assembly_accumulates_declared_cells; test_family_assembly_refuses_duplicate_measure_key; test_family_assembly_round_trips_decimal_measure; test_family_fetch_receipt_names_its_release_table; test_family_table_contract_is_documented; test_text_measure_in_number_column_is_refused; test_undeclared_column_is_refused. Source: custodian/tests/test_s2_t19_family_tables.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "46 passed in 5.14s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_orchestration_collects_families_without_tables; test_each_family_cache_and_receipt_preserve_published_shape; test_exact_block_and_metadata; test_exact_hosts_and_pack_list; test_existing_fetch_kinds_have_hashed_receipts. Source: custodian/tests/test_s2_t19_registry.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "50 passed in 1.98s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_awards_intake_security_refuses; test_cleared_hold_keeps_evidence_refusal; test_existing_proof_integrity_refusal_preserves_archive; test_held_dispatch_continues; test_interrupted_publication_has_no_partial. Source: custodian/tests/test_s2_t29_fix.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 0.57s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_final_rename_failure_restores_source; test_real_incomplete_awards_proof; test_real_incomplete_registry_source; test_real_redirect_pin_refusal. Source: custodian/tests/test_s2_t29_fix2.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_fix6.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "91 passed in 62.70s (0:01:02)" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_off_list_fetching_row_refuses_without_transport; test_off_list_refusal_loads_and_normal_dispatch_never_fetches. Source: custodian/tests/test_s2_t29_fix6.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_live_acquire.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "80 passed in 0.29s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_schools_private_directory_declaration_includes_count_columns. Source: custodian/tests/test_s2_t29_live_acquire.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_series_exact_regressions.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "75 passed in 10.23s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_pub64_requires_receipt_lineage. Source: custodian/tests/test_series_exact_regressions.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_series_frame.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 1.38s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_frame_then_stage_supplies_municipalities. Source: custodian/tests/test_series_frame.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_series_parse_survivors_lr3.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "20 passed in 0.50s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_municipality_names_read_the_frame_and_reviewed_csv_only. Source: custodian/tests/test_series_parse_survivors_lr3.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_series_r5.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "27 passed in 0.51s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_installed_review_has_metadata. Source: custodian/tests/test_series_r5.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "68 passed in 0.85s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_tender_path_wording_matches_accept_language_only_guarantee. Source: custodian/tests/test_tenders.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_attempts.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "8 passed in 0.92s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_a_read_terms_page_records_no_attempt; test_an_unread_terms_page_is_recorded_as_an_attempt_only. Source: custodian/tests/test_terms_attempts.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_terms_fingerprint.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "6 passed in 1.67s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_changed_terms_sentence_prints_the_terms_line; test_failed_build_keeps_terms_baseline_and_local_statuses; test_raw_byte_previous_log_does_not_print_a_false_terms_line; test_token_nonce_and_whitespace_keep_one_fingerprint. Source: custodian/tests/test_terms_fingerprint.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_deferred.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "15 passed in 0.11s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_deferred_record_is_closed_and_inactive; test_owner_deferred_file_is_outside_active_inputs; test_resolved_owner_selection_never_reads_or_pairs_deferred_file. Source: custodian/tests/test_trade_deferred.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_publisher_readings.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "39 passed in 1.06s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_benchmark_licence_ids_use_registry_tokens; test_comtrade_partial_budgets_do_not_claim_api_tiers; test_comtrade_partial_budgets_leave_acceptance_open; test_comtrade_registry_keeps_both_dated_terms_excerpts; test_comtrade_terms_agree_with_deployment_record_and_current_summary; test_page_reading_is_independent_of_fetch_permission; test_partial_readings_do_not_activate_downloads; test_pub03_fetch_host_delta_matches_readings_and_fetch_configuration; test_pub03_fetch_host_delta_rejects_planted_extra_host; test_pub03_refuses_metadata_only_publisher_hosts; test_pub03_rejects_planted_read_only_host; test_registry_rows_resolve_to_independent_publisher_readings; test_review_rejects_unbacked_confirmation. Source: custodian/tests/test_trade_publisher_readings.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_release.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "62 passed in 0.94s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_dispatch_comparison_invalid; test_dispatch_reader_failure; test_pending_selection_and_dispatch. Source: custodian/tests/test_trade_reconciliation_release.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_reconciliation_survivors_2.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "14 passed in 0.13s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_default_selection. Source: custodian/tests/test_trade_reconciliation_survivors_2.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest custodian/tests/test_trade_selection_pending.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "18 passed in 0.35s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_missing_partner_year_is_never_filled; test_owner_selection_is_confirmed_but_pending; test_pending_assembly_records_no_compared_output; test_pending_dispatch_records_no_comparison; test_pending_fetch_cannot_claim_evidence; test_pending_fetch_never_reads_compares_or_reports; test_pending_flag_is_boolean; test_scope_directive_never_becomes_a_compared_cell; test_selected_pending_fetch_roundtrip; test_selection_refuses_size_cut_and_ranking. Source: custodian/tests/test_trade_selection_pending.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest product/tests/test_released_imagery.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "7 passed in 0.10s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_change_during_hash_refuses_without_caching_pre_hash_identity; test_first_read_accepts_intact_object_when_relatime_updates_atime; test_manifest_is_explicit_and_cannot_escape_or_be_mutated; test_member_hash_checks_intact_object_with_wrong_manifest_hash; test_object_hash_checks_bytes_outside_requested_member; test_release_carries_only_selected_verified_immutable_files; test_shard_hash_is_cached_and_file_change_invalidates_it. Source: product/tests/test_released_imagery.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest product/tests/test_structured_address.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "23 passed in 0.17s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_exact_found_missing_and_ambiguous_never_silently_chosen; test_five_candidate_cap_is_exact_and_stably_ordered; test_store_adapters_share_results_and_embedded_index_is_real; test_store_reader_refuses_seven_rows_before_result_selection; test_two_fixed_store_reads_bind_only_typed_values; test_typed_api_with_keys_and_offline_controls_never_egresses; test_typed_fields_are_closed_published_strings; test_unknown_and_free_text_fields_refused_by_name. Source: product/tests/test_structured_address.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_commands.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_usage_lists_every_command. Source: scripts/tests/test_commands.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest scripts.tests.test_fsq_exclusions -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    12 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_module_docstring_names_explicit_release_not_pinned_copy. Source: scripts/tests/test_fsq_exclusions.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m pytest scripts/tests/test_gis_snapshot_binding.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "30 passed in 0.14s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_imagery_root_cannot_contain_repository; test_imagery_root_cannot_overlap_other_roles; test_kernel_mount_is_read_only_hides_the_root_and_rechecks_file_hash; test_no_selection_needs_no_external_root_and_selected_unset_refuses; test_selected_file_budget_refuses_before_opening_any_source; test_selected_files_are_the_only_new_read_only_mounts; test_supervisor_pid_descriptor_collision_does_not_change_mount_judgement; test_unverified_paths_and_nonobjects_cannot_be_selected; test_valid_object_requires_registered_top_folder; test_valid_object_through_in_root_symlink_refuses_for_symlink; test_world_profile_cannot_select_imagery. Source: scripts/tests/test_gis_snapshot_binding.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count. Pytest fixture functions; unittest would collect zero. Brief runner-form conflict recorded in gaps.json.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_forms.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    11 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_product_tests_every_forbidden_mechanism. Source: scripts/tests/test_import_boundary_forms.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_real.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (all functions because the change is in shared file code): test_clean_boundary_fixture_passes; test_guard_changes_nothing; test_metadata_guard_is_wired; test_real_tree_fresh_interpreters_pass; test_real_tree_static_passes; test_tables_have_their_sizes. Source: scripts/tests/test_import_boundary_real.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest scripts.tests.test_reference_notes_real -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_configuration_repeat_reading_is_explicit; test_geoparquet_setting_official_reading; test_p24_summary_rows_match_local_reading_closures; test_p24_terms_cell_preserves_only_remaining_attribution_hold; test_parquet_official_readings. Source: scripts/tests/test_reference_notes_real.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest scripts.tests.test_register_company_task_replan -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_document_14_names_register_company_owners; test_oi_162_closure_names_s2_t49; test_oi_162_item_is_closed; test_s2_t49_dat_83_criterion; test_s3_t12_oi_162_amendment; test_tasks_md_lists_s2_t49. Source: scripts/tests/test_register_company_task_replan.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_environment.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    5 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_same_named_test_files_in_two_folders; test_secrets_never_reach_a_suite. Source: scripts/tests/test_runner_environment.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_failures.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_suite_that_cannot_start. Source: scripts/tests/test_runner_failures.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    7 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_duration_normalisation_preserves_other_lines; test_each_suite_prints_its_own_duration; test_unavailable_counts_and_internal_error_print_duration. Source: scripts/tests/test_runner_usage.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_verdicts.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    6 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_clean_suites_exit_zero; test_subtests_are_part_of_their_test. Source: scripts/tests/test_runner_verdicts.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_sandbox_argv.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    16 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_run_starts_bubblewrap_with_nothing_inherited. Source: scripts/tests/test_sandbox_argv.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest scripts.tests.test_spine_triage -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    38 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_all_priority_groups_are_stable_and_accounted; test_both_binding_inputs_refuse_stale_identity; test_context_and_output_preserve_exact_lineage_and_columns; test_each_cli_input_is_required_before_context_or_gateway; test_each_failure_outcome_restores_prior_decisions_and_stops_calls; test_each_membership_key_is_required; test_each_provider_exception_has_closed_refusal_or_fallback; test_full_review_binding_with_audit_hash_admitted; test_main_refuses_each_input_exception_without_echo; test_missing_provider_defaults_to_none; test_path_and_code_returns_and_run_id_boundaries; test_qualification_and_caps_refused_without_calls; test_records_only_in_runs_and_manifest_has_no_payload; test_requests_have_exact_closed_contract; test_script_entry_refuses_before_reading_inputs; test_stale_review_binding_with_audit_hash_refused. Source: scripts/tests/test_spine_triage.py at WORK 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   npm --prefix web run test:checks
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     web/spikes/performance/tests/performance.spec.ts: readiness diagnostics retain failure events and the original rejection; readiness diagnostics are silent and release listeners after success; readiness diagnostics keep events observed before the readiness call; readiness diagnostics in open retain navigation events and the original readiness rejection; readiness diagnostics in open report a rejected navigation once; readiness diagnostics in open abandon readiness when a foreign request wins navigation; readiness diagnostics report a host timeout without awaiting the hung page; the smoke orbit draws both layers and records a trace; the Arabic route uses the Arabic notice; isolating hexagons leaves the hex canvas nonblank; isolating particles leaves the particle canvas nonblank; omitting one hexagon lowers the drawn count; hiding the hexagon layer reports no hexagon instances; omitting one particle lowers the drawn count; hiding the particle layer reports no particle instances; a frozen clock leaves the first particle in place; an empty timestamp list is refused by name; a blank renderer is refused by name; an unknown field is refused by name; ignoring the cap is qualified as the wrong cap; a renamed profile is qualified by name; the ordinary page helper rejects a remote asset; a remote image does not load; the no-webgl2 plant names the failure without a map; a planted software renderer is refused before the orbit; a planted remote renderer is refused before the orbit; a planted capped empty canvas is refused before the layers load; a planted coarse clock is refused before the orbit; a planted slow full scene with an empty canvas at 60 is stored; roads carry the Simulated word and dash style in the interleaved overlay; roads draw the configured full fixture and first load with both original layers; roads short orbit posts a well-formed smoke trace; roads playback visits each stored hour and holds the recorded bands across the load cycle; roads Pause motion freezes the hour clock and resumes it on a second press; roads Pause motion freezes particles and resumes them on a second press; roads reduced motion never starts hour playback or particles; roads have the Arabic provenance word and dashed legend on the Arabic route; roads paused playback plant is refused by name; roads missing dash plant removes the actual extension; roads missing link plant lowers the drawn count; roads hidden layer plant reports zero drawn road links; roads ordinary helper refuses the remote request plant; roads full street load draws every link and carries the Simulated mark. Browser spec is executed by spikes/performance/tests/run.node-test.mjs and run.mjs; web/package.json test:checks. Actual exit owed to lead; same script working directory via npm --prefix.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   npm --prefix web run test:spike:performance
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     web/spikes/performance/tests/scene-size-sites.mjs: FULL_SITES; scene-size.node-test.mjs consumer. Changed fixture helper imported by scene-size.node-test.mjs; test:spike:performance covers its consumer. Actual exit owed to lead; same script working directory via npm --prefix.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   node --test web/spikes/performance/tests/layers.node-test.mjs
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     web/spikes/performance/tests/layers.node-test.mjs: composition retains two opacity passes with actual hourly accessors and stable data; map options retain the fixed extent, drawing buffer and noninteractive scene; base layer properties retain flat filled hexagons and pixel particles; composition keeps the original set and reports hidden and undashed road plants; mid-fade composite keeps unchanged colours exact and blends changed colours; canvas sample recognises opaque road colours and rejects background; road pixel recognition requires every RGB channel to match; scene reports actual counts, accessors, motion, renderer and context events; map failures reject without leaving the idle callback registered; sampling uses every interior grid point and separates pixel categories; initial counts use the layers already rendered at idle without scheduling a duplicate scene; initial idle mounts the heavy overlay after the basemap has loaded; a deferred overlay mount failure rejects readiness; a basemap load failure removes the deferred heavy mount and idle listener; an already loaded basemap mounts without waiting for another load event. S2-T44 lifecycle, deferred-idle fixture and already-loaded-map regression; also covered by both retained npm rows. Actual exit owed to lead; same script working directory via npm --prefix.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "912 files already formatted"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 487 source files"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1234 text files, 134 Markdown files: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 components: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 367 rows: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Rule 2; byte parity, exit owed.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation. No fallback.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    977 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation. No guessed expect count.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','a0e01df3a3d05ea04351d66d7505eab11b26ea9d...4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:core/tests/test_c2_centred_bulk.py A:custodian/data_tests/test_national_buildings.py A:custodian/publicdata/review/activity_spine_audits.json A:custodian/publicdata/review/gis_snapshot.json A:custodian/publicdata/review/landmark_heights.yaml A:custodian/publicdata/review/municipality_codes.csv A:custodian/publicdata/review/trade_publisher_readings.yaml A:custodian/src/eii_custodian/publicdata/building_inputs.py A:custodian/src/eii_custodian/publicdata/buildings.py A:custodian/src/eii_custodian/publicdata/cdse/wire.py A:custodian/src/eii_custodian/publicdata/company_web/README.md A:custodian/src/eii_custodian/publicdata/company_web/__init__.py A:custodian/src/eii_custodian/publicdata/company_web/build.py A:custodian/src/eii_custodian/publicdata/company_web/contracts.py A:custodian/src/eii_custodian/publicdata/company_web/evidence.py A:custodian/src/eii_custodian/publicdata/company_web/fetch.py A:custodian/src/eii_custodian/publicdata/company_web/names.py A:custodian/src/eii_custodian/publicdata/company_web/parse.py A:custodian/src/eii_custodian/publicdata/company_web/review.py A:custodian/src/eii_custodian/publicdata/company_web/scope.py A:custodian/src/eii_custodian/publicdata/company_web/search.py A:custodian/src/eii_custodian/publicdata/fetch/award_links.py A:custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md A:custodian/src/eii_custodian/publicdata/gis/snapshot_archive.py A:custodian/src/eii_custodian/publicdata/gis/snapshot_policy.py A:custodian/src/eii_custodian/publicdata/gis/snapshot_receipt.py A:custodian/src/eii_custodian/publicdata/gis/snapshot_release.py A:custodian/src/eii_custodian/publicdata/gis/snapshot_runner.py A:custodian/src/eii_custodian/publicdata/gis/snapshot_scheme.py A:custodian/src/eii_custodian/publicdata/heights/calibration.py A:custodian/src/eii_custodian/publicdata/heights/landmarks.py A:custodian/src/eii_custodian/publicdata/method_card_producer.py A:custodian/src/eii_custodian/publicdata/property/price_as_of.py A:custodian/src/eii_custodian/publicdata/registers/README.md A:custodian/src/eii_custodian/publicdata/registers/__init__.py A:custodian/src/eii_custodian/publicdata/registers/__main__.py A:custodian/src/eii_custodian/publicdata/registers/build.py A:custodian/src/eii_custodian/publicdata/registers/contracts.py A:custodian/src/eii_custodian/publicdata/registers/intake.py A:custodian/src/eii_custodian/publicdata/registers/parse.py A:custodian/src/eii_custodian/publicdata/registers/provenance.py A:custodian/src/eii_custodian/publicdata/registers/validate.py A:custodian/src/eii_custodian/publicdata/singles/families.py A:custodian/tests/building_fixture.py A:custodian/tests/company_web_fixture.py A:custodian/tests/fixtures/heights/landmark_hand_list.yaml A:custodian/tests/method_pin_gather_fixtures.py A:custodian/tests/support/__init__.py A:custodian/tests/support/buildings.py A:custodian/tests/support/fetch_build.py A:custodian/tests/test_activity_model_audits.py A:custodian/tests/test_assembly_terms_boundary.py A:custodian/tests/test_award_all_links.py A:custodian/tests/test_baci_archive_review.py A:custodian/tests/test_baci_reviewed_urls.py A:custodian/tests/test_building_workflow.py A:custodian/tests/test_buildings_support.py A:custodian/tests/test_company_web_command.py A:custodian/tests/test_company_web_evidence.py A:custodian/tests/test_company_web_fetch.py A:custodian/tests/test_company_web_fields.py A:custodian/tests/test_company_web_output.py A:custodian/tests/test_company_web_properties.py A:custodian/tests/test_company_web_review.py A:custodian/tests/test_company_web_revision.py A:custodian/tests/test_company_web_search.py A:custodian/tests/test_fc_register_guards.py A:custodian/tests/test_gis_snapshot.py A:custodian/tests/test_investment_arabic_list.py A:custodian/tests/test_investment_transport_charset.py A:custodian/tests/test_pinned_method_replays.py A:custodian/tests/test_property_price_as_of.py A:custodian/tests/test_publicdata_buildings.py A:custodian/tests/test_registers.py A:custodian/tests/test_registers_intake.py A:custodian/tests/test_s2_t19_family_tables.py A:custodian/tests/test_trade_deferred.py A:custodian/tests/test_trade_publisher_readings.py A:custodian/tests/test_trade_selection_pending.py A:docs/decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md A:docs/decisions/0074-company-level-fields-of-the-owners-company-workbook.md A:docs/decisions/0075-activity-mappings-signed-by-model-review.md A:docs/decisions/0076-company-web-pages-search-fetch-review-and-storage.md A:docs/decisions/0077-overture-footprints-as-the-national-building-table.md A:docs/decisions/0078-c2-bulk-months-by-the-centred-median.md A:docs/decisions/0079-dated-gis-snapshot-and-structured-address-search.md A:product/src/eii_product/api/address_search.py A:product/src/eii_product/api/gis_imagery.py A:product/tests/fixtures/released_imagery/README.md A:product/tests/fixtures/released_imagery/release/76a23626e7239f5c80258817de9b77e12ec19f648b74fc8b3bfa06db52e63f5e.json A:product/tests/fixtures/released_imagery/release/objects/4878616b843c68fdc5b514d93d64aa4ee9c5f71a3a592fd652248be7c318ed1d.json A:product/tests/fixtures/released_imagery/release/objects/9348542c40c768f8ac4ed0a7c540c36174fb68faf9b2ead14e66069619b2e28d.tar.b64 A:product/tests/fixtures/released_imagery/release/objects/d81faac9fcfcab38902d61da8899d17fc227c9ed2dc0b9117568077d5861b663.json A:product/tests/fixtures/released_imagery/release/objects/fdf01b635262f5f84c82870517c8ded6afcfde96a051b0947357afcf88da3578.json A:product/tests/fixtures/released_imagery/tile.jpg A:product/tests/test_released_imagery.py A:product/tests/test_structured_address.py A:scripts/gis_snapshot_input.py A:scripts/tests/test_gis_snapshot_binding.py A:scripts/tests/test_register_company_task_replan.py D:custodian/publicdata/review/municipality_aliases.json M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:core/src/eii_core/calc/building_heights.py M:core/src/eii_core/calc/public_series.py M:core/tests/fixtures/methods/public_methods.json M:core/tests/test_building_heights.py M:core/tests/test_public_methods.py M:core/tests/test_third_pass.py M:custodian/data_tests/README.md M:custodian/data_tests/cache.py M:custodian/data_tests/test_pinned_methods.py M:custodian/publicdata/baci.yaml M:custodian/publicdata/height_rules.yaml M:custodian/publicdata/investment_pages.yaml M:custodian/publicdata/review/baskets.yaml M:custodian/publicdata/review/s2_t29_sources.yaml M:custodian/publicdata/sources.yaml M:custodian/publicdata/trade_reconciliation.yaml M:custodian/src/eii_custodian/publicdata/additions/common.py M:custodian/src/eii_custodian/publicdata/additions/property_venues.py M:custodian/src/eii_custodian/publicdata/assembly_adapters.py M:custodian/src/eii_custodian/publicdata/assembly_inventory.py M:custodian/src/eii_custodian/publicdata/assembly_layers.py M:custodian/src/eii_custodian/publicdata/assembly_reports.py M:custodian/src/eii_custodian/publicdata/assembly_sources.py M:custodian/src/eii_custodian/publicdata/atlas/README.md M:custodian/src/eii_custodian/publicdata/baci/README.md M:custodian/src/eii_custodian/publicdata/baci/config.py M:custodian/src/eii_custodian/publicdata/baci/fetch.py M:custodian/src/eii_custodian/publicdata/baci/parse.py M:custodian/src/eii_custodian/publicdata/benchmarks/README.md M:custodian/src/eii_custodian/publicdata/cdse/README.md M:custodian/src/eii_custodian/publicdata/cdse/contracts.py M:custodian/src/eii_custodian/publicdata/cdse/transport.py M:custodian/src/eii_custodian/publicdata/comtrade/README.md M:custodian/src/eii_custodian/publicdata/fc_register/acquire.py M:custodian/src/eii_custodian/publicdata/fetch/allowlist.py M:custodian/src/eii_custodian/publicdata/fetch/award_checks.py M:custodian/src/eii_custodian/publicdata/fetch/awards.py M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/kinds.py M:custodian/src/eii_custodian/publicdata/fetch/listing.py M:custodian/src/eii_custodian/publicdata/fetch/page_schema.py M:custodian/src/eii_custodian/publicdata/fetch/receipts.py M:custodian/src/eii_custodian/publicdata/fetch/registry.py M:custodian/src/eii_custodian/publicdata/fetch/transport.py M:custodian/src/eii_custodian/publicdata/frame/README.md M:custodian/src/eii_custodian/publicdata/frame/build.py M:custodian/src/eii_custodian/publicdata/gate_report.py M:custodian/src/eii_custodian/publicdata/gis/layers.py M:custodian/src/eii_custodian/publicdata/heights/README.md M:custodian/src/eii_custodian/publicdata/heights/manifest.py M:custodian/src/eii_custodian/publicdata/heights/model.py M:custodian/src/eii_custodian/publicdata/heights/read.py M:custodian/src/eii_custodian/publicdata/heights/step.py M:custodian/src/eii_custodian/publicdata/investment_build.py M:custodian/src/eii_custodian/publicdata/investment_crosswalk.py M:custodian/src/eii_custodian/publicdata/method_card_validation.py M:custodian/src/eii_custodian/publicdata/places/README.md M:custodian/src/eii_custodian/publicdata/places/integrate.py M:custodian/src/eii_custodian/publicdata/places/read.py M:custodian/src/eii_custodian/publicdata/property/quarter.py M:custodian/src/eii_custodian/publicdata/review/activity.py M:custodian/src/eii_custodian/publicdata/series/figures.py M:custodian/src/eii_custodian/publicdata/series/parse.py M:custodian/src/eii_custodian/publicdata/series/support.py M:custodian/src/eii_custodian/publicdata/trade_reconciliation.py M:custodian/src/shapely-stubs/geometry/__init__.pyi M:custodian/src/shapely-stubs/geometry/base.pyi M:custodian/tests/fixtures/frame/invented.py M:custodian/tests/fixtures/heights/invented.py M:custodian/tests/method_card_pin_fixtures.py M:custodian/tests/test_additions_fetch.py M:custodian/tests/test_assembly_native.py M:custodian/tests/test_assembly_producers.py M:custodian/tests/test_assembly_reports.py M:custodian/tests/test_assembly_source_review.py M:custodian/tests/test_atlas_fetch.py M:custodian/tests/test_award_double_space.py M:custodian/tests/test_awards_survivors_3.py M:custodian/tests/test_baci.py M:custodian/tests/test_baci_contracts_survivors.py M:custodian/tests/test_baci_fetch.py M:custodian/tests/test_benchmark_access.py M:custodian/tests/test_benchmarks_fetch.py M:custodian/tests/test_cdse_cache.py M:custodian/tests/test_cdse_transport.py M:custodian/tests/test_comtrade_plants.py M:custodian/tests/test_dat141_schema_scan.py M:custodian/tests/test_fc_register.py M:custodian/tests/test_fc_register_transport.py M:custodian/tests/test_gate_records_survivors.py M:custodian/tests/test_gate_records_survivors_tender.py M:custodian/tests/test_gis_imagery_views.py M:custodian/tests/test_gis_layers.py M:custodian/tests/test_gis_layers_survivors.py M:custodian/tests/test_gis_layers_survivors_refusals.py M:custodian/tests/test_gravity_atlas_review.py M:custodian/tests/test_gravity_fetch.py M:custodian/tests/test_investment_bilingual.py M:custodian/tests/test_investment_build.py M:custodian/tests/test_investment_crosswalk.py M:custodian/tests/test_large_intake.py M:custodian/tests/test_local_file_report.py M:custodian/tests/test_method_card_pins.py M:custodian/tests/test_method_card_pins_data.py M:custodian/tests/test_museum_missing_forms.py M:custodian/tests/test_page_acquire_survivors_2.py M:custodian/tests/test_page_requests_survivors_1.py M:custodian/tests/test_page_schema_survivors_1.py M:custodian/tests/test_places_fetch.py M:custodian/tests/test_places_fsq.py M:custodian/tests/test_places_fsq_join.py M:custodian/tests/test_places_fsq_releases.py M:custodian/tests/test_places_partb_survivors_b.py M:custodian/tests/test_places_partb_survivors_d.py M:custodian/tests/test_places_pass2.py M:custodian/tests/test_places_pass3.py M:custodian/tests/test_places_pass3_build.py M:custodian/tests/test_production_adapters.py M:custodian/tests/test_property_quarter.py M:custodian/tests/test_property_sales_export.py M:custodian/tests/test_property_survivors.py M:custodian/tests/test_public_cadence.py M:custodian/tests/test_public_data_stage.py M:custodian/tests/test_public_series.py M:custodian/tests/test_public_snapshots.py M:custodian/tests/test_publicdata_behaviour.py M:custodian/tests/test_publicdata_besttime_build.py M:custodian/tests/test_publicdata_fetch.py M:custodian/tests/test_publicdata_heights.py M:custodian/tests/test_publicdata_licence.py M:custodian/tests/test_publicdata_listing_survivors.py M:custodian/tests/test_publicdata_registry.py M:custodian/tests/test_publicdata_unblocked_round2.py M:custodian/tests/test_publicdata_unblocked_round3.py M:custodian/tests/test_registry_terms_record.py M:custodian/tests/test_s2_t10_reader_retrieval_date.py M:custodian/tests/test_s2_t19_registry.py M:custodian/tests/test_s2_t29_fix.py M:custodian/tests/test_s2_t29_fix2.py M:custodian/tests/test_s2_t29_fix6.py M:custodian/tests/test_s2_t29_live_acquire.py M:custodian/tests/test_series_exact_regressions.py M:custodian/tests/test_series_frame.py M:custodian/tests/test_series_parse_survivors_lr3.py M:custodian/tests/test_series_r5.py M:custodian/tests/test_tenders.py M:custodian/tests/test_terms_attempts.py M:custodian/tests/test_terms_fingerprint.py M:custodian/tests/test_trade_reconciliation_release.py M:custodian/tests/test_trade_reconciliation_survivors_2.py M:docs/02_ARCHITECTURE.md M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/07_ECONOMIC_METHODS.md M:docs/08_BACKEND.md M:docs/09_AI_ASSISTANT.md M:docs/10_FRONTEND.md M:docs/12_TESTING_AND_QUALITY.md M:docs/13_DEPLOYMENT_AND_OPERATIONS.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/README.md M:docs/REFERENCE_NOTES.md M:docs/decisions/0025-reconciliation-of-restaurant-and-wage-figures.md M:eii M:product/src/eii_product/api/app.py M:scripts/commands/build_public.py M:scripts/commands/table.py M:scripts/fsq_exclusions.py M:scripts/mutation_explained.toml M:scripts/run_tests.py M:scripts/sandbox_launch.py M:scripts/sandbox_policy.py M:scripts/spine_triage_io.py M:scripts/tests/import_boundary_cases.py M:scripts/tests/import_boundary_guard.py M:scripts/tests/runner_support.py M:scripts/tests/sandbox_support.py M:scripts/tests/test_commands.py M:scripts/tests/test_fsq_exclusions.py M:scripts/tests/test_import_boundary_forms.py M:scripts/tests/test_import_boundary_real.py M:scripts/tests/test_reference_notes_real.py M:scripts/tests/test_runner_environment.py M:scripts/tests/test_runner_failures.py M:scripts/tests/test_runner_usage.py M:scripts/tests/test_runner_verdicts.py M:scripts/tests/test_sandbox_argv.py M:scripts/tests/test_spine_triage.py M:web/spikes/performance/README.md M:web/spikes/performance/layers.ts M:web/spikes/performance/tests/layers.node-test.mjs M:web/spikes/performance/tests/performance.spec.ts M:web/spikes/performance/tests/scene-size-sites.mjs'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; output "300 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact read-only Git BASE..WORK name-status; 300 paths.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','a0e01df3a3d05ea04351d66d7505eab11b26ea9d..4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     98 subjects and linear parents checked against literal inventory.
+```
+
+```text
+### MERGE TRAIN S2-11 — Slice S2: task log
+Commit:    4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c
+Command:   ./eii test --seed 3391827465
+Exit code: 0
+Date:      2026-11-21
+Run by:    lead (local)
+Counts:    13896 passed, 0 failed, 0 skipped
+Seed:      3391827465
+Notes:     Runtime seed. Exact merge-result fresh-seed whole test and six hosted checks remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

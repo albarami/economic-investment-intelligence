@@ -2972,6 +2972,57 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED: Must a `protected` release be frozen and registered before it is promoted to live, and if so, do promotions of protected-bearing slices wait for S11-T09 or does the freeze work move earlier? Ruled under AGENTS.md rule 46 before any `protected` release is promoted.
 - NEEDED BY: the first promotion of a `protected` release to live.
 
+## OI-360 — Unexplained tender archive HTTP refusal in the live build
+
+- ID: OI-360
+- TYPE: OPEN
+- RAISED BY: LIVE-S2.r11; `.overnight/IN/proposed-open-items.txt`, third item; log 2026-11-20 19:05 and 23:54; supplied `LIVE-S2.r10.build-public.txt`, `LIVE-S2.r11.build-public.txt` and `LIVE-S2.r11.traceback.txt` under `.overnight/IN/evidence/`.
+- CONCERNS: AGENTS.md rule 39; live public-build reliability and diagnostic scope.
+- EVIDENCE: the lead records r11 at c2b5910c with seed 2933417201 exiting 1, 241 PASS and one `tenders_pub` page-one `http_status` refusal. The traceback attributes r10's assembly NO_DATA refusal to this archive fetch. The log reports a later successful portal response but does not print the failed status code. These are lead observations, not a worker cache read.
+- NEEDED: record the failing status and identify the cause on a lead-shell live run without leaking page contents or changing the refusal boundary. A subsequent successful response or green rerun alone does not close the random failure.
+- NEEDED BY: live-build reliability closure and any claim that this failure has been explained.
+
+## OI-361 — Released-imagery test crossed the product/custodian boundary
+
+- ID: OI-361
+- TYPE: CLOSED — code and guard confirmed; final-head whole-test result still owed
+- RAISED BY: L-1316; `.overnight/IN/proposed-open-items.txt`, boundary-escape item; log 2026-11-21 03:48, 04:02, 04:10 and 04:18; `.overnight/IN/evidence/S2-T51.cf6.return.md` and `S2-T51.cf6b.return.md`.
+- CONCERNS: AGENTS.md rule 11; ARC-06; document 12 TST-60.
+- EVIDENCE: the product released-imagery test imported custodian tests and code from the initial S2-T51 build through 7ad369aa. Both lenses, confirmations and local approval missed it; the lead whole test at 7ad369aa failed product collection. Fix 6, 3c3cb5c9, uses a committed invented product fixture with a custodian equality test; fix 6b, 26d3255e, expands the import guard to product tests. Anthropic cf6 and cf6b separately CONFIRMED the fixes and their plants.
+- RESOLUTION: the defect's code and prevention guard are fixed and confirmed, as the proposal directs. The lead's escape-ledger rows are reported by the brief/L-1316 but their separate file is not supplied here; this entry does not claim to have inspected them. Historical approval misses remain recorded.
+- NEEDED: preserve the final-head whole-test and merge evidence separately; do not count this closure as a green whole test or slice-gate approval.
+- NEEDED BY: inclusion of the corrected S2-T51 boundary in the train ledger.
+
+## OI-362 — Live public build hung without a last-step diagnostic
+
+- ID: OI-362
+- TYPE: OPEN
+- RAISED BY: LIVE-S2.r13; `.overnight/IN/proposed-open-items.txt`, final item; corrected log entry 2026-11-21 04:25 supersedes the 04:10 claim that it never ran.
+- CONCERNS: AGENTS.md rule 39; lead-shell live-run process ownership and diagnostics.
+- EVIDENCE: the lead records the run at a875fa98 with seed 3903487288 alive for three hours and four minutes, with block-buffered empty output, no socket and a polling sleep. The lead moved the worktree and started r14 while r13 still lived, then stopped r13 by its recorded process IDs; r13's result was void after the head moved. The cause of the hang remains unknown. The correction is retained rather than the superseded no-run claim.
+- NEEDED: use unbuffered diagnostics on subsequent lead runs, inspect processes by working directory before reusing a live worktree, and determine the waiting step and root cause without changing a bound or treating a green rerun as closure.
+- NEEDED BY: closure of the live-build hang and any reliability claim about this run.
+
+## OI-363 — Ledger2 fake-server port collision remains unexplained
+
+- ID: OI-363
+- TYPE: OPEN
+- RAISED BY: train S2-11 ledger2, row 129 at c171b9e5; `.overnight/IN/ledger2-row129-failures.txt`; `.overnight/IN/LOG-S2-11.md`, 2026-11-21 09:40 RESULT.
+- CONCERNS: AGENTS.md rule 39; web/scripts/tests/check-dev-server-fake.node-test.mjs, test 'prints a Local line for another port'.
+- EVIDENCE: row 129 (`npm --prefix web run test:checks`) records HPE_INVALID_CONSTANT: Parse Error: Expected HTTP/, RTSP/ or ICE/. The lead reports another process answered on the test's port, a collision with a parallel job, and that the test passed alone. The excerpt proves the failure; the collision attribution and isolated pass are lead observations. Neither identifies the other process nor proves the test's port choice is isolated.
+- NEEDED: prove the test's port choice free of other jobs' servers or explain the collision with causal evidence. A green isolated rerun does not close this random failure; no timeout, retry or assertion change is proposed.
+- NEEDED BY: final-head ledger reliability and closure of this row-129 failure.
+
+## OI-364 — Ledger2 readiness failures need final-head T44 ledger evidence
+
+- ID: OI-364
+- TYPE: OPEN
+- RAISED BY: train S2-11 ledger2 at c171b9e5; `.overnight/IN/ledger2-row129-failures.txt`, `ledger2-row130-failures.txt`, `ledger2-row144-failures.txt`; `.overnight/IN/LOG-S2-11.md`, 2026-11-21 09:40 RESULT.
+- CONCERNS: S2-T44 criterion 3; AGENTS.md rules 33, 36 and 39; exact-head evidence for the readiness change.
+- EVIDENCE: row 129 (`npm --prefix web run test:checks`) records three browser READINESS FAILURE scenes; row 130 (`npm --prefix web run test:spike:performance`) records five; row 144 (`./eii test`, with its ledger seed) reports FAILED. The lead attributes row 144 to web-checks readiness; that excerpt alone contains only the final FAILED line. The two T44 commits 1218607c and 4f1606b6 follow this failing head. The round-3 return supplies two passing shared-core loaded suites and readiness-margin measurements for local criterion 3; it does not establish the historical cause or final-head ledger success. cf4 is pending in this specification.
+- NEEDED: ledger3 at 4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c, with actual outcomes for the retained command rows and a fresh whole-test seed. Preserve ledger2's failed evidence and obtain the independent cf4 verdict. A green rerun alone does not close OI-319, OI-341 or PO-S2-129 or prove criterion 1.
+- NEEDED BY: train S2-11's exact-head ledger and acceptance review of S2-T44 criterion 3 in that context.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -4791,6 +4842,51 @@ Proposals from the supplied two reviews, preserved without inventing a defect or
 - RAISED BY: review S2-P12.r1, record note 1 (2026-11-20).
 - EVIDENCE: in `test_parser_reads_the_yaml_declared_measure_field` the `NOTE` case passes whether or not the parser honours the YAML-declared measure field, because a missing column and the declared field give the same omission; the numeric case `7` alone decides the binding.
 - NEEDED: drop the `NOTE` case from the binding parametrisation, or add a case whose wrong field yields a different value, with a planted removal of the binding showing red. Owning task: S2-T11 (review follow-up).
+
+### PO-S2-143 — Bound the company-web contact scanner's fused-text cost
+
+- ID: PO-S2-143
+- TYPE: OPEN
+- RAISED BY: S2-T48 cf4/cf5 P1; `.overnight/IN/proposed-open-items.txt`, first item; `.overnight/IN/evidence/S2-T48.cf4.return.md` and `S2-T48.cf5.return.md`.
+- EVIDENCE: the reviewer attributes a pre-existing quadratic alternative to `_FORBIDDEN` in `company_web/contracts.py`; the proposal records approximately 53 seconds on an invented fused page before fix 4. Fix 5 bounds repeated span-edge scanning; it does not change this underlying scanner. These are attributed historical measurements, not measurements by this preparation.
+- NEEDED: give the scanner its own task and another-maker review; anchor the alternative to its witness and preserve every existing refusal, with a deciding cost/regression plant. No scanner change or performance guarantee is made here.
+- COMPARISON: OI-358 retains live company-web coverage and E1–E7 evidence; this proposal concerns scanner cost only.
+
+### PO-S2-144 — Check the BACI host against its document row
+
+- ID: PO-S2-144
+- TYPE: OPEN
+- RAISED BY: S2-join3 cf1 N1; `.overnight/IN/proposed-open-items.txt`, second item; `.overnight/IN/evidence/S2-join3.cf1.return.md`, N1.
+- EVIDENCE: `www.cepii.fr` is in the exact-host test's baseline set; the document-04 PUB-03 membership loop only checks the added set. Exact host-set equality still holds, but the documented-host link is not tested for this host.
+- NEEDED: move this host to the added set when PUB-03 names it, preserving exact host equality; plant a missing document mention and prove the assertion fails. Owning scope: S2-T19/S2-T24 review follow-up.
+- COMPARISON: the host admission itself was separately confirmed at 53c24050; this item does not broaden it.
+
+### PO-S2-145 — Keep the Atlas containment proof under the no-network fixture
+
+- ID: PO-S2-145
+- TYPE: OPEN
+- RAISED BY: S2-P21 cf7 N1, `.overnight/IN/evidence/S2-P21.cf7.return.md`, Non-blocking note; log 2026-11-20 23:02.
+- EVIDENCE: `test_atlas_fixture_contains_its_height_outputs` calls another test directly, bypassing that module's autouse opener guard. The reviewer says both transports are invented and no request reaches the network in the current test.
+- NEEDED: add the reviewer's explicit `build_opener` refusal monkeypatch before that call, with a deciding plant; keep fixture containment and the whole-folder write scan intact.
+- COMPARISON: cf7 CONFIRMED fix 6; this is its expressly non-blocking note, not a reversal of that verdict.
+
+### PO-S2-146 — State the full product-plane import guard in TST-60
+
+- ID: PO-S2-146
+- TYPE: OPEN — records-only correction proposed
+- RAISED BY: S2-T51 cf6b records note 2, `.overnight/IN/evidence/S2-T51.cf6b.return.md`.
+- EVIDENCE: TST-60 understates a guard that also covers product sources and rejects bare `custodian`, as well as its submodules. The reviewer CONFIRMED the guard; no code change is requested.
+- NEEDED: in document 12 TST-60 replace exactly “product tests also reject `custodian.*` and `eii_gateway` through every judged import form” with “the product plane (its sources and `product/tests`) also rejects `custodian` and any `custodian.*`, and `eii_gateway`, through every judged import form”; this preparation changes no tracked document. The lead verifies the exact text at application time.
+- COMPARISON: OI-361 records the already-fixed boundary escape; this item corrects the description of its guard.
+
+### PO-S2-147 — Preserve the stored-member truncation probe limitation
+
+- ID: PO-S2-147
+- TYPE: OPEN — non-blocking test-evidence proposal
+- RAISED BY: `.overnight/IN/proposed-open-items.txt`, S2-T51 cf4 records-only item; `.overnight/IN/evidence/S2-T51.cf4.return.md`.
+- EVIDENCE: the supplied proposal says no committed test plants a truncated stored member; the shared decoder and the reviewer's probe cover that behavior. This does not withdraw cf4 CONFIRMED or claim a newly reproduced failure.
+- NEEDED: the lead records the distinction and routes any dedicated stored-member regression under the normal test/review workflow, preserving the shared decoder and its existing truncation plants.
+- COMPARISON: the fix-5 decoder correction is already confirmed; this is a narrower test-location observation.
 
 ## Sources
 
