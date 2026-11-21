@@ -39,16 +39,30 @@ checks both newly printed C1 denominators, both densities and both location
 quotients. Its invented-cache tests are in
 `custodian/tests/test_pinned_method_replays.py`.
 
-The registry's `est_census` entry for `pub_census_national` describes business
-establishments, not employed residents. PO-S2-48 stays open for the lead to
-confirm the intended national employment source, its raw schema and its complete
-receipt metadata before `test_pinned_c8` can be written through `cache.pinned`.
-No publisher, retrieval date or employment-source identity is guessed for the
-removed orphan fixture entry. The committed C8 arithmetic uses only the existing
-invented stand-ins. The existing PUB-71 replay below remains the sole owner of
-the local national sum over reported zones; duplicating it under C8 would both
-substitute a different source and duplicate the wrong-value plant's failure,
-which the strict summary accounting correctly refuses.
+`test_pinned_c8` reads the pinned `census_2020_workbook` and
+`census_zone_sector` through `cache.pinned_body`, which reuses the frame's
+verified receipt reader and the existing named-sheet OOXML reader. National
+coverage comes from sheet `76`, the total row selected by label within the
+"Both Sexes" block; it is not the separate establishment source `est_census`
+or a sum over zones. The test recomputes each complete zone, checks the seven
+sector counts sum to its total, returns `NO_DATA` for every zone with a null
+sector count, and compares the national share, zone shares and range to plain
+raw-file arithmetic within the unchanged half-percentage-point tolerance.
+It prints no file values. Its invented-cache proof and wrong-value plants are
+in `custodian/tests/test_pinned_c8.py`. The separate PUB-71 replay and its
+lead-proof failure accounting are unchanged.
+
+The fixture restores attribution for both sources from their registry rows,
+without census counts or shares. A registry row has no file retrieval date:
+`retrieval_date: "pinned receipt: retrieved_utc"` explicitly resolves that field
+at replay time, and `SourceChain.retrieved` carries the pinned receipt's date.
+`terms_read_on` remains the registry's terms date and is never substituted for
+retrieval. No actual retrieval date is guessed or read from the real cache.
+PO-S2-48 remains open until the lead supplies both method pins and runs:
+
+```sh
+uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py::test_pinned_c8 -vv -p no:cacheprovider
+```
 
 PO-S2-51 still needs the lead's real-cache run. PO-S2-52 remains open for the
 signed activity spine and its input binding (OI-16 and OI-203, after the basket

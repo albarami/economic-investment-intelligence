@@ -1055,7 +1055,7 @@ sources:
     source_id: "census_2020_workbook"
     slug: ""
     kind: "https_file"
-    title_en: "Census 2020 detailed results workbook, Tables 1, 2, 151 and 152"
+    title_en: "Census 2020 detailed results workbook, Tables 1, 2, 76, 151 and 152"
     publisher: "Planning and Statistics Authority"
     licence_id: "none-stated"
     licence_basis: "owner_decision"
@@ -1070,7 +1070,7 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: []
+    release_tables: ["pub_census_national"]
     caveat_keys: []
     # Advisor reading, 2026-11-16: direct OOXML file; sheet parsing is downstream.
     # File name says 2022; source identity stays Census 2020 pending lead review.

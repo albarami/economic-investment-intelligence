@@ -6,6 +6,7 @@ from pathlib import Path
 from eii_core.calc.facts import SourceChain
 from eii_core.calc.public_series import C2_METHOD_VERSION
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.frame.build import read_cached
 from eii_custodian.publicdata.frame.mapping import POP_FIELDS, fields
 from eii_custodian.publicdata.series.parse import confirmed_rows, selected_source
 
@@ -48,7 +49,7 @@ def cached(cache: Path, source: str, digest: str):
     return rows, chain
 
 
-def pinned(source: str):
+def _pin(source: str):
     """The lead supplies a source-to-SHA map inside the documented public cache."""
     cache = CACHE
     pins = cache / "method_pins.json"
@@ -57,4 +58,28 @@ def pinned(source: str):
     digest = json.loads(pins.read_text()).get(source)
     if not isinstance(digest, str):
         raise ValueError("public_cache_missing:" + source)
-    return cached(cache, source, digest)
+    return digest
+
+
+def pinned(source: str):
+    return cached(CACHE, source, _pin(source))
+
+
+def pinned_body(source: str):
+    """Reuse the frame's receipt reader for binary workbooks and layer envelopes."""
+    entry = next(row for row in load_registry() if row.key == source)
+    digest = _pin(source)
+    body, receipt = read_cached(CACHE, entry, digest=digest, decode=lambda body: body)
+    chain = SourceChain(
+        source,
+        entry.release_tables[0],
+        "method-card",
+        "S2-T07-v1",
+        str(receipt["publisher"]),
+        entry.title_en,
+        str(receipt["fetch_url"]),
+        entry.licence_id,
+        str(receipt["retrieved_utc"])[:10],
+        digest,
+    )
+    return body, chain

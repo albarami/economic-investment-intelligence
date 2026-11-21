@@ -1,6 +1,7 @@
 """Card arithmetic and invented guard fixtures; not real-file regressions."""
 
 import json
+import sys
 from decimal import Decimal as D
 from fractions import Fraction
 from pathlib import Path
@@ -28,10 +29,37 @@ FIXTURE = Path(__file__).parent / "fixtures/methods/public_methods.json"
 def test_methods_fixture_has_no_census_counts():
     fixture = json.loads(FIXTURE.read_text())
     assert "C8" not in fixture["published"], "census counts and shares stay local"
-    assert not any("census" in name for name in fixture["sources"])
+    census_metadata = {
+        "publisher",
+        "dataset",
+        "url",
+        "licence",
+        "licence_basis",
+        "licence_url",
+        "terms_read_on",
+        "retrieval_date",
+    }
+    for name, source in fixture["sources"].items():
+        if "census" in name:
+            assert set(source) == census_metadata, "census metadata only"
+            assert all(isinstance(value, str) for value in source.values())
     for row in fixture["published"].values():
         assert set(row["sources"]) <= fixture["sources"].keys(), row["anchor"]
         assert not any("census" in source for source in row["sources"])
+
+
+@pytest.mark.parametrize("slot", ["published", "source"])
+def test_methods_fixture_census_count_plant(tmp_path, monkeypatch, slot):
+    fixture = json.loads(FIXTURE.read_text())
+    if slot == "published":
+        fixture["published"]["C8"] = {"private": 3, "employed": 4}
+    else:
+        fixture["sources"].setdefault("census_2020_workbook", {})["private"] = 3
+    planted = tmp_path / "invented.json"
+    planted.write_text(json.dumps(fixture))
+    monkeypatch.setattr(sys.modules[__name__], "FIXTURE", planted)
+    with pytest.raises(AssertionError):
+        test_methods_fixture_has_no_census_counts()
 
 
 def test_methods_fixture_sources_have_attribution():

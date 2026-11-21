@@ -48626,3 +48626,97 @@ Appended correction; no earlier row is rewritten. Source: the join confirmation 
 
 - F2: the S2-T44 paragraph of this train's ledger records says "Independent cf4 and final-head ledger3 remain owed". Correct state: cf4 (Anthropic Claude Opus 5.5) is CONFIRMED at `4f1606b62e8bfb31fc1d827d94c2ce7f7bd3677c`, and final-head ledger3 at that commit passed: 145 command rows with exit 0 or 0 failed, the whole test 13896 passed, 0 failed, 0 skipped, seed 3391827465. This closes no random-failure item and does not prove S2-T44 criterion 1.
 - F3: the S2-T44 cf4 line cites `.overnight/evidence/S2-T44.cf4.return.md`; the path form the other returns of this ledger use is `.overnight/IN/evidence/S2-T44.cf4.return.md`.
+## S2 P05 C8 sector-source replay — 2026-11-21
+
+Maker: OpenAI Codex; model: GPT-6 (the exact serving variant is not exposed).
+Builder persona: senior official-statistics engineer, specialising in census tables,
+provenance and regression tests on public files. Strict self-review persona: methods
+reviewer rejecting committed census figures, invented attribution, unrecomputed pins,
+skipped data checks and widened tolerances. Skills: project-orientation,
+task-standards, sanad-provenance, github-flow, strict-reviewer, muhasabah-gate;
+test-driven-development and verification-before-completion equivalent rules supplied
+by the task brief (those skill names are not in the session's installed catalogue).
+
+Authority and scope: PO-S2-48; decision 0064 item 43; S2-T07; document 07 C8 and
+MTH-03; document 12 TST-197. Full base commit:
+`3c3cb5c9c64314bf9be02aef798d7e79dba12f62`.
+The worker read no real public cache and made no external source request. The real
+pinned test was invoked only through invented temporary caches in ordinary tests.
+No source count, derived census share or actual source-file hash was added to the
+repository. Existing invented C8 arithmetic remains invented. PUB-71 and its
+separate sum-over-reported-zones replay are unchanged.
+
+Changes: the frame source map, registry and C8 fixture bind national employment
+to `census_2020_workbook`, sheet `76`, Table No (76), and zone employment to
+`census_zone_sector`. `est_census` retains its separate establishment purpose.
+`cache.pinned_body` reuses the frame receipt reader; the replay reuses the existing
+named-sheet OOXML reader and closed layer schema, and `eii_core.calc.coverage_share`
+and `share_range`. The national total is selected by its label within Both Sexes.
+Every complete zone reconciles its seven sectors to its total; any null count gives
+`NO_DATA`. Plain raw-cell/attribute Fraction arithmetic independently checks the
+national result, each zone result and both range endpoints at the unchanged
+half-percentage-point tolerance. Fixed C8 failure reasons expose no source values.
+
+Attribution limitation: the registry has no file retrieval date (also explicit in
+`eii_core.calc.facts.RegistrySource`). Fixture `retrieval_date` therefore explicitly
+resolves to `pinned receipt: retrieved_utc`; `SourceChain.retrieved` receives that
+receipt's actual date at replay time. Registry publisher, dataset, URL and licence
+fields are copied literally, including the genuinely empty licence URL and the
+owner-decision basis. The terms-reading date remains a separate field. No retrieval
+date is guessed or substituted. This was raised with the user during the task.
+PO-S2-48 remains OPEN for the lead's real-file run and different-maker acceptance;
+no task or slice acceptance box is ticked by this fix.
+
+Environment: Linux x86_64; Python 3.14.6; pytest 9.2.0; Hypothesis 6.170.15;
+ruff 0.17.4; mypy 2.4.1. Fresh task Hypothesis seed: `651209`.
+Every uv command below was executed with the literal environment prefix
+`UV_OFFLINE=1 UV_CACHE_DIR="$PWD/.overnight/tmp/uv-cache"`; no install or fetch ran.
+
+Commands, real exits and counts:
+
+- Test-first RED: `uv run --locked python -m pytest custodian/tests/test_pinned_c8.py core/tests/test_public_methods.py -q -p no:cacheprovider --hypothesis-seed=651209 --tb=short` — exit 1; 34 failed, 29 passed. C8 binding and replay definitions were absent.
+- First GREEN: the same command after implementation — exit 0; 63 passed.
+- Final focused proof: `uv run --locked python -m pytest custodian/tests/test_pinned_c8.py core/tests/test_public_methods.py -q -p no:cacheprovider --hypothesis-seed=651209` — exit 0; 67 passed. This includes wrong source bindings, count-in-publication and count-in-metadata plants, changed total-row positions, every nullable count field, corrupt sector sums/headers/total labels/sex blocks/denominators, wrong national/zone/range outputs, null-to-share corruption, and both sources' missing pins, corrupt bytes and mismatched receipts.
+- Deciding binding RED: `uv run --locked python .overnight/tmp/c8_red.py binding` — exit 1; 1 failed. The uncommitted pytest plugin changes only the test process's national C8 binding to `est_census`.
+- Census-count guard RED: `uv run --locked python .overnight/tmp/c8_red.py count` — exit 1; 1 failed. An invented count is planted in a temporary fixture, never in the repository fixture.
+- Attribution guard RED: `uv run --locked python .overnight/tmp/c8_red.py attribution` — exit 1; 1 failed. The temporary fixture omits the workbook publisher.
+- Pinned arithmetic RED: `uv run --locked python .overnight/tmp/c8_red.py wrong` — exit 1; 1 failed with `C8:national_mismatch`. Only the computed output is changed in the invented-cache test process.
+- Restored guards GREEN: `uv run --locked python -m pytest core/tests/test_public_methods.py::test_methods_fixture_has_no_census_counts core/tests/test_public_methods.py::test_methods_fixture_sources_have_attribution custodian/tests/test_pinned_c8.py::test_c8_source_binding_and_attribution -q -p no:cacheprovider --hypothesis-seed=651209` — exit 0; 3 passed. All plants are process-local or temporary; repository fixture bytes are unchanged by the plants.
+- Full affected-package proof: `uv run --locked python -m pytest core/tests custodian/tests -q -p no:cacheprovider --hypothesis-seed=651209` — exit 0; 11204 passed, 193 warnings, no skips; 968.12 seconds. Warnings identify the GIS snapshot raster fixtures and duplicate-ZIP workbook fixture. This covers the changed cache helpers and census module, its frame build/live/mapping/population importers, registry consumers and existing core arithmetic.
+- `uv run --locked ruff check .` — initial exit 1 (import order and a regex raw-string lint); both findings corrected. Final exit 0, all checks passed.
+- `uv run --locked ruff format core/tests/test_public_methods.py custodian/tests/test_pinned_c8.py custodian/data_tests/cache.py custodian/data_tests/test_pinned_methods.py custodian/src/eii_custodian/publicdata/frame/census.py` — exit 0; 4 files reformatted, 1 unchanged. Later targeted formatting after the null-zone proof also exited 0.
+- `uv run --locked ruff format --check .` — exit 0; 913 files already formatted.
+- `uv run --locked mypy` — exit 0; 487 source files, no issues.
+- `python3 scripts/check_docs.py` — exit 0; 1235 text files, 134 Markdown files. Rechecked after OPEN_ITEMS.md/TASKS.md updates with the same successful counts.
+- `python3 scripts/check_tree.py` — exit 0; 8 rules checked.
+- `cmp AGENTS.md CLAUDE.md` — exit 0; bytes match; neither file changed.
+- Environment inspection through `uv run --locked python -c` — exit 0; versions recorded above.
+- New-text digit-run audit through a repository-local Python command — exit 0; no run of exactly eight or eleven digits in added text or the new test file.
+
+Git authority: `git switch -c fix/p05-card-c8` — exit 128, shared reference storage
+is read-only. `git add` of the named task files — exit 128, shared worktree index
+storage is read-only. No commit could be created, no push was attempted, and HEAD
+remains the full base above. The requested commit and trailer remain for the lead;
+no different-maker approval or hosted check is claimed. Changes are left reviewable
+in this workspace, as the brief authorises when Git cannot write.
+
+Strict self-review: APPROVE for the assigned offline implementation and its evidence,
+not an independent maker verdict or approval of real census results. Muhasabah: PASS
+for the reported scope and limits. The final record checks are appended below after
+the ledger and return report are written; previous evidence bytes are preserved.
+
+Exact lead-shell real-cache command (not run by the worker), after both source keys
+are present in the existing local method-pins map:
+
+```sh
+uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py::test_pinned_c8 -vv -p no:cacheprovider
+```
+
+Final record checks after the ledger/report write: `python3 scripts/check_docs.py`
+exit 0 (1235 text files, 134 Markdown files); `python3 scripts/check_tree.py` exit 0
+(8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0;
+`git rev-parse HEAD` exit 0 (unchanged full base); `git status --short` exit 0
+(task files only). The repository-local final Python audit exited 0: the original
+PROGRESS bytes remain a prefix, exactly one task block was appended, the RETURN
+marker is correct, and added text has no forbidden digit run. No test failure,
+skip, retry or refreshed baseline was hidden. The real-cache run remains lead-owned.
