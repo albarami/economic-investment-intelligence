@@ -19,13 +19,14 @@ import run_tests
 
 PLUGIN = "pytest_custodian_part"
 OPTION = "--custodian-part"
-PART_NAMES = ("python-custodian-1", "python-custodian-2")
+PART_NAMES = ("python-custodian-1", "python-custodian-2", "python-custodian-3")
 
 
 class CustodianManifest(unittest.TestCase):
     def test_real_collection_is_an_exact_partition(self) -> None:
         suites = [suite for suite in run_tests.SUITES if suite.name in PART_NAMES]
         self.assertEqual(tuple(suite.name for suite in suites), PART_NAMES)
+        self.assertEqual(tuple(suite.timeout for suite in suites), (1200, 1200, 1200))
         whole = manifests.nodeids(manifests.collect(support.ROOT, ("custodian/tests",)))
         parts = [
             manifests.nodeids(manifests.collect(support.ROOT, suite.args))
@@ -55,19 +56,21 @@ class CustodianManifest(unittest.TestCase):
 
     def test_planted_empty_part_is_refused(self) -> None:
         with self.assertRaisesRegex(AssertionError, "nonempty"):
-            manifests.assert_partition(IDS, (IDS, []))
+            manifests.assert_partition(IDS, (IDS, [], []))
 
 
-IDS = [f"custodian/tests/test_{name}.py::test_one" for name in ("a", "b", "c")]
+IDS = [f"custodian/tests/test_{name}.py::test_one" for name in ("a", "b", "c", "d")]
 
 
 def assigned(module: str, part: int) -> bool:
-    return part == (1 if module.endswith(("test_a.py", "test_b.py")) else 2)
+    assignments = {"test_a.py": 1, "test_b.py": 2, "test_c.py": 3, "test_d.py": 1}
+    return assignments[module.rsplit("/", 1)[-1]] == part
 
 
 def partition(select: Callable[[str, int], bool]) -> list[list[str]]:
     return [
-        [test for test in IDS if select(test.split("::")[0], part)] for part in (1, 2)
+        [test for test in IDS if select(test.split("::")[0], part)]
+        for part in (1, 2, 3)
     ]
 
 
@@ -96,7 +99,7 @@ class CustodianPlugin(unittest.TestCase):
     def test_sha256_posix_module_paths_assign_all_cases_together(self) -> None:
         whole = self.collect()
         self.assertEqual(len(whole), 10)
-        parts = [self.collect("-p", PLUGIN, OPTION, str(part)) for part in (1, 2)]
+        parts = [self.collect("-p", PLUGIN, OPTION, str(part)) for part in (1, 2, 3)]
         manifests.assert_partition(whole, parts)
         for part, actual in enumerate(parts, 1):
             expected = [
@@ -105,7 +108,7 @@ class CustodianPlugin(unittest.TestCase):
                 if int(
                     hashlib.sha256(test.split("::")[0].encode("utf-8")).hexdigest(), 16
                 )
-                % 2
+                % 3
                 == part - 1
             ]
             self.assertEqual(actual, expected)
@@ -115,7 +118,7 @@ class CustodianPlugin(unittest.TestCase):
 
     def test_unknown_or_missing_part_is_a_usage_error(self) -> None:
         for args, detail in (
-            ((OPTION, "3"), "invalid choice"),
+            ((OPTION, "4"), "invalid choice"),
             ((OPTION, "0"), "invalid choice"),
             ((OPTION, ""), "invalid choice"),
             ((OPTION,), "expected one argument"),

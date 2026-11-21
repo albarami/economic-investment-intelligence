@@ -664,7 +664,11 @@ def test_restricted_selection_plants():
     from run_tests import SUITES
 
     custodian = [s for s in SUITES if s.name.startswith("python-custodian")]
-    assert len(custodian) == 2
+    assert [s.name for s in custodian] == [
+        "python-custodian-1",
+        "python-custodian-2",
+        "python-custodian-3",
+    ]
     for suite in SUITES:
         if suite.kind == "pytest":
             selections(suite.args)
