@@ -1,6 +1,7 @@
 """Card arithmetic and invented guard fixtures; not real-file regressions."""
 
 import json
+import re
 import sys
 from decimal import Decimal as D
 from fractions import Fraction
@@ -43,18 +44,24 @@ def test_methods_fixture_has_no_census_counts():
         if "census" in name:
             assert set(source) == census_metadata, "census metadata only"
             assert all(isinstance(value, str) for value in source.values())
+            assert source["retrieval_date"] == "pinned receipt: retrieved_utc"
+            assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", source["terms_read_on"])
     for row in fixture["published"].values():
         assert set(row["sources"]) <= fixture["sources"].keys(), row["anchor"]
         assert not any("census" in source for source in row["sources"])
 
 
-@pytest.mark.parametrize("slot", ["published", "source"])
+@pytest.mark.parametrize(
+    "slot", ["published", "source", "retrieval_date", "terms_read_on"]
+)
 def test_methods_fixture_census_count_plant(tmp_path, monkeypatch, slot):
     fixture = json.loads(FIXTURE.read_text())
     if slot == "published":
         fixture["published"]["C8"] = {"private": 3, "employed": 4}
-    else:
+    elif slot == "source":
         fixture["sources"].setdefault("census_2020_workbook", {})["private"] = 3
+    else:
+        fixture["sources"]["census_2020_workbook"][slot] = "INVENTED count: 3"
     planted = tmp_path / "invented.json"
     planted.write_text(json.dumps(fixture))
     monkeypatch.setattr(sys.modules[__name__], "FIXTURE", planted)

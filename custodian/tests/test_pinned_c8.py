@@ -74,6 +74,22 @@ def workbook(*, total_row=12, plant=""):
         cells["B8"] = "Males"
     elif plant == "national_denominator":
         cells[f"J{total_row}"] = "0"
+    elif plant == "national_non_numeric":
+        cells[f"F{total_row}"] = "INVENTED"
+        formula_cells.remove(f"F{total_row}")
+    elif plant == "national_missing_cell":
+        del cells[f"J{total_row}"]
+    elif plant == "national_fraction":
+        cells[f"F{total_row}"] = "30.5"
+    elif plant == "national_negative":
+        cells[f"F{total_row}"] = "-1"
+    elif plant.startswith("national_total_"):
+        cells[f"J{total_row}"] = {
+            "fraction": "60.5",
+            "negative": "-1",
+            "infinite": "inf",
+            "nan": "NaN",
+        }[plant.removeprefix("national_total_")]
     elif plant == "sex_private":
         cells[f"F{total_row + 3}"] = "10"
     elif plant == "sex_total":
@@ -179,6 +195,16 @@ def invented_cache(
     payload = zones(null_field)
     if plant == "sector_sum":
         payload["features"][0]["attributes"]["Government"] += 1
+    elif plant == "zone_zero":
+        for field in ("Private", "Government", COUNTS["census_zone_sector"][0]):
+            payload["features"][0]["attributes"][field] = 0
+    elif plant == "zone_duplicate_key":
+        payload["features"][1]["attributes"]["ZONE_NO"] = payload["features"][0][
+            "attributes"
+        ]["ZONE_NO"]
+    elif plant == "no_complete_zones":
+        for feature in payload["features"]:
+            feature["attributes"]["Private"] = None
     pins = {
         "census_zone_sector": write_source(
             tmp_path, "census_zone_sector", json.dumps(payload).encode()
@@ -264,11 +290,14 @@ def test_c8_formula_without_cached_value_refuses(tmp_path, monkeypatch):
         methods.test_pinned_c8()
 
 
-@pytest.mark.parametrize("plant", ["sex_private", "sex_total"])
+@pytest.mark.parametrize(
+    "plant,reason",
+    [("sex_private", "sex_sum_mismatch"), ("sex_total", "sex_sum_mismatch")],
+)
 @pytest.mark.parametrize("total_row", [12, 18])
-def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, total_row):
+def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, reason, total_row):
     invented_cache(tmp_path, monkeypatch, plant=plant, total_row=total_row)
-    with pytest.raises(ValueError, match=r"^C8:sex_sum_mismatch$"):
+    with pytest.raises(ValueError, match=f"C8:{reason}$"):
         methods.test_pinned_c8()
 
 
@@ -282,7 +311,7 @@ def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, total_row):
 )
 def test_c8_sex_reconciliation_schema_plants(tmp_path, monkeypatch, plant, reason):
     invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises(ValueError, match="^C8:" + reason + "$"):
+    with pytest.raises(ValueError, match=f"C8:{reason}$"):
         methods.test_pinned_c8()
 
 
@@ -320,19 +349,51 @@ def test_c8_null_zone_must_never_return_a_share(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "plant",
+    "plant,reason",
     [
-        "sector_sum",
-        "header",
-        "missing_total",
-        "duplicate_total",
-        "missing_block",
-        "national_denominator",
+        ("sector_sum", "sector_sum"),
+        ("header", "national_header"),
+        ("missing_total", "national_total_label"),
+        ("duplicate_total", "national_total_label"),
+        ("missing_block", "national_block"),
+        ("national_denominator", "national_denominator"),
+        ("national_non_numeric", "national_count"),
+        ("national_missing_cell", "national_count"),
+        ("national_fraction", "national_denominator"),
+        ("national_negative", "national_denominator"),
+        ("national_total_fraction", "national_denominator"),
+        ("national_total_negative", "national_denominator"),
+        ("national_total_infinite", "national_denominator"),
+        ("national_total_nan", "national_denominator"),
+        ("zone_zero", "zone_denominator"),
+        ("zone_duplicate_key", "zone_keys"),
+        ("no_complete_zones", "no_complete_zones"),
     ],
 )
-def test_c8_raw_schema_plants(tmp_path, monkeypatch, plant):
+def test_c8_raw_schema_plants(tmp_path, monkeypatch, plant, reason):
     invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises((AssertionError, ValueError), match="C8:"):
+    with pytest.raises(ValueError, match=f"C8:{reason}$"):
+        methods.test_pinned_c8()
+
+
+@pytest.mark.parametrize("slot", ["national", "zone"])
+def test_c8_lineage_plants(tmp_path, monkeypatch, slot):
+    invented_cache(tmp_path, monkeypatch)
+    original = methods.coverage_share
+
+    def missing_lineage(private, employed):
+        result = original(private, employed)
+        if not isinstance(result, NoData) and (
+            (private.geography == "national") == (slot == "national")
+        ):
+            # Deliberately corrupt a valid fact after construction: the fact's
+            # own constructor would otherwise refuse before the replay guard.
+            object.__setattr__(result["percent"], "sources", ())
+        return result
+
+    monkeypatch.setattr(methods, "coverage_share", missing_lineage)
+    reason = slot + "_lineage"
+    with pytest.raises(ValueError, match=f"C8:{reason}$"):
         methods.test_pinned_c8()
 
 
