@@ -5612,3 +5612,43 @@ A focused regression run exited 1 with a false failure in `test_run_starts_bubbl
 
 - PO-S2-T51-06 — **PROPOSED OPEN ITEM**, baseline routing-engine failure, not closed by a pass. The starting-head scratch suite failed `custodian/tests/test_places_area_engine.py::test_pinned_engine_writes_one_polygon_from_the_invented_road` with `engine_failed` from the tile-build subprocess; the first working-tree full run did not fail that ID. The source of this difference is unestablished; those runs used different temporary roots. No routing-engine change belongs to S2-T51. Retain the failure for the lead's environment/engine investigation; a successful rerun is not closure. Evidence: PROGRESS.md, **S2-T51 f1 review corrections — 2026-11-20**, and the baseline/final failure-ID comparison in the worker's handoff.
 - Diagnostic evidence correction: an earlier f1 disk probe collided with another fixture's machine-global lock, and its new wrapped parameter initially still injected a direct fault. Both limitations are explicitly corrected in PROGRESS.md. Lock-holding probes now run sequentially, and an isolated removed-guard test fails the actual immutable-publication-wrapped faults before the restored source passes. These earlier masked results are not accepted as disk-fault proof. No production bound or safety check was relaxed.
+
+
+## Train S2-11 records audit — re-opening dispositions (2026-11-21)
+
+These dated dispositions supersede only the named closing rows of the S2 records reconciliation; every earlier line is preserved. Source: the supplied RECON-AUDIT.md, “Exact fixes for every UNPROVED row”, by Anthropic Claude Opus 5.5 (`claude-opus-5-5`), at train head `26d3255e69a4b413d747e6ba04400f4cdc7e6f93`.
+
+- UPDATE (2026-11-21, train S2-11 records audit), OI-103: RE-OPENED; TYPE OPEN.
+- NEEDED (OI-103): a test at HEAD in which a build-public run without `EARTHDATA_API_KEY` completes. It must exit 0, or the fetch-only path must return no failure, with exactly one OMIT line, no ntl_blackmarble request and night lights recorded as omitted. For example, `custodian/tests/test_night_lights.py::test_night_absent_key_build_succeeds`, with invented reviewed pins or a stubbed assembly. Today both no-key tests assert exit 1 (`snapshot_selection_invalid`), and PR 98 changed the first one from 0 to 1. Its box, S2-T14#6, was already re-opened in 7983073f.
+
+- UPDATE (2026-11-21, train S2-11 records audit), PO-S2-22: RE-OPENED; TYPE OPEN.
+- NEEDED (PO-S2-22): as the item already states: replay the emptied-`send` mutant of `web/spikes/performance/server.mjs`. The replay must show that `mutation-server.node-test.mjs` and `trace.node-test.mjs` fail with a response timeout and end before the command limit (not exit 124), recorded in PROGRESS. The alternative is a `lifecycle.node-test.mjs` case that loads server.mjs with `send` emptied, or a `scripts/mutation_web.py` run that reports the mutant killed, not timed out.
+
+- UPDATE (2026-11-21, train S2-11 records audit), PO-S2-81: RE-OPENED; TYPE OPEN; proposed disposition.
+- NEEDED (PO-S2-81): Quote the lead's NOT VALID ruling in the tree (ID, date, words) and record another maker's confirmation of it. The other route: at the first reuse of the audit tool, add separate detail and summary paths with a planted collision refusal.
+
+- UPDATE (2026-11-21, train S2-11 records audit), PO-S2-128: RE-OPENED; TYPE OPEN.
+- NEEDED (PO-S2-128): append to PROGRESS.md, under MERGE TRAIN S2-7, the exact merge-result row from the lead's log: 293c7e2c or ff3dd5d, the command, seed 3575249656, exit, counts and who ran it. Also append PR 104's six hosted-check results. The moved-head run S2-7.mv2 (33df1963, seed 1357531151, 11846 passed) is already in the tree.
+
+- UPDATE (2026-11-21, train S2-11 records audit), OI-323: RE-OPENED; TYPE OPEN.
+- NEEDED (OI-323): the six hosted-check results of PR 103's head and the lead's fresh-seed `./eii test` on aded6a4 (or a recorded identical tree), with seed, exit and counts. Append them under MERGE TRAIN S2-6 to close entry M03, which today says they are MISSING. Rule 39 holds: a green re-run alone does not close it.
+
+## OI-359 — Portal fetch paths under a robots-disallowed prefix
+
+- ID: OI-359
+- TYPE: OPEN
+- RAISED BY: train S2-11 records audit, 2026-11-21; Anthropic Claude Opus 5.5 (`claude-opus-5-5`), RECON-AUDIT.md, “OI-210 robots finding”.
+- CONCERNS: OI-210; S2-T08 and S2-T21; the cleared wage_sector, wage_bands_priv, work_hours_act, cpi_group and bnd_muni_2025 portal rows.
+- EVIDENCE: OI-210’s UPDATE of 2026-11-19 records that robots disallows /api/ and no export was requested; the audit reports that the five cleared rows fetch from /api/ paths. Clearing their skip reasons does not establish a successful export.
+- NEEDED: The lead records a disposition for the five portal fetch paths under the robots-disallowed /api/ prefix, with an approved access path or an explicit unresolved technical absence and attributable export evidence before claiming fetchability.
+- NEEDED BY: S2-T08 release evidence and the slice S2 gate.
+
+## Train S2-11 records audit — second reader's re-opening dispositions (2026-11-21)
+
+A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same 29 closures at train head `26d3255e69a4b413d747e6ba04400f4cdc7e6f93`. It agreed on OI-103, PO-S2-128 and OI-323 and found two more closures unproved. Where the two readers differ, the lead keeps the item open (the stricter reading); every earlier line is preserved.
+
+- UPDATE (2026-11-21, train S2-11 records audit, second reader), OI-286: RE-OPENED; TYPE OPEN.
+- NEEDED (OI-286): keep the fixed ZipInfo dates and their clock plant; the item closes only on the hosted run of the merge, so append to PROGRESS.md the retained hosted merge-check record of pull request 89 (both custodian parts, run identifiers and conclusions).
+
+- UPDATE (2026-11-21, train S2-11 records audit, second reader), PO-S2-36: RE-OPENED; TYPE OPEN.
+- NEEDED (PO-S2-36): the live copy's declared column order, read by the still-open live fetch (OI-197, OI-202), or one recorded line after that fetch stating that refusal of a later order is enough; the hand-encoded orders of the format tests are an offline substitute and do not decide it.
