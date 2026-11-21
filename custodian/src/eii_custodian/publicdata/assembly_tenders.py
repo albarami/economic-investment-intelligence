@@ -3,18 +3,56 @@
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from .assembly import AssemblyError
 from .assembly_io import local, read_object
 from .fetch.receipts import sha256_hex, sidecar_for
 from .fetch.registry import Entry
-from .fetch.snapshots import publish_snapshot
+from .fetch.snapshots import publish_snapshot, read_snapshot
+from .fetch.terms_text import FINGERPRINT_VISIBLE_TEXT, terms_text_sha256
 from .singles.tenders import AWARD_CONTINUITY_PAGES, LIST_PATHS, TenderError
 
 
+def terms_body_hash(
+    cache: Path, entry: Entry, rows: Sequence[Mapping[str, object]]
+) -> str:
+    """Select this run's raw terms body, retaining the review's hash convention."""
+    matches = [row for row in rows if row.get("key") == entry.key]
+    if len(matches) != 1:
+        raise AssemblyError("assembly_tender_terms_incomplete")
+    row = matches[0]
+    digest = row.get("terms_body_sha256")
+    if (
+        row.get("terms_url") != entry.terms_url
+        or row.get("terms_fingerprint") != FINGERPRINT_VISIBLE_TEXT
+        or not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+    ):
+        raise AssemblyError("assembly_tender_terms_incomplete")
+    try:
+        snapshot = read_snapshot(cache / entry.key / "terms", digest)
+        if (
+            snapshot.sidecar.get("source_id") != entry.source_id
+            or snapshot.sidecar.get("key") != entry.key
+            or snapshot.sidecar.get("fetch_url") != entry.terms_url
+            or row.get("terms_sha256") != terms_text_sha256(snapshot.body)
+        ):
+            raise AssemblyError("assembly_tender_terms_incomplete")
+    except (OSError, ValueError):
+        raise AssemblyError("assembly_tender_terms_incomplete") from None
+    return digest
+
+
 def archive_pages(
-    cache: Path, entry: Entry, stamp: str, *, retrieved_utc: str | None = None
+    cache: Path,
+    entry: Entry,
+    stamp: str,
+    *,
+    retrieved_utc: str | None = None,
+    terms_sha256: str = "",
 ) -> str:
     pages = []
     readings = []
@@ -119,6 +157,6 @@ def archive_pages(
         publisher=entry.publisher,
         source_modified="",
         row_count=None,
-        terms_sha256="",
+        terms_sha256=terms_sha256,
     )
     return publish_snapshot(local(cache, entry.key), "json", body, sidecar).sha256

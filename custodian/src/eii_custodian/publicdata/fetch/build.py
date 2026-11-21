@@ -1814,7 +1814,15 @@ def _read_terms_apart(
     archive_auxiliary(
         entry, cache / entry.key, "terms", read.body, retrieved, entry.terms_url
     )
-    _record_terms(entry, read.sha256, retrieved, previous, lines, terms)
+    _record_terms(
+        entry,
+        read.sha256,
+        retrieved,
+        previous,
+        lines,
+        terms,
+        body_sha256=sha256_hex(read.body) if entry.source_id == "tenders_pub" else "",
+    )
 
 
 def _record_terms(
@@ -1824,19 +1832,22 @@ def _record_terms(
     previous: dict[str, str],
     lines: list[str],
     terms: list[dict[str, object]],
+    *,
+    body_sha256: str = "",
 ) -> None:
     """Record the visible-text fingerprint. A changed fingerprint of this kind is named."""
-    terms.append(
-        {
-            "key": entry.key,
-            "retrieved_utc": retrieved,
-            "terms_sha256": digest,
-            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
-            "terms_url": entry.terms_url,
-            "terms_words": entry.terms_words,
-            "terms_read_on": entry.terms_read_on,
-        }
-    )
+    row: dict[str, object] = {
+        "key": entry.key,
+        "retrieved_utc": retrieved,
+        "terms_sha256": digest,
+        "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
+        "terms_url": entry.terms_url,
+        "terms_words": entry.terms_words,
+        "terms_read_on": entry.terms_read_on,
+    }
+    if body_sha256:
+        row["terms_body_sha256"] = body_sha256
+    terms.append(row)
     prior = previous.get(entry.key)
     if prior is not None and prior != digest:
         lines.append(terms_changed_line(entry.key, entry.terms_url))

@@ -10,12 +10,15 @@ The committed YAML uses JSON syntax (a YAML subset) and is read as strict JSON.
 """
 
 import json
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from datetime import date
 from pathlib import Path
 
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.snapshots import utc
 
 OUTCOMES = frozenset(
     {
@@ -273,6 +276,7 @@ def tender_disposition(
         return withheld
     expected = {
         "source_id": tender.source_id,
+        "key": registry.key,
         "publisher": tender.publisher,
         "licence_id": tender.licence_id,
         "licence_basis": tender.basis_of_use,
@@ -280,18 +284,34 @@ def tender_disposition(
         "period_first": tender.period_first or None,
         "period_last": tender.period_last or None,
         "terms_sha256": tender.terms_sha256 or None,
-        "retrieved_utc": tender.retrieved_utc,
-        "sha256": tender.page_sha256,
-        "fetch_url": tender.page,
+        "fetch_url": registry.url,
+        "fetch_host": registry.fetch_host,
         "release_tables": list(tender.release_tables),
         "switched_off": False,
     }
     registry_matches = (
         _registry_binds(tender, registry)
-        and registry.url == tender.page
-        and registry.basis_note == tender.review_reason
+        and registry.key == tender.source_id
+        and registry.fetch_host == host_of(registry.url)
+        and registry.fetch_host == host_of(tender.page)
+        and (
+            (tender.outcome == "terms_absent" and not tender.terms_url)
+            or registry.fetch_host == host_of(tender.terms_url)
+        )
+        and bool(registry.basis_note.strip())
     )
-    if not registry_matches or any(receipt.get(k) != v for k, v in expected.items()):
+    digest = receipt.get("sha256")
+    retrieved = receipt.get("retrieved_utc")
+    try:
+        utc(retrieved)
+    except ValueError:
+        return withheld
+    if (
+        not registry_matches
+        or any(receipt.get(k) != v for k, v in expected.items())
+        or not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+    ):
         return withheld
     return Disposition(True, "SHOWN", "")
 

@@ -230,7 +230,7 @@ class Production:
             raise AssemblyError("assembly_fetch_refused")
         if self.intake_refusal:
             raise AssemblyError(self.intake_refusal)
-        from .assembly_tenders import archive_pages
+        from .assembly_tenders import archive_pages, terms_body_hash
         from .fetch.own_run import is_tender_entry
 
         pages = {}
@@ -240,6 +240,9 @@ class Production:
                 and not entry.skip_reason
                 and not is_tender_entry(entry)
             ):
+                if entry.kind != "paged_cards":
+                    continue
+                terms_hash = terms_body_hash(self.cache, entry, self.fetched.terms)
                 reused_times = getattr(self.fetched, "reused_times", {})
                 if entry.key in reused_times:
                     pages[entry.key] = archive_pages(
@@ -247,10 +250,14 @@ class Production:
                         entry,
                         self.stamp or self.clock(),
                         retrieved_utc=reused_times[entry.key],
+                        terms_sha256=terms_hash,
                     )
                 else:
                     pages[entry.key] = archive_pages(
-                        self.cache, entry, self.stamp or self.clock()
+                        self.cache,
+                        entry,
+                        self.stamp or self.clock(),
+                        terms_sha256=terms_hash,
                     )
         return self.record(
             "fetch_archive",

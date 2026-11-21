@@ -6008,3 +6008,9 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - 2026-11-21 S2-GW — PO-S2-129: stays OPEN for its retained readiness-margin follow-up (its assertion part remains closed by decision 0073 item 3). Carried by decision 0085 item 2 with S2-T44 criterion 1 to the same backlog row; outside S2-T10's criteria 3 and 4 under that task's exclusion line.
 - 2026-11-21 S2-GW — OI-360: stays OPEN. Carried by decision 0085 item 3 with the tenders own run of decision 0084: it is settled on that run's evidence before the S7-T09 start check of decision 0084 item 6, never by a green run alone. Its NEEDED text is unchanged.
 - No other item is carried by decision 0085. These lines close nothing and rewrite no earlier line.
+
+## PO-S2-P40 — Tender binding requires live terms proof and decision review
+
+- TYPE: OPEN; raised 2026-11-21 by S2-P40 offline repair.
+- EVIDENCE: the offline committed-row/confirmation/fresh-archive join and substitution tests pass, but they use invented pages and a supplied matching review terms digest. No worker live source read occurred. The committed confirmation describes its terms hash as the raw fetched body hash; the existing build-public terms log uses a visible-text fingerprint. The repair records and verifies both digests from one terms read.
+- NEEDED: the lead's next permitted live run verifies that its raw terms-body hash equals the committed S2-T13 review hash, or has the changed body reviewed and updates the confirmation by the normal review route. The owner decides proposed decision 0083's narrow amendment to decision 0026 item 8, and another maker reviews the implementation before any S2-T13 completion or slice-gate claim. OI-360's separate HTTP refusal remains open.
