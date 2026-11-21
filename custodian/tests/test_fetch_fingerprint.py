@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import importlib
 import json
+import os
 import sys
+import time
 import types
 from dataclasses import replace
 from pathlib import Path
@@ -26,6 +29,7 @@ from eii_custodian.publicdata.fetch.fingerprint import (
     EXCLUDED_SCOPES,
     CodeRoots,
     FingerprintUnavailable,
+    _sha256,
     closed_encode,
     closure_files,
     default_roots,
@@ -738,3 +742,276 @@ def test_fixture_fetch_opens_only_declared_repo_files(
     (roots.code_root / "uv.lock").read_bytes()
     state["enabled"] = False
     assert roots.code_root / "uv.lock" in state["opened"]
+
+
+# --- review RV1 planted attacks --------------------------------------------
+#
+# The independent review's attack tests, planted on the same invented stubs.
+# Each asserts the corrected behaviour: a module loaded before begin() is
+# bound by hash, a dynamic form anywhere refuses the scan, an unavailable
+# proof refetches instead of refusing the build, and the comparison is exact.
+
+FORMS = {
+    # control: a static import inside the closure is bound, so the edit
+    # refetches through the union hash (must pass)
+    "control_static_import": "import syn_hidden\nH = syn_hidden\n",
+    "importlib_dunder_import": (
+        'import importlib\nH = importlib.__import__("syn_hidden")\n'
+    ),
+    "getattr_import_module": (
+        'import importlib\nH = getattr(importlib, "import_module")("syn_hidden")\n'
+    ),
+    "bound_alias_of_import_module": (
+        'import importlib\nload = importlib.import_module\nH = load("syn_hidden")\n'
+    ),
+    "sys_modules_lookup": 'import sys\nH = sys.modules["syn_hidden"]\n',
+    "pkgutil_resolve_name": 'import pkgutil\nH = pkgutil.resolve_name("syn_hidden")\n',
+    "source_file_loader": (
+        "from importlib.machinery import SourceFileLoader\n"
+        'H = SourceFileLoader("syn_hidden", "syn_hidden.py")\n'
+    ),
+    # a submodule reached by attribute, imported by a module outside the closure
+    "attribute_chain_submodule": "import synhid\nH = synhid.hidden\n",
+}
+
+
+@pytest.mark.parametrize("form", sorted(FORMS))
+def test_module_level_load_before_begin_is_bound_by_hash(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, form: str
+) -> None:
+    """A module loaded before begin() is hashed even outside the closure.
+
+    A launcher or machinery module's own module-level load runs before
+    begin(), so the loaded module is already in sys.modules when the baseline
+    is taken; the run-time guard excuses it and, outside the union, the
+    static scan never sees it. The loaded-module hash binds it anyway: an
+    edit between the runs refetches.
+    """
+    for name in [
+        n for n in sys.modules if n.startswith(("syn_hidden", "synhid", "syn_preload"))
+    ]:
+        del sys.modules[name]
+    roots = _stub_roots(tmp_path, monkeypatch)
+    code = tmp_path / "code"
+    (code / "syn_hidden.py").write_text("PACING_SECONDS = 1\n", "utf-8")
+    (code / "synhid").mkdir()
+    (code / "synhid" / "__init__.py").write_text("", "utf-8")
+    (code / "synhid" / "hidden.py").write_text("PACING_SECONDS = 1\n", "utf-8")
+    if form == "control_static_import":
+        (code / "syn_machinery.py").write_text(FORMS[form], "utf-8")
+        preload = "PRELOADED = 1\n"
+    else:
+        # Each dynamic form lives in syn_preload, a module outside the
+        # closure that is loaded before begin().
+        preload = FORMS[form]
+    (code / "syn_preload.py").write_text(preload, "utf-8")
+    edited = (
+        code / "synhid" / "hidden.py"
+        if form == "attribute_chain_submodule"
+        else code / "syn_hidden.py"
+    )
+    importlib.import_module("syn_hidden")
+    importlib.import_module("synhid.hidden")
+    importlib.import_module("syn_preload")
+    _interrupt(harness, code_roots=roots)
+    assert "fingerprint" in record(harness)["entries"]["SYN-first"]
+    _rewrite(edited, "PACING_SECONDS = 0")
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert outcome.failure is None
+    stale = [line for line in outcome.lines if line.startswith("REUSE SYN-first ")]
+    assert not stale, f"stale reuse after editing {edited.name}: {stale}"
+    assert harness.entries[0].url in harness.seen
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "import importlib\nimportlib.__import__('x')\n",
+        "import importlib\nimportlib.reload\n",
+        "from importlib.machinery import SourceFileLoader\nSourceFileLoader('a','b')\n",
+        "import importlib.util\nimportlib.util.module_from_spec\n",
+        "import importlib.util\nimportlib.util.spec_from_loader\n",
+        "import pkgutil\npkgutil.resolve_name('x')\n",
+        "import zipimport\nzipimport.zipimporter\n",
+        "import sys\nsys.modules['x']\n",
+        "import sys\nvalue = sys.modules.get('x')\n",
+        "import importlib\ngetattr(importlib, 'import_module')('x')\n",
+        "import builtins\ngetattr(builtins, 'eval')('1')\n",
+        "import sys\ngetattr(sys, 'modules')['x']\n",
+        "import importlib\nload = importlib.import_module\nload('x')\n",
+        "from importlib import import_module\nload = import_module\n",
+        "import runpy\nload = runpy.run_module\n",
+    ],
+)
+def test_reference_level_dynamic_forms_refuse_the_closure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source: str
+) -> None:
+    """Each dynamic form refuses on any reference, not only a call."""
+    roots = _stub_tree(tmp_path, monkeypatch)
+    bad = tmp_path / "tree" / "synpkg" / "dynamic.py"
+    bad.write_text(source, "utf-8")
+    with pytest.raises(FingerprintUnavailable):
+        closure_files(roots, ("synpkg.dynamic",), scoped=False)
+
+
+def test_launcher_module_is_bound_by_the_loaded_hash() -> None:
+    """scripts/commands/main.py calls build_public.run(root, environ, args).
+
+    It chooses the transport seam, the environment mapping and the root that
+    the whole fetch runs under. It is loaded before begin(), so it is bound
+    through the loaded-module hash, not the closure.
+    """
+    roots = default_roots()
+    sys.path.insert(0, str(roots.code_root / "scripts"))
+    try:
+        import commands.main  # noqa: F401  (as ./eii loads it)
+
+        scan = scan_run((), roots, large=True)
+    finally:
+        sys.path.pop(0)
+    launcher = roots.code_root / "scripts/commands/main.py"
+    assert launcher.is_file()
+    assert launcher in scan.baseline
+    assert not scan.unexpected_loaded()  # the guard excuses it as baseline
+    # Bound through the loaded-module hash: the union holds every bound file.
+    assert launcher in scan.union
+    assert launcher in scan.hashes
+    # The eii shell launcher is a named hashed file of every record.
+    assert roots.code_root / "eii" in scan.hashes
+
+
+def test_loaded_digest_and_named_file_are_in_each_record(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    launcher = tmp_path / "code" / "syn_launcher.sh"
+    launcher.write_text("#!/bin/sh\necho syn\n", "utf-8")
+    roots = replace(roots, named_files={"syn_launcher": launcher})
+    scan = scan_run((entry("SYN-only"),), roots, large=False)
+    stored = scan.records["SYN-only"]
+    assert stored is not None
+    assert stored["named_files"] == {"syn_launcher": _sha256(launcher.resolve())}
+    assert launcher.resolve() in scan.hashes
+    assert isinstance(stored["loaded"], str)
+    assert len(stored["loaded"]) == 64
+
+
+def test_missing_named_file_leaves_every_item_unproven(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    roots = replace(roots, named_files={"syn_gone": tmp_path / "gone"})
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+
+
+def test_ordinary_run_is_not_refused_by_the_resume_proof(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A non-resume seeded build still fetches when the proof is unavailable.
+
+    A refused form, an unresolvable import or an unreadable module leaves the
+    whole scan unavailable; the build fetches anyway and every item is marked
+    resume_fingerprint_unavailable.
+    """
+    roots = _stub_roots(tmp_path, monkeypatch)
+    (tmp_path / "code" / "syn_machinery.py").write_text('X = eval("1")\n', "utf-8")
+    outcome = harness.run(code_roots=roots)
+    assert harness.seen, f"nothing fetched; failure={outcome.failure}"
+    assert outcome.failure is not None and outcome.failure.code == 6
+    item = record(harness)["entries"]["SYN-first"]
+    assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+
+
+def test_resume_run_marks_and_refetches_when_the_proof_is_unavailable(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """On resume an unavailable proof refetches every entry, never reuses."""
+    roots = _stub_roots(tmp_path, monkeypatch)
+    _interrupt(harness, code_roots=roots)
+    _rewrite(tmp_path / "code" / "syn_machinery.py", 'X = eval("1")')
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert outcome.failure is None
+    assert harness.seen == [source.url for source in harness.entries]
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+    item = record(harness)["entries"]["SYN-first"]
+    assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+
+
+@pytest.mark.parametrize("version", ["2", 2.0, True, None, 3, 1])
+def test_journal_version_mixups_never_reuse(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: Any
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    _interrupt(harness, code_roots=roots)
+    row = record(harness)
+    if version is None:
+        del row["version"]
+    else:
+        row["version"] = version
+    # a version-1 shaped item: no fingerprint
+    del row["entries"]["SYN-first"]["fingerprint"]
+    (harness.cache / "build-run.json").write_text(json.dumps(row))
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert not [line for line in outcome.lines if line.startswith("REUSE ")]
+    assert harness.entries[0].url in harness.seen or outcome.failure is not None
+
+
+@pytest.mark.parametrize("plant", ["bytes", "receipt"])
+def test_receipt_rehash_still_gates_reuse_with_a_matching_fingerprint(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, plant: str
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch)
+    _interrupt(harness, code_roots=roots)
+    item = record(harness)["entries"]["SYN-first"]
+    names = sorted(item["proofs"][0]["files"])
+    target = next(
+        harness.cache / n
+        for n in names
+        if (plant == "receipt") == ("receipt" in n or n.endswith(".meta.json"))
+    )
+    target.write_bytes(target.read_bytes() + b" ")
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert not [line for line in outcome.lines if line.startswith("REUSE SYN-first")]
+    assert harness.entries[0].url in harness.seen
+
+
+def test_fingerprint_comparison_is_type_exact(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """true/1/1.0 are different canonical rows; Python == treats them as equal."""
+    roots = _stub_roots(tmp_path, monkeypatch)
+    _interrupt(harness, code_roots=roots)
+    row = record(harness)
+    changed = 0
+
+    def swap(value: Any) -> Any:
+        nonlocal changed
+        if isinstance(value, list):
+            return [swap(item) for item in value]
+        if value is True or value is False:
+            changed += 1
+            return int(value)
+        return value
+
+    stored = row["entries"]["SYN-first"]["fingerprint"]
+    stored["entry"] = swap(stored["entry"])
+    assert changed, "fixture entry has no boolean field"
+    (harness.cache / "build-run.json").write_text(json.dumps(row))
+    harness.run(resume=True, code_roots=roots)
+    assert harness.entries[0].url in harness.seen
+
+
+def test_same_size_same_mtime_edit_is_rehashed(tmp_path: Path) -> None:
+    """The file-hash cache key holds ctime too: a copy that preserves times
+    still changes it, so a same-size, same-mtime rewrite is rehashed."""
+    path = tmp_path / "syn_module.py"
+    path.write_text("A = 1\n", "utf-8")
+    first = _sha256(path)
+    stat = path.stat()
+    # Cross the filesystem's ctime granularity so the metadata change lands.
+    time.sleep(0.05)
+    path.write_text("B = 2\n", "utf-8")
+    os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+    assert _sha256(path) != first

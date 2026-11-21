@@ -126,12 +126,16 @@ and S2-P39 replaces the checkout-HEAD reuse gate with per-entry fingerprints.
 Ordinary public builds atomically keep `build-run.json` in the same cache, with
 start time, seed, checkout HEAD and per-entry fetch completion. Resume refuses
 without an interrupted record matching the seed. Each completed entry carries
-a fingerprint of its canonical registry row, dispatch branch, constructed
-entry, interpreter and locked-dependency versions, its computed code closure
-and the tracked public-data inputs; the tender portal also binds its intake
-receipts. An entry whose fingerprint, receipt or page-meta proof cannot be
-reproduced is fetched again, as is a missing, changed or pre-run file, and a
-version-1 journal without that proof refuses with its old refusal names. The
+a fingerprint of the closed-encoded constructed entry, which carries every
+field of its registry row, its dispatch branch, interpreter and
+locked-dependency versions, its computed code closure, the repository modules
+loaded before the run, the `eii` launcher and the tracked public-data inputs;
+the tender portal also binds its intake receipts. An entry whose fingerprint,
+receipt or page-meta proof cannot be reproduced is fetched again, as is a
+missing, changed or pre-run file, and a
+version-1 journal without that proof refuses with its old refusal names. A
+build whose fingerprint proof cannot be computed at all still fetches, marking
+each item `resume_fingerprint_unavailable`. The
 paged portal's per-page hashes live in the run record alongside its original
 list receipts. A cache layout without complete receipt proof is fetched
 through its existing adapter. `REUSE` build-log lines name the interrupted

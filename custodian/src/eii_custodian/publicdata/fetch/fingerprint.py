@@ -1,12 +1,15 @@
 """Per-entry fetch-code and data-input fingerprints for durable resume.
 
 A reuse-capable journal item (schema 2) binds one entry to the exact code and
-inputs that produced it: the canonical registry row, the dispatch branch, the
-computed code closure hash, the global public-data input, the Python version
-and the locked dependency set. The code closure is computed from a static AST
-scan resolved with ``importlib.util.find_spec`` under the actual ``sys.path``;
-anything dynamic or unresolvable refuses rather than guessing. Anything the
-scan cannot prove leaves the item without a fingerprint and is never reused.
+inputs that produced it: the closed-encoded constructed ``Entry`` (which
+carries every field of its registry row), the dispatch branch, the computed
+code closure hash, the repository modules loaded before the run began, the
+named non-module files such as the ``eii`` launcher, the global public-data
+input, the Python version and the locked dependency set. The code closure is
+computed from a static AST scan resolved with ``importlib.util.find_spec``
+under the actual ``sys.path``; anything dynamic or unresolvable refuses
+rather than guessing. Anything the scan cannot prove leaves the item without
+a fingerprint and is never reused.
 """
 
 from __future__ import annotations
@@ -40,8 +43,10 @@ MACHINERY_SEEDS: tuple[str, ...] = (
     "earthdata_key",
 )
 
-# build.py function scopes that run only after the fetch loop or only for
-# note-only rows (whose completion never carries a fingerprint). Each name is
+# build.py function scopes excluded from the machinery closure. Each runs
+# only after the fetch loop or only for note-only rows (whose completion
+# never carries a fingerprint), except _seeded_assembly, which runs before
+# the loop and is bound through the loaded-module hash instead. Each name is
 # asserted to exist as a top-level function of build.py; the scope set may not
 # overlap any computed closure's inputs.
 EXCLUDED_SCOPES: frozenset[str] = frozenset(
@@ -167,7 +172,7 @@ def _canonical(value: object) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
-_HASH_CACHE: dict[Path, tuple[int, int, str]] = {}
+_HASH_CACHE: dict[Path, tuple[int, int, int, str]] = {}
 
 
 def _sha256(path: Path) -> str:
@@ -176,15 +181,16 @@ def _sha256(path: Path) -> str:
     if (
         cached is not None
         and cached[0] == stat.st_mtime_ns
-        and cached[1] == stat.st_size
+        and cached[1] == stat.st_ctime_ns
+        and cached[2] == stat.st_size
     ):
-        return cached[2]
+        return cached[3]
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)
     value = digest.hexdigest()
-    _HASH_CACHE[path] = (stat.st_mtime_ns, stat.st_size, value)
+    _HASH_CACHE[path] = (stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, value)
     return value
 
 
@@ -258,7 +264,13 @@ class _ModuleScan:
 
 
 class _ImportScan(ast.NodeVisitor):
-    """Collect absolute import edges and refused dynamic forms per scope."""
+    """Collect absolute import edges and refused dynamic forms per scope.
+
+    Calls of the named forms refuse, and so does any reference — call or not —
+    to an object that can load code or reach module state the static scan
+    cannot see. The one named exception is this module's own ``sys.modules``
+    read in ``_qualifying_modules``.
+    """
 
     _REFUSE_NAMES: ClassVar[frozenset[str]] = frozenset({"__import__", "exec", "eval"})
     _REFUSE_EXACT: ClassVar[frozenset[str]] = frozenset(
@@ -269,6 +281,32 @@ class _ImportScan(ast.NodeVisitor):
             "importlib.util.spec_from_file_location",
         }
     )
+    _REFUSE_REFERENCES: ClassVar[frozenset[str]] = frozenset(
+        {
+            "__import__",
+            "exec",
+            "eval",
+            "builtins.__import__",
+            "builtins.exec",
+            "builtins.eval",
+            "importlib.__import__",
+            "importlib.reload",
+            "importlib.util.module_from_spec",
+            "importlib.util.spec_from_loader",
+            "importlib.util.spec_from_file_location",
+        }
+    )
+    _REFUSE_REFERENCE_ROOTS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "importlib.machinery",
+            "pkgutil",
+            "runpy",
+            "zipimport",
+        }
+    )
+    _GETATTR_ROOTS: ClassVar[frozenset[str]] = frozenset(
+        {"builtins", "importlib", "sys"}
+    )
 
     def __init__(self, module: str, is_package: bool) -> None:
         self.module = module
@@ -277,9 +315,15 @@ class _ImportScan(ast.NodeVisitor):
         self.edges: list[tuple[str, str]] = []
         self.refusals: list[tuple[str, str]] = []
         self.aliases: dict[str, str] = {}
+        self._permitted: set[int] = set()
 
     def _top(self) -> str:
         return self.scope[0] if self.scope else ""
+
+    def _refuse(self, form: str) -> None:
+        item = (form, self._top())
+        if item not in self.refusals:
+            self.refusals.append(item)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         self.scope.append(node.name)
@@ -322,18 +366,48 @@ class _ImportScan(ast.NodeVisitor):
         base = ".".join(package)
         return (base + "." + node.module) if node.module else base
 
-    def _callee(self, node: ast.Call) -> str | None:
-        func = node.func
-        if isinstance(func, ast.Name):
-            return self.aliases.get(func.id, func.id)
+    def _dotted(self, node: ast.AST) -> str | None:
+        """Resolve a Name or Attribute chain through the import aliases."""
         parts: list[str] = []
-        while isinstance(func, ast.Attribute):
-            parts.append(func.attr)
-            func = func.value
-        if isinstance(func, ast.Name):
-            base = self.aliases.get(func.id, func.id)
+        while isinstance(node, ast.Attribute):
+            parts.append(node.attr)
+            node = node.value
+        if isinstance(node, ast.Name):
+            base = self.aliases.get(node.id, node.id)
             return ".".join([base, *reversed(parts)])
         return None
+
+    def _callee(self, node: ast.Call) -> str | None:
+        return self._dotted(node.func)
+
+    def _reference(self, node: ast.Name | ast.Attribute) -> None:
+        """Refuse a resolved reference that can load or reach unseen code."""
+        if id(node) in self._permitted:
+            return
+        name = self._dotted(node)
+        if name is None:
+            return
+        if name == "sys.modules" or name.startswith("sys.modules."):
+            # This module's own baseline read is the one named exception.
+            if (self.module, self._top()) != (__name__, "_qualifying_modules"):
+                self._refuse("sys.modules")
+            return
+        if (
+            name in self._REFUSE_REFERENCES
+            or name in self._REFUSE_REFERENCE_ROOTS
+            or any(name.startswith(root + ".") for root in self._REFUSE_REFERENCE_ROOTS)
+            or name == "importlib.import_module"
+            or name.endswith(".import_module")
+        ):
+            self._refuse(name)
+
+    def visit_Name(self, node: ast.Name) -> None:
+        self._reference(node)
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        self._reference(node)
+        self.generic_visit(node)
 
     def visit_Call(self, node: ast.Call) -> None:
         name = self._callee(node)
@@ -341,22 +415,30 @@ class _ImportScan(ast.NodeVisitor):
             self.generic_visit(node)
             return
         if (
+            name in {"getattr", "builtins.getattr"}
+            and node.args
+            and (target := self._dotted(node.args[0])) is not None
+            and target.split(".", 1)[0] in self._GETATTR_ROOTS
+        ):
+            self._refuse(f"getattr:{target}")
+        if (
             name in self._REFUSE_NAMES
             or name in self._REFUSE_EXACT
             or name == "runpy"
             or name.startswith("runpy.")
         ):
-            self.refusals.append((name, self._top()))
+            self._refuse(name)
         elif name == "importlib.import_module" or name.endswith(".import_module"):
             first = node.args[0] if node.args else None
             if isinstance(first, ast.Constant) and isinstance(first.value, str):
                 self.edges.append((first.value, self._top()))
+                self._permitted.add(id(node.func))
             else:
-                self.refusals.append(("importlib.import_module", self._top()))
+                self._refuse("importlib.import_module")
         self.generic_visit(node)
 
 
-_SCAN_CACHE: dict[tuple[Path, str], tuple[int, int, _ModuleScan]] = {}
+_SCAN_CACHE: dict[tuple[Path, str], tuple[int, int, int, _ModuleScan]] = {}
 
 
 def _scan_file(path: Path, module: str) -> _ModuleScan:
@@ -368,9 +450,10 @@ def _scan_file(path: Path, module: str) -> _ModuleScan:
     if (
         cached is not None
         and cached[0] == stat.st_mtime_ns
-        and cached[1] == stat.st_size
+        and cached[1] == stat.st_ctime_ns
+        and cached[2] == stat.st_size
     ):
-        return cached[2]
+        return cached[3]
     try:
         tree = ast.parse(path.read_bytes(), filename=str(path))
     except (OSError, SyntaxError, ValueError):
@@ -378,7 +461,12 @@ def _scan_file(path: Path, module: str) -> _ModuleScan:
     visitor = _ImportScan(module, path.name == "__init__.py")
     visitor.visit(tree)
     scan = _ModuleScan(tuple(visitor.edges), tuple(visitor.refusals))
-    _SCAN_CACHE[(path, module)] = (stat.st_mtime_ns, stat.st_size, scan)
+    _SCAN_CACHE[(path, module)] = (
+        stat.st_mtime_ns,
+        stat.st_ctime_ns,
+        stat.st_size,
+        scan,
+    )
     return scan
 
 
@@ -402,10 +490,11 @@ class CodeRoots:
     """The roots and seams the fingerprint computation binds.
 
     ``code_root`` bounds the static closure; ``runtime_dirs``/``runtime_files``
-    bound the runtime loaded-module check; ``tracked`` lists the public-data
-    input files; ``seeds``/``scope_excludes``/``branch_roots``/``brancher``
-    define the machinery and per-branch roots. Tests substitute a small stub
-    tree for ``code_root`` and the seed names.
+    bound the runtime loaded-module check; ``named_files`` are bound by hash
+    into every record; ``tracked`` lists the public-data input files;
+    ``seeds``/``scope_excludes``/``branch_roots``/``brancher`` define the
+    machinery and per-branch roots. Tests substitute a small stub tree for
+    ``code_root`` and the seed names.
     """
 
     code_root: Path
@@ -415,6 +504,7 @@ class CodeRoots:
     code_excludes: tuple[Path, ...] = ()
     runtime_dirs: tuple[Path, ...] = ()
     runtime_files: frozenset[Path] = frozenset()
+    named_files: Mapping[str, Path] = field(default_factory=dict)
     seeds: tuple[str, ...] = MACHINERY_SEEDS
     scope_excludes: Mapping[str, frozenset[str]] = field(
         default_factory=lambda: {_BUILD_MODULE: EXCLUDED_SCOPES}
@@ -461,6 +551,9 @@ def default_roots() -> CodeRoots:
         code_excludes=code_excludes,
         runtime_dirs=runtime_dirs,
         runtime_files=runtime_files,
+        # The eii shell launcher is no Python module; it sets python -I and
+        # the entry script, so it is bound as a named hashed file instead.
+        named_files={"eii": root / "eii"},
     )
 
 
@@ -595,6 +688,8 @@ class RunScan:
     """Every fingerprint input computed once at RunRecord.begin."""
 
     records: dict[str, dict[str, Any] | None]
+    # The static closure plus every baseline module outside it: the set of
+    # module files the per-entry fingerprints bind.
     union: frozenset[Path]
     hashes: dict[Path, str]
     baseline: frozenset[Path]
@@ -602,7 +697,7 @@ class RunScan:
     roots: CodeRoots
 
     def closure_intact(self) -> bool:
-        """Re-hash every closure file; a mid-run edit breaks the proof."""
+        """Re-hash every bound file; a mid-run edit breaks the proof."""
         try:
             for path, digest in self.hashes.items():
                 if _sha256(path) != digest:
@@ -686,5 +781,32 @@ def scan_run(entries: Sequence[Entry], roots: CodeRoots, *, large: bool) -> RunS
             records[entry.key] = record
         except (FingerprintUnavailable, ValueError):
             records[entry.key] = None
+    # The baseline stays last so modules this scan itself loads (parent
+    # packages of find_spec, the brancher's lazy imports) are recorded as
+    # loaded-before-fetch rather than tripping the runtime guard. Every
+    # baseline module outside the static closure is hashed, folded into each
+    # record's loaded digest and joined into the union, which then holds
+    # every module file the fingerprints bind: an edit to it refetches, and
+    # a module loaded later still trips the guard.
     baseline = _qualifying_modules(roots)
-    return RunScan(records, union, hashes, baseline, data, roots)
+    outside = baseline - union
+    named: dict[str, str] = {}
+    try:
+        for path in outside:
+            if not path.is_relative_to(roots.code_root):
+                raise FingerprintUnavailable("loaded_module_outside_root")
+            hashes[path] = _sha256(path)
+        for name, path in sorted(roots.named_files.items()):
+            resolved = path.resolve()
+            if not resolved.is_file():
+                raise FingerprintUnavailable("named_file_missing")
+            hashes[resolved] = _sha256(resolved)
+            named[name] = hashes[resolved]
+    except OSError:
+        raise FingerprintUnavailable("module_unreadable") from None
+    loaded = digest(outside)
+    for stored in records.values():
+        if stored is not None:
+            stored["loaded"] = loaded
+            stored["named_files"] = named
+    return RunScan(records, union | outside, hashes, baseline, data, roots)

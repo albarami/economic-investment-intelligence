@@ -5,10 +5,10 @@
 | Status | Proposed, 2026-11-21: built under the owner's S2-P39 approval and plan 3's independent design review, for different-maker confirmation |
 | Date | 2026-11-21 |
 | Owner | The owner |
-| Decided by | The owner, recorded in `.overnight/IN/OWNER-CONDITION.md` (no loss of quality; any doubt means refetch); design independently approved by `.overnight/IN/DESIGN-REVIEW-3.md` (Anthropic Opus) with five records-only corrections applied |
+| Decided by | The owner's S2-P39 approval of 2026-11-21 (no loss of quality; any doubt means refetch), recorded in [PROGRESS.md](../../PROGRESS.md) S2-P39; design independently approved by the plan-3 design review (Anthropic Opus) with five records-only corrections applied |
 | Amends | The `--resume` reuse rule recorded for S2-P37 in [document 13](../13_DEPLOYMENT_AND_OPERATIONS.md) command table, the [README](../../README.md) S2-P37 paragraph and `AGENTS.md`/`CLAUDE.md` rule 44; named by the task brief as an amendment of decision 0077's resume rule |
 | Purpose | Let `./eii build-public --seed N --resume` reuse proven fetched bytes across unrelated code and data changes, with unchanged quality and an explicit refetch whenever proof is unavailable or uncertain |
-| Read first | [PROGRESS.md](../../PROGRESS.md) S2-P37 and S2-P39; `.overnight/IN/PLAN.md`, `.overnight/IN/DESIGN-REVIEW-3.md`, `.overnight/IN/OWNER-CONDITION.md`; `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py` and `fetch/resume.py` |
+| Read first | [PROGRESS.md](../../PROGRESS.md) S2-P37 and S2-P39; `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py` and `fetch/resume.py` |
 
 ## Context and evidence
 
@@ -29,31 +29,43 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    completes through the ordinary fetched path stores a fingerprint beside the
    existing receipt and page-meta proofs. The recorded `head` stays in the journal
    for audit and for the version-1 refusal names below; it no longer gates reuse.
-2. **Fingerprint contents.** The fingerprint of an entry binds: the canonical
-   registry row, the named dispatch branch (including the explicit `grid` and
-   `large` selections), the closed-encoded constructed `Entry`, the interpreter
-   version, the `uv.lock` SHA-256, a hash of the computed code closure of the
-   machinery and the branch, and one canonical hash of every git-tracked file
-   under `custodian/publicdata/` (the global data input; `sources.yaml` rows stay
-   bound per registry row and `tenders_pub.intermediate.pem` stays pinned by
-   `chain_intermediate_sha256`). For `tenders_pub` the intake triple (award
+2. **Fingerprint contents.** The fingerprint of an entry binds: the closed-encoded
+   constructed `Entry`, which carries every field of its registry row, the named
+   dispatch branch (including the explicit `grid` and `large` selections), the
+   interpreter version, the `uv.lock` SHA-256, a hash of the computed code
+   closure of the machinery and the branch, a loaded-module digest of every
+   repository module loaded before the run begins that lies outside that
+   closure, the named `eii` shell launcher, and one canonical hash of every
+   git-tracked file under `custodian/publicdata/` (the global data input;
+   `sources.yaml` rows stay bound per registry row and
+   `tenders_pub.intermediate.pem` stays pinned by `chain_intermediate_sha256`).
+   For `tenders_pub` the intake triple (award
    cutoff, cutoff reason, workbook SHA-256) is stored from the awarded-list
    receipts at fetch completion and recomputed through `intake_cutoff` on
    resume. Listing entries fold
    the canonical rows of every registry key under `entry.key + "/"`.
+   Stored and current fingerprints compare as canonical JSON text.
 3. **Computed closure.** The machinery is the static import closure of the fetch
    loop seeds (`fetch/build.py`, `fetch/resume.py`, `commands.build_public`,
    `earthdata_key`) scanned by AST over module-level and function-level imports,
    relative imports, parent-package `__init__` modules and literal
    `importlib.import_module` targets, resolved by `importlib.util.find_spec`
    under the build's actual `sys.path`; bare script imports such as `cdse_key`
-   join it. Only the named `build.py` scopes that run after the fetch loop or
-   only for note-only rows are excluded; an unlisted scope is machinery by
-   default, `.venv`, `.git` and `node_modules` are excluded code roots, and every
-   dynamic form (`__import__`, `exec`, `eval`, `runpy`,
-   `importlib.util.spec_from_file_location`, a non-literal `import_module`)
-   refuses the fingerprint. In this checkout the machinery computes to **195
-   modules** at build time (the review's static scan estimated 188 plus
+   join it. Of the named `build.py` scopes excluded from it, `_seeded_assembly`
+   runs before the fetch loop and is bound through the loaded-module digest of
+   item 4; the rest run only after the fetch loop or only for note-only rows,
+   an unlisted scope is machinery by default, `.venv`, `.git` and
+   `node_modules` are excluded code roots, and every dynamic form refuses the
+   fingerprint: any reference — call or not — to `__import__`, `exec`, `eval`,
+   `runpy`, `pkgutil`, `zipimport`, `importlib.machinery`, `importlib.reload`,
+   `importlib.util.module_from_spec`, `importlib.util.spec_from_loader` or
+   `importlib.util.spec_from_file_location`, any `sys.modules` access (the one
+   named exception is `fingerprint.py`'s own baseline read in
+   `_qualifying_modules`), a `getattr` on `importlib`, `builtins` or `sys`,
+   and any `importlib.import_module` reference that is not the direct callee
+   of a call with a literal first argument. In this checkout the machinery
+   computes to **195 modules** at build time (the review's static scan
+   estimated 188 plus
    `cdse_key`; the difference is environment-dependent resolution, not scope).
    Every branch root of the dispatch map is already inside it, so the union
    measures the same 195; an added lazy import inside a kept scope invalidates
@@ -62,15 +74,25 @@ bytes keep their original publisher, retrieval time, hash and provenance.
    origin file lies under the runtime roots are compared with the union computed
    at run start; anything new and in-repository makes the item
    `resume_fingerprint_unproven` instead of silently binding it. Modules loaded
-   before the run begins (for example the test runner's own imports) are the
-   recorded baseline and do not trip the guard.
+   before the run begins — `scripts/commands/main.py`, the pre-fetch
+   `_seeded_assembly` import chain and the test runner's own imports, for
+   example — are the recorded baseline; they do not trip the guard, and each
+   baseline file outside the computed closure is hashed at run start and folded
+   into every record's loaded-module digest, so an edit to one refetches. The
+   `eii` shell launcher, no Python module, is bound as a named hashed file of
+   every record.
 5. **Fail closed.** A missing or tampered fingerprint, an unresolvable first-party
    import, a dynamic import form, an unsupported `Entry` field type, an untracked
    file under `custodian/publicdata/`, a tracked input missing from the working
    tree, an unexpected loaded module or a changed intake triple each leave the
    entry without proof: it is refetched, or the item is marked
    `resume_fingerprint_unavailable` / `resume_fingerprint_unproven` and refetched
-   on the next resume. A version-1 journal keeps its old refusal names:
+   on the next resume. A proof that cannot be computed at all — the closure
+   scan raising on any refused form, an unresolvable import or an unreadable
+   module — never refuses the build, ordinary or resume: the run fetches with
+   no fingerprints and every fetched item is marked
+   `resume_fingerprint_unavailable` (lead ruling L-1379). A version-1 journal
+   keeps its old refusal names:
    `resume_head_mismatch` when its recorded head differs, `resume_record_unproven`
    otherwise. Receipt and page-meta rehashing before reuse is unchanged, so
    provenance and every existing check are preserved.
@@ -90,11 +112,16 @@ at `ce4e7de3`):
 
 About **7 of 40** past commits keep reuse, not the plan's earlier "about 10".
 The `awards`/`award_links` figure is **0 s** — with the F2 dispatch refactor
-dropped, both stay inside the machinery through `kinds.py`. **32** post-fetch
-modules (assembly family of 12, `draw`, `gate_report`, the `heights` family,
+dropped, both stay inside the machinery through `kinds.py`. **26** post-fetch
+modules (assembly family of 6, `draw`, `gate_report`, the `heights` family,
 `property` family of 5, `places_fsq.assemble`, `review.graph`,
 `singles.families`, `method_card_validation`, `gis.layers`, `atlas.contracts`,
-`gravity.contracts`) lie outside the machinery; `busyness.*` is inside it.
+`gravity.contracts`) lie outside the machinery unbound; `busyness.*` is inside
+it. Six assembly modules — `assembly.py`, `assembly_adapters.py`,
+`assembly_intake.py`, `assembly_inventory.py`, `assembly_io.py` and
+`assembly_profile.py` — are loaded before the run begins through
+`_seeded_assembly` and bound by the loaded-module digest, so an edit to one
+refetches everything.
 
 ## Limits and consequences
 
@@ -108,6 +135,9 @@ modules (assembly family of 12, `draw`, `gate_report`, the `heights` family,
 - A later task may move `run_build`'s `busyness`/`building_inputs`/`series`/
   `places.integrate` lazy imports into named post-fetch scopes to shrink the
   machinery; it is recorded as an open item and is not built here.
+- For the record, unchanged from version 1 and not regressions: reuse does not
+  bind the wall clock (period forms, the weather grid), proxy variables of the
+  environment, or the Earthdata token value.
 - No live acquisition, network or real cache is used by the tests; every fixture
   is synthetic.
 

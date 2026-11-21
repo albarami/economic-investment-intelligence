@@ -24,6 +24,7 @@ from .fingerprint import (
     CodeRoots,
     FingerprintUnavailable,
     RunScan,
+    _canonical,
     default_roots,
     scan_run,
 )
@@ -164,7 +165,10 @@ class RunRecord:
             try:
                 scan = scan_run(entries, roots or default_roots(), large=large)
             except (FingerprintUnavailable, OSError):
-                raise ResumeError("resume_fingerprint_unavailable") from None
+                # Any doubt refetches (L-1379): an unavailable proof never
+                # refuses a resume build; it leaves every item marked
+                # resume_fingerprint_unavailable and refetched.
+                scan = None
             return cls(
                 cache,
                 row,
@@ -177,7 +181,9 @@ class RunRecord:
         try:
             scan = scan_run(entries, roots or default_roots(), large=large)
         except (FingerprintUnavailable, OSError):
-            raise ResumeError("resume_fingerprint_unavailable") from None
+            # Same ruling for an ordinary run: the build fetches with no
+            # fingerprint and every fetched item is marked unavailable.
+            scan = None
         run = cls(
             cache,
             {
@@ -358,7 +364,7 @@ class RunRecord:
             except Exception:
                 return False
             current = {**current, "intake": [cutoff, reason, workbook]}
-        return stored == current
+        return _canonical(stored) == _canonical(current)
 
     def reuse(self, entry: Entry, lines: list[str]) -> dict[str, Any] | None:
         """Rehash all selected input bytes; stale or unproven input is refetched."""
