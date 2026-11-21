@@ -142,6 +142,73 @@ def test_registry_rows_resolve_to_independent_publisher_readings(source):
     assert entry.commit_allowed is False
 
 
+@pytest.mark.parametrize(
+    ("source", "page_id", "url", "body_hash", "access", "licence", "licence_page"),
+    [
+        (
+            "cepii_baci",
+            "baci_dataset",
+            "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37",
+            "0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60",
+            "no registration, no key, no paid tier; free direct download under Etalab 2.0",
+            "Etalab 2.0",
+            "baci_dataset",
+        ),
+        (
+            "cepii_gravity",
+            "gravity",
+            "https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8",
+            "7d9a401b1714f633fecc8bf35b66bb81f9bd1ade15ee3d5ea8d1747cf87da6e6",
+            "no registration, no key, no paid tier; free direct download under Etalab 2.0",
+            "Etalab 2.0",
+            "gravity",
+        ),
+        (
+            "atlas_complexity",
+            "atlas",
+            "https://atlas.hks.harvard.edu/data-downloads",
+            "c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b",
+            "no registration, no key, no paid tier; CC0 1.0 for the Dataverse files; "
+            "the guestbook is a form of the web interface only, not met on the anonymous API path",
+            "CC0 1.0",
+            "atlas_dataverse",
+        ),
+    ],
+)
+def test_access_readings_are_dated_and_quote_backed(
+    source, page_id, url, body_hash, access, licence, licence_page
+):
+    record = readings()["sources"][source]
+    page = next(item for item in record["pages"] if item["id"] == page_id)
+    assert page["url"] == url
+    assert page["read_on"] == "2026-11-21"
+    assert page["body_sha256"] == body_hash
+    assert record["facts"]["visitor_access"] == {
+        "confirmed": True,
+        "value": access,
+        "page": page_id,
+        "sentence": page["sentences"][-1],
+    }
+    assert record["facts"]["licence"]["value"] == licence
+    assert record["facts"]["licence"]["page"] == licence_page
+    check_source(record)
+
+
+@pytest.mark.parametrize(
+    ("source", "wrong_licence"),
+    [
+        ("cepii_baci", "CC BY 4.0"),
+        ("cepii_gravity", "CC BY 4.0"),
+        ("atlas_complexity", "Etalab 2.0"),
+    ],
+)
+def test_access_reading_rejects_a_licence_word_not_on_the_page(source, wrong_licence):
+    record = deepcopy(readings()["sources"][source])
+    record["facts"]["licence"]["sentence"] = wrong_licence
+    with pytest.raises(AssertionError):
+        check_source(record)
+
+
 @pytest.mark.parametrize("plant", ["hash", "sentence", "failed_page", "activation"])
 def test_review_rejects_unbacked_confirmation(plant):
     record = deepcopy(readings()["sources"]["un_comtrade"])

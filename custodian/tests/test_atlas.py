@@ -40,7 +40,25 @@ def test_atlas_closed_configuration_refuses_rebuild_and_pending() -> None:
     assert loaded.publisher_mapping == "pending"
     pending = load_config()
     assert pending.confirmed is False
+    assert pending.access == "visitor"
     assert pending.bound_origin == "pending"
+    assert pending.source_version == ""
+    assert pending.page == "https://atlas.hks.harvard.edu/data-downloads"
+    assert pending.page_sha256 == (
+        "c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b"
+    )
+    assert pending.reviewed_urls == (
+        pending.page,
+        "https://dataverse.harvard.edu/dataverse/atlas",
+        "https://dataverse.harvard.edu/api/dataverses/atlas/contents",
+        "https://dataverse.harvard.edu/api/access/datafile/13685113",
+    )
+    assert pending.licence_words == "CC0 1.0"
+    assert "no registration, no key, no paid tier" in pending.evidence
+    assert "guestbook" in pending.evidence
+    assert "2026-11-21" in pending.attribution
+    assert pending.year_selection == "pending"
+    assert all(item.url == "" for item in pending.downloads)
     assert tuple(item.grain for item in pending.downloads) == (
         "country_product_year",
         "country_partner_product_year",

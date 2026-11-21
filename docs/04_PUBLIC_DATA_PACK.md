@@ -497,9 +497,11 @@ page and archive. BACI checks every request and redirect against its exact
 Other selectors, extra parameters, credentials and unreviewed redirects fail;
 the generic query prohibition is unchanged. No redirect host is newly admitted.
 The registry retains `baci_metadata_unconfirmed`, `commit_allowed: false` and
-`nightly_live_fetch: true`. Target/country representation, missing-quantity
-tokens, decimal limits, access configuration and bounded first-fetch row
-accounting remain unresolved loader preconditions, with `confirmed: false`.
+`nightly_live_fetch: true`. The lead access reading of 2026-11-21 records no
+registration, key or paid tier and free direct download under Etalab 2.0.
+Target/country representation, missing-quantity tokens, decimal limits and
+bounded first-fetch row accounting remain unresolved loader preconditions,
+with `confirmed: false`.
 Input 4 stays `pending_fetch: true` with no hash. The first full fetch and selected
 manifest remain lead work. BACI keeps a separate series; no portal or Comtrade
 figure is replaced or averaged and every coverage gap stays explicit.
@@ -507,35 +509,35 @@ figure is replaced or averaged and every coverage gap stays explicit.
 #### Gravity pending identity and coverage (S2-T25)
 
 `cepii_gravity` identifies the CEPII Gravity lead of decision 0040. Its
-placeholder registry row has `gravity_metadata_unconfirmed`,
-`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
-checked on 2026-11-16; the publisher page, version, licence words, Etalab lead,
-access state, country keys, units and year coverage are NOT READ. This date is
-not page-reading evidence. The page lead carries a query string and is not a
-reviewed data URL. Terms remain `terms to be read` on basis `owner_decision`,
-decision 0026. No Gravity host is admitted under PUB-03 yet. Qatar origin or
-destination selection does not replace another series. Missing coverage stays
-explicit and is not zero.
+registry row retains `gravity_metadata_unconfirmed`, `commit_allowed: false`
+and `nightly_live_fetch: true`. The lead read the live publisher page on
+2026-11-21: version 202211, `Licence: Etalab 2.0`, no registration, key or paid
+tier, and free direct download. The former `presentation.asp?id=8` URL cited
+below returned HTTP 404; `bdd_modele_item.asp?id=8` is the live page. Country
+keys, units, coverage, schema, rows, members, year selection, digits and exact
+bounds remain pending with `confirmed: false`. No Gravity fetch host is
+admitted under PUB-03 yet. Qatar origin or destination selection does not
+replace another series. Missing coverage stays explicit and is not zero.
 
 #### Atlas pending identity and coverage (S2-T25)
 
 `atlas_complexity` identifies the Harvard Growth Lab Atlas lead of decision
-0040. Its placeholder registry row has `atlas_metadata_unconfirmed`,
-`commit_allowed: false` and `nightly_live_fetch: true`. The pending record was
-checked on 2026-11-16; the publisher pages, licence words, native revision,
-available history, access tier and units are NOT READ. This date is not
-page-reading evidence. The row names two finished downloads,
-country-product-year and country-partner-product-year. A rebuild input is
-refused. Terms remain `terms to be read` on basis `owner_decision`, decision
-0026. No Atlas host is admitted under PUB-03. The S2-P18 metadata readings
-do not admit atlas.hks.harvard.edu or intl-atlas-downloads.s3.amazonaws.com;
-no data URL or redirect is confirmed (L-1270). Registration or a paid tier
-fetches nothing. A narrower year selection records the excluded coverage and
-infers no concordance.
+0040. Its registry row retains `atlas_metadata_unconfirmed`,
+`commit_allowed: false` and `nightly_live_fetch: true`. The lead access
+reading of 2026-11-21 records no registration, key or paid tier and CC0 1.0
+for the Dataverse files. The guestbook belongs to the web interface and was
+not met on the anonymous API path; it is an observation, not an obstacle.
+Each download's specific citation requirement remains to be recorded. The row
+names two finished downloads, country-product-year and
+country-partner-product-year, and refuses a rebuild input. No file vintage,
+data URL, redirect or native finished-measure schema is selected, and no Atlas
+fetch host is admitted under PUB-03. A narrower year selection records the
+excluded coverage and infers no concordance.
 
 #### Publisher metadata readings (S2-P18)
 
-Read on 2026-11-20, from each publisher's own dataset, documentation and terms
+Read on 2026-11-20, with BACI, Gravity and Atlas access readings added on
+2026-11-21, from each publisher's own dataset, documentation and terms
 pages only. The registry's eight `basis_note` records resolve to
 [custodian/publicdata/review/trade_publisher_readings.yaml](../custodian/publicdata/review/trade_publisher_readings.yaml).
 Each record holds publisher, URL, date read, SHA-256 of the complete response
@@ -626,9 +628,9 @@ Historical leads recorded for decision 0040; current readings are in **Publisher
 | Planned source_id | Publisher, dataset and page address | Page lead and verification task | Intended use |
 |---|---|---|---|
 | `un_comtrade` | United Nations Statistics Division, UN Comtrade; https://comtradeapi.un.org/public/v1 ; https://comtradeapi.un.org/data/v1 ; https://comtradeapi.un.org/tools/v1 ; https://uncomtrade.org/docs/un-comtrade-tools/ | Registry row added by S2-T23 with `licence_basis` `provider_terms`, empty `decision_record`, `commit_allowed` false and `skip_reason` `metadata_unconfirmed`. Free API limits, licence words, hosts, schema and the selection remain to be verified by the lead; nothing is committed | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model"; read 2026-11-19; basis `provider_terms`; per-key evidence and hash in section 4, "S2-T21 part B terms readings". |
-| `cepii_baci` | CEPII, BACI; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37 | Lead page reading 2026-11-20: selected HS 2017 edition, release 202601, published period 2017-2024, "Licence: Etalab 2.0"; supplied archive reading records native headers, units and exact member byte bounds; row counts, remaining loader preconditions and file receipt remain pending under S2-T24 | Free substitute for Comtrade bulk files; separate comparison series |
-| `cepii_gravity` | CEPII, Gravity; https://www.cepii.fr/cepii/en/bdd_modele/presentation.asp?id=8 | The page states bilateral distance, contiguity, language, colonial links, trade agreements and GDP, version 202211, Etalab 2.0, to be verified by S2-T25 | Bilateral gravity and relatedness covariates; not local catchment observations |
-| `atlas_complexity` | Harvard Growth Lab, Atlas of Economic Complexity; https://atlas.hks.harvard.edu/data-downloads/ ; https://intl-atlas-downloads.s3.amazonaws.com/index.html ; https://dataverse.harvard.edu/dataverse/atlas | The page states finished country-product-year and country-partner-product-year files at four-digit HS with complexity measures, to be verified by S2-T25; licence read on its own page | Finished files only, product/country relatedness comparison and RCA |
+| `cepii_baci` | CEPII, BACI; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37 | Lead page reading 2026-11-20: selected HS 2017 edition, release 202601, published period 2017-2024, "Licence: Etalab 2.0"; supplied archive reading records native headers, units and exact member byte bounds. Access reading 2026-11-21: no registration, no key, no paid tier; free direct download under Etalab 2.0; row counts, remaining loader preconditions and file receipt remain pending under S2-T24 | Free substitute for Comtrade bulk files; separate comparison series |
+| `cepii_gravity` | CEPII, Gravity; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8 | Lead page reading 2026-11-21: version 202211, "Licence: Etalab 2.0"; no registration, no key, no paid tier; free direct download under Etalab 2.0. The former presentation.asp URL returned HTTP 404; rows, members, schema, year selection and exact bounds remain pending under S2-T25 | Bilateral gravity and relatedness covariates; not local catchment observations |
+| `atlas_complexity` | Harvard Growth Lab, Atlas of Economic Complexity; https://atlas.hks.harvard.edu/data-downloads ; https://intl-atlas-downloads.s3.amazonaws.com/index.html ; https://dataverse.harvard.edu/dataverse/atlas | Lead access reading 2026-11-21: no registration, no key, no paid tier; CC0 1.0 for the Dataverse files; cite the Atlas and underlying data sources appropriately and record each download-specific citation. The guestbook is a web-interface observation, not an obstacle on the anonymous API path; file selections and native schema remain pending under S2-T25 | Finished files only, product/country relatedness comparison and RCA |
 | `wb_wdi` | World Bank, World Development Indicators; https://data.worldbank.org/ | The page states a free benchmark route, to be verified by S2-T26; version and licence words not verified | National economic benchmarks in D1 |
 | `unctad_fdi` | UNCTAD, UNCTADstat; https://unctadstat.unctad.org/ | The page states FDI flows and country profiles, to be verified by S2-T26; version and licence words not verified | FDI flows separate from project announcements |
 | `imf_weo` | International Monetary Fund, World Economic Outlook; https://www.imf.org/ | The page states a free benchmark route, to be verified by S2-T26; version and licence words not verified | Historical macroeconomic benchmark; a publisher forecast is not a project forecast |
@@ -1583,8 +1585,8 @@ reading; this worker neither fetched nor independently rehashed the page.
 | `gis_rail` | terms to be read. Pending reason: The service metadata is readable but provides no licence or reuse clause; copyrightText and descriptions are empty where present. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#gis-gis_rail; dataset_licences.tsv#gis_rail; f99c3f091578f44ced168679c7483bd6f32086ff905b772802eab271e2d8bebc |
 | `gis_zoning` | terms to be read. Pending reason: The service metadata is readable but provides no licence or reuse clause; copyrightText and descriptions are empty where present. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#gis-gis_zoning; dataset_licences.tsv#gis_zoning; cf353bab16e92d7c06fff674d7aeb5ccedcece35fa509a30eefbcd269ff5be3d |
 | `cepii_baci` | "Licence: Etalab 2.0" | 2026-11-20 | `dataset` | S2-P29 round B supplied lead page reading; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37; 0689cf69a963eb0ca6ef05731482b04898bcef215a90127edeb2a78ff4990c60; supplied lead link reading: the saved publisher page links "Etalab 2.0" to https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf (publisher-link target; PDF text not read here) |
-| `cepii_gravity` | terms to be read. Pending reason: Unconfirmed downloadable-data family; no configured file or reviewed landing URL; publisher terms remain unread. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#cepii-unread; no terms-page hash established |
-| `atlas_complexity` | terms to be read. Pending reason: Unconfirmed finished-download family; no configured file; the terms page returned a client-side shell. | Pending; checked 2026-11-19 (not a publisher terms reading) | `owner_decision` | terms_pages.tsv#atlas-unread; 680119ab9c9f86c313f237b998f20dc84bff980484bfe8fe875683377d79dff4 |
+| `cepii_gravity` | "Licence: Etalab 2.0" | 2026-11-21 | `dataset` | S2-P35 lead page reading; https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=8; 7d9a401b1714f633fecc8bf35b66bb81f9bd1ade15ee3d5ea8d1747cf87da6e6; publisher-linked licence https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf |
+| `atlas_complexity` | "CC0 1.0 for the Dataverse files; cite the Atlas and underlying data sources appropriately; each downloadable data file includes specific citation requirements." | 2026-11-21 | `dataset` | S2-P35 lead page and anonymous API readings; https://atlas.hks.harvard.edu/data-downloads; c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b; https://dataverse.harvard.edu/api/dataverses/atlas/contents; 08dc40ed5ce9d861caac4e2c0feaadb078ef6edc49b566b4e3c87889b928ffb1 |
 | `un_comtrade` | "any copying, automated browsing or downloading, redistribution, publication, or commercial exploitation" [...] "is strictly prohibited without the prior written permission of the United Nations." [...] "Internal use, including the use of UN Comtrade data for the AI model" | 2026-11-19 | `provider_terms` | terms_pages.tsv#comtrade-license; terms_pages.tsv#comtrade-redistribution; 5c6facb2c8be4836318bba9d490fc52bf397dee12fab6f79da95a4bc0772dc56; 288fbf7e96a4421c76b5bdb5551cc93968343d2833598ed1ced421f79fad64ba; https://comtradeplus.un.org/en/license-agreement |
 | `wb_wdi` | "Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below." | 2026-11-19 | `portal_terms` | terms_pages.tsv#wb-datasets; f41bff86be36b973d7e013fbedd7541694c9fdede7a6412adb6456d56870a619; https://www.worldbank.org/ext/en/legal/terms-conditions/datasets |
 | `unctad_fdi` | "Creative Commons Attribution 3.0 IGO license" [...] "All data and metadata provided on the UNCTAD Data Hub may be copied freely, duplicated and further distributed provided that United Nations Trade and Development Data Hub is cited as the source." | 2026-11-19 | `portal_terms` | terms_pages.tsv#unctad; terms_pages.tsv#unctad-faq; e162327eb25dce401980e29cf2b2040fac30f7fd058803d913235370820a7a17; cb54eb415156532df6fb8273f41d9a30aac0b305d5d5f53f9885a87bcdd493d3; https://unctadstat.unctad.org/EN/About.html#TERMS_OF_USE |

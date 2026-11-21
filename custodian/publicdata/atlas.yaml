@@ -1,19 +1,23 @@
-# Pending placeholders only. No publisher page, licence, version or host is confirmed.
+# Access and licence are read; technical download metadata remains pending.
 # Two finished grains are named. Neither file is fetched and neither measure is rebuilt.
 config_version: atlas-v1
 method_version: v1
 source_version: ""
-access: unconfirmed
+access: visitor
 confirmed: false
 bound_origin: pending
 finished_only: true
-reviewed_urls: []
-publisher: ""
-page: ""
-page_sha256: ""
-attribution: ""
-evidence: ""
-licence_words: ""
+reviewed_urls:
+- https://atlas.hks.harvard.edu/data-downloads
+- https://dataverse.harvard.edu/dataverse/atlas
+- https://dataverse.harvard.edu/api/dataverses/atlas/contents
+- https://dataverse.harvard.edu/api/access/datafile/13685113
+publisher: Harvard Growth Lab
+page: https://atlas.hks.harvard.edu/data-downloads
+page_sha256: c880b9e92765c8d5fe42c776da6fe29a2ba6b840ffa5df78e660f60c84fb2b5b
+attribution: 'Harvard Growth Lab, Atlas of Economic Complexity; cite the Atlas and underlying data sources appropriately; each downloadable data file includes specific citation requirements; Dataverse files CC0 1.0; publisher page and Dataverse API read 2026-11-21.'
+evidence: 'Lead access reading 2026-11-21: no registration, no key, no paid tier; CC0 1.0 for the Dataverse files; the guestbook is a form of the web interface only, not met on the anonymous API path. Rows, members, version selections, digits and bounds remain pending.'
+licence_words: CC0 1.0
 hs_revision: ""
 publisher_mapping: pending
 qatar_key: ""
