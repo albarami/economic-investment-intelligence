@@ -45563,3 +45563,122 @@ Recorded commands (all from the repository root; seed and environment above):
 - `final-custodian-gis-suite`: exit 0; `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k 'gis or imagery or snapshot' --hypothesis-seed=1313296242`.
 - Git staging (direct tool result): exit 128;
   `git add product/tests/test_released_imagery.py custodian/tests/test_gis_snapshot.py product/tests/fixtures/released_imagery`.
+
+
+## S2-T51 fix 6b — product-test import boundary — 2026-11-21
+
+Maker/model: OpenAI Codex / GPT-6 family; exact serving variant unavailable.
+This corrects the earlier progress message's unsupported GPT-6.2 variant label.
+Base commit: `3c3cb5c9c64314bf9be02aef798d7e79dba12f62`. Changes remain uncommitted: Git staging exited 128
+because the worktree's Git metadata is read-only. No push.
+
+Builder persona: senior Python test engineer for the custodian/product boundary.
+Strict self-review persona: reviewer rejecting an unplanted or weakened guard,
+new skips, retries, raised time limits, and growing exemptions.
+Skills used: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. The brief supplies the test-driven-development
+and verification-before-completion rules: plant first, prove red, implement in
+the existing guard, prove green, withdraw only the scan entry, prove red again,
+and record real exits before claiming completion.
+
+The existing static guard now scans `product/tests` with the same judge and
+scanner as its three package source trees. Product-plane forbidden targets add
+`custodian`, covering its test package as well as the existing `eii_custodian`
+and `eii_gateway` targets. No second guard or exemption is added. Clean fixtures
+include product tests, and the read-only fingerprint check includes that tree.
+Document 12's TST-60 scope is updated in its existing row.
+
+Changed files:
+
+- `scripts/tests/import_boundary_guard.py`.
+- `scripts/tests/import_boundary_cases.py`.
+- `scripts/tests/test_import_boundary_forms.py`.
+- `scripts/tests/test_import_boundary_real.py`.
+- `docs/12_TESTING_AND_QUALITY.md` (TST-60 only).
+- `PROGRESS.md` (one appended block).
+- `.overnight/RETURN.md` (requested return; temporary evidence is under `.overnight/tmp/f6b/`).
+
+The new `test_product_tests_every_forbidden_mechanism` plants the shared
+`PRODUCT_TEST_TARGETS` in both a direct and a nested product test file, using
+all 30 existing import mechanisms. Its 180 subcases fail against the original
+guard (exit 1), then pass with the new scan (exit 0). A disposable copy of the
+patched guard changes only its scan loop back to `PACKAGES`: all 180 subcases
+fail again (exit 1). `withdrawal.diff` records the single-line change; the real
+guard stays untouched during this experiment and passes afterward (exit 0).
+
+| Check | Exit | Counts/result |
+|---|---|---|
+| Original guard with new planted cases | 1 | 1 test; 180 subcase failures |
+| Patched guard with new planted cases | 0 | 1 test; all 180 subcases pass |
+| Only new scan removed in disposable copy | 1 | 1 test; 180 subcase failures |
+| Real guard after withdrawal experiment | 0 | 1 test; all 180 subcases pass |
+| Guard's own suite | 0 | 37 tests; no failures or skips |
+| Scripts discovery suite | 0 | 977 tests, including all 37 import-boundary tests; no failures or skips |
+| Product suite, requested command | 0 | 816 passed; no failures or skips |
+| Product suite, recorded seed | 0 | 816 passed; no failures or skips |
+| Ruff check | 0 | All checks passed |
+| Initial Ruff format check | 1 | 1 new assertion needed wrapping; 911 files already formatted |
+| Ruff formatter applied | 0 | 1 file reformatted |
+| Final Ruff format check | 0 | 912 files already formatted |
+| Mypy | 0 | 487 source files; no issues |
+| Documentation check | 0 | 1234 text files; 134 Markdown files |
+| AGENTS/CLAUDE byte comparison | 0 | Identical |
+| Guard AST/prefix audit | 0 | Existing check body differs only at scan entry/docstring; other guard functions unchanged; original forbidden rules retained; original PROGRESS prefix preserved |
+| Whitespace check | 0 | No errors |
+| Git staging | 128 | Read-only Git metadata; no commit |
+
+The full scripts suite has no failures to compare against the base commit.
+The focused boundary suite and the same tests inside full discovery both pass.
+The judge, message construction, rule grouping, sorting, and exemption function
+are unchanged; the AST audit verifies this, with five changed-source hashes in
+`tested-state.json`. No existing rule, test, attack size, tolerance, skip policy
+or time limit is weakened. No new unresolved decision or random failure was found.
+
+Environment: Linux; Python 3.14.6; pytest 9.2.0; Hypothesis 6.170.15;
+Ruff 0.17.4; mypy 2.4.1. Commands run from the repository root with
+`UV_OFFLINE=1`, `UV_PYTHON_DOWNLOADS=never`, `EII_DECISION_PROVIDER=none`,
+`PYTHONDONTWRITEBYTECODE=1`, and process temporary files beneath
+`.overnight/tmp/f6b/tmp`. Product replay seed: `1313296242`.
+The initial requested quiet product command used the repository's automatic
+seed, which it did not print; the explicit-seed run supplies reproducible
+qualification. The static/unittest matrix itself uses no random seed.
+
+Evidence: `.overnight/tmp/f6b/commands.jsonl`, per-command sanitized logs,
+`withdraw_scan.py`, `withdrawal.diff`, `audit.py`, and `tested-state.json`.
+Strict self-review: APPROVE. Muhasabah: PASS. Independent different-maker
+approval and the lead's broader task/merge gates remain pending; no merge,
+whole-test qualification or live acquisition is claimed.
+
+Recorded commands:
+
+- `product-test-red`: exit 1; `uv run --locked python -m unittest discover -s scripts/tests -p test_import_boundary_forms.py -k test_product_tests_every_forbidden_mechanism -v`.
+- `product-test-green`: exit 0; `uv run --locked python -m unittest discover -s scripts/tests -p test_import_boundary_forms.py -k test_product_tests_every_forbidden_mechanism -v`.
+- `boundary-suite`: exit 0; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary*.py' -v`.
+- `product-suite`: exit 0; `uv run --locked python -m pytest product/tests -q -p no:cacheprovider`.
+- `lint`: exit 0; `uv run --locked ruff check .`.
+- `format`: exit 1; `uv run --locked ruff format --check .`.
+- `agents-parity`: exit 0; `cmp AGENTS.md CLAUDE.md`.
+- `docs`: exit 0; `python3 scripts/check_docs.py`.
+- `mypy`: exit 0; `uv run --locked mypy`.
+- `format-apply`: exit 0; `uv run --locked ruff format scripts/tests/test_import_boundary_forms.py`.
+- `environment`: exit 0; `uv run --locked python -c 'import importlib.metadata as m, platform; print("Python", platform.python_version()); print("system", platform.system()); print("pytest", m.version("pytest")); print("hypothesis", m.version("hypothesis")); print("ruff", m.version("ruff")); print("mypy", m.version("mypy"))'`.
+- `final-format`: exit 0; `uv run --locked ruff format --check .`.
+- `scan-withdrawal-red`: exit 1; `uv run --locked python .overnight/tmp/f6b/withdraw_scan.py`.
+- `product-test-restored`: exit 0; `uv run --locked python -m unittest discover -s scripts/tests -p test_import_boundary_forms.py -k test_product_tests_every_forbidden_mechanism -v`.
+- `diff-whitespace`: exit 0; `git diff --check`.
+- `git-stage`: exit 128; `git add scripts/tests/import_boundary_guard.py scripts/tests/import_boundary_cases.py scripts/tests/test_import_boundary_forms.py scripts/tests/test_import_boundary_real.py docs/12_TESTING_AND_QUALITY.md`.
+- `product-suite-seeded`: exit 0; `uv run --locked python -m pytest product/tests -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `guard-audit`: exit 0; `python3 .overnight/tmp/f6b/audit.py`.
+- `scripts-suite`: exit 0; `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v`.
+
+Final verification after writing the evidence block and return: all exits 0;
+documentation still checks 1234 text files and 134 Markdown files, Ruff format
+checks 912 files, and original progress bytes remain unchanged.
+
+- `reports`: exit 0; `python3 .overnight/tmp/f6b/report.py`.
+- `final-agents-parity`: exit 0; `cmp AGENTS.md CLAUDE.md`.
+- `final-whitespace`: exit 0; `git diff --check`.
+- `final-guard-audit`: exit 0; `python3 .overnight/tmp/f6b/audit.py`.
+- `final-format-complete`: exit 0; `uv run --locked ruff format --check .`.
+- `final-lint`: exit 0; `uv run --locked ruff check .`.
+- `final-docs`: exit 0; `python3 scripts/check_docs.py`.

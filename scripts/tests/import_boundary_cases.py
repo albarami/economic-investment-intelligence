@@ -31,6 +31,9 @@ ALLOWED: list[tuple[str, str]] = [
     ("eii_product", "eii_product"),
 ]
 
+PRODUCT_TEST_TARGETS = ("custodian.tests", "eii_custodian", "eii_gateway")
+PRODUCT_TEST_FILES = ("test_planted.py", "nested/test_planted.py")
+
 _FRESH_LOADED = (
     "FAIL fresh-interpreter: eii_product: forbidden module loaded: eii_custodian"
 )
@@ -466,7 +469,7 @@ def write_custodian_other(root: Path) -> Path:
 
 
 def make_tree(root: Path, *, gateway: bool = False) -> None:
-    """Create minimal synthetic package trees for boundary tests.
+    """Create minimal synthetic package sources and product tests for the guards.
 
     Args:
         root: Directory that will hold ``core/``, ``custodian/``, and
@@ -487,6 +490,9 @@ def make_tree(root: Path, *, gateway: bool = False) -> None:
         sub.mkdir(parents=True, exist_ok=True)
         (sub / "__init__.py").write_text("from . import mod\n", encoding="utf-8")
         (sub / "mod.py").write_text("from .. import __version__\n", encoding="utf-8")
+    tests = root / "product/tests"
+    tests.mkdir(parents=True, exist_ok=True)
+    (tests / "__init__.py").write_text("", encoding="utf-8")
     if gateway:
         gw = root / "gateway" / "src" / "eii_gateway"
         gw.mkdir(parents=True, exist_ok=True)

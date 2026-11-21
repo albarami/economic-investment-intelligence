@@ -25,12 +25,12 @@ def tearDownModule() -> None:
 
 
 def _source_tree_paths(root: Path) -> list[Path]:
-    """Return the three package source trees under ``root``."""
-    return [root / rel for _pkg, rel in guard.PACKAGES]
+    """Return the package sources and product tests under ``root``."""
+    return [root / rel for _pkg, rel in guard.PACKAGES] + [root / "product/tests"]
 
 
 def _tree_fingerprint(root: Path) -> list[tuple[str, str]]:
-    """Return a sorted (relative path, sha256) listing of files under source trees."""
+    """Return a sorted (relative path, sha256) listing under all scanned trees."""
     entries: list[tuple[str, str]] = []
     for tree in _source_tree_paths(root):
         if not tree.is_dir():

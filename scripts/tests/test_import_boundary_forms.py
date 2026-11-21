@@ -183,6 +183,33 @@ def _plant_child_case(root: Path, label: str) -> None:
 class ImportBoundaryFormsTest(unittest.TestCase):
     """Judged and not-judged import forms for the static and fresh guards."""
 
+    def test_product_tests_every_forbidden_mechanism(self) -> None:
+        """Product tests cannot reach build-plane packages by any judged form."""
+        for target in cases.PRODUCT_TEST_TARGETS:
+            for rel_name in cases.PRODUCT_TEST_FILES:
+                for mech in cases.MECHANISMS:
+                    with self.subTest(target=target, file=rel_name, mech=mech.id):
+                        with tempfile.TemporaryDirectory() as folder:
+                            root = Path(folder)
+                            cases.make_tree(root)
+                            rel_path = f"product/tests/{rel_name}"
+                            path = root / rel_path
+                            path.parent.mkdir(parents=True, exist_ok=True)
+                            path.write_text(
+                                cases.mechanism_source(mech, target), encoding="utf-8"
+                            )
+                            expected = cases.expected_forbidden_line(
+                                rel_path,
+                                mech.line,
+                                mech.form,
+                                cases.substitute_target(mech.target, target),
+                                "eii_product",
+                                target.split(".")[0],
+                            )
+                            self.assertEqual(
+                                guard.check_imports(root), ([expected], [])
+                            )
+
     def test_every_edge_every_mechanism(self) -> None:
         """Forbidden import mechanisms fail on every documented plane edge."""
         count = 0

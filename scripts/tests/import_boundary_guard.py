@@ -1,4 +1,4 @@
-"""Static import-boundary guard over the three package source trees."""
+"""Static import-boundary guard over package sources and product tests."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ PACKAGES = (
 FORBIDDEN = {
     "eii_core": ("eii_custodian", "eii_product", "eii_gateway"),
     "eii_custodian": ("eii_product", "eii_gateway"),
-    "eii_product": ("eii_custodian", "eii_gateway"),
+    "eii_product": ("eii_custodian", "eii_gateway", "custodian"),
 }
 ENV_NAMES = (
     "EII_DECISION_PROVIDER",
@@ -90,7 +90,7 @@ def _group_and_sort(
 
 
 def check_imports(root: Path) -> tuple[list[str], list[str]]:
-    """Scan the three source trees under ``root`` for import-boundary violations.
+    """Scan package sources and product tests for import-boundary violations.
 
     Args:
         root: Repository root containing ``core/``, ``custodian/`` and ``product/``.
@@ -115,7 +115,7 @@ def check_imports(root: Path) -> tuple[list[str], list[str]]:
             seen_note.add(line)
             notes.append(line)
 
-    for package, rel in PACKAGES:
+    for package, rel in (*PACKAGES, ("eii_product", "product/tests")):
         tree = root / rel
         rel_path = rel.replace("\\", "/")
         ancestor = root
