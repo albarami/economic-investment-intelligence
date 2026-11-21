@@ -317,26 +317,29 @@ def test_other_resume_forms_are_usage_errors_before_reads(
     assert list(tmp_path.iterdir()) == []
 
 
-def test_data_completion_survives_exception_before_terms(harness: Harness) -> None:
+def test_data_completion_survives_exception_before_terms(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A certificate fault on a terms page is an advisory (S2-P36), so the
+    # exception is raised from the terms step itself, after the row's data.
+    from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.certificate_pins import PinError
 
     harness.entries = (
         replace(harness.entries[0], terms_url="https://www.data.gov.qa/SYN/terms"),
         harness.entries[1],
     )
-    original = harness.transport
 
-    def interrupted(url: str) -> Response:
-        if url == harness.entries[0].terms_url:
-            raise PinError("certificate_chain_incomplete")
-        return original(url)
+    def interrupted(*args: Any, **kwargs: Any) -> None:
+        raise PinError("certificate_chain_incomplete")
 
-    harness.transport = interrupted  # type: ignore[method-assign]
-    result = harness.run()
+    with monkeypatch.context() as patch:
+        patch.setattr(build, "_read_terms_apart", interrupted)
+        result = harness.run()
     assert result.failure is not None
+    assert harness.entries[1].url not in harness.seen
     assert record(harness)["entries"]["SYN-first"]["completed"] is True
     assert record(harness)["state"] == "interrupted"
-    harness.transport = original  # type: ignore[method-assign]
     harness.fail = False
     harness.seen.clear()
     assert harness.run(resume=True).failure is None
@@ -664,7 +667,12 @@ def test_missing_file_meta_hash_is_not_a_complete_proof(harness: Harness) -> Non
     assert harness.entries[0].url in harness.seen
 
 
-def test_reuse_log_survives_later_terms_exception(harness: Harness) -> None:
+def test_reuse_log_survives_later_terms_exception(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # A certificate fault on a terms page is an advisory (S2-P36), so the
+    # later exception is raised from the terms step itself.
+    from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.certificate_pins import PinError
 
     harness.entries = (
@@ -672,14 +680,11 @@ def test_reuse_log_survives_later_terms_exception(harness: Harness) -> None:
         harness.entries[1],
     )
     harness.interrupt()
-    original = harness.transport
 
-    def fail_terms(url: str) -> Response:
-        if url == harness.entries[0].terms_url:
-            raise PinError("certificate_chain_incomplete")
-        return original(url)
+    def fail_terms(*args: Any, **kwargs: Any) -> None:
+        raise PinError("certificate_chain_incomplete")
 
-    harness.transport = fail_terms  # type: ignore[method-assign]
+    monkeypatch.setattr(build, "_read_terms_apart", fail_terms)
     result = harness.run(resume=True)
     assert result.failure is not None
     log = json.loads((harness.cache / "build-log.json").read_bytes())
