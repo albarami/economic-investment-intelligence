@@ -16,11 +16,14 @@ from .fetch.terms_text import FINGERPRINT_VISIBLE_TEXT, terms_text_sha256
 from .singles.tenders import AWARD_CONTINUITY_PAGES, LIST_PATHS, TenderError
 
 
-def terms_body_hash(
-    cache: Path, entry: Entry, rows: Sequence[Mapping[str, object]]
-) -> str:
+def terms_body_hash(cache: Path, entry: Entry, rows: Sequence[object]) -> str:
     """Select this run's raw terms body, retaining the review's hash convention."""
-    matches = [row for row in rows if row.get("key") == entry.key]
+    matches: list[Mapping[str, object]] = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            raise AssemblyError("assembly_tender_terms_incomplete")
+        if row.get("key") == entry.key:
+            matches.append(row)
     if len(matches) != 1:
         raise AssemblyError("assembly_tender_terms_incomplete")
     row = matches[0]
@@ -142,6 +145,7 @@ def archive_pages(
                 "method": "assembly-tender-pages.v1",
                 "pages": pages,
                 "readings": readings,
+                "terms_sha256": terms_sha256,
             },
             sort_keys=True,
         )

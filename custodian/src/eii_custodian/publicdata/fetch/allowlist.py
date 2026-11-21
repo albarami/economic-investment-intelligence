@@ -169,7 +169,10 @@ def secret_in_url(url: str, secret: str) -> bool:
 
 def host_of(url: str) -> str:
     """Return the lowercase host of a URL, or an empty string."""
-    return (urlsplit(url).hostname or "").casefold()
+    try:
+        return (urlsplit(url).hostname or "").removesuffix(".").casefold()
+    except ValueError:
+        return ""
 
 
 def reviewed_url(url: str) -> bool:

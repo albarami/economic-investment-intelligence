@@ -15,6 +15,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.registry import Entry
@@ -35,6 +36,32 @@ OUTCOMES = frozenset(
 BASES = frozenset({"dataset", "portal_terms", "provider_terms", ""})
 RECORDED = OUTCOMES - {"not_yet_recorded", "none_found"}
 CAVEAT = "No public tender source is recorded"
+
+
+def _same_reviewed_origin(url: str, origin: str) -> bool:
+    """Bind a reviewed URL to the HTTPS endpoint of the registered fetch URL."""
+    try:
+        parts, registered = urlsplit(url), urlsplit(origin)
+        return (
+            parts.scheme.casefold() == registered.scheme.casefold() == "https"
+            and parts.port in (None, 443)
+            and registered.port in (None, 443)
+            and parts.username is None
+            and parts.password is None
+            and registered.username is None
+            and registered.password is None
+            and not parts.query
+            and not parts.fragment
+            and not any(ord(char) <= 32 for char in url + origin)
+            and "\\" not in parts.netloc
+            and "\\" not in registered.netloc
+            and parts.netloc.isascii()
+            and registered.netloc.isascii()
+            and bool(host_of(origin))
+            and host_of(url) == host_of(origin)
+        )
+    except ValueError:
+        return False
 
 
 @dataclass(frozen=True)
@@ -292,11 +319,11 @@ def tender_disposition(
     registry_matches = (
         _registry_binds(tender, registry)
         and registry.key == tender.source_id
-        and registry.fetch_host == host_of(registry.url)
-        and registry.fetch_host == host_of(tender.page)
+        and registry.fetch_host.casefold() == host_of(registry.url)
+        and _same_reviewed_origin(tender.page, registry.url)
         and (
             (tender.outcome == "terms_absent" and not tender.terms_url)
-            or registry.fetch_host == host_of(tender.terms_url)
+            or _same_reviewed_origin(tender.terms_url, registry.url)
         )
         and bool(registry.basis_note.strip())
     )

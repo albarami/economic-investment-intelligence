@@ -572,6 +572,7 @@ def _seeded_assembly(
             "assembly_regression_refused",
             "assembly_intake_invalid",
             "assembly_tender_pages_incomplete",
+            "assembly_tender_terms_incomplete",
         }:
             reason = str(exc)
         assembly_failure = FetchFailure(

@@ -1,5 +1,6 @@
 """The committed tender review joins to a fresh, invented archive receipt."""
 
+import json
 import re
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -16,6 +17,7 @@ from eii_custodian.publicdata.confirm_s2_t13 import (
     completion_evidence,
     load_confirmation,
 )
+from eii_custodian.publicdata.fetch.receipts import archive_auxiliary, sha256_hex
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.singles.tenders import (
     LIST_PATHS,
@@ -50,6 +52,55 @@ def test_committed_review_accepts_fresh_archive(tmp_path):
     assert receipt["retrieved_utc"] != confirmation.tender.retrieved_utc
     assert receipt["sha256"] != confirmation.tender.page_sha256
     assert completion_evidence(confirmation, entry, receipt) == confirmation
+
+
+def test_changed_terms_on_resume_gets_new_receipt(tmp_path):
+    confirmation, entry, first = _fresh(tmp_path)
+    identity = archive_pages(
+        tmp_path,
+        entry,
+        first["retrieved_utc"],
+        retrieved_utc=first["retrieved_utc"],
+        terms_sha256="f" * 64,
+    )
+    second = read_snapshot(tmp_path / entry.key, identity).sidecar
+    assert second["terms_sha256"] == "f" * 64
+    assert second["sha256"] != first["sha256"]
+    with pytest.raises(ValueError, match="do not confirm tender"):
+        completion_evidence(confirmation, entry, second)
+
+
+def test_split_whitespace_keeps_visible_text_but_changes_reviewed_raw_body(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    confirmation, entry, first_receipt = _fresh(tmp_path)
+    first_body = b"<html>Invented terms</html>"
+    second_body = b"<html>Invented  terms</html>"
+    assert terms_text_sha256(first_body) == terms_text_sha256(second_body)
+    assert sha256_hex(first_body) != sha256_hex(second_body)
+    receipts = []
+    for body in (first_body, second_body):
+        _, rows = _real_terms(tmp_path, monkeypatch, body)
+        digest = terms_body_hash(tmp_path, entry, rows)
+        identity = archive_pages(
+            tmp_path,
+            entry,
+            first_receipt["retrieved_utc"],
+            retrieved_utc=first_receipt["retrieved_utc"],
+            terms_sha256=digest,
+        )
+        receipts.append(read_snapshot(tmp_path / entry.key, identity).sidecar)
+    assert receipts[0]["terms_sha256"] == sha256_hex(first_body)
+    assert receipts[1]["terms_sha256"] == sha256_hex(second_body)
+    reviewed = replace(
+        confirmation,
+        tender=replace(confirmation.tender, terms_sha256=sha256_hex(first_body)),
+    )
+    assert completion_evidence(reviewed, entry, receipts[0]) == reviewed
+    with pytest.raises(ValueError, match="do not confirm tender"):
+        completion_evidence(reviewed, entry, receipts[1])
 
 
 @pytest.mark.parametrize(
@@ -132,30 +183,272 @@ def test_run_terms_record_must_be_unique_and_bound(tmp_path, plant):
         terms_body_hash(tmp_path, entry, rows)
 
 
-def test_terms_read_carries_its_raw_body_hash(tmp_path, monkeypatch):
+def _real_terms(tmp_path, monkeypatch, body=b"<html>Invented terms</html>"):
     from eii_custodian.publicdata.fetch import build
     from eii_custodian.publicdata.fetch.kinds import TermsPage
-    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 
     entry = tender_entry()
-    body = b"<html>Invented terms</html>"
     monkeypatch.setattr(
         build,
         "read_terms_page",
-        lambda *_: TermsPage(sha256_hex(b"Invented terms"), None, body),
+        lambda *_: TermsPage(terms_text_sha256(body), None, body),
     )
-    terms = []
+    rows = []
     build._read_terms_apart(
         entry,
         lambda *_: None,
         lambda *_: None,
         lambda: "2026-11-21T00:00:00Z",
         [],
-        terms,
+        rows,
         {},
         tmp_path,
         [],
     )
+    return entry, rows
+
+
+@pytest.mark.parametrize(
+    "plant",
+    [
+        "missing",
+        "duplicate",
+        "row_url",
+        "fingerprint",
+        "digest",
+        "source_id",
+        "key",
+        "fetch_url",
+        "non_mapping",
+    ],
+)
+def test_real_terms_snapshot_single_field_plants(tmp_path, monkeypatch, plant):
+    import shutil
+
+    entry, rows = _real_terms(tmp_path, monkeypatch)
+    assert terms_body_hash(tmp_path, entry, rows) == rows[0]["terms_body_sha256"]
+    if plant == "missing":
+        rows.clear()
+    elif plant == "duplicate":
+        rows.append(rows[0].copy())
+    elif plant == "row_url":
+        rows[0]["terms_url"] = "https://other.invalid/terms"
+    elif plant == "fingerprint":
+        rows[0]["terms_fingerprint"] = "raw_bytes"
+    elif plant == "digest":
+        rows[0]["terms_body_sha256"] = "z" * 64
+    elif plant == "non_mapping":
+        rows.insert(0, "not-a-mapping")
+    else:
+        shutil.rmtree(tmp_path / entry.key / "terms")
+        changed = (
+            replace(entry, **{plant: "other.invalid"})
+            if plant != "fetch_url"
+            else entry
+        )
+        url = "https://other.invalid/terms" if plant == "fetch_url" else entry.terms_url
+        archive_auxiliary(
+            changed,
+            tmp_path / entry.key,
+            "terms",
+            b"<html>Invented terms</html>",
+            "2026-11-21T00:00:00Z",
+            url,
+        )
+    with pytest.raises(AssemblyError, match="assembly_tender_terms_incomplete"):
+        terms_body_hash(tmp_path, entry, rows)
+
+
+@pytest.mark.parametrize("position", [0, 1])
+def test_terms_row_order_does_not_change_unique_selection(
+    tmp_path, monkeypatch, position
+):
+    entry, rows = _real_terms(tmp_path, monkeypatch)
+    foreign = dict(rows[0], key="SYN-foreign")
+    rows.insert(position, foreign)
+    assert (
+        terms_body_hash(tmp_path, entry, rows)
+        == rows[1 - position]["terms_body_sha256"]
+    )
+
+
+@pytest.mark.parametrize("reused", [False, True])
+def test_adapter_uses_this_run_terms_for_both_archive_paths(
+    tmp_path, monkeypatch, reused
+):
+    from custodian.tests.test_production_adapters import context
+
+    from eii_custodian.publicdata.fetch.build import BuildOutcome
+    from eii_custodian.publicdata.review.cache_fixture import read_cached
+
+    confirmation, entry, _ = _fresh(tmp_path)
+    build = context(tmp_path, (entry,))
+    reused_times = {entry.key: "2026-11-21T00:00:00Z"} if reused else {}
+    for body, expected in (
+        (b"<html>Invented terms</html>", True),
+        (b"<html>Different invented terms</html>", False),
+    ):
+        _, rows = _real_terms(tmp_path, monkeypatch, body)
+        build.fetcher = lambda rows=tuple(rows): BuildOutcome(
+            (),
+            None,
+            terms=rows,
+            reused_times=reused_times,
+        )
+        build.fetch_archive()
+        stage = json.loads((tmp_path / "assembly/fetch_archive.json").read_text())
+        digest = stage["tender_archives"][entry.key]
+        receipt = read_cached(tmp_path, entry, digest=digest, extension="json").sidecar
+        reviewed = replace(
+            confirmation,
+            tender=replace(
+                confirmation.tender,
+                terms_sha256=sha256_hex(b"<html>Invented terms</html>"),
+            ),
+        )
+        if expected:
+            assert completion_evidence(reviewed, entry, receipt) == reviewed
+        else:
+            with pytest.raises(ValueError, match="do not confirm tender"):
+                completion_evidence(reviewed, entry, receipt)
+
+
+@pytest.mark.parametrize(
+    "plant",
+    ["page", "terms", "registry_host", "registry_other_origin", "key", "receipt_host"],
+)
+def test_each_host_and_key_guard_has_a_single_field_plant(tmp_path, plant):
+    confirmation, entry, receipt = _fresh(tmp_path)
+    other = "https://other.invalid/"
+    if plant == "page":
+        confirmation = replace(
+            confirmation, tender=replace(confirmation.tender, page=other)
+        )
+    elif plant == "terms":
+        confirmation = replace(
+            confirmation, tender=replace(confirmation.tender, terms_url=other)
+        )
+        entry = replace(entry, terms_url=other)
+    elif plant == "registry_host":
+        entry = replace(entry, fetch_host="other.invalid")
+        receipt["fetch_host"] = "other.invalid"
+    elif plant == "registry_other_origin":
+        entry = replace(entry, url=other, fetch_host="other.invalid", terms_url=other)
+        confirmation = replace(
+            confirmation, tender=replace(confirmation.tender, terms_url=other)
+        )
+        receipt["fetch_url"] = other
+        receipt["fetch_host"] = "other.invalid"
+    elif plant == "key":
+        entry = replace(entry, key="SYN-other-key")
+        receipt["key"] = entry.key
+    else:
+        receipt["fetch_host"] = "other.invalid"
+    with pytest.raises(ValueError, match="do not confirm tender"):
+        completion_evidence(confirmation, entry, receipt)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("page", "https://monaqasat.mof.gov.qa:8443/"),
+        ("page", "http://monaqasat.mof.gov.qa/"),
+        ("page", "https://evil.com\\@monaqasat.mof.gov.qa/"),
+        ("page", "https://evil.com\uff20monaqasat.mof.gov.qa/"),
+        ("terms_url", "https://monaqasat.mof.gov.qa:8443/TermsOfUse"),
+        ("terms_url", "http://monaqasat.mof.gov.qa/TermsOfUse"),
+        ("terms_url", "https://evil.com\\@monaqasat.mof.gov.qa/TermsOfUse"),
+        ("terms_url", "https://evil.com\uff20monaqasat.mof.gov.qa/TermsOfUse"),
+    ],
+)
+def test_reviewed_endpoint_must_be_same_safe_origin(tmp_path, field, value):
+    confirmation, entry, receipt = _fresh(tmp_path)
+    confirmation = replace(
+        confirmation, tender=replace(confirmation.tender, **{field: value})
+    )
+    if field == "terms_url":
+        entry = replace(entry, terms_url=value)
+    with pytest.raises(ValueError, match="do not confirm tender"):
+        completion_evidence(confirmation, entry, receipt)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://evil.com\uff20monaqasat.mof.gov.qa/",
+        "https://evil.com\uff20monaqasat.mof.gov.qa/TermsOfUse",
+    ],
+)
+def test_host_of_malformed_netloc_returns_empty(url):
+    from eii_custodian.publicdata.fetch.allowlist import host_of
+
+    assert host_of(url) == ""
+
+
+@pytest.mark.parametrize("field", ["page", "terms_url", "fetch_host"])
+def test_equivalent_hostname_forms_are_accepted(tmp_path, field):
+    confirmation, entry, receipt = _fresh(tmp_path)
+    if field == "fetch_host":
+        entry = replace(entry, fetch_host=entry.fetch_host.upper())
+        receipt["fetch_host"] = entry.fetch_host
+    else:
+        value = getattr(confirmation.tender, field).replace(
+            "monaqasat.mof.gov.qa", "monaqasat.mof.gov.qa."
+        )
+        confirmation = replace(
+            confirmation, tender=replace(confirmation.tender, **{field: value})
+        )
+        if field == "terms_url":
+            entry = replace(entry, terms_url=value)
+    assert completion_evidence(confirmation, entry, receipt) == confirmation
+
+
+@given(
+    scheme=st.sampled_from(["https", "http"]),
+    host=st.sampled_from(["invented.invalid", "other.invalid"]),
+    port=st.sampled_from(["", ":443", ":8443"]),
+    path=st.text(alphabet="abcXYZ0123456789/-_", max_size=24),
+)
+def test_reviewed_page_origin_oracle(scheme, host, port, path):
+    from custodian.tests.test_s2_t13_confirmation import receipt as invented_receipt
+    from custodian.tests.test_s2_t13_confirmation import registry_record, tender
+
+    from eii_custodian.publicdata.confirm_s2_t13 import tender_disposition
+
+    review = tender()
+    entry = registry_record(review)
+    sidecar = invented_receipt(review, entry)
+    page = f"{scheme}://{host}{port}/{path}"
+    expected = scheme == "https" and host == entry.fetch_host and port in ("", ":443")
+    assert (
+        tender_disposition(replace(review, page=page), entry, sidecar).shown is expected
+    )
+
+
+def test_missing_tender_terms_has_named_build_refusal(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.assembly_adapters import Production
+    from eii_custodian.publicdata.fetch.build import run_build
+
+    def refuse(_self):
+        raise AssemblyError("assembly_tender_terms_incomplete")
+
+    monkeypatch.setattr(Production, "run", refuse)
+    outcome = run_build(
+        (),
+        lambda *_: pytest.fail("network called"),
+        tmp_path,
+        lambda: "2026-11-21T00:00:00Z",
+        lambda _: None,
+        seed=17,
+    )
+    assert outcome.failure is not None
+    assert outcome.failure.check == "assembly_tender_terms_incomplete"
+
+
+def test_terms_read_carries_its_raw_body_hash(tmp_path, monkeypatch):
+    body = b"<html>Invented terms</html>"
+    entry, terms = _real_terms(tmp_path, monkeypatch, body)
     assert terms_body_hash(tmp_path, entry, terms) == sha256_hex(body)
     terms[0]["terms_sha256"] = "0" * 64
     with pytest.raises(AssemblyError, match="assembly_tender_terms_incomplete"):
