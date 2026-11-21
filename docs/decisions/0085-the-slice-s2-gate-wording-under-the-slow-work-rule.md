@@ -5,10 +5,10 @@
 | Status | Accepted, 2026-11-21 |
 | Date | 2026-11-21 |
 | Owner | The owner |
-| Decided by | The owner's words of 2026-11-21 (22:16, 22:18, 22:28 and 22:32, quoted below; OWNER_RULES 34), applied row by row by the advisor under that delegation; the gate reviewer judges the wording |
+| Decided by | The owner's words of 2026-11-21 (22:16, 22:18, 22:28, 22:30 and 22:32, quoted below; OWNER_RULES 34), applied row by row by the advisor under that delegation; the gate reviewer judges the wording |
 | Amends | [document 14](../14_IMPLEMENTATION_PLAN.md): new PLN-32, section 10 "Slice S2" gate bullet on the tender portal, and **ENHANCEMENT BACKLOG**; [document 12](../12_TESTING_AND_QUALITY.md): TST-168, new TST-280 and the slice S2 row of section 5; [document 15](../15_REVIEWER_CHECKLIST.md): REV-33 and REV-41; [TASKS.md](../../TASKS.md): S2-T44, S2-T10 and the slice S2 gate paragraph; [OPEN_ITEMS.md](../../OPEN_ITEMS.md): appended lines for OI-319, OI-341, PO-S2-129 and OI-360. It does not amend PLN-02, PLN-25, TST-165 to TST-167, TST-169, AGENTS.md rules 12, 33, 36, 37 and 39, decision 0055, decision 0069, decision 0071 or decision 0084 |
 | Purpose | Reword, in one record, the slice S2 gate rows that were written before the slow-work rule, so that a slow item no later work needs moves to after go-live and a slow item later work needs runs in the background, with no check, test, plant or bound changed |
-| Read first | Decision 0084, which lands with its code in task S2-TSEP of the same train; [decision 0055](0055-mutation-testing-moves-to-after-go-live.md) and TST-278, the earlier record of the same kind; [decision 0071](0071-after-go-live-operations-and-continuous-promotion.md) item 3; [decision 0079](0079-dated-gis-snapshot-and-structured-address-search.md) item 3; TASKS.md S2-T44, S2-T10, S2-T13 and S7-T09; OPEN_ITEMS.md OI-319, OI-341 and PO-S2-129 |
+| Read first | Decision 0084, which lands with its code in the sibling task of the same train that builds the tenders own run; [decision 0055](0055-mutation-testing-moves-to-after-go-live.md) and TST-278, the earlier record of the same kind; [decision 0071](0071-after-go-live-operations-and-continuous-promotion.md) item 3; [decision 0079](0079-dated-gis-snapshot-and-structured-address-search.md) item 3; TASKS.md S2-T44, S2-T10, S2-T13 and S7-T09; OPEN_ITEMS.md OI-319, OI-341 and PO-S2-129 |
 
 ## Context and evidence
 
@@ -19,6 +19,8 @@ The owner's words, typing preserved (OWNER_RULES 34):
 > i think probably if something takes long or very slow but has a dependency goes to the background and if something slow or takes long and doesnt have a dependency goes to enhancements after go live
 
 > the gate is not a deciding factor the gate is written based on previous rule. you evaluate based on what we agreed on now. and tell me what do you suggest? does it have dependency to go to the background or its slow with no dependencies that can go after go live?
+
+> we are not dropping it anyway we are only moving it to another stage so quality is not lost it will still run at a different time
 
 > the gate wording can change based on the enhancements we just did i think our approach is more smart more integrated and faster value without loosing quality
 
@@ -231,8 +233,8 @@ TST-167 and TST-169; decisions 0055, 0069 and 0071. No command is added by this 
 
 ## Sources
 
-- The owner's words of 2026-11-21 quoted above, relayed exactly in the advisor's notes of 22:16, 22:18, 22:28
-  and 22:32; OWNER_RULES 34.
+- The owner's words of 2026-11-21 quoted above, relayed exactly in the advisor's notes of 22:16, 22:18, 22:28,
+  22:30 and 22:32; OWNER_RULES 34.
 - The slice S2 gate checklist (r5), rows C-P1 to C-P8 and C-01 to C-27; decision 0084 items 1 to 6
   and its plan, sections 2 and 5.
 - [TASKS.md](../../TASKS.md): S2-T10, S2-T13, S2-T14, S2-T16, S2-T20, S2-T23, S2-T27, S2-T29, S2-T32, S2-T41,
