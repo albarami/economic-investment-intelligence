@@ -231,14 +231,14 @@ class Production:
         if self.intake_refusal:
             raise AssemblyError(self.intake_refusal)
         from .assembly_tenders import archive_pages
-        from .fetch.own_run import is_own_run_entry
+        from .fetch.own_run import is_tender_entry
 
         pages = {}
         for entry in self.entries:
             if (
                 entry.kind == "paged_cards"
                 and not entry.skip_reason
-                and not is_own_run_entry(entry)
+                and not is_tender_entry(entry)
             ):
                 reused_times = getattr(self.fetched, "reused_times", {})
                 if entry.key in reused_times:
@@ -290,12 +290,13 @@ class Production:
 
     def reviewed_selections(self) -> dict[str, str]:
         selected = reviewed_selections(self.cache)
-        from .fetch.own_run import OWN_RUN_PIN_REFUSAL, is_own_run_entry
+        from .fetch.own_run import OWN_RUN_PIN_REFUSAL, is_tender_entry
 
-        own_run = [entry for entry in self.entries if is_own_run_entry(entry)]
-        if any(entry.key in selected for entry in own_run):
+        # Any tender row, whatever its kind, refuses its pin before any read.
+        tender = [entry for entry in self.entries if is_tender_entry(entry)]
+        if any(entry.key in selected for entry in tender):
             raise AssemblyError(OWN_RUN_PIN_REFUSAL)
-        pending = self._own_run_pending(own_run)
+        pending = self._own_run_pending(tender)
         if not selected and (not self.entries or len(pending) != len(self.entries)):
             raise AssemblyError("snapshot_selection_invalid")
         keys = {entry.key for entry in self.entries}

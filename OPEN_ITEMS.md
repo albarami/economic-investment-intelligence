@@ -3083,6 +3083,16 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED: the `--tenders-only [--resume]` form, the identity-bound pick-up that replaces the `own_run_pickup_unbuilt` refusal, the completed-result handoff, and S2-P40's review binding, carried over from S2-TSEP with their own review; the pending binding then reuses the decision 0083 registry binding.
 - NEEDED BY: the day S7-T09 starts (decision 0084 item 6); no slice S2 gate dependency.
 
+## OI-374 — S2-TSKIP round 2: the own-run journal failure block is one more copy for OI-368
+
+- ID: OI-374
+- TYPE: OPEN (nit; no behaviour change)
+- RAISED BY: S2-TSKIP RV1 reviewer (OpenAI Codex, GPT-6), finding C1, recorded by the S2-TSKIP round-2 builder (Anthropic Claude Opus 5.5), 2026-11-21
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/build.py`, the `own_run` skip branch of `run_build`.
+- EVIDENCE: RV1 C1: the new `_run.note` / `resume_record_write_failed` block repeats the block OI-368 counts. Round 2 did not extract the helper: one helper used once would not remove the repetition, and replacing every copy is a change of its own beyond the brief's "small and safe" limit. The branch now has its own committed test, `test_own_run_journal_note_failure_is_named`, which a shared helper must keep red-for-its-reason. RV1 C2 was taken: `confirm_s2_t13._registry_binds` holds the registry comparisons common to the shown and pending bindings.
+- NEEDED: the helper of OI-368, covering this copy too.
+- NEEDED BY: with OI-368.
+
 ## S2-P30 — Audit-box dispositions: closing lines — 2026-11-21
 
 These lines close the three entries of the section "S2-P30 — Audit-box dispositions — 2026-11-21" further below, which say they await a different maker's confirmation; the entries themselves are not edited.

@@ -17,3 +17,8 @@ def is_own_run_entry(entry: Entry) -> bool:
         and entry.kind == "paged_cards"
         and entry.skip_reason == ""
     )
+
+
+def is_tender_entry(entry: Entry) -> bool:
+    """Any row the registry names as the tender source, by key or source ID."""
+    return entry.key in OWN_RUN_KEYS or entry.source_id == "tenders_pub"
