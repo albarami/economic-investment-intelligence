@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (rows TST-277 and TST-278); amended by decision 0055 on 2026-11-18 (mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed); amended by decision 0032 on 2026-11-15; amended by decision 0035 on 2026-11-15 |
+| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (rows TST-277 and TST-278); amended by decision 0055 on 2026-11-18 (mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decisions 0024 and 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md), as amended by [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md); amended by decision 0030 on 2026-11-14 (proposed); amended by decision 0032 on 2026-11-15; amended by decision 0035 on 2026-11-15; amended by decision 0086 on 2026-11-21 |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Define every kind of test, the CI pipeline, the evidence that proves each slice gate, and the definition of done. |
@@ -77,6 +77,8 @@ The three planes are defined in [02_ARCHITECTURE.md](02_ARCHITECTURE.md). The ta
 | TST-17 | Fixture releases must be built by the test run itself, from a small seeded synthetic world, through the same `custodian/` code path as a real build, into a temporary directory. Hand-written release tables standing in for the engine's output are forbidden, because they would test the fixture instead of the engine. |
 | TST-18 | The attack suite and planted-truth checks must use the sealed world. Before running, the test must verify that the SHA-256 of the scenario file equals the hash committed before the build, and fail otherwise. |
 | TST-19 | Recorded model responses for the recorded provider must live under `evals/`, must pass the secret and identifier scans, and must record the model name, prompt version and release they were captured against; a mismatch with the current prompt version or release fails the run instead of replaying stale answers. |
+
+The current `./eii test` table runs eight suites. Its three named custodian parts each collect `custodian/tests` and select whole modules by the SHA-256 of the repository-relative POSIX module path modulo 3, with a 1,200-second limit per part ([decision 0086](decisions/0086-custodian-part-limit-and-watch.md)). The `python-guards` manifest compares the three disjoint collections with the unsplit collection by test ID and count; an empty part or a missing module fails. The runner prints every suite's elapsed time as a share of its single limit on every runner. A custodian part whose green hosted time passes 720 seconds is split by a further decision record using decision 0060's method; the watch does not change the timeout or the kill-on-timeout test. The six hosted check names are unchanged.
 
 ## 3. Requirements by test kind
 

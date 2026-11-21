@@ -11,15 +11,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     """An omitted option leaves the whole collection unchanged."""
     parser.addoption(
         "--custodian-part",
-        choices=("1", "2"),
+        choices=("1", "2", "3"),
         default=None,
-        help="select custodian part 1 or 2 by SHA-256 of the module path",
+        help="select custodian part 1, 2 or 3 by SHA-256 of the module path",
     )
 
 
 def module_part(path: str) -> int:
     """Return the one-based part of a repository-relative POSIX module path."""
-    return int.from_bytes(hashlib.sha256(path.encode("utf-8")).digest(), "big") % 2 + 1
+    return int.from_bytes(hashlib.sha256(path.encode("utf-8")).digest(), "big") % 3 + 1
 
 
 @pytest.hookimpl(trylast=True)

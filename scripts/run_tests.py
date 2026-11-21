@@ -50,14 +50,21 @@ SUITES: tuple[Suite, ...] = (
         "pytest",
         ".",
         ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
-        600,
+        1200,
     ),
     Suite(
         "python-custodian-2",
         "pytest",
         ".",
         ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "2"),
-        600,
+        1200,
+    ),
+    Suite(
+        "python-custodian-3",
+        "pytest",
+        ".",
+        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "3"),
+        1200,
     ),
     Suite("python-product", "pytest", ".", ("product/tests",), 600),
     Suite(
@@ -256,7 +263,7 @@ def _main(
             result = _internal(suite.name, error)
         elapsed = now() - started
         results.append(result)
-        _print_suite(stdout, result, elapsed)
+        _print_suite(stdout, result, elapsed, suite.timeout)
     passed = sum(item.counts.passed for item in results if item.counts is not None)
     failed = sum(item.counts.failed for item in results if item.counts is not None)
     skipped = sum(item.counts.skipped for item in results if item.counts is not None)
@@ -278,14 +285,19 @@ def _internal(name: str, error: Exception) -> SuiteResult:
     return SuiteResult(name, None, (line,), ())
 
 
-def _print_suite(stdout: TextIO, result: SuiteResult, duration: float) -> None:
+def _print_suite(
+    stdout: TextIO, result: SuiteResult, duration: float, limit: int
+) -> None:
+    share = f" ({duration / limit:.1%} of {limit} s limit)"
     if result.counts is None:
-        stdout.write(f"suite {result.name}: counts unavailable in {duration:.1f} s\n")
+        stdout.write(
+            f"suite {result.name}: counts unavailable in {duration:.1f} s{share}\n"
+        )
     else:
         stdout.write(
             f"suite {result.name}: {result.counts.passed} passed, "
             f"{result.counts.failed} failed, {result.counts.skipped} skipped "
-            f"in {duration:.1f} s\n"
+            f"in {duration:.1f} s{share}\n"
         )
     stdout.flush()
     for line in result.fail_lines:

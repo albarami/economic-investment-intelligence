@@ -91,6 +91,7 @@ class RunnerUsage(unittest.TestCase):
             "python-core",
             "python-custodian-1",
             "python-custodian-2",
+            "python-custodian-3",
             "python-product",
             "web-checks",
             "web-unit",
@@ -108,7 +109,7 @@ class RunnerUsage(unittest.TestCase):
                     "--custodian-part",
                     "1",
                 ),
-                600,
+                1200,
             ),
             (
                 "python-custodian-2",
@@ -119,7 +120,18 @@ class RunnerUsage(unittest.TestCase):
                     "--custodian-part",
                     "2",
                 ),
-                600,
+                1200,
+            ),
+            (
+                "python-custodian-3",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "3",
+                ),
+                1200,
             ),
             ("python-product", ("product/tests",), 600),
         )
@@ -168,6 +180,22 @@ class RunnerUsage(unittest.TestCase):
                                 suite.timeout,
                             )
 
+    def test_custodian_limit_is_one_value_on_every_runner(self) -> None:
+        parts = [
+            suite
+            for suite in run_tests.SUITES
+            if suite.name.startswith("python-custodian-")
+        ]
+        for environ in (
+            {},
+            {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"},
+        ):
+            with self.subTest(environ=environ):
+                self.assertEqual(
+                    tuple(run_tests.suite_timeout(suite, environ) for suite in parts),
+                    (1200, 1200, 1200),
+                )
+
     def test_each_suite_prints_its_own_duration(self) -> None:
         first = run_tests.SuiteResult("first", counts.Counts(2, 0, 1, (), True), (), ())
         second = run_tests.SuiteResult(
@@ -191,8 +219,8 @@ class RunnerUsage(unittest.TestCase):
             out,
             [
                 "seed=1794000123",
-                "suite first: 2 passed, 0 failed, 1 skipped in 2.5 s",
-                "suite second: 1 passed, 0 failed, 0 skipped in 0.3 s",
+                "suite first: 2 passed, 0 failed, 1 skipped in 2.5 s (2.1% of 120 s limit)",
+                "suite second: 1 passed, 0 failed, 0 skipped in 0.3 s (0.3% of 120 s limit)",
                 "total: 3 passed, 0 failed, 1 skipped in 2 suites, 0 with problems",
                 "RESULT: PASSED",
             ],
@@ -222,9 +250,9 @@ class RunnerUsage(unittest.TestCase):
             out,
             [
                 f"seed={support.FIXTURE_SEED}",
-                "suite unavailable: counts unavailable in 1.5 s",
+                "suite unavailable: counts unavailable in 1.5 s (1.2% of 120 s limit)",
                 "FAIL invented-no-counts",
-                "suite internal: counts unavailable in 4.2 s",
+                "suite internal: counts unavailable in 4.2 s (3.5% of 120 s limit)",
                 "FAIL internal-error: internal: ValueError: invented",
                 "total: 0 passed, 0 failed, 0 skipped in 2 suites, 2 with problems",
                 "RESULT: FAILED",
@@ -236,11 +264,13 @@ class RunnerUsage(unittest.TestCase):
             support.untimed(
                 [
                     "suite invented: counts unavailable in 1.5 s",
+                    "suite invented: counts unavailable in 1.5 s (1.2% of 120 s limit)",
                     "FAIL invented in 1.5 s",
                     "suite invented: counts unavailable in unexpected s",
                 ]
             ),
             [
+                "suite invented: counts unavailable",
                 "suite invented: counts unavailable",
                 "FAIL invented in 1.5 s",
                 "suite invented: counts unavailable in unexpected s",

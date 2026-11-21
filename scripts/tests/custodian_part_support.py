@@ -52,12 +52,15 @@ def nodeids(proc: subprocess.CompletedProcess[str]) -> list[str]:
 
 def assert_partition(whole: Sequence[str], parts: Sequence[Sequence[str]]) -> None:
     """Prove no test id is lost, duplicated, or assigned to an empty part."""
-    if len(parts) != 2 or any(not part for part in parts):
-        raise AssertionError("both custodian parts must be nonempty")
-    first, second = (set(part) for part in parts)
-    if first & second:
-        raise AssertionError("custodian parts overlap")
-    if first | second != set(whole):
+    if len(parts) != 3 or any(not part for part in parts):
+        raise AssertionError("all three custodian parts must be nonempty")
+    seen: set[str] = set()
+    for part in parts:
+        selected = set(part)
+        if seen & selected:
+            raise AssertionError("custodian parts overlap")
+        seen.update(selected)
+    if seen != set(whole):
         raise AssertionError("custodian parts do not cover the whole collection")
     if sum(map(len, parts)) != len(whole):
         raise AssertionError("custodian part counts do not add up")

@@ -104,7 +104,7 @@ def visible(lines: list[str]) -> list[str]:
     return untimed(kept)
 
 
-DURATION = re.compile(r" in [0-9]+\.[0-9] s$")
+DURATION = re.compile(r" in [0-9]+\.[0-9] s(?: \([0-9]+\.[0-9]% of [0-9]+ s limit\))?$")
 
 
 def untimed(lines: list[str]) -> list[str]:

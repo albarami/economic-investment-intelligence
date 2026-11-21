@@ -3081,6 +3081,42 @@ These lines close the three entries of the section "S2-P30 — Audit-box disposi
 - CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T14#8: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T14#8 as a box that may be ticked, and the train ticks it. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and point 2.
 - CLOSED (2026-11-21, merge train S2-12, pull request 112), S2-T19#7: the same review, **APPROVED** `42b75eb17467f2b776f72a2aad95884b7aa4a5dc`, names S2-T19#7 as a box that may be ticked, and the train ticks it. Its point 1 (case-fold the listed-table lookup) and point 4 (short identifiers) do not reject and stay as review notes. Evidence: `evidence/S2-P30.rv1.md` sections 1, 2 and 4 and points 1, 2 and 4.
 
+## OI-371 — S2-P41 review nit: the printed share of a suite's limit
+
+- ID: OI-371
+- TYPE: OPEN
+- RAISED BY: lead, from review S2-P41.rv1 finding F1 (pull request 113), 2026-11-22
+- CONCERNS: `scripts/run_tests.py`. It prints each suite's time as a share of `suite.timeout`, while the kill uses `suite_timeout(suite, parent)`.
+- EVIDENCE: the two agree today, because every runner has one limit under decision 0086. If a per-runner limit came back, the printed share would no longer match the enforced limit.
+- NEEDED: pass `suite_timeout(suite, parent)` to the print, with a test whose runner limit differs from the suite field.
+- NEEDED BY: the next change to `scripts/run_tests.py`.
+
+## OI-372 — Decision 0086 records: amended items of decision 0060, the reading of ruling L-1404, the OI-285 closing line
+
+- ID: OI-372
+- TYPE: OPEN
+- RAISED BY: lead, from review S2-P41.rv1 finding F2 and proposed items 2, 3 and 5 (pull request 113), 2026-11-22
+- CONCERNS: decision 0086's "Amends" row and item 1; the decision 0060 row of `docs/README.md`; the OI-285 update line of 2026-11-22; the TASKS.md S2-T34 section.
+- EVIDENCE:
+  - Decision 0086 lists items 2 and 4 of decision 0060 as amended, but items 1 and 3 are changed too. Item 1 is "two named parts … same 600-second limit"; item 3 is "the two parts … neither is empty".
+  - Lead ruling L-1404 reads, in its words, as applying the limit "instead of the three-part split". The lead's reading of 2026-11-21 23:43 kept three parts and the 1200-second limit. It is recorded in the lead's log, and the round-2 brief names three parts as its subject.
+  - The OI-285 update line says "The owner-approved response keeps three parts". The owner approved the limit and the watch; keeping three parts was the builder's and the lead's choice. This item corrects that line, append-only.
+  - S2-T34's ticked criterion still reads "two parts … 600-second". It is historical and stays unedited.
+- NEEDED: a documents-only change, reviewed by a maker other than its writer:
+  - write "decision 0060 items 1, 2, 3 and 4" in decision 0086, and "items 1 to 4 amended" in the index row;
+  - add a pointer from S2-T34 to decision 0086.
+- NEEDED BY: the S2 gate record.
+
+## OI-373 — Hosted tests job cap against the summed suite limits
+
+- ID: OI-373
+- TYPE: OPEN (watch)
+- RAISED BY: lead, from review S2-P41.rv1 proposed item 4 (pull request 113), 2026-11-22
+- CONCERNS: the hosted `tests` job in `.github/workflows/ci.yml`, capped at `timeout-minutes: 90` (5,400 s).
+- EVIDENCE: the suite limits now sum to 10,800 s, and the custodian worst case rose from 1,200 s to 3,600 s. On a very slow runner the job cap could cancel the run before any per-suite kill reports. The same gap held before this change (8,400 s summed), and `ci.yml` was left unchanged.
+- NEEDED: read each green hosted run's job time against the cap. If a run comes within 15 minutes of it, a recorded change to the cap or to the parts.
+- NEEDED BY: watched at every merge until the S2 gate.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
@@ -5826,3 +5862,5 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - 2026-11-21 S2-P31 — S2-T20#5: DHA-102 now includes `bldg_gba` with the registry's CC-BY-NC-4.0 terms and 2026-11-20 reading. The NC-height registry coverage guard fails for the missing real row before the doc correction and for an injected invented missing NC row (exit 1); the permanent invented-row refusal test and restored touched files pass (369 passed, seed 2144974661). Evidence: PROGRESS.md, **S2-P31 audit-proof tests**. Disposition: local fixture proof supplied; independent maker review remains with the lead; no task box changed.
 
 - CLOSED (2026-11-21, S2-P32 round 2, S2 gate item 14 and only the C12 part of item 15; lead ruling L-1320): owner's decision of 2026-11-21 05:34 (.overnight/IN/OWNER-YES.md; .overnight/IN/PROOFS.md items 14 and 15) carries S2-T12 box 2 word for word into a new unticked S3-T12 box and only the card C12, MTH-46 part of S2-T35 box 1 into the new unticked S6-T13 box. The whole original S2-T35 first box remains unticked, word for word and in its original place, retaining PUB-71 and every other unpinned-value criterion; the exact notice says only its C12 part moved. S2-T12's notice and both target boxes stay as round 1 wrote them. scripts/tests/test_moved_boxes.py guards source retention, exact target wording, unticked status, C12 scope and notices; removing the S2-T35 source box in scratch fails (exit 1). Closure concerns the stated requirements transfer only; the rest of S2 gate item 15 is not closed here and S2-T35 box 2 is unchanged. The round-2 full unittest command also exits 1 (979 tests, seven test_clean_environment failures; both sync failures report the offline pyyaml 6.0.3 wheel absent); this environment limitation remains unresolved for the lead, without retry, fetch, skip or weakened test. Evidence: PROGRESS.md S2-P32 row and .overnight/RETURN.md.
+
+- OI-285 UPDATE 2026-11-22 — **CLOSED by [decision 0086](docs/decisions/0086-custodian-part-limit-and-watch.md), which supersedes this item's former 600-second remedy.** The advisor's hosted readings were part 1 at 342 and 528 seconds on the same tests, and part 2 at 428, 452 and 516 seconds, followed by no result within 600 seconds on the main run; the earlier OI-285 reading was 569 seconds. The three-part local build measured 208.69, 287.77 and 237.97 seconds and 3,690 + 3,533 + 3,552 = 10,775 passing cases. The owner-approved response keeps three parts, raises only their limit to 1,200 seconds everywhere and watches green hosted times above 720 seconds for a further recorded split. No green hosted result of this new head is asserted; its timing remains follow-up evidence, not a condition for reopening this superseded item.

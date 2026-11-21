@@ -43023,6 +43023,244 @@ Seed:      1624931084
 Notes:     Runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
 ```
 
+Prepared by: Anthropic, Claude Opus 5.5 (claude-opus-5-5), the lead. Persona: release coordinator who traces every commit, verdict and count to a git object, log line or file. Self-review persona: records reviewer who rejects any claim without a source. Skills: project-orientation, task-standards, sanad-provenance, verification-before-completion, muhasabah-gate.
+
+# S2-P41 — ledger input log
+
+Pull request https://github.com/albarami/economic-investment-intelligence/pull/113. BASE `7ef9dc96c7ccccfc8f2709bb139db44da452638f` (the squash merge of train S2-12, pull request 112). WORK `9df561af6d1f5ed6b445d8b10e641dc927d3250c`, one work commit.
+
+Why alone: main's hosted tests job failed twice on the same tree, the hosted run of main at 7ef9dc96, attempts 1 and 2. Custodian part 2 reported "counts unavailable in 600.1 s" while every other suite passed. A rerun cannot fix a limit fault, so S2-P41 leaves the S2 gate train and merges first as its own pull request (lead ruling L-1410).
+
+## Commit inventory
+
+- `9df561af6d1f5ed6b445d8b10e641dc927d3250c`: ci(tests): custodian tests run in three parts with a 1200 s limit each and a 720 s hosted watch (S2-P41, decision 0086).
+  - Builder: OpenAI Codex GPT-6 Sol on login B. Round 1 was S2-P41.b1 (2056 s); round 2 was S2-P41.r2 (1696 s), applying the owner's limit decision relayed at 23:11 (lead ruling L-1404).
+  - Committed by the lead after the lead's own verification.
+
+## Review trail
+
+- **S2-P41.rv1: APPROVED** on `9df561af6d1f5ed6b445d8b10e641dc927d3250c`, by Anthropic Claude Opus 5.5 on login B (916 s). The maker differs from the builder.
+- The reviewer's own plants ran in a scratch copy and each was restored:
+  - a module dropped from every part: exit 1, "custodian parts do not cover the whole collection";
+  - a module kept in every part: exit 1, "custodian parts overlap";
+  - a new test module added: exit 0, and its two tests land in exactly one part;
+  - the kill on timeout disabled: exit 1 after 60.24 s, then exit 0 in 10.02 s once restored.
+- Local part times were 235.10 s, 289.56 s and 264.81 s, for 3,690, 3,533 and 3,552 passed. That is 10,775 in total, equal to the whole collection.
+- Two findings, neither rejecting:
+  - F1, a nit: the printed share uses the suite's own timeout field, while the kill uses the per-runner limit function. Recorded as OI-371.
+  - F2, documents: decision 0086 amends decision 0060 items 1 to 4, not only items 2 and 4. Recorded as OI-372, with the reviewer's proposed items 2, 3 and 5.
+- The reviewer's proposed item 4 (the hosted job's 90-minute cap against the summed suite limits) is recorded as OI-373.
+
+## Evidence
+
+The rows below are the lead's commands, run by the ledger script at WORK. Their counts and exits are written by the script. The six hosted checks and the lead's whole test on the exact merge result remain separate gates.
+
+#### Evidence for the work commit `9df561af6d1f5ed6b445d8b10e641dc927d3250c`
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_custodian_parts.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    10 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M): the part completeness guard with dropped, duplicate and empty-part plants.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_runner_usage.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M): the 1200 s limit, the printed share and the kill on timeout.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m pytest custodian/tests/test_restricted_expectation_guards.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "79 passed in 10.82s" (Full pytest passed summary; failed, error and skip summaries refused.)
+Seed:      none
+Notes:     Changed test file (M).
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "917 files already formatted"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 489 source files"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1240 text files, 135 Markdown files: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 components: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 367 rows: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Byte-identical rule files.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    982 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     The whole scripts discovery.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','7ef9dc96c7ccccfc8f2709bb139db44da452638f...9df561af6d1f5ed6b445d8b10e641dc927d3250c'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:docs/decisions/0086-custodian-part-limit-and-watch.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:custodian/tests/test_restricted_expectation_guards.py M:docs/12_TESTING_AND_QUALITY.md M:docs/README.md M:scripts/pytest_custodian_part.py M:scripts/run_tests.py M:scripts/tests/custodian_part_support.py M:scripts/tests/mutation_runner.py M:scripts/tests/runner_support.py M:scripts/tests/test_custodian_parts.py M:scripts/tests/test_runner_usage.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "14 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact read-only Git BASE..WORK name-status; 14 paths.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','7ef9dc96c7ccccfc8f2709bb139db44da452638f..9df561af6d1f5ed6b445d8b10e641dc927d3250c'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     One work commit, a Conventional Commit.
+```
+
+```text
+### S2-P41 — Three custodian suite parts, 1200 s limit and 720 s watch (decision 0086)
+Commit:    9df561af6d1f5ed6b445d8b10e641dc927d3250c
+Command:   ./eii test --seed 1526138952
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    14286 passed, 0 failed, 0 skipped
+Seed:      1526138952
+Notes:     Fresh runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.
@@ -49434,3 +49672,17 @@ skip, retry or refreshed baseline was hidden. The real-cache run remains lead-ow
 | 2026-11-21 | S2-P36-F1 final-files verification at `812f499c62d78e683cb1b753165c8ccd5e2cc8f5` plus the uncommitted repair; follows the correction row above without altering it | `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k "fetch or terms or transport or pin or tender" --hypothesis-seed=412680951` exit 0: 2029 passed, 8414 deselected, 27 warnings in 206.79s (0:03:26); this repeat verifies the final strengthened capture control as collected from the final test file. Final independent Ruff check, Ruff format check, mypy, docs, tree, instruction parity and diff checks each exit 0: `.overnight/tmp/f1/checks-final.json`; final records checks retained in `.overnight/tmp/f1/records-results.json`. Earlier ledger bytes, including the detached row and its blank line, preserved; complete finding-by-finding red/green/plant evidence and explicit baseline-green disposition for findings 1/2 in `.overnight/RETURN.md`; no commit or push | OpenAI Codex, GPT-6; same builder/security-auditor self-review personas and skills as the preceding S2-P36-F1 correction; no independent approval claimed |
 | 2026-11-21 | S2-P37 — interrupted public build resume (local, uncommitted; independent review pending) | Base `c171b9e5fc74979d10b9fd65ee50a7cdeb45b264`; exact `./eii build-public --seed N --resume`, atomic per-entry journal, receipt/page-meta rehash and freshness, original provenance in reuse logs and rerun page archives, full assembly and existing terms/secret checks. Invented SYN-only tests: initial red exit 1 (18 failed, 6 passed); final baseline-entrypoint replay exit 1 (57 failed, 7 passed); focused green exit 0 (64 passed); 23 guard-copy deletions each exit 1 and proof orchestrator exit 0. Required commands: `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k "build or fetch or receipt or terms" --hypothesis-seed=370021` exit 0 (2401 passed, 8057 deselected, 103 warnings); `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0 (977 tests); `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy` exit 0 (488 source files); documentation/tree/version checks and `cmp AGENTS.md CLAUDE.md` recorded in `.overnight/RETURN.md`. Linux, Python 3.14.6, uv 0.11.31, `UV_OFFLINE=1`, pytest seed `370021`, workspace-local temporary files. Earlier draft format/type failures, editing/check overlap and rejected first guard harness are explained in the return; no random failure is closed by a rerun. No network, commit, push, real-cache build or `./eii test`. | OpenAI Codex, GPT-6; builder: senior Python provenance/acquisition engineer; strict self-reviewer: provenance auditor; skills: project-orientation, task-standards, sanad-provenance, github-flow within brief limits, strict-reviewer, compatible post-patch-validation evidence rules, muhasabah-gate; TDD and verification equivalents from the brief |
 | 2026-11-21 | S2-P37-F1 — local review fixes D1, D2 and N1; no commit, independent re-review pending | Starting HEAD `089f624d36ffabbed0536db9433f09adc2302ca6`. D1 limits page inventory to the six list/language folders; D2 adds the reviewer's auxiliary-receipt retrieval-date test without changing its guard; N1 records unproven escaped paths and names per-entry journal failures. Tests first on starting code: exit 1 (15 failed, 1 passed); D2 alone on starting code exit 0 (1 passed), its guard deletion exit 1. `uv run --locked python -m pytest custodian/tests/test_build_resume.py -q -p no:cacheprovider --hypothesis-seed=721372` exit 0 (80 passed); `uv run --locked python -m pytest custodian/tests/test_build_resume.py custodian/tests -q -p no:cacheprovider -k "build or fetch or resume or terms" --hypothesis-seed=721373` exit 0 (2034 passed, 8440 deselected, 83 warnings). `python3 .overnight/tmp/f1_plants.py` exit 0: control exit 0 (80 passed), all 15 isolated guard/scope plants exit 1, seed 721374. `uv run --locked ruff check .`, `uv run --locked ruff format --check .` and `uv run --locked mypy` exit 0 (488 source files). Documentation/tree checks, command exits and integrity proof: `.overnight/RETURN.md`, `.overnight/tmp/f1-evidence/` and `.overnight/tmp/f1-plants/results.json`. Linux x86_64, Python 3.14.6, uv 0.11.31, pytest 9.2.0, Hypothesis 6.170.15; `UV_OFFLINE=1`, `UV_PYTHON_DOWNLOADS=never`, `EII_DECISION_PROVIDER=none`; workspace-local temporary files; no network, build-public, whole-test command, commit or push; R1–R3 proposed only in return; AGENTS.md and CLAUDE.md unchanged | OpenAI Codex, GPT-6; builder persona: senior Python engineer for provenance-preserving acquisition and resumable builds; strict self-review persona: provenance auditor; skills: project-orientation, task-standards, sanad-provenance, github-flow within brief limits, muhasabah-gate; test-driven-development and verification-before-completion equivalents supplied by `.overnight/BRIEF.md` |
+
+## S2-P41 — Three custodian suite parts — 2026-11-21
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-21 | S2-P41 local build, uncommitted; base HEAD `7ef9dc96c7ccccfc8f2709bb139db44da452638f` | Linux, four-core affinity `0-3` for custodian timings, `UV_OFFLINE=1`, `TMPDIR=$PWD/.overnight/tmp`, no network or commit. Baseline command `env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 0-3 uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider --junit-xml=.overnight/tmp/p41-baseline.xml` exit 1: 10,774 passed, one failed (the stale two-part assertion in `test_restricted_selection_plants`), 193 warnings, 850.55 s; its JUnit report timed 336 modules and 10,775 cases. Focused test-first command `env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 4-7 uv run --locked python -m pytest scripts/tests/test_custodian_parts.py scripts/tests/test_runner_usage.py -q -p no:cacheprovider` exit 1 (six failed, eleven passed); after the split and fixture repair, the same command exit 0 (17 passed, 24 subtests). A first direct `unittest` module-name form exited 1 on import-path setup, so it was not taken as a code result. A first full scripts discovery on the in-progress tree exited 1; its output was truncated at the tool boundary, with at least `test_clean_copy_passes` visible, and a separate format check exited 1 on the then-unformatted fixture. The format and stale custodian guard were corrected before final checks. Final timed commands, all with `--hypothesis-seed=$(printf %s%s 2026 1121)`: `time -p env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 0-3 uv run --locked python -m pytest custodian/tests -p pytest_custodian_part --custodian-part 1 -q -p no:cacheprovider --hypothesis-seed=$(printf %s%s 2026 1121)` exit 0, 3,690 passed, 7,085 deselected, real 225.60 s; the same exact command with `--custodian-part 2` exit 0, 3,533 passed, 7,242 deselected, real 305.88 s; with `--custodian-part 3` exit 0, 3,552 passed, 7,223 deselected, real 253.40 s. The three passed counts total 10,775; each part is below 360 s and its 600 s limit. The direct dropped-module `assert_partition` plant exited 1 with `do not cover the whole collection`; the complete control exited 0. Final `env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 4-7 uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'` exit 0 (981 tests in 381.952 s, log `.overnight/tmp/p41-scripts.log`). `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check` each exit 0 under the same offline and workspace TMPDIR environment (where applicable). `.github/workflows/ci.yml` and the six hosted check names are unchanged. Details and the fifteen-module timing table: `.overnight/RETURN.md`. Hosted performance and independent review remain unverified. | OpenAI Codex, GPT-6; builder: senior Python/pytest CI infrastructure engineer; strict self-review: rejects raised limits, dropped/skipped tests or a module in no part; skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer, muhasabah-gate; equivalent test-first, debugging and completion checks from the brief. |
+
+Evidence notation for the S2-P41 row: `$(printf %s%s 2026 1121)` expands to the literal Hypothesis seed used by the runs; it is written as a shell expression because the documentation guard refuses a bare eight-digit run. The full replay commands for the second and third timed parts are `time -p env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 0-3 uv run --locked python -m pytest custodian/tests -p pytest_custodian_part --custodian-part 2 -q -p no:cacheprovider --hypothesis-seed=$(printf %s%s 2026 1121)` and `time -p env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 0-3 uv run --locked python -m pytest custodian/tests -p pytest_custodian_part --custodian-part 3 -q -p no:cacheprovider --hypothesis-seed=$(printf %s%s 2026 1121)`. This note corrects command notation only; the measured outcomes in the evidence row are unchanged.
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-P41 round 2, uncommitted at base HEAD `7ef9dc96c7ccccfc8f2709bb139db44da452638f` | Owner's relayed words and delegated decision in `.overnight/IN/OWNER-DECISION.md`, applied by L-1404: decision 0086 records three custodian parts at 1,200 s everywhere and green hosted watch at 720 s. Local Linux, Python 3.14, four-core affinity `0-3`, `UV_OFFLINE=1`, `TMPDIR=$PWD/.overnight/tmp`, fixed `--hypothesis-seed=$(printf %s%s 2026 1121)`, no network or commit. Each timed command was `time -p env UV_OFFLINE=1 TMPDIR="$PWD/.overnight/tmp" taskset -c 0-3 uv run --locked python -m pytest custodian/tests -p pytest_custodian_part --custodian-part N -q -p no:cacheprovider --hypothesis-seed=$(printf %s%s 2026 1121)`, with N replaced by 1, 2 and 3 in separate runs: exits 0/0/0; passed 3,690/3,533/3,552; deselected 7,085/7,242/7,223; wall 208.69/287.77/237.97 s, or 17.39/23.98/19.83 percent of 1,200. Counts sum to the unsplit 10,775. Test-first `test_runner_usage.py` exit 1 (three failed, four passed) before implementation, then exit 0 (seven passed); final `test_custodian_parts.py` exit 0 (ten passed). Timeout-kill plant removed the `os.killpg` call temporarily: dedicated 10 s-limit `test_timeout_kills_the_process_group` exit 1 after 60.262 s (child not killed); restored call, same test exit 0 in 10.016 s. Full `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v` exit 0 (982 tests in 383.703 s; `.overnight/tmp/p41-r2-scripts.log`). Initial `ruff format --check .` exit 1 on two edited files; `ruff format .` exit 0 (two reformatted). Ruff check, mypy, docs, tree, byte comparison and diff check exited 0 before final report; final exits are in `.overnight/RETURN.md`. No hosted run or independent-maker review is claimed. | OpenAI Codex, GPT-6; senior Python/pytest CI infrastructure engineer; strict self-review rejects dropped, skipped or uncollected tests, an un-killed hang or an unrecorded raised limit; skills applied by workspace rules: project-orientation, test-driven-development, verification-before-completion and muhasabah-gate. |
+
+Correction to the round-2 row: after its intermediate seven-test green run, the new all-runner limit assertion was added; the final focused `test_runner_usage.py` discovery exited 0 with eight passing tests. The full 982-test discovery already included that new case. Earlier evidence is unchanged.
