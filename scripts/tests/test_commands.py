@@ -258,6 +258,7 @@ class Commands(unittest.TestCase):
         self.assertTrue(stderr.startswith("eii: usage error:"), stderr)
         self.assertIn("build-public", stderr)
         import commands.build_public as build_public
+        from eii_custodian.publicdata.fetch.fingerprint import default_roots
         from eii_custodian.publicdata.fetch.registry import load_registry
         from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
@@ -296,7 +297,31 @@ class Commands(unittest.TestCase):
             recorded_argv.append(repr(args))
             env = kwargs.get("env")
             child_environments.append(repr(os.environ if env is None else env))
-            return MagicMock()
+            child = MagicMock()
+            if (
+                isinstance(args, list)
+                and len(args) == 7
+                and args[0] == "git"
+                and args[1] == "-C"
+                and args[3] == "ls-files"
+                and args[4] == "-z"
+                and args[5] == "--"
+            ):
+                root = Path(str(args[2]))
+                names = sorted(
+                    path.relative_to(root).as_posix()
+                    for path in (root / str(args[6])).rglob("*")
+                    if path.is_file()
+                )
+                child.__enter__.return_value = child
+                child.__exit__.return_value = False
+                child.communicate.return_value = (
+                    ("\0".join(names) + "\0" if names else "").encode("utf-8"),
+                    b"",
+                )
+                child.poll.return_value = 0
+                child.returncode = 0
+            return child
 
         stdout_buf = io.StringIO()
         stderr_buf = io.StringIO()
@@ -346,7 +371,32 @@ class Commands(unittest.TestCase):
                         self.assertNotIn(value.encode(), body, name)
                 for name, body in receipts.items():
                     self.assertNotIn(value.encode(), body, name)
-        self.assertEqual(children.call_args_list, [], "unexpected build child")
+        roots = default_roots()
+        git_argv = [
+            "git",
+            "-C",
+            str(roots.code_root),
+            "ls-files",
+            "-z",
+            "--",
+            roots.publicdata.relative_to(roots.code_root).as_posix(),
+        ]
+        unexpected = [
+            call for call in children.call_args_list if call.args != (git_argv,)
+        ]
+        self.assertEqual(unexpected, [], "unexpected build child")
+        self.assertTrue(children.call_args_list, "git listing child not recorded")
+        git_envs = [
+            env
+            for argv, env in zip(recorded_argv, child_environments, strict=True)
+            if argv == repr(git_argv)
+        ]
+        self.assertTrue(git_envs, "git child environment not recorded")
+        planted = repr({"PATH": "/p", "PLANTED_CHILD_KEY": secret})
+        flagged = [env for env in [*git_envs, planted] if secret in env]
+        self.assertEqual(
+            flagged, [planted], "environment sweep must flag a planted child key"
+        )
 
     def test_down_deletes_nothing(self) -> None:
         folder = support.stub_folder(self)

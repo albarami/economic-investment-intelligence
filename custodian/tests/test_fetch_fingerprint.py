@@ -2,17 +2,21 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib
 import json
 import os
 import subprocess
 import sys
+import tempfile
 import textwrap
 import time
 import types
+from collections.abc import Iterator
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from custodian.tests.test_build_resume import (
@@ -22,6 +26,8 @@ from custodian.tests.test_build_resume import (
     entry,
     record,
 )
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.assembly_adapters import Production
@@ -31,6 +37,7 @@ from eii_custodian.publicdata.fetch.fingerprint import (
     EXCLUDED_SCOPES,
     CodeRoots,
     FingerprintUnavailable,
+    _git_tracked,
     _ImportScan,
     _sha256,
     closed_encode,
@@ -252,6 +259,87 @@ def test_tracked_publicdata_missing_leaves_fingerprint_unavailable(
     _interrupt(harness, code_roots=roots)
     item = record(harness)["entries"]["SYN-first"]
     assert item["reuse_unavailable"] == "resume_fingerprint_unavailable"
+
+
+# --- _git_tracked: the option-fixed listing child --------------------------
+
+_SEGMENT = st.from_regex(r"[A-Za-z0-9_.\- ]{1,12}", fullmatch=True).filter(
+    lambda name: name not in {".", ".."}
+)
+
+
+@contextlib.contextmanager
+def _listing_child(
+    body: bytes, returncode: int = 0
+) -> Iterator[list[tuple[tuple[Any, ...], dict[str, Any]]]]:
+    """Record each subprocess.run call and answer the given listing bytes."""
+    seen: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
+
+    def fake_run(*popenargs: Any, **kwargs: Any) -> subprocess.CompletedProcess[bytes]:
+        seen.append((popenargs, kwargs))
+        return subprocess.CompletedProcess(popenargs[0], returncode, body, b"")
+
+    with patch.object(subprocess, "run", fake_run):
+        yield seen
+
+
+@given(
+    names=st.lists(
+        st.lists(_SEGMENT, min_size=1, max_size=4).map("/".join), max_size=12
+    ),
+    trailing=st.booleans(),
+)
+def test_git_tracked_binds_exactly_the_listed_names(
+    names: list[str], trailing: bool
+) -> None:
+    """Any -z listing resolves to exactly its names, under the fixed argv and
+    an environment that cannot carry a credential."""
+    with tempfile.TemporaryDirectory() as folder:
+        root = Path(folder) / "checkout"
+        publicdata = root / "custodian" / "publicdata"
+        listing = "\0".join(names) + ("\0" if names and trailing else "")
+        with _listing_child(listing.encode("utf-8")) as seen:
+            tracked = _git_tracked(root, publicdata)
+    assert tracked == frozenset((root / name).resolve() for name in names if name)
+    (argv,), kwargs = seen[0]
+    assert argv == [
+        "git",
+        "-C",
+        str(root),
+        "ls-files",
+        "-z",
+        "--",
+        "custodian/publicdata",
+    ]
+    assert kwargs["env"] == {"PATH": "/usr/bin:/bin", "LC_ALL": "C"}
+    assert kwargs["capture_output"] and not kwargs["check"]
+
+
+@pytest.mark.parametrize("returncode", [1, 128])
+def test_git_tracked_refuses_a_failed_listing(tmp_path: Path, returncode: int) -> None:
+    root = tmp_path / "checkout"
+    with (
+        _listing_child(b"", returncode),
+        pytest.raises(FingerprintUnavailable, match="tracked_listing_failed"),
+    ):
+        _git_tracked(root, root / "custodian" / "publicdata")
+
+
+def test_git_tracked_refuses_a_spawn_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fail(*popenargs: Any, **kwargs: Any) -> None:
+        raise OSError("invented spawn failure")
+
+    monkeypatch.setattr(subprocess, "run", fail)
+    root = tmp_path / "checkout"
+    with pytest.raises(FingerprintUnavailable, match="tracked_listing_failed"):
+        _git_tracked(root, root / "custodian" / "publicdata")
+
+
+def test_git_tracked_refuses_publicdata_outside_root(tmp_path: Path) -> None:
+    with pytest.raises(FingerprintUnavailable, match="publicdata_outside_root"):
+        _git_tracked(tmp_path, tmp_path.parent / "other")
 
 
 # --- F8 encoder / fingerprint contents ------------------------------------
