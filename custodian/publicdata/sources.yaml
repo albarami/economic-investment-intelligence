@@ -11595,7 +11595,7 @@ sources:
     commit_allowed: false
     release_tables:
     - pub_tender
-    caveat_keys: []
+    caveat_keys: [tender_fetch_own_run]
     columns: []
     reconciliation: none
     skip_reason: ''

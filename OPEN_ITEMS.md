@@ -3073,6 +3073,16 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED: the lead's written rule, in full, that every timed job's brief carries an `IN/CORES` file naming cores recorded in `tmp/cores.reserved` and that a job with no such file refuses rather than falling back to cores 0-3; S5RC-J1's timings rerun on reserved cores before any timing is used.
 - NEEDED BY: the next timed job (S5RC-J1 timings rerun) and the next train ledger.
 
+## OI-370 — tenders own run, pinned pick-up and review binding in the background lane
+
+- ID: OI-370
+- TYPE: OPEN (background lane)
+- RAISED BY: S2-TSKIP builder (Anthropic Claude Opus 5.5), under lead ruling L-1408, 2026-11-21
+- CONCERNS: decision 0084 items 1, 3, 4, 5 and 6; `custodian/src/eii_custodian/publicdata/fetch/own_run.py`; `Production.reviewed_selections`; `confirm_s2_t13.own_run_pending`.
+- EVIDENCE: S2-TSKIP built only the ordinary run's `own_run` skip and the `own_run_pending` absence; any tender pin in the main cache refuses with `own_run_pickup_unbuilt`. The pending binding compares the page's host and a non-empty basis note, because main's committed S2-T13 review and registry row differ on the full page address and the basis note's words, which S2-P40 (decision 0083) rebinds. The ordinary skip notes the tender entry `completed` in the main journal without page proofs (S2-TSEP review RV-F5); a later handoff must refuse such an entry.
+- NEEDED: the `--tenders-only [--resume]` form, the identity-bound pick-up that replaces the `own_run_pickup_unbuilt` refusal, the completed-result handoff, and S2-P40's review binding, carried over from S2-TSEP with their own review; the pending binding then reuses the decision 0083 registry binding.
+- NEEDED BY: the day S7-T09 starts (decision 0084 item 6); no slice S2 gate dependency.
+
 ## S2-P30 — Audit-box dispositions: closing lines — 2026-11-21
 
 These lines close the three entries of the section "S2-P30 — Audit-box dispositions — 2026-11-21" further below, which say they await a different maker's confirmation; the entries themselves are not edited.

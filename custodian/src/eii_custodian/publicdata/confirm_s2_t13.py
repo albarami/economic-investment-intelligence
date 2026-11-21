@@ -289,6 +289,43 @@ def tender_disposition(
     return Disposition(True, "SHOWN", "")
 
 
+def own_run_pending(
+    confirmation: Confirmation,
+    registry: Entry | None,
+    receipt: Mapping[str, object] | None,
+) -> bool:
+    """Allow the own-run source's true absence (decision 0084), never a receipt.
+
+    The binding is every registry field the review records in the same form.
+    The present-receipt binding of ``tender_disposition`` also compares the
+    full page address and the basis note's words; S2-P40 rebinds those two and
+    is not on this base, so the absent case binds the page's host and a
+    non-empty basis note instead.
+    """
+    from .fetch.allowlist import host_of
+    from .fetch.own_run import is_own_run_entry
+
+    _validate(confirmation)
+    t = confirmation.tender
+    return (
+        registry is not None
+        and receipt is None
+        and t.outcome in RECORDED
+        and is_own_run_entry(registry)
+        and registry.key == t.source_id
+        and registry.publisher == t.publisher
+        and registry.fetch_host == host_of(t.page)
+        and registry.terms_url == t.terms_url
+        and registry.licence_id == t.licence_id
+        and registry.licence_basis == t.basis_of_use
+        and registry.decision_record == t.decision_record
+        and registry.period_first == t.period_first
+        and registry.period_last == t.period_last
+        and registry.release_tables == t.release_tables
+        and bool(registry.basis_note.strip())
+    )
+
+
 def completion_evidence(
     confirmation: Confirmation,
     registry: Entry | None,
@@ -304,7 +341,10 @@ def completion_evidence(
     if t.outcome == "not_yet_recorded":
         raise ValueError("incomplete tender confirmation")
     if t.outcome in RECORDED:
-        if not tender_disposition(t, registry, receipt).shown:
+        if (
+            not own_run_pending(confirmation, registry, receipt)
+            and not tender_disposition(t, registry, receipt).shown
+        ):
             raise ValueError("registry and fetched evidence do not confirm tender")
     elif (
         registry is None

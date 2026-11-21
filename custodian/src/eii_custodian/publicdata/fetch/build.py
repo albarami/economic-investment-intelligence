@@ -32,6 +32,7 @@ from eii_custodian.publicdata.fetch.kinds import (
     prepare,
     read_terms_page,
 )
+from eii_custodian.publicdata.fetch.own_run import is_own_run_entry
 from eii_custodian.publicdata.fetch.partitions import (
     PartitionError,
     bounded_partition_reader,
@@ -695,6 +696,20 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
+        if is_own_run_entry(entry):
+            # Decision 0084: no list, page or terms request for the source
+            # that has its own run; its absence is recorded at assembly.
+            lines.append(skip_line(entry.key, "own_run"))
+            if _run is not None:
+                try:
+                    _run.note(entry)
+                except OSError:
+                    failure = FetchFailure(
+                        1, entry.source_id, "", "resume_record_write_failed", "", ""
+                    )
+                    lines.append(fail_line(entry.key, "", failure.check, "", ""))
+                    break
+            continue
         if entry.kind == "register_file":
             lines.append(skip_line(entry.key, "lead_shell_file_input"))
             continue
