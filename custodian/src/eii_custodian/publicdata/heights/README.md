@@ -7,7 +7,7 @@ Every building of the basemap building table
 (`data/assets/buildings/buildings.geojson`) receives a height in the order of
 decision 0023 item A2:
 
-Under proposed decision 0077, that table is the pinned Overture inventory built
+Under decision 0077, that table is the pinned Overture inventory built
 inside the shared public-frame composition. Before reading it, heights checks
 its output hash, method version and source chain against the current run's
 part and STAC pins and boundary snapshot, including their verified receipt
