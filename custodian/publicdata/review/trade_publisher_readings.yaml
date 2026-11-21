@@ -238,6 +238,7 @@ sources:
       - 'HS 2012: data available from 2012 onward'
       - 'HS 2022: data available from 2022 onward'
       - Each downloadable data file includes specific citation requirements.
+      - Atlas users can query data directly through our GraphQL API.
       - The Atlas of Economic Complexity is a freely available public resource. Its data and
         tools are widely used in research, policy analysis, and applied projects. We encourage
         reuse and adaptation, provided that users cite the Atlas and underlying data sources

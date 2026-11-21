@@ -430,3 +430,71 @@ def test_partial_readings_do_not_activate_downloads():
         c.confirmed for c in (atlas_config(), baci_config(), gravity_config())
     )
     assert all(not policy.confirmed for policy in load_policies().values())
+
+
+# Lead access reading 2026-11-21, data-downloads page, quoted exactly.
+ATLAS_DATA_DOWNLOAD_SENTENCES = (
+    "The Atlas of Economic Complexity is a freely available public resource. "
+    "Its data and tools are widely used in research, policy analysis, and "
+    "applied projects. We encourage reuse and adaptation, provided that users "
+    "cite the Atlas and underlying data sources appropriately.",
+    "Each downloadable data file includes specific citation requirements.",
+    "Atlas users can query data directly through our GraphQL API.",
+)
+DATAVERSE_API_LICENCE_VALUE = "CC0 1.0"
+
+
+def atlas_quoted_terms(
+    sentences: tuple[str, ...] = ATLAS_DATA_DOWNLOAD_SENTENCES,
+) -> str:
+    """Return the data-downloads sentences as one quoted terms excerpt."""
+    return " [...] ".join(f'"{sentence}"' for sentence in sentences)
+
+
+def atlas_terms_cells(document: str) -> tuple[str, str, str]:
+    """Return the Atlas quoted terms, basis and evidence cells from document 04."""
+    section = document.split("### S2-T21 part B terms readings", 1)[1]
+    section = section.split("\n## ", 1)[0]
+    row = next(
+        line
+        for line in section.splitlines()
+        if line.startswith("| `atlas_complexity` |")
+    )
+    cells = [cell.strip() for cell in row.split("|")]
+    return cells[2], cells[4], cells[5]
+
+
+def check_atlas_terms(terms_words: str, quoted_terms: str) -> None:
+    """Bind registry terms and the document row to the reading's exact sentences."""
+    expected = atlas_quoted_terms()
+    assert terms_words == expected
+    assert quoted_terms == expected
+
+
+def test_atlas_terms_bind_the_reading_and_reject_an_altered_word() -> None:
+    """Quoted Atlas terms are the data-downloads sentences; an altered word fails."""
+    document = (ROOT / "docs/04_PUBLIC_DATA_PACK.md").read_text()
+    quoted, basis, evidence = atlas_terms_cells(document)
+    entry = next(item for item in load_registry() if item.key == "atlas_complexity")
+    record = readings()["sources"]["atlas_complexity"]
+    page = next(item for item in record["pages"] if item["id"] == "atlas")
+    check_atlas_terms(entry.terms_words, quoted)
+    assert basis == "`dataset`"
+    assert f'Dataverse API licence value "{DATAVERSE_API_LICENCE_VALUE}"' in evidence
+    assert DATAVERSE_API_LICENCE_VALUE not in entry.terms_words
+    assert DATAVERSE_API_LICENCE_VALUE not in quoted
+    assert record["facts"]["licence"] == {
+        "confirmed": True,
+        "value": DATAVERSE_API_LICENCE_VALUE,
+        "page": "atlas_dataverse",
+        "sentence": DATAVERSE_API_LICENCE_VALUE,
+    }
+    for sentence in ATLAS_DATA_DOWNLOAD_SENTENCES:
+        assert sentence in page["sentences"]
+    assert "guestbook is a form of the web interface only" in entry.basis_note
+    assert "not met on the anonymous API path" in entry.basis_note
+    assert "guestbook" not in entry.terms_words
+    assert "guestbook" not in quoted
+    planted = entry.terms_words.replace("freely", "openly", 1)
+    with pytest.raises(AssertionError):
+        check_atlas_terms(planted, quoted.replace("freely", "openly", 1))
