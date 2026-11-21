@@ -168,8 +168,28 @@ def _c8_label(value):
     return " ".join(value.replace("\\", " ").replace("/", " ").split()).casefold()
 
 
+def _c8_block_rows(sheet):
+    """Exactly one English label per block, in column B only; mirrors are text."""
+    starts = []
+    for labels, reason in (
+        ({"both sexes"}, "national_block"),
+        ({"male", "males"}, "sex_block"),
+        ({"female", "females"}, "sex_block"),
+    ):
+        found = [
+            (number, index)
+            for number, row in sheet.rows.items()
+            for index, cell in enumerate(row)
+            if _c8_label(cell) in labels
+        ]
+        if len(found) != 1 or found[0][1] != 1:
+            raise ValueError("C8:" + reason)
+        starts.append(found[0][0])
+    return tuple(starts)
+
+
 def c8_national_counts(sheet):
-    """Table 76's Both Sexes total, selected by labels within its own block."""
+    """Table 76 totals live on the uniquely labelled Both Sexes block row."""
     headers = (
         "Household",
         "Non-Profit",
@@ -184,35 +204,9 @@ def c8_national_counts(sheet):
         _c8_label(sheet.cells.get(f"{column}7", "")) for column in "CDEFGHIJ"
     ) != tuple(_c8_label(label) for label in headers):
         raise ValueError("C8:national_header")
-    blocks = [
-        number
-        for number, row in sheet.rows.items()
-        if any(_c8_label(cell) == "both sexes" for cell in row[:2])
-    ]
-    if blocks != [8]:
-        raise ValueError("C8:national_block")
-    end = next(
-        (
-            number
-            for number, row in sheet.rows.items()
-            if number > blocks[0]
-            and any(
-                _c8_label(cell) in {"male", "males", "female", "females"}
-                for cell in row[:2]
-            )
-        ),
-        max(sheet.rows) + 1,
-    )
-    totals = [
-        number
-        for number, row in sheet.rows.items()
-        if blocks[0] <= number < end
-        and any(_c8_label(cell) == "total" for cell in row[:2])
-    ]
-    if len(totals) != 1:
-        raise ValueError("C8:national_total_label")
+    both_row, _, _ = _c8_block_rows(sheet)
     try:
-        private, total = (D(sheet.cells[f"{column}{totals[0]}"]) for column in "FJ")
+        private, total = (D(sheet.cells[f"{column}{both_row}"]) for column in "FJ")
     except (KeyError, ArithmeticError):
         raise ValueError("C8:national_count") from None
     if (
@@ -223,7 +217,7 @@ def c8_national_counts(sheet):
         or total == 0
     ):
         raise ValueError("C8:national_denominator")
-    return totals[0], private, total
+    return both_row, private, total
 
 
 def _c8_share(private, total, chain, geography):
@@ -252,42 +246,38 @@ def _c8_agrees(actual, expected, reason):
 
 
 def _c8_check_sex_totals(sheet, both_row):
-    """Independent cached-value reconciliation; never evaluate workbook formulas."""
-    labels = ({"male", "males"}, {"female", "females"})
-    starts = [
-        [
-            number
-            for number, row in sheet.rows.items()
-            if any(_c8_label(cell) in names for cell in row[:2])
-        ]
-        for names in labels
-    ]
-    if any(len(block) != 1 for block in starts):
-        raise ValueError("C8:sex_block")
-    sex_rows = []
-    for (start,) in starts:
+    """Independent Fraction checks on cached cells; never use calc or formulas."""
+    starts = _c8_block_rows(sheet)
+
+    def counts(number, reason):
+        try:
+            return tuple(
+                Fraction(sheet.cells[f"{column}{number}"]) for column in "CDEFGHIJ"
+            )
+        except (KeyError, ValueError, ZeroDivisionError):
+            raise ValueError("C8:" + reason) from None
+
+    totals = {
+        start: counts(start, "national_count" if start == both_row else "sex_count")
+        for start in starts
+    }
+    for start in starts:
         end = min(
-            (number for (number,) in starts if number > start),
-            default=max(sheet.rows) + 1,
+            (number for number in starts if number > start), default=max(sheet.rows) + 1
         )
-        totals = [
-            number
-            for number, row in sheet.rows.items()
-            if start <= number < end
-            and any(_c8_label(cell) == "total" for cell in row[:2])
+        activities = [
+            counts(number, "activity_count")
+            for number in sheet.rows
+            if start < number < end and sheet.cells.get(f"A{number}", "").strip()
         ]
-        if len(totals) > 1:
-            raise ValueError("C8:sex_total_label")
-        sex_rows.append(totals[0] if totals else start)
-    for column in "FJ":
-        values = [sheet.cells.get(f"{column}{row}", "") for row in sex_rows]
-        if all(values):
-            try:
-                expected = sum((Fraction(value) for value in values), Fraction(0))
-            except (ValueError, ZeroDivisionError):
-                raise ValueError("C8:sex_count") from None
-            if Fraction(sheet.cells[f"{column}{both_row}"]) != expected:
-                raise ValueError("C8:sex_sum_mismatch")
+        for index, value in enumerate(totals[start]):
+            if value != sum((row[index] for row in activities), Fraction(0)):
+                raise ValueError("C8:activity_sum_mismatch")
+    both, male, female = (totals[start] for start in starts)
+    if any(b != m + f for b, m, f in zip(both, male, female, strict=True)):
+        raise ValueError("C8:sex_sum_mismatch")
+    if both[-1] != sum(both[:-1], Fraction(0)):
+        raise ValueError("C8:national_sector_sum")
 
 
 def test_pinned_c8():

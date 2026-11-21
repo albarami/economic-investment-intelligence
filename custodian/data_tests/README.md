@@ -42,15 +42,19 @@ quotients. Its invented-cache tests are in
 `test_pinned_c8` reads the pinned `census_2020_workbook` and
 `census_zone_sector` through `cache.pinned_body`, which reuses the frame's
 verified receipt reader and the existing named-sheet OOXML reader. National
-coverage comes from sheet `76`, the total row selected by label within the
-"Both Sexes" block; it is not the separate establishment source `est_census`
-or a sum over zones. The sheet reader explicitly accepts stored formula caches;
-formulas are never evaluated, and a formula without a cached value still fails
-with `schema_missing`. Where both sex blocks provide values, plain `Fraction`
-arithmetic checks that national Private and Total each equal Males plus Females,
-using labelled totals within each block (or the sex heading's own values when
-there is no labelled total). A column without values for both sexes omits only
-that reconciliation; the national and zone replay checks still run.
+coverage comes from sheet `76`, the "Both Sexes" block row itself,
+selected by its unique English label in column B. There is no separate "Total"
+row in this table. This is not the separate establishment source `est_census`
+or a sum over zones. Missing, duplicate or misplaced sex-block labels fail;
+both Male and Female blocks are required. Each block ends at the next sex
+label (or sheet end), and its activity rows have nonempty ISIC codes in column
+A; trailing code whitespace and text mirror columns K and L are preserved.
+The sheet reader explicitly accepts stored formula caches; formulas are never
+evaluated, and a formula without a cached value still fails with `schema_missing`.
+Independent plain `Fraction` arithmetic checks each block row against the sum
+of its activity rows in every column C through J, Both Sexes against Male plus
+Female in each of those columns, and the Both Sexes Total against its seven
+sector counts. Missing or nonnumeric counts fail; no reconciliation is omitted.
 The test recomputes each complete zone, checks the seven
 sector counts sum to its total, returns `NO_DATA` for every zone with a null
 sector count, and compares the national share, zone shares and range to plain
