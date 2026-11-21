@@ -509,6 +509,54 @@ def test_municipality_cache_reaches_publication(tmp_path: Path, monkeypatch):
     assert table["rows"][0]["municipality_code"] == "SYN042"
 
 
+def test_municipality_cache_reaches_native_assembly(tmp_path: Path, monkeypatch):
+    from eii_custodian.publicdata.assembly_adapters import Production
+    from eii_custodian.publicdata.assembly_native import read_investment
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    c, page, row, document, path, _good = specimen(tmp_path)
+    root = tmp_path / "run"
+    cache = root / "data/public_cache"
+    target = cache / "review/municipality_codes.csv"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(invented_municipality_codes())
+    row.update(
+        column="municipality_code",
+        target_key="SYN042",
+        target_resource=target.name,
+        target_sha256=sha256_hex(target.read_bytes()),
+    )
+    path.write_text(json.dumps(document))
+    monkeypatch.setattr(c, "_REVIEW", tmp_path)
+    # A dropped cache argument must fail without reading the repository cache.
+    monkeypatch.setattr(c, "_CACHE", tmp_path / "unused-cache")
+    entry = b._fdi_entry()
+    with monkeypatch.context() as publication:
+        assert b._run(root, publication, entry, {b.DASHBOARD_URL: page.body}) == 0
+    pointer, _, table = b._batch(root, entry.source_id)
+    raw_identity = sha256_hex(page.body)
+    build = Production(
+        entries=(entry,),
+        cache=cache,
+        review=tmp_path,
+        root=root,
+        transport=lambda _url: pytest.fail("native assembly must stay offline"),
+        clock=lambda: b.RETRIEVED,
+        sleep=lambda _seconds: None,
+        seed=0,
+        environ={},
+    )
+    build.receipts[entry.key] = read_snapshot(cache / entry.key, raw_identity).sidecar
+
+    read_investment(build, entry, raw_identity, pointer["manifest_sha256"])
+
+    assert build.tables["fdi_projects"] == table["rows"]
+    assert build.tables["fdi_projects"][0]["municipality_code"] == "SYN042"
+    assert build.tables["fdi_projects"][0]["mapping_coverage"]["municipality_code"] == (
+        "reviewed"
+    )
+
+
 @pytest.mark.parametrize("plant", ["missing", "file_symlink", "directory_symlink"])
 def test_municipality_cached_target_refuses_missing_or_link(tmp_path: Path, plant):
     c, _page, row, document, path, _good = specimen(tmp_path)
