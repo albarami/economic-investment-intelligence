@@ -1028,8 +1028,8 @@ def _execute(
             return HostDecision(True, decision.host, "https", "")
         return decision
 
-    def loading(source_id: str, *, url: str) -> object:
-        spec = load_source_spec(source_id, url=url)
+    def loading(source_id: str, *, url: str, cache: Path | None = None) -> object:
+        spec = load_source_spec(source_id, url=url, cache=cache)
         if source_id != "investqa_pages" or isinstance(spec, InvestmentFailure):
             return spec
         chosen = (

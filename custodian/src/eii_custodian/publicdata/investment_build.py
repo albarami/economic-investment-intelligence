@@ -106,7 +106,7 @@ def publish_investment(
     """Parse one investment source after its fetch. Other sources are untouched."""
     if entry.source_id not in INVESTMENT_SOURCES:
         return None
-    spec = load_source_spec(entry.source_id, url=entry.url)
+    spec = load_source_spec(entry.source_id, url=entry.url, cache=cache)
     if isinstance(spec, InvestmentFailure):
         return _refuse(cache, entry.source_id, spec)
     if not spec.bounds.confirmed:
@@ -148,7 +148,9 @@ def publish_investment(
     return None
 
 
-def load_source_spec(source_id: str, *, url: str) -> SourceSpec | InvestmentFailure:
+def load_source_spec(
+    source_id: str, *, url: str, cache: Path | None = None
+) -> SourceSpec | InvestmentFailure:
     """Load the reviewed page specification. An unknown key cannot publish."""
     if not _PAGES.is_file():
         return InvestmentFailure(
@@ -177,7 +179,7 @@ def load_source_spec(source_id: str, *, url: str) -> SourceSpec | InvestmentFail
             1, source_id, url, "inventory_schema", "investment_pages.v2", "unsupported"
         )
     if source_id == "fdi_projects":
-        return _dashboard_spec(row, url)
+        return _dashboard_spec(row, url, cache=cache)
     return _agency_spec(row, url)
 
 
@@ -867,7 +869,7 @@ def _period_failure(
 
 
 def _dashboard_spec(
-    row: Mapping[str, object], url: str
+    row: Mapping[str, object], url: str, *, cache: Path | None = None
 ) -> SourceSpec | InvestmentFailure:
     for name in ("country_iso3", "municipality_code", "place_key"):
         if row.get(name, {}) != {}:
@@ -879,7 +881,7 @@ def _dashboard_spec(
                 "identifier crosswalk",
                 "legacy map",
             )
-    crosswalk = load_crosswalk()
+    crosswalk = load_crosswalk(cache)
     if isinstance(crosswalk, InvestmentFailure):
         return replace(crosswalk, url=url)
     confirmation = _confirmation(row.get("confirmation"), "fdi_projects", url)

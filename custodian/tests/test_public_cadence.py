@@ -1,6 +1,7 @@
 """Offline schedules use invented UTC clocks, never source-period frequency."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 import yaml
@@ -15,7 +16,8 @@ from eii_custodian.publicdata.fetch.registry import (
 def test_registry_cadence_closed():
     entries = load_registry()
     assert all(entry.refetch for entry in entries)
-    assert next(e for e in entries if e.key == "prop_sales").refetch.value == "weekly"
+    for key in ("prop_sales", "prop_resi_units"):
+        assert next(e for e in entries if e.source_id == key).refetch.value == "weekly"
 
 
 @pytest.mark.parametrize(
@@ -263,3 +265,29 @@ def test_trade_manifest_omits_absent_family(tmp_path, kind):
     assert "family" not in manifest["entry"]["refetch"]
     reader = importlib.import_module("eii_custodian.publicdata." + kind + ".contracts")
     assert reader.read_selected(fixture_cache, digest).manifest == manifest
+
+
+@pytest.mark.parametrize(
+    "family", ["investment_pages", "tender_notices", "event_pages", "incentive_windows"]
+)
+@pytest.mark.parametrize("checked", ["2024-01-31T15:00:00Z", "2024-01-31T00:00:00Z"])
+def test_daily_due_is_0300_asia_qatar(family, checked):
+    from eii_custodian.publicdata.fetch.cadence import due_source, parse_cadence
+
+    rule = parse_cadence(
+        {"value": "daily", "family": family, "evidence": "syn-schedule"}
+    )
+    midnight = datetime(2024, 2, 1, tzinfo=UTC)
+    checks = ["2024-01-30T00:00:00Z", checked]
+    before = due_source(
+        rule, checks, clock=lambda: midnight - timedelta(microseconds=1)
+    )
+    assert before.due_at == midnight
+    assert before.status == "not_due"
+    result = due_source(rule, checks, clock=lambda: midnight)
+    assert result.due_at == midnight
+    assert result.status == "due"
+    assert result.due_at.astimezone(ZoneInfo("Asia/Qatar")).hour == 3
+    reset = due_source(rule, [*checks, midnight.isoformat()], clock=lambda: midnight)
+    assert reset.status == "not_due"
+    assert reset.due_at == midnight + timedelta(days=1)

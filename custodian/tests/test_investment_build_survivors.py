@@ -128,8 +128,9 @@ def test_publish_refusals_preserve_source_and_all_text(
         6, "fdi_projects", entry.url, "SYN-read", "SYN-want", "SYN-got"
     )
 
-    def loading(source_id: str, *, url: str) -> InvestmentFailure:
+    def loading(source_id: str, *, url: str, cache: Path) -> InvestmentFailure:
         assert source_id == "fdi_projects"
+        assert cache == tmp_path
         assert url == "https://dashboard.invalid/"
         return failure
 

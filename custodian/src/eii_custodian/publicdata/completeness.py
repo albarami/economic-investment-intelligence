@@ -7,6 +7,8 @@ tasks' component inventories and verified output/table references.
 
 from __future__ import annotations
 
+import csv
+import io
 import re
 from collections.abc import Mapping, Sequence, Set
 from dataclasses import dataclass, replace
@@ -353,7 +355,7 @@ def check(
 def committed_derived_check(
     files: Mapping[str, object], entries: Sequence[Entry]
 ) -> Record:
-    """Inspect only caller-supplied committed files declaring a source_id (B15)."""
+    """Inspect declared source IDs in committed objects and review CSV rows (B15)."""
     records: Record = []
 
     def visit(name: str, value: object) -> None:
@@ -380,5 +382,7 @@ def committed_derived_check(
                 visit(name, child)
 
     for name, value in files.items():
+        if name.endswith(".csv") and isinstance(value, str):
+            value = list(csv.DictReader(io.StringIO(value), strict=True))
         visit(name, value)
     return records

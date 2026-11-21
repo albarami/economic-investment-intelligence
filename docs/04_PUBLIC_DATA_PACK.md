@@ -1114,9 +1114,10 @@ date rule requires recorded publisher evidence or an EII schedule family; `none`
 Unconfirmed frequencies use `none` with `frequency_unconfirmed`. A source's
 observation period is not evidence of its publication frequency. The weekly sales
 bulletins are weekly. `fetch.cadence.due_registry` is an offline Python interface
-with an injected UTC clock: daily means elapsed UTC days (03:00 Asia/Qatar,
-00:00 UTC); weekly means elapsed weeks; monthly, quarterly and
-annual mean calendar anniversaries with end-of-month clamping. A successful
+with an injected UTC clock: daily is due at the first 00:00 UTC boundary
+(03:00 Asia/Qatar) strictly after the latest successful check, including when
+that check is exactly at midnight (lead ruling L-1324); weekly means elapsed weeks;
+monthly, quarterly and annual mean calendar anniversaries with end-of-month clamping. A successful
 identical-byte check resets the anniversary. Never fetched is due;
 `as_published` returns `publication_check_required`; `none` returns an exclusion
 and its reason. The schedule does not select release inputs or change nightly
@@ -1125,14 +1126,42 @@ source eligibility.
 The optional closed `family` inside `refetch` records EII's check schedule,
 not publisher frequency (S2-T27, decision 0045 item 4 as supplied in the task).
 `investment_pages` is daily for `fdi_projects` and `investqa_pages`;
-`registers` is weekly for `lic_active`, `lic_cancelled` and `lic_issued`;
+`registers` is weekly for `biz_register`, `fc_register`, `lic_active`,
+`lic_cancelled` and `lic_issued`;
 `overture_release` is monthly for every `places_ovt` and `bldg_ovt` row.
-The closed families `tender_notices`, `event_pages`, `incentive_windows` (daily),
-`gis_layers`, `supplier_credentials` (weekly), `register_snapshots` (monthly)
-have no registry rows yet. `statistical_series` requires a publisher-stated
+`event_pages` is daily for `events_visit_qatar` and `events_qncc`;
+`supplier_credentials` is weekly for `suppliers_tawteen` and `monaqasat_classified`;
+`award_reports` is weekly for `awards_owner_scrape`.
+The closed families `tender_notices`, `incentive_windows` (daily),
+`gis_layers` (weekly) and `register_snapshots` (monthly) have no registry rows yet.
+`statistical_series` requires a publisher-stated
 publication-driven schedule with `as_published`; none is recorded for a current
 row. Statistical rows retain `none`, `frequency_unconfirmed` and no family.
 Weekly sales bulletins retain weekly with no family. No other row takes a family.
+
+The code-only FDI municipality target is a derived file at
+`data/public_cache/review/municipality_codes.csv`, alongside other local review
+files such as district aliases. It is never committed (decision 0026 item 5,
+decision 0034 item 2; lead ruling L-1324). Its `target_sha256` in each reviewed
+`fdi_crosswalks.yaml` mapping pins the exact CSV bytes. The reader verifies that
+hash on every read and never substitutes a file beside the committed crosswalk.
+The public build and release assembly pass their cache root to the reader;
+standalone specification reads use the repository's public cache. The empty
+mapping list needs no target file and continues to leave those slots null.
+
+The lead alone produces the local target through
+`investment_crosswalk.write_municipality_codes(cache, entry, digest=identity)`,
+where `entry` is the `bnd_zone_2020` registry row and `identity` is its reviewed
+snapshot identity from `fetch.snapshots.reviewed_selections(cache)`. This offline
+code path reads the named snapshot through the verified frame cache reader,
+extracts distinct `MUNICIPAL_CODE` values without names, sorts them and atomically
+writes the CSV under `cache/review/`. Each row carries the source ID, the verified
+source body hash and its recorded retrieval UTC. The function returns the CSV's
+SHA-256 for the lead's review; it does not create or approve a mapping. Tests use
+invented source snapshots and invented code-only CSVs of this shape. The commit
+policy check also inspects source declarations in tracked review CSV rows and
+refuses rows whose declared source is absent from the registry or is not allowed
+for an open dataset.
 
 The lead supplies `snapshot_pins.json` in the public cache as an explicit map
 from registry entry key to reviewed hash for frame, activity/graph, places and

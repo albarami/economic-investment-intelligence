@@ -404,9 +404,9 @@ def test_project_archive_forwards_url_and_parser_version(
     actual_load = investment_build.load_source_spec
     actual_parse = evidence.parse_fdi
 
-    def loading(source_id: str, *, url: str):
+    def loading(source_id: str, *, url: str, cache: Path | None = None):
         assert (source_id, url) == (PROJECT, DASHBOARD_URL)
-        return actual_load(source_id, url=url)
+        return actual_load(source_id, url=url, cache=cache)
 
     def parsing(body, dashboard, base):
         assert base.method == "eii_custodian.publicdata.investment_parse.parse_fdi"

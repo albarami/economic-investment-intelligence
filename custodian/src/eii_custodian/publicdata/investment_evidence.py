@@ -79,7 +79,9 @@ def build_cache_evidence(
         snapshot = read_snapshot(cache / selection.key, selection.identity)
         if selection.identity != snapshot.sha256:
             return _snapshot_failure(snapshot, "raw snapshot identity", "mismatch")
-        item = _parse_project_snapshot(snapshot, coverage=selection.coverage)
+        item = _parse_project_snapshot(
+            snapshot, coverage=selection.coverage, cache=cache
+        )
         if isinstance(item, InvestmentFailure):
             return item
         snapshots.append(item)
@@ -142,7 +144,7 @@ def build_cache_evidence(
         )
 
     evidence = build_project_evidence(
-        tuple(snapshots), tuple(candidates), tuple(reviewed_links)
+        tuple(snapshots), tuple(candidates), tuple(reviewed_links), cache=cache
     )
     if isinstance(evidence, InvestmentFailure):
         return evidence
@@ -152,6 +154,7 @@ def build_cache_evidence(
         attempts,
         snapshots=tuple(snapshots),
         archives=tuple(archives),
+        cache=cache,
     )
     if isinstance(audit, InvestmentFailure):
         return audit
@@ -159,7 +162,7 @@ def build_cache_evidence(
 
 
 def _parse_project_snapshot(
-    snapshot: Snapshot, *, coverage: Mapping[str, object]
+    snapshot: Snapshot, *, coverage: Mapping[str, object], cache: Path | None = None
 ) -> ProjectSnapshot | InvestmentFailure:
     """Parse one raw dashboard body; no caller-supplied row is evidence."""
     from eii_custodian.publicdata.investment_build import load_source_spec
@@ -176,7 +179,7 @@ def _parse_project_snapshot(
         or not url
     ):
         return _snapshot_failure(snapshot, "project archive metadata", "mismatch")
-    spec = load_source_spec(source_id, url=url)
+    spec = load_source_spec(source_id, url=url, cache=cache)
     if isinstance(spec, InvestmentFailure):
         return spec
     if spec.dashboard is None:
@@ -256,6 +259,7 @@ def build_project_evidence(
     reviewed_links: tuple[ReviewedMilestoneLink, ...] = (),
     *,
     observed_investment: tuple[ObservedInvestment, ...] = (),
+    cache: Path | None = None,
 ) -> ProjectEvidence | InvestmentFailure:
     """Link source-scoped project IDs across immutable, explicitly named snapshots."""
     seen_snapshots: set[str] = set()
@@ -276,7 +280,7 @@ def build_project_evidence(
         item = replace(item, rows=tuple(dict(row) for row in item.rows))
         # A Snapshot keeps the caller rows. Parser rows replace them.
         authenticated: ProjectSnapshot | Snapshot | InvestmentFailure = (
-            _metadata_failure(item)
+            _metadata_failure(item, cache=cache)
         )
         if isinstance(authenticated, InvestmentFailure):
             return authenticated
@@ -401,6 +405,7 @@ def audit_project_evidence(
     *,
     snapshots: tuple[ProjectSnapshot, ...] = (),
     archives: tuple[VerifiedArchive, ...] = (),
+    cache: Path | None = None,
 ) -> EvidenceAudit | InvestmentFailure:
     """Project every retained row, absence and fetch outcome into the S2 audit."""
     attempt_by_key: dict[tuple[str, str], FetchAttempt] = {}
@@ -412,10 +417,12 @@ def audit_project_evidence(
     verified_archives = _audit_archives(snapshots, archives, evidence.milestones)
     if isinstance(verified_archives, InvestmentFailure):
         return verified_archives
-    canonical_snapshots = _audit_project_snapshots(verified_archives, snapshots)
+    canonical_snapshots = _audit_project_snapshots(
+        verified_archives, snapshots, cache=cache
+    )
     if isinstance(canonical_snapshots, InvestmentFailure):
         return canonical_snapshots
-    canonical_projects = build_project_evidence(canonical_snapshots)
+    canonical_projects = build_project_evidence(canonical_snapshots, cache=cache)
     if isinstance(canonical_projects, InvestmentFailure):
         return canonical_projects
     unauthenticated = _refuse_unauthenticated_audit(evidence, expected, attempts)
@@ -611,6 +618,8 @@ def _audit_archives(
 def _audit_project_snapshots(
     archives: tuple[VerifiedArchive, ...],
     supplied: tuple[ProjectSnapshot, ...],
+    *,
+    cache: Path | None = None,
 ) -> tuple[ProjectSnapshot, ...] | InvestmentFailure:
     """Derive expected revisions and absences from verified dashboard bytes."""
     coverage: dict[str, Mapping[str, object]] = {}
@@ -621,7 +630,7 @@ def _audit_project_snapshots(
         if archive.kind != "project":
             continue
         parsed = _parse_project_snapshot(
-            archive.snapshot, coverage=coverage.get(archive.identity, {})
+            archive.snapshot, coverage=coverage.get(archive.identity, {}), cache=cache
         )
         if isinstance(parsed, InvestmentFailure):
             return parsed
@@ -1251,7 +1260,9 @@ def _candidate_failure(
     )
 
 
-def _metadata_failure(item: ProjectSnapshot) -> ProjectSnapshot | InvestmentFailure:
+def _metadata_failure(
+    item: ProjectSnapshot, *, cache: Path | None = None
+) -> ProjectSnapshot | InvestmentFailure:
     """Return the authenticated parser snapshot after archived-row equality."""
     snapshot = _reread_snapshot(item.snapshot, item.identity)
     side = snapshot.sidecar
@@ -1318,7 +1329,7 @@ def _metadata_failure(item: ProjectSnapshot) -> ProjectSnapshot | InvestmentFail
                 "matching source metadata",
                 "mismatch",
             )
-    canonical = _parse_project_snapshot(snapshot, coverage=item.coverage)
+    canonical = _parse_project_snapshot(snapshot, coverage=item.coverage, cache=cache)
     if isinstance(canonical, InvestmentFailure):
         return canonical
     if (

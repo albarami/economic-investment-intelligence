@@ -9,6 +9,7 @@ committed files and fail if one comes back; each carries its planted violation.
 from __future__ import annotations
 
 import re
+import subprocess
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -129,3 +130,63 @@ def test_local_alias_file_rows_reach_join_districts(tmp_path: Path) -> None:
     assert join_districts(
         districts, changed, census, district_aliases(review, cache)
     ) == ({(42, 73): "SYN042042009"}, [])
+
+
+def _tracked_review_csvs(root: Path) -> dict[str, str]:
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", "custodian/publicdata/review/*.csv"],
+        cwd=root,
+        capture_output=True,
+        check=True,
+    )
+    files = {}
+    for name in result.stdout.decode().split("\0"):
+        if name and (root / name).is_file():
+            files[name] = (root / name).read_text(encoding="utf-8")
+    return files
+
+
+def test_tracked_review_csv_from_non_open_source_is_refused(tmp_path: Path) -> None:
+    """A staged review CSV is still fetched content; never a licence exception."""
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.completeness import committed_derived_check
+
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    name = "custodian/publicdata/review/invented_codes.csv"
+    path = tmp_path / name
+    path.parent.mkdir(parents=True)
+    path.write_text("municipality_code,source_id,source_sha256,retrieved_utc\n")
+    subprocess.run(["git", "add", "--", name], cwd=tmp_path, check=True)
+    entries = load_registry()
+    assert committed_derived_check(_tracked_review_csvs(tmp_path), entries) == []
+    path.write_text(
+        path.read_text()
+        + "SYN042,bnd_zone_2020,"
+        + "a" * 64
+        + ",2024-01-31T15:00:00Z\n"
+    )
+    subprocess.run(["git", "add", "--", name], cwd=tmp_path, check=True)
+    files = _tracked_review_csvs(tmp_path)
+    assert name in files
+    expected = [{"id": name, "state": "failed", "reason": "committed_source_value"}]
+    assert committed_derived_check(files, entries) == expected
+    opened = [
+        replace(
+            row,
+            licence_basis="dataset",
+            licence_id="Invented open licence",
+            commit_allowed=True,
+        )
+        for row in entries
+        if row.source_id == "bnd_zone_2020"
+    ]
+    assert committed_derived_check(files, opened) == []
+    assert committed_derived_check(files, []) == expected
+
+
+def test_tracked_review_csvs_follow_commit_policy() -> None:
+    from eii_custodian.publicdata.completeness import committed_derived_check
+
+    root = repository_root(Path(__file__))
+    assert committed_derived_check(_tracked_review_csvs(root), load_registry()) == []

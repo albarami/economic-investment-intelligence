@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -11,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.fetch.registry import RegistryError, read_yaml
+from eii_custodian.publicdata.fetch.registry import Entry, RegistryError, read_yaml
 from eii_custodian.publicdata.investment_contracts import (
     InvestmentFailure,
     SourceEnvelope,
@@ -44,6 +45,7 @@ _HASH = re.compile(r"[a-f0-9]{64}")
 _FILE = re.compile(r"[a-z][a-z0-9_-]*\.(?:csv|yaml)")
 _REFERENCE = re.compile(r"[A-Za-z0-9_:-]+")
 _REVIEW = Path(__file__).resolve().parents[3] / "publicdata/review"
+_CACHE = _REVIEW.parents[2] / "data/public_cache"
 
 
 @dataclass(frozen=True)
@@ -74,11 +76,12 @@ def _failure(check: str) -> InvestmentFailure:
 
 
 def read_crosswalk(
-    path: Path, *, expected_sha256: str
+    path: Path, *, expected_sha256: str, cache: Path | None = None
 ) -> ReviewedCrosswalk | InvestmentFailure:
     """Check a crosswalk against the caller's hash and validate its Public targets.
 
-    Target resources are direct files beside the crosswalk, pinned per mapping.
+    Municipality codes live only in the supplied cache/review directory.
+    Other targets are direct files beside the crosswalk, pinned per mapping.
     Only target keys are read, never a name-matching map or target review flags.
     The caller supplies the expected hash; this reader does not establish its
     approval or bind it to a separate trusted manifest.
@@ -112,7 +115,7 @@ def read_crosswalk(
                 and (snapshot, identifier, column) in seen
             ):
                 return _failure("crosswalk_duplicate")
-        checked = _mapping(item, path.parent)
+        checked = _mapping(item, path.parent, cache)
         if isinstance(checked, InvestmentFailure):
             return checked
         key = (checked.snapshot_sha256, checked.project_id, checked.column)
@@ -130,7 +133,7 @@ def read_crosswalk(
     return ReviewedCrosswalk(expected_sha256, tuple(found))
 
 
-def load_crosswalk() -> ReviewedCrosswalk | InvestmentFailure:
+def load_crosswalk(cache: Path | None = None) -> ReviewedCrosswalk | InvestmentFailure:
     """Load the review file using a hash computed from its current bytes.
 
     The hash checks read consistency, not approval against an independent pin.
@@ -141,10 +144,14 @@ def load_crosswalk() -> ReviewedCrosswalk | InvestmentFailure:
         digest = sha256_hex(path.read_bytes())
     except OSError:
         return _failure("crosswalk_hash")
-    return read_crosswalk(path, expected_sha256=digest)
+    return read_crosswalk(
+        path, expected_sha256=digest, cache=_CACHE if cache is None else cache
+    )
 
 
-def _mapping(item: object, directory: Path) -> MappingRow | InvestmentFailure:
+def _mapping(
+    item: object, directory: Path, cache: Path | None
+) -> MappingRow | InvestmentFailure:
     if not isinstance(item, dict) or set(item) != _FIELDS:
         return _failure("crosswalk_schema")
     identifier = item["project_id"]
@@ -181,6 +188,14 @@ def _mapping(item: object, directory: Path) -> MappingRow | InvestmentFailure:
     resource = item["target_resource"]
     if resource == "municipality_names.csv" or _FILE.fullmatch(resource) is None:
         return _failure("name_derived_key")
+    if resource == "municipality_codes.csv":
+        if cache is None:
+            return _failure("crosswalk_target")
+        directory = cache / "review"
+        if directory.is_symlink() or any(
+            parent.is_symlink() for parent in directory.parents
+        ):
+            return _failure("crosswalk_target")
     target_path = directory / resource
     try:
         if target_path.is_symlink():
@@ -276,3 +291,45 @@ def source_membership(
             envelope, "crosswalk_source_value", "present source identifier", "absent"
         )
     return None
+
+
+def write_municipality_codes(cache: Path, entry: Entry, *, digest: str) -> str:
+    """Lead-shell offline extract from a reviewed, verified bnd_zone_2020 snapshot.
+
+    Like the district aliases, derived rows stay in the uncommitted cache/review
+    directory. Return the target SHA-256 for each lead-reviewed crosswalk row;
+    no source values or guessed retrieval dates are embedded in this module.
+    """
+    from eii_custodian.publicdata.frame.build import read_cached
+    from eii_custodian.publicdata.frame.layers import layer_rows
+
+    if entry.source_id != "bnd_zone_2020":
+        raise ValueError("municipality_codes_source")
+    payload, receipt = read_cached(cache, entry, digest=digest)
+    rows = layer_rows(entry.source_id, payload)
+    buffer = io.StringIO(newline="")
+    writer = csv.writer(buffer, lineterminator="\n")
+    writer.writerow(
+        ("municipality_code", "source_id", "source_sha256", "retrieved_utc")
+    )
+    for code in sorted({row["MUNICIPAL_CODE"] for row in rows}):
+        writer.writerow(
+            (code, entry.source_id, receipt["sha256"], receipt["retrieved_utc"])
+        )
+    body = buffer.getvalue().encode("utf-8")
+    directory = cache / "review"
+    if directory.is_symlink() or any(
+        parent.is_symlink() for parent in directory.parents
+    ):
+        raise ValueError("municipality_codes_path")
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "municipality_codes.csv"
+    partial = directory / ".municipality_codes.csv.partial"
+    if path.is_symlink() or partial.is_symlink():
+        raise ValueError("municipality_codes_path")
+    try:
+        partial.write_bytes(body)
+        os.replace(partial, path)
+    finally:
+        partial.unlink(missing_ok=True)
+    return sha256_hex(body)
