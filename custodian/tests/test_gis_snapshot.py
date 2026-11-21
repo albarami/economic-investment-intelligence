@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 import warnings
+from base64 import b64decode
 from copy import deepcopy
 from itertools import pairwise
+from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
 
@@ -339,6 +341,36 @@ def fixture_archive(tmp_path):
         },
     )
     return archive, archive.write_shard(0, {(10, 0, 0): JPEG}, STAMP)
+
+
+def test_assembled_release_equals_product_imagery_fixture(tmp_path):
+    from eii_custodian.publicdata.gis.snapshot_release import assemble
+
+    fixture = (
+        Path(__file__).resolve().parents[2] / "product/tests/fixtures/released_imagery"
+    )
+    assert (fixture / "tile.jpg").read_bytes() == JPEG
+    archive, _ = fixture_archive(tmp_path / "acquisition")
+    manifest = archive.complete([0], STAMP)
+    selection = verify_selection(archive.root, manifest)
+    assert tuple(selection.iter_tiles()) == (("1995-02", 10, 0, 0, JPEG),)
+    output = tmp_path / "release"
+    identity = assemble((selection,), output)
+    expected = fixture / "release"
+    assert identity == next(expected.glob("*.json")).stem
+    assert {
+        path.relative_to(output): path.read_bytes()
+        for path in output.rglob("*")
+        if path.is_file()
+    } == {
+        path.relative_to(expected).with_suffix("")
+        if path.suffix == ".b64"
+        else path.relative_to(expected): b64decode(path.read_bytes())
+        if path.suffix == ".b64"
+        else path.read_bytes()
+        for path in expected.rglob("*")
+        if path.is_file()
+    }
 
 
 def test_immutable_shard_receipt_and_resume(tmp_path):

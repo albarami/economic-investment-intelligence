@@ -45435,3 +45435,131 @@ Final ledger checks after the S2-T51 evidence append: `python3 scripts/check_doc
 - `custodian-suite`: exit 1; `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=79 -rf custodian/tests`; cwd `.`.
 - `current-progress-6`: exit 0; `python3 -c 'from pathlib import Path; import datetime; print(datetime.datetime.now(datetime.UTC).isoformat()); print("\n".join(Path(".overnight/tmp/f5/custodian-suite.log").read_text().splitlines()[-4:]))'`; cwd `.`.
 - `compare-failure-ids`: exit 0; `python3 .overnight/tmp/f5/compare.py`; cwd `.`.
+
+
+## S2-T51 fix 6 — Released-imagery test plane boundary — 2026-11-21
+
+- Maker/model: OpenAI Codex / GPT-6; exact serving variant unavailable.
+- Builder persona: senior Python test engineer for the two-plane boundary.
+  Strict self-review persona: rejects weakened assertions, skips, moved tests and
+  cross-plane imports. Self-review APPROVE for this scoped change; no independent
+  different-maker verdict is claimed. Muhasabah PASS.
+- Loaded skills: project-orientation, task-standards, github-flow,
+  strict-reviewer, sanad-provenance, muhasabah-gate. Named Superpowers skills were
+  unavailable; their test-driven-development, systematic-debugging and
+  verification-before-completion practices were applied directly.
+- Base commit: `7ad369aa63758008f9a145578ff14a38e6627d54`; tests ran on the uncommitted task worktree.
+  File SHA-256 identities and original ledger prefix are pinned in
+  `.overnight/tmp/f6/tested-state.json`. Git staging exited 128 because this
+  checkout's Git metadata is read-only. No commit was possible; no push was attempted.
+- Environment: Linux; Python 3.14.6; pytest 9.2.0; hypothesis 6.170.15;
+  rasterio 1.5.2. Seed `1313296242` for recorded pytest checks. UV_OFFLINE=1,
+  UV_NO_SYNC=1, PYTHONDONTWRITEBYTECODE=1, EII_DECISION_PROVIDER=none;
+  temporary paths and tool caches for recorded checks live under
+  `.overnight/tmp/f6/`. No network or dependency/pin change was used.
+- Authority/scope: `.overnight/BRIEF.md`; AGENTS.md rule 11; ARC-06;
+  document 08 BE-02 and BE-05; decision 0079 item 4; TASKS.md S2-T51.
+
+Product tests now copy an invented committed release and decode its stored TAR
+from base64 using the standard library. No build-plane import remains under
+product/. The product reader and all its original assertions/refusals are unchanged.
+
+The new custodian test `test_assembled_release_equals_product_imagery_fixture`
+builds the same invented archive, calls the real `verify_selection()` and
+`assemble()`, checks the selected tile bytes and manifest identity, then compares
+the complete relative file set and every byte against the decoded product fixture,
+including both receipts. A changed manifest, changed archive, missing receipt,
+extra file or changed JPEG each fails the planted proof. Base64 preserves the
+original TAR bytes/hash while satisfying the existing identifier guard.
+
+
+Files:
+
+- `product/tests/test_released_imagery.py`.
+- `custodian/tests/test_gis_snapshot.py`.
+- `product/tests/fixtures/released_imagery/README.md` and `tile.jpg`.
+- `product/tests/fixtures/released_imagery/release/`: one manifest plus three
+  object JSON files and one `.tar.b64` object (five decoded release files).
+- `PROGRESS.md`: one appended block. `.overnight/RETURN.md`: requested report.
+
+
+Results (the final suites were rerun after the fixture's transport encoding changed):
+
+| Check | Exit | Result |
+|---|---|---|
+| Product suite | 0 | 816 passed; zero failed/skipped |
+| Custodian selection `gis or imagery or snapshot` | 0 | 1558 passed; 8836 deselected; zero failed/skipped; 192 warnings |
+| Product imagery with Python `-P` | 0 | 7 passed |
+| Restored fixture-equality contract | 0 | 1 passed; 295 deselected; 1 warning |
+| Five planted fixture defects | 1 each | Each rejected: 1 failed, 295 deselected; harness exit 0; bytes restored |
+| `uv run --locked ruff check .` | 0 | All checks passed |
+| `uv run --locked ruff format --check .` | 0 | 912 files formatted |
+| `uv run --locked mypy` | 0 | 487 source files checked |
+| `python3 scripts/check_docs.py` | 0 | 1234 text files; 134 Markdown files |
+| `cmp AGENTS.md CLAUDE.md` | 0 | Byte-identical |
+| Product import grep | 1 | Zero matches; AST audit also found zero forbidden imports in 50 Python files |
+| Assertion/refusal AST comparison | 0 | All 20 checks in all 7 original product tests unchanged |
+| `git diff --check` | 0 | No whitespace errors |
+| Original product imagery with `-P`, before fix | 2 | Collection error reproduced: 1 error |
+| Contract before fixture creation | 1 | 1 failed; 295 deselected |
+| Initial documentation guard | 1 | 2 findings in raw TAR numeric headers; resolved through reversible base64 encoding |
+| `git add` for the task files | 128 | Read-only Git metadata; no commit or push |
+
+
+The exploratory initial direct imagery run also passed (exit 0, seven tests,
+six warnings), showing why the unsafe import was hidden outside the runner's
+safe-path mode. Its automatic seed was not printed by quiet mode, so qualification
+uses the recorded explicit-seed reproduction and final checks instead. Earlier required
+suites on the raw fixture passed with the same final pass/deselection counts.
+No assertion, refusal, suite membership, privacy rule, skip, retry or time limit
+was weakened. No live acquisition or whole-test qualification is claimed.
+No new unresolved decision or random failure was found. Existing independent
+review, whole-test/merge and lead-operation gates remain with the lead.
+
+Evidence: `.overnight/tmp/f6/commands.jsonl`, per-command logs, `plant.py`,
+`assertion_audit.py`, and `tested-state.json`. Logs redact local paths and
+identifier-shaped TAR-header text while preserving real exits/failure reasons.
+The original PROGRESS.md prefix is preserved byte-for-byte.
+
+Recorded commands (all from the repository root; seed and environment above):
+
+- `baseline-safe-path`: exit 2; `uv run --locked python -P -m pytest product/tests/test_released_imagery.py -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `contract-red`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `create-fixture`: exit 0; `uv run --locked python .overnight/tmp/f6/make_fixture.py`.
+- `product-imagery-safe-path`: exit 0; `uv run --locked python -P -m pytest product/tests/test_released_imagery.py -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `contract-green`: exit 0; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `format-apply`: exit 0; `uv run --locked ruff format product/tests/test_released_imagery.py custodian/tests/test_gis_snapshot.py`.
+- `agents-parity`: exit 0; `cmp AGENTS.md CLAUDE.md`.
+- `product-imports`: exit 1; `rg -n --glob '*.py' '^\s*(from\s+(eii_custodian|custodian)(\.|\s)|import\s+(eii_custodian|custodian)(\.|\s|$))' product`.
+- `lint`: exit 0; `uv run --locked ruff check .`.
+- `format`: exit 0; `uv run --locked ruff format --check .`.
+- `product-suite`: exit 0; `uv run --locked python -m pytest product/tests -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `mypy`: exit 0; `uv run --locked mypy`.
+- `diff-whitespace`: exit 0; `git diff --check`.
+- `docs-before-ledger`: exit 1; `python3 scripts/check_docs.py`.
+- `assertion-audit`: exit 0; `python3 .overnight/tmp/f6/assertion_audit.py`.
+- `environment`: exit 0; `uv run --locked python -c 'import importlib.metadata as m, platform; print("Python", platform.python_version()); print("system", platform.system()); print("rasterio", m.version("rasterio")); print("pytest", m.version("pytest")); print("hypothesis", m.version("hypothesis"))'`.
+- `custodian-gis-suite`: exit 0; `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k 'gis or imagery or snapshot' --hypothesis-seed=1313296242`.
+- `encode-fixture`: exit 0; `python3 .overnight/tmp/f6/encode_fixture.py`.
+- `format-encoding`: exit 0; `uv run --locked ruff format product/tests/test_released_imagery.py custodian/tests/test_gis_snapshot.py`.
+- `plant-manifest-byte`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `plant-object-byte`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `plant-missing-receipt`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `plant-extra-file`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `plant-jpeg-byte`: exit 1; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `contract-plants`: exit 0; `python3 .overnight/tmp/f6/plant.py`.
+- `final-assertion-audit`: exit 0; `python3 .overnight/tmp/f6/assertion_audit.py`.
+- `final-format`: exit 0; `uv run --locked ruff format --check .`.
+- `final-lint`: exit 0; `uv run --locked ruff check .`.
+- `final-mypy`: exit 0; `uv run --locked mypy`.
+- `final-product-imagery-safe-path`: exit 0; `uv run --locked python -P -m pytest product/tests/test_released_imagery.py -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `final-docs-code`: exit 0; `python3 scripts/check_docs.py`.
+- `final-product-suite`: exit 0; `uv run --locked python -m pytest product/tests -q -p no:cacheprovider --hypothesis-seed=1313296242`.
+- `final-product-imports`: exit 1; `rg -n --glob '*.py' '^\s*(from\s+(eii_custodian|custodian)(\.|\s)|import\s+(eii_custodian|custodian)(\.|\s|$))' product`.
+- `final-agents-parity`: exit 0; `cmp AGENTS.md CLAUDE.md`.
+- `pin-tested-state`: exit 0; `python3 .overnight/tmp/f6/state.py`.
+- `final-contract-restored`: exit 0; `uv run --locked python -m pytest custodian/tests/test_gis_snapshot.py -q -p no:cacheprovider -k assembled_release_equals_product_imagery_fixture --hypothesis-seed=1313296242`.
+- `final-diff-whitespace`: exit 0; `git diff --check`.
+- `final-custodian-gis-suite`: exit 0; `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k 'gis or imagery or snapshot' --hypothesis-seed=1313296242`.
+- Git staging (direct tool result): exit 128;
+  `git add product/tests/test_released_imagery.py custodian/tests/test_gis_snapshot.py product/tests/fixtures/released_imagery`.
