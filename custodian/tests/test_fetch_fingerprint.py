@@ -622,12 +622,36 @@ def test_listing_sibling_row_edit_refetches_parent(
 
 
 # --- F4 tenders intake triple ----------------------------------------------
+# Joined with decision 0084 (train S2-13): the ordinary run never fetches the
+# tender row, so it never reaches the resume plan's intake triple. The first
+# test proves that skip on a resume; the second keeps F4's claim on the resume
+# plan itself, with the ordinary run's skip of the tender row lifted, the path
+# the tender row's own run takes through the same plan.
+
+
+def test_ordinary_resume_skips_the_tender_row(
+    harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots = _stub_roots(tmp_path, monkeypatch, brancher=lambda e, large: "a")
+    harness.entries = (
+        replace(harness.entries[0], kind="paged_cards", source_id="tenders_pub"),
+        harness.entries[1],
+    )
+    _interrupt(harness, code_roots=roots)
+    outcome = harness.run(resume=True, code_roots=roots)
+    assert outcome.failure is None
+    tender = [line for line in outcome.lines if line.split()[1:2] == ["SYN-first"]]
+    assert tender == ["SKIP SYN-first own_run"]
+    assert harness.seen == [harness.entries[1].url]
 
 
 def test_changed_intake_triple_refetches_tenders(
     harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from eii_custodian.publicdata.fetch import awards
+    from eii_custodian.publicdata.fetch import build as build_module
+
+    monkeypatch.setattr(build_module, "is_tender_entry", lambda entry: False)
     from eii_custodian.publicdata.singles.tenders import (
         LIST_PATHS,
         ListReading,
