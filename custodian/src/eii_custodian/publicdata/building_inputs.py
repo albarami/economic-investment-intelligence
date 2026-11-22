@@ -7,11 +7,13 @@ import math
 from collections.abc import Mapping, Sequence
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urljoin
 
+import shapely
 from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
+from shapely.ops import unary_union
 
 from .fetch.bounded import file_hash
 from .fetch.receipts import sha256_hex
@@ -27,6 +29,8 @@ BUILDING_METHOD = "national-buildings.v1"
 BUILDING_MANIFEST = "manifest.buildings.json"
 BUILDING_MANIFEST_RELATIVE = "assets/buildings/" + BUILDING_MANIFEST
 FRAME_BOUNDS = (50.7, 24.4, 51.7, 26.2)
+OUTSIDE_REVIEW = "custodian/publicdata/review/national_boundary_outside.json"
+OUTSIDE_REVIEW_KEYS = frozenset(("version", "bnd_hdx_sha256", "outside_part_sha256"))
 
 
 def bounds_polygon(bounds: tuple[float, float, float, float]) -> BaseGeometry:
@@ -42,6 +46,95 @@ class BuildingError(ValueError):
     def __init__(self, name: str, detail: str = "") -> None:
         self.name, self.detail = name, detail
         super().__init__(name)
+
+
+def part_hash(part: BaseGeometry) -> str:
+    """SHA-256 of one boundary polygon's canonical two-dimensional WKB.
+
+    The stub declares neither function; both exist in the pinned Shapely.
+    """
+    library = cast(Any, shapely)
+    body = library.to_wkb(
+        library.normalize(part), output_dimension=2, byte_order=1, include_srid=False
+    )
+    return sha256_hex(body)
+
+
+def boundary_parts(
+    boundary: BaseGeometry,
+) -> tuple[tuple[BaseGeometry, ...], dict[str, BaseGeometry]]:
+    """Split the union into parts inside the frame box and parts wholly outside it.
+
+    A part that shares any point with the box without lying in it straddles and
+    refuses, as does an empty, invalid or non-areal boundary or one with no
+    inside part. Wholly-outside parts are keyed by `part_hash`.
+    """
+    if (
+        boundary.is_empty
+        or not boundary.is_valid
+        or boundary.geom_type not in ("Polygon", "MultiPolygon")
+    ):
+        raise BuildingError("national_boundary_outside_frame_box", "boundary")
+    frame = bounds_polygon(FRAME_BOUNDS)
+    inside: list[BaseGeometry] = []
+    outside: dict[str, BaseGeometry] = {}
+    for part in getattr(boundary, "geoms", (boundary,)):
+        if frame.covers(part):
+            inside.append(part)
+        elif not frame.intersects(part):
+            outside[part_hash(part)] = part
+        else:
+            raise BuildingError("national_boundary_outside_frame_box", "straddling")
+    if not inside:
+        raise BuildingError("national_boundary_outside_frame_box", "no_inside_part")
+    return tuple(inside), outside
+
+
+def outside_review_document(
+    boundary: BaseGeometry, bnd_sha256: str
+) -> dict[str, object]:
+    """The review file body the lead commits after reading the real boundary (L4)."""
+    _inside, outside = boundary_parts(boundary)
+    return {
+        "version": 1,
+        "bnd_hdx_sha256": bnd_sha256,
+        "outside_part_sha256": sorted(outside),
+    }
+
+
+def outside_review(
+    path: Path, outside: Mapping[str, BaseGeometry], bnd_sha256: str
+) -> str | None:
+    """Admit wholly-outside parts only when a review file lists exactly them.
+
+    Returns the review file's SHA-256, or None when no file and no outside part.
+    """
+    if not path.exists():
+        if outside:
+            raise BuildingError("national_boundary_outside_frame_box", "unreviewed")
+        return None
+    try:
+        body = path.read_bytes()
+        document = unique_json(body, "national_boundary_review")
+    except (OSError, HeightError):
+        raise BuildingError("national_boundary_review") from None
+    listed = document.get("outside_part_sha256") if isinstance(document, dict) else None
+    if (
+        not isinstance(document, dict)
+        or set(document) != OUTSIDE_REVIEW_KEYS
+        or type(document["version"]) is not int
+        or document["version"] != 1
+        or not isinstance(document["bnd_hdx_sha256"], str)
+        or not isinstance(listed, list)
+        or not all(isinstance(item, str) for item in listed)
+        or len(set(listed)) != len(listed)
+    ):
+        raise BuildingError("national_boundary_review")
+    if document["bnd_hdx_sha256"] != bnd_sha256 or not set(listed) <= set(outside):
+        raise BuildingError("national_boundary_review_stale")
+    if set(outside) != set(listed):
+        raise BuildingError("national_boundary_outside_frame_box", "unlisted")
+    return sha256_hex(body)
 
 
 def dump(value: object) -> bytes:
@@ -203,19 +296,28 @@ def national_guard(
     entries: Sequence[Entry],
     selections: Mapping[str, str],
     boundary: BaseGeometry,
-) -> tuple[bool, dict[str, dict[str, object]]]:
+) -> tuple[dict[str, object], dict[str, dict[str, object]]]:
     """Traverse all reviewed STAC item links; compare their assets to fixed parts.
 
-    Unregistered links, pagination, missing metadata and foreign part assets
-    refuse. No bbox from prose or a filename substitutes for a STAC item.
+    The required parts are the assets of the items whose bbox meets the bounds
+    of the boundary parts inside the frame box; reviewed wholly-outside parts
+    require none. Unregistered links, pagination, missing metadata and foreign
+    part assets refuse. No bbox from prose or a filename substitutes for a STAC
+    item. Returns the boundary scope for the manifest and the metadata chain.
     """
-    bounds = geometry_bounds(boundary)
-    if (
-        boundary.is_empty
-        or not boundary.is_valid
-        or not bounds_polygon(FRAME_BOUNDS).covers(bounds_polygon(bounds))
-    ):
-        raise BuildingError("national_boundary_outside_frame_box")
+    inside, outside = boundary_parts(boundary)
+    bounds = geometry_bounds(unary_union(inside))
+    review = outside_review(
+        cache.parent.parent / OUTSIDE_REVIEW,
+        outside,
+        pinned(cache, entries, selections, "bnd_hdx").sha256,
+    )
+    scope: dict[str, object] = {
+        "in_box_bounds": list(bounds),
+        "outside_parts": len(outside),
+        "outside_part_sha256": sorted(outside),
+        "outside_review_sha256": review,
+    }
     rows = {entry.key: entry for entry in entries}
     metadata = set(metadata_keys(entries))
     urls = {
@@ -282,7 +384,7 @@ def national_guard(
             raise BuildingError("bldg_ovt_part_set_incomplete")
     if matching != set(BUILDING_PARTS) or visited != metadata:
         raise BuildingError("bldg_ovt_part_set_incomplete")
-    return matching == set(BUILDING_PARTS), chain
+    return scope, chain
 
 
 def verify_building_manifest(
