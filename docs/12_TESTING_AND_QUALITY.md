@@ -952,6 +952,12 @@ failure. The observer is bound only for assembly execution, so legacy producer
 logging and the fetch fingerprint's exclusion of assembly dependencies remain
 unchanged. Inventory plants use invented producer outputs and no acquisition.
 
+Round-4 fixture compatibility: the inventory is a Python literal in
+`custodian/tests/fixtures/assembly_refusals.py`, imported by the refusal tests.
+Its canonical payload hash pins every approved row, plant and expected reason.
+The existing non-Python fixture guard is unchanged; separate places-reader and
+building-reader plants verify that each caught refusal reaches the observer.
+
 Round-2 clarification (R3 and R4): non-terminal `REFUSED <stage> <reason>`
 lines can appear in a build that otherwise passes, including caught refusals
 whose existing policy skips an input or retains a blocked result. The legacy

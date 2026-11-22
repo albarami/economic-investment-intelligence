@@ -8,9 +8,10 @@ correctness of the pre-existing producer's refusal conditions.
 import importlib
 import json
 import re
-from pathlib import Path
+from hashlib import sha256
 
 import pytest
+from custodian.tests.fixtures.assembly_refusals import INVENTORY_CASES
 from custodian.tests.test_production_adapters import context
 from hypothesis import given
 from hypothesis import strategies as st
@@ -22,9 +23,6 @@ from eii_custodian.publicdata.assembly_io import write_record
 from eii_custodian.publicdata.assembly_refusal_policy import TEXT_REASONS
 from eii_custodian.publicdata.fetch.build import run_build
 
-INVENTORY_CASES = json.loads(
-    (Path(__file__).parent / "fixtures/assembly_refusals.json").read_text()
-)
 CASES = [
     {
         "row": row["row"],
@@ -77,6 +75,13 @@ MODULES = {
     "PackageNotFoundError": "importlib.metadata",
     "InvalidOperation": "decimal",
 }
+
+
+def test_refusal_inventory_matches_approved_payload():
+    payload = json.dumps(INVENTORY_CASES, sort_keys=True, separators=(",", ":"))
+    assert sha256(payload.encode()).hexdigest() == (
+        "336f1caf739ac6763e34a875870abe40b8f5b95d480ad501a133a9d32d575e1d"
+    )
 
 
 def planted_error(name, message):
@@ -309,8 +314,9 @@ def test_silent_road_refusals_are_observed_without_changing_return(
     assert lines == [f"REFUSED frame {reason}"]
 
 
+@pytest.mark.parametrize("reader", ["read_place_file", "read_building_file"])
 def test_swallowed_places_reader_error_is_observed_without_changing_points(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, reader
 ):
     from eii_custodian.publicdata.places import PlacesError, integrate
 
@@ -323,10 +329,18 @@ def test_swallowed_places_reader_error_is_observed_without_changing_points(
         ),
     )
 
-    def refused(_path, _tag):
+    monkeypatch.setattr(
+        integrate,
+        "_buildings_from_registry",
+        lambda _cache, _registry: ([tmp_path / "syn.parquet"], ()),
+    )
+    monkeypatch.setattr(integrate, "read_place_file", lambda *_args, **_kwargs: ())
+    monkeypatch.setattr(integrate, "read_building_file", lambda *_args, **_kwargs: ())
+
+    def refused(*_args, **_kwargs):
         raise PlacesError("missing_column")
 
-    monkeypatch.setattr(integrate, "read_place_file", refused)
+    monkeypatch.setattr(integrate, reader, refused)
     lines = []
     from eii_custodian.publicdata.assembly_refusals import stage_refusals
 
