@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed; owner acceptance required before code merge (S2-P53 ruling R9) |
+| Status | Accepted, 2026-11-22; owner acceptance relayed by lead ruling L-1475 |
 | Date | 2026-11-22 |
 | Scope | Document 04 PUB-106; decision 0064 item 25; S2-T20 |
 
@@ -13,7 +13,7 @@ out of the public repository. Decision 0059 item 3 keeps sources in local use
 regardless of their terms. S2-P53 rulings R0 and R9 require one placement for
 all publishers, following the local district-alias record of S2-T22.
 
-## Proposed decision
+## Decision
 
 1. Place the landmark hand list in the single uncommitted, independently
    reviewed `review/landmark_heights.yaml` record under the public cache.
@@ -30,7 +30,11 @@ all publishers, following the local district-alias record of S2-T22.
 
 ## Evidence and consequences
 
-The task brief and lead rulings R0 and R9 are the authority for this proposed
-placement. Offline implementation evidence is recorded under S2-P53 in
+The task brief and lead rulings R0 and R9 define this placement. Lead ruling
+L-1475 records the owner-relayed acceptance at 20:14 on 2026-11-22
+("Yea to both"), with the lead record at 20:17. Public page URLs and publisher
+hosts remain committed citation metadata under rules 5 and 19; source
+records and citation snapshots remain uncommitted. Offline implementation evidence is recorded under S2-P53 in
 PROGRESS.md. It establishes no live selection, tie, coverage or source reading.
-The build may proceed before acceptance; merge waits for owner acceptance.
+The acceptance hold is closed; independent different-maker code review and
+the existing slice gate remain required.

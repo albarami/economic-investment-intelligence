@@ -111,7 +111,7 @@ value at one point refuse the build (`wsf3d_overlap`).
 
 ## Reviewed landmark cache record (S2-P53)
 
-Under proposed decision 0093, the production list is one local, independently
+Under accepted decision 0093, the production list is one local, independently
 reviewed `review/landmark_heights.yaml` beneath the public cache. The old
 committed file remains only an empty format sample; it is used as pending
 when the local record does not exist. No source row is copied into that sample.
@@ -169,10 +169,16 @@ Malformed citation envelopes, including invalid UTF-8 and empty inputs, refuse
 archive's constrained cache directory helper; absolute keys, parent traversal
 and symlinked entry directories refuse with that same closed reason.
 
-No live publisher/page metadata or host is installed by this offline task:
-the brief forbids committing researched names, URLs and hosts. The lead must
-resolve that constraint before the separate reviewed registry and PUB-03 host
-admission. Invented acquisition tests establish the path, not live admission.
+S2-P53-cit installs the supplied public citation metadata and PUB-03 hosts.
+`scripts/landmark_citation_rows.py RESEARCH OUTPUT` deterministically emits
+JSON source rows, page declarations and hosts from the research publisher list
+and primary/second-page URLs, reusing `researched_pages`. It copies no height,
+name or excerpt. Review and install its output into `sources.yaml`,
+`review/s2_t29_sources.yaml` and `fetch/allowlist.py`; no fetch occurs.
+Landmark registry loading refuses unadmitted page or terms hosts. The
+committed-metadata test resolves every declaration through `_registry_entry`;
+generator tests use invented inputs only. Live acquisition and record review
+remain lead-owned.
 
 The cache loader retains the validated bytes, rows and pending status together
 in an immutable `LandmarkRecord`. The height manifest hashes those same bytes;

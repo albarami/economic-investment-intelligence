@@ -45,6 +45,22 @@ ALLOWED_HOSTS = frozenset(
         "myschools.edu.gov.qa",
         # S2-P29: reviewed BACI page and HS17 archive, PUB-03 registry change.
         "www.cepii.fr",
+        # S2-P53: cited public pages and recorded terms, PUB-03 metadata.
+        "dezzzme.wordpress.com",
+        "en.wikiarquitectura.com",
+        "en.wikipedia.org",
+        "foundation.wikimedia.org",
+        "inside.fifa.com",
+        "megatalls.com",
+        "nabkmastclimber.com",
+        "qm.org.qa",
+        "skyscraperpage.com",
+        "stadiumdb.com",
+        "www.businessdestinations.com",
+        "www.scraperbase.com",
+        "www.skyscrapercenter.com",
+        "www.thenationalnews.com",
+        "www.wernersobek.com",
     }
 )
 

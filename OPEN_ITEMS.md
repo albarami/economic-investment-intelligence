@@ -6160,3 +6160,24 @@ return and its deletion evidence.
 S2-P53 fixture-deletion follow-up: both corrected duplicate-claim guards were
 then deleted separately; each test run exited 1 and each source hash restored.
 The final task-specific run after restoration exited 0 with 75 tests passing.
+
+
+## S2-P53-cit — Publisher terms still to be read (2026-11-22)
+
+The supplied research marks the following readings `terms_not_found`; the
+registry uses `terms to be read` with checked date 2026-11-22. Under decision
+0026 item 3 these remain admitted with `owner_decision`, not excluded. The
+lead must obtain and record the terms reading; no permission is inferred.
+
+- Business Destinations, `landmark_business_destinations`: no terms page located in the supplied research.
+- Dezzzme, `landmark_dezzzme`: no terms page located in the supplied research.
+- FIFA, `landmark_fifa`: no terms page located in the supplied research.
+- NABK Mast Climber Rental Qatar, `landmark_nabk_mast_climber_rental_qatar`: linked terms page could not be read.
+- Scraperbase.com, `landmark_scraperbase_com`: no terms page located in the supplied research.
+- StadiumDB.com, `landmark_stadiumdb_com`: no terms page located in the supplied research.
+- Werner Sobek AG, `landmark_werner_sobek_ag`: no terms page located in the supplied research.
+
+The registry and host-installation hold in the historical S2-P53 entries is
+addressed by this part; it supplies no live acquisition, receipt, tie or
+height-completeness proof. Independent different-maker review remains with
+the lead, as do S2-T20, C-20 and OI-310.

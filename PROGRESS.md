@@ -51022,3 +51022,111 @@ Lead shell (Anthropic Opus 5.5), real public cache, offline. The pinned collecti
 ## S2-P53 round 4 — Closed envelope refusals and citation cache boundary — 2026-11-22
 
 - Maker: OpenAI Codex, GPT-6 family; builder persona: senior provenance engineer for reference datasets; strict self-review persona: fetch-boundary reviewer. Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer, muhasabah-gate; the brief's test-driven-development, security-review and verification-before-completion rules applied directly (those named skills are not installed). Authority: task brief **Do**, accepted lens-2 findings 1 and 2; full parent commit `1c4dee1e564818f24249cdb25d39f445f73ed4b8`. `_emit` now translates UnicodeDecodeError and IndexError into `landmark_heights_citation` / `page_snapshot`; `_page_directory` reuses `page_records.cache_directory(cache, entry)` and receipt verification translates PageError alongside SnapshotError to that same closed refusal. Five invented negative cases assert the exact name/detail: invalid UTF-8, empty inputs, absolute key, parent-traversal key and symlinked entry directory. Envelope tests retain real published, pinned, verified snapshots and isolate envelope consumption from selected_page's separate shape checks. Path cases keep valid matching receipts and change only the path representation or entry-folder symlink. Initial focused invocation exited 1 with two test-import defects and three expected boundary failures; the import was corrected before the decisive fail-first invocation exited 1 with all five intended failures. Patched focused invocation exited 0 (5 passed). Four isolated deletions each exited 1: UnicodeDecodeError catch (1 failed), IndexError catch (1 failed), constrained-directory helper bypass (3 failed), PageError translation (3 failed); each source was byte-restored immediately, each restoration exited 0, and restored SHA-256 values and full commands are in `.overnight/OUT/guard-deletions.json`. Required tests: `uv run --locked python -m pytest custodian/tests/test_landmark_select.py custodian/tests/test_landmark_tie.py custodian/tests/test_landmark_cache.py custodian/tests/test_landmark_snapshots.py custodian/tests/test_landmark_command.py custodian/tests/test_publicdata_heights.py custodian/tests/test_page_records_survivors_1.py custodian/tests/test_page_records_survivors_2.py custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider --hypothesis-seed=53 --basetemp=.overnight/tmp/pytest-final` exited 0 (405 passed). `uv run --locked ruff check .`, `uv run --locked ruff format --check .` (945 files), `uv run --locked mypy` (502 source files), `python3 scripts/check_docs.py` (1278 text files, 144 Markdown files), `python3 scripts/check_tree.py` (8 rules), `cmp AGENTS.md CLAUDE.md` and `git diff --check` all exited 0. Environment: `UV_OFFLINE=1`, workspace-local UV_CACHE_DIR and TMPDIR, Python 3.14.6, pytest 9.2.0, seed 53, unchanged eii Hypothesis profile. Full logs and verification ledger are under `.overnight/OUT/`. No new production function; longest new test function `test_malformed_citation_envelope_has_closed_refusal` is 32 lines by AST span; none copied. Strict self-review: APPROVE for this bounded correction; muhasabah PASS. Independent different-maker review remains lead-owned. Provided Git metadata stays read-only; delivery uses workspace-local Git metadata, one child commit and its bundle, with full delivered hash and per-file counts in `.overnight/RETURN.md`. No push, merge, network, forbidden-file read, data-directory read or full test command; existing source-admission and C-20 limits remain unchanged.
+
+
+## S2-P53-cit — Landmark citation registry metadata
+
+- Date: 2026-11-22. Maker: OpenAI Codex, GPT-6 family. Builder persona:
+  senior data engineer for public-source registries. Strict self-review persona:
+  sanad auditor. Skills: project-orientation, task-standards, github-flow,
+  sanad-provenance, property-based-testing, strict-reviewer, muhasabah-gate.
+  The brief's test-driven-development and verification-before-completion rules
+  were applied directly; those named skill packages are not installed.
+- Authority: task brief **Do**, handover item 1, lead rulings L-1454, L-1456
+  and L-1475; decision 0026 items 3 and 5; decision 0093 items 1 to 3;
+  AGENTS.md rules 5, 19, 35 and 38. Full parent commit:
+  `31fbcb3cce07ed87945b34a042e23c33811c12d4`. The one delivered child hash
+  and bundle checksum are recorded in the workspace delivery return, avoiding
+  a self-referential commit hash in this committed evidence row.
+- `scripts/landmark_citation_rows.py` reuses `researched_pages`, `read_yaml`,
+  `sha256_hex`, `safe_https_shape` and `host_of`. It emits source rows,
+  citation declarations and hosts, copying no landmark record fields. Its
+  output is installed in `sources.yaml`, `review/s2_t29_sources.yaml` and
+  `fetch/allowlist.py`. Committed metadata is compared field for field with
+  generated output; all supplied primary and secondary URL occurrences resolve
+  to exactly one row. The committed-only integration test calls the existing
+  `_registry_entry` and `validate_entry`, without reading the research or data
+  cache. Generator tests use invented inputs only.
+- The supplied research has 91 citation occurrences yielding 70 distinct URLs
+  under 15 publisher source IDs. Their page-and-terms host set has 16 hosts,
+  of which 15 are new; `visitqatar.com` already existed. The research SHA-256 is
+  `431265e3013067cc8e3826fe754a27b316a58f0b3d8e7e125ac2b6367006477f`. Wikipedia's 19 text citations record CC-BY-SA-4.0; the
+  other 51 pages record owner_decision / decision 0026. Every page remains
+  commit_allowed false, with empty columns, shape, period fields and release
+  tables. Terms readings are recorded with checked date 2026-11-22, and seven
+  unread publishers are appended in OPEN_ITEMS.md. Document 04 names the
+  concrete sources, quotes and PUB-03 hosts; DHA-102 retains the real-use list.
+  Decision 0093 and its index now record the supplied owner acceptance.
+- Fail-first: the new tests before the generator existed exited 2 (missing
+  module at collection). With the generator but before admission, they exited
+  1: 3 failed, 20 passed (missing host enforcement and committed rows). An
+  initial metadata-installation probe exited 1: 2 failed, 21 passed because
+  declarations were inserted under the wrong YAML section and the test used
+  the wrong HeightError string shape; both were corrected. A subsequent probe
+  exposed a missing test import (1 failed, 22 passed); the test was corrected.
+  The focused invented-generator and host-contract command then exited 0,
+  40 passed, including Hypothesis cases under the unchanged eii profile.
+- The first prescribed selection exited 1: 5 failed, 1759 passed, 9769
+  deselected. Four failures were the expected registry-count, owner-count,
+  nightly-exclusion and exact-host contracts affected by the added metadata
+  (the generated-building consumer calls the count guard too). The remaining
+  failure was the CDSE transport fixture replacing the complete allowlist:
+  its metadata-only test now reads and validates only its CDSE declaration,
+  preserving the fixture's socket and host restrictions and asserting the
+  exact existing refusal. Closed inventories remain exact, expanded by the
+  reviewed additions. The five affected nodes then exited 0, 5 passed.
+- Isolated guard-deletion proof: ten refusal sites, each removed alone, each
+  test process exit 1; each immediate byte-restoration run exited 0. Nine
+  additional isolated plants (second-page omission, ordering, URL deduplication,
+  empty input, one page, source-record leak, key collision, unread marker and
+  commit permission) each exited 1, then 0 after byte restoration. Physical
+  metadata plants: deleting one page row gave exit 1 and the exact citation
+  detail registry_row; deleting one page host gave exit 1 / host_refused;
+  deleting the Wikimedia terms host gave exit 1 / host_refused. Each physical
+  restoration resolved the same citation with exit 0. Full per-plant commands,
+  expected/actual exits and restoration hashes are in the workspace OUT ledger
+  and summarized in the return. Seed 53 throughout; no guard, tolerance,
+  baseline or attack size was weakened.
+- Environment: UV_OFFLINE=1; workspace-local uv cache, pytest base directories
+  and plant temporary paths; Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1 and Shapely 2.2.0. No network,
+  forbidden input file, live source snapshot or data directory was read. No full
+  eii test, public fetch, push or merge was run. A diagnostic audit initially
+  exited 1 because a scripts-only import was used from the repository root;
+  the corrected namespace import and exact metadata audit exited 0.
+- Initial Ruff check exited 1 (import order, unused import and raw regex
+  spellings); these were corrected. Formatter applications exited 0. Final
+  Ruff lint, formatter check (947 files), mypy (503 source files), documentation
+  check, tree check (8 rules), AGENTS/CLAUDE byte comparison and whitespace
+  checks are recorded below after the final test selection finishes.
+- Code practice: longest new production function `_row`, 43 lines by AST
+  span; none copied. No new function exceeds 100 lines. Per-file added and
+  removed lines are in the delivery return. Provided Git metadata stays
+  read-only; a workspace-local Git directory prepares one conventional commit
+  and its prerequisite-bound bundle. Independent different-maker approval
+  remains the lead's responsibility; no build or merge approval is claimed.
+  S2-T20, C-20, live receipts, building ties, live selection and OI-310 remain
+  open. Self-review and muhasabah verdicts follow the final verification row.
+- Final verification: `UV_OFFLINE=1 uv run --locked python -m pytest
+  custodian/tests -q -p no:cacheprovider -k "heights or landmark or registry or
+  allowlist or page" --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-final` exited 0: 1776 passed, 9769
+  deselected, one expected warning from the invented duplicate-ZIP fixture.
+  The later documentation check exited 1 on the invented user-info URL's
+  email-shaped literal. That fixture now assembles the identical URL with
+  the repository's existing join pattern; no refusal or input value changed.
+  The final `custodian/tests/test_landmark_registry.py` selection under the
+  same seed exited 0, 39 passed; `python3 scripts/check_docs.py` then exited
+  0, checking 1280 text files and 144 Markdown files. This deterministic
+  fixture correction is not a random failure or an exception to the scan.
+- `UV_OFFLINE=1 uv run --locked ruff check .`: exit 0.
+  `UV_OFFLINE=1 uv run --locked ruff format --check .`: exit 0, 947 files.
+  `UV_OFFLINE=1 uv run --locked mypy`: exit 0, 503 source files.
+  `python3 scripts/check_tree.py`: exit 0, 8 rules.
+  `cmp AGENTS.md CLAUDE.md`, `git diff --check` and the workspace-local
+  `git diff --cached --check`: exit 0. Final metadata equality probe: exit 0.
+- Longest new function including tests:
+  `test_generator_refusals_change_one_input`, 48 lines by AST span; longest
+  new production function `_row`, 43 lines. None copied. Strict self-review:
+  APPROVE for this bounded metadata implementation and bundle handoff;
+  independent different-maker approval is still lead-owned. Muhasabah: PASS.
