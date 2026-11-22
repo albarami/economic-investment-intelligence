@@ -52104,3 +52104,111 @@ No network, real cache, `.env`, `.private` or repository `data/` input was read.
 | Round | Commands, counts, real exits and evidence |
 |---|---|
 | S2-P56 R3 | `uv run --locked python -m pytest custodian/tests/test_assembly_refusals.py -q -k all_policy_words --hypothesis-seed=56` with a distinct workspace-local `--basetemp`: class guard first on the base, 2 failed (the specific missing-fields row and the dead basket duplicate), 474 passed, 958 deselected, exit 1; fixed policy and fixtures, 475 passed, 959 deselected, exit 0. Delete only the specific missing-fields rule: 1 failed, 473 passed, 959 deselected, exit 1; restore, reintroduce only the dead duplicate: 1 failed, 475 passed, 959 deselected, exit 1; restore bytes, `cmp` exit 0; final focused run 475 passed, 959 deselected, exit 0. The same pytest command without `-k`: 1434 passed in 147.93s, exit 0. The guard covers all 474 pattern rows of 14 class tables, asserting the first matching row's identity and its exact closed word. Fixture rows `gis_property_singles:25` and `final_audit:06` assert `missing_fields_unknown_fields`; 909 inventory plants remain. Ruff check and format check initially exited 1 for import ordering and assertion wrapping; corrected, each exits 0. `uv run --locked mypy`: 503 source files, exit 0. `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md`, `git diff --check`: exit 0 each. Exact argv and logs: `.overnight/tmp/p56-r3-evidence/commands.jsonl` and sibling logs. No producer refusal condition changed or new refusal branch was added. PO-S2-P56-03 leaves exact-type subclass fallback detail open; independent maker review remains pending, with no slice-gate claim. |
+
+
+## S2-P56 round 4 — Python inventory fixture and joined-reader confirmation — 2026-11-22
+
+Builder: OpenAI Codex, senior build-pipeline engineer (S2-P56 builder).
+Strict self-review persona: strict-reviewer, rejecting guard exceptions, lost cases,
+changed expected reasons and weakened assertions. Skills: project-orientation,
+task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate;
+test-driven-development and verification-before-completion equivalents are in the
+round-4 brief. This self-review does not substitute for another maker's review.
+Base `b94dad801d4b7c8910ca96c91b6eb1fc6abb795f`; implementation commit
+`29f11de87303044e99a9a0f429f55dd6db6bbbba`. Linux, Python 3.14.6,
+`UV_OFFLINE=1 EII_DECISION_PROVIDER=none`; Hypothesis seed 56, existing invented
+build seed 17. Git metadata, caches, logs and test temporary paths are workspace
+local under `.overnight/tmp/`. No network, real cache, release build, `.env`,
+`.private` or repository `data/` input is used.
+
+The existing registry guard fails first on HEAD: one failure, exit 1, identifying
+the JSON inventory. The same inventory is now a normal Python literal fixture;
+its importer uses a direct import. Exact deep equality against the base's JSON
+and the base test's expanded comprehension proves all 262 rows and all 909 cases,
+their order, messages and exact expected reasons unchanged. Canonical payload
+SHA-256: `336f1caf739ac6763e34a875870abe40b8f5b95d480ad501a133a9d32d575e1d`.
+The fixture-integrity test pins that payload without modifying the existing
+non-Python guard. Changing only an expected reason, removing a row, reversing
+row order, duplicating a row and emptying the list each gives exit 1; the unchanged
+payload gives exit 0. These isolated process-local plants do not mutate the
+fixture during the importer run.
+
+CONFIRMED: the joined `places/integrate.py` keeps both reader loops and every
+refusal. `_building_entries` and `_buildings_from_registry` are AST-identical to
+train base `2e7061a23a57b03ad207c6c578403c0d5f9bac7e`. `_cache_points` is
+AST-identical after removing only its two `_observe(exc)` additions and handler
+bindings. Each observer is inside the correct reader's `PlacesError` handler,
+before the unchanged `continue`. Deleting only the places observer gives one
+failed and one passed reader case, exit 1. Restoring it and deleting only the
+building observer reverses the failed reader case, exit 1. Restored bytes match
+exactly and both reader cases pass, exit 0. No production code or refusal branch
+changes in this round.
+
+| Command / evidence | Actual result | Exit |
+|---|---|---|
+| Registry fixture guard on base, seed 56 | 1 failed, 80 deselected | 1 |
+| Registry guard, canonical-payload test and both reader cases | 4 passed, 1513 deselected | 0 |
+| Approved JSON / expanded-case equality and joined-loop AST proof | 262 rows, 909 cases equal; all three functions verified | 0 |
+| Independent observer deletions, seed 56 | 1 failed, 1 passed each; both restored | 1 each |
+| Restored observer cases, seed 56 | 2 passed, 1434 deselected | 0 |
+| Five isolated payload-integrity plants | Exact checksum assertion fails for each individual mutation | 1 each |
+| Unchanged payload-integrity check | Passes | 0 |
+| `uv run --locked ruff check .` | All checks passed | 0 |
+| `uv run --locked ruff format --check .` | 959 files already formatted | 0 |
+| `uv run --locked mypy` | 514 source files, no issues | 0 |
+| `python3 scripts/check_docs.py` | 1294 text files, 144 Markdown files checked | 0 |
+| `python3 scripts/check_tree.py`, after local-index setup | Eight rules pass | 0 |
+| `cmp AGENTS.md CLAUDE.md`; `git diff --check`; staged whitespace check | Identical bytes / clean diff | 0 each |
+
+Deterministic setup failures are retained: the first equality helper invocation
+exits 1 because its temporary script location lacks the repository import path;
+explicitly adding the workspace import path fixes that helper. A first local
+`git add` exits 128 and the tree check exits 1 because the bare metadata copy has
+no index. Setting its local non-bare configuration and initializing its index
+from HEAD resolves the cause; the shared Git metadata is unchanged. These are
+setup corrections, not random failures or a guard exception. Full argv, exits,
+durations and logs: `.overnight/tmp/p56-r4/commands.jsonl`; importer selection:
+`.overnight/tmp/p56-r4/importers.json`. Final importer evidence and final commit
+and bundle checksums are appended below or recorded in `.overnight/RETURN.md`.
+No acceptance box, independent-maker approval, live release or slice gate is claimed.
+
+Round-4 environment correction: the first importer invocation inherited the
+workspace-local `GIT_DIR` and `GIT_WORK_TREE`, which would interfere with tests
+that initialize their own Git repositories. It was stopped by session control,
+exit 130; its buffered output gives no completed test count, so none is claimed.
+The temporary command runner now unsets both variables specifically for pytest,
+while documentation/tree checks and local commits retain workspace-local metadata.
+The targeted registry test `test_cache_path_is_gitignored` then passes, exit 0,
+with seed 56. The corrected importer invocation has its own log and basetemp,
+`importing-tests-isolated`; this is an explicit environment correction, not a
+hidden retry. No product, test assertion or tracked Git metadata is changed.
+
+Round-4 separate checks with corrected pytest Git isolation: the complete
+`custodian/tests/test_publicdata_registry.py` gives 81 passed, exit 0, and
+`test_places_build_lines.py` plus `test_fetch_fingerprint.py` give 186 passed,
+exit 0, all with seed 56. A source-text cross-check of the AST-selected importer
+manifest also finds two tests referring to the changed modules only through
+literal targets; their separate run is recorded as `importing-literal-references`.
+
+Round-4 literal-reference supplement: `custodian/tests/test_investment_build.py` and `custodian/tests/test_investment_parse.py` give 115 passed, exit 0, with seed 56. The fixture AST is only its docstring and one literal assignment; the source name remains present as ordinary text. No encoded representation is used.
+
+Round-4 assertion-integrity audit: AST counters retain all 69 original assertions in `test_assembly_refusals.py`; the current file has 70, adding only the canonical-payload assertion. No original assertion node is lost or changed.
+
+Round-4 final importer result: the corrected 93-file invocation recorded in
+`.overnight/tmp/p56-r4/importers.json` and `commands.jsonl` gives **5159 passed,
+192 warnings, 854 subtests passed in 1285.46s**, exit **0**, seed **56**.
+It includes the complete registry, refusal-inventory, build-log context and
+fingerprint test files, all direct importers of the original P56 modules, and
+the registry-driven building-area tests. The warnings are the existing invented
+raster fixtures' NotGeoreferencedWarning. The two literal-reference importer
+files separately give 115 passed, exit 0; standalone registry and context /
+fingerprint commands give 81 and 186 passed respectively, exit 0 each. Counts
+from separate commands overlap and are not added as unique tests. The original
+arbitrary-message/class-name Hypothesis property passes in the full refusal file.
+No new or changed production refusal branch, numeric operation or privacy guard
+exists in this fixture-only round. The exact finite payload equality and the
+individual row/order/duplicate/reason/empty and observer plants provide the
+round's edge evidence. The implementation remains exactly commit
+`29f11de87303044e99a9a0f429f55dd6db6bbbba`; subsequent changes are task records.
+Strict self-review: APPROVE; muhasabah: PASS. Different-maker approval remains
+pending under PO-S2-P56-01; no live release or slice gate is claimed.
