@@ -267,12 +267,15 @@ def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> P
 
 
 def restore(replaced: Sequence[tuple[Path, Path]]) -> list[Path]:
-    """Move each kept original back over its target; return those not restored."""
+    """Move each kept original back over its target; return those not restored.
+
+    Any exception, an interrupt included, counts as a failed restore.
+    """
     unrestored = []
     for original, path in replaced:
         try:
             os.replace(original, path)
-        except OSError:
+        except BaseException:
             unrestored.append(original)
     return unrestored
 
@@ -285,31 +288,37 @@ def write_reviewed(
     A refusal or a failed replacement leaves neither target changed and no
     temporary file. A failed restore raises ``rollback_failed`` and leaves each
     unrestored original beside its target; no cleanup failure replaces it. A
-    cleanup failure is raised only when nothing else is.
+    cleanup failure is raised only when nothing else is. An original is at risk
+    from just before its target's replacement, unless that replacement raises
+    ``OSError``; an interrupt unwinds like any failure, and an at-risk original
+    is unlinked only by its own restore.
     """
     staged: list[tuple[Path, Path]] = []
     originals: list[tuple[Path, Path]] = []
-    unrestored: list[Path] = []
+    at_risk: list[tuple[Path, Path]] = []
 
-    def temporaries() -> list[Path]:
-        every = (*staged, *originals)
-        return [temporary for temporary, _ in every if temporary not in unrestored]
+    def temporaries(keep: Sequence[Path] = ()) -> list[Path]:
+        return [
+            temporary for temporary, _ in (*staged, *originals) if temporary not in keep
+        ]
 
     try:
         for path, rows, loader in planned:
             staged.append((stage(path, rows, loader), path))
         for _temporary, path in staged:
             originals.append((write_beside(path, path.read_bytes()), path))
-        for index, (temporary, path) in enumerate(staged):
+        for (temporary, path), original in zip(staged, originals, strict=True):
+            at_risk.append(original)
             try:
                 os.replace(temporary, path)
-            except BaseException:
-                unrestored = restore(originals[:index])
-                if unrestored:
-                    raise ReviewError(ROLLBACK_FAILED) from None
+            except OSError:
+                at_risk.pop()
                 raise
     except BaseException:
-        discard(temporaries())
+        unrestored = restore(at_risk)
+        discard(temporaries(unrestored))
+        if unrestored:
+            raise ReviewError(ROLLBACK_FAILED) from None
         raise
     failure = discard(temporaries())
     if failure is not None:

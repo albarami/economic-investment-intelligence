@@ -925,6 +925,18 @@ class CleanupNeverMasks(Pair):
         kept = [name for name in extra if after[name] == before[FLAGSHIP]]
         self.assertEqual(len(kept), 1)
 
+    def test_read_only_directory_before_first_replacement_is_refused(self) -> None:
+        """An OSError replacement changed nothing: no restore, so no rollback."""
+        self.write(self.valid())
+        before = self.files()
+        with self.read_only_from(FLAGSHIP):
+            run = self.run_tool()
+        self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
+        after = self.files()
+        self.assertEqual(
+            [after[FLAGSHIP], after[GAZETTEER]], [before[FLAGSHIP], before[GAZETTEER]]
+        )
+
     def test_stage_cleanup_failure_keeps_the_reload_refusal(self) -> None:
         self.write(self.valid())
         before, mode = self.files(), self.review.stat().st_mode
@@ -1003,6 +1015,94 @@ class CleanupNeverMasks(Pair):
         self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
         self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
         self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
+
+
+class InterruptedUnwinding(Pair):
+    """A KeyboardInterrupt while unwinding never unlinks an original (R1, CF4)."""
+
+    def scripted(
+        self, script: Mapping[tuple[str, int], tuple[type[BaseException], bool]]
+    ) -> contextlib.AbstractContextManager[object]:
+        """os.replace raising script[(name, call)] = (error, after the real call)."""
+        real, calls = os.replace, dict[str, int]()
+
+        def replace(source: str | Path, destination: str | Path) -> None:
+            name = Path(destination).name
+            calls[name] = calls.get(name, 0) + 1
+            error, after = script.get((name, calls[name]), (None, False))
+            if error is not None and not after:
+                raise error("syn")
+            real(source, destination)
+            if error is not None:
+                raise error("syn")
+
+        return patch("review_place_keys.os.replace", replace)
+
+    def settled(self) -> tuple[int, str]:
+        """run_tool, with an escaped interrupt failing the test, not the run."""
+        try:
+            return self.run_tool()
+        except (KeyboardInterrupt, SystemExit) as escaped:
+            self.fail(f"escaped {type(escaped).__name__}")
+
+    def kept_original(self, before: Mapping[str, bytes]) -> None:
+        """The gazetteer is unchanged; one extra file holds the flagship's bytes."""
+        after = self.files()
+        self.assertEqual(after[GAZETTEER], before[GAZETTEER])
+        kept = sorted(set(after) - set(before))
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(after[kept[0]], before[FLAGSHIP])
+
+    def test_interrupted_restore_is_rollback_failed_and_keeps_the_original(
+        self,
+    ) -> None:
+        self.write(self.valid())
+        before = self.files()
+        script = {
+            (GAZETTEER, 1): (PermissionError, False),
+            (FLAGSHIP, 2): (KeyboardInterrupt, False),
+        }
+        with self.scripted(script):
+            run = self.settled()
+        self.assertEqual(run, (3, "FAILED rollback_failed\n"))
+        self.kept_original(before)
+
+    def test_restore_that_escapes_keeps_every_original(self) -> None:
+        self.write(self.valid())
+        before = self.files()
+        script = {(GAZETTEER, 1): (PermissionError, False)}
+        with (
+            self.scripted(script),
+            patch.object(keys_tool, "restore", side_effect=KeyboardInterrupt),
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                self.run_tool()
+        after = self.files()
+        self.assertIn(before[FLAGSHIP], after.values())
+        self.assertEqual(after[GAZETTEER], before[GAZETTEER])
+
+    def test_interrupt_around_the_second_replacement_changes_neither(self) -> None:
+        """Before or after the real call: the interrupt passes, bytes unchanged."""
+        for after in (False, True):
+            with self.subTest(after=after):
+                self.write(self.valid())
+                before = self.files()
+                with self.scripted({(GAZETTEER, 1): (KeyboardInterrupt, after)}):
+                    with self.assertRaises(KeyboardInterrupt):
+                        self.run_tool()
+                self.assertEqual(self.files(), before)
+
+    def test_system_exit_in_restore_is_rollback_failed(self) -> None:
+        self.write(self.valid())
+        before = self.files()
+        script = {
+            (GAZETTEER, 1): (PermissionError, False),
+            (FLAGSHIP, 2): (SystemExit, False),
+        }
+        with self.scripted(script):
+            run = self.settled()
+        self.assertEqual(run, (3, "FAILED rollback_failed\n"))
+        self.kept_original(before)
 
 
 SECRETS = ("SYN-P-1", "Syn Souq", "syn souq", "51.1", "25.1", "/")
