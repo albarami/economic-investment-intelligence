@@ -13,6 +13,7 @@ from typing import Any
 from eii_custodian.publicdata.fetch.registry import load_registry, parse_yaml
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
+    _MODEL_LIKE,
     CODE_SYSTEM_VERSION,
     ActivityInputs,
     ReviewRow,
@@ -41,7 +42,7 @@ from spine_triage_io import (
     output_path,
     source_receipts,
 )
-from versions_inputs import read_input
+from versions_inputs import _pairs, read_input
 
 
 def json_bytes(value: object) -> bytes:
@@ -74,8 +75,8 @@ def derive(root: Path, cache: Path, review: Path) -> tuple[Context, dict[str, ob
         raise Refusal("cache_location_invalid")
     review = contained(root, review)
     baskets = contained(root, review.with_name("baskets.yaml"))
-    for path in (binding_path(review), review.with_name("activity_spine_audits.json")):
-        contained(root, path)
+    audit_path = contained(root, review.with_name("activity_spine_audits.json"))
+    contained(root, binding_path(review))
     selected = reviewed_selections(cache)
     entries = load_registry()
     activities, _, _ = read_activity_rows(cache, entries, selected)
@@ -94,7 +95,7 @@ def derive(root: Path, cache: Path, review: Path) -> tuple[Context, dict[str, ob
         ("review", review),
         ("baskets", baskets),
         ("binding", binding_path(review)),
-        ("audits", review.with_name("activity_spine_audits.json")),
+        ("audits", audit_path),
     ):
         hashes[name] = file_hash(path) if path.exists() else "absent"
     membership = dict(
@@ -288,6 +289,8 @@ def decision_rows(
                 raise Refusal("signer_role_differs")
         elif (row.status, row.reason, row.isic_class) != (held.status, held.reason, ""):
             raise Refusal("acknowledgement_decision_invalid")
+        elif _MODEL_LIKE.match(row.reviewed_by_role):
+            raise Refusal("acknowledgement_role_invalid")
     return tuple(row for row in signed if row.code in eligible)
 
 
@@ -329,7 +332,88 @@ def audit_record(
 
 
 def input_hashes(root: Path, paths: dict[str, Path]) -> dict[str, str]:
-    return {name: file_hash(contained(root, path)) for name, path in paths.items()}
+    checked = {name: contained(root, path) for name, path in paths.items()}
+    return {
+        name: file_hash(path) if path.exists() else "absent"
+        for name, path in checked.items()
+    }
+
+
+def previous_audits(root: Path, review: Path) -> tuple[bytes, list[Any]]:
+    """Strict duplicate-key parsing with the original bytes retained for append."""
+    path = contained(root, review.with_name("activity_spine_audits.json"))
+    body = path.read_bytes() if path.exists() else b"[]\n"
+    try:
+        payload = json.loads(body, object_pairs_hook=_pairs)
+    except (ValueError, UnicodeError) as error:
+        raise Refusal("previous_audits_invalid") from error
+    if not isinstance(payload, list):
+        raise Refusal("previous_audits_invalid")
+    return body, payload
+
+
+def require_fresh_seed(audits: list[Any], seed: int) -> None:
+    if any(isinstance(row, dict) and row.get("seed") == seed for row in audits):
+        raise Refusal("audit_seed_reused")
+
+
+def append_audit(
+    body: bytes, audits: list[Any], batch: dict[str, object] | None
+) -> bytes:
+    """Append inside the list, preserving earlier records' exact bytes."""
+    if batch is None:
+        return body
+    end = body.rfind(b"]")
+    return (
+        body[:end]
+        + (b"," if audits else b"")
+        + json_bytes(batch).rstrip(b"\n")
+        + body[end:]
+    )
+
+
+def draw_record(
+    evidence: dict[str, str], decisions: tuple[ReviewRow, ...], makers: dict[str, Any]
+) -> dict[str, Any]:
+    return dict(
+        manifest_sha256=evidence["manifest"],
+        signer_rows_sha256=evidence["signer"],
+        maker_record_sha256=evidence["makers"],
+        seed=makers["seed"],
+        batch_id=makers["batch_id"],
+        sampled_codes=list(
+            audit_sample([row.code for row in decisions], makers["seed"])
+        ),
+    )
+
+
+def draw_audit(
+    root: Path, manifest: Path, signer_rows: Path, maker_record: Path, run_id: str
+) -> Path:
+    returned = dict(manifest=manifest, signer=signer_rows, makers=maker_record)
+    evidence = input_hashes(root, returned)
+    context, frozen = frozen_context(root, manifest)
+    fresh_target(context, run_id)
+    makers = read_makers(root, maker_record, frozen["preparer_maker"])
+    decisions = decision_rows(
+        context, read_review_csv(contained(root, signer_rows)), makers["signer_role"]
+    )
+    _, earlier = previous_audits(root, Path(frozen["review"]))
+    require_fresh_seed(earlier, makers["seed"])
+    drawn = draw_record(evidence, decisions, makers)
+    packet = json.loads(
+        (contained(root, manifest).parent / "signer_packet.json").read_bytes()
+    )
+    sampled = drawn["sampled_codes"]
+    audit_packet = [entry for entry in packet if entry["code"] in sampled]
+    frozen_context(root, manifest)
+    if input_hashes(root, returned) != evidence:
+        raise Refusal("returned_inputs_changed")
+    return publish(
+        context,
+        run_id,
+        {"draw.json": json_bytes(drawn), "audit_packet.json": json_bytes(audit_packet)},
+    )
 
 
 def assemble_audited_review(
@@ -339,28 +423,31 @@ def assemble_audited_review(
     auditor_rows: Path,
     maker_record: Path,
     run_id: str,
+    draw: Path,
 ) -> Path:
     context, frozen = frozen_context(root, manifest)
     fresh_target(context, run_id)
     returned = dict(
-        manifest=manifest, signer=signer_rows, auditor=auditor_rows, makers=maker_record
+        manifest=manifest,
+        signer=signer_rows,
+        auditor=auditor_rows,
+        makers=maker_record,
+        draw=draw,
     )
     evidence = input_hashes(root, returned)
     makers = read_makers(root, maker_record, frozen["preparer_maker"])
     signed = read_review_csv(contained(root, signer_rows))
     decisions = decision_rows(context, signed, makers["signer_role"])
+    if read_object(root, draw) != draw_record(evidence, decisions, makers):
+        raise Refusal("draw_changed")
     audited = read_review_csv(contained(root, auditor_rows))
     batch = audit_record(decisions, audited, makers)
     previous = read_review_csv(contained(root, Path(frozen["review"])))
     queue_codes = {row.code for row in signed}
     candidate = tuple(row for row in previous if row.code not in queue_codes) + signed
-    audit_path = contained(root, Path(frozen["review"])).with_name(
-        "activity_spine_audits.json"
-    )
-    old_audits = json.loads(audit_path.read_bytes()) if audit_path.exists() else []
-    if not isinstance(old_audits, list):
-        raise Refusal("previous_audits_invalid")
-    audits = json_bytes([*old_audits, *([batch] if decisions else [])])
+    old_bytes, old_audits = previous_audits(root, Path(frozen["review"]))
+    require_fresh_seed(old_audits, makers["seed"])
+    audits = append_audit(old_bytes, old_audits, batch if decisions else None)
     binding = {
         **binding_document(context.inputs),
         "audit_sha256": hashlib.sha256(audits).hexdigest(),
@@ -415,19 +502,20 @@ def verify_candidate(
 
 
 def finalise_check(root: Path, manifest: Path, review: Path, run_id: str) -> Path:
+    review = contained(root, review)
+    returned = dict(
+        manifest=manifest,
+        review=review,
+        binding=binding_path(review),
+        audits=review.with_name("activity_spine_audits.json"),
+    )
+    evidence = input_hashes(root, returned)
     context, frozen = frozen_context(root, manifest)
     fresh_target(context, run_id)
-    review = contained(root, review)
     inputs = verify_candidate(root, context, frozen, review)
-    evidence = input_hashes(
-        root,
-        dict(
-            manifest=manifest,
-            review=review,
-            binding=binding_path(review),
-            audits=review.with_name("activity_spine_audits.json"),
-        ),
-    )
+    frozen_context(root, manifest)
+    if input_hashes(root, returned) != evidence:
+        raise Refusal("returned_inputs_changed")
     return publish(
         context,
         run_id,

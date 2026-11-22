@@ -51623,3 +51623,72 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
   lint/format/type, byte-identity and whitespace checks all exit 0. The bundle
   and its checksum are delivered in the workspace return; no hosted check or
   independent-maker approval is inferred from this local evidence.
+
+## S2-P60 round 2 — pre-audit draw and review findings
+
+- Date: 2026-11-22. Base: `f704c02e6c4ad9125460414f87522893d59a19fc`.
+  Builder: OpenAI GPT-6 through Codex; senior data-governance engineer for
+  classification mappings. Strict self-review persona: sanad auditor. Skills:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer and muhasabah-gate; the brief supplies
+  equivalent TDD, security-review and verification-before-completion rules.
+- RV1 F1: `--mode draw` freezes the manifest, signer-file and maker-record
+  hashes, seed, batch id and ordered sample before auditing, and publishes only
+  sampled source packets without signer answers. Assembly requires `--draw`
+  and refuses `draw_changed`; draw and assembly refuse `audit_seed_reused`
+  against every prior audit, including empty eligible batches. Rule 44 and the
+  procedure now give prepare, triage, sign, draw, audit, assemble, finalise-check.
+- RV1 F2 and A1: the wrong-existing-class negative asserts
+  `signer_decision_invalid` and kills the exact surviving prefix plant; model
+  acknowledgement roles refuse `acknowledgement_role_invalid` using the shared
+  model-like-role pattern. A2: earlier audits reuse strict duplicate-key parsing
+  and retain their record bytes on append, or all bytes with no new batch. A3:
+  finalisation hashes before context loading and verification, rederives frozen
+  inputs and rehashes before publication; changed inputs refuse. Optional-file
+  absence is explicitly bound, preserving the unsigned mandatory-row refusal.
+- RV2: review-adjacent audit resolution and baskets containment were already
+  present in the supplied base; derivation now reuses one checked audit path.
+  New wrong-root and symlink plants prove those contracts. The two-pass fixture
+  keeps the review outside the cache, preserves prior decisions and exact audit
+  bytes, and uses a fresh seed for its empty eligible pass. No committed review,
+  baskets, binding or audit file changed. OI-203 remains open.
+- Environment: Linux; Python 3.14.6; uv 0.11.31; pytest 9.2.0; Hypothesis
+  6.170.15; ruff 0.17.4; mypy 2.4.1. `UV_OFFLINE=1`, provider `none`,
+  workspace temporary paths and invented caches only; no network, real cache,
+  `.env` or `.private` read. Hypothesis seed `2026112262`; audit fixture seed
+  `3141592653`, continuation seed `3141592654`, both permitted endpoints tested.
+- Final required commands and real exits:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v` exit 0, 96 tests;
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112262` exit 0, 221 passed and 21 subtests passed;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0;
+  `uv run --locked mypy` exit 0;
+  `python3 scripts/check_docs.py` exit 0;
+  `python3 scripts/check_tree.py` exit 0;
+  `cmp AGENTS.md CLAUDE.md` exit 0;
+  `git diff --check` exit 0;
+  Candidate-index document/tree, instruction bytes, source checksums,
+  unchanged review/core and whitespace checks are recorded in the return.
+- Final proof inventory: forty unique isolated plants, each red exit 1,
+  byte restoration true and restored green exit 0, refreshed after the final
+  seed correction. Exact commands and logs are under
+  `.overnight/evidence/r2/final-proofs/` and
+  `.overnight/evidence/r2/final-plant-inventory.json`. Recursive JSON append and
+  seed-history properties join the existing audit/eligibility properties;
+  forced hash ties, empty/single/multi-batch, sample boundaries, ordering,
+  duplicate keys, Unicode text, malformed encoding, symlinks and input-change
+  timing have explicit proofs. No guard, audit size, tolerance or gate weakened.
+- Development corrections are retained in the return: missing new APIs in the
+  test-first run, optional-file absence during early hashing, a reused fixture
+  output id, lint/type annotations, an initially unrequested empty-batch seed
+  exception, and a scratch-runner filename collision that repeated two edge
+  proofs. The corrected extra proofs run separately and duplicate pairs do not
+  enter the final count. No failed check was hidden by retry, skip or a refreshed
+  baseline; no unresolved random failure was observed.
+- Delivery: workspace-local Git metadata and bundle on the stated base; the
+  containing checkout's metadata remains unchanged. No push, merge, task-box
+  change, hosted check, whole-project test, independent-maker approval or real
+  signing is claimed. `.overnight/RETURN.md` holds findings, refusal and plant
+  tables, exact file counts, longest functions, copy/reuse inventory and limits.
+  Muhasabah: PASS for this bounded local delivery; independent different-maker
+  review and OI-203's actual signing/audit remain lead-owned.

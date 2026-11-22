@@ -104,12 +104,82 @@ class SpineReviewTest(unittest.TestCase):
         prepared: Path,
         paths: tuple[Path, Path, Path],
         run_id: str = "invented-assembled",
+        draw: Path | None = None,
     ) -> Path:
         from spine_review import assemble_audited_review
 
+        draw = self.draw(prepared, paths) if draw is None else draw
         return assemble_audited_review(
-            self.root, prepared / "manifest.json", *paths, run_id
+            self.root, prepared / "manifest.json", *paths, run_id, draw
         )
+
+    def draw(self, prepared: Path, paths: tuple[Path, Path, Path]) -> Path:
+        from spine_review import draw_audit
+
+        target = draw_audit(
+            self.root,
+            prepared / "manifest.json",
+            paths[0],
+            paths[2],
+            prepared.name + "-draw",
+        )
+        return target / "draw.json"
+
+    def install_candidate(self, candidate: Path) -> bytes:
+        from eii_custodian.publicdata.review.activity import binding_path
+        from spine_triage_io import file_hash
+
+        self.review.write_bytes((candidate / "activity_spine.csv").read_bytes())
+        audit_path = self.review.with_name("activity_spine_audits.json")
+        # Noncanonical whitespace must survive every later pass exactly.
+        old_bytes = b" \n" + (candidate / audit_path.name).read_bytes().replace(
+            b"{", b"{\n "
+        )
+        audit_path.write_bytes(old_bytes)
+        binding = json.loads((candidate / "activity_spine.binding.json").read_bytes())
+        binding["audit_sha256"] = file_hash(audit_path)
+        binding_path(self.review).write_text(json.dumps(binding))
+        return old_bytes
+
+    def next_batch(self, seed: int) -> tuple[Path, tuple[Path, Path, Path], bytes]:
+        from eii_custodian.publicdata.fetch.registry import load_registry
+        from eii_custodian.publicdata.review.cache_fixture import (
+            real_feed_body,
+            write_cached,
+        )
+        from spine_review import prepare_review_inputs
+
+        first = self.prepare()
+        old_bytes = self.install_candidate(self.assemble(first, self.returns(first)))
+        entry = next(e for e in load_registry() if e.key == "lic_active")
+        write_cached(
+            self.cache,
+            entry,
+            real_feed_body(
+                "lic_active",
+                [
+                    dict(
+                        activity_code=code,
+                        activity_name_ar="نشاط اصطناعي للاختبار",
+                        active_count=1,
+                    )
+                    for code in ("5610901", "5610902", "561099", "5610903")
+                ],
+            ),
+        )
+        prepared = prepare_review_inputs(
+            self.root,
+            self.cache,
+            self.review,
+            "invented-second",
+            self.preparer,
+        )
+        paths = self.returns(prepared)
+        makers = json.loads(paths[2].read_bytes())
+        paths[2].write_text(
+            json.dumps({**makers, "seed": seed, "batch_id": "invented-second-batch"})
+        )
+        return prepared, paths, old_bytes
 
     def test_prepare_assemble_finalise_roundtrip(self) -> None:
         from spine_review import finalise_check
@@ -215,122 +285,125 @@ class SpineReviewTest(unittest.TestCase):
             )
         self.assertFalse((self.cache / "spine_review").exists())
 
-    def test_cli_modes_are_offline_and_print_closed_output(self) -> None:
+    def cli(self, mode: str, **values: str | Path) -> tuple[int, str]:
         from spine_triage import main
 
+        args = ["--mode", mode]
+        for key, value in values.items():
+            args.extend(("--" + key.replace("_", "-"), str(value)))
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            result = main(args, root=self.root)
+        return result, output.getvalue()
+
+    def test_cli_modes_are_offline_and_print_closed_output(self) -> None:
         with patch(
             "spine_triage.Gateway", side_effect=AssertionError("gateway forbidden")
         ):
-            output = io.StringIO()
-            with contextlib.redirect_stdout(output):
-                result = main(
-                    [
-                        "--mode",
-                        "prepare",
-                        "--cache",
-                        str(self.cache),
-                        "--review",
-                        str(self.review),
-                        "--run-id",
-                        "invented-prepare",
-                        "--preparer-maker",
-                        "invented_preparer",
-                    ],
-                    root=self.root,
-                )
-            self.assertEqual(result, 0)
             self.assertEqual(
-                output.getvalue(),
-                "acknowledgement_rows=1 eligible_codes=2 excluded_groups=0\n",
+                self.cli(
+                    "prepare",
+                    cache=self.cache,
+                    review=self.review,
+                    run_id="invented-prepare",
+                    preparer_maker=self.preparer,
+                ),
+                (0, "acknowledgement_rows=1 eligible_codes=2 excluded_groups=0\n"),
             )
             prepared = self.cache / "spine_review/invented-prepare"
             signed, audited, makers = self.returns(prepared)
-            with contextlib.redirect_stdout(io.StringIO()):
+            arguments = dict(
+                manifest=prepared / "manifest.json",
+                signer_rows=signed,
+                maker_record=makers,
+            )
+            self.assertEqual(
+                self.cli("draw", **arguments, run_id="invented-draw"),
+                (0, "OK audit draw\n"),
+            )
+            for missing in arguments:
+                partial = {
+                    key: value for key, value in arguments.items() if key != missing
+                }
                 self.assertEqual(
-                    main(
-                        [
-                            "--mode=assemble",
-                            "--manifest",
-                            str(prepared / "manifest.json"),
-                            "--signer-rows",
-                            str(signed),
-                            "--auditor-rows",
-                            str(audited),
-                            "--maker-record",
-                            str(makers),
-                            "--run-id",
-                            "invented-assembled",
-                        ],
-                        root=self.root,
-                    ),
-                    0,
+                    self.cli("draw", **partial, run_id="invented-new-draw"),
+                    (3, "REFUSED arguments refused\n"),
                 )
-                self.assertEqual(
-                    main(
-                        [
-                            "--mode",
-                            "finalise-check",
-                            "--manifest",
-                            str(prepared / "manifest.json"),
-                            "--review",
-                            str(
-                                self.cache
-                                / "spine_review/invented-assembled/activity_spine.csv"
-                            ),
-                            "--run-id",
-                            "invented-final",
-                        ],
-                        root=self.root,
-                    ),
-                    0,
-                )
-            for args, reason in (
-                (["--mode", "prepare", "--run-id", "invented"], "arguments refused"),
-                (
-                    [
-                        "--mode",
-                        "prepare",
-                        "--cache",
-                        str(self.cache),
-                        "--review",
-                        "missing",
-                        "--preparer-maker",
-                        "invented",
-                        "--run-id",
-                        "invented",
-                    ],
-                    "review_input_invalid",
+            self.assertEqual(
+                self.cli(
+                    "assemble",
+                    **arguments,
+                    auditor_rows=audited,
+                    draw=self.cache / "spine_review/invented-draw/draw.json",
+                    run_id="invented-assembled",
                 ),
+                (0, "OK audited candidate\n"),
+            )
+            self.assertEqual(
+                self.cli(
+                    "finalise-check",
+                    manifest=prepared / "manifest.json",
+                    review=self.cache
+                    / "spine_review/invented-assembled/activity_spine.csv",
+                    run_id="invented-final",
+                ),
+                (0, "OK finalised spine\n"),
+            )
+            for mode, values in (
+                ("prepare", {}),
+                ("draw", {}),
+                ("assemble", {**arguments, "auditor_rows": audited}),
             ):
-                output = io.StringIO()
-                with contextlib.redirect_stdout(output):
-                    self.assertEqual(main(args, root=self.root), 3)
-                self.assertEqual(output.getvalue(), "REFUSED " + reason + "\n")
+                self.assertEqual(
+                    self.cli(mode, **values, run_id="invented"),
+                    (3, "REFUSED arguments refused\n"),
+                )
+            self.assertEqual(
+                self.cli(
+                    "prepare",
+                    cache=self.cache,
+                    review="missing",
+                    preparer_maker="invented",
+                    run_id="invented",
+                ),
+                (3, "REFUSED review_input_invalid\n"),
+            )
 
     def test_preserves_earlier_signed_rows_and_audits(self) -> None:
         from spine_review import prepare_review_inputs
 
+        # Real procedure keeps review evidence beside the review, outside the cache.
+        folder = self.root / "review"
+        folder.mkdir()
+        self.review.rename(folder / "activity_spine.csv")
+        self.baskets.rename(folder / "baskets.yaml")
+        self.review = folder / "activity_spine.csv"
+        self.baskets = folder / "baskets.yaml"
         first = self.prepare()
         signed, audited, makers = self.returns(first)
         # First candidate contains a person-signed acknowledgement and audited decisions.
         candidate = self.assemble(first, (signed, audited, makers))
         earlier = read_review_csv(candidate / "activity_spine.csv")
-        self.review.write_bytes((candidate / "activity_spine.csv").read_bytes())
-        for name in ("activity_spine_audits.json",):
-            (self.cache / name).write_bytes((candidate / name).read_bytes())
-        (self.cache / "review.binding.json").write_bytes(
-            (candidate / "activity_spine.binding.json").read_bytes()
-        )
+        old_bytes = self.install_candidate(candidate)
+        from spine_triage_io import file_hash
+
+        audit_path = self.review.with_name("activity_spine_audits.json")
         prepared = prepare_review_inputs(
             self.root, self.cache, self.review, "invented-second", "invented_preparer"
         )
         self.assertEqual(read_review_csv(prepared / "queue.csv"), ())
         paths = self.returns(prepared)
+        makers = json.loads(paths[2].read_bytes())
+        paths[2].write_text(json.dumps({**makers, "seed": 3141592654}))
         second = self.assemble(prepared, paths, "invented-second-assembled")
         self.assertEqual(read_review_csv(second / "activity_spine.csv"), earlier)
         self.assertEqual(
             (second / "activity_spine_audits.json").read_bytes(),
-            (candidate / "activity_spine_audits.json").read_bytes(),
+            old_bytes,
+        )
+        manifest = json.loads((prepared / "manifest.json").read_bytes())
+        self.assertEqual(
+            manifest["snapshot"]["inputs"]["audits"], file_hash(audit_path)
         )
 
     def test_rejected_row_is_bound_and_audit_disagreement_is_not_accepted(self) -> None:
@@ -508,6 +581,252 @@ class SpineReviewTest(unittest.TestCase):
                 self.assemble(prepared, paths)
         self.assertFalse((self.cache / "spine_review/invented-assembled").exists())
 
+    def test_draw_packet_is_blind_and_bound_before_auditor_return(self) -> None:
+        from spine_triage_io import file_hash
+
+        prepared = self.prepare()
+        paths = self.returns(prepared)
+        paths[1].unlink()  # Drawing cannot require or read an auditor return.
+        drawn = self.draw(prepared, paths)
+        record = json.loads(drawn.read_bytes())
+        self.assertEqual(
+            record,
+            dict(
+                manifest_sha256=file_hash(prepared / "manifest.json"),
+                signer_rows_sha256=file_hash(paths[0]),
+                maker_record_sha256=file_hash(paths[2]),
+                seed=3141592653,
+                batch_id="invented-batch",
+                sampled_codes=["5610901", "5610902"],
+            ),
+        )
+        packet = json.loads(drawn.with_name("audit_packet.json").read_bytes())
+        self.assertEqual(
+            packet, json.loads((prepared / "signer_packet.json").read_bytes())
+        )
+        self.assertTrue(
+            all(
+                set(row)
+                == {"code", "name_ar", "prefix", "class_title_en", "class_title_ar"}
+                for row in packet
+            )
+        )
+
+    def test_draw_input_change_during_validation_refuses(self) -> None:
+        import spine_review
+        from spine_triage_io import Refusal
+
+        prepared = self.prepare()
+        paths = self.returns(prepared)
+        original = spine_review.decision_rows
+
+        def change(*args: Any) -> Any:
+            result = original(*args)
+            paths[0].write_bytes(paths[0].read_bytes() + b"\n")
+            return result
+
+        with patch("spine_review.decision_rows", side_effect=change):
+            with self.assertRaisesRegex(Refusal, "^returned_inputs_changed$"):
+                self.draw(prepared, paths)
+        self.assertFalse((prepared.parent / (prepared.name + "-draw")).exists())
+
+    def test_finalise_input_change_during_validation_refuses(self) -> None:
+        import spine_review
+        from spine_triage_io import Refusal
+
+        prepared = self.prepare()
+        candidate = self.assemble(prepared, self.returns(prepared))
+        original = spine_review.verify_candidate
+
+        def change(*args: Any) -> Any:
+            result = original(*args)
+            review = candidate / "activity_spine.csv"
+            review.write_bytes(review.read_bytes() + b"\n")
+            return result
+
+        with patch("spine_review.verify_candidate", side_effect=change):
+            with self.assertRaisesRegex(Refusal, "^returned_inputs_changed$"):
+                spine_review.finalise_check(
+                    self.root,
+                    prepared / "manifest.json",
+                    candidate / "activity_spine.csv",
+                    "invented-final",
+                )
+        self.assertFalse((prepared.parent / "invented-final").exists())
+
+    def test_finalise_manifest_change_during_context_refuses(self) -> None:
+        import spine_review
+        from spine_triage_io import Refusal
+
+        prepared = self.prepare()
+        candidate = self.assemble(prepared, self.returns(prepared))
+        manifest = prepared / "manifest.json"
+        original = spine_review.frozen_context
+        calls = 0
+
+        def change(*args: Any) -> Any:
+            nonlocal calls
+            result = original(*args)
+            calls += 1
+            if calls == 1:
+                manifest.write_bytes(manifest.read_bytes() + b"\n")
+            return result
+
+        with patch("spine_review.frozen_context", side_effect=change):
+            with self.assertRaisesRegex(Refusal, "^returned_inputs_changed$"):
+                spine_review.finalise_check(
+                    self.root,
+                    manifest,
+                    candidate / "activity_spine.csv",
+                    "invented-final",
+                )
+        self.assertFalse((prepared.parent / "invented-final").exists())
+
+    def test_baskets_symlink_refuses_before_reader(self) -> None:
+        from spine_triage_io import Refusal
+
+        folder = self.root / "review"
+        folder.mkdir()
+        self.review.rename(folder / "activity_spine.csv")
+        self.review = folder / "activity_spine.csv"
+        (folder / "baskets.yaml").symlink_to(self.baskets)
+        with patch(
+            "spine_review.parse_yaml", side_effect=AssertionError("reader reached")
+        ):
+            with self.assertRaisesRegex(Refusal, "^input refused$"):
+                self.prepare()
+        self.assertFalse((self.cache / "spine_review").exists())
+
+    def test_review_audit_symlink_refuses_before_reader(self) -> None:
+        from spine_triage_io import Refusal
+
+        folder = self.root / "review"
+        folder.mkdir()
+        self.review.rename(folder / "activity_spine.csv")
+        self.baskets.rename(folder / "baskets.yaml")
+        self.review = folder / "activity_spine.csv"
+        self.baskets = folder / "baskets.yaml"
+        (folder / "activity_spine_audits.json").symlink_to(self.cache / "queue.csv")
+        with patch(
+            "spine_review.reviewed_selections",
+            side_effect=AssertionError("reader reached"),
+        ):
+            with self.assertRaisesRegex(Refusal, "^input refused$"):
+                self.prepare()
+        self.assertFalse((self.cache / "spine_review").exists())
+
+    def test_draw_only_samples_thirty_blind_packets(self) -> None:
+        from eii_custodian.publicdata.fetch.registry import load_registry
+        from eii_custodian.publicdata.review.activity import audit_sample
+        from eii_custodian.publicdata.review.cache_fixture import (
+            real_feed_body,
+            write_cached,
+        )
+
+        entry = next(e for e in load_registry() if e.key == "lic_active")
+        write_cached(
+            self.cache,
+            entry,
+            real_feed_body(
+                "lic_active",
+                [
+                    dict(
+                        activity_code=f"5610{index:03d}",
+                        activity_name_ar="نشاط مخترع",
+                        active_count=1,
+                    )
+                    for index in range(35)
+                ],
+            ),
+        )
+        prepared = self.prepare()
+        paths = self.returns(prepared)
+        drawn = self.draw(prepared, paths)
+        sample = audit_sample([r.code for r in read_review_csv(paths[0])], 3141592653)
+        packet = json.loads(drawn.with_name("audit_packet.json").read_bytes())
+        self.assertEqual(len(packet), 30)
+        self.assertEqual([row["code"] for row in packet], list(sample))
+        write_review_csv(
+            paths[1], [row for row in read_review_csv(paths[1]) if row.code in sample]
+        )
+        self.assemble(prepared, paths, draw=drawn)
+
+    def test_previous_audits_strict_json(self) -> None:
+        from spine_review import previous_audits
+        from spine_triage_io import Refusal
+
+        path = self.review.with_name("activity_spine_audits.json")
+        for body in (b'[{"seed": 1, "seed": 2}]', b"[{", b"\xff", b"{}"):
+            path.write_bytes(body)
+            with (
+                self.subTest(body=body),
+                self.assertRaisesRegex(Refusal, "^previous_audits_invalid$"),
+            ):
+                previous_audits(self.root, self.review)
+
+    def test_audit_seed_reuse_refuses(self) -> None:
+        from spine_review import require_fresh_seed
+        from spine_triage_io import Refusal
+
+        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+            require_fresh_seed([{"seed": 3141592653}], 3141592653)
+        require_fresh_seed([{"seed": 3141592653}], 3141592654)
+
+    def test_draw_refuses_seed_from_earlier_valid_batch(self) -> None:
+        from spine_triage_io import Refusal
+
+        prepared, paths, _ = self.next_batch(3141592653)
+        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+            self.draw(prepared, paths)
+        self.assertFalse((prepared.parent / (prepared.name + "-draw")).exists())
+
+    def test_empty_batch_refuses_seed_reuse(self) -> None:
+        from spine_review import prepare_review_inputs
+        from spine_triage_io import Refusal
+
+        first = self.prepare()
+        self.install_candidate(self.assemble(first, self.returns(first)))
+        prepared = prepare_review_inputs(
+            self.root, self.cache, self.review, "invented-empty", self.preparer
+        )
+        paths = self.returns(prepared)
+        self.assertEqual(read_review_csv(prepared / "queue.csv"), ())
+        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+            self.draw(prepared, paths)
+        self.assertFalse((prepared.parent / "invented-empty-draw").exists())
+
+    def test_assemble_rechecks_seed_from_earlier_valid_batch(self) -> None:
+        from spine_triage_io import Refusal
+
+        prepared, paths, _ = self.next_batch(3141592653)
+        # Isolate assembly's guard: emulate a draw emitted with its seed check removed.
+        with patch("spine_review.require_fresh_seed"):
+            drawn = self.draw(prepared, paths)
+        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+            self.assemble(prepared, paths, "invented-second-assembled", draw=drawn)
+        self.assertFalse((prepared.parent / "invented-second-assembled").exists())
+
+    def test_fresh_second_batch_preserves_prior_record_bytes(self) -> None:
+        prepared, paths, old_bytes = self.next_batch(3141592654)
+        candidate = self.assemble(prepared, paths, "invented-second-assembled")
+        body = (candidate / "activity_spine_audits.json").read_bytes()
+        self.assertTrue(body.startswith(old_bytes[: old_bytes.rfind(b"]")]))
+        audits = json.loads(body)
+        self.assertEqual(len(audits), 2)
+        self.assertEqual(audits[0], json.loads(old_bytes)[0])
+        self.assertEqual(audits[1]["codes"], ["5610903"])
+
+    def test_append_preserves_earlier_audit_record_bytes(self) -> None:
+        from spine_review import append_audit
+
+        body = b' \n[ { "seed" : 3141592653 }  ]\t\n'
+        result = append_audit(body, [{"seed": 3141592653}], {"seed": 3141592654})
+        self.assertIn(b'{ "seed" : 3141592653 }', result)
+        self.assertEqual(
+            json.loads(result), [{"seed": 3141592653}, {"seed": 3141592654}]
+        )
+        self.assertEqual(append_audit(body, [{"seed": 3141592653}], None), body)
+
 
 # Each row changes one frozen file or one returned field; all other inputs stay valid.
 REFUSALS = {
@@ -524,8 +843,10 @@ REFUSALS = {
     "signer_coverage": "signer_coverage_differs",
     "judgement_name": "judgement_identity_differs",
     "signer_decision": "signer_decision_invalid",
+    "signer_other_class": "signer_decision_invalid",
     "signer_role": "signer_role_differs",
     "acknowledgement_decision": "acknowledgement_decision_invalid",
+    "acknowledgement_role": "acknowledgement_role_invalid",
     "auditor_coverage": "auditor_coverage_differs",
     "auditor_identity": "auditor_identity_differs",
     "audit_disagreement": "audit_decision_differs",
@@ -537,6 +858,24 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
     def test(self: SpineReviewTest) -> None:
         from spine_triage_io import Refusal
 
+        if plant == "signer_other_class":
+            from eii_custodian.publicdata.fetch.registry import load_registry
+            from eii_custodian.publicdata.review.cache_fixture import (
+                class_csv,
+                write_cached,
+            )
+
+            entry = next(e for e in load_registry() if e.key == "cls_isic4")
+            write_cached(
+                self.cache,
+                entry,
+                class_csv(
+                    [
+                        ("5610", "Invented test class"),
+                        ("5630", "Another invented class"),
+                    ]
+                ),
+            )
         if plant == "same_preparer":
             self.preparer = "invented_signer"
         if plant == "previous_audits":
@@ -577,10 +916,14 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
             signed[0] = replace(signed[0], name_ar="اسم مخترع معدل")
         elif plant == "signer_decision":
             signed[0] = replace(signed[0], reason="reviewer_rejected")
+        elif plant == "signer_other_class":
+            signed[0] = replace(signed[0], isic_class="5630")
         elif plant == "signer_role":
             signed[0] = replace(signed[0], reviewed_by_role="INVENTED other role")
         elif plant == "acknowledgement_decision":
             signed[-1] = replace(signed[-1], status="unreviewed")
+        elif plant == "acknowledgement_role":
+            signed[-1] = replace(signed[-1], reviewed_by_role=record["signer_role"])
         elif plant == "auditor_coverage":
             audited.pop()
         elif plant == "auditor_identity":
@@ -611,3 +954,49 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
 
 for _plant, _reason in REFUSALS.items():
     setattr(SpineReviewTest, "test_refuses_" + _plant, refusal_case(_plant, _reason))
+
+
+def draw_change_case(field: str) -> Callable[[SpineReviewTest], None]:
+    def test(self: SpineReviewTest) -> None:
+        from spine_triage_io import Refusal
+
+        prepared = self.prepare()
+        paths = self.returns(prepared)
+        drawn = self.draw(prepared, paths)
+        if field in ("manifest", "signer", "makers"):
+            path = {
+                "manifest": prepared / "manifest.json",
+                "signer": paths[0],
+                "makers": paths[2],
+            }[field]
+            path.write_bytes(path.read_bytes() + b"\n")
+        else:
+            record = json.loads(drawn.read_bytes())
+            record[field] = {
+                "seed": 3141592654,
+                "batch_id": "invented-other",
+                "sampled_codes": ["5610901"],
+                "manifest_sha256": "0" * 64,
+                "signer_rows_sha256": "0" * 64,
+                "maker_record_sha256": "0" * 64,
+            }[field]
+            drawn.write_text(json.dumps(record))
+        with self.assertRaisesRegex(Refusal, "^draw_changed$"):
+            self.assemble(prepared, paths, draw=drawn)
+        self.assertFalse((prepared.parent / "invented-assembled").exists())
+
+    return test
+
+
+for _field in (
+    "manifest",
+    "signer",
+    "makers",
+    "seed",
+    "batch_id",
+    "sampled_codes",
+    "manifest_sha256",
+    "signer_rows_sha256",
+    "maker_record_sha256",
+):
+    setattr(SpineReviewTest, "test_refuses_draw_" + _field, draw_change_case(_field))

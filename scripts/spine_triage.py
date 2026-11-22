@@ -165,16 +165,19 @@ class Parser(argparse.ArgumentParser):
 
 
 def review_main(argv: list[str], root: Path) -> int:
-    """Three offline modes; no provider or gateway construction is reachable."""
+    """Offline review modes; no provider or gateway construction is reachable."""
     from spine_review import (
         assemble_audited_review,
+        draw_audit,
         finalise_check,
         prepare_review_inputs,
     )
 
     parser = Parser(description="Offline audited activity review")
     parser.add_argument(
-        "--mode", required=True, choices=("prepare", "assemble", "finalise-check")
+        "--mode",
+        required=True,
+        choices=("prepare", "draw", "assemble", "finalise-check"),
     )
     parser.add_argument("--run-id", required=True)
     for name in (
@@ -184,6 +187,7 @@ def review_main(argv: list[str], root: Path) -> int:
         "signer-rows",
         "auditor-rows",
         "maker-record",
+        "draw",
     ):
         parser.add_argument("--" + name, type=Path)
     parser.add_argument("--preparer-maker")
@@ -191,11 +195,13 @@ def review_main(argv: list[str], root: Path) -> int:
         args = parser.parse_args(argv)
         required = {
             "prepare": (args.cache, args.review, args.preparer_maker),
+            "draw": (args.manifest, args.signer_rows, args.maker_record),
             "assemble": (
                 args.manifest,
                 args.signer_rows,
                 args.auditor_rows,
                 args.maker_record,
+                args.draw,
             ),
             "finalise-check": (args.manifest, args.review),
         }
@@ -207,6 +213,11 @@ def review_main(argv: list[str], root: Path) -> int:
             )
             counts = json.loads((target / "manifest.json").read_bytes())["counts"]
             print(" ".join(f"{key}={value}" for key, value in sorted(counts.items())))
+        elif args.mode == "draw":
+            draw_audit(
+                root, args.manifest, args.signer_rows, args.maker_record, args.run_id
+            )
+            print("OK audit draw")
         elif args.mode == "assemble":
             assemble_audited_review(
                 root,
@@ -215,6 +226,7 @@ def review_main(argv: list[str], root: Path) -> int:
                 args.auditor_rows,
                 args.maker_record,
                 args.run_id,
+                args.draw,
             )
             print("OK audited candidate")
         else:

@@ -64,7 +64,7 @@ There is no application import, table, screen or automatic mapping.
 
 ## Offline audited review modes (decision 0075, OI-203)
 
-The lead order is **prepare, triage with provider none, sign, audit, assemble,
+The lead order is **prepare, triage with provider none, sign, draw, audit, assemble,
 finalise-check**, followed by the lead's review and commit of the candidate trio.
 These modes never construct a gateway, fetch a source or change committed review
 files. Use a fresh run identifier for every output folder. All paths must be
@@ -75,7 +75,8 @@ instructions to read a real cache.
 ```sh
 uv run --locked python scripts/spine_triage.py --mode prepare --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --preparer-maker PREPARER --run-id oi203-prepared
 EII_DECISION_PROVIDER=none uv run --locked python scripts/spine_triage.py --queue data/public_cache/spine_review/oi203-prepared/queue.csv --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --membership data/public_cache/spine_review/oi203-prepared/membership.json --run-id oi203-triage
-uv run --locked python scripts/spine_triage.py --mode assemble --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --auditor-rows data/public_cache/auditor.csv --maker-record data/public_cache/makers.json --run-id oi203-candidate
+uv run --locked python scripts/spine_triage.py --mode draw --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --maker-record data/public_cache/makers.json --run-id oi203-drawn
+uv run --locked python scripts/spine_triage.py --mode assemble --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --auditor-rows data/public_cache/auditor.csv --maker-record data/public_cache/makers.json --draw data/public_cache/spine_review/oi203-drawn/draw.json --run-id oi203-candidate
 uv run --locked python scripts/spine_triage.py --mode finalise-check --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --review data/public_cache/spine_review/oi203-candidate/activity_spine.csv --run-id oi203-final
 ```
 
@@ -95,11 +96,17 @@ covering every queue row exactly once. Eligible rows permit only `mapped` with
 the prefix and `reviewer_approved`, or `not_mappable_rejected` with an empty
 class and `reviewer_rejected`. Mandatory legacy and invalid-prefix rows keep
 their derived status and reason, empty class, and individual signed
-acknowledgements; they are not eligible model mapping decisions. All names and
-code lengths stay unchanged. Signed rows need the actual ISO signing date.
+acknowledgements by a person; model-review roles on these rows refuse with
+`acknowledgement_role_invalid`. All names and code lengths stay unchanged.
+Signed rows need the actual ISO signing date.
 
-Freeze the signer's returned file before drawing `audit_sample` with the
-recorded seed. Give an independent auditor only the sampled minimal packets,
+Freeze the signer's returned file and maker record, then run `--mode draw`
+before sending anything to the auditor. It writes `draw.json` and
+`audit_packet.json` in a fresh run folder. The draw binds the exact preparation
+manifest, signer-file and maker-record hashes, seed, batch id and ordered sampled
+codes. The audit packet copies only those codes' minimal entries from
+`signer_packet.json`; it contains no signer status, reason or role. Preserve the
+draw as the pre-audit evidence. Give the independent auditor only that packet,
 without signer answers. The auditor returns the same CSV contract for exactly
 the sampled codes, its own role and the actual audit date. Its decisions must
 match in every judgement field. The maker record is a JSON object with exactly
@@ -109,15 +116,21 @@ case. The signer differs from both preparer and auditor. The seed, date,
 independence, draw and zero-error requirements are decision 0075 item 4's
 existing admission contract. A disagreement refuses the batch; arrange fresh
 code-by-code signing and a fresh seeded audit under item 3, never edit the
-auditor's decision to match. Empty eligible batches produce no new audit batch.
+auditor's decision to match. A seed already in any earlier audit refuses with
+`audit_seed_reused`, including a draw for an empty eligible batch. Empty eligible
+batches produce no new audit record and preserve the earlier audit file's bytes.
 
 `assemble` rederives frozen inputs and verifies returned coverage and decisions
-before publishing anything. It preserves earlier review rows outside the queue
-and earlier audit records, then calls the normal admission and finalisation
+before publishing anything. `--draw` is mandatory; a changed manifest, signer
+file, maker record, seed, batch id or sample refuses with `draw_changed`.
+It preserves earlier review rows outside the queue and parses the review file's
+adjacent `activity_spine_audits.json` with duplicate-key refusal. Earlier audit
+record bytes remain intact when appending; with no new batch the whole file is
+byte-identical. It then calls the normal admission and finalisation
 checks on a temporary candidate. It writes `activity_spine.csv`,
 `activity_spine_audits.json`, `activity_spine.binding.json` and `assembly.json`
 into a fresh run folder. The binding hashes the exact emitted audit bytes;
-`assembly.json` hashes the frozen manifest, returned files and emitted trio.
+`assembly.json` hashes the frozen manifest, draw, returned files and emitted trio.
 Rejections bind their prefix's classification title just as approvals bind
 their class title. Temporary validation files are removed on refusal; no
 candidate folder is published.
@@ -125,8 +138,11 @@ candidate folder is published.
 `finalise-check` rederives membership and inputs from the preparation manifest,
 loads the selected candidate through the ordinary spine admission guards and
 calls `finalise_spine`. It writes `result.json` binding the manifest, review,
-binding and audit hashes, source snapshot and resulting spine manifest. A
-mandatory unsigned row exits nonzero, with no result folder. Run this before
+binding and audit hashes, source snapshot and resulting spine manifest. It
+hashes inputs before verification, rechecks the frozen snapshot and rehashes
+inputs before publication; a changed input refuses with
+`returned_inputs_changed`. A mandatory unsigned row exits nonzero, with no
+result folder. Run this before
 installing the candidate trio into the committed review folder, because the
 preparation manifest also freezes the earlier committed review bytes.
 
