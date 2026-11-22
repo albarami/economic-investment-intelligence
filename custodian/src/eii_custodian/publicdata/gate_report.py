@@ -17,15 +17,11 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from eii_custodian.publicdata.completeness import in_use
-from eii_custodian.publicdata.confirm_s2_t13 import Confirmation, own_run_pending
+from eii_custodian.publicdata.confirm_s2_t13 import Confirmation
 from eii_custodian.publicdata.confirm_s2_t13 import (
     completion_evidence as tender_completion_evidence,
 )
-from eii_custodian.publicdata.fetch.own_run import (
-    OWN_RUN_CAVEAT,
-    OWN_RUN_REASON,
-    is_own_run_entry,
-)
+from eii_custodian.publicdata.fetch.own_run import OWN_RUN_REASON, is_own_run_entry
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.method_card_validation import (
     completion_evidence as method_pin_completion_evidence,
@@ -275,9 +271,9 @@ def confirmations(
                     )
                     or (
                         task == "S2-T13"
-                        and is_own_run_entry(rows[key])
-                        and item.absence_reasons.get(key) == OWN_RUN_REASON
                         and key not in receipts
+                        and item.absence_reasons.get(key) == OWN_RUN_REASON
+                        and is_own_run_entry(rows[key])
                     )
                 )
                 for key in item.source_keys
@@ -302,8 +298,12 @@ def tender_evidence(
     row: Entry | None,
     receipt: Mapping[str, object] | None,
     reference: str,
+    archive: Mapping[str, object] | None = None,
 ) -> ConfirmationEvidence:
     """Reuse S2-T13's existing validation instead of duplicating its loader."""
+    from .confirm_s2_t13 import own_run_pending
+    from .fetch.own_run import OWN_RUN_CAVEAT, OWN_RUN_REASON
+
     pending = False
     try:
         tender_completion_evidence(confirmation, row, receipt)
@@ -312,6 +312,40 @@ def tender_evidence(
         confirmed = False
     else:
         confirmed = True
+    details: dict[str, object] = {}
+    if confirmed and pending:
+        details = {
+            "state": "NO_DATA",
+            "reason": OWN_RUN_REASON,
+            "caveat": OWN_RUN_CAVEAT,
+        }
+    elif confirmed and archive is not None and receipt is not None:
+        readings = archive.get("readings")
+        if isinstance(readings, list):
+            details = {
+                "state": "in use",
+                "sha256": receipt.get("sha256"),
+                "retrieved_utc": receipt.get("retrieved_utc"),
+                "terms_sha256": receipt.get("terms_sha256"),
+                "awarded_readings": [
+                    {
+                        key: reading.get(key)
+                        for key in (
+                            "language",
+                            "award_cutoff",
+                            "cutoff_reason",
+                            "workbook_sha256",
+                            "pages_read",
+                            "stop_page",
+                            "continuity_pages",
+                            "last_page_read",
+                        )
+                    }
+                    for reading in readings
+                    if isinstance(reading, dict)
+                    and reading.get("list_name") == "awarded"
+                ],
+            }
     return ConfirmationEvidence(
         "S2-T13",
         (row.key,) if row else (),
@@ -323,10 +357,7 @@ def tender_evidence(
         absence_reasons={row.key: OWN_RUN_REASON if pending else row.skip_reason}
         if row and confirmed and (row.skip_reason or pending)
         else {},
-        # Decision 0085 item 9, row C-09: the technical-reason branch.
-        details={"state": "NO_DATA", "reason": OWN_RUN_REASON, "caveat": OWN_RUN_CAVEAT}
-        if pending
-        else {},
+        details=details,
     )
 
 

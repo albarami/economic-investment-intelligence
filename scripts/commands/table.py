@@ -37,6 +37,13 @@ COMMANDS: tuple[Command, ...] = (
     Command(TEST_FORM, "test", "All", "real", ""),
     Command("build-public [--seed N]", "build-public", "Custodian", "real", ""),
     Command(
+        "build-public --tenders-only [--resume]",
+        "build-public",
+        "Custodian",
+        "real",
+        "",
+    ),
+    Command(
         "build-public --gis-imagery-snapshot", "build-public", "Custodian", "real", ""
     ),
     Command("build-public --cdse-backup", "build-public", "Custodian", "real", ""),

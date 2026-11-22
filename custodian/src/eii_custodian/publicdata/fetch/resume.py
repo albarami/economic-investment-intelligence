@@ -509,10 +509,19 @@ class RunRecord:
         )
         if {p for p in paths if p.suffix == ".html"} != set(html):
             raise ValueError("page_inventory_invalid")
+        from .awards import intake_cutoff
+
+        manifest = self.cache / "intake/awards_owner_scrape/intake.json"
         return {
             "publisher": entry.publisher,
             "retrieved_utc": state["retrieved_utc"],
             "sha256": state["digest"],
+            "intake": {
+                "manifest_sha256": file_hash(manifest) if manifest.is_file() else None,
+                "cutoff": list(
+                    intake_cutoff(self.cache, cast(str, state["retrieved_utc"]))
+                ),
+            },
             "files": {
                 p.relative_to(self.cache).as_posix(): file_hash(p) for p in paths
             },
@@ -522,35 +531,45 @@ class RunRecord:
         self, entry: Entry, item: dict[str, Any], lines: list[str]
     ) -> dict[str, Any] | None:
         try:
-            state = item["fetch"]
-            saved = item["page_meta"]
-            started = utc(self.row["started_utc"])
-            if (
-                not self._valid_state(state)
-                or not isinstance(saved, dict)
-                or state["fetch_host"] != entry.fetch_host
-                or saved.get("publisher") != entry.publisher
-                or utc(saved.get("retrieved_utc")) < started
-                or state.get("retrieved_utc") != saved["retrieved_utc"]
-                or state.get("digest") != saved["sha256"]
-            ):
-                raise ValueError("page_meta_invalid")
-            # Compute the closed inventory from the receipts again, and hash
-            # every page and receipt, including any added or missing page.
-            current = self._page_meta(entry, state)
-            if current != saved:
-                raise ValueError("page_meta_changed")
-            for name in saved["files"]:
-                if self._local(name, entry).stat().st_mtime < started.timestamp():
-                    raise ValueError("page_file_old")
+            state = self.proven_pages(entry, item)
         except (OSError, ValueError, KeyError, TypeError):
             self._invalidate(entry, lines)
             return None
+        saved = item["page_meta"]
         lines.append(
             f"REUSE {entry.key} interrupted_start={self.row['started_utc']} "
             f"publisher={saved['publisher']} retrieved_utc={saved['retrieved_utc']} "
             f"sha256={saved['sha256']}"
         )
+        return state
+
+    def proven_pages(
+        self, entry: Entry, item: dict[str, Any], *, legacy_intake: bool = False
+    ) -> dict[str, Any]:
+        """Check a completed page set without mutating any journal."""
+        state = item["fetch"]
+        saved = item["page_meta"]
+        if not self._valid_state(state) or not isinstance(saved, dict):
+            raise ValueError("page_meta_changed")
+        started = utc(self.row["started_utc"])
+        current = self._page_meta(entry, state)
+        if legacy_intake and "intake" not in saved:
+            # Earlier journals had page proofs but no intake fingerprint. A
+            # handoff checks the archive's readings against the current main
+            # intake separately; ordinary resume never gets this exception.
+            saved = {**saved, "intake": current["intake"]}
+        if (
+            state["fetch_host"] != entry.fetch_host
+            or saved.get("publisher") != entry.publisher
+            or utc(saved.get("retrieved_utc")) < started
+            or state.get("retrieved_utc") != saved["retrieved_utc"]
+            or state.get("digest") != saved["sha256"]
+            or current != saved
+        ):
+            raise ValueError("page_meta_changed")
+        for name in saved["files"]:
+            if self._local(name, entry).stat().st_mtime < started.timestamp():
+                raise ValueError("page_file_old")
         return cast(dict[str, Any], state)
 
     def _invalidate(self, entry: Entry, lines: list[str]) -> None:

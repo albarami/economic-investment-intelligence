@@ -397,6 +397,13 @@ def test_nonpublic_address_hosts_refused_before_manifest_admission(url):
         Manifest.from_data(value)
 
 
+def test_trailing_dot_website_keeps_earlier_admission():
+    assert (
+        checked_url("https://example.invalid./about")
+        == "https://example.invalid./about"
+    )
+
+
 @pytest.mark.parametrize(
     "title",
     [

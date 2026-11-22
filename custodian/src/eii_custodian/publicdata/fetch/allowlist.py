@@ -169,21 +169,30 @@ def secret_in_url(url: str, secret: str) -> bool:
 
 def host_of(url: str) -> str:
     """Return the lowercase host of a URL, or an empty string."""
-    return (urlsplit(url).hostname or "").casefold()
+    try:
+        return (urlsplit(url).hostname or "").removesuffix(".").casefold()
+    except ValueError:
+        return ""
 
 
-def reviewed_url(url: str) -> bool:
-    """True for an allow-listed HTTPS URL with no query, fragment or credential."""
+def safe_https_shape(url: str) -> bool:
+    """Check the URL shape used by reviewed pages and registered endpoints."""
     try:
         parts = urlsplit(url)
         return (
-            not any(ord(char) <= 32 for char in url)
+            parts.scheme.casefold() == "https"
+            and not any(ord(char) <= 32 for char in url)
             and parts.username is None
+            # O5/O7 password checks are defence in depth: password exposes username.
             and parts.password is None
             and not parts.query
             and not parts.fragment
             and parts.port in (None, 443)
-            and approve(url).ok
         )
     except ValueError:
         return False
+
+
+def reviewed_url(url: str) -> bool:
+    """True for an allow-listed HTTPS URL with no query, fragment or credential."""
+    return safe_https_shape(url) and approve(url).ok
