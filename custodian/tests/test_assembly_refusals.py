@@ -404,6 +404,66 @@ def test_wrapped_refusal_names_both_closed_causes_without_changing_exception():
     ]
 
 
+@pytest.mark.parametrize(
+    "chain,outer_kind,inner_kind,reasons",
+    [
+        (
+            "explicit",
+            "AssemblyError",
+            "ValueError",
+            ["assembly_input_refused", "heights_unexpected_valueerror"],
+        ),
+        (
+            "implicit",
+            "PlacesError",
+            "ValueError",
+            ["heights_unexpected_placeserror", "heights_unexpected_valueerror"],
+        ),
+        (
+            "suppressed",
+            "OSError",
+            "KeyError",
+            ["heights_unexpected_oserror", "heights_unexpected_keyerror"],
+        ),
+        (
+            "cycle",
+            "OSError",
+            "KeyError",
+            ["heights_unexpected_oserror", "heights_unexpected_keyerror"],
+        ),
+    ],
+)
+def test_exception_chains_keep_closed_lines_and_exception_identity(
+    chain, outer_kind, inner_kind, reasons
+):
+    from eii_custodian.publicdata.assembly_refusals import stage_refusals
+
+    message = "/syn/leak/path 1234567890 https://syn.invalid/x"
+    outer = planted_error(
+        outer_kind, "assembly_input_refused" if chain == "explicit" else message
+    )
+    inner = planted_error(inner_kind, message)
+    if chain == "cycle":
+        outer.__cause__ = inner
+        inner.__cause__ = outer
+    lines = []
+    with pytest.raises(type(outer), match=re.escape(str(outer))) as raised:
+        with stage_refusals(lines, "heights"):
+            if chain == "explicit":
+                raise outer from inner
+            if chain == "cycle":
+                raise outer
+            try:
+                raise inner
+            except type(inner):
+                if chain == "suppressed":
+                    raise outer from None
+                raise outer  # noqa: B904 -- exercise implicit exception context
+    assert raised.value is outer
+    assert lines == ["REFUSED heights " + reason for reason in reasons]
+    assert not any(re.search(r"/syn|[0-9]{10}|https?:", line) for line in lines)
+
+
 def test_exception_context_cycle_is_finite_and_deduplicated(monkeypatch):
     from eii_custodian.publicdata import assembly_refusals
     from eii_custodian.publicdata.assembly_refusals import note_refusal

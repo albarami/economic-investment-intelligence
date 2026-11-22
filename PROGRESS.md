@@ -52059,3 +52059,29 @@ all earlier real exits and per-file line counts are in `.overnight/RETURN.md` an
 `.overnight/tmp/p56-evidence/commands.jsonl`. No acceptance box is ticked, no live
 release or slice gate is claimed, and independent maker review remains pending
 under PO-S2-P56-01.
+
+## S2-P56 round 2 — explicit-cause planted test and record clarifications — 2026-11-22
+
+OpenAI Codex, senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects a branch without a planted violation.
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate; test-driven-development and
+verification-before-completion equivalent rules supplied by the round-2 brief.
+Base `d27da212c96442f57e598370f8ce1e39111b760a`; the single resulting commit,
+bundle and checksum are recorded in `.overnight/RETURN.md`. Python 3.14.6,
+`UV_OFFLINE=1 EII_DECISION_PROVIDER=none`, Hypothesis seed 56; temporary files
+and tool caches remain under `.overnight/tmp/`. No network or real source cache
+was used. The new test reuses `planted_error` and checks exact closed lines,
+exception identity and the specified leak pattern for explicit cause, implicit
+context, suppressed context and a cause cycle. The source is byte-identical to
+the base after restoring the context-only plant; no production guard changed.
+
+R1 correction to the earlier S2-P56 evidence: `refusal-invariants.json` was local,
+uncommitted comparison evidence, not a committed reproducible test, and is not
+reproduced by this round. R3/R4 clarifications are appended to document 12,
+"Closed assembly refusal diagnostics (S2-P56)". PO-S2-P56-01 records R5's
+exception-delivery limit; PO-S2-P56-02 leaves R2's separate `plan` stage open.
+
+| Round | Commands, counts, real exits and evidence |
+|---|---|
+| S2-P56 R2 | `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_assembly_refusals.py -k test_exception_chains_keep_closed_lines_and_exception_identity --hypothesis-seed=56`: context-only plant 2 failed, 2 passed, 955 deselected, exit 1; restored source 4 passed, 955 deselected, exit 0. The same pytest command without `-k`, adding `custodian/tests/test_places_build_lines.py custodian/tests/test_fetch_fingerprint.py`: 1145 passed, exit 0. `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check`: exit 0 each. `python3 scripts/check_docs.py`: first exit 1 because the workspace-local Git metadata lacked the existing `.overnight/` exclusion; after copying the original local exclusion policy, exit 0. Initial local-Git setup exited 1 because `.git` is read-only; explicit workspace-local `GIT_DIR`/`GIT_WORK_TREE` resolved it, without changing shared metadata. Full commands and logs: `.overnight/tmp/p56-r2-evidence/commands.jsonl` and sibling logs (initial documentation-scan local paths and identity redacted). Independent maker approval and lead-owned integration evidence remain pending; no slice gate is claimed. |

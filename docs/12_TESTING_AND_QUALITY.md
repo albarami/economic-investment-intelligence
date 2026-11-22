@@ -951,3 +951,10 @@ recorded once each. The original exception object, refusal conditions, existing
 failure. The observer is bound only for assembly execution, so legacy producer
 logging and the fetch fingerprint's exclusion of assembly dependencies remain
 unchanged. Inventory plants use invented producer outputs and no acquisition.
+
+Round-2 clarification (R3 and R4): non-terminal `REFUSED <stage> <reason>`
+lines can appear in a build that otherwise passes, including caught refusals
+whose existing policy skips an input or retains a blocked result. The legacy
+producer logging formats are unchanged only outside assembly; under assembly,
+the observer replaces those diagnostics with the closed stage/reason format.
+The fetch fingerprint boundary remains unchanged.
