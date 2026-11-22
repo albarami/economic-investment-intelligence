@@ -179,8 +179,13 @@ def test_check_and_placeholder_replacement(tmp_path: Path) -> None:
     assert generate(registry=committed) == generated
     old = {row["key"]: row for row in registry_rows()}
     new = {row["key"]: row for row in committed}
+    item = "bldg_ovt/stac-part-"
+    assert {key for key in new if key.startswith(item)} == {
+        row["key"] for row in generated
+    }
     for key in old.keys() - {row["key"] for row in generated}:
-        assert old[key] == new[key]
+        if not key.startswith(item):
+            assert old[key] == new[key]
 
 
 def test_component_assignment_roundtrip() -> None:
