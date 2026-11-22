@@ -6244,5 +6244,7 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
   implementation. Neither is claimed by this record.
 - LIMITS: invented stand-in fixtures only; no live register read, no release
   command, no admission-policy or registration-key-exception change, no slice
-  gate. The published-tower basis and sole-proprietor questions stay open as
-  before.
+  gate. The receipt list binds the tables only through the lead's manifest
+  pin: raw files are not retained, so a stale receipt list under a fresh pin
+  is undetectable by the reader; pin review is the sole control. The
+  published-tower basis and sole-proprietor questions stay open as before.

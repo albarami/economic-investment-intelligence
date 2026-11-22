@@ -536,7 +536,7 @@ class Production:
             self.table(name, rows, sources)
         self.files.update(
             {
-                PIN: file_hash(local(self.cache, PIN)),
+                PIN: bundle.pin_sha256,
                 BUNDLE + "/manifest.json": bundle.manifest_sha256,
                 **{
                     BUNDLE + "/tables/" + name + ".parquet": digest

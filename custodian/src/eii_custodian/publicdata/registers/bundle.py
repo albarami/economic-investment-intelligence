@@ -15,12 +15,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from eii_custodian.publicdata.fetch.registry import LICENCE_BASES
-from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 from eii_custodian.publicdata.review.cache_fixture import read_parquet
 
 from .contracts import METHOD, REGISTRY_KEYS, ROLES, VERSION, refuse
-from .provenance import Frame, digest, month
+from .provenance import (
+    _RECEIPT_KEYS,
+    Frame,
+    digest,
+    month,
+    validate_receipt,
+)
 from .validate import validate_release
 
 BUNDLE = "register_bundle"
@@ -29,22 +33,6 @@ _PIN_VERSION = "register_bundle_pin_v1"
 _MANIFEST_LIMIT = 4 * 1024 * 1024
 _TABLE_LIMIT = 256 * 1024 * 1024
 _TABLES = ("pub_register_company", "pub_register_snapshot")
-_RECEIPT_KEYS = {
-    "version",
-    "kind",
-    "key",
-    "source_id",
-    "period",
-    "publisher",
-    "dataset",
-    "retrieved_utc",
-    "licence_id",
-    "licence_basis",
-    "terms_words",
-    "terms_read_on",
-    "basis_note",
-    "files",
-}
 _HASH = re.compile(r"[a-f0-9]{64}\Z")
 
 
@@ -55,6 +43,7 @@ class Bundle:
     tables: dict[str, tuple[dict[str, Any], ...]]
     manifest: dict[str, Any]
     manifest_sha256: str
+    pin_sha256: str
     table_sha256: dict[str, str]
     coverage: dict[str, tuple[str, ...]]
     receipts: tuple[dict[str, Any], ...]
@@ -113,42 +102,12 @@ def _receipt(entry: object) -> tuple[str, str, str, str, dict[str, Any]]:
         refuse("receipt_schema")
     source = side["source_id"] if isinstance(side["source_id"], str) else ""
     key = REGISTRY_KEYS.get(source, "")
-    if (
-        side["version"] != "register_input_v1"
-        or side["kind"] != "register_file"
-        or not key
-        or side["key"] != key
-    ):
-        refuse("receipt_binding")
     period = month(side["period"])
-    for name in _RECEIPT_KEYS - {"files"}:
-        if not isinstance(side[name], str) or not side[name].strip():
-            refuse("receipt_metadata")
-    if side["licence_basis"] not in LICENCE_BASES:
-        refuse("receipt_metadata")
-    try:
-        stamp = utc(side["retrieved_utc"])
-    except SnapshotError:
-        refuse("receipt_retrieval")
-    if stamp.strftime("%Y-%m") != period:
-        refuse("receipt_month_mismatch")
-    files = side["files"]
-    if not isinstance(files, dict) or set(files) != ROLES[source]:
-        refuse("receipt_files")
-    for info in files.values():
-        if (
-            not isinstance(info, dict)
-            or set(info) != {"sha256", "bytes"}
-            or not isinstance(info["sha256"], str)
-            or _HASH.fullmatch(info["sha256"]) is None
-            or type(info["bytes"]) is not int
-            or info["bytes"] < 0
-        ):
-            refuse("receipt_files")
+    receipt = validate_receipt(source, period, side)
     canonical = json.dumps(side, sort_keys=True, separators=(",", ":")).encode()
     if entry["receipt_sha256"] != digest(canonical):
         refuse("register_bundle_receipt")
-    return key, source, str(use), period, dict(side)
+    return key, source, str(use), period, receipt
 
 
 def _receipts(
@@ -212,8 +171,8 @@ def _coverage(
     return coverage
 
 
-def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
-    """Re-verify the staged bundle and its released rows; closed refusals only."""
+def _pinned_manifest(directory: Path, pin: Path) -> tuple[dict[str, Any], str, str]:
+    """Verify the pin file, then the manifest bytes it names."""
     pin_body = _read(pin, _MANIFEST_LIMIT, "register_bundle_pin")
     reference = _object(pin_body, "register_bundle_pin")
     if (
@@ -248,16 +207,15 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
         or manifest["release_kind"] not in {"public_only", "protected"}
     ):
         refuse("register_bundle_manifest")
-    frame = Frame(cells)
-    if manifest["frame_sha256"] != frame.sha256:
-        refuse("frame_hash_mismatch")
-    receipts, current, snapshots = _receipts(manifest["receipts"])
-    coverage = _coverage(manifest["snapshot_coverage"], snapshots)
-    declared = manifest["tables"]
-    if not isinstance(declared, list):
+    return manifest, manifest_sha256, digest(pin_body)
+
+
+def _specs(raw: object) -> dict[str, tuple[int, str]]:
+    """Parse the declared table set: exactly the two released tables, once each."""
+    if not isinstance(raw, list):
         refuse("register_bundle_table")
     specs: dict[str, tuple[int, str]] = {}
-    for item in declared:
+    for item in raw:
         if (
             not isinstance(item, dict)
             or set(item) != {"name", "rows", "sha256"}
@@ -271,7 +229,16 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
         specs[item["name"]] = (item["rows"], item["sha256"])
     if set(specs) != set(_TABLES):
         refuse("register_bundle_table")
+    return specs
+
+
+def _tables(
+    directory: Path, specs: dict[str, tuple[int, str]]
+) -> tuple[dict[str, tuple[dict[str, Any], ...]], dict[str, str]]:
+    """Read each declared parquet; the staged directory must be a real one."""
     tables_dir = directory / "tables"
+    if tables_dir.is_symlink() or not tables_dir.is_dir():
+        refuse("register_bundle_missing")
     table_sha256: dict[str, str] = {}
     tables: dict[str, tuple[dict[str, Any], ...]] = {}
     for name, (count, expected) in specs.items():
@@ -298,6 +265,21 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
         refuse("register_bundle_missing")
     if foreign:
         refuse("register_bundle_table")
+    return tables, table_sha256
+
+
+def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
+    """Re-verify the staged bundle and its released rows; closed refusals only."""
+    if directory.is_symlink() or not directory.is_dir():
+        refuse("register_bundle_missing")
+    manifest, manifest_sha256, pin_sha256 = _pinned_manifest(directory, pin)
+    frame = Frame(cells)
+    if manifest["frame_sha256"] != frame.sha256:
+        refuse("frame_hash_mismatch")
+    receipts, current, snapshots = _receipts(manifest["receipts"])
+    coverage = _coverage(manifest["snapshot_coverage"], snapshots)
+    specs = _specs(manifest["tables"])
+    tables, table_sha256 = _tables(directory, specs)
     validate_release(tables, frame)
     kept = {
         (source, period) for source, months in coverage.items() for period in months
@@ -309,6 +291,7 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
         tables=tables,
         manifest=manifest,
         manifest_sha256=manifest_sha256,
+        pin_sha256=pin_sha256,
         table_sha256=table_sha256,
         coverage=coverage,
         receipts=receipts,

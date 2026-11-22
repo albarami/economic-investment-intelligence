@@ -2276,8 +2276,12 @@ The release assembly consumes these projections only through a lead-staged,
 pin-verified `register_bundle/` (the published `current/` output) plus
 `register_bundle_pin.json` in the allowed cache: the `register_tables` phase
 re-checks pin, manifest, receipts, table bytes and released rows against the
-run's own frame before crediting both keys (S2-T49, S2-P64). Assembly never
-opens a register path or setting.
+run's own frame before crediting both keys, and a symlinked bundle component
+is refused as missing (S2-T49, S2-P64). Assembly never opens a register path
+or setting. The receipt list is bound to the released tables only through the
+lead's manifest pin: raw register files are not retained, so a stale receipt
+list repacked under a fresh pin cannot be detected by the reader; the pin
+review is the sole control over that binding.
 
 
 ### S2-P52 GeoParquet intake record

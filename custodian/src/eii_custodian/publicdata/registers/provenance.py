@@ -16,6 +16,25 @@ from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 
 from .contracts import REGISTRY_KEYS, ROLES, refuse
 
+_RECEIPT_KEYS = frozenset(
+    {
+        "version",
+        "kind",
+        "key",
+        "source_id",
+        "period",
+        "publisher",
+        "dataset",
+        "retrieved_utc",
+        "licence_id",
+        "licence_basis",
+        "terms_words",
+        "terms_read_on",
+        "basis_note",
+        "files",
+    }
+)
+
 
 def digest(body: bytes) -> str:
     return hashlib.sha256(body).hexdigest()
@@ -105,47 +124,29 @@ def receipt_for(
     )
 
 
-def validate_capture(item: Capture) -> dict[str, object]:
-    """Check every receipt field, every file, and the source/key/period binding."""
-    source = item.source_id
-    if source not in ROLES:
-        refuse("register_source")
-    period = month(item.period)
-    side = item.receipt
-    expected = {
-        "version",
-        "kind",
-        "key",
-        "source_id",
-        "period",
-        "publisher",
-        "dataset",
-        "retrieved_utc",
-        "licence_id",
-        "licence_basis",
-        "terms_words",
-        "terms_read_on",
-        "basis_note",
-        "files",
-    }
-    if set(side) != expected:
+def validate_receipt(
+    source: str, period: str, side: Mapping[str, object]
+) -> dict[str, object]:
+    """Check one receipt's schema, identity binding, metadata and file shape."""
+    if not isinstance(side, Mapping) or set(side) != _RECEIPT_KEYS:
         refuse("receipt_schema")
     for name, value in {
         "version": "register_input_v1",
         "kind": "register_file",
-        "key": REGISTRY_KEYS[source],
+        "key": REGISTRY_KEYS.get(source, ""),
         "source_id": source,
         "period": period,
     }.items():
         if side[name] != value:
             refuse("receipt_binding")
-    for name in expected - {"files"}:
+    for name in _RECEIPT_KEYS - {"files"}:
         if not isinstance(side[name], str) or not str(side[name]).strip():
             refuse("receipt_metadata")
     for name in ("publisher", "dataset"):
-        if str(side[name]).strip().casefold() in {"pending", "terms to be read"} or str(
-            side[name]
-        ).strip().casefold().startswith("lead receipt required"):
+        text = str(side[name]).strip().casefold()
+        if text in {"pending", "terms to be read"} or text.startswith(
+            "lead receipt required"
+        ):
             refuse("receipt_metadata")
     if side["licence_basis"] not in LICENCE_BASES:
         refuse("receipt_metadata")
@@ -167,25 +168,37 @@ def validate_capture(item: Capture) -> dict[str, object]:
         except ValueError:
             refuse("receipt_terms_date")
     metadata = side["files"]
-    if (
-        set(item.files) != ROLES[source]
-        or not isinstance(metadata, dict)
-        or set(metadata) != ROLES[source]
-    ):
+    roles = ROLES.get(source)
+    if roles is None or not isinstance(metadata, dict) or set(metadata) != roles:
+        refuse("receipt_files")
+    for info in metadata.values():
+        if (
+            not isinstance(info, dict)
+            or set(info) != {"sha256", "bytes"}
+            or not isinstance(info["sha256"], str)
+            or re.fullmatch(r"[a-f0-9]{64}", info["sha256"]) is None
+            or type(info["bytes"]) is not int
+            or info["bytes"] < 0
+        ):
+            refuse("receipt_files")
+    return deepcopy(dict(side))
+
+
+def validate_capture(item: Capture) -> dict[str, object]:
+    """Check every receipt field, every file, and the source/key/period binding."""
+    source = item.source_id
+    if source not in ROLES:
+        refuse("register_source")
+    period = month(item.period)
+    side = validate_receipt(source, period, item.receipt)
+    metadata = side["files"]
+    if set(item.files) != ROLES[source] or not isinstance(metadata, dict):
         refuse("receipt_files")
     for role, body in item.files.items():
         info = metadata[role]
-        if (
-            not isinstance(body, bytes)
-            or not isinstance(info, dict)
-            or set(info) != {"sha256", "bytes"}
-        ):
+        if not isinstance(body, bytes):
             refuse("receipt_files")
-        if (
-            info["sha256"] != digest(body)
-            or type(info["bytes"]) is not int
-            or info["bytes"] != len(body)
-        ):
+        if info["sha256"] != digest(body) or info["bytes"] != len(body):
             refuse("receipt_hash_mismatch")
     # Return a detached JSON-shaped copy. There are no file names or source rows.
-    return deepcopy(dict(side))
+    return side

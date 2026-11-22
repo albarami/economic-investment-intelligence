@@ -334,6 +334,24 @@ def test_receipt_schema_refused(tmp_path: Path, frame) -> None:
         state.register_tables()
 
 
+def test_receipt_missing_key_refused(tmp_path: Path, frame) -> None:
+    """A receipt entry missing a declared key is refused, not KeyError."""
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        for item in manifest["receipts"]:
+            if (
+                item["use"] == "current"
+                and item["receipt"]["source_id"] == "biz_register"
+            ):
+                item["receipt"].pop("period")
+        _fix_receipt_sha(manifest)
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^receipt_schema$"):
+        state.register_tables()
+
+
 def test_receipt_binding_refused(tmp_path: Path, frame) -> None:
     state = _production(tmp_path, frame)
     _rewrite_manifest(tmp_path, lambda m: _alter_receipt(m, "kind", "x"))
@@ -615,6 +633,7 @@ def test_snapshot_reason_is_closed_over_the_month_domain(
         tables={},
         manifest={},
         manifest_sha256="0" * 64,
+        pin_sha256="0" * 64,
         table_sha256={},
         coverage={"biz_register": tuple(sorted(kept))},
         receipts=(),
@@ -773,4 +792,417 @@ def test_symlinked_bundle_refuses(tmp_path: Path, frame) -> None:
     shutil.rmtree(tmp_path / BUNDLE)
     os.symlink(outside, tmp_path / BUNDLE, target_is_directory=True)
     with pytest.raises(AssemblyError, match="assembly_path_invalid"):
+        state.register_tables()
+
+
+def test_symlinked_tables_dir_refused(tmp_path: Path, tmp_path_factory, frame) -> None:
+    """A staged ``tables/`` moved outside the cache and symlinked back is refused."""
+    state = _production(tmp_path, frame)
+    outside = tmp_path_factory.mktemp("outside") / "tables"
+    shutil.move(str(tmp_path / BUNDLE / "tables"), str(outside))
+    (tmp_path / BUNDLE / "tables").symlink_to(outside, target_is_directory=True)
+    with pytest.raises(RegisterError, match=r"^register_bundle_missing$"):
+        state.register_tables()
+
+
+def test_symlinked_bundle_directory_refused(
+    tmp_path: Path, tmp_path_factory, frame
+) -> None:
+    """The standalone reader refuses a symlinked bundle directory itself."""
+    _production(tmp_path, frame)
+    outside = tmp_path_factory.mktemp("outside") / BUNDLE
+    shutil.move(str(tmp_path / BUNDLE), str(outside))
+    (tmp_path / BUNDLE).symlink_to(outside, target_is_directory=True)
+    with pytest.raises(RegisterError, match=r"^register_bundle_missing$"):
+        load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frozenset(frame.cells))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("publisher", "pending"),
+        ("publisher", "Lead receipt required — terms on file"),
+        ("dataset", "Terms to be read"),
+    ],
+)
+def test_receipt_pending_metadata_refused(tmp_path: Path, frame, field, value) -> None:
+    """The reader refuses the same pending attribution the writer refuses."""
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: _alter_receipt(m, field, value))
+    with pytest.raises(RegisterError, match=r"^receipt_metadata$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("value", ["2026-13-45", "yesterday"])
+def test_receipt_terms_date_refused(tmp_path: Path, frame, value) -> None:
+    """A malformed ``terms_read_on`` is refused on the assembly side too."""
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: _alter_receipt(m, "terms_read_on", value))
+    with pytest.raises(RegisterError, match=r"^receipt_terms_date$"):
+        state.register_tables()
+
+
+def test_duplicate_declared_table_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        manifest["tables"].append(dict(manifest["tables"][0]))
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_table$"):
+        state.register_tables()
+
+
+def test_duplicate_current_receipt_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        current = next(
+            item for item in manifest["receipts"] if item["use"] == "current"
+        )
+        manifest["receipts"].append(dict(current))
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_source$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    "months",
+    [["2027-01", "2026-11"], ["2026-11", "2026-11"], "2026-11", 5],
+    ids=["reversed", "repeated", "not_a_list", "not_sized"],
+)
+def test_coverage_month_list_plants_refused(tmp_path: Path, frame, months) -> None:
+    snapshots = (capture(period="2026-11"), capture(period="2027-01"))
+    state = _production(tmp_path, frame, snapshots, current_period="2027-02")
+
+    def alter(manifest):
+        manifest["snapshot_coverage"]["biz_register"] = months
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+def test_coverage_bad_month_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame, (capture(period="2026-11"),))
+    _rewrite_manifest(
+        tmp_path,
+        lambda m: m["snapshot_coverage"].__setitem__("biz_register", ["2026-13"]),
+    )
+    with pytest.raises(RegisterError, match=r"^snapshot_month$"):
+        state.register_tables()
+
+
+def test_coverage_not_a_dict_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: m.__setitem__("snapshot_coverage", []))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+def test_coverage_source_missing_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: m["snapshot_coverage"].pop("fc_register"))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+def test_pin_duplicate_key_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    real = digest((tmp_path / BUNDLE / "manifest.json").read_bytes())
+    (tmp_path / PIN).write_text(
+        f'{{"version": "register_bundle_pin_v1", "manifest_sha256": "{real}", '
+        f'"manifest_sha256": "{real}"}}'
+    )
+    with pytest.raises(RegisterError, match=r"^register_bundle_pin$"):
+        state.register_tables()
+
+
+def test_manifest_duplicate_key_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    manifest_path = tmp_path / BUNDLE / "manifest.json"
+    manifest_path.write_text(
+        manifest_path.read_text().replace('"method"', '"method": "x", "method"', 1)
+    )
+    pin = json.loads((tmp_path / PIN).read_text())
+    pin["manifest_sha256"] = digest(manifest_path.read_bytes())
+    (tmp_path / PIN).write_text(json.dumps(pin))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("plant", ["missing_use", "scalar_entry", "int_entry"])
+def test_receipt_entry_shape_refused(tmp_path: Path, frame, plant) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        if plant == "missing_use":
+            manifest["receipts"][0].pop("use")
+        elif plant == "scalar_entry":
+            manifest["receipts"] = ["x"]
+        else:
+            manifest["receipts"] = [5]
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_receipt$"):
+        state.register_tables()
+
+
+def test_receipt_side_not_a_dict_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        manifest["receipts"][0]["receipt"] = 5
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^receipt_schema$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("version", "x"),
+        ("key", "fc_register/file"),
+        ("source_id", "bogus_register"),
+        ("source_id", "fc_register"),
+    ],
+)
+def test_receipt_identity_binding_refused(tmp_path: Path, frame, field, value) -> None:
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: _alter_receipt(m, field, value))
+    with pytest.raises(RegisterError, match=r"^receipt_binding$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("sha256", 5),
+        ("sha256", "z" * 64),
+        ("bytes", "1"),
+        ("bytes", -1),
+    ],
+)
+def test_receipt_file_info_value_plants_refused(
+    tmp_path: Path, frame, field, value
+) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        for item in manifest["receipts"]:
+            if (
+                item["use"] == "current"
+                and item["receipt"]["source_id"] == "biz_register"
+            ):
+                item["receipt"]["files"]["establishments"][field] = value
+        _fix_receipt_sha(manifest)
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^receipt_files$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("value", [5, {"geocoded": {"sha256": "a" * 64, "bytes": 1}}])
+def test_receipt_files_shape_plants_refused(tmp_path: Path, frame, value) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        for item in manifest["receipts"]:
+            if (
+                item["use"] == "current"
+                and item["receipt"]["source_id"] == "biz_register"
+            ):
+                item["receipt"]["files"] = value
+        _fix_receipt_sha(manifest)
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^receipt_files$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("value", ["x", {"sha256": "a" * 64}, 5])
+def test_receipt_file_info_shape_plants_refused(tmp_path: Path, frame, value) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        for item in manifest["receipts"]:
+            if (
+                item["use"] == "current"
+                and item["receipt"]["source_id"] == "biz_register"
+            ):
+                item["receipt"]["files"]["establishments"] = value
+        _fix_receipt_sha(manifest)
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^receipt_files$"):
+        state.register_tables()
+
+
+def test_receipts_not_a_list_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: m.__setitem__("receipts", {}))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    "plant",
+    [
+        "not_list",
+        "not_dict",
+        "int_entry",
+        "missing_rows",
+        "extra_key",
+        "negative_rows",
+        "str_rows",
+        "bad_sha",
+        "int_sha",
+    ],
+)
+def test_table_spec_plants_refused(tmp_path: Path, frame, plant) -> None:
+    state = _production(tmp_path, frame)
+
+    def alter(manifest):
+        if plant == "not_list":
+            manifest["tables"] = {}
+        elif plant == "not_dict":
+            manifest["tables"] = ["x"]
+        elif plant == "int_entry":
+            manifest["tables"] = [5]
+        elif plant == "missing_rows":
+            manifest["tables"][0].pop("rows")
+        elif plant == "extra_key":
+            manifest["tables"][0]["junk"] = 1
+        elif plant == "negative_rows":
+            manifest["tables"][0]["rows"] = -1
+        elif plant == "str_rows":
+            manifest["tables"][0]["rows"] = "3"
+        elif plant == "bad_sha":
+            manifest["tables"][0]["sha256"] = "zz"
+        else:
+            manifest["tables"][0]["sha256"] = 5
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_table$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("version", "x"), ("provenance", "Synthetic"), ("release_kind", "bogus")],
+)
+def test_manifest_field_binding_refused(tmp_path: Path, frame, field, value) -> None:
+    state = _production(tmp_path, frame)
+    _rewrite_manifest(tmp_path, lambda m: m.__setitem__(field, value))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("body", ["not json", "[1, 2]"])
+def test_manifest_shape_plants_refused(tmp_path: Path, frame, body) -> None:
+    state = _production(tmp_path, frame)
+    manifest_path = tmp_path / BUNDLE / "manifest.json"
+    manifest_path.write_text(body)
+    pin = json.loads((tmp_path / PIN).read_text())
+    pin["manifest_sha256"] = digest(manifest_path.read_bytes())
+    (tmp_path / PIN).write_text(json.dumps(pin))
+    with pytest.raises(RegisterError, match=r"^register_bundle_manifest$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize(
+    "plant", ["garbage", "list", "scalar", "version", "hash", "int_hash"]
+)
+def test_pin_shape_plants_refused(tmp_path: Path, frame, plant) -> None:
+    state = _production(tmp_path, frame)
+    real = digest((tmp_path / BUNDLE / "manifest.json").read_bytes())
+    body = {
+        "garbage": "not json",
+        "list": json.dumps([1, 2]),
+        "scalar": "5",
+        "version": json.dumps({"version": "x", "manifest_sha256": real}),
+        "hash": json.dumps(
+            {"version": "register_bundle_pin_v1", "manifest_sha256": "zz"}
+        ),
+        "int_hash": json.dumps(
+            {"version": "register_bundle_pin_v1", "manifest_sha256": 5}
+        ),
+    }[plant]
+    (tmp_path / PIN).write_text(body)
+    with pytest.raises(RegisterError, match=r"^register_bundle_pin$"):
+        state.register_tables()
+
+
+def test_oversized_pin_refused(tmp_path: Path, frame) -> None:
+    """A pin beyond the byte limit is refused even when it would parse."""
+    state = _production(tmp_path, frame)
+    pin = tmp_path / PIN
+    pin.write_text(pin.read_text() + " " * (4 * 1024 * 1024 + 1))
+    with pytest.raises(RegisterError, match=r"^register_bundle_pin$"):
+        state.register_tables()
+
+
+def test_oversized_manifest_refused(tmp_path: Path, frame) -> None:
+    """A manifest beyond the byte limit is refused even when it would parse."""
+    state = _production(tmp_path, frame)
+    manifest_path = tmp_path / BUNDLE / "manifest.json"
+    manifest_path.write_text(manifest_path.read_text() + " " * (4 * 1024 * 1024 + 1))
+    pin = json.loads((tmp_path / PIN).read_text())
+    pin["manifest_sha256"] = digest(manifest_path.read_bytes())
+    (tmp_path / PIN).write_text(json.dumps(pin))
+    with pytest.raises(RegisterError, match=r"^register_bundle_missing$"):
+        state.register_tables()
+
+
+def test_oversized_table_refused(tmp_path: Path, frame, monkeypatch) -> None:
+    """A parquet beyond the byte limit is refused before it is decoded."""
+    from eii_custodian.publicdata.registers import bundle as bundle_module
+
+    state = _production(tmp_path, frame)
+    monkeypatch.setattr(bundle_module, "_TABLE_LIMIT", 8)
+    with pytest.raises(RegisterError, match=r"^register_bundle_table$"):
+        state.register_tables()
+
+
+def test_corrupt_table_bytes_refused(tmp_path: Path, frame) -> None:
+    """A declared-matching but undecodable parquet is refused by name."""
+    state = _production(tmp_path, frame)
+    body = b"not a parquet file"
+    (tmp_path / BUNDLE / "tables" / "pub_register_snapshot.parquet").write_bytes(body)
+
+    def alter(manifest):
+        for item in manifest["tables"]:
+            if item["name"] == "pub_register_snapshot":
+                item["sha256"] = digest(body)
+
+    _rewrite_manifest(tmp_path, alter)
+    with pytest.raises(RegisterError, match=r"^register_bundle_table$"):
+        state.register_tables()
+
+
+def test_tables_dir_not_listable_refused(tmp_path: Path, frame) -> None:
+    """A ``tables/`` that cannot be listed is refused, not silently trusted."""
+    import os
+
+    state = _production(tmp_path, frame)
+    tables = tmp_path / BUNDLE / "tables"
+    os.chmod(tables, 0o111)
+    try:
+        with pytest.raises(RegisterError, match=r"^register_bundle_missing$"):
+            state.register_tables()
+    finally:
+        os.chmod(tables, 0o700)
+
+
+def test_receipt_bad_period_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+
+    def mutate(manifest):
+        manifest["receipts"][0]["receipt"]["period"] = "2026-13"
+        _fix_receipt_sha(manifest)
+
+    _rewrite_manifest(tmp_path, mutate)
+    with pytest.raises(RegisterError, match=r"^snapshot_month$"):
         state.register_tables()

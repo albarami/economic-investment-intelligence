@@ -132,7 +132,15 @@ The `register_tables` phase re-verifies the pin, the manifest's closed key set
 and bindings, every receipt's digest, metadata, files and period rules, the
 declared table byte hashes and row counts, the frame's ownership hash against
 the run's own `grid_cell` set, and the released rows through `validate_release`,
-refusing by name at the first mismatch. Only the bundle's released rows, file
-digests and receipt lineage are bound: current receipts credit both registry
-keys, historical receipts stay per-period in the phase record, and a missing
-kept month stays `snapshot_not_kept`.
+refusing by name at the first mismatch. A bundle path that is not a real
+directory — a symlinked `register_bundle/` or `tables/` — is refused as
+missing, so every byte read stays inside the allowed cache. Only the bundle's
+released rows, file digests and receipt lineage are bound: current receipts
+credit both registry keys, historical receipts stay per-period in the phase
+record, and a missing kept month stays `snapshot_not_kept`.
+
+Trust root: the receipt list is bound to the released tables only through the
+lead's manifest pin. Raw register files are never retained in the cache, so the
+reader cannot re-derive a receipt from file bytes; a stale receipt list
+repacked under a fresh pin passes all checks. Reviewing and pinning the
+manifest is therefore the sole control over the receipt-to-table binding.

@@ -51354,13 +51354,28 @@ S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline e
   per-period lineage and kept-month coverage. `draw_tables` and source
   completeness (`register_in_use`) account for both tables; missing months stay
   `snapshot_not_kept`.
-- Tests (`custodian/tests/test_register_tables.py`): 44 cases on invented
-  stand-in staged bundles — red on HEAD (phase absent, `AttributeError`), green
+- Tests (`custodian/tests/test_register_tables.py`): 106 cases on invented
+  stand-in staged bundles — round 1 set red on HEAD (phase absent,
+  `AttributeError`), round-2 set red on round-1 code (9 failed), green
   after; one-change refusals for missing/wrong pin, manifest, frame, source,
   table bytes, receipts, periods, person column and identifier egress; symlinked
-  and unreadable staged paths refused; 34 isolated guard removals each red.
-- The writer path (`registers.intake`, `registers.build`) is unchanged; the
-  lead's real-file run and release evidence remain pending. No gate claimed.
+  and unreadable staged paths refused; isolated guard removals recorded red in
+  the round-2 break table (`.overnight/RETURN.md`).
+- Round 2 (2026-11-22, Anthropic review rv2 fixes): `load_bundle` now refuses a
+  symlinked or absent `register_bundle/` or `tables/` directory as
+  `register_bundle_missing` before any read, so staged bytes cannot escape the
+  allowed cache (F1); receipt validation is shared, not re-implemented — the
+  metadata half of `validate_capture` moved to `provenance.validate_receipt`,
+  which `bundle._receipt` calls, restoring the `receipt_metadata` pending-wording
+  and `receipt_terms_date` refusals on the assembly side (F2); `load_bundle` was
+  split into `_pinned_manifest`, `_specs` and `_tables`, and the verified pin
+  digest is returned on the `Bundle` instead of re-read. The four uncovered
+  guards (duplicate declared table, duplicate current receipt, unsorted or
+  repeated coverage months, the duplicate JSON-key hook) and every remaining
+  branch now have one-change negatives asserting the exact refusal code (F3).
+- The writer path (`registers.intake`, `registers.build`) keeps the same
+  refusal codes through the shared receipt check; the lead's real-file run and
+  release evidence remain pending. No gate claimed.
 
 ## Train S2-18 records — 2026-11-22
 

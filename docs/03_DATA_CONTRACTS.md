@@ -2693,10 +2693,14 @@ placeholder release command or the other tables' privacy checks.
 
 Assembly handoff (S2-T49, S2-P64): the `register_tables` phase consumes only a
 lead-staged, pin-verified `register_bundle/` and `register_bundle_pin.json` in
-the allowed cache; it re-verifies the manifest chain, receipts, table bytes and
-released rows against the run's own frame hash before crediting keys
+the allowed cache; a symlinked `register_bundle/` or `tables/` component is
+refused as missing. It re-verifies the manifest chain, receipts, table bytes
+and released rows against the run's own frame hash before crediting keys
 `biz_register` and `fc_register/file`, keeping per-period lineage. A missing
-kept snapshot month is reported `snapshot_not_kept`, never filled.
+kept snapshot month is reported `snapshot_not_kept`, never filled. The receipt
+list is bound to the tables only through the lead's manifest pin; raw register
+files are not retained, so a stale receipt list under a fresh pin is not
+detectable by the reader.
 
 ## Structured Public address reader — decision 0079
 
