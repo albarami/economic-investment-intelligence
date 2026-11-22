@@ -11,16 +11,21 @@ no whole-deal meaning is invented. Every row below is invented.
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_property_quarter import _blocked, _frame, _map
+from hypothesis import given
+from hypothesis import strategies as st
 
-from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.additions.common import AdditionError, read_measure
 from eii_custodian.publicdata.fetch.checks import schema_failure
 from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.frame.build import read_cached
 from eii_custodian.publicdata.property.bulletin import (
     SALES_EXPORT_FIELDS,
     SALES_SHARE_FIELDS,
@@ -28,6 +33,7 @@ from eii_custodian.publicdata.property.bulletin import (
     sales_export_rows,
 )
 from eii_custodian.publicdata.property.quarter import quarter_aggregates
+from eii_custodian.publicdata.review.cache_fixture import write_cached
 
 REPO = repository_root(Path(__file__))
 # The names of the shape pack's prop_sales row, in the portal metadata's order.
@@ -130,6 +136,47 @@ def test_exact_shape_keeps_a_deal_in_published_square_metres(tmp_path: Path) -> 
     )
     # 100000 * 0.09290304 / 100, the card's factor; no published square feet.
     assert row["median_price_per_ft2"] == Decimal("92.90")
+
+
+@pytest.mark.parametrize("value", [1500, 1500.0, 1234.5])
+def test_cached_sales_measure_matches_the_float_path(
+    tmp_path: Path, value: int | float
+) -> None:
+    entry = next(e for e in load_registry() if e.key == "prop_sales")
+    rows = [_export(property_value=value)]
+    digest = write_cached(tmp_path, entry, json.dumps(rows).encode()).stem
+    cached, _receipt = read_cached(tmp_path, entry, digest=digest)
+    assert isinstance(
+        cached[0]["property_value"], Decimal if isinstance(value, float) else int
+    )
+    if value == 1234.5:
+        for payload in (rows, cached):
+            with pytest.raises(AdditionError, match=r"^measure_not_integral$"):
+                _parse(payload, tmp_path)
+    else:
+        expected = _parse(rows, tmp_path)
+        assert _parse(cached, tmp_path) == expected
+        assert expected.deals[0].value == Decimal("1500")
+
+
+@pytest.mark.parametrize("value", ["NaN", "sNaN", "Infinity", "-Infinity"])
+def test_nonfinite_decimal_measure_is_unparsed(value: str) -> None:
+    with pytest.raises(AdditionError, match=r"^measure_unparsed$"):
+        read_measure(Decimal(value), missing_forms=frozenset(), integral=False)
+
+
+@given(value=st.decimals(allow_nan=False, allow_infinity=False), integral=st.booleans())
+def test_decimal_measure_matches_a_rational_oracle(
+    value: Decimal, integral: bool
+) -> None:
+    exact = Fraction(value)
+    if integral and exact.denominator != 1:
+        with pytest.raises(AdditionError, match=r"^measure_not_integral$"):
+            read_measure(value, missing_forms=frozenset(), integral=integral)
+    else:
+        result = read_measure(value, missing_forms=frozenset(), integral=integral)
+        assert result.number is not None
+        assert Fraction(result.number) == exact
 
 
 def test_published_price_per_square_foot_is_never_read(tmp_path: Path) -> None:

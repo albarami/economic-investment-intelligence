@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -54,7 +55,10 @@ def test_missing_pin_never_uses_fetched_hash_or_latest(tmp_path: Path) -> None:
         build.reviewed_selections()
 
 
-def test_real_bank_credit_builder_and_null_unit_are_preserved(tmp_path: Path) -> None:
+@pytest.mark.parametrize("value, expected", [(25, "25.00"), (25.5, "25.50")])
+def test_real_bank_credit_builder_and_null_unit_are_preserved(
+    tmp_path: Path, value: int | float, expected: str
+) -> None:
     row = replace(
         next(e for e in load_registry() if e.source_id == "bank_credit_act"),
         key="bank_credit_act",
@@ -68,7 +72,7 @@ def test_real_bank_credit_builder_and_null_unit_are_preserved(tmp_path: Path) ->
                     "year": "2026",
                     "economic_activity": "Invented activity",
                     "lnsht_lqtsdy": "نشاط تجريبي",
-                    "value": 25,
+                    "value": value,
                 }
             ]
         ).encode(),
@@ -78,7 +82,8 @@ def test_real_bank_credit_builder_and_null_unit_are_preserved(tmp_path: Path) ->
     build.frame_result = FrameResult({"grid_cell": []}, [], {}, {})
     build.gis_property_singles()
     rows = build.tables["pub_bank_credit"]
-    assert str(rows[0]["value"]) == "25.00"
+    assert rows[0]["value"] == Decimal(expected)
+    assert rows[0]["value"].as_tuple().exponent == -2
     assert rows[0]["unit"] is None
     record = json.loads((tmp_path / "assembly/gis_property_singles.json").read_text())
     assert record["source_tables"] == {row.key: ["pub_bank_credit"]}
