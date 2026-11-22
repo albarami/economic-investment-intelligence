@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from .assembly import AssemblyError
 from .assembly_io import local
+from .fetch.allowlist import host_of
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry
 from .fetch.snapshots import read_snapshot
@@ -114,6 +115,26 @@ def read_native(build: Production, entry: Entry, identity: str) -> None:
         build.files[relative] = file_hash(local(build.cache, relative))
 
 
+def _fetched_from(sidecar: dict[str, object], page_url: str, entry: Entry) -> bool:
+    """True when an archived page's receipt shows it was fetched from page_url.
+
+    A sub-page receipt keeps its URL exactly. The landing page is the entry's
+    own fetch, whose receipt keeps the final address (build.py stores
+    ``final_url``): a redirect on the entry's own host is that same page, bound
+    to the entry's key here and to the pinned identity by the caller.
+    """
+    fetched = sidecar.get("fetch_url")
+    if fetched == page_url:
+        return True
+    return (
+        page_url == entry.url
+        and sidecar.get("key") == entry.key
+        and isinstance(fetched, str)
+        and host_of(entry.url) != ""
+        and host_of(fetched) == host_of(entry.url)
+    )
+
+
 def read_investment(
     build: Production, entry: Entry, raw_identity: str, manifest_identity: str
 ) -> None:
@@ -151,9 +172,8 @@ def read_investment(
     primary = []
     for page in manifest["pages"]:
         raw = read_snapshot(local(build.cache, entry.key), page["sha256"])
-        if (
-            raw.sidecar.get("fetch_url") != page["url"]
-            or raw.sidecar.get("source_id") != entry.source_id
+        if raw.sidecar.get("source_id") != entry.source_id or not _fetched_from(
+            raw.sidecar, page["url"], entry
         ):
             raise AssemblyError("assembly_investment_refused")
         if page["url"] == entry.url:

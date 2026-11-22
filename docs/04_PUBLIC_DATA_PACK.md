@@ -1190,6 +1190,14 @@ spine-triage readers. Series and method readers accept an explicit digest; trade
 readers accept a manifest hash. No reader chooses the newest file. Missing or
 ambiguous legacy provenance requires a reviewed migration; no date is invented.
 
+The investment readers (`fdi_projects`, `investqa_pages`) bind each page of the
+pinned evidence manifest to its archived receipt by URL. A sub-page receipt keeps
+its requested URL exactly. The landing page is the entry's own fetch, whose
+receipt keeps the final address of the response: a redirect on the entry's own
+host is accepted for the landing page only, bound to the entry's key and to the
+pinned landing identity (S2-P45); a redirect to another host refuses with
+`assembly_investment_refused`.
+
 The archive remains in the uncommitted local cache. Off-machine survival is not
 yet proved. Open item for the lead: arrange an owner-managed copy to separately
 held storage, then restore into the documented cache and verify every hash. This
