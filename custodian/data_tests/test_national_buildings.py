@@ -130,6 +130,7 @@ def test_selected_national_source_ids_table_ids_and_height_ids(capsys):
                         "optional_fields": block["optional_fields"],
                         "national_completeness": block["national_completeness"],
                         "boundary_review": block["boundary_review"],
+                        "boundary_scope": block["boundary_scope"],
                         "hashes": before,
                         "fallback_errors": height_manifest["errors"],
                     }

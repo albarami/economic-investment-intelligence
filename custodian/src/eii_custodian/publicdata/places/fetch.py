@@ -23,7 +23,6 @@ from eii_custodian.publicdata.fetch.transport import (
 
 FILE_KEYS = (
     "places_ovt/part-00014",
-    "bldg_ovt/part-00288",
     "bldg_ovt/part-00384",
     "bldg_ovt/part-00385",
 )

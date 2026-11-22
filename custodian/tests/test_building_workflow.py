@@ -104,9 +104,7 @@ def test_real_inventory_precedes_heights_and_binds_every_selected_id(
         feature["properties"]["building_id"] for feature in table(prepared)["features"]
     }
     rows = json.loads((prepared.output.parent / "heights/heights.json").read_text())
-    assert (
-        ids == {"SYN-B-0", "SYN-B-1", "SYN-B-2"} == {row["building_id"] for row in rows}
-    )
+    assert ids == {"SYN-B-0", "SYN-B-1"} == {row["building_id"] for row in rows}
     assert all(
         row["height_source"] == "none" and row["height_m"] is None for row in rows
     )

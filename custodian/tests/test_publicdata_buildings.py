@@ -81,7 +81,6 @@ def test_optional_field_counts_separate_kept_rows_from_all_read(tmp_path):
                 ),
             ],
             [],
-            [],
         ],
     )
     prepared.produce()
@@ -111,7 +110,7 @@ def test_explicit_pin_wins_over_cache_review(tmp_path):
     prepared.produce()
     assert {
         row["properties"]["building_id"] for row in table(prepared)["features"]
-    } == {"SYN-B-0", "SYN-B-1", "SYN-B-2"}
+    } == {"SYN-B-0", "SYN-B-1"}
 
 
 def test_registered_stac_collection_uses_existing_transport_and_receipt(tmp_path):
@@ -238,7 +237,6 @@ def test_national_selection_is_unrounded_with_island_hole_and_separate_counts(tm
                 footprint("SYN-round", box(51.4, 25.1, 51.4000008, 25.2).wkb),
             ],
             [footprint("SYN-north", box(51.1, 25.4, 51.2, 25.45).wkb)],
-            [],
         ],
     )
     prepared.produce(boundary=boundary)
@@ -274,7 +272,6 @@ def test_present_fields_are_null_and_counted_including_unusable_and_modelled(tmp
                 ),
             ],
             [],
-            [],
         ],
     )
     prepared.produce()
@@ -303,7 +300,6 @@ def test_unmapped_height_coverage_uses_c47_usable_precision(tmp_path):
                 footprint("SYN-infinite", height=float("inf")),
             ],
             [],
-            [],
         ],
     )
     prepared.produce()
@@ -322,7 +318,6 @@ def test_invalid_and_underground_footprints_are_excluded_without_repair(tmp_path
                 footprint("SYN-underground", is_underground=True),
             ],
             [footprint("SYN-ok")],
-            [],
         ],
     )
     prepared.produce()
@@ -352,9 +347,9 @@ def test_unknown_schema_crs_and_missing_columns_refuse(tmp_path, options, name):
     "rows,name",
     [
         ([[footprint("SYN-dup")], [footprint("SYN-dup")], []], "building_duplicate"),
-        ([[footprint("")], [], []], "building_id"),
+        ([[footprint("")], []], "building_id"),
         (
-            [[footprint("SYN-swap", box(25.1, 51.1, 25.2, 51.2).wkb)], [], []],
+            [[footprint("SYN-swap", box(25.1, 51.1, 25.2, 51.2).wkb)], []],
             "building_axis_swapped",
         ),
     ],
@@ -364,7 +359,7 @@ def test_identifier_and_axis_plants(tmp_path, rows, name):
 
 
 def test_identical_pins_produce_identical_bytes_and_sorted_ids(tmp_path):
-    prepared = world(tmp_path, rows=[[footprint("SYN-Z"), footprint("SYN-A")], [], []])
+    prepared = world(tmp_path, rows=[[footprint("SYN-Z"), footprint("SYN-A")], []])
     prepared.produce()
     first = [
         (prepared.output / name).read_bytes()
@@ -468,7 +463,7 @@ def test_malformed_or_noncovering_stac_item_refuses(tmp_path, field, value):
 
 def test_duplicate_stac_part_assets_refuse(tmp_path):
     prepared = world(tmp_path)
-    row = prepared.entries[5]
+    row = prepared.entries[4]
     document = {
         "type": "Feature",
         "bbox": [50.7, 24.4, 51.7, 26.2],
@@ -512,19 +507,19 @@ def test_explicit_crs84_and_absent_optional_columns_are_supported(tmp_path):
         drop=("height", "num_floors", "sources", "is_underground"),
     )
     prepared.produce()
-    assert manifest(prepared)["optional_fields"]["height"]["absent"] == 3
-    assert manifest(prepared)["footprint_contributors"] == {"unconfirmed": 3}
+    assert manifest(prepared)["optional_fields"]["height"]["absent"] == 2
+    assert manifest(prepared)["footprint_contributors"] == {"unconfirmed": 2}
 
 
 def test_axis_range_and_malformed_source_flag_refuse(tmp_path):
     prepared = world(
         tmp_path / "axis",
-        rows=[[footprint("SYN-range", box(200, 25, 201, 26).wkb)], [], []],
+        rows=[[footprint("SYN-range", box(200, 25, 201, 26).wkb)], []],
     )
     refusal(prepared, "building_axis_range")
     prepared = world(
         tmp_path / "flag",
-        rows=[[footprint("SYN-flag", is_underground="SYN malformed")], [], []],
+        rows=[[footprint("SYN-flag", is_underground="SYN malformed")], []],
         kinds_override={"is_underground": "VARCHAR"},
     )
     refusal(prepared, "building_underground_flag")
@@ -561,7 +556,6 @@ def test_footprint_attribution_counts_record_level_datasets_only(tmp_path):
                 )
             ],
             [],
-            [],
         ],
     )
     prepared.produce()
@@ -574,11 +568,11 @@ def test_footprint_attribution_counts_record_level_datasets_only(tmp_path):
 
 def test_reversed_source_rows_keep_table_bytes_and_id_hash(tmp_path):
     prepared = world(
-        tmp_path / "first", rows=[[footprint("SYN-Z"), footprint("SYN-A")], [], []]
+        tmp_path / "first", rows=[[footprint("SYN-Z"), footprint("SYN-A")], []]
     )
     prepared.produce()
     other = world(
-        tmp_path / "second", rows=[[footprint("SYN-A"), footprint("SYN-Z")], [], []]
+        tmp_path / "second", rows=[[footprint("SYN-A"), footprint("SYN-Z")], []]
     )
     other.produce()
     assert (prepared.output / "buildings.geojson").read_bytes() == (
@@ -596,7 +590,7 @@ def test_lead_boundary_review_is_bound_to_input_chain_and_count(tmp_path, outcom
     from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
     prepared = world(
-        tmp_path, rows=[[footprint("SYN-out", box(51.5, 25.2, 51.6, 25.3).wkb)], [], []]
+        tmp_path, rows=[[footprint("SYN-out", box(51.5, 25.2, 51.6, 25.3).wkb)], []]
     )
     prepared.produce()
     block = manifest(prepared)
@@ -634,7 +628,7 @@ def test_stale_or_malformed_boundary_review_refuses(tmp_path, field, value):
     from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
     prepared = world(
-        tmp_path, rows=[[footprint("SYN-out", box(51.5, 25.2, 51.6, 25.3).wkb)], [], []]
+        tmp_path, rows=[[footprint("SYN-out", box(51.5, 25.2, 51.6, 25.3).wkb)], []]
     )
     prepared.produce()
     block = manifest(prepared)
@@ -731,7 +725,6 @@ def test_full_polygon_holes_and_multipolygons_are_preserved(tmp_path):
         rows=[
             [footprint("SYN-hole-footprint", polygon.wkb)],
             [footprint("SYN-multi", multi.wkb)],
-            [],
         ],
     )
     prepared.produce()
@@ -768,7 +761,7 @@ def test_heights_manifest_uses_building_manifest_path_and_hash(tmp_path):
     }
     assert {
         row["building_id"] for row in json.loads((output / "heights.json").read_text())
-    } == {"SYN-B-0", "SYN-B-1", "SYN-B-2"}
+    } == {"SYN-B-0", "SYN-B-1"}
 
 
 def test_legacy_frame_wrapper_preserves_named_producer_failure(tmp_path, monkeypatch):
