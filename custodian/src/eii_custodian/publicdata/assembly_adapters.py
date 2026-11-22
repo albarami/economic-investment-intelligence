@@ -15,7 +15,7 @@ from typing import Any
 
 from .assembly import AssemblyError, Step, run_steps
 from .assembly_intake import write_intake_evidence
-from .assembly_inventory import INVENTORY, validate_inventory
+from .assembly_inventory import INVENTORY, InventoryItem, validate_inventory
 from .assembly_io import bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry, read_yaml
@@ -57,6 +57,7 @@ class Production:
     reconciliation_selection: Selection | None = None
     pin_generation_config: Mapping[str, object] | None = None
     pin_rows: Sequence[Mapping[str, object]] = ()
+    pin_pending_reason: str = ""
     selected: dict[str, str] = field(default_factory=dict)
     receipts: dict[str, dict[str, Any]] = field(default_factory=dict)
     tables: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
@@ -116,17 +117,34 @@ class Production:
         self.audit.clear()
         self.frame_result = None
         self.intake_refusal = ""
+        self.pin_pending_reason = ""
         # Persist the seed before the clock, review, cache or source reader.
         write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
         self.stamp = self.clock()
         steps = tuple(
-            Step(item.name, adapters[item.name], item.outputs) for item in INVENTORY
+            Step(item.name, adapters[item.name], self._declared_outputs(item))
+            for item in INVENTORY
         )
         completed = run_steps(self.cache, steps)
         from .assembly_reports import require_complete
 
         require_complete(self.audit)
         return completed
+
+    def _declared_outputs(self, item: InventoryItem) -> tuple[str, ...]:
+        """The pending pin phase declares no outputs: it writes nothing.
+
+        Ruling L-1494: unbound S2-T08 part B inputs never stop the live build.
+        The phase records its closed pending reason and the gate refuses the
+        pending build after reports, so the step owns no file in that state.
+        """
+        from .assembly_method_pins import pin_inputs_bound
+
+        if item.name == "method_pins" and not pin_inputs_bound(
+            self.pin_generation_config, self.pin_rows
+        ):
+            return ()
+        return item.outputs
 
     def record(self, phase: str, value: object) -> dict[str, str]:
         if not isinstance(value, dict):
@@ -894,8 +912,18 @@ class Production:
         return self.record("busyness", {"manifests": results, "tables": tables})
 
     def method_pins(self) -> dict[str, str]:
-        from .assembly_method_pins import write_pin_pair
+        from .assembly_method_pins import (
+            PIN_INPUTS_MISSING,
+            pin_inputs_bound,
+            write_pin_pair,
+        )
 
+        if not pin_inputs_bound(self.pin_generation_config, self.pin_rows):
+            # Ruling L-1494: unbound S2-T08 part B inputs write no pair and
+            # never stop the live build; the closed pending reason is recorded
+            # for the build report and the gate refuses the pending build.
+            self.pin_pending_reason = PIN_INPUTS_MISSING
+            return {}
         output = write_pin_pair(self.cache, self.pin_generation_config, self.pin_rows)
         self.files.update(output)
         return {

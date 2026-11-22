@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,9 @@ from custodian.tests.method_pin_gather_fixtures import (
     stage_method_pin_gather_build,
 )
 from custodian.tests.test_production_adapters import context
+from hypothesis import given
+from hypothesis import settings as hypothesis_settings
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import PHASES, AssemblyError
 from eii_custodian.publicdata.assembly_adapters import Production
@@ -134,20 +138,212 @@ def test_new_run_removes_stale_pin_outputs_before_any_source_read(
     assert not any((tmp_path / name).exists() for name in PHASE_OUTPUTS)
 
 
-def test_phase_refuses_missing_generation_configuration(tmp_path: Path) -> None:
+# S2-P63 round 3 (ruling L-1494): while the S2-T08 part B inputs are not
+# bound, the phase never stops the live build. It writes no pair, records its
+# closed pending reason for the build report, and the gate refuses the pending
+# build after reports.
+def test_phase_pends_unbound_generation_configuration(tmp_path: Path) -> None:
     build, *_ = _staged_phase_build(tmp_path)
     build.pin_generation_config = None
-    with pytest.raises(AssemblyError, match=r"^pin_inputs_missing$"):
-        build.method_pins()
+    assert build.method_pins() == {}
     _no_credited_output(build)
+    assert build.pin_pending_reason == "pin_inputs_missing"
 
 
-def test_phase_refuses_missing_producer_rows(tmp_path: Path) -> None:
+def test_phase_pends_missing_producer_rows(tmp_path: Path) -> None:
     build, *_ = _staged_phase_build(tmp_path)
     build.pin_rows = ()
-    with pytest.raises(AssemblyError, match=r"^pin_inputs_missing$"):
-        build.method_pins()
+    assert build.method_pins() == {}
     _no_credited_output(build)
+    assert build.pin_pending_reason == "pin_inputs_missing"
+
+
+def test_phase_pends_a_configuration_that_is_no_mapping(tmp_path: Path) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    build.pin_generation_config = [{"SYN": "not a recorded mapping"}]
+    assert build.method_pins() == {}
+    _no_credited_output(build)
+    assert build.pin_pending_reason == "pin_inputs_missing"
+
+
+# The bound pair of the boundness boundary: the only shape that still writes.
+def test_bound_inputs_still_write_the_pair_with_no_pending_reason(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    output = build.method_pins()
+    assert set(output) == set(PHASE_OUTPUTS)
+    assert build.pin_pending_reason == ""
+    s2_t09 = gathered_s2_t09_confirmation(build)
+    assert s2_t09["state"] == "recorded"
+    assert "details" not in s2_t09
+
+
+# The writer's own closed refusal for direct callers stays: the phase decides
+# pending, the writer never accepts an unbound input.
+def test_writer_refuses_unbound_inputs_directly(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.assembly_method_pins import write_pin_pair
+
+    _paths, _record, artifact, config = case(tmp_path / "case-root")
+    with pytest.raises(AssemblyError, match=r"^pin_inputs_missing$"):
+        write_pin_pair(tmp_path / "cache", None, producer_rows(artifact["pins"]))
+    with pytest.raises(AssemblyError, match=r"^pin_inputs_missing$"):
+        write_pin_pair(tmp_path / "cache", config, ())
+    assert not (tmp_path / "cache").exists()
+
+
+@hypothesis_settings(deadline=None, max_examples=40)
+@given(
+    config=st.one_of(
+        st.none(),
+        st.booleans(),
+        st.integers(),
+        st.text(max_size=4),
+        st.lists(st.integers(), max_size=3),
+    ),
+    rows=st.lists(
+        st.dictionaries(st.text(max_size=3), st.text(max_size=3)), max_size=2
+    ),
+)
+def test_property_an_unbound_configuration_never_writes_a_pair(config, rows):
+    # Oracle written from the plan's words, never from the module's code:
+    # without a recorded mapping configuration no pair is written, whatever
+    # producer rows are bound, and the closed pending reason is recorded.
+    with tempfile.TemporaryDirectory() as folder:
+        build, *_ = _staged_phase_build(Path(folder))
+        build.pin_generation_config = config
+        build.pin_rows = tuple(rows)
+        assert build.method_pins() == {}
+        _no_credited_output(build)
+        assert build.pin_pending_reason == "pin_inputs_missing"
+
+
+def _pending_run_build(
+    tmp_path: Path, *, stale_pair: bool = False
+) -> tuple[Any, dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """A gather-rooted Production whose head phases are invented stubs.
+
+    The real ``method_pins``, ``final_audit``, ``draw`` and ``reports``
+    adapters run in their production order through ``Production.run``; every
+    earlier phase is replaced by a stub that writes only its declared invented
+    outputs, and one stub registers an invented 25-row table so the figure
+    draw has its review universe. The pin inputs stay unbound: the pending
+    state of ruling L-1494, entered the way the live build enters it.
+    """
+    build, record, artifact, config = stage_method_pin_gather_build(
+        tmp_path, stage_outputs=False
+    )
+    if stale_pair:
+        for name in PHASE_OUTPUTS:
+            write_record(build.cache, name, {"SYN": "stale earlier run"})
+    for item in INVENTORY:
+        if item.name in {"method_pins", "final_audit", "draw", "reports"}:
+            continue
+
+        def stub(item=item):
+            output: dict[str, str] = {}
+            for name in item.outputs:
+                output.update(write_record(build.cache, name, {"SYN": item.name}))
+            return output
+
+        setattr(build, item.name, stub)
+    key, sidecar = next(iter(build.receipts.items()))
+
+    def gis_property_singles() -> dict[str, str]:
+        # run() clears the bound receipts; the stub rebinds the invented
+        # receipt of the fixture before any table or audit reads it.
+        build.receipts[key] = sidecar
+        build.table(
+            "pub_invented",
+            [{"period": "2026", "value": str(i), "cell": i} for i in range(25)],
+            (key,),
+        )
+        return build.record(
+            "gis_property_singles",
+            {"tables": build.tables, "source_tables": build.source_tables},
+        )
+
+    build.gis_property_singles = gis_property_singles
+    return build, record, artifact, config
+
+
+def _s2_t09_row(cache: Path, name: str) -> dict[str, Any]:
+    rows = json.loads((cache / name).read_text(encoding="utf-8"))
+    return next(item for item in rows if item["task"] == "S2-T09")
+
+
+def test_pending_pin_state_build_reaches_reports_and_records_its_reason(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _pending_run_build(tmp_path)
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        build.run()
+    # The run continued past the pending phase to the report writer.
+    for name in (
+        "assembly/final_audit.json",
+        "assembly/draw_values.json",
+        "assembly/s2_t08_completeness.json",
+        "assembly/s2_t08_terms.json",
+        "assembly/s2_t08_coverage.json",
+        "assembly/s2_t08_oi03.json",
+        "assembly/s2_t08_confirmations.json",
+        "assembly/s2_t08_investment.json",
+        "assembly/s2_t08_draw.json",
+    ):
+        assert (build.cache / name).is_file(), name
+    row = _s2_t09_row(build.cache, "assembly/s2_t08_confirmations.json")
+    assert row["state"] == "pending"
+    assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+    _no_credited_output(build)
+
+
+def test_require_complete_refuses_the_pending_pin_state(tmp_path: Path) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    build.pin_generation_config = None
+    assert build.method_pins() == {}
+    build.final_audit()
+    row = next(
+        item for item in build.audit["confirmations"] if item["task"] == "S2-T09"
+    )
+    assert row["state"] == "pending"
+    assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        require_complete(otherwise_complete_audit_with_s2_t09(row))
+
+
+def test_pending_pin_state_never_credits_a_stale_pair_of_an_earlier_run(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _pending_run_build(tmp_path, stale_pair=True)
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        build.run()
+    # The new run removed the stale pair before any source read, the pending
+    # phase wrote nothing over it, and the report credits no pin output.
+    _no_credited_output(build)
+    row = _s2_t09_row(build.cache, "assembly/s2_t08_confirmations.json")
+    assert row["state"] == "pending"
+    assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+
+
+def test_a_later_bound_run_leaves_no_stale_pending_reason(tmp_path: Path) -> None:
+    build, _record, artifact, config = _pending_run_build(tmp_path)
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        build.run()
+    build.pin_generation_config = config
+    build.pin_rows = producer_rows(artifact["pins"])
+    try:
+        build.run()
+    except AssemblyError as exc:
+        # Other gates may still be pending on invented inputs; no pin reason
+        # may survive the bound run.
+        assert str(exc) == "assembly_gate_pending"
+    assert set(PHASE_OUTPUTS) <= set(build.files)
+    assert (build.cache / PIN_ARTIFACT).is_file()
+    row = next(
+        item for item in build.audit["confirmations"] if item["task"] == "S2-T09"
+    )
+    assert row["state"] == "recorded"
+    assert "details" not in row
 
 
 def test_phase_refuses_missing_producer_row(tmp_path: Path) -> None:
@@ -222,12 +418,13 @@ def test_phase_refuses_unserializable_setting_and_leaves_no_half_pair(
     _no_credited_output(build)
 
 
-# S2-P63 round 2 (review RV1 F2): the command's assembly outcome carries the
-# phase's own closed refusals, never the generic assembly_build_refused.
+# S2-P63 round 3 (ruling L-1494): the unbound-input case no longer refuses at
+# the phase; the pending build runs on and the run's own gate refuses, and the
+# command reports that closed reason, never the generic assembly_build_refused.
 @pytest.mark.parametrize(
     "planted,reason",
     [
-        ("unbound_inputs", "pin_inputs_missing"),
+        ("pending_inputs", "assembly_gate_pending"),
         ("failed_second_write", "pin_output_pair_unwritten"),
     ],
 )
@@ -238,11 +435,14 @@ def test_build_public_reports_the_phase_s_own_closed_pin_refusals(
 
     from eii_custodian.publicdata.fetch.build import run_build
 
-    if planted == "unbound_inputs":
+    if planted == "pending_inputs":
 
         def run(build: Production) -> dict[str, str]:
-            # The live command binds no pin input: the phase refuses closed.
-            return build.method_pins()
+            # The live command binds no pin input: the phase stays pending,
+            # writes no pair, and the run's own gate refuses after reports.
+            assert build.method_pins() == {}
+            assert not (build.cache / PIN_ARTIFACT).exists()
+            require_complete(build.audit)
 
     else:
         # Bound, schema-valid inputs; only the second write of the pair fails.

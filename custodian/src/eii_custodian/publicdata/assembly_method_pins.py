@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import TypeGuard
 
 from .assembly import AssemblyError
 from .assembly_io import local, write_record
@@ -18,6 +19,14 @@ from .method_card_producer import produce_pin_artifact
 
 PIN_ARTIFACT_NAME = "assembly/s2_t09_pin_artifact.json"
 PIN_CONFIG_NAME = "assembly/s2_t09_pin_generation_config.json"
+PIN_INPUTS_MISSING = "pin_inputs_missing"
+
+
+def pin_inputs_bound(
+    generation_config: object, pin_rows: Sequence[object]
+) -> TypeGuard[Mapping[str, object]]:
+    """True when a recorded configuration mapping and producer rows are bound."""
+    return isinstance(generation_config, Mapping) and bool(pin_rows)
 
 
 def _drop_half_pair(cache: Path) -> None:
@@ -47,8 +56,8 @@ def write_pin_pair(
     an operating-system error — removes the other half and refuses with the
     one closed reason ``pin_output_pair_unwritten``, never a half pair.
     """
-    if not isinstance(generation_config, Mapping) or not pin_rows:
-        raise AssemblyError("pin_inputs_missing")
+    if not pin_inputs_bound(generation_config, pin_rows):
+        raise AssemblyError(PIN_INPUTS_MISSING)
     artifact = produce_pin_artifact(generation_config, pin_rows)
     try:
         outputs = write_record(cache, PIN_ARTIFACT_NAME, artifact)

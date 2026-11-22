@@ -567,9 +567,21 @@ def gather_audit(build: Production) -> dict[str, Any]:
             },
         )
     )
-    evidence.append(
-        method_pin_evidence(build.root, build.cache, build.entries, build.receipts)
+    pin_evidence = method_pin_evidence(
+        build.root, build.cache, build.entries, build.receipts
     )
+    if build.pin_pending_reason:
+        # Ruling L-1494: the pending phase's own closed reason rides the
+        # S2-T09 row of the build report; the gate still refuses the pending
+        # build, it never credits a pair that was not written.
+        pin_evidence = replace(
+            pin_evidence,
+            details={
+                **pin_evidence.details,
+                "pending_reason": build.pin_pending_reason,
+            },
+        )
+    evidence.append(pin_evidence)
     decision_name = "0025-reconciliation-of-restaurant-and-wage-figures.md"
     decision_path = build.root / "docs/decisions" / decision_name
     decision = decision_path.read_bytes() if decision_path.is_file() else b""
