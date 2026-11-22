@@ -765,7 +765,10 @@ class Production:
         output = self.record(
             "series_stage", {**result, "tables": produced, "row_sources": row_sources}
         )
-        if result["mismatch"] or result["missing"]:
+        # run_stage names a missing required (owned) figure as the mismatch.
+        # Unowned section 10 figures stay in ``missing`` and final_audit
+        # compares them after every producer has run.
+        if result["mismatch"]:
             raise AssemblyError("assembly_regression_refused")
         return output
 
@@ -893,9 +896,16 @@ class Production:
 
     def final_audit(self) -> dict[str, str]:
         from .assembly_reports import gather_audit
+        from .stage import run_stage
 
         bound_files(self.cache, self.files)
         bound_files(self.cache.parent, self.data_files)
+        # Every section 10 record produced in this run (series_stage cleared
+        # the folder) is compared again; one the series stage does not own is
+        # compared only here. A figure no producer wrote stays not measured.
+        section = run_stage(self.cache, evidence=True)
+        if section.mismatch or section.unrecorded:
+            raise AssemblyError("assembly_regression_refused")
         self.audit = gather_audit(self)
         return self.record("final_audit", self.audit)
 
