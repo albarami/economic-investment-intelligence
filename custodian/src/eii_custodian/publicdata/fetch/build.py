@@ -580,6 +580,7 @@ def _seeded_assembly(
             "assembly_places_incomplete",
             "assembly_membership_invalid",
             "assembly_regression_refused",
+            "assembly_section10_input_invalid",
             "assembly_intake_invalid",
             "assembly_tender_pages_incomplete",
             "assembly_tender_terms_incomplete",

@@ -21,7 +21,7 @@ from shapely.geometry import Polygon, box
 
 import h3
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.places import PlacesError
+from eii_custodian.publicdata.places import PlacesError, stage
 from eii_custodian.publicdata.places.area_files import (
     AreaRequest,
     produce_areas,
@@ -84,6 +84,22 @@ def test_without_area_files_nothing_is_complete(tmp_path: Path) -> None:
     assert "census_comparison_pending" in report["report"]
     assert report["decision"] == "pending"
     assert report["caveat_key"] == CAVEAT_KEY
+
+
+def test_stage_with_area_manifest_refuses_missing_flagship_point(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    review = _review(tmp_path, verified="")
+    places = _places(tmp_path, _food())
+    _buildings(tmp_path)
+    _areas(tmp_path)
+    config = _config(tmp_path, review, places)
+    run_places_stage(config)
+    points = stage._source_points(config)
+    del points[("bldg_ovt", "SYN-BLDG")]
+    monkeypatch.setattr(stage, "_source_points", lambda _config: points)
+    with pytest.raises(PlacesError, match=r"^flagship_point_missing$"):
+        run_places_stage(config)
 
 
 def test_place_and_verification_rows_round_trip(tmp_path: Path) -> None:

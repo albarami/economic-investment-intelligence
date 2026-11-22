@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
+from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.area_files import AreaRequest, coordinate_text
 from eii_custodian.publicdata.places.areas import AreaCutoff, AreaMode
 from eii_custodian.publicdata.places.review import (
@@ -35,7 +36,7 @@ def area_requests(
         )
     for item in load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]:
         for mode, cutoff in _CANDIDATE_AREAS:
-            _remember(found, item, points, mode, cutoff)
+            _remember(found, item, points, mode, cutoff, required=True)
     return tuple(found[key] for key in sorted(found))
 
 
@@ -45,6 +46,8 @@ def _remember(
     points: Mapping[tuple[str, str], tuple[float, float]],
     mode: AreaMode | None,
     cutoff: AreaCutoff | None,
+    *,
+    required: bool = False,
 ) -> None:
     if mode is None or cutoff is None:
         return
@@ -59,6 +62,8 @@ def _remember(
         return
     pair = points.get((source, record))
     if pair is None:
+        if required:
+            raise PlacesError("flagship_point_missing")
         return
     found[(place_key, mode.value, cutoff.value)] = AreaRequest(
         place_key,

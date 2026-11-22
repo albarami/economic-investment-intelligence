@@ -35,6 +35,11 @@ from eii_custodian.publicdata.singles.tenders import (
     _write_pages,
 )
 
+# Read the tender row once at import: the shared lazily cached registry helper
+# parses the 1.2 MB sources.yaml, and a cold first call inside a property test
+# would land inside its first Hypothesis deadline.
+TENDER_ENTRY = tender_entry()
+
 
 def test_pending_selection_layer_and_gate_without_tender_output(tmp_path: Path) -> None:
     row = tender_entry()
@@ -53,7 +58,7 @@ def test_pending_selection_layer_and_gate_without_tender_output(tmp_path: Path) 
 
 @given(st.text().filter(lambda value: value != "tenders_pub"))
 def test_pending_is_closed_to_every_other_key(value: str) -> None:
-    row = replace(tender_entry(), key=value)
+    row = replace(TENDER_ENTRY, key=value)
     committed = load_confirmation(
         Path("custodian/publicdata/review/s2_t13_confirmation.yaml")
     )
@@ -172,7 +177,7 @@ def test_ordinary_archive_refuses_unexpected_active_paged_source(
 
 @given(st.text(), st.text())
 def test_tender_identity_is_key_or_source_id(key: str, source_id: str) -> None:
-    row = replace(tender_entry(), key=key, source_id=source_id)
+    row = replace(TENDER_ENTRY, key=key, source_id=source_id)
     assert is_tender_entry(row) is ("tenders_pub" in {key, source_id})
 
 

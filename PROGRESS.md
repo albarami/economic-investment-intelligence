@@ -51348,3 +51348,627 @@ S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline e
 | 2026-11-22 | S2-P52 verdict | Head `fa872bacc592cd9d4c77ffd7d297b75f50e39f92` (builder OpenAI gpt-6.1-sol via Codex, rounds 1 to 3, lead records commit). Reviewers: Anthropic Opus 5.5 via Claude Code APPROVED `c15df8ed` (round 1) and confirmed APPROVED `fa872bac` with own plants; Moonshot Kimi K3.1 Pro via Abacus confirmed APPROVED `fa872bac`. Two records-only nits (two docstrings; a test monkeypatches a dict) are recorded and do not reject. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | S2-P57 BT-1 verdict | Head `1299da7a700fc441389ab383c6b646559a1b3650` (builder OpenAI gpt-6.1-sol via Codex). Lens 1 Anthropic Opus 5.5 via Claude Code APPROVED `7f658478` with five nits; lens 2 Moonshot Kimi K3.1 Pro via Abacus APPROVED `7f658478`; the lead took nits F1 to F3 as round 2 (`1299da7a`: the baskets hash binds the parsed bytes; read failures refuse as `assembly_membership_invalid`; the PUB-34 cell restored byte for byte); lens 1 confirmed APPROVED `1299da7a`. Lead verify on `1299da7a`: importer suites 5,800 passed, one environmental data test that needs the real cache; ruff, format, mypy, docs, tree, rule-file identity and diff check exit 0. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | Train join identity | `train/s2-18` on main `154333b5`: join commits `df32b699` (S2-P54), `fac3142f` (S2-P55), `a5a24a1d` (S2-P52), `3481d4be` (S2-P57). The lead's script `train_identity.py` proves, file by file, that each join commit holds exactly its task's own change: 39 files identical, 0 differing; PROGRESS.md and OPEN_ITEMS.md conflicts resolved by appending each task's rows after the new base, in order. | Lead (Anthropic Opus 5.5) |
+
+## S2-P61 — flagship area origins from every active registry building part
+
+| Date | Task | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-P61, S2-T06 correction; inspected base `154333b5238adda52e529a1222fb6bdc8fd3c01a` | `_cache_points` reuses `_buildings_from_registry`, the stage's active, receipted Parquet selection, for building origins outside `FILE_KEYS`. The fetch list and `building_inputs.BUILDING_PARTS` are unchanged. Missing resolved points of keyed flagship candidates raise the closed `PlacesError("flagship_point_missing")`; the area producer records `REFUSED flagship_point_missing`, and the stage retains its existing PlacesError refusal channel. Places notes describe the shared part set. No source fetched or real cache read; no S2-T06 criterion or slice gate is ticked. | OpenAI Codex; senior Python engineer for geospatial data pipelines; strict self-review persona: sanad auditor. |
+
+**Skills and method.** Applied `project-orientation`, `task-standards`,
+`github-flow`, `sanad-provenance`, `strict-reviewer` and `muhasabah-gate`.
+The brief supplies the equivalent test-first, systematic-debugging and
+verification-before-completion rules; their superpowers skill files are not in
+this session's installed skill catalogue. Reused the existing registry resolver
+and invented Parquet, receipt and review fixtures; no copied implementation or
+duplicate helper. Self-review is not independent different-maker approval; the
+lead retains that review and the merge gate.
+
+**Environment and commands.** Linux, bash, Python 3.14.6, pytest 9.2.0,
+Hypothesis 6.170.15, profile `eii`, seed `6101`; every uv invocation used
+`UV_OFFLINE=1`. Test basetemps and evidence are under `.overnight/tmp/`.
+No network, `.env`, `.private`, real `data/` input, service command, push or
+merge. The final delivery commit is recorded after committing in
+`.overnight/RETURN.md`, avoiding a self-referential hash in this commit.
+
+The final regression command (exit **0**, **1102 passed**, no failed or skipped
+tests, **113.28 seconds**) was:
+
+```sh
+UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places*.py custodian/tests/test_assembly_readers.py custodian/tests/test_public_snapshots.py custodian/tests/test_publicdata_unblocked_round3.py custodian/tests/test_snapshot_refusals.py custodian/tests/test_building_workflow.py custodian/tests/test_publicdata_besttime_build.py custodian/tests/test_publicdata_buildings.py custodian/tests/test_series_frame.py -q --hypothesis-seed=6101 --basetemp=.overnight/tmp/pytest-regressions-final
+```
+
+An AST scan found **16** direct importers of the changed modules. The command
+covers all of them and all places tests, **47** files in total; the explicit
+selection is in `.overnight/tmp/test-selection.json`. The earlier run, before
+the supplementary property and PlacesError routing correction, exited **0**,
+**1101 passed**. Only import formatting changed during the final broad run;
+the focused suite was rerun on the final test bytes.
+
+**Red, refusal and restoration evidence.** The initial five-case suite exited
+**1**, **3 failed / 2 passed**: the extra registry part lost its point, the
+dependent negative first encountered that missing origin, and the producer
+logged `areas: nothing to do`. The negative was then isolated on the fixed
+part; changing only the valid point map by deleting its candidate pair exited
+**1**, **1 failed**, specifically `DID NOT RAISE`. After implementation the same
+five cases exited **0**, **5 passed**. The final suite includes a supplementary
+property over nonempty source/record strings and every closed mode/cutoff:
+both exact keys are needed even with wrong-source and wrong-record decoys.
+It exited **0**, **6 passed**. There is one new refusal branch, the required
+flagship's missing point; the negative asserts the anchored exact reason
+`flagship_point_missing`. Existing optional-showcase and malformed-key handling,
+receipt guards and parser exclusions are retained.
+
+| Plant, changed alone | Red exit and evidence | Byte restoration and green exit |
+|---|---|---|
+| Restore the base `_cache_points` fixed-key loop | 1; 1 failed / 5 passed, extra-part point is `{}` | Exact original fixed bytes restored; 0, 6 passed |
+| Delete only the new missing-point refusal, restoring the silent skip | 1; 3 failed / 3 passed, exact-reason negatives and property report `DID NOT RAISE` | Exact fixed bytes restored; 0, 6 passed |
+| Remove only `required=True` from the flagship request call | 1; 2 failed / 4 passed, required flagship and producer-log negatives fail | Exact fixed bytes restored; 0, 6 passed |
+
+Plant commands were the focused `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py -vv --hypothesis-seed=6101`
+with a distinct `.overnight/tmp/pytest-...` basetemp per run. Actual commands,
+exits and summaries are retained in `.overnight/tmp/plants.json`. Both modified
+production files were compared byte-for-byte with their saved fixes after
+restoration. No privacy rule, gate, baseline, skip or tolerance changed.
+
+**Other checks.** `uv run --locked ruff check .` exit **0**;
+`uv run --locked ruff format --check .` exit **0**, **939** files formatted;
+`uv run --locked mypy` exit **0**, **500** source files;
+`python3 scripts/check_docs.py` exit **0**, **1272** text files / **143** Markdown
+files in the first run; `python3 scripts/check_tree.py` exit **0**, **8** rules;
+`cmp AGENTS.md CLAUDE.md` exit **0**; `git diff --check` exit **0**.
+Initial lint/format checks exited **1** for a non-raw anchored regex and line
+wrapping in the new test. The formatter exited **0** and changed only that
+test; the later added Hypothesis import needed splitting, lint exit **1**, then
+**0** after correction. These are explained corrections, not random failures.
+Final post-record checks and the exact bundle checksum are in the return.
+
+**Delivery constraint.** Creating a branch in the supplied worktree exited
+**128** because its shared Git refs are read-only. A workspace-local shared
+bare clone under `.overnight/tmp/delivery.git` was created (exit **0**) and its
+own branch and index were initialized at the full base hash above. The delivery
+commit and bundle use only that local Git metadata; the supplied shared Git
+metadata is unchanged. No permission bypass, push or remote operation is used.
+
+**Code practice and limits.** Longest new function:
+`test_registry_building_supplies_flagship_point_and_all_requests`, **29** lines
+by AST span. Changed production functions `_cache_points` and `_remember` are
+**28** and **32** lines. No block copied; existing loops moved within the same
+function and the registry resolver was reused. No new arithmetic, rounding,
+geospatial method or privacy/leak rule; the property supplements the scoped
+origin-presence and exact-key cases rather than asserting new numeric coverage.
+Fixture evidence proves the point/request and closed-refusal correction only;
+live flagship areas, source review and different-maker acceptance remain with
+the lead. Muhasabah self-audit: **PASS** for this scoped implementation.
+
+## S2-P61 round 2 — retain building-part refusals
+
+**Subject and scope.** Base `a1476ca9f65771ccd15fd4dda1e0851c373160bb`;
+`.overnight/BRIEF.md` and `.overnight/IN/REVIEW-RV1.md`, F1, O1 and O2.
+Builder: OpenAI Codex, senior geospatial data pipelines engineer. Strict
+self-review persona: sanad auditor; no independent-maker approval is claimed.
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. The brief's test-driven-development,
+systematic-debugging and verification-before-completion rules were applied
+directly; those named skill files are not in the installed skill catalogue.
+
+**Correction.** The earlier S2-P61 statement that receipt guards were retained
+is superseded for building area origins: the round-1 resolver silently skipped
+bad building snapshots. The shared `_building_entries` predicate now supplies
+both registry consumers. The producer first calls `_opened_place` for fixed
+building-part keys, then refuses a selected active registry building entry
+without a valid receipt with `places_file_digest`. The listing parent
+`bldg_ovt` does not receive the unpinned-directory check. Fetch keys and required
+building parts are unchanged.
+
+O1 correction: building-part selection in the stage is unchanged, but the
+round-1 shared request guard also changes its refusal reason when an area
+manifest exists: a missing keyed flagship point raises `flagship_point_missing`
+before later review resolution could produce `record_missing`. A new actual
+stage-boundary test starts with a successful stage and deletes only that point
+from the provider's source-point map; it asserts the anchored exact reason.
+O2: the places README now names `_cache_points`' full `load_registry()` input
+and the stage's supplied registry. Earlier return wording saying simply
+"stage unchanged" must not be used.
+
+**Red and green.** Before changing production code, all three exact-log
+negatives failed on the base: corrupt pinned part-00384, corrupt pinned
+part-90001 outside `FILE_KEYS`, and unpinned part-00384. Each logged
+`areas: nothing to do`; the command exited **1**, **3 failed / 6 deselected**.
+The same base bytes were replayed with the new tests to retain
+`.overnight/tmp/red-recorded.json` and `.log` (same exit and failures).
+Command: `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py -q -p no:cacheprovider
+-k 'corrupt_reviewed or unpinned_fixed' --hypothesis-seed=61`, with the
+recorded distinct `.overnight/tmp/` basetemp. Each negative changes one input
+from a proven valid origin/request: body bytes or one reviewed pin.
+
+Focused command: `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py custodian/tests/test_places_stage.py
+-q -p no:cacheprovider --hypothesis-seed=61`, distinct basetemp per run.
+First green: **21 passed**, exit **0**. Plants were applied individually and
+restored byte-for-byte before each green run; complete commands and exits are
+in `.overnight/tmp/r2-plants.json`.
+
+| Deleted guard alone | Red exit/result | Restored exit/result |
+|---|---|---|
+| Fixed-building `_opened_place` precheck | 1; 1 failed / 20 passed, exact unreceipted log | 0; 21 passed |
+| Reviewed registry building digest refusal | 1; 1 failed / 20 passed, exact extra-part digest log | 0; 21 passed |
+| Required flagship missing-point raise | 1; 4 failed / 17 passed, including the stage-boundary negative | 0; 21 passed |
+
+**Required checks.** All commands used `UV_OFFLINE=1`; test `TMPDIR` and
+basetemp were inside `.overnight/tmp/`, Hypothesis seed **61**. Runtime:
+Python **3.14.6**, Linux/WSL2. No network, real cache, `.env`, `.private` or
+`data/` was read. Required selection:
+`uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider
+-k 'places or building' --basetemp=.overnight/tmp/required-suite
+--hypothesis-seed=61`, exit **0**, **969 passed / 10466 deselected** in
+**126.64 seconds**. `uv run --locked ruff check .`,
+`uv run --locked ruff format --check .` (**939** files),
+`uv run --locked mypy` (**500** source files), `python3 scripts/check_docs.py`
+(**1272** text / **143** Markdown files), `cmp AGENTS.md CLAUDE.md` and
+`git diff --check`: each exit **0**. Logs: `.overnight/tmp/required-suite.log`
+and `.overnight/tmp/r2-checks.json`; final records and packaging checks are
+recorded in the return.
+
+**Code practice and handoff.** No blocks copied; the existing receipt opener,
+receipt reader, registry resolver and invented-fixture helpers are reused.
+Longest new function by AST span is
+`test_area_producer_refuses_unpinned_fixed_building_directory`, **15** lines;
+new production helper `_building_entries` is **9** lines. No function added
+exceeds the brief's limit. The deliverable is one Conventional Commit on the
+full base hash above, created through workspace-local Git metadata to keep
+writes inside this workspace, and a verified bundle; exact commit and checksum
+are in `.overnight/RETURN.md`. Self-review and muhasabah: **PASS** for this
+scoped patch. Different-maker review and live source/flagship evidence remain
+with the lead; no task criterion or slice gate is ticked.
+
+## S2-HYPO records — 2026-11-22
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-HYPO, property-test timer sweep at head `154333b5` (class sweep after S2-18-RF1; delivered commit and bundle in `.overnight/RETURN.md`) | Linux, Python 3.14, pytest 9.2.0, hypothesis 6.170.15, `taskset -c 24,25`, `UV_OFFLINE=1`, no network. All 17 `@given` files listed with `git grep -l "@given"`; 23 real property tests ran with `--hypothesis-show-statistics -p no:cacheprovider` (typical runtimes recorded in `.overnight/RETURN.md`). Maximum per-example runtimes measured with a measurement-only probe profile (per-example deadline 80 ms; first example effective 100 ms) run per test in an isolated process: `test_census_national_producer.py::test_counts_preserve_exact_rational_values` 107.77 ms cold and `test_stac_item_pins.py::test_snapshot_cardinality_property` 139.72 ms cold exceeded 100 ms; `test_stac_item_rows.py::test_order_independence_and_injective_key_property` measured 93.60 ms and its underlying registry parse alone measured 95-152 ms across runs. cProfile: the cost is `load_registry()`, the 1.2 MB `sources.yaml` parse, landing inside the first timed example of each lazily filled test cache. Fix (brief remedy b): each test now reads its fixed registry input once at module scope (`CENSUS_ENTRY`, `_COLLECTION_ENTRY`, `_COMMITTED_ROWS`); every assertion and the whole domain are unchanged, and no deadline, example count, strategy or skip was touched. After the fix all three pass the 80 ms probe in an isolated process (max at most 100 ms cold). Plants: census `Decimal(...) * 2` red exit 1, restored green exit 0; pins `propose` returning `{}` red exit 1, restored green exit 0; rows `generate` returning insertion order red exit 1, restored green exit 0. Required commands: pytest on the three changed files exit 0 (105 passed); `ruff check .` exit 0; `ruff format --check .` exit 0 (938 files); `mypy` exit 0 (500 source files); `python3 scripts/check_docs.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. No production code changed in the delivered diff. | Droid (Z.ai GLM-5.3); senior Python property-test engineer persona; strict self-review persona. |
+| 2026-11-22 | Correction to the S2-HYPO row: round 2 (review finding F1; delivered commit and bundle in `.overnight/RETURN.md` of the round-2 worktree) | The OpenAI review rejected round-1 commit `6da9107` on base `154333b5`: two property tests in `custodian/tests/test_build_own_run.py` still paid the 1.2 MB `sources.yaml` registry parse inside their first timed Hypothesis example, measured 124.49 ms and 129.04 ms cold (over the 100 ms bound). Cause: `tender_entry()` reaches `custodian/tests/singles_entries.py::_registry`, a `@cache` around `load_registry()` first filled inside the timed example. Fix: module-scope `TENDER_ENTRY = tender_entry()` in `custodian/tests/test_build_own_run.py`; both properties use `replace(TENDER_ENTRY, ...)`; strategies, assertions, `max_examples` and deadlines unchanged. Class closed: the only lazily cached helpers reaching a large committed-file parse are `singles_entries.py::_registry` (round 1 fixed its three other consumers at module scope) and the three module-scope reads already warm; every one of the 23 `@given` bodies re-inspected, and only these two reached a lazily cached registry parse. Fresh-process re-measurement of every property (one process per test, `taskset -c 24,25`, `--hypothesis-seed` set to the date 2026-11-22 written as one eight-digit number, timing plugin over `perf_counter`): all 23 first examples under 100 ms; the two fixed tests measured 0.263 ms and 0.033 ms first example (max later example 0.198 ms and 0.033 ms), exit 0 each; worst first example of the class 19.50 ms (`test_counts_preserve_exact_rational_values`). Plants: `is_tender_entry` returning `entry.key is not None` red exit 1, restored green exit 0; `own_run_pending` reduced to `registry is not None and receipt is None` red exit 1, restored green exit 0; both production files restored byte-identical to their backups (`cmp`). Required commands: pytest `custodian/tests/test_build_own_run.py` exit 0 (76 passed); `ruff check .` exit 0; `ruff format --check .` exit 0 (938 files); `mypy` exit 0 (500 source files); `python3 scripts/check_docs.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. No production code changed in the delivered diff. | Droid (Z.ai GLM-5.3); senior Python property-test engineer persona; strict self-review persona. |
+
+
+## S2-P59 — exact cached decimals reach the bank-credit stage (2026-11-22)
+
+- Base inspected and tested with the working patch: `154333b5238adda52e529a1222fb6bdc8fd3c01a`. Task authority: S2-P59 brief, gate checklist row 17 (bank-credit Decimal input), S2-T09 area; study S2-DEC rows 1 and 3. This is the parser correction, not a live build, method-pin approval or whole-slice gate. The delivered commit identity is in the task return, avoiding a self-referential commit hash.
+- Builder: OpenAI Codex, senior Python data-pipeline engineer. Strict self-review: rule-7 auditor. Skills applied: project-orientation, task-standards, github-flow, sanad-provenance, property-based-testing, strict-reviewer and muhasabah-gate; the brief supplies test-driven-development and verification-before-completion rules (the corresponding standalone skill files were not installed). Different-maker acceptance remains the lead's review step.
+- `singles/bank_credit.py:_value` admits Decimal through the existing `_VALUE` grammar and quantizes to cents. Formatting is exact fixed-point text, never a float; it refuses excess fraction digits, negative/signed-zero text and non-finite Decimals with exactly `CreditError("value")`. The integer/string branches and closed float refusal remain unchanged. The new cache-to-stage case writes an invented JSON fraction `25.5`, reads Decimal through `frame.build.read_cached`, and checks `Decimal("25.50")`, cents scale, null unit and the source-table edge.
+- `additions/common.py:read_measure` adds Decimal to the existing numeric branch. Inspection and the regression test establish that today's float path admits integral `1500.0` like int `1500`; Decimal now does likewise. Fractions retain `measure_not_integral`, non-finite values retain `measure_unparsed`. The invented `prop_sales` body passes through the hash/receipt-verified cache reader and existing bulletin adapter. Its integral-valued JSON fraction deliberately exercises the defensive reader, although the unchanged fetch schema declares that measure an integer.
+- Sweep: the only bare int/float check on the decoded `read_cached` path was `additions/common.py:read_measure`, explicitly included by the brief despite study row 3's SAFE/latent classification. Bank credit was study row 1's required correction. All 16 remaining bare tuple/set checks were traced: GIS uses `standard_json=True`; frame raw parses zip-member bytes itself; fetch checks precede the cache reader; source-web, snapshot, places and AST-policy readers use other inputs. Mixed numeric checks in frame layers, establishments, families and page schema already admit Decimal; register validation uses its own capture path. The task return names every swept check and its boundary. No other production file changed.
+- Environment: Linux/bash, Python 3.14.6, uv 0.11.31, pytest 9.2.0, Hypothesis 6.170.15; `UV_OFFLINE=1`, `UV_NO_SYNC=1` preserves the prepared engine environment, workspace-local `UV_CACHE_DIR` and `TMPDIR`; pytest uses repository profile `eii`, 100 generated examples per property, no example database, seed `5901`, workspace-local `--basetemp`. No network, real cache, `.env`, `.private` or `data/` input. No push, service command or merge.
+
+| Date | S2-P59 evidence | Real exit and result |
+|---|---|---|
+| 2026-11-22 | Red before production edits: `uv run --locked python -m pytest custodian/tests/test_production_adapters.py::test_real_bank_credit_builder_and_null_unit_are_preserved -vv --hypothesis-seed=5901 --basetemp=.overnight/tmp/pytest-red` | 1: integer passed; JSON fraction failed at `_value` with `CreditError("value")`, input `Decimal('25.5')`. |
+| 2026-11-22 | Added regressions on unchanged base production: `uv run --locked python -m pytest custodian/tests/test_bank_credit.py custodian/tests/test_production_adapters.py custodian/tests/test_property_sales_export.py -q --hypothesis-seed=5901 --basetemp=.overnight/tmp/pytest-baseline` | 1: 9 failed, 71 passed. Bank positive Decimal cases, exact-rational property and stage case fail; cached integral/fractional property measures fail for the documented type/reason gap. |
+| 2026-11-22 | Same three touched files after production edits; basetemp `pytest-green` | 0: 85 passed. Two Fraction-oracle properties cover bank-contract coefficients/scales and unrestricted finite measure Decimals, respectively. |
+| 2026-11-22 | Seven one-change plants, each restored byte-for-byte; all use `uv run --locked python -m pytest`, seed `5901`, `-q`, unique workspace-local basetemp/log | Every red 1; every restored green 0. Remove Decimal dispatch: 7 failed/31 passed then 38 passed; delete new Decimal grammar guard alone: 9/29 then 38; omit cents quantization: 5/33 then 38; remove Decimal measure admission: 3/44 then 47; delete measure finiteness guard alone: 4/43 then 47; delete numeric integrality guard alone: 2/45 then 47; introduce float conversion into Decimal quantization: 1/20 then 21. Credit plants use bank-credit and production-adapter files, except the precision plant uses bank-credit only; measure plants use property-sales-export. Negative tests require the exact refusal reason. |
+| 2026-11-22 | Caller regressions: `uv run --locked python -m pytest custodian/tests/test_additions_*.py custodian/tests/test_property_quarter.py custodian/tests/test_property_survivors.py custodian/tests/test_museum_missing_forms.py -q --hypothesis-seed=5901 --basetemp=.overnight/tmp/pytest-callers` | 0: 403 passed in 40.18 seconds. |
+| 2026-11-22 | Initial quality checks | `ruff check .` 1: two import-order findings in added test imports, corrected by splitting aliased Hypothesis imports; `ruff format --check .` 0: 938 files; `mypy --cache-dir .overnight/tmp/mypy-cache` 0: 500 source files. No random failure or gate suppression. |
+| 2026-11-22 | Delivery Git boundary | Initial branch creation 128 (shared refs are read-only). `git clone --bare --shared --no-hardlinks . .overnight/tmp/delivery.git` 0; workspace-local index initialized from the full base above, so commit/bundle generation changes no shared metadata. |
+| 2026-11-22 | Final checks after the code and evidence additions | Touched-file pytest command above with basetemp `pytest-final`: exit 0, 85 passed in 1.95 seconds. `uv run --locked ruff check .`: 0; `uv run --locked ruff format --check .`: 0 (938 files); `uv run --locked mypy` with workspace-local `MYPY_CACHE_DIR`: 0 (500 source files); `python3 scripts/check_docs.py`: 0 (1,271 text / 143 Markdown files); `python3 scripts/check_tree.py`: 0 (8 rules); `cmp AGENTS.md CLAUDE.md`: 0; `git diff --check`: 0. Byte-prefix comparison of both evidence files against the base: 0, append-only. Strict self-review APPROVE for this scope; muhasabah PASS. No independent approval is claimed. |
+| 2026-11-22 | S2-RDP H1 and H2 (slice S2, S2-T06), build | New lead-shell helpers `scripts/review_place_keys.py` (H1) and `scripts/review_attribution_tokens.py` (H2) with `scripts/tests/test_review_place_keys.py` on invented Parquet only (26 tests, two Hypothesis properties). `uv run --locked python -m unittest scripts.tests.test_review_place_keys`: exit 0, 26 ran. ruff check exit 0, ruff format --check exit 0, mypy exit 0 (503 files). Each refusal guard deleted alone turns the suite red (exits in the task's return). Neither helper was run on a real cache. Base main `154333b5`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 and H2 round 2 (slice S2, S2-T06), build | Design review finding F-3: H1 writes a key only when the matched place survives the build's own `places/build.py` `_keep` exclusions and `places/display.py` `resolve_duplicates`, called directly, not copied; otherwise the row stays null with `excluded_by_keep_<reason>` or `duplicate_dropped`. `attribution_missing` is reported apart as `attribution=true|false|na`. The frame grid is not rebuilt, so `no_cell` is not evaluated (open point in the task's return). Added `kept=` and `attribution=` to the printed line and to `--check`. Frame-boundary tests now use an invented `bnd_hdx` archive through the real reader. `uv run --locked python -m unittest scripts.tests.test_review_place_keys`: exit 0, 38 ran. pytest exit 0 (38 passed). ruff check exit 0, ruff format --check exit 0, mypy exit 0 (503 files), check_docs exit 0, check_tree exit 0. Each new guard deleted alone turns the suite red; the 17 round-1 plants were re-run and are still red. Neither helper was run on a real cache. Base main `154333b5`, on round-1 commit `3f6d5065`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 and H2 round 3 (slice S2, S2-T06), build | Lens-1 findings F-1 to F-5 (all accepted by the lead; ruling L-1462 otherwise stands). F-1: a repeated `place_key` refuses `duplicate_place_key` before writing and in `--check`; each proposal fills only its own row. F-2: `_keep` now reads the reviewed `places_ovt_attribution.csv`, so `attribution_missing` withholds the key (`excluded_by_keep_attribution_missing`) and `--check` fails a filled key whose place is excluded; the separate `attribution=` field is removed (H2 and the reviewer's table now come before H1). F-3: every selected, active `bldg_ovt` part must verify through the existing receipt reader, or `buildings_file_unverified`. F-4: parsing, decoding, filesystem and snapshot failures print one closed reason (`review_file_unparsable`, `filesystem_refused`, `snapshot_refused`) on both helpers, with no failure text; every CLI test asserts stderr empty. F-5: the reload negative submits a changed row and keeps the original bytes. `UV_OFFLINE=1`. unittest exit 0 (54 ran); pytest exit 0 (54 passed, 4 subtests); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. 41 plants, each guard deleted alone (13 new, 28 earlier, including the write-before-validate plant and both second-hash `require_receipt` guards, now observable by a stale-receipt test): every one exit 1. Neither helper was run on a real cache. On round-2 commit `054bd167`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 round 4 (slice S2, S2-T06), build | Lens-2 finding 1: `fill` now loads both review files and computes every proposal and updated row first, then stages and reloads both outputs through the build's own readers (`stage`), and only then replaces both targets (`write_reviewed`); on any refusal neither target changes and no staged file remains. Lens-2 findings 2 and 3 were closed by round 3. New negatives on invented Parquet: a refusal planted only in the second file (`aliases_form`, `overwrite_refused`, `duplicate_place_key`, `reload_mismatch`), each asserting its exact reason and both files' bytes and the folder listing unchanged, plus an exhaustive case over each kind in the first, second or both files. Red before the change: pytest exit 1 (8 failed, all second-file cases). Four plants, each alone (replace the first file before the second is validated; no removal of a failed stage; no removal of staged files on a later refusal; no reload check): every one exit 1. Records: rule 44's H1 text states that neither file is written on a refusal and the accepted `no_cell` limit; OPEN_ITEMS.md PO-S2-RDP-01 UPDATE records ruling L-1462. `UV_OFFLINE=1`. pytest exit 0 (58 passed, 19 subtests); unittest exit 0 (58 ran); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Neither helper was run on a real cache. On round-3 commit `dc86b21b`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 round 5 (slice S2, S2-T06), build | Lens-1 confirmation finding R1 (accepted by the lead): `write_reviewed` now keeps a same-directory copy of each target's original, with its mode, before the first replacement; if a replacement raises, every target already replaced is restored and every staged and kept file is removed before the ordinary `filesystem_refused`. A restore that itself fails prints `FAILED rollback_failed`, exits 3 and leaves the unrestored original beside its file. New negatives on the valid invented pair, each changing one input: the second target's replacement fails (`REFUSED filesystem_refused`, both files' bytes, modes and the folder listing unchanged); the first target's replacement fails (same); the copy of the second original fails (same); the restore of the first also fails (exit 3, `FAILED rollback_failed`, second file unchanged, one kept file equal to the first original). Red before the change: pytest exit 1 (3 failed; the first-replacement control passed). Seven plants, each alone (no rollback; no `rollback_failed` branch; kept originals not removed; no removal of a failed copy; mode not copied; unrestored original removed; restore failure not caught): every one exit 1, each restored exit 0. Records: rule 44's H1 text says neither file is left changed on any refusal and names the exit-3 outcome. `UV_OFFLINE=1`. pytest exit 0 (62 passed, 19 subtests); unittest exit 0 (62 ran); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Neither helper was run on a real cache. On round-4 commit `b1ee59d8`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+S2-P58 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona senior statistical-pipeline engineer for public regression figures with exact decimals and complete source chains; strict self-review persona a numbers auditor; skills project-orientation, task-standards, test-driven-development, sanad-provenance, dimensional-analysis, verification-before-completion), on base 132133938f1f4b03f287c88df82dddce98a1f1a6, for PO-S2-P55-01. Producers of PUB-71 and PUB-72 on the assembly path. `eii_core.calc.public_methods` gains `private_employer_share` (PUB-71: private over all employed residents through `coverage_share`, national to one decimal and zones 69 and 70 to none, each rounded once half up by `rounded`) and `licence_density_pair` (PUB-72: licences of activity 5610101 per 10,000 residents through `licence_density`, Al Daayen and national, no decimal, half up). The PUB-71 replay in `custodian/data_tests/local_expectations.py` now calls `private_employer_share` (moved, not copied). New `series/section10.py` `produce` computes and validates every figure whose selected inputs are all present, then writes `series/regression/<id>.json` in the `build_series` envelope with the snapshot receipts as source chain; `Production.series_stage` calls the new `Production.section10` after `build_series`'s clear, and a parse refusal raises the closed `assembly_section10_input_invalid`, now on the fetch/build allow-list. `final_audit` reports its own complete comparison as the audit's regressions. PUB-73 has no producer (PO-S2-P58-01): it stays not measured and `require_complete` still refuses `assembly_gate_pending`. No anchor, expected value, tolerance or comparison changed. Tests first: `core/tests/test_section10_figures.py` (25 tests, two Hypothesis exact-rational oracle and order properties) exit 2 at base (import error); `custodian/tests/test_assembly_section10_producers.py` (22 tests, invented inputs) exit 2 at base and, with the new modules on the base adapters, 16 failed, 6 passed (exit 1); after the change 47 passed (exit 0). Each guard deleted alone, then restored: duplicate_zone, null_pair, zone_missing, negative_count, no_denominator, geography_invalid, population_duplicate, municipality_missing, population_missing, the inputs-selected skip, the unreviewed-indicator refusal, `validate_figure`, the skip-reason and not-selected filters, the duplicate-source refusal, the closed-name translation, the series-stage call, the audit's final comparison and the replay's zone_missing mapping each exit 1; the allow-list name exit 1. Commands (UV_OFFLINE=1): pytest over the 54 importer test files of `core/tests` and `custodian/tests` 2187 passed, exit 0; `ruff check .` exit 0; `ruff format --check .` exit 0; `mypy` exit 0 (501 files); `check_docs.py` exit 0; `check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. `./eii test` and `custodian/data_tests` not run (brief). Not reviewed by another maker yet.
+S2-P58 round 2 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona as round 1, senior statistical-pipeline engineer for public regression figures; strict self-review persona the round-1 numbers auditor; skills test-driven-development, sanad-provenance, dimensional-analysis, verification-before-completion), on base e505afdb (this commit's parent; its full hash holds an eleven-digit run, so it is not written here), for the lead's ruling on PO-S2-P58-01. PUB-73 producer: `eii_core.calc.public_methods.places_in_country` (inclusive box test on the four bbox bounds, exact country compare, one count per record) and `series/section10.py` `pub73` / `place_records` (only `bbox` and `addresses` of the receipt-proven places file through DuckDB with a bound path, read in batches of 2048) with `establishments_2020` from the existing `frame/establishments.establishment_rows`. `Production.section10` passes the verified snapshot path of `places_ovt/part-00014` (the listing entry is skipped; a receipt of another key refuses `places_receipt_mismatch`). Tests first: `core/tests/test_section10_figures.py` exit 2 at base (import error), then 41 passed (exit 0), with a Hypothesis exact-rational oracle and order and duplication properties; `custodian/tests/test_assembly_section10_producers.py` exit 2 at base (import error), then 49 passed (exit 0), on invented parquet written by DuckDB COPY in the test's temporary folder. Each guard deleted alone, then restored: in-box predicate (10 failed, exit 1), exact country (4 failed, exit 1), places_column_missing (2 failed, exit 1), places_parquet_invalid (1 failed, exit 1), places_bbox_invalid (3 failed, exit 1), places_addresses_invalid (4 failed, exit 1), listing filter (1 failed, exit 1), places_receipt_mismatch (1 failed, exit 1). Commands (UV_OFFLINE=1): pytest over the two files above plus `test_restricted_expectation_guards.py` and `test_assembly_section10.py` 178 passed, exit 0; pytest over the 34 test files of `core/tests` and `custodian/tests` that import `public_methods`, `section10`, `assembly_adapters` or `Production` 1548 passed, exit 0; `ruff check .` exit 0; `ruff format --check .` exit 0; `mypy` exit 0 (501 files); `check_docs.py` exit 0; `check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Not run: `./eii test`, `custodian/data_tests` and the real cache (brief). Not reviewed by another maker yet.
+S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona as round 2, senior statistical-pipeline engineer for public regression figures; strict self-review persona a numbers auditor who rejects a reader that admits less strictly than its siblings or a refusal tested only below the production boundary; skills test-driven-development, verification-before-completion), on base 4eb4979e22cf7962e627a53e49665d9b184e08a3, for lens-2 findings 1 to 3 on that commit. `series/section10.place_records` now calls the existing `places/read._require_schema` before reading columns, as every other places reader does, and refuses `places_schema_invalid` (closed `ValueError`; `Production.section10` turns it into `assembly_section10_input_invalid`). Test fixtures write the places schema metadata as the places-reader fixtures do. One list `MALFORMED` of twelve malformed places files (column missing x2, bbox invalid x3, addresses invalid x4, schema missing, schema wrong, not parquet) drives both the direct reason test (exact reason) and a new adapter test through `Production.section10` with valid PUB-71/72 inputs (exact closed name, no record under `series/regression`); a new negative changes only the places receipt's `source_id`. Red first: 4 failed, 60 passed (the four schema cases; exit 1); green: 64 passed (exit 0). Guard deletions, each alone then restored byte-for-byte: schema guard 4 failed (exit 1); receipt `source_id` half 1 failed (exit 1); column guard 2 failed in the direct reason test (exit 1; at the adapter the DuckDB read still refuses under the same closed name); bbox raise 1 failed (exit 1); addresses raise 1 failed (exit 1); parquet translation 1 failed (exit 1). Commands with `UV_OFFLINE=1`: pytest of `core/tests/test_section10_figures.py`, `custodian/tests/test_assembly_section10_producers.py`, `custodian/tests/test_restricted_expectation_guards.py`, `custodian/tests/test_places_read.py`, `test_places_read_survivors.py`, `test_places_read_survivors2.py`: 288 passed, exit 0; ruff check exit 0; ruff format --check exit 0; mypy exit 0 (501 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. `./eii test` not run (brief).
+## S2-P60 — offline activity review preparation and admission
+
+- Date: 2026-11-22. Base: `8f75f027a17a16d1e40c98396fbf502ef3e207bd`.
+  Builder: OpenAI GPT-6 through Codex; senior data-governance engineer for
+  classification mappings. Strict self-review persona: sanad auditor. Skills:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer, muhasabah-gate; the brief supplies
+  test-driven-development, security-review and verification-before-completion
+  equivalent rules. Independent different-maker approval remains with the lead.
+- Scope: `spine_triage.py --mode prepare`, `--mode assemble` and
+  `--mode finalise-check`; verified source receipts and basket-derived membership,
+  minimal untranslated signer packets, frozen inputs, maker independence, exact
+  coverage and audit decisions, preserved earlier rows, exact audit-byte binding
+  and mandatory finalisation. Rejected decisions bind their classification title,
+  including refusal when that title disappears. The committed review, baskets,
+  binding and audit files are unchanged; unsigned-seed assumptions moved into
+  invented fixtures. OI-203 stays open for the lead's real review.
+- Environment: Linux, Python 3.14.6, uv 0.11.31, pytest 9.2.0,
+  Hypothesis 6.170.15; `UV_OFFLINE=1`. Only invented caches under documented
+  temporary paths were used. No network, real cache, secret file or private
+  directory was read. The original worktree Git metadata is read-only; commit
+  and bundle metadata are maintained inside the workspace, without changing the
+  containing clone. No push, merge or independent review is claimed.
+- Verification commands and real exits on the final source:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exit 0, 71 tests; `uv run --locked python -m pytest
+  custodian/tests/test_activity*.py scripts/tests/test_spine_review_properties.py
+  --hypothesis-seed=2026112260 -vv` exit 0, 378 passed, none skipped;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0, 943 files;
+  `uv run --locked mypy` exit 0, 503 source files;
+  `python3 scripts/check_docs.py` exit 0;
+  `python3 scripts/check_tree.py` exit 0, eight rules;
+  `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0.
+  Documentation/tree checks use the workspace-local candidate index.
+- Red/green evidence: every new explicit refusal guard was removed alone and
+  restored; the accepted plant inventory has 40 red exit-1 / restored exit-0
+  pairs, including shared path/output guards, diagnostic handlers, title removal,
+  exact Arabic text, duplicate return codes, eligibility boundaries, preservation
+  and exact audit bytes. A newly added missing-rejected-title test first failed
+  (exit 1, no refusal) and passed after the binding correction (exit 0).
+  Property tests cover empty and single batches, sample-size boundaries,
+  rejected/mapped mixtures, order invariance and queue eligibility partitions.
+- Development failures are retained in the return evidence: initial test imports
+  needed the repository's fixture search paths; fixture sign-off defaults, a
+  reused output id and the exact missing-receipt reason were corrected. Initial
+  lint/type failures were corrected without exclusions. One title-binding plant
+  was mistakenly invoked with unittest instead of pytest, yielding red 1 and
+  restored 1; it is excluded from the 40 accepted pairs and its corrected pytest
+  plant records red 1 / restored 0. These are diagnosed development errors, not
+  random failures or waived checks. The earlier 70-test green is superseded by
+  the 71-test run after the exact-text edge case was added.
+- Evidence: workspace return `.overnight/RETURN.md` and its named logs under
+  `.overnight/evidence/`; no real signing, source acquisition, task checkbox,
+  slice approval or whole-project test is claimed.
+
+- Commit identity, S2-P60: `506ae6ea995346d6d3db1abbaf530c36ffe5ab86`
+  contains the final tested code and the record above. The subsequent evidence
+  commit adds only this identity line; the code/test files stay byte-identical.
+  The last named-command run is 71 tests, exit 0; the broader activity/property
+  run is 378 passed, exit 0, seed `2026112260`. The final documentation/tree,
+  lint/format/type, byte-identity and whitespace checks all exit 0. The bundle
+  and its checksum are delivered in the workspace return; no hosted check or
+  independent-maker approval is inferred from this local evidence.
+
+## S2-P60 round 2 — pre-audit draw and review findings
+
+- Date: 2026-11-22. Base: `f704c02e6c4ad9125460414f87522893d59a19fc`.
+  Builder: OpenAI GPT-6 through Codex; senior data-governance engineer for
+  classification mappings. Strict self-review persona: sanad auditor. Skills:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer and muhasabah-gate; the brief supplies
+  equivalent TDD, security-review and verification-before-completion rules.
+- RV1 F1: `--mode draw` freezes the manifest, signer-file and maker-record
+  hashes, seed, batch id and ordered sample before auditing, and publishes only
+  sampled source packets without signer answers. Assembly requires `--draw`
+  and refuses `draw_changed`; draw and assembly refuse `audit_seed_reused`
+  against every prior audit, including empty eligible batches. Rule 44 and the
+  procedure now give prepare, triage, sign, draw, audit, assemble, finalise-check.
+- RV1 F2 and A1: the wrong-existing-class negative asserts
+  `signer_decision_invalid` and kills the exact surviving prefix plant; model
+  acknowledgement roles refuse `acknowledgement_role_invalid` using the shared
+  model-like-role pattern. A2: earlier audits reuse strict duplicate-key parsing
+  and retain their record bytes on append, or all bytes with no new batch. A3:
+  finalisation hashes before context loading and verification, rederives frozen
+  inputs and rehashes before publication; changed inputs refuse. Optional-file
+  absence is explicitly bound, preserving the unsigned mandatory-row refusal.
+- RV2: review-adjacent audit resolution and baskets containment were already
+  present in the supplied base; derivation now reuses one checked audit path.
+  New wrong-root and symlink plants prove those contracts. The two-pass fixture
+  keeps the review outside the cache, preserves prior decisions and exact audit
+  bytes, and uses a fresh seed for its empty eligible pass. No committed review,
+  baskets, binding or audit file changed. OI-203 remains open.
+- Environment: Linux; Python 3.14.6; uv 0.11.31; pytest 9.2.0; Hypothesis
+  6.170.15; ruff 0.17.4; mypy 2.4.1. `UV_OFFLINE=1`, provider `none`,
+  workspace temporary paths and invented caches only; no network, real cache,
+  `.env` or `.private` read. Hypothesis seed `2026112262`; audit fixture seed
+  `3141592653`, continuation seed `3141592654`, both permitted endpoints tested.
+- Final required commands and real exits:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v` exit 0, 96 tests;
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112262` exit 0, 221 passed and 21 subtests passed;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0;
+  `uv run --locked mypy` exit 0;
+  `python3 scripts/check_docs.py` exit 0;
+  `python3 scripts/check_tree.py` exit 0;
+  `cmp AGENTS.md CLAUDE.md` exit 0;
+  `git diff --check` exit 0;
+  Candidate-index document/tree, instruction bytes, source checksums,
+  unchanged review/core and whitespace checks are recorded in the return.
+- Final proof inventory: forty unique isolated plants, each red exit 1,
+  byte restoration true and restored green exit 0, refreshed after the final
+  seed correction. Exact commands and logs are under
+  `.overnight/evidence/r2/final-proofs/` and
+  `.overnight/evidence/r2/final-plant-inventory.json`. Recursive JSON append and
+  seed-history properties join the existing audit/eligibility properties;
+  forced hash ties, empty/single/multi-batch, sample boundaries, ordering,
+  duplicate keys, Unicode text, malformed encoding, symlinks and input-change
+  timing have explicit proofs. No guard, audit size, tolerance or gate weakened.
+- Development corrections are retained in the return: missing new APIs in the
+  test-first run, optional-file absence during early hashing, a reused fixture
+  output id, lint/type annotations, an initially unrequested empty-batch seed
+  exception, and a scratch-runner filename collision that repeated two edge
+  proofs. The corrected extra proofs run separately and duplicate pairs do not
+  enter the final count. No failed check was hidden by retry, skip or a refreshed
+  baseline; no unresolved random failure was observed.
+- Delivery: workspace-local Git metadata and bundle on the stated base; the
+  containing checkout's metadata remains unchanged. No push, merge, task-box
+  change, hosted check, whole-project test, independent-maker approval or real
+  signing is claimed. `.overnight/RETURN.md` holds findings, refusal and plant
+  tables, exact file counts, longest functions, copy/reuse inventory and limits.
+  Muhasabah: PASS for this bounded local delivery; independent different-maker
+  review and OI-203's actual signing/audit remain lead-owned.
+
+- S2-P60 round 2 code identity: `15ff01801e1084af2b1fa41ce5c1de38ac58b33a`. This identity record follows
+  that tested code commit; no code or test change accompanies it. Final required
+  checks are exit 0: 96 unittest tests, 221 pytest passes and 21 subtests, with
+  forty unique red-1/restored-green-0 proof pairs. Candidate-index document/tree,
+  source checksums, unchanged review/core and staged whitespace checks also exit
+  0. The delivery head and verified bundle checksum are in the workspace return.
+
+- S2-P60 round 2 accounting clarification: the forty final recorded plant
+  pairs cover thirty-nine distinct proof cases. The hash-tie case appears in
+  both the edge set and the final confirmation set, each red 1 / restored green
+  0. Earlier uses of "unique" refer to named run records, not distinct mutation
+  cases; the return now states both counts. No required guard proof is missing,
+  and no source or test change accompanies this append-only clarification.
+
+
+## S2-P60 round 3 — derived audit seed
+
+- Date: 2026-11-22. Base: `9fc271ef773d61e6176eaa5ce25840a57be7d280`.
+  Test-first local commit: `74c37f36eb2257d7415cac847efb67b7ad0b96f7` on that base;
+  it is amended into the one requested delivery commit. The delivery hash,
+  bundle checksum and per-file counts are in `.overnight/RETURN.md`.
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies equivalent TDD,
+  systematic-debugging and verification-before-completion rules.
+- Authority: lead ruling L-1469, supplied with the round-3 brief, reading
+  decision 0075 item 3. `derived_audit_seed` derives J from only eligible code,
+  status and isic_class, sorted by code, and P from the canonical hash of the
+  latest earlier refused same-code batch in the frozen committed history.
+  Historical code ordering and lead-editable batch/run metadata cannot select
+  the seed. The existing range and freshness checks remain. Both maker-record
+  and draw-record seed mismatches refuse `audit_seed_not_derived`. Draw
+  construction, drawing, maker reading and assembly share the derivation.
+- Red first: the C1 regression ran against the unchanged base and exited 1
+  after proving admission with errors 0: all 35 invented codes were audited,
+  disagreements on 5610000 and 5610001 were hidden by shopping seed 1000000001,
+  and only sampled auditor rows were submitted. Its log explicitly reaches
+  admitted output before the safety assertion fails. After the fix the same
+  attack refuses the exact new reason. The draw-seed reason test also ran red
+  first (exit 1, old draw_changed instead of audit_seed_not_derived).
+- Environment, measured locally: Linux, Python 3.14.6, pytest 9.2.0,
+  Hypothesis 6.170.15, Ruff 0.17.4, mypy 2.4.1. `UV_OFFLINE=1`, provider none,
+  all generated cache/temporary/bytecode paths inside this workspace. Only
+  invented fixture inputs; no network, .env, .private or real data/ input.
+  Hypothesis seed 2026112263. No real signing, task box or gate verdict.
+- Required checks and actual exits on the final code:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exit 0, 96 tests;
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112263`
+  exit 0, 236 passed and 21 subtests passed;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0;
+  `uv run --locked mypy` exit 0;
+  `python3 scripts/check_docs.py` initially exit 1 on untracked workspace
+  metadata, then exit 0 (1277 text files, 143 Markdown files) after restoring
+  the isolated Git metadata's local .overnight/ exclusion; no checked source
+  or checker was changed to resolve that harness configuration error;
+  `python3 scripts/check_tree.py` exit 0;
+  `cmp AGENTS.md CLAUDE.md` exit 0;
+  `git diff --check 9fc271ef` exit 0. Post-record checks and source hashes are
+  retained with the return report. Initial and corrected logs both remain.
+- Plant evidence: 28 recorded red-1/restored-green-0 pairs, with exact byte
+  restoration, covering 26 distinct cases (maker comparison and omission of
+  P repeated after the history-order correction). Every new refusal guard and
+  the retained raises in changed functions has a focused deletion proof.
+  Empty/single decisions, sample boundaries, hash ties, inclusive seed bounds,
+  mapped/rejected decisions, text/Unicode, order, latest/other/admitted history,
+  duplicate JSON keys and core zero-error admission have recorded plants.
+  Property tests use an independent JSONEncoder/int.from_bytes oracle.
+- Development corrections: initial lint exit 1 (imports and lambda capture)
+  was fixed; development mypy exit 0. An initial shared-bytecode plant run
+  incorrectly let the modulus mutation pass (exit 0). A same-size/same-mtime
+  fixture reproduced stale cache reuse, exit 0, with values 1/shared 1/isolated
+  2. Counted plant runs use a separate bytecode directory for every red and
+  every restored run. The failed initial proof attempt remains recorded and
+  is excluded from the 28 pairs. No random application failure is claimed.
+- Limit, retained under OI-203: the correctly re-signed unchanged refused
+  batch gets a different derived seed and a fresh draw. The unchanged core
+  admission schema still refuses a history containing a nonzero-error record;
+  the new integration-limit test proves the exact error. Refusal persistence
+  and an archival layout for real post-refusal assembly need the lead's
+  resolution; no successful post-refusal assembly is claimed. The no-P
+  negatives target maker reading and drawing, whose correct-seed counterfactual
+  is valid, not an otherwise-invalid assembly fixture. Strict self-review is
+  REJECT for end-to-end post-refusal readiness; the bounded seed mechanics pass.
+- Code practice: one derivation helper; reuse existing sampling, strict JSON,
+  decision validation and frozen/candidate checks. The existing large-batch
+  test reuses the new fixture helper. No copied block; no new function exceeds
+  100 lines. Exact additions/removals and longest new function are in the return.
+  Core/custodian and committed review inputs are unchanged. No push, merge or
+  different-maker approval is claimed. Muhasabah passes for the bounded,
+  evidenced claims and explicit unresolved integration work.
+
+- S2-P60 round 3 final proof addition: deletion of the retained
+  `audit_seed_reused` raise is now also proved this round by the seed-freshness
+  property, red exit 1, exact byte restoration, green exit 0. This supplements
+  the earlier 28-pair record: the final inventory is 29 pairs covering 27
+  distinct mutation cases. Raw argv, exits and logs are under
+  `.overnight/evidence/r3/freshness-plant/`. This addition changes records only;
+  the final tested production/test source hashes remain unchanged. The bundle
+  and final return identity are regenerated from the amended single commit.
+
+## S2-P60 round 4 — committed refusal chain
+
+- Date: 2026-11-22. Base: `1a128a2aa2e63f35f35c6c7c98ab8b14ff46df2a`.
+  Red-first local commit: `6659c8c6b64c9a5e1abe942070404bb17b19898f`, amended
+  into the requested single delivery commit; its final full identity and bundle
+  checksum are recorded in `.overnight/RETURN.md` to avoid a self-referential
+  commit hash in this committed record.
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies equivalent TDD,
+  systematic-debugging and verification-before-completion rules.
+- Authority: lead rulings L-1471 and L-1472 amend L-1469's P under decision 0075
+  item 3. Refusals live in a separate, strictly parsed, committed archive whose
+  exact bytes are frozen in preparation. Preparation, draw and assembly refuse
+  untracked or HEAD-different bytes with `refusal_history_uncommitted`.
+  Each record retains historical signed rows: their codes and canonical hash,
+  ordered sample, error bounds and seed chain are checked before use, else
+  `refusal_record_invalid`. P hashes only the ruled projection, with sorted codes.
+  Metadata, JSON key order and code ordering cannot change that projection.
+- Assembly counts differing sampled codes and publishes `refusal.json` before
+  `audit_decision_differs`; it rechecks frozen inputs and returned hashes first.
+  Freshness covers both archives before either outcome. Zero-error admission
+  history and the core guard remain unchanged. The procedure copies the refusal
+  object unchanged, commits it, prepares again, signs, draws and audits anew.
+- Red on the unchanged base: the cf3 probe produced five seeds from five
+  hand-written records (3351316034, 1022983301, 1230559174, 2210797427,
+  3512274674). It and twelve commitment regressions exited 1: 13 failed.
+  Evidence: `.overnight/evidence/r4/red-baseline.log`; command was
+  `uv run --locked python -m pytest scripts/tests/test_spine_refusals.py -k 'cf3_five or uncommitted' -q -p no:cacheprovider`.
+- Final focused command:
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py scripts/tests/test_spine_refusals.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112264`
+  exited 0, 298 passed and 21 subtests passed. It includes byte-preserved refusal
+  copying, byte-identical unchanged re-signing, a fresh seed, independent-maker
+  role audit, zero-error assembly and successful finalise-check on invented inputs.
+  Properties retain empty batches, singletons, sample boundaries, both seed
+  endpoints, arbitrary Unicode/text, ordering and varied valid error counts.
+- Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  Ruff 0.17.4, mypy 2.4.1; `UV_OFFLINE=1`, provider none; generated test/cache/
+  bytecode paths inside this workspace. No network or real data, .env or .private
+  input. The mounted Git metadata is read-only; delivery uses an isolated Git
+  directory inside `.overnight/`, based on the exact base revision. Failed
+  attempts to write the mounted metadata made no repository change.
+- Development corrections are retained in the logs: initial Ruff import-order
+  failures; mypy explicit-reexport and test annotations; tuple/list fixture
+  normalization, the bool-versus-int assertion, an unsuppressed Hypothesis nested
+  import health check, a missing test role constant, and the retained core test's
+  extra archive fields. Corrected without weakening a guard, suppressing a check,
+  retrying a random failure or changing the core. Self-review reused `_audit_codes`
+  rather than duplicating its code validation and moved assembly freshness ahead
+  of both possible outcomes; checks were rerun after these changes.
+- The remaining fabrication risk is explicitly recorded under OI-203: correctly
+  chained fabricated refusals remain possible, visible in the committed archive
+  and Git history, which L-1471 rules sufficient for this capability demonstration.
+  This establishes consistency and committed bytes, not audit authenticity.
+  OI-203 real-feed signing and different-maker review remain lead-owned; no task
+  box, gate, push, merge or independent approval is claimed.
+- Code practice: no copied block; the existing derivation was extracted into
+  single-purpose helpers, with one canonical encoder and reuse of `_pairs`,
+  `_audit_codes`, `git_environment`, row hashing, sampling and the existing frozen
+  and candidate checks. Per-file counts and longest functions are in the return.
+- Final Unicode correction: an escaped unpaired surrogate in a historical
+  signed-row string initially escaped as UnicodeEncodeError (red exit 1,
+  `test_refusal_signed_rows_with_unpaired_surrogate`). The wrapper now maps
+  UnicodeError to `refusal_record_invalid`; the same test exits 0, and the
+  required focused suite exits 0 with 298 passed and 21 subtests passed.
+  No core parser or hash function was changed.
+- Final guard-removal replay: 41 isolated plants on the final source bytes,
+  each red exit 1, exact byte restoration and green exit 0. Results, argv,
+  old/new source text and restored source hashes are retained under
+  `.overnight/evidence/r4/plants-sealed/`; the return includes every row and
+  its exact focused test node. Earlier 30-pair and intermediate 40-pair runs
+  remain supplemental records, not substituted for this final replay.
+- Required triage unittest command: `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`,
+  exit 0, 96 tests. Final Ruff check, Ruff format --check, mypy, check_docs,
+  check_tree, instruction cmp and diff checks exit 0 (actual argv and logs in
+  `.overnight/evidence/r4/checks.json`). After appending this record the
+  document/tree/instruction/diff checks are recorded separately in
+  `.overnight/evidence/r4/post-record.json`; no source is changed by those checks.
+- Core unchanged proof: SHA-256
+  `6063a7d12d10ae01addfd3ff036ce46c91fb73573893158c67a8bf8333aa57eb`,
+  equal to the base's activity.py. Strict builder self-review: APPROVE for
+  this bounded r4 delivery, not independent-maker approval. Muhasabah PASS
+  for the sourced claims, explicit residual and completed requested mechanics.
+
+
+## S2-P60 round 5 — automatic refusal persistence
+
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies TDD,
+  systematic-debugging and verification-before-completion rules.
+- Base: `55135a9e8f3f18adc843123ffe5ce47ff490dcf2`. Failing-first regression:
+  `de71e37e29b27f4fc3b6efed0dfb1e09be3c51e6`. Validated code and documents:
+  `3a2899e0ee1262f994ee98d78599aef7a0620b66`. Final records-commit identity,
+  bundle checksum, per-file counts and full command list are in
+  `.overnight/RETURN.md`.
+- Authority: lead ruling L-1489, amending L-1471 under decision 0075 item 3,
+  takes REVIEW-CF5 finding F1's code fix. A refused assembly now publishes
+  `refusal.json` and appends the identical object to the working-tree refusal
+  archive with the existing `append_audit` and `json_bytes` helpers. Earlier
+  record bytes remain intact. The existing committed-byte check blocks every
+  later prepare, draw and assemble with `refusal_history_uncommitted` until
+  that archive is committed. No core audit rule or refusal parser changed.
+- Failing first on the unchanged base: four tests failed with exit 1. The F1
+  same-draw/new-run-id agreeing audit was admitted (DID NOT RAISE Refusal);
+  prepare and draw also proceeded, and the archive stayed empty. The committed
+  regression and initial green used seed 2026112296; green exit 0, four tests.
+  Final added coverage comprises nine tests, including three history-size
+  cases, a generated arbitrary-binary-suffix property and committed-history
+  recovery. The shared refusal fixture is extracted from the existing recovery
+  test, retaining its pre-refusal signing-byte capture; it is reused, not copied.
+- Final eight-file command, exact round-4 seven-file set plus the new file:
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py scripts/tests/test_spine_refusals.py scripts/tests/test_spine_refusal_persistence.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -vv --hypothesis-seed=2026112296`
+  exited 0: 307 passed, 21 subtests passed. The required
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exited 0: 96 tests. Final Ruff check and format check exited 0; mypy exited 0
+  over 507 source files; instruction cmp exited 0. Post-record document, tree
+  and diff checks, their actual exits and the final commit are retained in the
+  return report and `.overnight/evidence/r5/`.
+- Eight isolated plants on the final source all gave red exit 1, cmp exit 0
+  after exact-byte restoration and green exit 0: delete the append; replace
+  raw-byte append with JSON reserialization; delete the committed-byte check;
+  delete the refusal-path returned-input check; delete the audit-disagreement
+  raise; delete the assembly draw-seed check; delete the assembly draw-record
+  check; delete the success-path returned-input check. Each red was an intended
+  test assertion failure, not a collection or setup failure. Exact argv,
+  deleted text, output and restored hashes are in
+  `.overnight/evidence/r5/sealed-plants/` and
+  `.overnight/evidence/r5/assembly-guard-plants/`.
+- Development failures are disclosed: the first broad-suite invocation named
+  a nonexistent audit test file and exited 4 without collecting tests. It was
+  corrected from the round-4 command above. Initial Ruff import/noqa/style
+  findings, a mypy missing annotation and a later unused fixture binding were
+  corrected without changing a guard or tolerance; their logs remain. There
+  were no random failures. Earlier successful suite runs are supplemental;
+  final evidence uses the exact code revision named above.
+- Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15;
+  `UV_OFFLINE=1`, provider none, no network. Fixture caches, uv cache and
+  temporary paths stay inside the workspace. No existing data/, .env or
+  .private inputs were read. Workspace-local Git metadata holds the commits
+  because the shared worktree metadata is outside the writable workspace.
+  No push, merge, real review, acceptance-box change or slice verdict is claimed.
+- The supplied 73-row independent attack report remains prior evidence;
+  it was not rerun as a new independent attack. Every existing test remains
+  present. The core activity module and the entire refusal-chain module are
+  byte-identical to the base; the core SHA-256 remains
+  `6063a7d12d10ae01addfd3ff036ce46c91fb73573893158c67a8bf8333aa57eb`.
+- OI-203 retains the lead-owned real review and independent audit. Its appended
+  L-1489 correction records automatic persistence, deliberate reversion or
+  local reset before push, and the unbounded fabricated-free-field seed choice.
+  The runbook says assembly appends; the lead commits. This proves consistency
+  and committed bytes, not audit authenticity. Strict builder self-review:
+  APPROVE for this bounded fix only; different-maker review remains owed.
+  Muhasabah: PASS for attributable evidence, disclosed residuals and scope.
+  Code practice: no copied block and no new production helper; existing JSON,
+  append, fixture and Git helpers are reused. The longest new function is
+  `test_autoappend_keeps_prior_record_bytes`, 32 lines; the changed production
+  function `assemble_audited_review` is 84 lines.
+
+## Train S2-19 records — 2026-11-22
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | Train S2-18 merge (post-approval evidence) | Pull request 124 merged at its confirmed head `82b5ddd5` as main `88aea3ca5bde655a6a0e3fccd84fb8600e4bdd69`; the six required hosted checks were green on that head. The forced test change of that join was confirmed by OpenAI gpt-6-astra via Codex (S2-18 rf1, APPROVED), and the lead's whole test on `82b5ddd5` exited 0 (15220 passed, 0 failed, 8 suites, seed 3858581822). | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P61 verdict | Head `8bafdfe1f07d244e0893cd11dcdf48c48b168bbf` (builder OpenAI gpt-6.1-sol via Codex, round 2). Anthropic Opus 5.5 via Claude Code rejected `a1476ca9` in round 1 and confirmed APPROVED `8bafdfe1`: the probe cases refuse with exact reasons, and the plants went red and then green. The lead's verify on `8bafdfe1` exited 0 on every command. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-HYPO verdict | Head `19c37af0` (builder Zhipu GLM-5.3 via Droid, rounds 1 and 2). OpenAI gpt-6-astra via Codex rejected `6da91074`; Anthropic Opus 5.5 via Claude Code confirmed APPROVED `19c37af0`. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P62 verdict | Head `2d4121a1c7dc6b3bc6e18199f7b9767582aaf316` (builder Anthropic Opus 5.5 via Claude Code). OpenAI gpt-6-astra via Codex: APPROVED `2d4121a1`, with its own plants P5, P6 and P6b each red. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P59 verdict | Head `b4271762` (builder OpenAI gpt-6.1-sol via Codex). Anthropic Opus 5.5 via Claude Code: APPROVED `b4271762`. Moonshot Kimi K3.1 Pro via Abacus: APPROVED `b4271762`. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP verdict | Head `0c90accb7f` (builder Anthropic Opus 5.5 via Claude Code, H1 rounds 1 to 9). Moonshot Kimi K3.1 Pro via Abacus approved `b1ee59d8`. OpenAI gpt-6-astra via Codex approved `5008bee0` and confirmed APPROVED `0c90accb`. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P58 verdict | Head `b36b803afe53a8a65810fae58063a6d786309982` (builder Anthropic Opus 5.5 via Claude Code, rounds 1 to 3). Cognition SWE-2 High via Devin approved `4eb4979e`. Moonshot Kimi K3.1 Pro via Abacus rejected `4eb4979e` and confirmed APPROVED `b36b803a`. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P60 verdict | Head `63243d5d16432e49e960064a648b3fe3c3ef70e8` (builder OpenAI gpt-6.1-sol via Codex, rounds 1 to 5). Cognition SWE-2 via Devin ran the attack list and approved `55135a9e`; Moonshot Kimi via Abacus approved `55135a9e`. Anthropic Opus 5.5 via Claude Code, the round-4 rejecter, confirmed APPROVED `63243d5d`. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | Train join identity | `train/s2-19` on main `88aea3ca`. Merge joins: `500dd2ab` (S2-P61), `04757e0e` (S2-HYPO), `7369e854` (S2-P62), `5ea04b3e` (S2-P59), `eb33e087` (S2-RDP). The lead's `train_identity.py` shows each merge join holds exactly its task's own change, file by file; the one difference is the S2-HYPO `PROGRESS.md` row, where an eight-digit seed is written in words (records only). S2-P58 (`1f5311f0`, `7316df48`, `d0672abe`) and S2-P60 (`f8a01897` to `4f1c487d`, ten commits) are cherry-picked own commits, because their branches carry earlier train history. Their added and removed lines equal those of the approved commits, file by file, with three exceptions, all records or the rule-44 command line: union of `OPEN_ITEMS.md` and `PROGRESS.md` (main first; one blank line); `AGENTS.md`/`CLAUDE.md` rule 44, where S2-P60's two word-level edits to the `spine_triage.py` command forms were applied to main's newer line, word for word, and the two files stay byte-identical. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-P56 leaves this train | The joiner (OpenAI gpt-6.1-sol via Codex) found that S2-P56's approved JSON refusal inventory names a source that `custodian/tests/test_publicdata_registry.py` refuses in any non-Python test file. The join of S2-P56 also needs a forced change of `places/integrate.py`. Under rule 33, a forced code or test change needs the task's own confirmation, so S2-P56 leaves this train for a fix round and a later train. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | PO-S2-51 disposition (C1 pinned data test) | The lead ran `test_pinned_c1` on main `88aea3ca` against the real public cache from the lead's shell: PASSED. Moonshot Kimi K3.1 Pro via Abacus reviewed the C1 source chain: APPROVED (both sources carry an open licence with a dataset basis matching document 04). | Lead (Anthropic Opus 5.5) |

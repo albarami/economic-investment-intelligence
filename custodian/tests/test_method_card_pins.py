@@ -8,13 +8,19 @@ compound values, and the per-line C5 value encoding.
 
 import copy
 import re
+import tempfile
 from pathlib import Path
 
 import pytest
 import yaml
+from hypothesis import given
+from hypothesis import settings as hypothesis_settings
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.method_card_validation import (
     CONFIGURATION_PINS,
+    S7_DEFERRAL_ITEM,
+    S7_DEFERRED_PINS,
     completion_evidence,
     validate_source_check_record,
     verify_method_cards_sync,
@@ -194,6 +200,153 @@ def test_plant_unpinned_at_gate_even_with_open_item(tmp_path, gate, pin):
     (tmp_path / "OPEN_ITEMS.md").write_text(f"Recorded: {pin} still unpinned.\n")
     with pytest.raises(ValueError, match=re.escape(gate + ":unpinned:")):
         _complete(paths, record, gate=gate)
+
+
+# Decision 0094: the five C6 neighbour and C7 shared-reach result pins, written
+# out literally so the module's own set is checked, never trusted.
+DEFERRED_TO_S7 = (
+    "c6.expected_clq",
+    "c6.expected_p",
+    "c6.expected_q",
+    "c7.shared_b_given_a",
+    "c7.shared_a_given_b",
+)
+OI_283_REASON = "OI-283: computed by a later slice task, decision 0094"
+
+
+def _pend(tmp_path, reasons):
+    """A complete invented case with each named pin pending under its reason."""
+    paths, record, artifact, _ = case(tmp_path)
+    for row in record["pins"]:
+        if row["pin_id"] in reasons:
+            pending(row)
+            row["unpinned_reason"] = reasons[row["pin_id"]]
+    save(paths, record, artifact)
+    paths[3].write_text(methods_document(record["pins"]), encoding="utf-8")
+    return paths, record
+
+
+def _refusal(paths, record, gate):
+    with pytest.raises(ValueError) as refused:
+        _complete(paths, record, gate=gate)
+    return str(refused.value)
+
+
+def test_s7_deferred_pins_are_the_five_result_pins():
+    assert S7_DEFERRED_PINS == frozenset(DEFERRED_TO_S7)
+    assert S7_DEFERRAL_ITEM == "OI-283: "
+
+
+def test_s2_accepts_every_deferred_pin_naming_oi_283_and_s7_refuses(tmp_path):
+    paths, record = _pend(tmp_path, dict.fromkeys(DEFERRED_TO_S7, OI_283_REASON))
+    assert set(_complete(paths, record, gate="S2")) == set(PINS)
+    # The S7 branch is unchanged: every pending pin is refused by name.
+    assert _refusal(paths, record, "S7") == "S7:unpinned:" + ",".join(
+        sorted(DEFERRED_TO_S7)
+    )
+
+
+@pytest.mark.parametrize("pin", DEFERRED_TO_S7)
+def test_s2_accepts_one_deferred_pin_naming_oi_283(tmp_path, pin):
+    paths, record = _pend(tmp_path, {pin: OI_283_REASON})
+    assert set(_complete(paths, record, gate="S2")) == set(PINS)
+    assert _refusal(paths, record, "S7") == "S7:unpinned:" + pin
+
+
+@pytest.mark.parametrize("pin", [pin for pin in PINS if pin not in DEFERRED_TO_S7])
+def test_plant_s2_refuses_other_pending_pin_naming_oi_283(tmp_path, pin):
+    # One change from the accepted case: an S2 pin pending under OI-283.
+    paths, record = _pend(tmp_path, {pin: OI_283_REASON})
+    assert _refusal(paths, record, "S2") == "S2:unpinned:" + pin
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "awaiting the live public build of S2-T08 part B",
+        "OI-28: computed later",
+        "OI-2830: computed later",
+        "oi-283: computed later",
+        "OI-283 computed later",
+        "see OI-283: computed later",
+        " OI-283: computed later",
+    ],
+)
+@pytest.mark.parametrize("pin", DEFERRED_TO_S7)
+def test_plant_s2_refuses_deferred_pin_not_naming_oi_283(tmp_path, pin, reason):
+    paths, record = _pend(tmp_path, {pin: reason})
+    assert _refusal(paths, record, "S2") == "S2:unpinned:" + pin
+
+
+def test_plant_s2_names_only_the_refused_pin_beside_an_accepted_deferral(tmp_path):
+    reasons = {"c6.expected_p": OI_283_REASON, "c14.medians_2025": OI_283_REASON}
+    paths, record = _pend(tmp_path, reasons)
+    assert _refusal(paths, record, "S2") == "S2:unpinned:c14.medians_2025"
+
+
+@hypothesis_settings(deadline=None, max_examples=40)
+@given(
+    reasons=st.dictionaries(
+        st.sampled_from(PINS),
+        st.sampled_from([OI_283_REASON, "awaiting the live build", "OI-2830: x"]),
+        max_size=6,
+    )
+)
+def test_property_gate_outcome_over_pending_subsets(reasons):
+    # Oracle written from the decision's words, not from the module's code.
+    named = {pin for pin, reason in reasons.items() if reason.startswith("OI-283: ")}
+    refused_s2 = sorted(set(reasons) - (named & set(DEFERRED_TO_S7)))
+    with tempfile.TemporaryDirectory() as folder:
+        paths, record = _pend(Path(folder), reasons)
+        for gate, refused in (("S2", refused_s2), ("S7", sorted(reasons))):
+            if refused:
+                assert _refusal(paths, record, gate) == (
+                    gate + ":unpinned:" + ",".join(refused)
+                )
+            else:
+                assert set(_complete(paths, record, gate=gate)) == set(PINS)
+
+
+def _oi_283_section(open_items):
+    text = open_items.read_text(encoding="utf-8")
+    return text.split("## OI-283 ", 1)[1].split("\n## ", 1)[0]
+
+
+def _assert_deferred_rows(open_items):
+    """Each deferred pin has its own OI-283 row naming its reason and task."""
+    section = _oi_283_section(open_items)
+    owners = {"c6": "S6-T10", "c7": "S7-T05"}
+    missing = [
+        pin
+        for pin in DEFERRED_TO_S7
+        if not any(
+            line.startswith(f"  - `{pin}` deferred to slice S7")
+            and f"task {owners[pin[:2]]}" in line
+            and "decision 0094" in line
+            for line in section.splitlines()
+        )
+    ]
+    if missing:
+        raise AssertionError("deferred_pin_without_oi_283_row:" + ",".join(missing))
+
+
+def test_committed_oi_283_has_a_row_per_deferred_pin():
+    _assert_deferred_rows(COMMITTED_OPEN_ITEMS)
+
+
+def test_plant_deferred_pin_row_without_its_task(tmp_path):
+    original = COMMITTED_OPEN_ITEMS.read_text(encoding="utf-8")
+    planted = tmp_path / "OPEN_ITEMS.md"
+    planted.write_text(
+        original.replace("task S7-T05", "task S7-T99", 1), encoding="utf-8"
+    )
+    with pytest.raises(
+        AssertionError,
+        match="^"
+        + re.escape("deferred_pin_without_oi_283_row:c7.shared_b_given_a")
+        + "$",
+    ):
+        _assert_deferred_rows(planted)
 
 
 @pytest.mark.parametrize("treatment", ["", "clean"])

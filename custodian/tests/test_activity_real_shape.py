@@ -19,6 +19,7 @@ from eii_custodian.publicdata.review.activity import (
     FeedRead,
     IsicClass,
     LeftOut,
+    ReviewRow,
     SpineError,
     SupplierMembership,
     entry_by_key,
@@ -30,6 +31,7 @@ from eii_custodian.publicdata.review.activity import (
     read_review_csv,
     release_field,
     spine_path,
+    write_review_csv,
 )
 from eii_custodian.publicdata.review.cache_fixture import (
     class_csv,
@@ -575,11 +577,20 @@ def test_committed_review_signs_every_claimed_status() -> None:
             )
 
 
-def test_committed_review_loads_derived_legacy(tmp_path: Path) -> None:
-    """The committed file loads; a six-digit code stays unsigned and higher levels are left out."""
-    held = next(
-        row for row in read_review_csv(spine_path()) if row.status == "unreviewed"
+def test_invented_review_loads_derived_legacy(tmp_path: Path) -> None:
+    """An invented review loads; a six-digit code stays unsigned and higher levels are left out."""
+    held = ReviewRow(
+        "5610901",
+        7,
+        "نشاط مخترع",
+        "5610",
+        "unreviewed",
+        "awaiting_human_review",
+        "",
+        "",
     )
+    review = tmp_path / "review.csv"
+    write_review_csv(review, (held,))
     six = "470000"
     seven = "4700001"
     write_cached(
@@ -619,7 +630,9 @@ def test_committed_review_loads_derived_legacy(tmp_path: Path) -> None:
             )
         ),
     )
-    inputs = load_activity_inputs(tmp_path, (), supplier_membership=_NO_SUPPLIERS)
+    inputs = load_activity_inputs(
+        tmp_path, (), review_path=review, supplier_membership=_NO_SUPPLIERS
+    )
     derived = {row.code: row for row in inputs.spine.rows}
     assert derived[six].status == "not_mappable_legacy"
     assert derived[six].reviewed_by_role == ""
@@ -631,19 +644,24 @@ def test_committed_review_loads_derived_legacy(tmp_path: Path) -> None:
     )
 
 
-_PLANTED_LEGACY_ROW = (
-    "561000,6,تجارة قطع الغيار,,not_mappable_legacy,legacy_code_length,,"
-)
-
-
 def test_unsigned_legacy_claim_is_refused(tmp_path: Path) -> None:
     """A temporary copy that claims not_mappable_legacy without sign-off is refused."""
-    source = spine_path().read_text(encoding="utf-8")
-    if _PLANTED_LEGACY_ROW not in source.splitlines():
-        header, newline, rest = source.partition("\n")
-        source = header + newline + _PLANTED_LEGACY_ROW + "\n" + rest
     review = tmp_path / "review.csv"
-    review.write_text(source, encoding="utf-8")
+    write_review_csv(
+        review,
+        (
+            ReviewRow(
+                "561099",
+                6,
+                "نشاط مخترع",
+                "",
+                "not_mappable_legacy",
+                "legacy_code_length",
+                "",
+                "",
+            ),
+        ),
+    )
     claimed = next(row for row in read_review_csv(review) if row.status != "unreviewed")
     write_cached(
         tmp_path,

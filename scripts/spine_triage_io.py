@@ -133,6 +133,16 @@ def load_context(
         "queue": file_hash(queue),
         "membership": file_hash(membership),
     }
+    receipt_hashes, receipts = source_receipts(cache, selected)
+    hashes.update(receipt_hashes)
+    return Context(root, cache, inputs, hashes, receipts)
+
+
+def source_receipts(
+    cache: Path, selected: dict[str, str]
+) -> tuple[dict[str, str], tuple[dict[str, object], ...]]:
+    """Attribution and exact verified receipt hashes shared by offline modes."""
+    hashes: dict[str, str] = {}
     receipts = []
     for entry in load_registry():
         if entry.key in ("lic_active", "lic_cancelled", "cls_isic4"):
@@ -152,15 +162,15 @@ def load_context(
                     )
                 }
             )
-    return Context(root, cache, inputs, hashes, tuple(receipts))
+    return hashes, tuple(receipts)
 
 
-def output_path(context: Context, run_id: str) -> Path:
+def output_path(context: Context, run_id: str, *, stage: str = "spine_triage") -> Path:
     if re.fullmatch(r"[a-z][a-z0-9-]{0,63}", run_id) is None:
         raise Refusal("output refused")
     if re.search(r"(?<!\d)(?:\d{8}|\d{11})(?!\d)", run_id):
         raise Refusal("output refused")
-    target = contained(context.root, context.cache / "spine_triage" / run_id)
+    target = contained(context.root, context.cache / stage / run_id)
     contained(context.root, context.root / "evals/typed_decisions/runs")
     if target.exists():
         raise Refusal("output refused")

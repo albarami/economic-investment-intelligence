@@ -984,3 +984,17 @@ def test_fetched_symlink_outside_cache_records_unavailable_proof(
     harness.interrupt()
     completed = record(harness)["entries"]["SYN-first"]
     assert completed == {"completed": True, "reuse_unavailable": "receipt_unproven"}
+
+
+def test_section10_refusal_reaches_the_record_by_its_closed_name(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """S2-P58: a refused section 10 input is named, never ``assembly_build_refused``."""
+
+    def refuse(self: Production) -> tuple[str, ...]:
+        raise AssemblyError("assembly_section10_input_invalid")
+
+    monkeypatch.setattr(Production, "run", refuse)
+    result = harness.run()
+    assert result.failure is not None
+    assert result.failure.check == "assembly_section10_input_invalid"

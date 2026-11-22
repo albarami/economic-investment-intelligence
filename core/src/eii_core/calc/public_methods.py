@@ -4,7 +4,7 @@ Other roots use CALC_CONTEXT; approximate outputs refuse rounding/comparison
 within 1e-40 of a boundary through public_series.rounded/compare.
 """
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 from fractions import Fraction
@@ -16,6 +16,7 @@ from .facts import (
     Measure,
     MeasureMismatch,
     NoData,
+    SourceLink,
     emit,
     require_aligned,
 )
@@ -29,6 +30,7 @@ from .public_series import (
     divide,
     finite,
     ratio,
+    rounded,
     unit_value,
 )
 
@@ -385,6 +387,158 @@ def coverage_share(
             ),
             "interval_unrounded": (low, high),
         }
+
+
+def _unrounded(fact: object, geography: str) -> Number:
+    """The exact value of one result on the geography it was asked for."""
+    if (
+        not isinstance(fact, CalculationFact)
+        or fact.geography != geography
+        or fact.exact_unrounded is None
+    ):
+        raise ValueError("geography_invalid")
+    return fact.exact_unrounded
+
+
+def _counts(measure_of: Callable[[int], Measure], values: Sequence[int]) -> Measure:
+    if any(value < 0 for value in values):
+        raise ValueError("negative_count")
+    return measure_of(sum(values))
+
+
+def private_employer_share(
+    zones: Sequence[tuple[int, int | None, int | None]],
+    source: SourceLink,
+    period: str,
+    named: Sequence[int],
+) -> dict[str, str]:
+    """PUB-71: private divided by all employed residents, on the source's zones.
+
+    Each zone is (zone number, private, all employed). A zone with both counts
+    null is unavailable and left out; one null of the pair is refused. The
+    national share is over the remaining zones (one decimal); each named zone
+    has its own share (no decimal). Each share is rounded once, half up.
+    """
+    numbers = [zone for zone, _, _ in zones]
+    if len(set(numbers)) != len(numbers):
+        raise ValueError("duplicate_zone")
+    if any((private is None) != (total is None) for _, private, total in zones):
+        raise ValueError("null_pair")
+    kept = [(zone, p, t) for zone, p, t in zones if p is not None and t is not None]
+    if not set(named) <= {zone for zone, _, _ in kept}:
+        raise ValueError("zone_missing")
+
+    def percent(group: Sequence[tuple[int, int, int]], geography: str) -> Number:
+        def measure(value: int) -> Measure:
+            kind = "national" if geography == "national" else "public"
+            return Measure(
+                Decimal(value), "count", period, geography, kind, "public", (source,)
+            )
+
+        result = coverage_share(
+            _counts(measure, [p for _, p, _ in group]),
+            _counts(measure, [t for _, _, t in group]),
+        )
+        if not isinstance(result, dict):
+            raise ValueError("no_denominator")
+        return _unrounded(result["percent"], geography)
+
+    values = {
+        "national_private": str(sum(p for _, p, _ in kept)),
+        "national_all": str(sum(t for _, _, t in kept)),
+        "national_1dp": rounded(percent(kept, "national"), 1),
+    }
+    for zone in named:
+        group = [row for row in kept if row[0] == zone]
+        values[f"zone_{zone}_0dp"] = rounded(percent(group, f"zone:{zone}"), 0)
+    return values
+
+
+def licence_density_pair(
+    licences: Sequence[tuple[str, str, int]],
+    residents: Sequence[tuple[str, int]],
+    *,
+    target: str,
+    activity: str,
+    period: str,
+    licence_source: SourceLink,
+    resident_source: SourceLink,
+) -> dict[str, str]:
+    """PUB-72: licences of one activity per 10,000 residents, local and national.
+
+    Licences are (municipality key, activity code, count); residents are
+    (municipality key, count) for one period. Both sides must name the same
+    municipalities. Each density is rounded once, half up, to no decimal.
+    """
+    keys = [key for key, _ in residents]
+    if len(set(keys)) != len(keys):
+        raise ValueError("population_duplicate")
+    licence_keys = {key for key, _, _ in licences}
+    if target not in licence_keys:
+        raise ValueError("municipality_missing")
+    if set(keys) != licence_keys:
+        raise ValueError("population_missing")
+
+    def density(local: bool) -> tuple[int, str]:
+        geography = f"municipality:{target}" if local else "national"
+
+        def measure_of(source: SourceLink) -> Callable[[int], Measure]:
+            kind = "public" if local else "national"
+            return lambda value: Measure(
+                Decimal(value), "count", period, geography, kind, "public", (source,)
+            )
+
+        population = _counts(
+            measure_of(resident_source),
+            [n for key, n in residents if not local or key == target],
+        )
+        fact = licence_density(
+            _counts(
+                measure_of(licence_source),
+                [
+                    n
+                    for key, code, n in licences
+                    if code == activity and (not local or key == target)
+                ],
+            ),
+            population,
+        )
+        return int(population.value), rounded(_unrounded(fact, geography), 0)
+
+    local_residents, local_density = density(True)
+    national_residents, national_density = density(False)
+    return {
+        "local_residents": str(local_residents),
+        "national_residents": str(national_residents),
+        "local_0dp": local_density,
+        "national_0dp": national_density,
+    }
+
+
+def places_in_country(
+    records: Iterable[
+        tuple[tuple[float, float, float, float], Sequence[str | None] | None]
+    ],
+    box: tuple[float, float, float, float],
+    country: str,
+) -> int:
+    """PUB-73: records inside the box with an address in the country.
+
+    A record is its bounding box (xmin, xmax, ymin, ymax) and the countries of
+    its addresses; the box is (west, south, east, north). A record counts once
+    when its whole bounding box is inside the box, edges included, and any
+    address country equals ``country`` exactly; a null or empty list does not.
+    """
+    west, south, east, north = box
+    return sum(
+        1
+        for (xmin, xmax, ymin, ymax), countries in records
+        if xmin >= west
+        and xmax <= east
+        and ymin >= south
+        and ymax <= north
+        and country in (countries or ())
+    )
 
 
 @dataclass(frozen=True)

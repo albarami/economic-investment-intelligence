@@ -260,7 +260,7 @@ def read_measure(
                 raise AdditionError("measure_not_integral")
             return MeasureRead(MeasureKind.NUMBER, number)
         raise AdditionError("measure_unparsed")
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
         raise AdditionError("measure_unparsed")
     number = Decimal(str(value))
     if not number.is_finite():

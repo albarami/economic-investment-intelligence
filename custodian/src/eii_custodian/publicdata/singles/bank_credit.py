@@ -71,6 +71,10 @@ def _value(raw: object) -> Decimal:
         raise CreditError("value")
     if isinstance(raw, int):
         return Decimal(raw).quantize(_CENTS)
+    if isinstance(raw, Decimal):
+        if not _VALUE.fullmatch(format(raw, "f")):
+            raise CreditError("value")
+        return raw.quantize(_CENTS)
     if isinstance(raw, str) and _VALUE.fullmatch(raw.strip()):
         return Decimal(raw.strip()).quantize(_CENTS)
     shown = raw if isinstance(raw, str) else ""

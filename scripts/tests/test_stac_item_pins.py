@@ -114,6 +114,12 @@ def _collection_entry() -> Entry:
     return next(e for e in load_registry() if e.key == "bldg_ovt/stac-collection")
 
 
+# Read the collection row once at import: the registry parse measured over
+# 100 ms, and a lazily filled cache would land inside the property test's
+# first Hypothesis deadline.
+_COLLECTION_ENTRY = _collection_entry()
+
+
 @given(
     st.lists(st.binary(min_size=1, max_size=40), min_size=1, max_size=3, unique=True)
 )
@@ -122,7 +128,7 @@ def test_snapshot_cardinality_property(
 ) -> None:
     # A new directory per example avoids a history shared by generated cases.
     cache = tmp_path_factory.mktemp("pins")
-    entry = _collection_entry()
+    entry = _COLLECTION_ENTRY
     for body in bodies:
         store(cache, entry, body)
     if len(bodies) == 1:

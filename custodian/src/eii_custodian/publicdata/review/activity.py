@@ -879,7 +879,8 @@ def audit_sample(codes: Sequence[str], seed: int) -> tuple[str, ...]:
     return tuple(sorted(ranked[: min(30, len(ranked))]))
 
 
-def _audit_maker(role: object) -> str:
+def audit_maker(role: object) -> str:
+    """Validate a decision-0075 role and return its case-folded maker token."""
     match = _MODEL_ROLE.fullmatch(role) if isinstance(role, str) else None
     if match is None or any(part != part.strip() for part in match.groups()):
         raise SpineError("model audit role is malformed")
@@ -917,7 +918,7 @@ def _audit_record(value: object) -> ActivityAudit:
     if type(errors) is not int or errors != 0:
         raise SpineError("model audit errors are not zero")
     signer, auditor = value["signer_role"], value["auditor_role"]
-    if _audit_maker(signer) == _audit_maker(auditor):
+    if audit_maker(signer) == audit_maker(auditor):
         raise SpineError("model audit makers are not different")
     on = value["audit_date"]
     try:
@@ -1008,7 +1009,7 @@ def _require_reviewed_binding(
     code_system_version: str,
     reviews: Sequence[ReviewRow],
 ) -> None:
-    """Refuse a mapped approval whose recorded inputs are absent or different."""
+    """Bind approved and rejected judgements to their classification titles."""
     if binding is None:
         if binding_required(reviews):
             raise SpineError("review binding is missing")
@@ -1021,15 +1022,18 @@ def _require_reviewed_binding(
         if name == _CLASS_TITLE
     }
     for review in reviews:
-        if review.status != "mapped":
+        if review.status not in {"mapped", "not_mappable_rejected"}:
             continue
-        current = classes.get(review.isic_class)
-        if current is None:
+        class_code = review.isic_class if review.status == "mapped" else review.code[:4]
+        current = classes.get(class_code)
+        if current is None and review.status == "mapped":
             continue
-        present = _class_title_identity(
-            current.code, current.label_en, current.label_ar
+        present = (
+            _class_title_identity(current.code, current.label_en, current.label_ar)
+            if current is not None
+            else ""
         )
-        if recorded.get(review.isic_class) != present:
+        if recorded.get(class_code) != present:
             raise SpineError("classification title differs from the reviewed title")
 
 

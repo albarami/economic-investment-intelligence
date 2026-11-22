@@ -13,9 +13,8 @@ from decimal import Decimal
 
 import pytest
 
-from eii_core.calc.facts import Measure, SourceChain
-from eii_core.calc.public_methods import coverage_share
-from eii_core.calc.public_series import rounded
+from eii_core.calc.facts import SourceChain
+from eii_core.calc.public_methods import private_employer_share
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.frame.build import read_cached
@@ -304,49 +303,20 @@ def replay(cache, case):
         if case.case_id != "PUB-71":
             return Replay({"rows": str(len(layers[case.source_key]))}, tuple(chains))
         check_employment(layers)
-        rows = layers[case.source_key]
-        if len({row["ZONE_NO"] for row in rows}) != len(rows):
-            raise ValueError("duplicate_zone") from None
-        if any(
-            (row["Private"] is None) != (row["Total_Economic_active___15"] is None)
-            for row in rows
-        ):
-            refuse(case, "source_invalid")
-        rows = [row for row in rows if row["Private"] is not None]
-        if not {69, 70}.issubset({row["ZONE_NO"] for row in rows}):
-            refuse(case, "zone_missing")
-        chain = chains[0].source_chain()
-
-        def share(group, geography):
-            private = sum(row["Private"] for row in group)
-            total = sum(row["Total_Economic_active___15"] for row in group)
-
-            def measure(value):
-                return Measure(
-                    Decimal(value),
-                    "count",
-                    case.period,
-                    geography,
-                    "national" if geography == "national" else "public",
-                    "public",
-                    (chain,),
-                )
-
-            result = coverage_share(measure(private), measure(total))
-            return private, total, result["percent"]
-
-        private, total, national = share(rows, "national")
-        values = {
-            "national_private": str(private),
-            "national_all": str(total),
-            "national_1dp": rounded(national.exact_unrounded, 1),
-        }
-        for zone in (69, 70):
-            group = [row for row in rows if row["ZONE_NO"] == zone]
-            _, _, result = share(group, f"zone:{zone}")
-            if result.geography != f"zone:{zone}":
-                raise ValueError("geography_invalid") from None
-            values[f"zone_{zone}_0dp"] = rounded(result.exact_unrounded, 0)
+        try:
+            values = private_employer_share(
+                [
+                    (row["ZONE_NO"], row["Private"], row["Total_Economic_active___15"])
+                    for row in layers[case.source_key]
+                ],
+                chains[0].source_chain(),
+                case.period,
+                (69, 70),
+            )
+        except ValueError as exc:
+            if str(exc) == "zone_missing":
+                refuse(case, "zone_missing")
+            raise
         return Replay(values, tuple(chains))
     except ExpectationError:
         raise

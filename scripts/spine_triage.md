@@ -35,9 +35,9 @@ Outputs are local, uncommitted files under
   method/rubric/route identity and run accounting, with no payload or scores.
 
 Gateway records retain DAT-126 and null `human_disposition` and are written only
-under `evals/typed_decisions/runs/`. A person reviews each meaning, transfers that
-row into the S2-T04 review CSV, records their reviewer role and date and carries
-the matching binding. Previously signed rows must be preserved. Rebuild and
+under `evals/typed_decisions/runs/`. A reviewer signs each meaning under decision 0075, records the reviewer role
+and date and carries the matching binding and, for model decisions, the
+independent audit evidence described below. Previously signed rows must be preserved. Rebuild and
 finalise through S2-T04. Unsigned legacy acknowledgements also require individual
 review; copying the queue or suggestions into the review path cannot complete it.
 
@@ -61,3 +61,146 @@ Exit 0 means an unsigned queue was written. Exit 3 means input or authorisation
 refusal, with a fixed diagnostic. Exit 4 means keyed failure: no follow-on call
 or retry, the complete baseline queue and unresolved suggestions are written.
 There is no application import, table, screen or automatic mapping.
+
+## Offline audited review modes (decision 0075, OI-203)
+
+The lead order is **prepare, triage with provider none, sign, draw, audit, assemble,
+finalise-check**, followed by the lead's review and commit of the candidate trio.
+These modes never construct a gateway or fetch a source. A refused assembly
+appends its record to the tracked refusal archive as described below; the other
+committed review files are unchanged. Use a fresh run identifier for every output folder. All paths must be
+inside the repository without symlinks or traversal; the verified cache must be
+under `data/public_cache`. The examples are later lead-shell commands, not worker
+instructions to read a real cache.
+
+```sh
+uv run --locked python scripts/spine_triage.py --mode prepare --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --preparer-maker PREPARER --run-id oi203-prepared
+EII_DECISION_PROVIDER=none uv run --locked python scripts/spine_triage.py --queue data/public_cache/spine_review/oi203-prepared/queue.csv --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --membership data/public_cache/spine_review/oi203-prepared/membership.json --run-id oi203-triage
+uv run --locked python scripts/spine_triage.py --mode draw --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --maker-record data/public_cache/makers.json --run-id oi203-drawn
+uv run --locked python scripts/spine_triage.py --mode assemble --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --auditor-rows data/public_cache/auditor.csv --maker-record data/public_cache/makers.json --draw data/public_cache/spine_review/oi203-drawn/draw.json --run-id oi203-candidate
+uv run --locked python scripts/spine_triage.py --mode finalise-check --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --review data/public_cache/spine_review/oi203-candidate/activity_spine.csv --run-id oi203-final
+```
+
+`prepare` reuses the assembly's verified active and cancelled feed readers and
+reviewed basket membership. It writes `queue.csv`, `membership.json`,
+`queue.binding.json`, `signer_packet.json` and `manifest.json` under
+`data/public_cache/spine_review/<run-id>/`. `signer_packet.json` lists every eligible code. The packet contains only code, exact
+Arabic name, prefix and source-provided English and Arabic class titles; an
+absent Arabic title stays empty. The manifest binds the exact baskets, review,
+existing binding, audit and refusal-archive bytes, source receipts and attribution, recomputed
+membership, spine input identities and output hashes. Standard output contains
+only eligible-code, mandatory-acknowledgement and excluded-pattern-group counts.
+The preparer's maker is frozen with the packet.
+
+The signer returns the exact eight-column review CSV contract documented above,
+covering every queue row exactly once. Eligible rows permit only `mapped` with
+the prefix and `reviewer_approved`, or `not_mappable_rejected` with an empty
+class and `reviewer_rejected`. Mandatory legacy and invalid-prefix rows keep
+their derived status and reason, empty class, and individual signed
+acknowledgements by a person; model-review roles on these rows refuse with
+`acknowledgement_role_invalid`. All names and code lengths stay unchanged.
+Signed rows need the actual ISO signing date.
+
+The seed is derived, never chosen (L-1469 as amended by L-1471 and L-1472,
+reading of decision 0075 item 3). Use `derived_audit_seed` in
+`scripts/spine_review.py` with the signed eligible rows and the list returned by
+`previous_refusals(root, review)` to fill `makers.json`:
+`1000000000 + int(sha256(b"oi203-audit-seed:" + J + b":" + P)) % 3294967296`.
+J is compact canonical UTF-8 JSON (`ensure_ascii=False`, sorted keys, separators
+`(',', ':')`, no newline) of the eligible decisions sorted by code, holding
+exactly `code`, `status`, `isic_class`. P is the ASCII hex SHA-256 of the latest
+refusal's canonical projection containing exactly sorted `codes`,
+`review_rows_sha256`, `seed`, `sampled_codes` and `errors`, for that same code set;
+without a prior refusal P is empty bytes. Batch ids, dates, roles, extra keys,
+JSON key order and original code order never enter the projection. No free text
+enters J. A different recorded seed refuses `audit_seed_not_derived`.
+
+Refusals live only in `activity_spine_refusals.json` beside the review; the
+admission history `activity_spine_audits.json` keeps zero-error records only.
+The initially empty refusal list must already be committed. Preparation, drawing
+and assembly require the refusal file to be git-tracked and byte-identical to
+HEAD, else `refusal_history_uncommitted`; staging changed bytes is insufficient.
+The preparation manifest freezes its exact hash. Duplicate JSON keys, malformed
+JSON or a non-list archive refuse `refusal_record_invalid`. Every historical
+refusal retains `review_rows` (the signed eligible ReviewRow objects), so its
+same-code batch and `review_rows_sha256` can be verified even after a later
+re-signing changes dates or decisions. Its recorded seed must equal the derived
+seed over the refusals preceding it; its ordered sample must reproduce and its
+integer error count must be positive and no larger than that sample. A broken
+link, row hash or sample refuses `refusal_record_invalid`.
+
+On `audit_decision_differs`, assembly writes `refusal.json` in the selected
+fresh run folder and appends the identical object to the working-tree
+`activity_spine_refusals.json` with the existing JSON writer, retaining every
+earlier record's bytes, then exits with refusal. It records the audit fields, the count
+of differing sampled codes, the exact `draw_sha256` and historical `review_rows`.
+Assembly appends; the lead commits. Every later prepare, draw or assemble refuses
+`refusal_history_uncommitted` until the lead **commits the refusal file**. Do not
+put it in the zero-error audit history. Then prepare a fresh manifest (the old
+one freezes the earlier archive), triage with provider none, arrange fresh
+code-by-code signing, derive the next seed from the committed archive, draw and
+obtain a new independent audit. An unchanged re-signing receives a fresh seed
+through P. Never edit the auditor's disagreement into agreement. The remaining
+fabrication risk and the lead's capability-demonstration ruling are recorded
+under OI-203 in OPEN_ITEMS.md; the committed archive and its Git history retain
+the evidence. Seed range, sample size and the core zero-error guard are unchanged.
+
+Freeze the signer's returned file and maker record, then run `--mode draw`
+before sending anything to the auditor. It writes `draw.json` and
+`audit_packet.json` in a fresh run folder. The draw binds the exact preparation
+manifest, signer-file and maker-record hashes, seed, batch id and ordered sampled
+codes. The audit packet copies only those codes' minimal entries from
+`signer_packet.json`; it contains no signer status, reason or role. Preserve the
+draw as the pre-audit evidence. Since `signer_packet.json` lists every eligible
+code, restriction of the auditor to the sample rests on the packet the lead sends.
+Give the independent auditor only `audit_packet.json`,
+without signer answers. The auditor returns the same CSV contract for exactly
+the sampled codes, its own role and the actual audit date. Its decisions must
+match in every judgement field. The maker record is a JSON object with exactly
+`preparer_maker`, `signer_role`, `auditor_role`, `batch_id`, `seed`, `audit_date`.
+Roles use `model review: <maker> <model>, <persona>`; maker comparison ignores
+case. The signer differs from both preparer and auditor. The seed, date,
+independence, draw and zero-error requirements are decision 0075 item 4's
+existing admission contract. A disagreement refuses the batch; arrange fresh
+code-by-code signing and a fresh seeded audit under item 3, never edit the
+auditor's decision to match. A seed already in any earlier audit or refusal refuses with
+`audit_seed_reused`, including a draw for an empty eligible batch. Empty eligible
+batches produce no new audit record and preserve the earlier audit file's bytes.
+
+`assemble` rederives frozen inputs and verifies returned coverage and decisions
+before publishing a candidate. `--draw` is mandatory; a misderived recorded draw
+seed refuses with `audit_seed_not_derived`; a changed manifest, signer file,
+maker record, batch id or sample refuses with `draw_changed`.
+It preserves earlier review rows outside the queue and parses the review file's
+adjacent `activity_spine_audits.json` with duplicate-key refusal. Earlier audit
+record bytes remain intact when appending; with no new batch the whole file is
+byte-identical. It then calls the normal admission and finalisation
+checks on a temporary candidate. It writes `activity_spine.csv`,
+`activity_spine_audits.json`, `activity_spine.binding.json` and `assembly.json`
+into a fresh run folder. The binding hashes the exact emitted audit bytes;
+`assembly.json` hashes the frozen manifest, draw, returned files and emitted trio.
+Rejections bind their prefix's classification title just as approvals bind
+their class title. Temporary validation files are removed on refusal; no
+candidate review is published. A judgement disagreement publishes only the
+refusal record described above, after rechecking frozen inputs and return hashes.
+
+`finalise-check` rederives membership and inputs from the preparation manifest,
+loads the selected candidate through the ordinary spine admission guards and
+calls `finalise_spine`. It writes `result.json` binding the manifest, review,
+binding and audit hashes, source snapshot and resulting spine manifest. It
+hashes inputs before verification, rechecks the frozen snapshot and rehashes
+inputs before publication; a changed input refuses with
+`returned_inputs_changed`. A mandatory unsigned row exits nonzero, with no
+result folder. Run this before
+installing the candidate trio into the committed review folder, because the
+preparation manifest also freezes the earlier committed review bytes.
+
+Offline-mode exit 0 means the stated output was published; exit 3 means refusal.
+New helper refusals have closed reason tokens, including
+`frozen_inputs_changed`, `prepared_output_changed`, `signer_coverage_differs`,
+`signer_maker_conflict`, `audit_decision_differs` and
+`mandatory_review_missing`, `refusal_record_invalid` and
+`refusal_history_uncommitted`. Invalid JSON (including duplicate keys), missing
+files, malformed source inputs and other admission failures remain refusals;
+CLI diagnostics never echo source text or a path. Invented-fixture success does
+not sign the real queue or close OI-203.
