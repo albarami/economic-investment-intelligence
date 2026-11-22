@@ -1,4 +1,4 @@
-"""S2-P58: section 10 figures PUB-71 and PUB-72 on invented counts only.
+"""S2-P58: section 10 figures PUB-71, PUB-72 and PUB-73 on invented counts only.
 
 No census count or share of the real source is written here; PUB-72's
 committed open anchors are read from the pack's numbers in the docstring of
@@ -12,7 +12,11 @@ from hypothesis import given
 from hypothesis import strategies as st
 from method_rows import chain
 
-from eii_core.calc.public_methods import licence_density_pair, private_employer_share
+from eii_core.calc.public_methods import (
+    licence_density_pair,
+    places_in_country,
+    private_employer_share,
+)
 from eii_core.calc.public_series import rounded
 
 SOURCE = chain()
@@ -196,3 +200,76 @@ def test_results_on_another_geography_are_refused(monkeypatch, field):
     monkeypatch.setattr(public_methods, "licence_density", moved)
     with pytest.raises(ValueError, match=r"^geography_invalid$"):
         density([("A", R, 1)], [("A", 10)])
+
+
+# PUB-73: open-places records in the frame box with an address in country QA.
+# Invented boxes and records only; (west, south, east, north), inclusive.
+BOX = (1.0, 2.0, 3.0, 4.0)
+
+
+def inside(*countries):
+    return ((1.5, 2.5, 2.5, 3.5), countries)
+
+
+def qa_count(records, box=BOX):
+    return places_in_country(records, box, "QA")
+
+
+def test_places_on_every_box_edge_count():
+    edge = ((1.0, 3.0, 2.0, 4.0), ("QA",))  # bbox equals the box exactly
+    assert qa_count([edge]) == 1
+
+
+@pytest.mark.parametrize(
+    "bbox",
+    [
+        (0.999, 2.5, 2.5, 3.5),  # xmin just west
+        (1.5, 3.001, 2.5, 3.5),  # xmax just east
+        (1.5, 2.5, 1.999, 3.5),  # ymin just south
+        (1.5, 2.5, 2.5, 4.001),  # ymax just north
+    ],
+)
+def test_places_just_outside_on_one_side_count_not(bbox):
+    assert qa_count([(bbox, ("QA",))]) == 0
+
+
+@pytest.mark.parametrize(
+    "countries",
+    [("qa",), ("Qa",), (None,), (), None, ("QAT",), (" QA",), ("AE",)],
+)
+def test_places_without_an_exact_qa_country_count_not(countries):
+    assert qa_count([((1.5, 2.5, 2.5, 3.5), countries)]) == 0
+
+
+def test_place_with_two_qa_addresses_counts_once():
+    assert qa_count([inside("QA", "QA"), inside(None, "QA"), inside("AE", "QA")]) == 3
+
+
+def test_places_empty_input_counts_zero():
+    assert qa_count([]) == 0
+
+
+finite = st.floats(min_value=-10, max_value=10, allow_nan=False)
+countries = st.one_of(
+    st.none(), st.lists(st.sampled_from(["QA", "qa", "AE", None]), max_size=3)
+)
+record = st.tuples(st.tuples(finite, finite, finite, finite), countries)
+
+
+@given(st.lists(record, max_size=30), st.tuples(finite, finite, finite, finite))
+def test_places_count_matches_an_exact_rational_oracle(records, box):
+    west, south, east, north = (Fraction(value) for value in box)
+
+    def counts(item):
+        (xmin, xmax, ymin, ymax), found = item
+        within = (
+            west <= Fraction(xmin)
+            and Fraction(xmax) <= east
+            and south <= Fraction(ymin)
+            and Fraction(ymax) <= north
+        )
+        return within and any(country == "QA" for country in found or [])
+
+    assert qa_count(records, box) == sum(1 for item in records if counts(item))
+    assert qa_count(list(reversed(records)), box) == qa_count(records, box)
+    assert qa_count(records + records, box) == 2 * qa_count(records, box)

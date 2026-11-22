@@ -515,6 +515,32 @@ def licence_density_pair(
     }
 
 
+def places_in_country(
+    records: Iterable[
+        tuple[tuple[float, float, float, float], Sequence[str | None] | None]
+    ],
+    box: tuple[float, float, float, float],
+    country: str,
+) -> int:
+    """PUB-73: records inside the box with an address in the country.
+
+    A record is its bounding box (xmin, xmax, ymin, ymax) and the countries of
+    its addresses; the box is (west, south, east, north). A record counts once
+    when its whole bounding box is inside the box, edges included, and any
+    address country equals ``country`` exactly; a null or empty list does not.
+    """
+    west, south, east, north = box
+    return sum(
+        1
+        for (xmin, xmax, ymin, ymax), countries in records
+        if xmin >= west
+        and xmax <= east
+        and ymin >= south
+        and ymax <= north
+        and country in (countries or ())
+    )
+
+
 @dataclass(frozen=True)
 class TradeRow:
     product: str

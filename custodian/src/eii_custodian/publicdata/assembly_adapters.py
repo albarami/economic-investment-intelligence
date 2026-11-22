@@ -786,7 +786,8 @@ class Production:
         return output
 
     def section10(self) -> tuple[str, ...]:
-        """PUB-71 and PUB-72 from their selected snapshots; none selected, none written."""
+        """Section 10 figures from their selected snapshots; none selected, none written."""
+        from .places.fetch import FILE_KEYS
         from .series.section10 import SECTION10_REFUSED, SOURCES, Input, produce
 
         inputs: dict[str, Input] = {}
@@ -796,10 +797,25 @@ class Production:
                     entry.source_id not in SOURCES
                     or entry.skip_reason
                     or entry.key not in self.selected
+                    # The places listing is not the places file PUB-73 reads.
+                    or (entry.source_id == "places_ovt" and entry.key not in FILE_KEYS)
                 ):
                     continue
                 if entry.source_id in inputs:
                     raise ValueError("duplicate_source")
+                if entry.source_id == "places_ovt":
+                    # The verified snapshot path; its bytes are read by DuckDB.
+                    snapshot = read_snapshot(
+                        local(self.cache, entry.key), self.selected[entry.key]
+                    )
+                    receipt = snapshot.sidecar
+                    if (receipt.get("key"), receipt.get("source_id")) != (
+                        entry.key,
+                        entry.source_id,
+                    ):
+                        raise ValueError("places_receipt_mismatch")
+                    inputs[entry.source_id] = (entry, snapshot.path, receipt)
+                    continue
                 payload = self.raw(entry)
                 inputs[entry.source_id] = (entry, payload, self.receipts[entry.key])
             return produce(self.cache, self.review, inputs)
