@@ -46,7 +46,7 @@ def test_tender_success_binds_adapter_to_confirmation_registry_and_receipt():
 
 @pytest.mark.parametrize(
     "plant",
-    ["no_row", "no_receipt", "empty_receipt", "no_hash", "pending", "wrong_hash"],
+    ["no_row", "no_receipt", "empty_receipt", "no_hash", "pending", "wrong_terms_hash"],
 )
 def test_tender_failed_validation_is_false_and_preserves_only_supplied_metadata(plant):
     t = tender()
@@ -70,9 +70,8 @@ def test_tender_failed_validation_is_false_and_preserves_only_supplied_metadata(
         expected_hashes = {}
     elif plant == "pending":
         confirmation = Confirmation(Tender(), WeightConfirmation())
-    elif plant == "wrong_hash":
-        fetched["sha256"] = "b" * 64
-        expected_hashes = {"tenders_pub": "b" * 64}
+    elif plant == "wrong_terms_hash":
+        fetched["terms_sha256"] = "c" * 64
     evidence = g.tender_evidence(confirmation, row, fetched, "invented review")
     assert evidence == g.ConfirmationEvidence(
         "S2-T13",

@@ -3085,6 +3085,9 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - EVIDENCE: S2-TSKIP built only the ordinary run's `own_run` skip and the `own_run_pending` absence; any tender pin in the main cache refuses with `own_run_pickup_unbuilt`. The pending binding compares the page's host and a non-empty basis note, because main's committed S2-T13 review and registry row differ on the full page address and the basis note's words, which S2-P40 (decision 0083) rebinds. The ordinary skip notes the tender entry `completed` in the main journal without page proofs (S2-TSEP review RV-F5); a later handoff must refuse such an entry.
 - NEEDED: the `--tenders-only [--resume]` form, the identity-bound pick-up that replaces the `own_run_pickup_unbuilt` refusal, the completed-result handoff, and S2-P40's review binding, carried over from S2-TSEP with their own review; the pending binding then reuses the decision 0083 registry binding.
 - NEEDED BY: the day S7-T09 starts (decision 0084 item 6); no slice S2 gate dependency.
+### OI-370 visible-text live check (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.
 
 ## OI-374 — S2-TSKIP round 2: the own-run journal failure block is one more copy for OI-368
 
@@ -3235,6 +3238,41 @@ No existing open item is closed by this input. Sources resolve under `.overnight
 - EVIDENCE: Lead repair a0232ada retains `test_changed_intake_triple_refetches_tenders` with the ordinary tender skip lifted and adds `test_ordinary_resume_skips_the_tender_row`. This proves no own-run integration; decision 0084 item 7 defers that run.
 - NEEDED: The tender row's own run must call the resume plan's intake-triple check (`ResumePlan._fingerprint_matches`) and carry F4's changed-triple refetch test through its own-run path without lifting the ordinary skip. Preserve the ordinary-run skip test and the existing intake proof; record the deciding check in S2-TSEP's evidence. OI-370 remains the wider own-run/pick-up item.
 - NEEDED BY: S2-TSEP own-run resume delivery, before the decision 0084 item 6 S7-T09 start check.
+
+New records proposed for merge train S2-14 at WORK `d3627f471fc5b175b8f29edcc2016f9f5899ef75`, pull request 116.
+Sources: the PROPOSED OPEN ITEMS of the train confirmation CF1 (two) and the lead's own open-item line (one), both under `.overnight/IN/`.
+Next free number at the joined HEAD is OI-384; runtime preparation renumbers the whole block if needed.
+No existing open item is closed by this input.
+
+## OI-384 — The exclusion list of the own-run fingerprint has no honesty test
+
+- ID: OI-384
+- TYPE: OPEN (train confirmation proposal, nonblocking)
+- RAISED BY: CF1 of train S2-14, finding 4 and OI proposal 1
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py`, `OWN_RUN_EXCLUDED_SCOPES`; `custodian/tests/test_fetch_fingerprint.py`
+- EVIDENCE: `EXCLUDED_SCOPES` has an honesty test (the exclusion list is honest); `OWN_RUN_EXCLUDED_SCOPES` has none. CF1 treats it as a flag, not a rejection.
+- NEEDED: add the same guard in a later reviewed change: assert that every name in `OWN_RUN_EXCLUDED_SCOPES` is a function of `fetch/own_run.py` and is not reachable from the ordinary fetch loop's closure. Do not weaken any existing test.
+- NEEDED BY: next edit of the fingerprint or its tests.
+
+## OI-385 — Plant recipe for the assembly-side changed-row pin guard
+
+- ID: OI-385
+- TYPE: OPEN (train confirmation observation, nonblocking)
+- RAISED BY: CF1 of train S2-14, OI proposal 2
+- CONCERNS: `custodian/src/eii_custodian/publicdata/assembly_adapters.py`, `Production.reviewed_selections`, the `OWN_RUN_PIN_REFUSAL` branch; `test_changed_tender_row_pin_refuses_before_snapshot`
+- EVIDENCE: plant (i) of the own-run row guard does not redden that test, because it guards a separate branch.
+- NEEDED: record, in the plant recipes of the next review of this area, that the planted violation for the assembly-side changed-row pin guard neuters the `OWN_RUN_PIN_REFUSAL` branch in `Production.reviewed_selections`. No code change is implied.
+- NEEDED BY: next review that plants the tender own-run guards.
+
+## OI-386 — Random failure under load: scripts/tests process identity (S5-T05 round 2)
+
+- ID: OI-386
+- TYPE: RANDOM FAILURE (a green re-run does not close it, AGENTS.md rule 39)
+- RAISED BY: the lead, 2026-11-22 07:05, from the S5-T05 R2 run and its CF1
+- CONCERNS: `scripts/tests` cases `test_s3_t28_fixn::test_n6` and `test_s3_t28_fix1::test_f4` (through `test_s3_t28_boundaries`); `scripts/operations/process.py`
+- EVIDENCE: both failed with `process_identity_mismatch` under concurrent load and passed when run alone. No cause is recorded yet.
+- NEEDED: find why the process identity check mismatches under concurrent load (systematic debugging; record the load shape and the check's inputs), then fix the code or the test's isolation. Do not retry, skip or loosen the check.
+- NEEDED BY: before the next ledger that depends on these cases.
 
 ## Change control
 
@@ -6011,3 +6049,41 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - 2026-11-21 S2-GW — PO-S2-129: stays OPEN for its retained readiness-margin follow-up (its assertion part remains closed by decision 0073 item 3). Carried by decision 0085 item 2 with S2-T44 criterion 1 to the same backlog row; outside S2-T10's criteria 3 and 4 under that task's exclusion line.
 - 2026-11-21 S2-GW — OI-360: stays OPEN. Carried by decision 0085 item 3 with the tenders own run of decision 0084: it is settled on that run's evidence before the S7-T09 start check of decision 0084 item 6, never by a green run alone. Its NEEDED text is unchanged.
 - No other item is carried by decision 0085. These lines close nothing and rewrite no earlier line.
+
+## PO-S2-P40 — Tender binding requires live terms proof and decision review
+
+- TYPE: OPEN; raised 2026-11-21 by S2-P40 offline repair.
+- EVIDENCE: the offline committed-row/confirmation/fresh-archive join and substitution tests pass, but they use invented pages and a supplied matching review terms digest. No worker live source read occurred. The committed confirmation describes its terms hash as the raw fetched body hash; the existing build-public terms log uses a visible-text fingerprint. The repair records and verifies both digests from one terms read.
+- NEEDED: the lead's next permitted live run verifies that its raw terms-body hash equals the committed S2-T13 review hash, or has the changed body reviewed and updates the confirmation by the normal review route. The owner decides proposed decision 0083's narrow amendment to decision 0026 item 8, and another maker reviews the implementation before any S2-T13 completion or slice-gate claim. OI-360's separate HTTP refusal remains open.
+
+### PO-S2-P40 round 2 — unresolved review decisions (2026-11-21)
+
+- UPDATE, PO-S2-P40: the second local fix round binds the tender archive envelope to this run's raw terms hash, validates the reviewed page and terms URLs against the registered HTTPS origin, and gives an incomplete tender terms snapshot its named build refusal. Invented offline tests and deletion plants support these code claims; independent review, live terms equality and owner approval remain pending. See PROGRESS.md, **S2-P40 round 2**.
+- PROPOSED OPEN ITEM, decision 0083 against accepted decision 0059 item 1: decision 0059 says an unread terms record holds no build back; the proposed tender source-review handoff ends the build when its terms snapshot is absent or changed. The owner needs to decide the exception explicitly before treating decision 0083 or this build-level refusal as approved. No source wording is used as a permission gate.
+- PROPOSED OPEN ITEM, IDN equivalent spellings: the round-2 reviewed-URL guard refuses every non-ASCII netloc as required for the parser-differential fix. It therefore also refuses a Unicode IDN page paired with its ASCII punycode registry host (review case B7), even when both encode the same DNS name. Allowing B7 conflicts with that guard and needs a separate reviewed normalization rule; no broader host admission was made in this round.
+
+### PO-S2-P40 round 3 — CF1 and CF2 proposed records (2026-11-21)
+
+- UPDATE, CF1 proposed item 2: the user-info, query and fragment refusals described by proposed decision 0083 now have isolated cases in `test_reviewed_endpoint_must_be_same_safe_origin`; the round-3 plant driver deletes each shared check alone and records exit 1 on the relevant case, exit 0 restored. The decision record still does not cite those test cases by name; that editorial link remains proposed for its owner review.
+- PROPOSED OPEN ITEM, CF1 item 1 / CR1 item 5: the S2-P40 PROGRESS heading follows the preceding table rather than being a row of it. Earlier evidence bytes stay unchanged under rule 38; the lead should decide whether an append-only correction row is needed for the records layout.
+- PROPOSED OPEN ITEM, CF1 item 3 / CR1 item 1: proposed decision 0083 says "for owner review" and PO-S2-P40 asks for the owner's decision, while the original task brief treated it as a lead-recorded technical amendment. The lead and owner should settle the status and authority wording; no approval is inferred here.
+- PROPOSED OPEN ITEM, CF1 item 3 / CR1 item 3: proposed decision 0083 has no docs/README.md index entry, lacks the usual Owner, Decided by, Amends and Read first header rows, and has no numbered decision items. Its metadata and stable citation anchors need review before acceptance.
+- PROPOSED OPEN ITEM, CF1 item 3 / CR1 item 4: the lead's first permitted live terms check should compare two raw-body reads, since per-request bytes could make a raw-body binding unstable. The live equality of the committed terms hash remains open in PO-S2-P40; no worker live read is claimed.
+- PROPOSED OPEN ITEM, CF2 PO-A/PO-B: the reviewer reports that `utc()` accepts a negative zero offset and truncates nine fractional-second digits to microseconds, while refusing leap seconds and lowercase `z`. Record these timestamp semantics or explicitly refuse them; this round changes no timestamp parsing.
+- CARRIED, already recorded above: the decision 0083 conflict with accepted decision 0059 item 1, the IDN spelling case, and live raw terms-body equality remain open. CF2 proposed those again without adding a new decision or approval.
+### PO-S2-P40 round 4 — visible-text confirmation (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. The committed terms hash is the SHA-256 of the normalised visible text of terms snapshot 52cc0c2ca6 retrieved 2026-11-21. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.
+
+## OI-370 — Select and pick up the separate tender archive before S7-T09
+
+- TYPE: OPEN; raised by S2-TSEP on 2026-11-21 under [decision 0084](docs/decisions/0084-public-tenders-in-a-separate-run.md) items 4 and 6.
+- EVIDENCE: invented-input tests exercise exact pending evidence, a completed-result handoff, own-run resume, archive refusal and selected pick-up. No real cache or live source was read by this task, so no actual tender archive, main-cache pin, successful public assembly or start-day source chain is established. The base checkout contains `RunRecord` version 1; the separate S2-P39 fingerprint task was not present on this head, so its eventual joined implementation requires a compatibility review before live resume.
+- NEEDED: after the ongoing lead run and its armed resume finish, the lead reviews any completed tender entry and performs the decision-0084 handoff if its original pages, receipt, terms and intake proofs pass; otherwise records the refusal and runs the separate fetch. The lead places the verified intake in both caches, reviews and pins the archive identity in the main cache, runs the ordinary assembly and confirms its in-use `pub_tender` source chain. Repeat the identity-bound check on S7-T09's start day and before freeze. OI-360 and PO-S2-P40 remain open independently.
+### OI-370 round-2 update — handoff proof distinction (2026-11-22)
+
+- EVIDENCE: an invented-input plant replaces a completed main tender journal entry's `fetch` and `page_meta` proofs with the ordinary skip marker `{"completed": true}`. The separate handoff returns `tender_handoff_refused`, writes its refusal log and leaves its journal interrupted. The cache-relative-path test confirms the separate root's convention. Review CR1 RV-F5 and RV-F6 prompted these tests; they establish no live archive.
+- NEEDED: the lead's live handoff must distinguish an older completed tender entry with rehashed page, list and terms proofs from a newer ordinary-run skip marker with no such proofs. Only the former may be adopted, after the decision 0084 item 4 intake and receipt checks. A refused marker requires a separate later fetch, and the start-day and pre-freeze identity checks of item 6 remain open.
+### OI-370 visible-text live check (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.

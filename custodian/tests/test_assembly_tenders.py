@@ -7,7 +7,7 @@ import pytest
 from custodian.tests.singles_entries import tender_entry
 
 from eii_custodian.publicdata.assembly import AssemblyError
-from eii_custodian.publicdata.assembly_tenders import archive_pages
+from eii_custodian.publicdata.assembly_tenders import archive_pages, verify_intake_match
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 from eii_custodian.publicdata.singles.tenders import (
     LIST_PATHS,
@@ -49,6 +49,55 @@ def test_tender_archive_contains_every_list_language_and_named_page(
     assert read_snapshot(tmp_path / entry.key, identity).sha256 == identity
     with pytest.raises(AssemblyError, match="assembly_tender_pages_incomplete"):
         archive_pages(tmp_path, entry, "2026-11-18T00:00:00Z")
+
+
+@pytest.mark.parametrize(
+    "plant",
+    [
+        "clean",
+        "missing",
+        "duplicate",
+        "cutoff_en",
+        "cutoff_ar",
+        "hash_en",
+        "hash_ar",
+        "reason",
+    ],
+)
+def test_pickup_compares_both_awarded_readings_to_main_intake(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, plant: str
+) -> None:
+    from eii_custodian.publicdata.fetch import awards
+
+    monkeypatch.setattr(
+        awards, "intake_cutoff", lambda *_: ("2024-02-04", "", "a" * 64)
+    )
+    readings = [
+        {
+            "list_name": "awarded",
+            "language": lang,
+            "award_cutoff": "2024-02-04",
+            "workbook_sha256": "a" * 64,
+            "cutoff_reason": "",
+        }
+        for lang in ("en", "ar")
+    ]
+    if plant == "missing":
+        readings.pop()
+    elif plant == "duplicate":
+        readings.append(dict(readings[0]))
+    elif plant.startswith("cutoff_"):
+        readings[0 if plant.endswith("en") else 1]["award_cutoff"] = "2024-02-03"
+    elif plant.startswith("hash_"):
+        readings[0 if plant.endswith("en") else 1]["workbook_sha256"] = "b" * 64
+    elif plant == "reason":
+        readings[1]["cutoff_reason"] = "intake_missing"
+    body = json.dumps({"readings": readings}).encode()
+    if plant == "clean":
+        verify_intake_match(tmp_path, body, "2026-11-21T00:00:00Z")
+    else:
+        with pytest.raises(AssemblyError, match="assembly_tender_pages_incomplete"):
+            verify_intake_match(tmp_path, body, "2026-11-21T00:00:00Z")
 
 
 @pytest.mark.parametrize("remaining", [0, 1])
