@@ -1178,7 +1178,7 @@ Under decision 0064 item 41, amended by [decision 0088](decisions/0088-award-pro
 `proof_value_absent`, `proof_mismatch`, `match_rate`, `incomplete`, `status` and `results`. Every link is
 checked once, with results in URL order, through the existing bounded retry reader and reviewed proof scope.
 S2-P46 adds the per-link acquisition and offline replay contract of
-[proposed decision 0089](decisions/0089-award-proof-acquisition-and-offline-replay.md)
+[proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
 items 1 to 6: proofs survive a shape refusal, are rehashed before reuse, and a
 closed `refused` result still blocks publication after the full frame is checked.
 The immutable `proof_checks` receipt retains the full diagnostic result list and
@@ -1222,7 +1222,7 @@ retains the same closed reasons and counters; both receipt validators recompute
 them. For publishable results the register join, denominator, incompleteness and fetch rules remain unchanged.
 
 Page terms, raw bytes and parsed tables, and intake raw bytes and parsed
-rows, are staged together within the cache. Under proposed decision 0089 item 2,
+rows, are staged together within the cache. Under proposed decision 0091 item 2,
 award proof acquisitions and their diagnostic check receipts are durable outside
 that stage. A failed write or final validation publishes no raw or parsed intake
 snapshot and preserves previously published outputs; durable acquisitions remain.

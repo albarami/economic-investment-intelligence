@@ -1135,7 +1135,7 @@ page and awards contracts**. The field-limited school query never requests
 contact or capacity fields; source terms never relax that restriction.
 
 S2-P46 separates award proof acquisition from source publication under
-[proposed decision 0089](decisions/0089-award-proof-acquisition-and-offline-replay.md)
+[proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
 items 1 to 6. Each exact URL has an independently verified immutable dated
 acquisition receipt under `proof_store`; only its operational selection is
 mutable. Missing receipts or changed bytes invalidate that link alone and a live
