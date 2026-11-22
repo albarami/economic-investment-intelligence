@@ -16,9 +16,11 @@ from typing import Any
 import pytest
 from custodian.tests.method_card_pin_fixtures import (
     PINS,
+    case,
     digest,
     methods_document,
     pending,
+    producer_rows,
 )
 from custodian.tests.method_pin_gather_fixtures import (
     gathered_s2_t09_confirmation,
@@ -28,6 +30,7 @@ from custodian.tests.method_pin_gather_fixtures import (
 from custodian.tests.test_production_adapters import context
 
 from eii_custodian.publicdata.assembly import PHASES, AssemblyError
+from eii_custodian.publicdata.assembly_adapters import Production
 from eii_custodian.publicdata.assembly_inventory import INVENTORY
 from eii_custodian.publicdata.assembly_io import bound_files, write_record
 from eii_custodian.publicdata.assembly_reports import require_complete
@@ -49,18 +52,6 @@ DEFERRED_TO_S7 = (
 OI_283_REASON = "OI-283: computed by a later slice task, decision 0094"
 
 
-def _producer_rows(artifact: dict[str, Any]) -> list[dict[str, Any]]:
-    """Producer results for the phase: pin id, values and lineage only."""
-    return [
-        {
-            "pin_id": row["pin_id"],
-            "values": row["values"],
-            "source_lineage": row["source_lineage"],
-        }
-        for row in artifact["pins"]
-    ]
-
-
 def _staged_phase_build(
     tmp_path: Path, *, mutate: Any = None
 ) -> tuple[Any, dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -69,7 +60,7 @@ def _staged_phase_build(
         tmp_path, mutate=mutate, stage_outputs=False
     )
     build.pin_generation_config = config
-    build.pin_rows = _producer_rows(artifact)
+    build.pin_rows = producer_rows(artifact["pins"])
     return build, record, artifact, config
 
 
@@ -196,6 +187,86 @@ def test_phase_refuses_failed_second_write_and_leaves_no_half_pair(
         build.method_pins()
     assert not (build.cache / PIN_ARTIFACT).exists()
     assert PIN_ARTIFACT not in build.files
+
+
+# S2-P63 round 2 (review RV1 F1, RV2): only the configuration output is a
+# symlink to a file outside the cache. The refused second write must leave no
+# half pair under any refusal: the new artifact is removed, the symlink itself
+# is removed without following it, and its target survives.
+def test_phase_refuses_symlinked_configuration_output_and_leaves_no_half_pair(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    outside = tmp_path / "outside-the-cache.json"
+    outside.write_text("SYN body outside the cache", encoding="utf-8")
+    (build.cache / PIN_CONFIG).symlink_to(outside)
+    with pytest.raises(AssemblyError, match=r"^pin_output_pair_unwritten$"):
+        build.method_pins()
+    _no_credited_output(build)
+    assert not (build.cache / PIN_ARTIFACT).exists()
+    assert not (build.cache / PIN_CONFIG).is_symlink()
+    assert not (build.cache / PIN_CONFIG).exists()
+    assert outside.read_text(encoding="utf-8") == "SYN body outside the cache"
+
+
+# S2-P63 round 2 (review RV1 F1): the widened pair guard also covers the
+# serialization refusals of either write. One input changed: one recorded
+# setting carries a value the canonical JSON writer must refuse.
+def test_phase_refuses_unserializable_setting_and_leaves_no_half_pair(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    build.pin_generation_config["pins"]["wilson.period"]["nan_setting"] = float("nan")
+    with pytest.raises(AssemblyError, match=r"^pin_output_pair_unwritten$"):
+        build.method_pins()
+    _no_credited_output(build)
+
+
+# S2-P63 round 2 (review RV1 F2): the command's assembly outcome carries the
+# phase's own closed refusals, never the generic assembly_build_refused.
+@pytest.mark.parametrize(
+    "planted,reason",
+    [
+        ("unbound_inputs", "pin_inputs_missing"),
+        ("failed_second_write", "pin_output_pair_unwritten"),
+    ],
+)
+def test_build_public_reports_the_phase_s_own_closed_pin_refusals(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, planted: str, reason: str
+) -> None:
+    from custodian.tests.test_source_completeness import entry
+
+    from eii_custodian.publicdata.fetch.build import run_build
+
+    if planted == "unbound_inputs":
+
+        def run(build: Production) -> dict[str, str]:
+            # The live command binds no pin input: the phase refuses closed.
+            return build.method_pins()
+
+    else:
+        # Bound, schema-valid inputs; only the second write of the pair fails.
+        _paths, _record, artifact, config = case(tmp_path / "case-root")
+        (tmp_path / PIN_CONFIG).mkdir(parents=True)
+
+        def run(build: Production) -> dict[str, str]:
+            build.pin_generation_config = config
+            build.pin_rows = producer_rows(artifact["pins"])
+            return build.method_pins()
+
+    monkeypatch.setattr(Production, "run", run)
+    outcome = run_build(
+        (entry(),),
+        lambda url: pytest.fail("network called"),
+        tmp_path,
+        lambda: "2026-11-22T00:00:00Z",
+        lambda seconds: None,
+        seed=36,
+    )
+    assert outcome.failure is not None
+    assert outcome.failure.check == reason
+    assert any(reason in line for line in outcome.lines)
+    assert not any("assembly_build_refused" in line for line in outcome.lines)
 
 
 def test_consumer_refuses_changed_receipt_hash_of_written_pair(

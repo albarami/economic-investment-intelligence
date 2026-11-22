@@ -35,6 +35,7 @@ from .method_card_pin_fixtures import (
     lineage_context,
     methods_document,
     pending,
+    producer_rows,
     save,
     write_json,
     write_yaml,
@@ -215,12 +216,18 @@ OI_283_REASON = "OI-283: computed by a later slice task, decision 0094"
 
 
 def _pend(tmp_path, reasons):
-    """A complete invented case with each named pin pending under its reason."""
+    """A complete invented case with each named pin pending under its reason.
+
+    A pending record row binds its artifact row to the closed pending
+    representation of decision 0094: empty values and empty lineage.
+    """
     paths, record, artifact, _ = case(tmp_path)
-    for row in record["pins"]:
+    for row, produced in zip(record["pins"], artifact["pins"], strict=True):
         if row["pin_id"] in reasons:
             pending(row)
             row["unpinned_reason"] = reasons[row["pin_id"]]
+            produced["values"] = {}
+            produced["source_lineage"] = []
     save(paths, record, artifact)
     paths[3].write_text(methods_document(record["pins"]), encoding="utf-8")
     return paths, record
@@ -282,6 +289,74 @@ def test_plant_s2_names_only_the_refused_pin_beside_an_accepted_deferral(tmp_pat
     reasons = {"c6.expected_p": OI_283_REASON, "c14.medians_2025": OI_283_REASON}
     paths, record = _pend(tmp_path, reasons)
     assert _refusal(paths, record, "S2") == "S2:unpinned:c14.medians_2025"
+
+
+# S2-P63 round 2 (review RV1 F3): a pending deferred record row binds its
+# artifact row to the closed pending representation. A stand-in value or
+# lineage beside an unpinned record row is refused by the consumer, never
+# credited as a checked result.
+@pytest.mark.parametrize(
+    "stand,code",
+    [
+        ("value", "pin_pending_value_forbidden"),
+        ("lineage", "pin_pending_lineage_forbidden"),
+        ("row", "pin_artifact_missing"),
+    ],
+)
+def test_plant_pending_deferred_row_with_artifact_stand_in(tmp_path, stand, code):
+    # One change from the accepted deferral: the artifact row of one pending
+    # deferred record row carries a stand-in value, a stand-in lineage, or
+    # no row at all; only the consumer's pending-representation guard fails.
+    paths, record = _pend(tmp_path, dict.fromkeys(DEFERRED_TO_S7, OI_283_REASON))
+    artifact = yaml.safe_load(paths[1].read_text(encoding="utf-8"))
+    row = next(item for item in artifact["pins"] if item["pin_id"] == "c6.expected_clq")
+    if stand == "value":
+        row["values"] = {"value": "SYN stand-in"}
+    elif stand == "lineage":
+        row["source_lineage"] = [dict(record["pins"][1]["source_lineage"][0])]
+    else:
+        artifact["pins"] = [item for item in artifact["pins"] if item is not row]
+    write_json(paths[1], artifact)
+    with pytest.raises(ValueError, match="^" + re.escape(code) + "$"):
+        _complete(paths, record, gate="S2")
+
+
+@hypothesis_settings(deadline=None, max_examples=60)
+@given(
+    values=st.one_of(
+        st.dictionaries(st.text(max_size=6), st.text(max_size=6), max_size=2),
+        st.lists(st.text(max_size=6), max_size=2),
+    ),
+    lineage=st.lists(
+        st.dictionaries(st.text(max_size=6), st.text(max_size=6), max_size=1),
+        max_size=2,
+    ),
+)
+def test_property_pending_deferred_artifact_representation_oracle(values, lineage):
+    # Oracle written from decision 0094's words, never from the module's code:
+    # a pending deferred record row accepts only values == {} with no lineage;
+    # any other artifact shape is refused by its own closed reason.
+    with tempfile.TemporaryDirectory() as folder:
+        paths, record, artifact, _ = case(Path(folder))
+        pin = "c6.expected_clq"
+        record_row = next(row for row in record["pins"] if row["pin_id"] == pin)
+        pending(record_row)
+        record_row["unpinned_reason"] = OI_283_REASON
+        produced = next(row for row in artifact["pins"] if row["pin_id"] == pin)
+        produced["values"] = values
+        produced["source_lineage"] = lineage
+        save(paths, record, artifact)
+        paths[3].write_text(methods_document(record["pins"]), encoding="utf-8")
+        expected = (
+            "pin_pending_value_forbidden"
+            if values != {}
+            else ("pin_pending_lineage_forbidden" if lineage != [] else None)
+        )
+        if expected is None:
+            assert set(_complete(paths, record, gate="S2")) == set(PINS)
+        else:
+            with pytest.raises(ValueError, match="^" + expected + "$"):
+                _complete(paths, record, gate="S2")
 
 
 @hypothesis_settings(deadline=None, max_examples=40)
@@ -1247,23 +1322,12 @@ def test_producer_guard_plants(tmp_path, plant, code):
         produce_pin_artifact(config, rows)
 
 
-def _producer_rows(record):
-    return [
-        {
-            "pin_id": row["pin_id"],
-            "values": row["values"],
-            "source_lineage": row["source_lineage"],
-        }
-        for row in record["pins"]
-    ]
-
-
 @pytest.mark.parametrize("version", [2, 0, -1, True, 1.0, "1", None])
 def test_producer_refuses_schema_version(tmp_path, version):
     from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
 
     _, record, artifact, config = case(tmp_path)
-    rows = _producer_rows(record)
+    rows = producer_rows(record["pins"])
     # Control: the same rows and config with version 1 produce the artifact.
     assert produce_pin_artifact(config, rows) == artifact
     planted = {**config, "schema_version": version}
@@ -1297,7 +1361,7 @@ def test_producer_pin_row_pending_shapes(tmp_path, pin, pend, mode, code):
     from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
 
     _paths, record, _, config = case(tmp_path)
-    rows = _producer_rows(record)
+    rows = producer_rows(record["pins"])
     row = next(item for item in rows if item["pin_id"] == pin)
     link = [dict(item["source_lineage"][0]) for item in rows if item["source_lineage"]]
     if pend:
@@ -1330,7 +1394,7 @@ def test_property_producer_pin_row_shape_oracle(pin, pend, carries_lineage):
 
     with tempfile.TemporaryDirectory() as folder:
         _paths, record, _, config = case(Path(folder))
-        rows = _producer_rows(record)
+        rows = producer_rows(record["pins"])
         row = next(item for item in rows if item["pin_id"] == pin)
         link = next(
             dict(item["source_lineage"][0]) for item in rows if item["source_lineage"]

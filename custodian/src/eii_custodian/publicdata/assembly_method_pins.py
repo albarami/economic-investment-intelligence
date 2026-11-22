@@ -27,6 +27,10 @@ def _drop_half_pair(cache: Path) -> None:
             local(cache, name).unlink()
         except OSError:
             pass
+        except AssemblyError:
+            # A symlinked half never resolves inside the cache: remove the
+            # link itself, never its target, so no half pair survives.
+            (cache / name).unlink(missing_ok=True)
 
 
 def write_pin_pair(
@@ -39,6 +43,9 @@ def write_pin_pair(
     The artifact is built by ``produce_pin_artifact`` from the configuration
     and the producer rows; the configuration itself is persisted unchanged
     beside it, so the consumer's settings hash binds the producing bytes.
+    Any refusal of either write — a refused path, an unserializable value or
+    an operating-system error — removes the other half and refuses with the
+    one closed reason ``pin_output_pair_unwritten``, never a half pair.
     """
     if not isinstance(generation_config, Mapping) or not pin_rows:
         raise AssemblyError("pin_inputs_missing")
@@ -46,7 +53,7 @@ def write_pin_pair(
     try:
         outputs = write_record(cache, PIN_ARTIFACT_NAME, artifact)
         outputs.update(write_record(cache, PIN_CONFIG_NAME, generation_config))
-    except OSError:
+    except (OSError, AssemblyError, ValueError, TypeError):
         _drop_half_pair(cache)
         raise AssemblyError("pin_output_pair_unwritten") from None
     return outputs

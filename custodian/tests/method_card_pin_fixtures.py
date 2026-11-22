@@ -239,6 +239,18 @@ def pending(row):
     )
 
 
+def producer_rows(rows):
+    """Producer results for a pin phase: pin id, values and lineage only."""
+    return [
+        {
+            "pin_id": row["pin_id"],
+            "values": row["values"],
+            "source_lineage": row["source_lineage"],
+        }
+        for row in rows
+    ]
+
+
 def lineage_context(record):
     """INVENTED registry rows and build receipts for every source lineage row."""
     links: dict[str, str] = {}
