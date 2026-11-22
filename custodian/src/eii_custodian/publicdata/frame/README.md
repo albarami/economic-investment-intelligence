@@ -191,3 +191,15 @@ The frame's municipality handover also records `upstream_sha256` for `bnd_hdx`
 and `bnd_zone_2020` from the frame result's receipts. The PUB-67 series builder
 requires those hashes to agree with the same build's explicit selections;
 see document 03, **PUB-67 supporting provenance**.
+
+S2-P48 adds the national C8 producer from `census_2020_workbook`, sheet `76`.
+The national-count parser is shared with the pinned C8 replay. It selects the
+unique Both Sexes block label in column B, keeps Private and Total as the
+national-only `private_employed_residents` and `employed_residents` indicators
+(unit `persons`, period `2020`), and appends them beside `est_census` rows.
+The selected hash and full receipt remain under that source with method
+`frame.census.table76.v1: Both Sexes Private / Total`. Missing or malformed
+inputs refuse. Proposed decision 0089 names the two pairs; DAT-128's audit
+selectors are unchanged. PO-S2-48 stays open for the lead's real-cache replay,
+proposal acceptance and different-maker acceptance. Fixtures prove no real
+census value or completed release.

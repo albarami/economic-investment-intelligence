@@ -4085,6 +4085,9 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 
 - R3 FOLLOW-UP — 2026-11-21: `pub_census_national` is declared for C8 Table 76; the release producer and its private-employer/employed-residents indicator vocabulary are still owed (document 04 coverage row; `frame/live.py` and `frame/census.py`). PO-S2-48 stays OPEN for those obligations, the lead's real-cache replay and different-maker acceptance. Document 07 C8 has no explicit zero-denominator rule for a complete zone; the existing `C8:zone_denominator` refusal is retained, with a deciding plant, pending the lead's ruling rather than inventing a rule.
 
+
+- FIX — 2026-11-22, S2-P48 (PO-S2-48; PUB-83, PUB-84; DAT-128; document 07 card C8). The release producer now reads the selected `census_2020_workbook` Table 76 snapshot through the receipt verifier, reuses the C8 labelled-block parser and appends its two unaltered national counts beside `est_census` rows. The national-only pairs are `private_employed_residents`/`persons` and `employed_residents`/`persons`; proposed decision 0089 and documents 03/04 name them without changing DAT-128 or PUB-84's audit-count pairs. Invented-fixture tests and separately removed guards cover missing sheet, missing/ambiguous labels, null/invalid counts and unknown indicator/unit; the existing `C8:zone_denominator` refusal is retained and planted. **LEFT OPEN** for the lead's real-cache replay, acceptance of proposed decision 0089 and different-maker acceptance of this implementation. The reconciliation-table row remains **CARRIED — GATE HOLD**. No task box is ticked and no real source value was read or added by this worker. Commands, real exits and limits: PROGRESS.md, **S2-P48 C8 national release producer — 2026-11-22**.
+
 ### PO-S2-49 — The four calculation modules share one mutable decimal context
 
 - ID: PO-S2-49

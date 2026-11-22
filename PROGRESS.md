@@ -50166,3 +50166,189 @@ S2-P43 round 2 — lead (Anthropic Claude Opus 5.5), from the review rv1 of Moon
 
 2026-11-22 S2-P44 (L-1423; decision 0088) — OpenAI Codex (GPT-6), senior record-linkage engineer; strict self-review persona sanad-provenance reviewer. Skills: project-orientation, task-standards, github-flow, sanad-provenance, property-based-testing, strict-reviewer, muhasabah-gate; failing-first/debugging/completion rules from the brief. Tested implementation commit `04e9250d676f5425766239f9313f12876c869a74` on workspace-local `build/s2-p44-award-proof-formats`, base `1dd1a9f3ca4fac65556c2bc827820a607911996f`; shared Git metadata read-only (normal branch creation exit 128), no push. Linux/Python 3.14.6, `UV_OFFLINE=1 EII_DECISION_PROVIDER=none TMPDIR=$PWD/.overnight/tmp` (absolute TMPDIR), Hypothesis seed 61473, new sample fixtures seed 73. Original new tests red 19 failed/34 passed (exit 1); explicit-seed HEAD replay red 46 failed/44 passed (exit 1). `uv run --locked python -m pytest $(cat .overnight/tmp/focused-files.txt) -q --hypothesis-seed=61473`: 1068 passed in 45.05s, exit 0; `uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q --hypothesis-seed=61473`: 20 passed in 5.54s, exit 0; `uv run --locked python -m pytest custodian/tests -q --hypothesis-seed=61473`: 11120 passed, 193 warnings in 815.83s (0:13:35), exit 0. `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md`, `git diff --check`: exit 0 each. 26 isolated deletion plants red 1, restored cmp 0 and green 0 each. Two exploratory whole-suite runs interrupted with exit 130; an earlier completed whole-suite run before the final legacy-fixture audit passed 11120 tests (exit 0); none substitutes for the final committed-tree run. Evidence, outcomes, consumer sweep, negative branches and per-file counts: `.overnight/RETURN.md`, `.overnight/tmp/`. OI-277 live rates, registration-match evidence and independent maker review remain open; no live input/cache read or source fetch.
 S2-P44 round 2 — lead (Anthropic Claude Opus 5.5), from lens 1 rv1b (Anthropic Claude Opus 5.5, REJECTED `f580fe8a`, tests only): row S4 `test_number_column_is_not_used_by_the_proof_compare` (plant: compare the number column, 1 failed exit 1); row S6 `test_suffix_only_proof_value_is_absent_on_the_real_path` through the real `parse_body`, proof reader and `check_all_awards` on the version-2 page, the suffix-only cell giving `proof_value_absent`, never `schema_missing` or zero (plant: remove the suffix-only blank in `page_shapes.py`, 1 failed with `schema_missing`, exit 1); row S7 `test_registration_digit_slash_tokens_compare_as_sets`; cmp restore after each, 123 passed exit 0 (`UV_OFFLINE=1`, workspace `.overnight/tmp`). No production change. Finding F4 (a missing key read as a blank) is declined: unreachable on the real path, both proof readers emit every profile key; a code change would also change the fetch fingerprint of the running keyed run.
+
+
+## S2-P48 C8 national release producer — 2026-11-22
+
+Builder: OpenAI Codex, senior public-statistics data engineer (census tables,
+release producers and provenance). Strict self-review persona: a reviewer who
+rejects a number without its sanad chain and a guard without a planted violation.
+Installed skills applied: project-orientation, task-standards, github-flow,
+sanad-provenance, property-based-testing, strict-reviewer and muhasabah-gate.
+The brief supplies equivalent failing-first and verification-before-completion
+rules; no installed superpowers skill file was found. This is builder evidence,
+not a different-maker review or slice-gate approval.
+
+Full base commit: `1f7fd252584f2cef58006928be5b77511dabf1c0` (supplied main).
+The shared worktree Git metadata is read-only: normal branch creation exited 128.
+A workspace-local shared bare clone (clone exit 0, then local configuration,
+read-tree and branch creation exit 0) holds branch `feat/S2-P48-census-c8`.
+Only the final task commit is delivered above that base; its full hash and bundle
+checksum are in `.overnight/RETURN.md`. No push or base-branch write is authorized
+or performed. Git metadata, experiment backups, logs and the bundle stay under
+`.overnight/` and are not part of the task commit.
+
+Environment: Linux x86_64, Python 3.14.6, uv 0.11.31; `UV_OFFLINE=1`,
+`EII_DECISION_PROVIDER=none`, `TMPDIR` the absolute resolution of the workspace's
+`.overnight/tmp`; uv, Ruff and mypy caches also under that folder;
+`PYTHONDONTWRITEBYTECODE=1`. Hypothesis profile `eii`, seed `651248`, no example
+database. Tests read invented cache/workbook fixtures only. No source network,
+real public cache, custodian data, service start or real census value is used.
+
+Plan and build: first exercise the missing producer and vocabulary; then promote
+the existing C8 label/block/count helpers out of the lead-only data-test module,
+reuse them for both replay and production, add the two national-only unit pairs,
+and append verified workbook rows beside establishments in the live frame.
+Finally exercise isolated guard deletions and importer checks, document the
+contract and preserve the open gate hold. The three parser helpers are relocated,
+not duplicated; the independent Fraction arithmetic/reconciliation stays in the
+replay. Source rows retain `source_id`, period and exact Decimal values; the full
+selected receipt retains publisher, title, address, licence, retrieval date and
+hash, with method `frame.census.table76.v1: Both Sexes Private / Total`.
+
+Proposed decision 0089 is the next free number in the supplied main. It adds
+`private_employed_residents`/`persons` and `employed_residents`/`persons` to
+`pub_census_national` only. Its acceptance is owed. DAT-128 and PUB-84 rows are
+byte-identical to base; the four audit selectors remain unchanged. Document 03's
+**C8 national census indicator vocabulary**, document 04's coverage and PUB-83
+routing, and the frame README describe the producer. No task box is ticked.
+
+### Commands and actual outcomes
+
+All pytest commands below use `uv run --locked python -m pytest` and
+`--hypothesis-seed=651248`; the exact expanded file list is preserved in
+`.overnight/tmp/importer-tests.txt` and every command/exit in
+`.overnight/RETURN.md` and `.overnight/tmp/commands.jsonl`.
+
+| Command or evidence step | Actual result | Exit |
+|---|---|---|
+| Producer test module before implementation | 26 failed, 2 passed; missing `workbook_rows`/vocabulary | 1 |
+| Producer module plus `custodian/tests/test_pinned_c8.py` after implementation | 190 passed | 0 |
+| First 54-module importer/core sweep | 1 failed, 1915 passed; old table-specific vocabulary assertion still expected only `employed` | 1 |
+| Correction of that exact-list assertion | Add only the proposed C8 table pairs; preserve the exact four audit selectors and add negative plants for trying to make either C8 pair an audit selector | recorded below |
+| Producer, population-employed and C8 modules, final | 245 passed | 0 |
+| Final 54-module importer/core sweep | 1924 passed in 205.08 seconds | 0 |
+| `uv run --locked ruff check .` initial | Import ordering and raw-regex literal style defects; fixed without changing assertions | 1 |
+| `uv run --locked ruff check .` final | All checks passed | 0 |
+| `uv run --locked ruff format --check .` final | 926 files already formatted | 0 |
+| `uv run --locked mypy` initial and final | 492 source files, no issues | 0 each |
+| `python3 scripts/check_docs.py` before records | 1254 text files, 140 Markdown files | 0 |
+| `python3 scripts/check_tree.py` before staging | 8 rules | 0 |
+| `cmp AGENTS.md CLAUDE.md` | Identical and unchanged | 0 |
+| `git diff --check` before records | No whitespace errors | 0 |
+| `uv --version` and interpreter/platform probe | Environment above | 0 |
+| `.overnight/tmp/boundaries.py` first run | Local evidence helper tried to number `docs/decisions/README.md`; TypeError, no product defect | 1 |
+| Corrected boundaries helper | Ignore nonnumbered index; DAT-128/PUB-84 unchanged, next number 0089, no removed PROGRESS/OPEN_ITEMS evidence, agent files match | 0 |
+
+The first importer failure was a deterministic contract-expectation update, not a
+random failure and not a weakened audit assertion. The evidence-helper error was
+corrected explicitly and its earlier failure retained. No random failure is
+closed by a green rerun. Formatter application commands and their exits are
+listed in the return report.
+
+### Isolated plants (rule 37; L-1409; L-1389)
+
+For each row, the exact test command is
+`uv run --locked python -m pytest <selector> -q --hypothesis-seed=651248`.
+Delete/bypass one named guard or plant one output defect, run red, restore the
+saved original bytes, run `cmp <source-file> .overnight/tmp/plant-backups/<plant>.py`,
+then run that same test command green. Each experiment is sequential; none of its
+code changes remains. Both runner commands (`python3 .overnight/tmp/plants.py`
+and `python3 .overnight/tmp/extra-plants-runner.py`) exited 0.
+
+| Plant | Test selector | Red exit | Restore cmp | Green exit |
+|---|---|---|---|---|
+| P01-sheet-name | `custodian/tests/test_census_national_producer.py::test_missing_table_76_refuses` | 1 | 0 | 0 |
+| P02-header | `custodian/tests/test_census_national_producer.py -k national_header` | 1 | 0 | 0 |
+| P03-block-uniqueness | `custodian/tests/test_census_national_producer.py -k national_block` | 1 | 0 | 0 |
+| P04-block-column | `custodian/tests/test_census_national_producer.py -k misplaced` | 1 | 0 | 0 |
+| P05-count-refusal | `custodian/tests/test_census_national_producer.py -k national_count` | 1 | 0 | 0 |
+| P06-finite | `custodian/tests/test_census_national_producer.py -k national_denominator` | 1 | 0 | 0 |
+| P07-nonnegative | `custodian/tests/test_census_national_producer.py -k national_denominator` | 1 | 0 | 0 |
+| P08-integral | `custodian/tests/test_census_national_producer.py -k national_denominator` | 1 | 0 | 0 |
+| P09-positive-total | `custodian/tests/test_census_national_producer.py -k national_denominator` | 1 | 0 | 0 |
+| P10-indicator-unit | `custodian/tests/test_census_national_producer.py::test_closed_indicator_unit_refuses` | 1 | 0 | 0 |
+| P11-table-vocabulary | `custodian/tests/test_census_national_producer.py::test_c8_vocabulary_is_national_only_and_not_an_audit_selector` | 1 | 0 | 0 |
+| P12-entry-absence | `custodian/tests/test_census_national_producer.py -k "live_frame and missing"` | 1 | 0 | 0 |
+| P13-entry-skipped | `custodian/tests/test_census_national_producer.py -k "live_frame and skipped"` | 1 | 0 | 0 |
+| P14-zone-zero | `custodian/tests/test_pinned_c8.py -k "raw_schema_plants and zone_zero"` | 1 | 0 | 0 |
+| P15-count-lineage | `custodian/tests/test_census_national_producer.py::test_counts_preserve_exact_rational_values` | 1 | 0 | 0 |
+| P16-method-chain | `custodian/tests/test_census_national_producer.py -k "live_frame and active"` | 1 | 0 | 0 |
+| P17-establishment-retention | `custodian/tests/test_census_national_producer.py -k "live_frame and active"` | 1 | 0 | 0 |
+| P18-label-whitespace | `custodian/tests/test_census_national_producer.py::test_split_whitespace_and_case_are_normalised` | 1 | 0 | 0 |
+| P19-audit-selector-leak | `custodian/tests/test_population_employed.py::test_audit_selectors_stay_the_four_pairs` | 1 | 0 | 0 |
+| P20-fixed-row | `custodian/tests/test_census_national_producer.py::test_table_76_release_rows` | 1 | 0 | 0 |
+
+The moved parser's refusal branches are `C8:national_header`,
+`C8:national_block` / `C8:sex_block`, `C8:national_count` and
+`C8:national_denominator`. New vocabulary is subject to the existing
+`census_2020_workbook: invalid indicator/unit` guard. Missing Table 76 and
+uncached formulas are rejected as `schema_missing` by the reused named-sheet
+reader. The live source is withheld when its registry entry is missing or
+skipped. Existing receipt/schema/key checks are unchanged and exercised by the
+importer tests. The pre-existing `C8:zone_denominator` guard is unchanged and has
+its own deleted-guard proof P14.
+
+Each negative producer case changes one cell, one label's location, one sheet
+name, one indicator, one unit or one source availability field, with all other
+inputs valid, and asserts the specific reason or exact withheld rows/source.
+The exact-rational property generates arbitrary valid Private/Total pairs over
+the nonnegative integer portion of decimal(18,4), including explicit one and
+maximum-boundary examples, plus zero and equal numerator/denominator, with varied
+block-row positions. It verifies the extracted values using Fraction and is
+killed by P15. Missing/empty data: P01/P03/P05; one, ties and boundaries: P15;
+nonfinite/negative/fractional counts and zero denominator: P06-P09/P14;
+split whitespace/case versus fused text: P18/P03; duplicate labels: P03;
+column placement: P04; row order/offset: P20; unknown keys/units and closed
+vocabulary: P10/P11/P19; lineage and append retention: P16/P17. No new function
+exceeds 100 lines; the longest new/moved function is 32 lines (exact metrics in
+the return). No existing helper block is copied and retained twice.
+
+PO-S2-48 is LEFT OPEN, including its reconciliation-table gate hold. Still owed:
+the lead's real-cache C8 replay from the lead's shell, lead acceptance of proposed
+decision 0089, and different-maker acceptance of the delivered implementation.
+The separate missing-source/table obligations, live coverage, complete release
+and slice gate are not claimed. The zero-denominator-zone ruling remains with
+the lead; its existing refusal is preserved. Builder muhasabah checks provenance,
+assumptions, scope and limits; no independent approval is claimed.
+
+S2-P48 final verification supplement — 2026-11-22: the supplementary caller
+command `uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py custodian/tests/test_fetch_report_survivors.py custodian/tests/test_public_data_stage.py custodian/tests/test_build_resume.py custodian/tests/test_places_partb_survivors_c.py custodian/tests/test_places_partb_survivors_d.py -q --hypothesis-seed=651248`
+passed 141 tests in 40.47 seconds, exit 0. After recording the main evidence,
+`python3 scripts/check_docs.py` passed (1254 text files, 140 Markdown files),
+`python3 scripts/check_tree.py` passed all 8 rules against the staged workspace-local
+index (`GIT_DIR=$PWD/.overnight/tmp/local.git GIT_WORK_TREE=$PWD`),
+`cmp AGENTS.md CLAUDE.md` and the staged `git diff --cached --check` passed,
+each exit 0. The boundary verifier also passed (exit 0). All 20 plant sequences
+were 1/0/0 for red/cmp/green. No product-code change followed the passing test
+sweeps; remaining edits record evidence. The return carries the final commit,
+per-file additions/deletions, all commands and exits, exact refusal/edge mapping,
+test-module manifest, bundle checksum and the owed lead and different-maker work.
+
+S2-P48 packaging correction — 2026-11-22: the first commit command exited 128
+because a shared clone does not inherit the source repository's local author
+configuration. The already-requested author identity was copied from the source
+repository's configuration into workspace-local Git metadata without logging its
+values (exit 0); no identity was invented and no external configuration was
+written. The premature bundle command then exited 128 (empty range), verification
+exited 1 (missing bundle), and checksum generation exited 1 (missing bundle).
+Those failures are retained in the return. The initial status probe exited 0 but
+reported zero commits ahead of base; it was not proof of successful delivery.
+Packaging is repeated only after this recorded correction; product code and
+passing checks are unchanged. The final report records the successful commit and
+verified bundle separately.
+
+S2-P48 final edge-class audit — 2026-11-22: implementation commit
+`84eafd15cfb2296839d2a08d02d0c2ccde02be38` was created locally with the configured
+author, and its bundle verified with checksum (all exit 0). Before return, the
+formula-cache edge class received its own additional dependency plant P21:
+remove only `read_sheet`'s formula-marker recognition, then run
+`uv run --locked python -m pytest custodian/tests/test_census_national_producer.py -k "moved_labels_and_uncached_formula and uncached_formula" -q --hypothesis-seed=651248`.
+It exited 1 because the exact `schema_missing` refusal was lost; restore and
+`cmp custodian/src/eii_custodian/publicdata/fetch/page_workbook.py .overnight/tmp/plant-backups/P21-formula-marker.py`
+exited 0, then the same test command exited 0. The temporary runner
+`python3 .overnight/tmp/formula-plant.py` exited 0. This supplements the earlier
+20-plant table: final total 21, each red/cmp/green 1/0/0. No source/test byte
+changed relative to that implementation commit. The local commit is amended
+with this evidence only, keeping one task commit above base; the final hash
+and regenerated bundle/checksum are recorded in `.overnight/RETURN.md`.

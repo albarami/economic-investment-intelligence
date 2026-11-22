@@ -12,7 +12,7 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.grids.build import build_grids
 
 from .build import FrameResult, read_cached
-from .census import census_rows, validate_tables
+from .census import census_rows, validate_tables, workbook_rows
 from .checks import FrameError
 from .crosswalk import (
     check_municipality_names,
@@ -248,6 +248,21 @@ def build_live_frame(
         sources["est_census"]["method"] = (
             "frame.v1: sum count columns over source activity rows"
         )
+        report.extend(ignored)
+    workbook = entries.get("census_2020_workbook")
+    if workbook is not None and not workbook.skip_reason:
+        payload, receipt = read_cached(
+            cache, workbook, digest=selections.get(workbook.key, ""), decode=bytes
+        )
+        loaded, ignored = census_rows(
+            workbook,
+            workbook_rows(payload),
+            receipt["retrieved_utc"],
+            "pub_census_national",
+        )
+        tables["pub_census_national"].extend(loaded)
+        receipt["method"] = "frame.census.table76.v1: Both Sexes Private / Total"
+        sources[workbook.source_id] = receipt
         report.extend(ignored)
     validate_frame_tables(tables, free_zones)
     validate_tables(

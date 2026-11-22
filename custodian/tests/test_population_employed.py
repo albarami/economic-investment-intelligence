@@ -319,7 +319,12 @@ def test_plant_contract_without_employed_fails(old, new):
 
 def assert_audit_selectors_unchanged(units, table_units) -> None:
     assert dict(units) == AUDIT_PAIRS
-    assert dict(table_units) == {("pub_population_municipality", "employed"): "persons"}
+    # Proposed decision 0089 adds C8's national-only pairs, never audit selectors.
+    assert dict(table_units) == {
+        ("pub_population_municipality", "employed"): "persons",
+        ("pub_census_national", "private_employed_residents"): "persons",
+        ("pub_census_national", "employed_residents"): "persons",
+    }
     assert "employed" not in units
 
 
@@ -332,6 +337,8 @@ def test_audit_selectors_stay_the_four_pairs():
     [
         ({"employed": "persons"}, {}),
         ({"labour_force": "persons"}, {}),
+        ({"private_employed_residents": "persons"}, {}),
+        ({"employed_residents": "persons"}, {}),
         ({}, {("pub_census_zone", "employed"): "persons"}),
         ({}, {("pub_population_municipality", "unemployed"): "persons"}),
     ],

@@ -808,7 +808,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_property_sale` | `district_key`; `municipality_code`; `period` (`YYYY`); `property_type` (from the Arabic source field); `deal_count` int; `median_price_per_m2` decimal(12,2) (Y, null when `deal_count` is 0) |
 | `pub_census_zone` | `zone_code`; `period` (`2020`); `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_population_municipality` | `municipality_code`; `period`; `indicator` (`residents`, `employed`); `value` decimal(18,4); `unit` (`persons`); `source_id` |
-| `pub_census_national` | `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
+| `pub_census_national` | `period`; `indicator` (the audit pairs of DAT-128 plus the two C8 pairs below); `value` decimal(18,4); `unit`; `source_id` |
 | `pub_census_district` | `district_key`; `period`; `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_place` | `place_id` string (source identifier); `name` string; `name_ar` string (Y); `category` string (`basic_category`); `lon`, `lat` decimal(9,6); `cell` cell; `source_release` string; `source_provider` string; `licence` string; `confidence` decimal(5,4) (source range checked before conversion; round half to even to four decimal places); `merged_ids` string (Y, semicolon-separated reviewed source identifiers) |
 | `pub_place_verification` | `place_id` string; `check_date` date; `reviewer_role` string; `verification_link` string; `status` (`verified_open`, `closed_or_moved`, `not_found`, `duplicate`); `source_id` |
@@ -880,6 +880,23 @@ asserted to be the site's own page-list order, so `sequence` is null unless that
 source order is recorded. An English alternate-language link supplies the paired
 English path key; an unpaired page keeps its own path and language. No pairing is
 guessed from a translated title or path.
+
+### C8 national census indicator vocabulary
+
+Proposed [decision 0089](decisions/0089-c8-national-census-release-indicators.md)
+items 1 to 3 names two additional pairs in `pub_census_national` only:
+`private_employed_residents`/`persons` (Private) and
+`employed_residents`/`persons` (Total). Both are unaltered Census 2020 Table 76
+counts on the uniquely labelled Both Sexes row in column B, with period `2020`
+and `source_id` `census_2020_workbook`. They coexist with `est_census` establishment
+rows under the existing period-by-indicator key and carry the selected snapshot's
+receipt and the versioned producer method. Unknown indicators or wrong units
+refuse. Missing sheet, labels, cells or cached formula values refuse; counts must
+be finite nonnegative integers and Total must be positive.
+
+These pairs do not amend DAT-128's audit-count list or enable an audit selector.
+DAT-128 and PRV-115 still require review and refusal of an applicable unlisted
+count; no privacy applicability is decided by this vocabulary.
 
 The following closed lists and placement rules are part of the release schema, not application
 conventions.
