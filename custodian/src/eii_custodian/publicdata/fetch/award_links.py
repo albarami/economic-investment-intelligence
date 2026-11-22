@@ -17,10 +17,14 @@ from .award_checks import (
     proof_reason,
     validate_check_receipt,
 )
-from .certificate_pins import PinError
-from .snapshots import SnapshotError
+from .award_pool import ReaderPool
+from .page_html import ShapeError
+from .page_records import PageError
 
 METHOD = "awards.report_links@v1"
+SHAPE_REASONS = frozenset(
+    {"schema_missing", "snapshot_date_missing", "unavailable", "row_count"}
+)
 
 
 class ProofFetchError(AwardError):
@@ -46,16 +50,22 @@ def check_all_awards(
     rows: Sequence[Mapping[str, str]],
     profile: Mapping[str, Any],
     proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
+    *,
+    pool: ReaderPool | None = None,
 ) -> dict[str, Any]:
     """Check every distinct nonblank link once, with all its intake winners.
 
     Ordinary fetch failures remain checked links with a closed reason. Trust,
-    archive and schema refusals still stop publication; none becomes a match.
+    archive refusals stop immediately; shape refusals continue but block publication.
     """
     frame = _frame(rows)
-    results = _check_links(frame, profile, proof_reader, sorted(frame))
+    results = _check_links(frame, profile, proof_reader, sorted(frame), pool=pool)
     totals = _totals(results)
-    incomplete = not results or totals["failed_fetches"] > 0
+    incomplete = (
+        not results
+        or totals["failed_fetches"] > 0
+        or any(item["result"] == "refused" for item in results)
+    )
     return {
         "method": METHOD,
         "scope": "all_links",
@@ -74,23 +84,14 @@ def _check_links(
     profile: Mapping[str, Any],
     proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
     urls: Sequence[str],
+    *,
+    pool: ReaderPool | None = None,
 ) -> list[dict[str, str]]:
-    results: list[dict[str, str]] = []
-    for url in urls:
+    active = pool or ReaderPool()
+
+    def read(url: str) -> dict[str, str]:
         try:
             proof = proof_reader(url)
-        except (PinError, SnapshotError):
-            raise
-        except AwardError as exc:
-            if str(exc) != "proof_fetch_failed":
-                raise
-            result = "fetch_failed"
-            reason = (
-                exc.reason if isinstance(exc, ProofFetchError) else "proof_fetch_failed"
-            )
-        except OSError:
-            result, reason = "fetch_failed", "unreachable"
-        else:
             candidates = [proof] if isinstance(proof, Mapping) else list(proof)
             if not candidates or any(
                 not isinstance(item, Mapping) for item in candidates
@@ -98,8 +99,25 @@ def _check_links(
                 raise AwardError("schema_missing")
             reason = proof_reason(frame[url], candidates, profile)
             result = "matched" if reason in MATCH_REASONS else "mismatched"
-        results.append({"report_url": url, "result": result, "reason": reason})
-    return results
+        except (AwardError, PageError, ShapeError) as exc:
+            if str(exc) in SHAPE_REASONS:
+                result, reason = "refused", str(exc)
+            elif isinstance(exc, AwardError) and str(exc) == "proof_fetch_failed":
+                result = "fetch_failed"
+                reason = (
+                    exc.reason
+                    if isinstance(exc, ProofFetchError)
+                    else "proof_fetch_failed"
+                )
+                active.reduce(reason)
+            else:
+                raise
+        except OSError:
+            result, reason = "fetch_failed", "unreachable"
+            active.reduce(reason)
+        return {"report_url": url, "result": result, "reason": reason}
+
+    return active.read(urls, read)
 
 
 def _totals(results: Sequence[Mapping[str, str]]) -> dict[str, Any]:
@@ -137,7 +155,11 @@ def _sample(
     frame_count: int, results: list[dict[str, str]], seed: int
 ) -> dict[str, Any]:
     totals = _totals(results)
-    incomplete = len(results) < 30 or totals["failed_fetches"] > 0
+    incomplete = (
+        len(results) < 30
+        or totals["failed_fetches"] > 0
+        or any(item["result"] == "refused" for item in results)
+    )
     return {
         "seed": seed,
         "distinct_frame_count": frame_count,

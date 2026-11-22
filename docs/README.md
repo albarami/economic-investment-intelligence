@@ -139,6 +139,7 @@
 | [0085](decisions/0085-the-slice-s2-gate-wording-under-the-slow-work-rule.md) | The slice S2 gate wording under the slow-work rule: slow work with a dependent before go-live runs in the background, slow work with none moves word for word to the after-go-live list; S2-T44 criterion 1 moved with OI-319, OI-341 and PO-S2-129, tenders recorded as picked up or pending; no check, test, plant or bound changed | Accepted, 2026-11-21; the owner's words of 2026-11-21 (OWNER_RULES 34) |
 | [0086](decisions/0086-custodian-part-limit-and-watch.md) | Three complete custodian parts, each with a 1,200-second limit everywhere and a 720-second green hosted watch | Accepted, 2026-11-21; the owner's words and the delegated advisor decision, applied by lead ruling L-1404 |
 | [0089](decisions/0089-c8-national-census-release-indicators.md) | Two national-only C8 release indicator/unit pairs and the Table 76 producer; audit-count pairs unchanged | Accepted by the lead under L-1443, 2026-11-22; S2-P48, PO-S2-48 |
+| [0091](decisions/0091-award-proof-acquisition-and-offline-replay.md) | Per-link award proof acquisition, refusal retention, offline replay and bounded readers | Proposed, 2026-11-22; S2-P46, lead review pending |
 
 ## Identifiers and change control
 

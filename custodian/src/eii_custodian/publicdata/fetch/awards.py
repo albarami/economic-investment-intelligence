@@ -11,7 +11,7 @@ import io
 import json
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import nullcontext
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -24,11 +24,14 @@ from .award_checks import (
     validate_check_receipt,
 )
 from .award_links import (
+    SHAPE_REASONS,
     ProofFetchError,
     check_all_awards,
     sample_from_links,
     validate_links_receipt,
 )
+from .award_pool import ReaderPool
+from .award_store import ProofStore, verify_legacy_proofs
 from .certificate_pins import (
     Pin,
     PinError,
@@ -37,7 +40,7 @@ from .certificate_pins import (
     load_pin,
     page_transport,
 )
-from .page_archive import staged_source
+from .page_archive import staged_source, verify_source_directory
 from .page_records import (
     _value,
     cache_directory,
@@ -48,7 +51,7 @@ from .page_records import (
 from .receipts import sha256_hex, sidecar_for
 from .registry import Entry
 from .snapshots import Snapshot, SnapshotError, publish_snapshot, read_snapshot, utc
-from .transport import Transport, metadata_limit
+from .transport import Response, Transport, TransportFault, metadata_limit
 
 SOURCE = "awards_owner_scrape"
 METHOD = "awards.ingest_awards@v2"
@@ -331,6 +334,9 @@ def _publish_awards(
     proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
     registers: list[dict[str, str]],
     registration_inputs: list[dict[str, object]] | None = None,
+    *,
+    links: dict[str, Any] | None = None,
+    readers: dict[str, object] | None = None,
 ) -> Snapshot:
     """Append one intake snapshot with full-link and labelled sample evidence."""
     # Ruling L-1001: a pending basis of use is a record and never refuses.
@@ -343,7 +349,10 @@ def _publish_awards(
     cache_directory(cache, entry)
     validate_claim(SOURCE, "awarded_value")
     originals = [row["original"] for row in batch.rows]
-    links = check_all_awards(originals, profile, proof_reader)
+    if links is None:
+        links = check_all_awards(originals, profile, proof_reader)
+    if any(item["result"] == "refused" for item in links["results"]):
+        raise AwardError("award_proof_refused")
     # Publication independently checks the full frame against the intake below.
     check = sample_from_links(links, seed)
     match = match_register(originals, profile, registers)
@@ -366,6 +375,7 @@ def _publish_awards(
         award_check=check,
         award_check_scope="sample",
         award_links=links,
+        award_readers=readers or ReaderPool().receipt(),
         summary=batch.summary,
         method=METHOD,
         original_scrape_date=SCRAPE_DATE,
@@ -428,24 +438,115 @@ def _intake_profile(declaration: Mapping[str, Any]) -> dict[str, Any]:
     return profile
 
 
-def fetch_awards(
-    entry: Entry,
+def _proof_response(
+    url: str,
     transport: Transport,
-    cache: Path,
-    clock: Callable[[], str],
     sleep: Callable[[float], None],
-) -> Snapshot:
-    """Normal build dispatch; the lead supplies the reviewed intake manifest."""
-    from dataclasses import replace
-
+    declaration: Mapping[str, Any],
+    proof_urls: frozenset[str],
+    pin: Pin | None,
+    pool: ReaderPool,
+) -> Response:
     from .kinds import read_bounded, require_verified_chain
+    from .page_requests import page_requests
+
+    version_two = declaration.get("version") == 2
+
+    def send(address: str) -> Response:
+        try:
+            return transport(address)
+        except TransportFault as exc:
+            if exc.kind == "unreachable" or exc.status in {429, 503}:
+                pool.reduce(
+                    "unreachable" if exc.kind == "unreachable" else "http_status"
+                )
+            raise
+        except OSError:
+            pool.reduce("unreachable")
+            raise
+
+    scope = (
+        page_requests(tuple(sorted(proof_urls)), {pin.host: pin} if pin else {})
+        if version_two
+        else nullcontext()
+    )
+    limit = metadata_limit(declaration["max_bytes"]) if version_two else nullcontext()
+    with scope, limit, page_transport(None if version_two else pin):
+        response, failure = read_bounded(send, sleep, url)
+    require_verified_chain(failure)
+    if (
+        version_two
+        and response is not None
+        and len(response.body) > declaration["max_bytes"]
+    ):
+        raise AwardError("metadata_bytes")
+    if failure is not None and failure.check == "blocked_host":
+        raise AwardError("blocked_host")
+    if failure or response is None:
+        raise ProofFetchError(failure.check if failure else "proof_fetch_failed")
+    if any(
+        address not in proof_urls for address in (*response.hops, response.final_url)
+    ):
+        raise AwardError("blocked_host")
+    return response
+
+
+def _proof_reader(
+    entry: Entry,
+    declaration: Mapping[str, Any],
+    store: ProofStore,
+    proof_urls: frozenset[str],
+    pin: Pin | None,
+    pool: ReaderPool,
+    transport: Transport | None,
+    sleep: Callable[[float], None],
+) -> Callable[[str], Sequence[Mapping[str, str]]]:
     from .page_records import _obstacle
 
-    declaration = load_declaration(SOURCE)
-    profile = _intake_profile(declaration)
+    profile = declaration["profile"]
     version_two = declaration.get("version") == 2
+    proof_entry = replace(
+        entry, columns=tuple(tuple(pair) for pair in declaration["columns"])
+    )
+
+    def read(url: str) -> Sequence[Mapping[str, str]]:
+        if url not in proof_urls:
+            raise AwardError("blocked_host")
+        body = store.body(url, replay=transport is None)
+        if body is None:
+            assert transport is not None
+            response = _proof_response(
+                url, transport, sleep, declaration, proof_urls, pin, pool
+            )
+            body = store.save(url, response)
+        _obstacle(body)
+        rows = parse_body(body, proof_entry, declaration)
+        if not rows:
+            raise AwardError("schema_missing")
+        if version_two:
+            return [
+                {
+                    profile[key]: ""
+                    if row[profile["proof_columns"][key]] is None
+                    else str(row[profile["proof_columns"][key]])
+                    for key in ("company", "registration", "value")
+                }
+                for row in rows
+            ]
+        return [
+            {key: "" if value is None else str(value) for key, value in row.items()}
+            for row in rows
+        ]
+
+    return read
+
+
+def _awards_context(
+    entry: Entry, cache: Path, clock: Callable[[], str]
+) -> tuple[dict[str, Any], AwardBatch, int, object, frozenset[str], str]:
+    declaration = load_declaration(SOURCE)
+    _intake_profile(declaration)
     cache_directory(cache, entry)
-    # Ruling L-1001: a pending basis of use is a record and never refuses.
     if (
         not entry.publisher
         or entry.commit_allowed
@@ -453,112 +554,102 @@ def fetch_awards(
         or not approve(entry.url).ok
     ):
         raise AwardError("receipt_missing")
+    verify_source_directory(cache / entry.key)
+    verify_legacy_proofs(cache, entry)
     stamp = clock()
     batch, seed, selections = read_intake(cache, declaration, stamp)
+    urls = frozenset(_proof_urls(batch, declaration, entry.fetch_host))
+    return declaration, batch, seed, selections, urls, stamp
+
+
+def fetch_awards(
+    entry: Entry,
+    transport: Transport,
+    cache: Path,
+    clock: Callable[[], str],
+    sleep: Callable[[float], None],
+) -> Snapshot:
+    """Acquire durable proofs before staging publication; resume is per link."""
+    declaration, batch, seed, selections, urls, stamp = _awards_context(
+        entry, cache, clock
+    )
     registers, registration_inputs = read_registers(cache, selections)
-    proof_urls = _proof_urls(batch, declaration, entry.fetch_host)
-
     pin = _report_pin(cache, declaration)
-
-    destination = cache
-    with staged_source(cache, entry.key) as cache:
-
-        def proof_reader(url: str) -> Mapping[str, str] | Sequence[Mapping[str, str]]:
-            if url not in proof_urls:
-                raise AwardError("blocked_host")
-            from .page_requests import page_requests
-
-            scope = (
-                page_requests(proof_urls, {pin.host: pin} if pin else {})
-                if version_two
-                else nullcontext()
-            )
-            limit = (
-                metadata_limit(declaration["max_bytes"])
-                if version_two
-                else nullcontext()
-            )
-            with scope, limit, page_transport(None if version_two else pin):
-                response, failure = read_bounded(transport, sleep, url)
-            require_verified_chain(failure)
-            if (
-                version_two
-                and response is not None
-                and len(response.body) > declaration["max_bytes"]
-            ):
-                raise AwardError("metadata_bytes")
-            if failure is not None and failure.check == "blocked_host":
-                raise AwardError("blocked_host")
-            if failure or response is None:
-                raise ProofFetchError(
-                    failure.check if failure else "proof_fetch_failed"
-                )
-            if any(
-                address not in proof_urls
-                for address in (*response.hops, response.final_url)
-            ):
-                raise AwardError("blocked_host")
-            _obstacle(response.body)
-            proof_entry = replace(
-                entry, columns=tuple(tuple(pair) for pair in declaration["columns"])
-            )
-            rows = parse_body(response.body, proof_entry, declaration)
-            if not rows:
-                raise AwardError("schema_missing")
-            side = sidecar_for(
-                entry,
-                digest=sha256_hex(response.body),
-                nbytes=len(response.body),
-                fetch_url=response.final_url,
-                fetch_host=entry.fetch_host,
-                retrieved_utc=stamp,
-                publisher=entry.publisher,
-                source_modified="",
-                row_count=len(rows),
-                terms_sha256="",
-            )
-            proof_body = response.body
-            if version_two:
-                from .page_acquire import _html_without_form_secrets
-
-                proof_body = _html_without_form_secrets(proof_body)
-                side.update(
-                    sha256=sha256_hex(proof_body),
-                    bytes=len(proof_body),
-                    upstream_sha256=sha256_hex(response.body),
-                    representation="form_secret_removed",
-                )
-            try:
-                publish_snapshot(cache / entry.key / "proofs", "html", proof_body, side)
-            except OSError:
-                raise SnapshotError("snapshot_write_failed") from None
-            if version_two:
-                return [
-                    {
-                        profile[key]: ""
-                        if row[profile["proof_columns"][key]] is None
-                        else str(row[profile["proof_columns"][key]])
-                        for key in ("company", "registration", "value")
-                    }
-                    for row in rows
-                ]
-            return [
-                {key: "" if value is None else str(value) for key, value in row.items()}
-                for row in rows
-            ]
-
+    pool = ReaderPool(declaration.get("max_readers", 1))
+    store = ProofStore(cache, entry, declaration, stamp, clock)
+    reader = _proof_reader(entry, declaration, store, urls, pin, pool, transport, sleep)
+    # The check receipt survives source publication refusal, just like proofs.
+    links = check_all_awards(
+        [row["original"] for row in batch.rows],
+        declaration["profile"],
+        reader,
+        pool=pool,
+    )
+    report = _proof_report(links)
+    report["award_readers"] = pool.receipt()
+    report_body = json.dumps(report, sort_keys=True).encode()
+    publish_snapshot(
+        cache / entry.key / "proof_checks",
+        "json",
+        report_body,
+        {
+            "source_id": SOURCE,
+            "key": entry.key,
+            "retrieved_utc": stamp,
+            "sha256": sha256_hex(report_body),
+            "bytes": len(report_body),
+        },
+    )
+    if any(item["result"] == "refused" for item in links["results"]):
+        raise AwardError("award_proof_refused")
+    with staged_source(cache, entry.key) as stage:
         result = _publish_awards(
             entry,
-            cache,
+            stage,
             batch,
-            profile,
+            declaration["profile"],
             stamp,
             seed,
-            proof_reader,
+            reader,
             registers,
             registration_inputs,
+            links=links,
+            readers=pool.receipt(),
         )
-    return read_snapshot(destination / entry.key, result.sha256)
+    return read_snapshot(cache / entry.key, result.sha256)
+
+
+def replay_awards(
+    entry: Entry, cache: Path, clock: Callable[[], str]
+) -> dict[str, Any]:
+    """Closed offline mode: no transport exists, missing proofs refuse by name."""
+    declaration, batch, _seed, _selections, urls, stamp = _awards_context(
+        entry, cache, clock
+    )
+    pool = ReaderPool()  # Local parsing needs no network concurrency.
+    store = ProofStore(cache, entry, declaration, stamp)
+    reader = _proof_reader(
+        entry, declaration, store, urls, None, pool, None, lambda _: None
+    )
+    report = _proof_report(
+        check_all_awards(
+            [row["original"] for row in batch.rows], declaration["profile"], reader
+        )
+    )
+    report["award_readers"] = pool.receipt()
+    return report
+
+
+def _proof_report(links: dict[str, Any]) -> dict[str, Any]:
+    refusals = [item for item in links["results"] if item["result"] == "refused"]
+    return {
+        "award_links": links,
+        "refused_count": len(refusals),
+        "refusals_by_class": {
+            reason: sum(item["reason"] == reason for item in refusals)
+            for reason in sorted(SHAPE_REASONS)
+        },
+    }
 
 
 def _report_pin(cache: Path, declaration: Mapping[str, Any]) -> Pin | None:

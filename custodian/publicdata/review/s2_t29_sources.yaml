@@ -934,6 +934,7 @@ sources:
             nullable: true
             optional: false
   awards_owner_scrape:
+    max_readers: 4
     version: 2
     kind: html_table
     url: https://monaqasat.mof.gov.qa/TendersOnlineServices/AwardedTenders/1

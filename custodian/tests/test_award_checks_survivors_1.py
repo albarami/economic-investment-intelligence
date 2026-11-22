@@ -120,8 +120,13 @@ def test_one_failure_in_full_sample_is_incomplete():
 
 @pytest.mark.parametrize("proof", [[], [None], ["SYN invalid"]])
 def test_empty_or_nonmapping_proof_refuses(proof):
-    with pytest.raises(checks.AwardError, match=r"^schema_missing$"):
-        checks.check_awards([row()], profile(), 73, lambda _: proof)
+    result = checks.check_awards([row()], profile(), 73, lambda _: proof)
+    assert result["results"][0]["reason"] == "schema_missing"
+    assert result["results"][0]["result"] == "refused"
+    with pytest.raises(checks.AwardError, match=r"^award_check_metadata_missing$"):
+        checks.validate_check_receipt(
+            {"source_id": "awards_owner_scrape", "award_check": result}
+        )
 
 
 def test_mixed_result_labels():
