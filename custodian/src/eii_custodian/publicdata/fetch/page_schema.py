@@ -208,7 +208,13 @@ def json_body(body: bytes) -> Any:
 def validate(review: Mapping[str, Any]) -> None:
     if review.get("as_of") != "retrieval_date":
         raise ShapeError("snapshot_date_missing")
-    keys(dict(review), COMMON | ({"profile"} if "profile" in review else set()))
+    extra = {"profile"} if "profile" in review else set()
+    if "max_readers" in review and "profile" in review:
+        from .award_pool import reader_count
+
+        reader_count(review["max_readers"])
+        extra.add("max_readers")
+    keys(dict(review), COMMON | extra)
     if (
         type(review["version"]) is not int
         or review["version"] != 2

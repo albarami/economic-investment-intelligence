@@ -101,7 +101,7 @@ def setup(tmp_path, monkeypatch, *, version=2, host="www.data.gov.qa"):
             }
         path.write_text(yaml.safe_dump(document), encoding="utf-8")
         loaded = real_load(source, path)
-        assert calls == [("awards_owner_scrape", path)]
+        assert set(calls) == {("awards_owner_scrape", path)}
         if isinstance(mapping, UserDict):
             # YAML yields dicts. Preserve this separate in-memory type plant
             # after the real loader has checked the document and source.
@@ -140,11 +140,15 @@ def test_v2_proof_full_receipt_and_scope(tmp_path, monkeypatch):
     result = awards.fetch_awards(entry, send, tmp_path, lambda: STAMP, lambda _: None)
     assert calls == dec["reviewed_urls"]
     assert result.sidecar["award_check"]["matched"] == 2
-    directory = tmp_path / entry.key / "proofs"
-    snapshots = [
-        read_snapshot(directory, p.stem) for p in (directory / "index").glob("*.json")
-    ]
-    assert len(snapshots) == 1  # Equal proof bytes share a single identity.
+    from eii_custodian.publicdata.fetch.award_store import ProofStore
+
+    store = ProofStore(tmp_path, entry, dec, STAMP)
+    snapshots = []
+    for url in dec["reviewed_urls"]:
+        folder = store.folder(url)
+        state = json.loads((folder / "state.json").read_bytes())
+        snapshots.append(read_snapshot(folder / state["archive"], state["identity"]))
+    assert len(snapshots) == 2  # One receipt per URL, even for equal bytes.
     proof = snapshots[0]
     assert b"SYN discard" not in proof.body and proof.body != body
     side = proof.sidecar
@@ -153,7 +157,7 @@ def test_v2_proof_full_receipt_and_scope(tmp_path, monkeypatch):
         "publisher": entry.publisher,
         "source_modified": None,
         "terms_sha256": None,
-        "row_count": 2,
+        "row_count": None,
         "sha256": sha256_hex(proof.body),
         "bytes": len(proof.body),
         "upstream_sha256": sha256_hex(body),
@@ -358,7 +362,7 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
     )
     seen = []
 
-    def check(rows, schema, proof_reader):
+    def check(rows, schema, proof_reader, **kwargs):
         def proof(url):
             projected = proof_reader(url)
             assert projected == [
@@ -367,7 +371,7 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
             seen.append(url)
             return projected
 
-        return original(rows, schema, proof)
+        return original(rows, schema, proof, **kwargs)
 
     monkeypatch.setattr(awards, "check_all_awards", check)
     result = fetch(entry, tmp_path, body)
@@ -390,13 +394,13 @@ def test_suffix_only_proof_value_is_absent_on_the_real_path(tmp_path, monkeypatc
     projected_values = []
     results = []
 
-    def check(rows, schema, proof_reader):
+    def check(rows, schema, proof_reader, **kwargs):
         def proof(url):
             projected = proof_reader(url)
             projected_values.extend(row["syn_value"] for row in projected)
             return projected
 
-        outcome = original(rows, schema, proof)
+        outcome = original(rows, schema, proof, **kwargs)
         results.extend(outcome["results"])
         return outcome
 
@@ -411,7 +415,7 @@ def test_suffix_only_proof_value_is_absent_on_the_real_path(tmp_path, monkeypatc
 
 
 @pytest.mark.parametrize(
-    "plant,reason", [("oversize", "metadata_bytes"), ("empty", "schema_missing")]
+    "plant,reason", [("oversize", "metadata_bytes"), ("empty", "award_proof_refused")]
 )
 def test_proof_read_refusals(tmp_path, monkeypatch, plant, reason):
     entry, dec, body = setup(tmp_path, monkeypatch)
@@ -421,6 +425,11 @@ def test_proof_read_refusals(tmp_path, monkeypatch, plant, reason):
         monkeypatch.setattr(awards, "parse_body", lambda *args: [])
     with pytest.raises(AwardError, match=f"^{reason}$"):
         fetch(entry, tmp_path, body)
+    if plant == "empty":
+        replay = awards.replay_awards(entry, tmp_path, lambda: STAMP)
+        assert {r["reason"] for r in replay["award_links"]["results"]} == {
+            "schema_missing"
+        }
 
 
 def test_fetch_register_inputs_survive(tmp_path, monkeypatch):

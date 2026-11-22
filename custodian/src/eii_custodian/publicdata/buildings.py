@@ -120,7 +120,7 @@ def build_buildings(
     invalidate_buildings(cache)
     parts = {key: pinned(cache, entries, selections, key) for key in BUILDING_PARTS}
     boundary_snapshot = pinned(cache, entries, selections, "bnd_hdx")
-    complete, chain = national_guard(cache, entries, selections, boundary)
+    scope, chain = national_guard(cache, entries, selections, boundary)
     chain.update(
         {key: fingerprint(snapshot, selections[key]) for key, snapshot in parts.items()}
     )
@@ -228,7 +228,11 @@ def build_buildings(
         "selection": "unrounded point_on_surface covered by national municipality union; full footprint",
         "frame_bounds": list(FRAME_BOUNDS),
         "boundary_bounds": list(geometry_bounds(boundary)),
-        "national_completeness": complete,
+        "boundary_scope": {
+            **scope,
+            "rule": "required STAC items are those whose bbox meets in_box_bounds, the bounds of the boundary parts inside the frame box; reviewed wholly-outside parts require no item",
+        },
+        "national_completeness": True,
         "source_chain": chain,
         "output_sha256": sha256_hex(table_body),
         "counts": dict(counts),

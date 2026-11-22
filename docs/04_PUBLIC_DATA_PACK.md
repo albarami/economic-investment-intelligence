@@ -1066,7 +1066,7 @@ Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution w
 | PUB-14 | Transaction and parcel identifiers in `prop_sales` and `prop_resi_units`, and any other identifier column in a public source, are dropped before the release; only aggregates with their deal counts are stored. This identifier-dropping rule does not apply to `fdi_projects`: every project field is kept and may appear on its card, in lists and on the map (PUB-87). |
 | PUB-15 | `./eii build-public` prints, for the slice S2 gate, 20 randomly drawn stored figures, each with its `source_id`, URL, filter and value, so a reviewer can check them against the source. The seed and the list are saved with the build log. |
 | PUB-16 | Fetchers record retrieval time in UTC and never use a file date or a portal "modified" date as the reference period of the data. The reference period comes from the data's own period fields. |
-| PUB-17 | Under [decision 0077](decisions/0077-overture-footprints-as-the-national-building-table.md), the three building parts are the canonical national building inventory as well as gazetteer inputs. The building producer refuses unless every required part is registered, unskipped, explicitly pinned and verified. The release STAC collection and all linked item metadata must be registered and pinned through the existing HTTPS transport; unresolved item addresses remain explicitly unconfirmed. Its offline guard checks that the selected building part set equals the STAC item assets whose boxes meet the national municipality bounds, and that those bounds fit the frame box (50.7 to 51.7 E, 24.4 to 26.2 N); a failed guard never claims national completeness. It counts kept, outside-frame-box and in-box-outside-boundary rows separately, with the last awaiting lead review of the dated boundary and possible reclaimed land. Selection uses the unrounded point on surface and retains the whole footprint. Invalid footprints are excluded and listed, never repaired; entirely underground footprints are excluded by their source flag. The original concrete extract is the four files described by the pack as having STAC item boxes meeting the frame: places part 00014 and buildings parts 00288, 00384 and 00385 of release 2026-10-21.0. There is no `country = 'QA'` filter. A places row is kept when its point lies inside the national boundary, and a buildings row when the point on its footprint's surface does. The files are local Parquet, read with the pinned DuckDB and no extension loaded. Geometry is WKB, decoded with Shapely; an absent GeoParquet CRS means OGC:CRS84, longitude then latitude. `enable_geoparquet_conversion` is set off before the read. |
+| PUB-17 | Under [decision 0077](decisions/0077-overture-footprints-as-the-national-building-table.md), the three building parts are the canonical national building inventory as well as gazetteer inputs. The building producer refuses unless every required part is registered, unskipped, explicitly pinned and verified. The release STAC collection and all linked item metadata must be registered and pinned through the existing HTTPS transport; unresolved item addresses remain explicitly unconfirmed. Its offline guard checks that every part of the national municipality union lies inside the frame box (50.7 to 51.7 E, 24.4 to 26.2 N) or wholly outside it, that the wholly-outside parts are exactly those listed by the committed review file `custodian/publicdata/review/national_boundary_outside.json` bound to the pinned `bnd_hdx` hash, and that the selected building part set equals the assets of the STAC items whose boxes meet `in_box_bounds`, the bounds of the inside parts (proposed [decision 0090](decisions/0090-reviewed-outside-boundary-parts-and-the-required-building-part-set.md); owner acceptance owed); a failed guard never claims national completeness. It counts kept, outside-frame-box and in-box-outside-boundary rows separately, with the last awaiting lead review of the dated boundary and possible reclaimed land. Selection uses the unrounded point on surface and retains the whole footprint. Invalid footprints are excluded and listed, never repaired; entirely underground footprints are excluded by their source flag. The original concrete extract is the four files described by the pack as having STAC item boxes meeting the frame: places part 00014 and buildings parts 00288, 00384 and 00385 of release 2026-10-21.0. Under [decision 0090](decisions/0090-reviewed-outside-boundary-parts-and-the-required-building-part-set.md), the required building parts are 00384 and 00385; part 00288, whose item lies south of the boundary and whose 204 frame-box rows lie outside it, is no longer read. There is no `country = 'QA'` filter. A places row is kept when its point lies inside the national boundary, and a buildings row when the point on its footprint's surface does. The files are local Parquet, read with the pinned DuckDB and no extension loaded. Geometry is WKB, decoded with Shapely; an absent GeoParquet CRS means OGC:CRS84, longitude then latitude. `enable_geoparquet_conversion` is set off before the read. |
 | PUB-18 | ArcGIS feature services are paged at the server's stated maximum (2,000 features per request per research) until the reported total is reached; a short final total fails the build. |
 | PUB-80 | Every number and comparison emitted from this pack is produced by a deterministic tested release-build function or by `eii_core.calc`, with a method card and worked regression example. The browser only formats returned facts and never calculates a displayed value. A forecast, base rate, estimate or scenario figure of cards C30 to C35 is such a number: each candidate model, the backtest, the interval and the error measure have a method card and a worked regression example, with seeds where randomness enters. |
 | PUB-85 | The seventeen groups of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) are represented by eighteen source-id families, because the decision's group of museum and health-centre visits uses two (`visits_museum` and `visits_phcc`). Each family keeps one `source_id` and has one registry entry per slug, keyed `<source_id>/<slug>`. Each slug is a dataset of its own for PUB-04 to PUB-10 and PUB-16: its own sidecar, hash, host, declared columns and types, row-count range, last period, and publisher and licence checks. The release manifest names exactly one hash per slug, and lineage and the evidence drawer name the slug. The coverage facts in section 2.2 for these families were read from the portal's catalogue and records on 2026-11-12 and are recorded again at every fetch. Every figure from them is shown as Public with its source, its reference year (or month) and its retrieval date. |
@@ -1133,6 +1133,18 @@ rows only (PUB-16). Input representations, original and archived hashes, atomic
 publication and explicit selection are specified in document 03, **S2-T29 cached
 page and awards contracts**. The field-limited school query never requests
 contact or capacity fields; source terms never relax that restriction.
+
+S2-P46 separates award proof acquisition from source publication under
+[proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
+items 1 to 6. Each exact URL has an independently verified immutable dated
+acquisition receipt under `proof_store`; only its operational selection is
+mutable. Missing receipts or changed bytes invalidate that link alone and a live
+read creates a fresh archive without overwriting the old one. Shape/comparison
+changes reuse bytes after rehashing and rerun all checks. Closed shape refusals
+continue through the frame, survive in a `proof_checks` receipt and still block
+publication. The declaration's `max_readers` is an integer one through four,
+currently four; a transport refusal reduces the remaining run to one, recorded
+in the receipt. Offline replay has no transport and refuses a missing proof.
 
 S2-T27's local archive extends this cache. An immutable `index/<identity>.json`
 records source id, entry key, retrieval UTC, byte size, body SHA-256, extension,
@@ -2111,9 +2123,27 @@ All retrieved 2026-11-11 unless stated.
 - Overture Maps Foundation: release catalogue `https://stac.overturemaps.org/2026-10-21.0/catalog.json`;
   places guide `https://docs.overturemaps.org/guides/places`; attribution page
   `https://docs.overturemaps.org/attribution/`.
-  The four buildings STAC metadata registry rows follow the same release's
-  `bldg_ovt` licence fields exactly, including its terms wording and date read;
-  `commit_allowed` remains false. Item addresses still require confirmation.
+  The committed collection and its 512 item rows, generated from the pinned
+  collection by the lead's records step of S2-P47, follow the
+  same release's `bldg_ovt` licence fields exactly, including terms wording and
+  date read; `commit_allowed` remains false. S2-P47 part A adds the offline
+  `scripts/stac_item_rows.py` write/check helper and the literal `BLDG_OVT_KEYS`
+  tuple consumed by `SOURCE_COMPONENTS`. On invented absolute href/rel/type
+  links it replaces placeholders, emits reviewed `https_file` JSON rows and
+  checks exact committed field/key equality. The lead supplies the observed
+  filename regex; no default filename shape or item address is guessed. The
+  lead's records step wrote the real collection's 512 item rows with the
+  observed name pattern `(?P<part>[0-9]{5})/(?P=part)\.json`; its `--check`
+  form passes on the committed registry. The helper
+  binds each row's basis note to the pinned collection's SHA-256 and decision
+  0077 item 2, uses the item address as its landing URL, and preserves the
+  collection template's fetch cadence and nightly flag. The companion
+  `scripts/stac_item_pins.py` verifies indexed snapshots and writes new-key
+  proposals only to a new file outside the cache. An equal existing pin is
+  untouched; ambiguity, damaged receipts and conflicting pins refuse. Only
+  the lead's subsequent review makes a proposal a pin. Rule 44 lists both
+  commands; neither contacts a source. No national-completeness ruling is
+  changed by this fixture-only work.
 - Community Data License Agreement Permissive 2.0, `https://cdla.dev/permissive-2-0/`.
 - OpenStreetMap copyright and licence, `https://www.openstreetmap.org/copyright`; Qatar extract
   `https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf`.

@@ -391,7 +391,7 @@ def test_flagship_check_receives_zone_69(tmp_path: Path) -> None:
     _write_json(review / "flagship_candidates.yaml", [candidate])
     _write_json(review / "showcase_gazetteer.yaml", [])
     places = _active("places_ovt/part-00014")
-    buildings = _active("bldg_ovt/part-00288")
+    buildings = _active("bldg_ovt/part-00384")
     places_path = tmp_path / "syn-places.parquet"
     buildings_path = tmp_path / "syn-buildings.parquet"
     write_places(places_path, [place_row(lon=0.02, lat=0.02)])

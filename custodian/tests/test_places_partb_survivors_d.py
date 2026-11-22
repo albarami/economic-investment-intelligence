@@ -67,7 +67,7 @@ def test_a_missing_places_file_does_not_stop_the_buildings(tmp_path: Path) -> No
     """
     cache = tmp_path / "data" / "public_cache"
     review = _review(tmp_path / "review")
-    building = cache / "bldg_ovt" / "part-00288" / "syn.parquet"
+    building = cache / "bldg_ovt" / "part-00384" / "syn.parquet"
     building.parent.mkdir(parents=True)
     write_buildings(building, [building_row("SYN-B-A", _PIN)])
     _receipt(building)
@@ -83,7 +83,7 @@ def test_a_places_file_that_refuses_does_not_stop_the_buildings(tmp_path: Path) 
     places.parent.mkdir(parents=True)
     write_places(places, [place_row()], drop=("basic_category",))
     _receipt(places)
-    building = cache / "bldg_ovt" / "part-00288" / "syn.parquet"
+    building = cache / "bldg_ovt" / "part-00384" / "syn.parquet"
     building.parent.mkdir(parents=True)
     write_buildings(building, [building_row("SYN-B-A", _PIN)])
     _receipt(building)
@@ -103,7 +103,7 @@ def test_an_empty_tag_skips_only_the_places_keys(tmp_path: Path) -> None:
     places.parent.mkdir(parents=True)
     write_places(places, [place_row()])
     _receipt(places)
-    building = cache / "bldg_ovt" / "part-00288" / "syn.parquet"
+    building = cache / "bldg_ovt" / "part-00384" / "syn.parquet"
     building.parent.mkdir(parents=True)
     write_buildings(building, [building_row("SYN-B-A", _PIN)])
     _receipt(building)
@@ -131,7 +131,7 @@ def test_a_swapped_buildings_file_is_refused_by_the_frame_box(tmp_path: Path) ->
     """
     cache = tmp_path / "data" / "public_cache"
     review = _review(tmp_path / "review")
-    building = cache / "bldg_ovt" / "part-00288" / "syn.parquet"
+    building = cache / "bldg_ovt" / "part-00384" / "syn.parquet"
     building.parent.mkdir(parents=True)
     write_buildings(building, [building_row("SYN-B-A", _SWAPPED)])
     _receipt(building)

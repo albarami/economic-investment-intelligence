@@ -236,7 +236,6 @@ def award_intake(tmp_path, monkeypatch):
 def test_awards_intake_security_refuses(tmp_path, monkeypatch, plant, reason):
     fixture_cache = tmp_path / "data" / "public_cache"
     fixture_cache.mkdir(parents=True)
-    from eii_custodian.publicdata.fetch import awards
     from eii_custodian.publicdata.fetch.transport import TransportFault
 
     entry, declaration, proof = award_intake(fixture_cache, monkeypatch)
@@ -260,7 +259,9 @@ def test_awards_intake_security_refuses(tmp_path, monkeypatch, plant, reason):
         def refuse(*args, **kwargs):
             raise SnapshotError(reason)
 
-        monkeypatch.setattr(awards, "publish_snapshot", refuse)
+        from eii_custodian.publicdata.fetch import award_store
+
+        monkeypatch.setattr(award_store, "publish_snapshot", refuse)
 
     def transport(url):
         if plant in {"unreviewed", "offhost"}:
@@ -371,11 +372,17 @@ def test_interrupted_publication_has_no_partial(tmp_path, monkeypatch, source, p
     else:
         entry, _, transport = award_intake(fixture_cache, monkeypatch)
         module = awards
+    if phase == "proofs":
+        from eii_custodian.publicdata.fetch import award_store
+
+        module = award_store
     original = module.publish_snapshot
 
     def publish(directory, *args, **kwargs):
         result = original(directory, *args, **kwargs)
-        if directory.name == (entry.key if phase == "parsed" else phase):
+        if (
+            phase == "proofs" and directory.parent.parent.name == "proof_store"
+        ) or directory.name == (entry.key if phase == "parsed" else phase):
             raise OSError("SYN-secret-write-error")
         return result
 
@@ -395,7 +402,8 @@ def test_interrupted_publication_has_no_partial(tmp_path, monkeypatch, source, p
     assert outcome.failure.check == (
         "snapshot_write_failed" if phase == "proofs" else "page_validation_failed"
     )
-    assert not (fixture_cache / entry.key).exists()
+    assert not (fixture_cache / entry.key / "index").exists()
+    assert not (fixture_cache / entry.key / "raw").exists()
     assert not list(fixture_cache.glob(".page-stage-*"))
     assert "SYN-secret-write-error" not in repr(outcome)
 
@@ -544,9 +552,15 @@ def test_successful_intake_keeps_every_proof(tmp_path, monkeypatch):
 
     result = fetch_awards(entry, proof, tmp_path, lambda: STAMP, lambda _: None)
     assert result.sidecar["award_check"]["selected_count"] == 2
-    directory = tmp_path / entry.key / "proofs"
-    indices = list((directory / "index").glob("*.json"))
-    assert len(indices) == 2
-    assert {
-        read_snapshot(directory, p.stem).sidecar["fetch_url"] for p in indices
-    } == set(declaration["reviewed_urls"])
+    from eii_custodian.publicdata.fetch.award_store import ProofStore
+
+    store = ProofStore(tmp_path, entry, declaration, STAMP)
+    receipts = []
+    for url in declaration["reviewed_urls"]:
+        folder = store.folder(url)
+        state = json.loads((folder / "state.json").read_bytes())
+        receipts.append(
+            read_snapshot(folder / state["archive"], state["identity"]).sidecar
+        )
+    assert len(receipts) == 2
+    assert {side["fetch_url"] for side in receipts} == set(declaration["reviewed_urls"])

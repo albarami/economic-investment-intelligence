@@ -359,7 +359,6 @@ def test_invalid_imports_never_publish(entries, tmp_path, change, raw, reason):
     [
         "bldg_wsf3d",
         "places_ovt/part-00014",
-        "bldg_ovt/part-00288",
         "bldg_ovt/part-00384",
         "bldg_ovt/part-00385",
     ],
@@ -850,3 +849,14 @@ def test_default_dispatch_keeps_legacy_callback_signatures(
         )
         assert result.failure.check == "SYN-stop"
     assert seen == ["row", "places"]
+
+
+def test_part_00288_is_registered_skipped_and_never_streamed(entries):
+    from eii_custodian.publicdata.building_inputs import BUILDING_PARTS
+
+    entry = entries["bldg_ovt/part-00288"]
+    assert entry.skip_reason == "not_required_part_decision_0090"
+    assert entry.key not in large.REQUIRED_KEYS
+    assert entry.key not in BUILDING_PARTS
+    with pytest.raises(large.IntakeError, match=r"^stream_source$"):
+        large.receive(entry, None, io.BytesIO())  # type: ignore[arg-type]

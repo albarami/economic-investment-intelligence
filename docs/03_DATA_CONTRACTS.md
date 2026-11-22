@@ -1193,14 +1193,22 @@ Under decision 0064 item 41, amended by [decision 0088](decisions/0088-award-pro
 `report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
 `failed_fetches`, `matched_name_not_compared`, `intake_value_absent`,
 `proof_value_absent`, `proof_mismatch`, `match_rate`, `incomplete`, `status` and `results`. Every link is
-checked once in URL order through the existing bounded retry reader and reviewed proof scope.
+checked once, with results in URL order, through the existing bounded retry reader and reviewed proof scope.
+S2-P46 adds the per-link acquisition and offline replay contract of
+[proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
+items 1 to 6: proofs survive a shape refusal, are rehashed before reuse, and a
+closed `refused` result still blocks publication after the full frame is checked.
+The immutable `proof_checks` receipt retains the full diagnostic result list and
+`award_readers` records declared width, fallback flag and closed fallback reason.
+The publication receipt retains `award_readers`; its `award_links` schema for
+publishable results is unchanged.
 Each result has `report_url`, `result` and `reason`: a `matched` result uses
 `matched` or `matched_name_not_compared`; a `mismatched` result uses, in fixed
 precedence, `intake_value_absent`, `proof_value_absent` or `proof_mismatch`;
 fetch failures use only `proof_fetch_failed`,
 `unreachable`, `http_status` or `body_bytes`. Links whose bounded read fails stay in the checked
 denominator; `match_rate` is matched divided by checked, null for an empty frame.
-Empty frames or any failed fetch set `incomplete` and `award_links_incomplete`;
+Empty frames, any failed fetch or a diagnostic shape refusal set `incomplete` and `award_links_incomplete`;
 otherwise the status is `all_links_recorded`. Publication compares this complete
 frame with the intake, validates every result and recomputes the totals and the
 seeded sample. Missing, skipped, duplicated or inconsistent evidence refuses
@@ -1228,11 +1236,13 @@ not compared labels it. `matched_name_not_compared` is a subset of `matched`,
 and the three mismatch-reason counts sum to `mismatched`. The card shows the
 matched total and the name-not-compared subset separately. The seeded sample
 retains the same closed reasons and counters; both receipt validators recompute
-them. This changes no register join, denominator, incompleteness or fetch rule.
+them. For publishable results the register join, denominator, incompleteness and fetch rules remain unchanged.
 
-Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
-rows, are staged together within the cache. A failed write or final validation
-publishes none of that attempt's source tree and preserves its previous tree.
+Page terms, raw bytes and parsed tables, and intake raw bytes and parsed
+rows, are staged together within the cache. Under proposed decision 0091 item 2,
+award proof acquisitions and their diagnostic check receipts are durable outside
+that stage. A failed write or final validation publishes no raw or parsed intake
+snapshot and preserves previously published outputs; durable acquisitions remain.
 The single-writer build validates the complete staged archive before replacing
 the source directory; replacement may briefly make an existing source unavailable.
 Dated school access-failure receipts remain separate from successful page output.
