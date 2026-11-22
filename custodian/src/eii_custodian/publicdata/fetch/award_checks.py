@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-import random
+import re
 import unicodedata
 from collections.abc import Callable, Mapping, Sequence
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any
-
-from .allowlist import approve
-from .certificate_pins import PinError
-from .snapshots import SnapshotError
 
 
 class AwardError(ValueError):
@@ -24,26 +20,111 @@ def normalise_name(value: str) -> str:
     return " ".join(value.split())
 
 
+MATCH_REASONS = ("matched", "matched_name_not_compared")
+MISMATCH_REASONS = ("intake_value_absent", "proof_value_absent", "proof_mismatch")
+REASON_COUNTS = ("matched_name_not_compared", *MISMATCH_REASONS)
+FETCH_REASONS = frozenset(
+    {"proof_fetch_failed", "unreachable", "http_status", "body_bytes"}
+)
+RESULT_REASONS = {
+    "matched": frozenset(MATCH_REASONS),
+    "mismatched": frozenset(MISMATCH_REASONS),
+    "fetch_failed": FETCH_REASONS,
+}
+
+
+def name_script(value: str) -> str:
+    """Classify normalised letters by Unicode names, ignoring nonletters.
+
+    All letters named ARABIC => arabic; all named LATIN => latin; no letters
+    => none. Any other letter or combination of scripts => mixed. Thus equal
+    mixed-script names still require exact equality; digits never set a script.
+    """
+    scripts = {
+        "arabic"
+        if "ARABIC" in unicodedata.name(c, "")
+        else "latin"
+        if "LATIN" in unicodedata.name(c, "")
+        else "mixed"
+        for c in value
+        if unicodedata.category(c).startswith("L")
+    }
+    return next(iter(scripts)) if len(scripts) == 1 else "mixed" if scripts else "none"
+
+
+def comparison_reason(
+    left: Mapping[str, str], right: Mapping[str, str], profile: Mapping[str, Any]
+) -> str:
+    """L-1423: strict declared formats, exact token sets and script-gated names.
+
+    The proof reader supplies the awards parser's canonical two-decimal text,
+    or an empty string for null. Malformed intake text was already admitted as
+    a string: retain it as proof_mismatch, never as absent or a source refusal.
+    """
+    first = left.get(profile["value"], "")
+    second = right.get(profile["value"], "")
+    if isinstance(first, str) and first.strip() in {"", "QAR"}:
+        return "intake_value_absent"
+    if isinstance(second, str) and not second.strip():
+        return "proof_value_absent"
+    if (
+        not isinstance(first, str)
+        or re.fullmatch(r"([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+)\.[0-9]{2} QAR", first)
+        is None
+        or not isinstance(second, str)
+        or re.fullmatch(r"[0-9]+\.[0-9]{2}", second) is None
+        or Decimal(first.removesuffix(" QAR").replace(",", "")) != Decimal(second)
+    ):
+        return "proof_mismatch"
+    registrations = [
+        {
+            token.strip()
+            for token in row.get(profile["registration"], "").split(" | ")
+            if token.strip()
+        }
+        for row in (left, right)
+    ]
+    if not registrations[0] or registrations[0] != registrations[1]:
+        return "proof_mismatch"
+    names = [normalise_name(row.get(profile["company"], "")) for row in (left, right)]
+    scripts = [name_script(name) for name in names]
+    if scripts[0] != scripts[1] or scripts[0] == "none":
+        return "matched_name_not_compared"
+    return "matched" if names[0] == names[1] else "proof_mismatch"
+
+
 def _same(
     left: Mapping[str, str], right: Mapping[str, str], profile: Mapping[str, Any]
 ) -> bool:
-    try:
-        first, second = (
-            Decimal(left[profile["value"]]),
-            Decimal(right[profile["value"]]),
+    return comparison_reason(left, right, profile) in MATCH_REASONS
+
+
+def proof_reason(
+    rows: Sequence[Mapping[str, str]],
+    candidates: Sequence[Mapping[str, str]],
+    profile: Mapping[str, Any],
+) -> str:
+    """Every winner needs a match; prefer a compared-name match among candidates.
+
+    A winner without a match uses the closed mismatch precedence. Any failing
+    winner defeats the link; otherwise any un-compared name labels the match.
+    """
+    order = (*MATCH_REASONS, *MISMATCH_REASONS)
+    reasons = {
+        min(
+            (comparison_reason(row, item, profile) for item in candidates),
+            key=order.index,
         )
-        return (
-            first.is_finite()
-            and second.is_finite()
-            and first == second
-            and bool(left[profile["registration"]].strip())
-            and left[profile["registration"]] == right[profile["registration"]]
-            and bool(normalise_name(left[profile["company"]]).strip())
-            and normalise_name(left[profile["company"]])
-            == normalise_name(right[profile["company"]])
-        )
-    except (KeyError, InvalidOperation, TypeError):
-        return False
+        for row in rows
+    }
+    for reason in MISMATCH_REASONS:
+        if reason in reasons:
+            return reason
+    return (
+        "matched_name_not_compared"
+        if "matched_name_not_compared" in reasons
+        else "matched"
+    )
 
 
 def check_awards(
@@ -51,66 +132,15 @@ def check_awards(
     profile: Mapping[str, Any],
     seed: int,
     proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
-) -> dict[str, object]:
-    """Sample distinct nonblank URLs; failed fetches remain in the denominator."""
-    if type(seed) is not int:
-        raise AwardError("award_seed_pending")
-    frame: dict[str, list[Mapping[str, str]]] = {}
-    for row in rows:
-        link = row.get("report_url", "").strip()
-        if not link:
-            continue
-        if not approve(link).ok:
-            raise AwardError("blocked_host")
-        frame.setdefault(link, []).append(row)
-    eligible = sorted(frame)
-    selected = (
-        random.Random(seed).sample(eligible, 30) if len(eligible) > 30 else eligible
+) -> dict[str, Any]:
+    """Sample distinct links through the same checker as the full-link path."""
+    from .award_links import _check_links, _frame, _sample, _sample_urls
+
+    frame = _frame(rows)
+    selected = _sample_urls(sorted(frame), seed)
+    return _sample(
+        len(frame), _check_links(frame, profile, proof_reader, selected), seed
     )
-    matched = mismatched = failed = 0
-    results: list[dict[str, object]] = []
-    for url in selected:
-        try:
-            proof = proof_reader(url)
-        except (PinError, SnapshotError):
-            raise
-        except AwardError as exc:
-            if str(exc) != "proof_fetch_failed":
-                raise
-            failed += 1
-            results.append({"report_url": url, "result": "fetch_failed"})
-            continue
-        except OSError:
-            failed += 1
-            results.append({"report_url": url, "result": "fetch_failed"})
-            continue
-        candidates = [proof] if isinstance(proof, Mapping) else list(proof)
-        if not candidates or any(not isinstance(item, Mapping) for item in candidates):
-            raise AwardError("schema_missing")
-        agrees = all(
-            any(_same(row, candidate, profile) for candidate in candidates)
-            for row in frame[url]
-        )
-        matched += int(agrees)
-        mismatched += int(not agrees)
-        results.append(
-            {"report_url": url, "result": "matched" if agrees else "mismatched"}
-        )
-    incomplete = len(selected) < 30 or failed > 0
-    return {
-        "seed": seed,
-        "distinct_frame_count": len(frame),
-        "selected_count": len(selected),
-        "matched": matched,
-        "mismatched": mismatched,
-        "failed_fetches": failed,
-        "match_rate": str(Decimal(matched) / Decimal(len(selected)))
-        if selected
-        else None,
-        "incomplete": incomplete,
-        "status": "award_check_incomplete" if incomplete else "sample_recorded",
-        "results": results,
-    }
 
 
 def validate_check_receipt(receipt: Mapping[str, object]) -> None:
@@ -127,6 +157,7 @@ def validate_check_receipt(receipt: Mapping[str, object]) -> None:
         "incomplete",
         "status",
         "results",
+        *REASON_COUNTS,
     }
     if (
         receipt.get("source_id") != "awards_owner_scrape"
@@ -140,6 +171,7 @@ def validate_check_receipt(receipt: Mapping[str, object]) -> None:
         "matched",
         "mismatched",
         "failed_fetches",
+        *REASON_COUNTS,
     )
     if (
         any(type(check[key]) is not int or check[key] < 0 for key in counts)
@@ -159,6 +191,15 @@ def validate_check_receipt(receipt: Mapping[str, object]) -> None:
         != ("award_check_incomplete" if incomplete else "sample_recorded")
         or not isinstance(check["results"], list)
         or len(check["results"]) != selected
+    ):
+        raise AwardError("award_check_metadata_missing")
+
+    from .award_links import _totals, valid_result
+
+    if (
+        any(not valid_result(item) for item in check["results"])
+        or len({item["report_url"] for item in check["results"]}) != selected
+        or any(check[key] != value for key, value in _totals(check["results"]).items())
     ):
         raise AwardError("award_check_metadata_missing")
 

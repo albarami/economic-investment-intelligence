@@ -4,7 +4,7 @@ import copy
 import random
 
 import pytest
-from custodian.tests.test_s2_t29_awards import URL, profile, row
+from custodian.tests.test_s2_t29_awards import URL, profile, proof_row, row
 
 from eii_custodian.publicdata.fetch import award_checks as checks
 
@@ -12,8 +12,8 @@ from eii_custodian.publicdata.fetch import award_checks as checks
 def test_name_normalisation_and_invalid_comparison():
     assert checks.normalise_name("  \uff33\uff39\uff2e\tCompany!  ") == "syn company"
     assert checks._same(row(), {}, profile()) is False
-    assert checks._same(row(), dict(row(), syn_value="bad"), profile()) is False
-    assert checks._same(row(), dict(row(), syn_value=None), profile()) is False
+    assert checks._same(row(), dict(proof_row(), syn_value="bad"), profile()) is False
+    assert checks._same(row(), dict(proof_row(), syn_value=None), profile()) is False
 
 
 @pytest.mark.parametrize("seed", [None, True, "73", 1.5])
@@ -24,19 +24,25 @@ def test_seed_closed_refusal(seed):
 
 def test_blank_links_do_not_stop_the_frame():
     result = checks.check_awards(
-        [{}, dict(row(), report_url="  "), row()], profile(), 73, lambda _: row()
+        [{}, dict(row(), report_url="  "), row()], profile(), 73, lambda _: proof_row()
     )
     assert result == {
         "seed": 73,
         "distinct_frame_count": 1,
         "selected_count": 1,
         "matched": 1,
+        "matched_name_not_compared": 0,
+        "intake_value_absent": 0,
+        "proof_value_absent": 0,
+        "proof_mismatch": 0,
         "mismatched": 0,
         "failed_fetches": 0,
         "match_rate": "1",
         "incomplete": True,
         "status": "award_check_incomplete",
-        "results": [{"report_url": URL + "0", "result": "matched"}],
+        "results": [
+            {"report_url": URL + "0", "result": "matched", "reason": "matched"}
+        ],
     }
 
 
@@ -45,18 +51,25 @@ def test_frame_boundary_and_order(count):
     rows = [row(i) for i in range(count)]
     eligible = sorted(r["report_url"] for r in rows)
     selected = eligible if count == 30 else random.Random(73).sample(eligible, 30)
-    result = checks.check_awards(rows, profile(), 73, lambda _: row())
+    result = checks.check_awards(rows, profile(), 73, lambda _: proof_row())
     assert result == {
         "seed": 73,
         "distinct_frame_count": count,
         "selected_count": 30,
         "matched": 30,
+        "matched_name_not_compared": 0,
+        "intake_value_absent": 0,
+        "proof_value_absent": 0,
+        "proof_mismatch": 0,
         "mismatched": 0,
         "failed_fetches": 0,
         "match_rate": "1",
         "incomplete": False,
         "status": "sample_recorded",
-        "results": [{"report_url": url, "result": "matched"} for url in selected],
+        "results": [
+            {"report_url": url, "result": "matched", "reason": "matched"}
+            for url in selected
+        ],
     }
 
 
@@ -73,13 +86,22 @@ def test_failed_fetches_keep_every_result(error):
         "distinct_frame_count": 2,
         "selected_count": 2,
         "matched": 0,
+        "matched_name_not_compared": 0,
+        "intake_value_absent": 0,
+        "proof_value_absent": 0,
+        "proof_mismatch": 0,
         "mismatched": 0,
         "failed_fetches": 2,
         "match_rate": "0",
         "incomplete": True,
         "status": "award_check_incomplete",
         "results": [
-            {"report_url": URL + str(i), "result": "fetch_failed"} for i in range(2)
+            {
+                "report_url": URL + str(i),
+                "result": "fetch_failed",
+                "reason": "proof_fetch_failed" if error == "award" else "unreachable",
+            }
+            for i in range(2)
         ],
     }
 
@@ -88,7 +110,7 @@ def test_one_failure_in_full_sample_is_incomplete():
     def proof(url):
         if url == URL + "0":
             raise OSError("SYN unavailable")
-        return row()
+        return proof_row()
 
     result = checks.check_awards([row(i) for i in range(30)], profile(), 73, proof)
     assert result["incomplete"] is True
@@ -107,11 +129,13 @@ def test_mixed_result_labels():
         [row(i) for i in range(2)],
         profile(),
         73,
-        lambda url: dict(row(), syn_value="0") if url.endswith("/1") else row(),
+        lambda url: (
+            dict(proof_row(), syn_value="0.00") if url.endswith("/1") else proof_row()
+        ),
     )
     assert result["results"] == [
-        {"report_url": URL + "0", "result": "matched"},
-        {"report_url": URL + "1", "result": "mismatched"},
+        {"report_url": URL + "0", "result": "matched", "reason": "matched"},
+        {"report_url": URL + "1", "result": "mismatched", "reason": "proof_mismatch"},
     ]
     assert (result["matched"], result["mismatched"]) == (1, 1)
 
@@ -122,7 +146,7 @@ def receipt(count=30, failed=0):
     def proof(url):
         if url == URL + "0" and failed:
             raise OSError("SYN unavailable")
-        return row()
+        return proof_row()
 
     return {
         "source_id": "awards_owner_scrape",

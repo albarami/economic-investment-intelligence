@@ -94,14 +94,14 @@ def test_required_register_rows_cannot_disappear_from_assembly_audit(
 def test_awards_audit_checks_actual_receipt_and_retains_normalisation_count(
     change,
 ) -> None:
-    from custodian.tests.test_s2_t29_awards import profile, row
+    from custodian.tests.test_s2_t29_awards import profile, proof_row, row
 
     from eii_custodian.publicdata.assembly_reports import awards_evidence
     from eii_custodian.publicdata.fetch.award_checks import check_awards
     from eii_custodian.publicdata.fetch.award_links import check_all_awards
 
     rows = [row(index) for index in range(30)]
-    lookup = {item["report_url"]: item for item in rows}
+    lookup = {item["report_url"]: proof_row(index) for index, item in enumerate(rows)}
     check = check_awards(rows, profile(), 17, lookup.__getitem__)
     receipt = {
         "source_id": "awards_owner_scrape",
@@ -128,5 +128,6 @@ def test_awards_audit_checks_actual_receipt_and_retains_normalisation_count(
         result = awards_evidence(receipt, 17)
         assert result["registration_double_space_only"] == 2
         assert result["award_check"]["selected_count"] == 30
+        assert result["award_check"]["matched"] == 30
         assert "results" not in result["award_check"]
         assert "SYN Company" not in str(result)

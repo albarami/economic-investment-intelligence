@@ -8,7 +8,7 @@ from dataclasses import replace
 
 import pytest
 from custodian.tests.support.fetch_build import run_build
-from custodian.tests.test_s2_t29_awards import STAMP, profile, row
+from custodian.tests.test_s2_t29_awards import STAMP, profile, proof_row, row
 from custodian.tests.test_s2_t29_fix import award_intake
 
 from eii_custodian.publicdata.assembly import AssemblyError
@@ -79,6 +79,10 @@ def test_awards_build_checks_all_links_once_and_labels_the_sample(
         "distinct_frame_count": 40,
         "checked_count": 40,
         "matched": 40,
+        "matched_name_not_compared": 0,
+        "intake_value_absent": 0,
+        "proof_value_absent": 0,
+        "proof_mismatch": 0,
         "mismatched": 0,
         "failed_fetches": 0,
         "match_rate": "1",
@@ -357,7 +361,7 @@ def test_awards_publication_rejects_invalid_seed_before_any_proof_read(
 
     def reader(url):
         calls.append(url)
-        return row()
+        return proof_row()
 
     with pytest.raises(AwardError, match=r"^award_seed_pending$"):
         awards._publish_awards(
@@ -374,7 +378,7 @@ def test_awards_derived_sample_equals_the_original_seeded_sample(count):
         index = int(url.rsplit("/", 1)[1])
         if index % 4 == 0:
             raise OSError("SYN-private-upstream-message")
-        return dict(row(index), syn_value="13.50" if index % 4 == 1 else "12.50")
+        return dict(proof_row(index), syn_value="13.50" if index % 4 == 1 else "12.50")
 
     full = check_all_awards(records, profile(), proof)
     sample = sample_from_links(full, 73)
@@ -398,12 +402,18 @@ def test_awards_derived_sample_equals_the_original_seeded_sample(count):
 @pytest.mark.parametrize("both_winners", [False, True])
 def test_awards_all_link_check_requires_every_winner_on_a_shared_link(both_winners):
     first = row()
-    second = dict(first, syn_company="SYN Other", syn_reg="SYN-other", syn_value="7")
+    second = dict(
+        first, syn_company="SYN Other", syn_reg="SYN-other", syn_value="7.00 QAR"
+    )
     calls = []
 
     def proof(url):
         calls.append(url)
-        return [second, first] if both_winners else [first]
+        return (
+            [dict(second, syn_value="7.00"), proof_row()]
+            if both_winners
+            else [proof_row()]
+        )
 
     check = check_all_awards([first, second, first], profile(), proof)
     assert calls == [first["report_url"]]
