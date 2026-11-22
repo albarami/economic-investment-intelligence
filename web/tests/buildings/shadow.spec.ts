@@ -16,12 +16,16 @@ setWorkerUrl(workerUrl);
 const plant = new URL(location.href).searchParams.get('plant');
 const box = (x, y, r) => [[x-r,y-r],[x+r,y-r],[x+r,y+r],[x-r,y+r],[x-r,y-r]];
 const caster = box(0, 0, 0.00008);
-const none = box(-0.00055, 0, 0.00008);
+const none = box(0.0006, 0.0006, 0.00008);
 const receiver = box(0.00025, 0.00025, 0.0006);
 const features = [
   {type:'Feature', properties:{id:'SYN-B-caster',height:40}, geometry:{type:'Polygon',coordinates:[caster]}},
   {type:'Feature', properties:{id:'SYN-B-none',height:null}, geometry:{type:'Polygon',coordinates:[none]}}
 ];
+if (!document.createElement('canvas').getContext('webgl2')) {
+  globalThis.buildingsScene = {unavailable:'buildings_webgl2_unavailable'};
+  throw new Error('buildings_webgl2_unavailable');
+}
 const map = new Map({
   container:'map', center:[0.0001,0.0001], zoom:18, pitch:40, bearing:0,
   interactive:false, attributionControl:false, fadeDuration:0,
@@ -50,7 +54,7 @@ function layers() {
     getFillColor:[220,220,220,255],shadowEnabled:true,beforeId:'none'
   }));
   if (plant !== 'caster-removed') result.push(new ShadowCaster({
-    id:'caster',data:[caster],getPolygon:d=>d,extruded:true,getElevation:40,
+    id:'caster',data:plant === 'none-caster' ? [caster, none] : [caster],getPolygon:d=>d,extruded:true,getElevation:40,
     getFillColor:[208,64,48,255],shadowEnabled:true,beforeId:'none'
   }));
   return result;
@@ -83,21 +87,22 @@ async function capture(enabled) {
   const gl = canvas.getContext('webgl2');
   if (!gl) throw new Error('buildings_webgl2_unavailable');
   const samples = {};
-  for (const [name, point] of Object.entries({receiver:[-0.00025,-0.00025],none:[-0.00055,0],base:[-0.00045,0.0003]})) {
+  for (const [name, point] of Object.entries({receiver:[-0.00025,-0.00025],none:[0.0006,0.0006],noneShadow:[0.00045,0.00045],base:[-0.00045,0.0003]})) {
     const p = map.project(point);
     const pixels = new Uint8Array(7*7*4);
     gl.readPixels(Math.round(p.x)-3,canvas.height-1-Math.round(p.y)-3,7,7,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
     samples[name] = Array.from(pixels).filter((_,index)=>index%4!==3);
   }
+  const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info');
   return {samples,colourCasters:[...new Set(colourCasters)],failures,
     shells:[...new Set(map.queryRenderedFeatures({layers:['shell']}).map(f=>f.properties.id))],
-    renderer:gl.getParameter(gl.RENDERER)};
+    renderer:gl.getParameter(rendererInfo ? rendererInfo.UNMASKED_RENDERER_WEBGL : gl.RENDERER)};
 }
 globalThis.buildingsScene = {capture,remove:()=>map.remove()};
 `;
 
 type Capture = {
-  samples: Record<'receiver' | 'none' | 'base', number[]>;
+  samples: Record<'receiver' | 'none' | 'noneShadow' | 'base', number[]>;
   colourCasters: string[];
   failures: string[];
   shells: string[];
@@ -106,6 +111,7 @@ type Capture = {
 
 declare global {
   var buildingsScene: {
+    unavailable?: string;
     capture(enabled: boolean): Promise<Capture>;
     remove(): void;
   };
@@ -171,6 +177,10 @@ async function openScene(page: Page) {
         : `http://invented.invalid/?plant=${plant}`;
   await page.goto(entry);
   await page.waitForFunction(() => !!globalThis.buildingsScene);
+  expect(
+    await page.evaluate(() => globalThis.buildingsScene.unavailable ?? ''),
+    'buildings_webgl2_unavailable',
+  ).toBe('');
 }
 
 function mean(values: number[]) {
@@ -211,6 +221,12 @@ test('receiver darkens; none and basemap stay equal; one visible shell', async (
     mean(off.samples.receiver) - mean(on.samples.receiver),
     'buildings_shadow_pass_not_drawn',
   ).toBeGreaterThanOrEqual(20);
+  expect(off.samples.noneShadow, 'buildings_none_casts').toEqual(
+    Array(147).fill(220),
+  );
+  expect(on.samples.noneShadow, 'buildings_none_casts').toEqual(
+    off.samples.noneShadow,
+  );
   expect(on.samples.none, 'buildings_none_changed').toEqual(off.samples.none);
   expect(on.samples.base, 'buildings_base_changed').toEqual(off.samples.base);
   await page.evaluate(() => globalThis.buildingsScene.remove());
@@ -219,9 +235,7 @@ test('receiver darkens; none and basemap stay equal; one visible shell', async (
 test('missing WebGL2 refuses with its own renderer diagnostic', async ({
   page,
 }) => {
-  await openScene(page);
-  await page.evaluate(() => globalThis.buildingsScene.capture(false));
-  await page.evaluate(() => {
+  await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
       value: function (
@@ -234,8 +248,5 @@ test('missing WebGL2 refuses with its own renderer diagnostic', async ({
       },
     });
   });
-  await expect(
-    page.evaluate(() => globalThis.buildingsScene.capture(false)),
-  ).rejects.toThrow('buildings_webgl2_unavailable');
-  await page.evaluate(() => globalThis.buildingsScene.remove());
+  await expect(openScene(page)).rejects.toThrow('buildings_webgl2_unavailable');
 });

@@ -43,7 +43,7 @@ function runSpec(t, plant = '') {
   );
   return {
     status: result.status,
-    output: `buildings_shadow_renderer_failed: ${result.error?.message ?? ''}\n${result.stdout}\n${result.stderr}`,
+    output: `${result.error ? `buildings_shadow_renderer_failed: ${result.error.message}\n` : ''}${result.stdout}\n${result.stderr}`,
   };
 }
 
@@ -56,6 +56,7 @@ test('offline buildings WebGL shadow rendering contract', (t) => {
 });
 
 for (const [plant, reason] of [
+  ['none-caster', 'buildings_none_casts'],
   ['shadow-off', 'buildings_shadow_pass_not_drawn'],
   ['caster-removed', 'buildings_shadow_pass_not_drawn'],
   ['receiver-removed', 'buildings_receiver_missing'],

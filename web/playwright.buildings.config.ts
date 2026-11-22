@@ -1,3 +1,5 @@
+import os from 'node:os';
+import path from 'node:path';
 import { defineConfig } from '@playwright/test';
 import { browserHome } from './spikes/glyphs/browser-home.mjs';
 
@@ -10,7 +12,7 @@ export default defineConfig({
   retries: 0,
   reporter: 'list',
   timeout: 30000,
-  outputDir: `${process.env.TMPDIR}/buildings-results`,
+  outputDir: path.join(os.tmpdir(), 'buildings-results'),
   use: {
     viewport: { width: 640, height: 480 },
     deviceScaleFactor: 1,
