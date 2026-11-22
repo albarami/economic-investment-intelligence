@@ -126,18 +126,21 @@ def test_landing_redirect_to_another_host_is_refused(
         context(cache, (row,)).reviewed_selections()
 
 
+@pytest.mark.parametrize("which", [0, 54], ids=["in-manifest", "earlier-run-orphan"])
 def test_landing_with_a_sub_page_body_is_refused(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, which: int
 ) -> None:
     """The archive keeps a body's first receipt: a landing answering with the
-    bytes of a sub-page archived earlier carries that sub-page's receipt."""
+    bytes of a sub-page archived earlier carries that sub-page's receipt,
+    whether that sub-page is in the current manifest or only in an earlier
+    run's (page 54 is outside the current 54 sub-pages)."""
     from custodian.tests.test_investment_bilingual import bilingual_utf8
 
     from eii_custodian.publicdata.fetch.allowlist import HostDecision
     from eii_custodian.publicdata.investment_build import _fetch_page
 
-    _pages, copied = bilingual_utf8(copies=6)
-    chosen = fixture.SECTOR_URL.replace("agency.invalid/", "agency.invalid/c0/en/")
+    every, copied = bilingual_utf8(copies=6)
+    chosen = every[which].url
     row = fixture._agency_entry()
 
     def earlier(entry, transport):
@@ -164,7 +167,9 @@ def test_landing_with_a_sub_page_body_is_refused(
         prior=earlier,
     )
     landing = manifest["pages"][0]
-    assert sum(page["sha256"] == landing["sha256"] for page in manifest["pages"]) == 2
+    shared = sum(page["sha256"] == landing["sha256"] for page in manifest["pages"])
+    assert shared == (2 if which == 0 else 1)
+    assert _differing(cache, row, manifest) == [row.url]
     with pytest.raises(AssemblyError, match=r"^assembly_investment_refused$"):
         context(cache, (row,)).reviewed_selections()
 
@@ -182,6 +187,7 @@ def _receipt(**changes: object) -> dict[str, object]:
         "key": row.key,
         "fetch_url": row.url + REDIRECTED,
         "sha256": LANDING,
+        "terms_url": row.terms_url,
     }
     receipt.update(changes)
     return receipt
@@ -201,6 +207,9 @@ def _receipt(**changes: object) -> dict[str, object]:
         ({"fetch_url": ["SYN"]}, "landing", False),
         ({"fetch_url": fixture.SECTOR_URL}, "landing", False),
         ({"shared": True}, "landing", False),
+        ({"terms_url": None}, "landing", False),
+        ({"terms_url": "https://agency.invalid/SYN-other-terms"}, "landing", False),
+        ({"terms_url": None, "fetch_url": "SAME"}, "sub", True),
     ],
     ids=[
         "landing-redirect",
@@ -214,6 +223,9 @@ def _receipt(**changes: object) -> dict[str, object]:
         "list-address",
         "address-names-a-page",
         "digest-of-another-page",
+        "sub-page-writer-receipt",
+        "other-terms-address",
+        "exact-sub-page-without-terms",
     ],
 )
 def test_fetched_from_changes_one_input(receipt, page, expected) -> None:
@@ -237,5 +249,17 @@ def test_entry_without_host_never_accepts_a_redirect() -> None:
 
     row = replace(fixture._agency_entry(), url="SYN-relative/")
     receipt = {"key": row.key, "fetch_url": "SYN-relative/" + REDIRECTED}
+    receipt["terms_url"] = row.terms_url
     pages = ({"url": row.url, "sha256": None},)
     assert _fetched_from(receipt, row.url, row, pages) is False
+
+
+def test_entry_without_terms_address_never_accepts_a_redirect() -> None:
+    """An entry with no terms address cannot tell its own receipt apart."""
+    from dataclasses import replace
+
+    from eii_custodian.publicdata.assembly_native import _fetched_from
+
+    row = replace(fixture._agency_entry(), terms_url="")
+    receipt = _receipt(terms_url="")
+    assert _fetched_from(receipt, row.url, row, PAGES) is False

@@ -129,8 +129,10 @@ def _fetched_from(
     ``final_url``): a redirect on the entry's own host is that same page, bound
     to the entry's key here and to the pinned identity by the caller. The
     archive keeps the first receipt of a body, so a landing whose bytes equal
-    another page's would carry that page's receipt: the final address must
-    name no page of the manifest, and the landing's digest no other page.
+    another page's would carry that page's receipt: the receipt must be the
+    entry fetch's own (only build.py writes ``terms_url`` on an investment
+    receipt; the sub-page writer never does), its final address must name no
+    page of the manifest, and the landing's digest no other page.
     """
     fetched = sidecar.get("fetch_url")
     if fetched == page_url:
@@ -138,6 +140,8 @@ def _fetched_from(
     return (
         page_url == entry.url
         and sidecar.get("key") == entry.key
+        and bool(entry.terms_url)
+        and sidecar.get("terms_url") == entry.terms_url
         and isinstance(fetched, str)
         and host_of(entry.url) != ""
         and host_of(fetched) == host_of(entry.url)
