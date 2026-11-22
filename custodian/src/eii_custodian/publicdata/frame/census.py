@@ -3,6 +3,7 @@
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from eii_custodian.publicdata.fetch.page_workbook import Sheet, read_sheet
 from eii_custodian.publicdata.fetch.registry import Entry
 
 from .checks import FrameError, safe_key
@@ -16,7 +17,12 @@ UNITS = {
 # UNITS is the closed audit-count list of PUB-84 and DAT-128. A table-specific
 # Public count below is loaded on its source's own geography but is no audit
 # selector until a contract revision adds it (decision 0064 item 15, OI-170).
-TABLE_UNITS = {("pub_population_municipality", "employed"): "persons"}
+# C8 national-only pairs follow proposed decision 0089; UNITS is unchanged.
+TABLE_UNITS = {
+    ("pub_population_municipality", "employed"): "persons",
+    ("pub_census_national", "private_employed_residents"): "persons",
+    ("pub_census_national", "employed_residents"): "persons",
+}
 GEOGRAPHY = {
     "pub_population_municipality": "municipality_code",
     "pub_census_national": None,
@@ -112,3 +118,73 @@ def validate_tables(
             seen.add(key)
             if geography and row[geography] not in known[geography]:
                 raise FrameError(f"{table}: unknown geography key")
+
+
+def _c8_label(value: str) -> str:
+    return " ".join(value.replace("\\", " ").replace("/", " ").split()).casefold()
+
+
+def c8_block_rows(sheet: Sheet) -> tuple[int, ...]:
+    """Exactly one English label per block, in column B only; mirrors are text."""
+    starts = []
+    for labels, reason in (
+        ({"both sexes"}, "national_block"),
+        ({"male", "males"}, "sex_block"),
+        ({"female", "females"}, "sex_block"),
+    ):
+        found = [
+            (number, index)
+            for number, row in sheet.rows.items()
+            for index, cell in enumerate(row)
+            if _c8_label(cell) in labels
+        ]
+        if len(found) != 1 or found[0][1] != 1:
+            raise FrameError("C8:" + reason)
+        starts.append(found[0][0])
+    return tuple(starts)
+
+
+def c8_national_counts(sheet: Sheet) -> tuple[int, Decimal, Decimal]:
+    """Table 76 totals live on the uniquely labelled Both Sexes block row."""
+    headers = (
+        "Household",
+        "Non-Profit",
+        "Diplomatic International Regional",
+        "Private",
+        "Mixed",
+        "Government Establishment Company",
+        "Ministry Government Department",
+        "Total",
+    )
+    if tuple(
+        _c8_label(sheet.cells.get(f"{column}7", "")) for column in "CDEFGHIJ"
+    ) != tuple(_c8_label(label) for label in headers):
+        raise FrameError("C8:national_header")
+    both_row, _, _ = c8_block_rows(sheet)
+    try:
+        private, total = (
+            Decimal(sheet.cells[f"{column}{both_row}"]) for column in "FJ"
+        )
+    except (KeyError, ArithmeticError):
+        raise FrameError("C8:national_count") from None
+    if (
+        any(
+            not value.is_finite() or value < 0 or value != int(value)
+            for value in (private, total)
+        )
+        or total == 0
+    ):
+        raise FrameError("C8:national_denominator")
+    return both_row, private, total
+
+
+def workbook_rows(body: bytes) -> list[dict[str, Any]]:
+    """C8's two unaltered national counts; never establishment or activity sums."""
+    _, private, total = c8_national_counts(read_sheet(body, "76", cached_formulas=True))
+    return [
+        {"period": "2020", "indicator": indicator, "value": value, "unit": "persons"}
+        for indicator, value in (
+            ("private_employed_residents", private),
+            ("employed_residents", total),
+        )
+    ]
