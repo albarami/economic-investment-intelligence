@@ -2,13 +2,17 @@
 
 Usage: ``ci_aggregate.py WORKFLOW [NEEDS_JSON]`` where WORKFLOW is the
 checked-out ``ci.yml`` and NEEDS_JSON is the workflow expression
-``toJSON(needs)``. Before it reads a result, the shape of WORKFLOW must hold:
-job ``suite`` has one matrix axis, ``suite``, equal to the SUITES table, with no
-``exclude``, ``include`` or other axis; jobs ``static-checks``, ``suite``,
-``web-spikes`` and ``tests`` carry no ``continue-on-error``, condition, shell
-default or other escape key, on the job or on a step, and each still runs its
-own commands unchanged; job ``tests`` needs exactly ``suite`` and
-``web-spikes`` and always runs. A suite dropped or excused fails here and not
+``toJSON(needs)``. Before it reads a result, the shape of WORKFLOW must hold,
+as an exact allow-list, not a deny-list: the workflow root holds only its
+declared keys, ``contents: read``, the bash run shell and no ``env``; jobs
+``static-checks``, ``suite``, ``web-spikes`` and ``tests`` hold only their
+declared keys and values and no ``env``, and their steps equal the declared
+sequence of JOB_STEPS key for key, each step's ``env`` equal to its declared
+mapping; job ``suite`` has one matrix axis, ``suite``, equal to the SUITES
+table, under ``fail-fast: false`` alone; job ``tests`` needs exactly ``suite``
+and ``web-spikes`` and always runs. So no inherited variable such as
+``SHELLOPTS: noexec``, added step, key or changed setup step can stop a suite
+from running while the check stays green. A suite dropped or excused fails here and not
 only in the guard tests that suite runs. With WORKFLOW alone, only the shape is
 judged: job ``static-checks`` runs that form, needs no job and so is never
 skipped by a failed suite. A matrix job's result is ``success`` only when every
@@ -33,46 +37,135 @@ USAGE = "usage: ci_aggregate.py WORKFLOW [NEEDS_JSON]"
 NOT_A_LIST = "FAIL matrix-unreadable: the suite matrix is not a list of names"
 NO_AXIS = "FAIL matrix-unreadable: the suite strategy matrix is not a mapping"
 BASH = {"run": {"shell": "bash"}}
-# Keys that let a job or a step pass, or not run, while its command failed.
-JOB_KEYS = ("continue-on-error", "if", "needs", "defaults", "strategy")
-STEP_KEYS = ("continue-on-error", "if", "shell")
-ALLOWED_JOB_KEYS = {"suite": {"strategy"}, "tests": {"needs", "if"}}
+PERMISSIONS = {"contents": "read"}
+# Exact allow-lists: a key, step or variable not declared here is refused.
+ROOT_KEYS = ("name", True, "on", "permissions", "defaults", "jobs", "env")
 SHAPE_NAME = "Check the suite matrix and the tests verdict"
 SHAPE_RUN = "uv run --locked python scripts/ci_aggregate.py .github/workflows/ci.yml"
 AGGREGATE_NAME = "Require the whole suite matrix and every needed job to succeed"
 AGGREGATE_RUN = SHAPE_RUN + ' "$NEEDS"'
-WEB = {"working-directory": "web"}
-REQUIRED_STEPS: dict[str, tuple[dict[str, object], ...]] = {
-    "static-checks": ({"name": SHAPE_NAME, "run": SHAPE_RUN},),
-    "suite": (
-        {
-            "name": "Run one suite",
-            "run": './eii test --seed 2026111201 --suite "$SUITE"',
-            "env": {"SUITE": "${{ matrix.suite }}"},
-        },
+Step = dict[str, object]
+
+
+def run(name: str, command: str, folder: str | None = None) -> Step:
+    """Declare one ``run`` step, in folder ``web`` when FOLDER is given."""
+    step: Step = {"name": name, "run": command}
+    return {**step, "working-directory": folder} if folder else step
+
+
+def uses(name: str, action: str, /, **with_: object) -> Step:
+    """Declare one pinned action step with exactly its ``with`` inputs."""
+    return {"name": name, "uses": action, "with": with_}
+
+
+UV = "uv run --locked python scripts/"
+CHECKOUT = uses(
+    "Check out",
+    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+    **{"persist-credentials": False},
+)
+SETUP_UV = uses(
+    "Install uv",
+    "astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2",
+    version="0.11.31",
+    **{"enable-cache": "false"},
+)
+SETUP = (
+    CHECKOUT,
+    SETUP_UV,
+    run("Install Python from .python-version", "uv python install"),
+    uses(
+        "Install Node from .nvmrc",
+        "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        **{"node-version-file": ".nvmrc", "package-manager-cache": False},
     ),
-    "web-spikes": (
-        {"name": "Check built hosts", "run": "npm run check:hosts:dist", **WEB},
-        {"name": "Check the development server", "run": "npm run check:dev", **WEB},
-        {
-            "name": "Capture spike screenshots",
-            "run": "npm run spike:glyphs:capture",
-            **WEB,
-        },
-        {
-            "name": "Compare spike screenshots",
-            "run": "npm run test:spike:glyphs",
-            **WEB,
-        },
+    run(
+        "Sync the locked environment with the engine group",
+        "uv sync --managed-python --all-packages --locked --group engine",
     ),
-    "tests": (
-        {
-            "name": AGGREGATE_NAME,
-            "run": AGGREGATE_RUN,
-            "env": {"NEEDS": "${{ toJSON(needs) }}"},
-        },
+)
+SANDBOX = (
+    run(
+        "Install bubblewrap and AppArmor profiles",
+        "sudo apt-get update && sudo apt-get install -y --no-install-recommends"
+        " bubblewrap apparmor-profiles",
     ),
+    run("Print runner facts", UV + "ci_sandbox.py facts"),
+    run(
+        "Make namespace creation work for bubblewrap",
+        UV + "ci_sandbox.py install-profile",
+    ),
+    run("Fetch engine extensions", UV + "engine_extensions.py fetch"),
+    run("Fetch the secret scanner", UV + "hooks_gitleaks.py fetch"),
+    run("Install web dependencies", "npm ci", "web"),
+    run("Build the web application", "npm run build", "web"),
+)
+BROWSER = run(
+    "Install the spike browser", "npm run spike:glyphs:install-browser", "web"
+)
+SUITE_STEP = {
+    **run("Run one suite", './eii test --seed 2026111201 --suite "$SUITE"'),
+    "env": {"SUITE": "${{ matrix.suite }}"},
 }
+AGGREGATE_STEP = {
+    **run(AGGREGATE_NAME, AGGREGATE_RUN),
+    "env": {"NEEDS": "${{ toJSON(needs) }}"},
+}
+# The declared step sequence of each protected job, every key and value.
+JOB_STEPS: dict[str, tuple[Step, ...]] = {
+    "static-checks": (
+        *SETUP,
+        run(
+            "Print tool versions",
+            "uv --version && node --version && npm --version && git --version",
+        ),
+        run("Check the tree", "uv run --no-project python3 scripts/check_tree.py"),
+        run("Check the lock", "uv lock --check"),
+        run("Check versions", UV + "check_versions.py"),
+        run("Check reference notes", UV + "check_reference_notes.py"),
+        run("Check Python lint", "uv run --locked ruff check ."),
+        run("Check Python format", "uv run --locked ruff format --check ."),
+        run("Check Python types", "uv run --locked mypy"),
+        run(SHAPE_NAME, SHAPE_RUN),
+        run("Install web dependencies", "npm ci", "web"),
+        run("Check web structure", "npm run check", "web"),
+        run("Check web lint", "npm run lint", "web"),
+        run("Check web format", "npm run format:check", "web"),
+        run("Check web types", "npm run typecheck", "web"),
+    ),
+    "suite": (*SETUP, *SANDBOX, BROWSER, SUITE_STEP),
+    "web-spikes": (
+        *SETUP,
+        *SANDBOX,
+        run("Check built hosts", "npm run check:hosts:dist", "web"),
+        run("Check the development server", "npm run check:dev", "web"),
+        BROWSER,
+        run("Capture spike screenshots", "npm run spike:glyphs:capture", "web"),
+        uses(
+            "Upload spike screenshots",
+            "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+            name="spike-glyph-screenshots",
+            path="data/glyph-captures/",
+            **{"if-no-files-found": "error"},
+        ),
+        run("Compare spike screenshots", "npm run test:spike:glyphs", "web"),
+    ),
+    "tests": (*SETUP[:3], AGGREGATE_STEP),
+}
+# The declared job keys with their values; strategy, needs and if are judged
+# by matrix_shape_problems and tests_problems, steps by step_problems.
+RUNNER = "ubuntu-24.04"
+JOB_VALUES: dict[str, dict[str, object]] = {
+    name: {"name": name, "runs-on": RUNNER, "timeout-minutes": minutes}
+    for name, minutes in (
+        ("static-checks", 25),
+        ("suite", 90),
+        ("web-spikes", 45),
+        ("tests", 10),
+    )
+}
+JUDGED_ELSEWHERE = {"suite": {"strategy"}, "tests": {"needs", "if"}}
+STRATEGY_REST = {"fail-fast": False}
 
 
 def matrix_problems(matrix: object) -> list[str]:
@@ -95,30 +188,71 @@ def matrix_shape_problems(job: Mapping[str, object]) -> list[str]:
     """Require job ``suite``'s matrix to hold exactly the axis ``suite``."""
     strategy = job.get("strategy")
     matrix = strategy.get("matrix") if isinstance(strategy, dict) else None
-    if not isinstance(matrix, dict):
+    if not isinstance(strategy, dict) or not isinstance(matrix, dict):
         return [NO_AXIS]
+    rest = {key: value for key, value in strategy.items() if key != "matrix"}
+    if rest != STRATEGY_REST:
+        return ["FAIL strategy-keys: the suite strategy is not fail-fast false alone"]
     extra = sorted(str(key) for key in matrix if key != "suite")
     if extra:
         return [f"FAIL matrix-keys: {', '.join(extra)}"]
     return matrix_problems(matrix.get("suite"))
 
 
+def env_problems(label: str, env: object, want: Mapping[str, object]) -> list[str]:
+    """Refuse an ``env`` that adds, changes or drops a variable of WANT."""
+    if env is None:
+        env = {}
+    if not isinstance(env, dict):
+        return [f"FAIL {label}: not a mapping"]
+    names = sorted({str(key) for key in env} | set(want))
+    return [f"FAIL {label}: {k}" for k in names if env.get(k) != want.get(k)]
+
+
+def step_problems(name: str, steps: list[object]) -> list[str]:
+    """The job's steps equal the declared sequence, key for key."""
+    declared = JOB_STEPS[name]
+    want_names = [str(step["name"]) for step in declared]
+    got = [step if isinstance(step, dict) else {} for step in steps]
+    got_names = [str(step.get("name")) for step in got]
+    found = [
+        f"FAIL step-missing: {name}: {n}" for n in want_names if n not in got_names
+    ]
+    extra = [n for i, n in enumerate(got_names) if n not in got_names[:i] + want_names]
+    extra += sorted({n for n in got_names if got_names.count(n) > 1})
+    found += [f"FAIL step-extra: {name}: {n}" for n in extra]
+    if not found and got_names != want_names:
+        found.append(f"FAIL step-order: {name}: the steps are not in declared order")
+    for want in declared:
+        step = next((s for s in got if s.get("name") == want["name"]), None)
+        if step is None:
+            continue
+        label = f"{name}: {want['name']}"
+        found += [
+            f"FAIL step-key: {label}: {k}" for k in step if k not in {*want, "env"}
+        ]
+        env = want.get("env")
+        env = env if isinstance(env, dict) else {}
+        found += env_problems(f"step-env: {label}", step.get("env"), env)
+        if any(step.get(k) != v for k, v in want.items() if k != "env"):
+            found.append(f"FAIL step-missing: {label}")
+    return found
+
+
 def job_problems(name: str, job: object) -> list[str]:
-    """Refuse an escape key on job NAME or its steps, or a changed own command."""
+    """Job NAME holds exactly its declared keys, values, environment and steps."""
     if not isinstance(job, dict):
         return [f"FAIL job-missing: {name}"]
-    allowed = ALLOWED_JOB_KEYS.get(name, set())
-    found = [
-        f"FAIL job-key: {name}: {k}" for k in JOB_KEYS if k in job and k not in allowed
+    allowed = {*JOB_VALUES[name], *JUDGED_ELSEWHERE.get(name, ()), "steps", "env"}
+    found = [f"FAIL job-key: {name}: {k}" for k in job if k not in allowed]
+    found += [
+        f"FAIL job-value: {name}: {k}"
+        for k, v in JOB_VALUES[name].items()
+        if job.get(k) != v
     ]
-    steps = [step for step in job.get("steps") or [] if isinstance(step, dict)]
-    for step in steps:
-        label = f"{name}: {step.get('name')}"
-        found += [f"FAIL step-key: {label}: {k}" for k in STEP_KEYS if k in step]
-    for want in REQUIRED_STEPS[name]:
-        if not any(all(s.get(k) == v for k, v in want.items()) for s in steps):
-            found.append(f"FAIL step-missing: {name}: {want['name']}")
-    return found
+    found += env_problems(f"job-env: {name}", job.get("env"), {})
+    steps = job.get("steps")
+    return found + step_problems(name, steps if isinstance(steps, list) else [])
 
 
 def tests_problems(job: Mapping[str, object]) -> list[str]:
@@ -133,15 +267,24 @@ def tests_problems(job: Mapping[str, object]) -> list[str]:
     return found
 
 
+def root_problems(root: Mapping[object, object]) -> list[str]:
+    """The workflow root holds exactly its declared keys and no environment."""
+    found = [f"FAIL workflow-key: {k}" for k in root if k not in ROOT_KEYS]
+    found += env_problems("workflow-env", root.get("env"), {})
+    if root.get("permissions") != PERMISSIONS:
+        found.append("FAIL workflow-permissions: not contents read alone")
+    if root.get("defaults") != BASH:
+        found.append("FAIL workflow-defaults: the run shell is not bash")
+    return found
+
+
 def shape_problems(document: object) -> list[str]:
     """Return one FAIL line per way the workflow could pass without a suite."""
     root = document if isinstance(document, dict) else {}
-    found: list[str] = []
-    if root.get("defaults") != BASH:
-        found.append("FAIL workflow-defaults: the run shell is not bash")
+    found = root_problems(root)
     jobs = root.get("jobs")
     jobs = jobs if isinstance(jobs, dict) else {}
-    for name in REQUIRED_STEPS:
+    for name in JOB_STEPS:
         found += job_problems(name, jobs.get(name))
     if isinstance(jobs.get("suite"), dict):
         found += matrix_shape_problems(jobs["suite"])

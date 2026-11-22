@@ -29,6 +29,246 @@ SEED = "1794000000"
 GOOD = {"suite": {"result": "success"}, "web-spikes": {"result": "success"}}
 WORKFLOW = str(ci_support.WORKFLOW_DIR / "ci.yml")
 GUARDS_LINE = "          - python-guards\n"
+PLANTED_VARIABLES = ("SHELLOPTS", "BASHOPTS", "BASH_ENV", "ENV", "PATH")
+FORBIDDEN_JOB_KEYS = (
+    "container",
+    "services",
+    "defaults",
+    "concurrency",
+    "outputs",
+    "continue-on-error",
+    "if",
+    "needs",
+    "strategy",
+)
+FORBIDDEN_STEP_KEYS = (
+    "env",
+    "shell",
+    "working-directory",
+    "if",
+    "continue-on-error",
+    "timeout-minutes",
+    "id",
+)
+
+
+SUITE_RUN = '        run: ./eii test --seed 2026111201 --suite "$SUITE"\n'
+SUITE_ENV = "        env:\n          SUITE: ${{ matrix.suite }}\n"
+NEEDS_LINE = "          NEEDS: ${{ toJSON(needs) }}\n"
+COMPARE = "        run: npm run test:spike:glyphs\n"
+AGGREGATE_STEP = "Require the whole suite matrix and every needed job to succeed"
+TESTS_CHECKOUT = (
+    "    if: ${{ always() }}\n    steps:\n      - name: Check out\n"
+    "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n"
+    "        with:\n          persist-credentials: false\n"
+)
+LOCK = "      - name: Check the lock\n        run: uv lock --check\n"
+VERSIONS = (
+    "      - name: Check versions\n"
+    "        run: uv run --locked python scripts/check_versions.py\n"
+)
+
+
+def job_env(minutes: str, name: str) -> str:
+    return f"    timeout-minutes: {minutes}\n    env:\n      {name}: noexec\n"
+
+
+# Vector 1: a workflow, job or step environment differing from its declaration.
+ENV_ROWS: tuple[tuple[str, str, str], ...] = (
+    (
+        "permissions:\n",
+        "env:\n  SHELLOPTS: noexec\npermissions:\n",
+        "FAIL workflow-env: SHELLOPTS",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        job_env("90", "SHELLOPTS"),
+        "FAIL job-env: suite: SHELLOPTS",
+    ),
+    (
+        "    timeout-minutes: 10\n",
+        job_env("10", "BASHOPTS"),
+        "FAIL job-env: tests: BASHOPTS",
+    ),
+    (
+        "    timeout-minutes: 45\n",
+        job_env("45", "BASH_ENV"),
+        "FAIL job-env: web-spikes: BASH_ENV",
+    ),
+    (
+        "    timeout-minutes: 25\n",
+        job_env("25", "ENV"),
+        "FAIL job-env: static-checks: ENV",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90\n    env: ${{ fromJSON(vars.E) }}\n",
+        "FAIL job-env: suite: not a mapping",
+    ),
+    (
+        SUITE_ENV,
+        SUITE_ENV + "          PATH: /tmp/fake\n",
+        "FAIL step-env: suite: Run one suite: PATH",
+    ),
+    (SUITE_ENV, "", "FAIL step-env: suite: Run one suite: SUITE"),
+    (
+        NEEDS_LINE,
+        "          NEEDS: '{}'\n",
+        f"FAIL step-env: tests: {AGGREGATE_STEP}: NEEDS",
+    ),
+    (
+        COMPARE,
+        COMPARE + "        env:\n          SHELLOPTS: noexec\n",
+        "FAIL step-env: web-spikes: Compare spike screenshots: SHELLOPTS",
+    ),
+)
+# Vector 2: a step not declared, a reordered step, a changed setup step.
+STEP_ROWS: tuple[tuple[str, str, str], ...] = (
+    (
+        "      - name: Run one suite\n",
+        '      - name: Poison\n        run: echo SHELLOPTS=noexec >> "$GITHUB_ENV"\n'
+        "      - name: Run one suite\n",
+        "FAIL step-extra: suite: Poison",
+    ),
+    (
+        NEEDS_LINE,
+        NEEDS_LINE + '      - name: Path\n        run: echo /tmp >> "$GITHUB_PATH"\n',
+        "FAIL step-extra: tests: Path",
+    ),
+    (
+        "      - name: Compare spike screenshots\n",
+        "      - run: echo x\n      - name: Compare spike screenshots\n",
+        "FAIL step-extra: web-spikes: None",
+    ),
+    (
+        NEEDS_LINE,
+        NEEDS_LINE + "      - name: Install uv\n        run: true\n",
+        "FAIL step-extra: tests: Install uv",
+    ),
+    (
+        LOCK + VERSIONS,
+        VERSIONS + LOCK,
+        "FAIL step-order: static-checks: the steps are not in declared order",
+    ),
+    (
+        TESTS_CHECKOUT,
+        TESTS_CHECKOUT.replace("3d3c42e5", "0000000a"),
+        "FAIL step-missing: tests: Check out",
+    ),
+    (
+        TESTS_CHECKOUT,
+        TESTS_CHECKOUT.replace("false", "true"),
+        "FAIL step-missing: tests: Check out",
+    ),
+    (
+        TESTS_CHECKOUT,
+        TESTS_CHECKOUT + "          path: elsewhere\n",
+        "FAIL step-missing: tests: Check out",
+    ),
+    (
+        "        run: uv --version && node --version && npm --version && git --version\n",
+        "        run: echo ok\n",
+        "FAIL step-missing: static-checks: Print tool versions",
+    ),
+    (
+        "      - name: Print tool versions\n"
+        "        run: uv --version && node --version && npm --version && git --version\n",
+        "",
+        "FAIL step-missing: static-checks: Print tool versions",
+    ),
+)
+# Vector 3: job keys and workflow root keys are exact allow-lists.
+JOB_ROWS: tuple[tuple[str, str, str], ...] = (
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90\n    container: ubuntu:24.04\n",
+        "FAIL job-key: suite: container",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90\n    services:\n      db:\n        image: postgres\n",
+        "FAIL job-key: suite: services",
+    ),
+    (
+        "    runs-on: ubuntu-24.04\n    timeout-minutes: 90\n",
+        "    runs-on: ubuntu-22.04\n    timeout-minutes: 90\n",
+        "FAIL job-value: suite: runs-on",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 1\n",
+        "FAIL job-value: suite: timeout-minutes",
+    ),
+    ("    timeout-minutes: 10\n", "", "FAIL job-value: tests: timeout-minutes"),
+    (
+        "  tests:\n    name: tests\n",
+        "  tests:\n    name: test\n",
+        "FAIL job-value: tests: name",
+    ),
+    (
+        "    timeout-minutes: 10\n",
+        "    timeout-minutes: 10\n    concurrency: one\n",
+        "FAIL job-key: tests: concurrency",
+    ),
+    (
+        "    timeout-minutes: 45\n",
+        "    timeout-minutes: 45\n    outputs:\n      x: y\n",
+        "FAIL job-key: web-spikes: outputs",
+    ),
+    (
+        "    timeout-minutes: 45\n",
+        "    timeout-minutes: 45\n    defaults:\n      run:\n        shell: sh\n",
+        "FAIL job-key: web-spikes: defaults",
+    ),
+    (
+        "      fail-fast: false\n",
+        "      fail-fast: false\n      max-parallel: 1\n",
+        "FAIL strategy-keys: the suite strategy is not fail-fast false alone",
+    ),
+    (
+        "      fail-fast: false\n",
+        "      fail-fast: true\n",
+        "FAIL strategy-keys: the suite strategy is not fail-fast false alone",
+    ),
+    (
+        "permissions:\n",
+        "concurrency:\n  group: x\npermissions:\n",
+        "FAIL workflow-key: concurrency",
+    ),
+    (
+        "  contents: read\n",
+        "  contents: write\n",
+        "FAIL workflow-permissions: not contents read alone",
+    ),
+    (
+        "    shell: bash\n\njobs:\n",
+        "    shell: bash\n    working-directory: web\n\njobs:\n",
+        "FAIL workflow-defaults: the run shell is not bash",
+    ),
+)
+# Vector 4: step keys are an exact allow-list; env is vector 1.
+STEP_KEY_ROWS: tuple[tuple[str, str, str], ...] = (
+    *(
+        (
+            SUITE_RUN,
+            SUITE_RUN + f"        {key}: {value}\n",
+            f"FAIL step-key: suite: Run one suite: {key}",
+        )
+        for key, value in (
+            ("shell", "sh {0}"),
+            ("working-directory", "web"),
+            ("if", "${{ true }}"),
+            ("continue-on-error", "true"),
+            ("timeout-minutes", "0"),
+            ("id", "x"),
+        )
+    ),
+    (
+        COMPARE + "        working-directory: web\n",
+        COMPARE + "        working-directory: .\n",
+        "FAIL step-missing: web-spikes: Compare spike screenshots",
+    ),
+)
 
 
 def matrix_names(folder: Path) -> list[str]:
@@ -278,7 +518,7 @@ class Aggregate(unittest.TestCase):
             (
                 env,
                 "        env:\n          SUITE: python-core\n",
-                "FAIL step-missing: suite: Run one suite",
+                "FAIL step-env: suite: Run one suite: SUITE",
             ),
             # 8 the tests job
             (
@@ -376,6 +616,24 @@ class Aggregate(unittest.TestCase):
                 status, out = self.verdict(GOOD, self.edited(old, new))
                 self.assertEqual((status, out), (1, f"{line}\nRESULT: FAILED\n"))
 
+    def assert_rows(self, rows: tuple[tuple[str, str, str], ...]) -> None:
+        for old, new, line in rows:
+            with self.subTest(line=line, new=new):
+                status, out = self.verdict(GOOD, self.edited(old, new))
+                self.assertEqual((status, out), (1, f"{line}\nRESULT: FAILED\n"))
+
+    def test_vector_1_no_inherited_or_changed_environment(self) -> None:
+        self.assert_rows(ENV_ROWS)
+
+    def test_vector_2_no_extra_or_changed_step(self) -> None:
+        self.assert_rows(STEP_ROWS)
+
+    def test_vector_3_job_and_root_keys_are_an_allow_list(self) -> None:
+        self.assert_rows(JOB_ROWS)
+
+    def test_vector_4_step_keys_are_an_allow_list(self) -> None:
+        self.assert_rows(STEP_KEY_ROWS)
+
     def test_shape_alone_refuses_without_any_job_result(self) -> None:
         """Row 8 is refused by static-checks, which needs no job and is never skipped."""
         out = io.StringIO()
@@ -404,18 +662,59 @@ class Aggregate(unittest.TestCase):
         )
 
     @given(
-        st.sets(st.sampled_from([*ci_aggregate.JOB_KEYS, "timeout-minutes"])),
-        st.sets(st.sampled_from([*ci_aggregate.STEP_KEYS, "id"])),
+        st.sets(st.sampled_from([*FORBIDDEN_JOB_KEYS, "timeout-minutes", "name"])),
+        st.dictionaries(st.sampled_from(PLANTED_VARIABLES), st.just("x")),
     )
-    def test_job_passes_exactly_without_an_escape_key(
-        self, job_keys: set[str], step_keys: set[str]
+    def test_job_passes_exactly_with_its_declared_keys(
+        self, keys: set[str], env: dict[str, str]
     ) -> None:
-        step = dict(ci_aggregate.REQUIRED_STEPS["web-spikes"][0])
-        steps = [{**step, **{key: "x" for key in step_keys}}]
-        steps += list(ci_aggregate.REQUIRED_STEPS["web-spikes"][1:])
-        job = {"steps": steps, **{key: "x" for key in job_keys}}
-        clean = not (job_keys - {"timeout-minutes"}) and not (step_keys - {"id"})
+        job: dict[str, object] = {
+            **ci_aggregate.JOB_VALUES["web-spikes"],
+            "steps": [dict(step) for step in ci_aggregate.JOB_STEPS["web-spikes"]],
+            **{key: "x" for key in keys},
+        }
+        if env:
+            job["env"] = env
+        clean = not (keys & set(FORBIDDEN_JOB_KEYS)) and not keys and not env
         self.assertEqual(ci_aggregate.job_problems("web-spikes", job) == [], clean)
+
+    @given(
+        st.integers(0, len(ci_aggregate.JOB_STEPS["suite"]) - 1),
+        st.sets(st.sampled_from([*FORBIDDEN_STEP_KEYS, "name"])),
+        st.dictionaries(st.sampled_from([*PLANTED_VARIABLES, "SUITE"]), st.just("x")),
+    )
+    def test_step_passes_exactly_with_its_declared_keys_and_env(
+        self, index: int, keys: set[str], env: dict[str, str]
+    ) -> None:
+        steps = [dict(step) for step in ci_aggregate.JOB_STEPS["suite"]]
+        want = dict(steps[index])
+        steps[index].update({key: "x" for key in keys - {"env"}})
+        if env or "env" in keys:
+            steps[index]["env"] = env
+        job = {**ci_aggregate.JOB_VALUES["suite"], "steps": steps}
+        found = [
+            line
+            for line in ci_aggregate.job_problems("suite", job)
+            if not line.startswith("FAIL job-")
+        ]
+        env_now = steps[index].get("env") or {}
+        clean = not (keys - {"env"}) and env_now == (want.get("env") or {})
+        self.assertEqual(found == [], clean, (keys, env, found))
+
+    @given(st.permutations(range(len(ci_aggregate.JOB_STEPS["tests"]))))
+    def test_steps_pass_exactly_in_declared_order(self, order: list[int]) -> None:
+        declared = ci_aggregate.JOB_STEPS["tests"]
+        steps: list[object] = [dict(declared[i]) for i in order]
+        found = ci_aggregate.step_problems("tests", steps)
+        self.assertEqual(found == [], order == sorted(order))
+
+    @given(st.dictionaries(st.sampled_from(PLANTED_VARIABLES), st.just("noexec")))
+    def test_any_inherited_variable_fails(self, env: dict[str, str]) -> None:
+        self.assertEqual(ci_aggregate.env_problems("e", env, {}) == [], not env)
+        self.assertEqual(
+            ci_aggregate.env_problems("e", env, {}),
+            [f"FAIL e: {k}" for k in sorted(env)],
+        )
 
     def test_unreadable_workflow_names_its_reason(self) -> None:
         status, out = self.verdict(GOOD, self.edited("jobs:\n", "jobs: [\n"))
@@ -636,7 +935,11 @@ class ShardPlants(unittest.TestCase):
 
     def test_dropped_or_excluded_suite_plant_fails_the_aggregate_alone(self) -> None:
         self.assertEqual(run_tests.SUITES[0].name, "python-guards")
-        for check in ("tests-matrix-dropped", "tests-matrix-excluded"):
+        for check in (
+            "tests-matrix-dropped",
+            "tests-matrix-excluded",
+            "tests-suite-env",
+        ):
             with self.subTest(check=check):
                 case = next(c for c in cases.CASES if c.check == check)
                 shutil.copy2(

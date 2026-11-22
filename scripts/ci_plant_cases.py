@@ -175,6 +175,14 @@ PLANTS: dict[str, Plant] = {
             "          - web-unit\n        exclude:\n          - suite: python-guards\n",
         ),
     ),
+    "noexec-suite-env": combine(
+        write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
+        remove_text(
+            ".github/workflows/ci.yml",
+            "    timeout-minutes: 90\n",
+            "    timeout-minutes: 90\n    env:\n      SHELLOPTS: noexec\n",
+        ),
+    ),
 }
 
 CASES: tuple[Case, ...] = (
@@ -278,6 +286,13 @@ CASES: tuple[Case, ...] = (
         "FAIL matrix-keys: exclude",
     ),
     Case(
+        "tests-aggregate-noexec-suite-env",
+        "tests-suite-env",
+        AGGREGATE,
+        "noexec-suite-env",
+        "FAIL job-env: suite: SHELLOPTS",
+    ),
+    Case(
         "secrets-token-in-history",
         "secrets",
         SCAN,
@@ -303,5 +318,6 @@ CLASSES = (
     "tests-shard-skipped",
     "tests-matrix-dropped",
     "tests-matrix-excluded",
+    "tests-suite-env",
     "secrets",
 )
