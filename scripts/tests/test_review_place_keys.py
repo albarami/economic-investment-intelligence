@@ -3,28 +3,45 @@
 from __future__ import annotations
 
 import contextlib
+import importlib
 import io
 import json
 import sys
 import tempfile
 import unittest
+import zipfile
 from collections.abc import Mapping, Sequence
 from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch
 
-from hypothesis import given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from shapely.geometry import Point, box
 
+import h3
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 
 import review_attribution_tokens as tokens_tool
 import review_place_keys as keys_tool
 from eii_custodian.publicdata.fetch.registry import load_registry
-from eii_custodian.publicdata.places.read import ReadBuilding, ReadPlace, RecordLevel
+from eii_custodian.publicdata.places.build import build_places
+from eii_custodian.publicdata.places.integrate import _place_from_registry
+from eii_custodian.publicdata.places.read import (
+    ReadBuilding,
+    ReadPlace,
+    RecordLevel,
+    read_place_file,
+)
 from eii_custodian.publicdata.review.cache_fixture import write_cached
 
+# The custodian's own invented archive builder, loaded by name: the fixture is
+# untyped and outside the type check's configured files.
+invented_archive = importlib.import_module(
+    "custodian.tests.fixtures.frame.invented"
+).invented_archive
 BOUNDARY = box(51.0, 25.0, 51.6, 25.6)
 PLACES_KEY = "places_ovt/part-00014"
 PARTS = ("bldg_ovt/part-00384", "bldg_ovt/part-00385")
@@ -49,12 +66,13 @@ def place(
     name: str = "",
     arabic: str | None = None,
     dataset: str = "syn-source",
+    confidence: float | None = 0.9,
 ) -> dict[str, object]:
     common = {} if arabic is None else {"ar": arabic}
     return {
         "id": pid,
         "geometry": Point(lon, lat).wkb,
-        "confidence": 0.9,
+        "confidence": confidence,
         "names": {"primary": name, "common": common},
         "sources": [{"property": "", "dataset": dataset, "license": None}],
         "basic_category": "syn_category",
@@ -122,6 +140,9 @@ class World(unittest.TestCase):
         for item in (self.cache, self.review, self.scratch):
             item.mkdir()
         (self.review / "arabic_tag.txt").write_text("ar\n", encoding="utf-8")
+        (self.review / "places_ovt_attribution.csv").write_text(
+            "dataset_token,licence\nsyn-source,SYN-LICENCE\n", encoding="utf-8"
+        )
         self.registry = {row.key: row for row in load_registry()}
 
     def cache_places(self, rows: Sequence[Mapping[str, object]]) -> None:
@@ -175,7 +196,9 @@ class GazetteerRows(World):
             (row["source_id"], row["record_key"]), ("places_ovt", "SYN-P-1")
         )
         self.assertEqual(
-            out, "landmark:0 matches=1 footprints=na inside=na written=true reason=ok\n"
+            out,
+            "landmark:0 matches=1 kept=true attribution=true footprints=na "
+            "inside=na written=true reason=ok\n",
         )
         for secret in ("SYN-P-1", "souq", "Souq", "51.1", "25.1"):
             self.assertNotIn(secret, out)
@@ -187,7 +210,9 @@ class GazetteerRows(World):
         self.assertEqual(code, 0)
         self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
         self.assertIn(
-            "matches=0 footprints=na inside=na written=false reason=match_0", out
+            "matches=0 kept=na attribution=na footprints=na inside=na "
+            "written=false reason=match_0",
+            out,
         )
 
     def test_two_matches_stay_null(self) -> None:
@@ -202,7 +227,9 @@ class GazetteerRows(World):
         self.assertEqual(code, 0)
         self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
         self.assertIn(
-            "matches=n footprints=na inside=na written=false reason=match_n", out
+            "matches=n kept=na attribution=na footprints=na inside=na "
+            "written=false reason=match_n",
+            out,
         )
 
     def test_arabic_only_match_is_written(self) -> None:
@@ -265,7 +292,8 @@ class FlagshipRows(World):
         self.assertEqual((row["source_id"], row["record_key"]), ("bldg_ovt", "SYN-B-1"))
         self.assertEqual(
             out,
-            "building:0 matches=1 footprints=1 inside=true written=true reason=ok\n",
+            "building:0 matches=1 kept=true attribution=true footprints=1 "
+            "inside=true written=true reason=ok\n",
         )
 
     def test_footprint_in_second_part_is_found(self) -> None:
@@ -282,7 +310,9 @@ class FlagshipRows(World):
         self.assertEqual(code, 0)
         self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
         self.assertIn(
-            "matches=1 footprints=0 inside=na written=false reason=footprint_0", out
+            "matches=1 kept=true attribution=true footprints=0 inside=na "
+            "written=false reason=footprint_0",
+            out,
         )
 
     def test_point_in_two_footprints_stays_null(self) -> None:
@@ -293,30 +323,39 @@ class FlagshipRows(World):
         self.assertEqual(code, 0)
         self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
         self.assertIn(
-            "matches=1 footprints=n inside=na written=false reason=footprint_n", out
+            "matches=1 kept=true attribution=true footprints=n inside=na "
+            "written=false reason=footprint_n",
+            out,
         )
 
     def test_footprint_outside_boundary_stays_null(self) -> None:
         self.flagship_world(
-            [building("SYN-B-1", 51.62, 25.1), building("SYN-B-2", 51.3, 25.3)],
-            lon=51.625,
+            [building("SYN-B-1", 51.59, 25.1, 0.04), building("SYN-B-2", 51.3, 25.3)],
+            lon=51.595,
         )
         code, out = self.run_tool()
         self.assertEqual(code, 0)
         self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
         self.assertIn(
-            "matches=1 footprints=1 inside=false written=false reason=outside_boundary",
+            "matches=1 kept=true attribution=true footprints=1 inside=false "
+            "written=false reason=outside_boundary",
             out,
         )
 
     def test_check_agrees_after_fill_and_flags_a_planted_mismatch(self) -> None:
         self.flagship_world([building("SYN-B-1", 51.1, 25.1)])
         self.assertEqual(self.run_tool()[0], 0)
-        self.assertEqual(self.run_tool("--check"), (0, "building:0 check=true\n"))
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "building:0 check=true kept=true attribution=true\n"),
+        )
         rows = self.rows("flagship_candidates.yaml")
         rows[0]["record_key"] = "SYN-B-WRONG"
         self.review_files(flagship=rows)
-        self.assertEqual(self.run_tool("--check"), (1, "building:0 check=false\n"))
+        self.assertEqual(
+            self.run_tool("--check"),
+            (1, "building:0 check=false kept=true attribution=true\n"),
+        )
 
     def test_check_flags_a_wrong_source_id(self) -> None:
         self.flagship_world([building("SYN-B-1", 51.1, 25.1)])
@@ -324,7 +363,221 @@ class FlagshipRows(World):
             "building:0", "Syn Tower", source_id="places_ovt", record_key="SYN-B-1"
         )
         self.review_files(flagship=[filled])
-        self.assertEqual(self.run_tool("--check"), (1, "building:0 check=false\n"))
+        self.assertEqual(
+            self.run_tool("--check"),
+            (1, "building:0 check=false kept=true attribution=true\n"),
+        )
+
+
+class BuildFilters(World):
+    """A key is written only for a place the build's own filters keep."""
+
+    def test_place_excluded_by_keep_stays_null_with_its_reason(self) -> None:
+        self.cache_places(
+            [place("SYN-P-1", 51.1, 25.1, "Syn Souq", dataset="OpenStreetMap")]
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertEqual(
+            out,
+            "landmark:0 matches=1 kept=false attribution=na footprints=na "
+            "inside=na written=false reason=excluded_by_keep_osm_not_merged\n",
+        )
+
+    def test_flagship_place_excluded_by_keep_stays_null(self) -> None:
+        self.cache_places(
+            [place("SYN-P-1", 51.105, 25.105, "Syn Tower", confidence=None)]
+        )
+        self.cache_buildings(0, [building("SYN-B-1", 51.1, 25.1)])
+        self.review_files(flagship=[spec("building:0", "Syn Tower")])
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
+        self.assertIn("written=false reason=excluded_by_keep_null_confidence", out)
+
+    def test_duplicate_dropped_by_the_build_stays_null(self) -> None:
+        self.cache_places(
+            [
+                place("SYN-P-1", 51.1, 25.1, "Syn Souq", "سوق مخترع", confidence=0.5),
+                place("SYN-P-2", 51.1001, 25.1, "Syn Market", "سوق مخترع"),
+            ]
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertEqual(
+            out,
+            "landmark:0 matches=1 kept=false attribution=na footprints=na "
+            "inside=na written=false reason=duplicate_dropped\n",
+        )
+
+    def test_the_keeper_of_a_duplicate_is_written(self) -> None:
+        self.cache_places(
+            [
+                place("SYN-P-1", 51.1, 25.1, "Syn Souq", "سوق مخترع", confidence=0.5),
+                place("SYN-P-2", 51.1001, 25.1, "Syn Market", "سوق مخترع"),
+            ]
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Market")])
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(
+            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-2"
+        )
+
+    def test_missing_attribution_is_reported_apart_and_the_key_written(self) -> None:
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq", dataset="syn-x")])
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertEqual(
+            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-1"
+        )
+        self.assertEqual(
+            out,
+            "landmark:0 matches=1 kept=true attribution=false footprints=na "
+            "inside=na written=true reason=ok\n",
+        )
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "landmark:0 check=true kept=true attribution=false\n"),
+        )
+
+    def test_check_flags_a_key_whose_place_the_build_drops(self) -> None:
+        self.cache_places(
+            [place("SYN-P-1", 51.1, 25.1, "Syn Souq", dataset="OpenStreetMap")]
+        )
+        filled = spec(
+            "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
+        )
+        self.review_files(gazetteer=[filled])
+        self.assertEqual(
+            self.run_tool("--check"),
+            (1, "landmark:0 check=false kept=false attribution=na\n"),
+        )
+
+    def test_kept_ids_equal_the_builds_own_shown_survivors(self) -> None:
+        rows = [
+            place("SYN-P-1", 51.1, 25.1, "A"),
+            place("SYN-P-2", 51.7, 25.1, "B"),
+            place("SYN-P-3", 51.2, 25.2, "C", dataset="OpenStreetMap"),
+            place("SYN-P-4", 51.2, 25.3, "D", confidence=None),
+            place("SYN-P-5", 51.3, 25.3, "", "اسم"),
+            place("SYN-P-6", 51.4, 25.4, "Dup", confidence=0.5),
+            place("SYN-P-7", 51.4001, 25.4, "dup"),
+            place("SYN-P-8", 51.5, 25.5, "E", dataset=""),
+        ]
+        self.cache_places(rows)
+        located = _place_from_registry(self.cache, list(self.registry.values()))
+        assert located is not None
+        path, receipt = located
+        places = read_place_file(path, "ar")
+        fates, attributed = keys_tool.place_fates(
+            places, BOUNDARY, (("syn-source", "SYN-LICENCE"),)
+        )
+        grid = [
+            {"cell": h3.str_to_int(h3.latlng_to_cell(float(p.lat), float(p.lon), 9))}
+            for p in places
+        ]
+        built = build_places(
+            path,
+            arabic_tag="ar",
+            boundary=BOUNDARY,
+            grid=grid,
+            attribution=(("syn-source", "SYN-LICENCE"),),
+            places_receipt=receipt,
+        )
+        dropped = {
+            part for p in built.places for part in p.merged_ids.split(";") if part
+        }
+        survivors = {p.place_id for p in built.places} - dropped
+        self.assertEqual({k for k, v in fates.items() if v == "ok"}, survivors)
+        self.assertEqual(
+            fates,
+            {
+                "SYN-P-1": "ok",
+                "SYN-P-2": "excluded_by_keep_outside_boundary",
+                "SYN-P-3": "excluded_by_keep_osm_not_merged",
+                "SYN-P-4": "excluded_by_keep_null_confidence",
+                "SYN-P-5": "excluded_by_keep_name_missing",
+                "SYN-P-6": "duplicate_dropped",
+                "SYN-P-7": "ok",
+                "SYN-P-8": "excluded_by_keep_source_provider_missing",
+            },
+        )
+        self.assertEqual(
+            attributed,
+            frozenset(
+                {"SYN-P-1", "SYN-P-2", "SYN-P-4", "SYN-P-5", "SYN-P-6", "SYN-P-7"}
+            ),
+        )
+
+
+class FrameBoundary(World):
+    """The real reader path over an invented municipality archive."""
+
+    def cache_archive(self, body: bytes) -> None:
+        write_cached(self.cache, self.registry["bnd_hdx"], body)
+
+    def run_unpatched(self, *extra: str) -> tuple[int, str]:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = keys_tool.main([str(self.cache), str(self.review), *extra])
+        return code, out.getvalue()
+
+    def test_invented_archive_boundary_is_the_municipality_union(self) -> None:
+        self.cache_archive(invented_archive(bounds=(51.0, 25.0, 51.6, 25.6)))
+        merged = keys_tool.frame_boundary(self.cache, list(self.registry.values()))
+        self.assertTrue(merged.equals(BOUNDARY))
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        code, out = self.run_unpatched()
+        self.assertEqual(code, 0)
+        self.assertIn("written=true reason=ok", out)
+        self.assertEqual(
+            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-1"
+        )
+
+    def test_zero_municipalities_is_refused(self) -> None:
+        self.cache_archive(without_municipalities(invented_archive()))
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        self.assertEqual(self.run_unpatched(), (2, "REFUSED frame_boundary_missing\n"))
+
+    def test_unreadable_archive_is_refused(self) -> None:
+        self.cache_archive(b"SYN not an archive")
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        self.assertEqual(
+            self.run_unpatched(), (2, "REFUSED frame_boundary_unreadable\n")
+        )
+
+    def test_reader_refusal_passes_through_with_its_own_reason(self) -> None:
+        self.cache_archive(invented_archive(bounds=(51.0, 25.0, 51.6, 25.6)))
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        (self.review / "places_ovt_attribution.csv").write_text(
+            "token,licence\n", encoding="utf-8"
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        self.assertEqual(self.run_unpatched(), (2, "REFUSED attribution_header\n"))
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+
+
+def without_municipalities(body: bytes) -> bytes:
+    """The same invented archive with an empty municipality level."""
+    source = zipfile.ZipFile(io.BytesIO(body))
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive:
+        for info in source.infolist():
+            data = source.read(info)
+            if info.filename == "qat_admin1.geojson":
+                document = json.loads(data)
+                document["features"] = []
+                data = json.dumps(document).encode()
+            archive.writestr(info, data)
+    return stream.getvalue()
 
 
 class Refusals(World):
@@ -347,7 +600,9 @@ class Refusals(World):
         self.assertEqual(self.run_tool(), (2, "REFUSED arabic_tag_missing\n"))
 
     def test_overwrite_of_a_set_key_is_refused(self) -> None:
-        proposal = keys_tool.Proposal("landmark:0", 1, None, None, "SYN-P-1", "ok")
+        proposal = keys_tool.Proposal(
+            "landmark:0", 1, True, True, None, None, "SYN-P-1", "ok"
+        )
         for field in ("record_key", "source_id"):
             filled = spec("landmark:0", "Syn Souq", **{field: "SYN-OTHER"})
             with self.assertRaises(keys_tool.ReviewError) as caught:
@@ -370,7 +625,12 @@ class Refusals(World):
         self.assertEqual(path.read_bytes(), before)
         self.assertEqual(
             sorted(item.name for item in self.review.iterdir()),
-            ["arabic_tag.txt", "flagship_candidates.yaml", "showcase_gazetteer.yaml"],
+            [
+                "arabic_tag.txt",
+                "flagship_candidates.yaml",
+                "places_ovt_attribution.csv",
+                "showcase_gazetteer.yaml",
+            ],
         )
 
     def test_registry_without_boundary_source_is_refused(self) -> None:
@@ -414,10 +674,9 @@ class Properties(unittest.TestCase):
     def test_written_exactly_when_one_normalised_name_matches(
         self, names: list[str], target: str
     ) -> None:
+        places = tuple(read_place(f"SYN-P-{n}", name) for n, name in enumerate(names))
         inputs = keys_tool.Inputs(
-            tuple(read_place(f"SYN-P-{n}", name) for n, name in enumerate(names)),
-            (),
-            frozenset(),
+            places, (), frozenset(), {p.place_id: "ok" for p in places}, frozenset()
         )
         folded = " ".join(target.split()).casefold()
         oracle = [
@@ -440,13 +699,87 @@ class Properties(unittest.TestCase):
         )
         inside = frozenset(f"SYN-B-{n}" for n, (_c, flag) in enumerate(plan) if flag)
         inputs = keys_tool.Inputs(
-            (read_place("SYN-P-1", "Syn Tower"),), buildings, inside
+            (read_place("SYN-P-1", "Syn Tower"),),
+            buildings,
+            inside,
+            {"SYN-P-1": "ok"},
+            frozenset(),
         )
         result = keys_tool.propose(spec("building:0", "syn tower"), "bldg_ovt", inputs)
         covering = [n for n, (covers, _flag) in enumerate(plan) if covers]
         ok = len(covering) == 1 and plan[covering[0]][1]
         self.assertEqual(result.key, f"SYN-B-{covering[0]}" if ok else None)
         self.assertEqual(result.footprints, len(covering))
+
+
+LONS = st.sampled_from([51.1, 51.1001, 51.7])
+DATASETS = st.sampled_from(["syn-source", "syn-x", "OpenStreetMap", ""])
+CONFIDENCES = st.sampled_from([0.5, 0.9, None])
+LABELS = st.sampled_from(["Dup", " dup", "Other", ""])
+PLACE_PLANS = st.lists(
+    st.tuples(LONS, DATASETS, CONFIDENCES, LABELS), min_size=0, max_size=5
+)
+
+
+class FatesOracle(unittest.TestCase):
+    """place_fates against the build's own build_places over the whole plan space."""
+
+    @settings(max_examples=40, deadline=None)
+    @given(PLACE_PLANS)
+    @example([(51.1, "syn-source", 0.5, "Dup"), (51.1001, "syn-x", 0.9, " dup")])
+    @example([])
+    def test_fates_equal_the_builds_survivors(
+        self, plan: list[tuple[float, str, float | None, str]]
+    ) -> None:
+        with tempfile.TemporaryDirectory() as name:
+            rows = [
+                place(f"SYN-P-{n}", lon, 25.1, label, dataset=data, confidence=conf)
+                for n, (lon, data, conf, label) in enumerate(plan)
+            ]
+            places: tuple[ReadPlace, ...] = ()
+            if rows:
+                entries = load_registry()
+                entry = next(row for row in entries if row.key == PLACES_KEY)
+                write_cached(
+                    Path(name), entry, parquet(Path(name), PLACE_COLUMNS, rows)
+                )
+                located = _place_from_registry(Path(name), entries)
+                assert located is not None
+                path, receipt = located
+                places = read_place_file(path, "ar")
+            licences = (("syn-source", "SYN-LICENCE"),)
+            fates, attributed = keys_tool.place_fates(places, BOUNDARY, licences)
+            if not rows:
+                self.assertEqual((fates, attributed), ({}, frozenset()))
+                return
+            every = tuple((token, "SYN-LICENCE") for token in ("syn-source", "syn-x"))
+            built = build_places(
+                path,
+                arabic_tag="ar",
+                boundary=BOUNDARY,
+                grid=[
+                    {"cell": h3.str_to_int(h3.latlng_to_cell(25.1, lon, 9))}
+                    for lon, _d, _c, _l in plan
+                ],
+                attribution=every,
+                places_receipt=receipt,
+            )
+        dropped = {
+            part for p in built.places for part in p.merged_ids.split(";") if part
+        }
+        survivors = {p.place_id for p in built.places} - dropped
+        self.assertEqual({k for k, v in fates.items() if v == "ok"}, survivors)
+        self.assertEqual(set(fates), {f"SYN-P-{n}" for n in range(len(plan))})
+        for key in dropped:
+            self.assertEqual(fates[key], "duplicate_dropped")
+        self.assertEqual(
+            attributed,
+            frozenset(
+                f"SYN-P-{n}"
+                for n, (_l, data, _c, _n) in enumerate(plan)
+                if data == "syn-source"
+            ),
+        )
 
 
 class AttributionTokens(World):

@@ -5,7 +5,10 @@ of ``flagship_candidates.yaml`` (a building id, ``bldg_ovt``) and of
 ``showcase_gazetteer.yaml`` (a place id, ``places_ovt``) only when exactly one
 receipted open place carries one of the row's names after
 ``trim_collapse_whitespace_casefold``; a building also needs that point in
-exactly one footprint, inside the boundary set the build uses. Every other row
+exactly one footprint, inside the boundary set the build uses. The matched
+place must also survive the build's own ``_keep`` exclusions and
+``resolve_duplicates``; its attribution token is reported apart, because the
+attribution table is filled after the token worksheet. Every other row
 stays null with a closed reason. It prints counts and booleans per place_key,
 never a name, id or coordinate. ``--check`` re-derives every filled key.
 """
@@ -24,12 +27,15 @@ from pathlib import Path
 from shapely.geometry import Point
 from shapely.geometry.base import BaseGeometry
 
+import h3
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.build import read_cached
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.raw import read_archive
 from eii_custodian.publicdata.places import PlacesError
+from eii_custodian.publicdata.places.build import _dataset, _keep
+from eii_custodian.publicdata.places.display import resolve_duplicates
 from eii_custodian.publicdata.places.integrate import (
     _boundary,
     _buildings_from_registry,
@@ -46,6 +52,7 @@ from eii_custodian.publicdata.places.read import (
     require_receipt,
 )
 from eii_custodian.publicdata.places.review import (
+    load_attribution,
     load_flagship_candidates,
     load_showcase_gazetteer,
 )
@@ -53,6 +60,7 @@ from eii_custodian.publicdata.places_fsq.policy import normalise_duplicate_name
 
 PLACES = "places_ovt"
 BUILDINGS = "bldg_ovt"
+ATTRIBUTION = "places_ovt_attribution.csv"
 Loader = Callable[[Path, Path | None], tuple[str, tuple[Mapping[str, object], ...]]]
 FILES: tuple[tuple[str, str, Loader], ...] = (
     ("flagship_candidates.yaml", BUILDINGS, load_flagship_candidates),
@@ -70,11 +78,17 @@ class ReviewError(Exception):
 
 @dataclass(frozen=True)
 class Inputs:
-    """The receipted places, every receipted footprint and the inside ids."""
+    """The receipted places, every receipted footprint and the inside ids.
+
+    fates holds each place's outcome under the build's own filters ("ok" or a
+    closed reason); attributed holds the ids whose token has a licence row.
+    """
 
     places: tuple[ReadPlace, ...]
     buildings: tuple[ReadBuilding, ...]
     inside: frozenset[str]
+    fates: Mapping[str, str]
+    attributed: frozenset[str]
 
 
 @dataclass(frozen=True)
@@ -83,6 +97,8 @@ class Proposal:
 
     place_key: str
     matches: int
+    kept: bool | None
+    attribution: bool | None
     footprints: int | None
     inside: bool | None
     key: str | None
@@ -121,21 +137,65 @@ def propose(spec: Mapping[str, object], source_id: str, inputs: Inputs) -> Propo
     matches = matching_places(candidate_names(spec), inputs.places)
     if len(matches) != 1:
         reason = "match_0" if not matches else "match_n"
-        return Proposal(place_key, len(matches), None, None, None, reason)
+        return Proposal(place_key, len(matches), None, None, None, None, None, reason)
     place = matches[0]
+    fate = inputs.fates[place.place_id]
+    if fate != "ok":
+        return Proposal(place_key, 1, False, None, None, None, None, fate)
+    named = place.place_id in inputs.attributed
     if source_id == PLACES:
-        return Proposal(place_key, 1, None, None, place.place_id, "ok")
+        return Proposal(place_key, 1, True, named, None, None, place.place_id, "ok")
     point = Point(float(place.lon), float(place.lat))
     holding = [
         row for row in inputs.buildings if decode_wkb(row.footprint_wkb).covers(point)
     ]
     if len(holding) != 1:
         reason = "footprint_0" if not holding else "footprint_n"
-        return Proposal(place_key, 1, len(holding), None, None, reason)
+        return Proposal(place_key, 1, True, named, len(holding), None, None, reason)
     building = holding[0].building_id
     if building not in inputs.inside:
-        return Proposal(place_key, 1, 1, False, None, "outside_boundary")
-    return Proposal(place_key, 1, 1, True, building, "ok")
+        return Proposal(place_key, 1, True, named, 1, False, None, "outside_boundary")
+    return Proposal(place_key, 1, True, named, 1, True, building, "ok")
+
+
+def place_fates(
+    places: Sequence[ReadPlace],
+    boundary: BaseGeometry,
+    licences: Sequence[tuple[str, str]],
+) -> tuple[dict[str, str], frozenset[str]]:
+    """Each place's outcome under the build's own ``_keep`` and duplicate rule.
+
+    Every token gets a stand-in licence so ``attribution_missing`` never fires;
+    the real table decides only the attributed ids. The frame's grid is not
+    rebuilt here: each place's own fine cell stands in, so ``no_cell`` is not
+    evaluated. No showcase area exists yet, so ``inside`` is empty.
+    """
+    tokens = {_dataset(raw.source.entry) for raw in places}
+    stand_in = tuple((token, "pending") for token in sorted(t for t in tokens if t))
+    stored = frozenset(
+        h3.str_to_int(h3.latlng_to_cell(float(raw.lat), float(raw.lon), 9))
+        for raw in places
+    )
+    fates: dict[str, str] = {}
+    kept = []
+    for raw in places:
+        excluded: dict[str, int] = {}
+        place = _keep(raw, boundary, stored, stand_in, {}, excluded, [])
+        if place is None:
+            fates[raw.place_id] = f"excluded_by_keep_{next(iter(excluded))}"
+            continue
+        kept.append(place)
+        fates[raw.place_id] = "ok"
+    outcome = resolve_duplicates(kept, frozenset(), {})
+    for survivor in outcome.places:
+        for dropped in survivor.merged_ids.split(";"):
+            if dropped:
+                fates[dropped] = "duplicate_dropped"
+    named = dict(licences)
+    attributed = frozenset(
+        raw.place_id for raw in places if _dataset(raw.source.entry) in named
+    )
+    return fates, attributed
 
 
 def apply(
@@ -174,7 +234,11 @@ def write_reviewed(
 
 
 def load_inputs(
-    cache: Path, registry: Sequence[Entry], boundary: BaseGeometry, tag: str
+    cache: Path,
+    registry: Sequence[Entry],
+    boundary: BaseGeometry,
+    tag: str,
+    licences: Sequence[tuple[str, str]] = (),
 ) -> Inputs:
     """Read only receipted files through the build's own readers."""
     if tag == "":
@@ -193,10 +257,14 @@ def load_inputs(
                 raise ReviewError("buildings_file_unreceipted")
     inside, _receipts, _outside = load_boundary_buildings(paths, receipts, boundary)
     every = tuple(row for item in paths for row in read_building_file(item))
+    places = read_place_file(path, tag)
+    fates, attributed = place_fates(places, boundary, licences)
     return Inputs(
-        read_place_file(path, tag),
+        places,
         every,
         frozenset(row.building_id for row in inside),
+        fates,
+        attributed,
     )
 
 
@@ -246,6 +314,7 @@ def fill(review: Path, inputs: Inputs) -> list[str]:
         for item in proposals:
             lines.append(
                 f"{item.place_key} matches={_bucket(item.matches)} "
+                f"kept={_flag(item.kept)} attribution={_flag(item.attribution)} "
                 f"footprints={_bucket(item.footprints)} inside={_flag(item.inside)} "
                 f"written={_flag(item.key is not None)} reason={item.reason}"
             )
@@ -265,7 +334,10 @@ def check(review: Path, inputs: Inputs) -> tuple[list[str], bool]:
                 item.key == row.get("record_key") and row.get("source_id") == source_id
             )
             agrees = agrees and same
-            lines.append(f"{item.place_key} check={_flag(same)}")
+            lines.append(
+                f"{item.place_key} check={_flag(same)} kept={_flag(item.kept)} "
+                f"attribution={_flag(item.attribution)}"
+            )
     return lines, agrees
 
 
@@ -278,7 +350,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     registry = load_registry()
     try:
         boundary = frame_boundary(args.cache, registry)
-        inputs = load_inputs(args.cache, registry, boundary, _tag(args.review))
+        licences = load_attribution(args.review / ATTRIBUTION, None)[1]
+        inputs = load_inputs(
+            args.cache, registry, boundary, _tag(args.review), licences
+        )
         if args.check:
             lines, agrees = check(args.review, inputs)
         else:
