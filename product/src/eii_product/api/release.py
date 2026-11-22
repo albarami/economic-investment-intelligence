@@ -18,7 +18,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict
 from starlette.responses import JSONResponse
 
-from eii_core.facts import METRIC_KEYS, Fact, validate_chain
+from eii_core.facts import METRIC_KEYS, Fact, validate_artefact_chain, validate_chain
 from eii_core.reasons import reason
 from eii_product.api.area_context import trusted_seat, trusted_shapes
 from eii_product.api.building_heights import heights_from_release
@@ -48,11 +48,18 @@ class Table(Closed):
     tableName: str
 
 
+class Artefact(Closed):
+    releaseId: str
+    path: str
+    sha256: str
+
+
 class Summary(Closed):
     release_id: str
     release_kind: Literal["public_only"]
     rules_version_id: str
     tables: list[Table]
+    artefacts: list[Artefact]
     hour_keys: list[str]
     day_keys: list[str]
     month_keys: list[str]
@@ -85,6 +92,18 @@ class CitedLineage(Lineage):
     providerUpdatedOn: str | None
 
 
+class ArtefactLineage(Closed):
+    link: Literal["artefact"]
+    lineageId: str
+    releaseId: str
+    artefactPath: str
+    artefactSha256: str
+    method: str
+    methodVersion: str
+    sourceIds: list[str]
+    inputClasses: list[Literal["public"]]
+
+
 class Binding(Closed):
     metricKey: str
     presentation: Literal["ordinary"] = "ordinary"
@@ -94,7 +113,7 @@ class Binding(Closed):
 class Chain(Closed):
     fact_id: str
     release_id: str
-    lineage: Lineage | CitedLineage
+    lineage: Lineage | CitedLineage | ArtefactLineage
     sources: list[Source]
     binding: Binding
 
@@ -132,6 +151,7 @@ class MountedRelease:
         self.emitted: dict[str, tuple[Fact, Binding]] = {}
         # Playbook answer facts, by the admitted session's seat.
         self.answered: dict[str, dict[str, tuple[Fact, Binding]]] = {}
+        self.artefact_lineages: dict[str, list[dict[str, Any]]] = {}
         self.citations: dict[str, dict[str, Any]] = {}
         try:
             checked = check_release(folder)
@@ -143,6 +163,10 @@ class MountedRelease:
                 raise ValueError("mount_unverified")
             receipt = read_receipt(folder, store.release_id)
             self.manifest = manifest_rows(checked.document)
+            self.artefacts = tuple(
+                Artefact(releaseId=identity, path=r["path"], sha256=r["sha256"])
+                for r in cast(list[dict[str, Any]], checked.document["artefacts"])
+            )
             if set(cast(list[str], receipt["tables"])) != {
                 r["table_name"] for r in self.manifest
             } | {"release_manifest"}:
@@ -208,6 +232,7 @@ class MountedRelease:
                 Table(releaseId=r["release_id"], tableName=r["table_name"])
                 for r in rows
             ],
+            artefacts=list(self.artefacts),
             hour_keys=[],
             day_keys=[],
             month_keys=[r["period"] for r in months],
@@ -224,6 +249,8 @@ class MountedRelease:
         if binding.metricKey not in METRIC_KEYS:
             raise ValueError("metric_unbound")
         summary = self.summary()
+        if fact.lineage_ref in self.artefact_lineages:
+            return self._project_artefact(fact, binding)
         lines = read(self.store, "sector_facts_lineage", lineage=fact.lineage_ref)
         sources = read(
             self.store,
@@ -283,19 +310,46 @@ class MountedRelease:
             fact_id=fact.fact_id,
             release_id=fact.release_id,
             lineage=lineage,
-            sources=[
-                Source(
-                    sourceId=r["source_id"],
-                    kind=r["kind"],
-                    inputClass="public",
-                    publisher=r["publisher"],
-                    datasetOrPage=r["title"],
-                    licenceOrTerms=r["licence"],
-                    retrievalDate=str(r["retrieved_on"]),
-                    sha256=r["sha256"],
-                )
-                for r in sources
-            ],
+            sources=_project_sources(sources),
+            binding=binding,
+        ).model_dump()
+
+    def _project_artefact(self, fact: Fact, binding: Binding) -> dict[str, Any]:
+        lines = [
+            r
+            for r in self.artefact_lineages[fact.lineage_ref]
+            if r.get("lineage_id") == fact.lineage_ref
+        ]
+        sources = [
+            r
+            for r in self.rows["source_registry"]
+            if r["source_id"] in {line.get("source_id") for line in lines}
+        ]
+        problem = validate_artefact_chain(
+            fact.lineage_ref,
+            lines,
+            sources,
+            [r.model_dump() for r in self.artefacts],
+            self.store.release_id,
+        )
+        if problem is not None:
+            raise ValueError(problem)
+        first = lines[0]
+        return Chain(
+            fact_id=fact.fact_id,
+            release_id=fact.release_id,
+            lineage=ArtefactLineage(
+                link="artefact",
+                lineageId=fact.lineage_ref,
+                releaseId=fact.release_id,
+                artefactPath=first["artefact_path"],
+                artefactSha256=first["artefact_sha256"],
+                method=first["method"],
+                methodVersion=first["method_version"],
+                sourceIds=sorted({r["source_id"] for r in lines}),
+                inputClasses=["public"],
+            ),
+            sources=_project_sources(sources),
             binding=binding,
         ).model_dump()
 
@@ -422,6 +476,23 @@ class MountedRelease:
 
 
 SEAT = Depends(trusted_seat)
+
+
+def _project_sources(sources: list[dict[str, Any]]) -> list[Source]:
+    """One wire projection for both lineage kinds; no inferred source metadata."""
+    return [
+        Source(
+            sourceId=r["source_id"],
+            kind=r["kind"],
+            inputClass="public",
+            publisher=r["publisher"],
+            datasetOrPage=r["title"],
+            licenceOrTerms=r["licence"],
+            retrievalDate=str(r["retrieved_on"]),
+            sha256=r["sha256"],
+        )
+        for r in sources
+    ]
 
 
 def build_release_router(mount: MountedRelease | None) -> APIRouter:

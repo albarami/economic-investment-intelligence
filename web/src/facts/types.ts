@@ -57,12 +57,11 @@ export interface SourceRow {
   sha256: string;
 }
 
-export interface LineageRow {
+interface LineageCommon {
   /** HTTP chain request identity; row citations remain bound to this Fact. */
   factId?: string;
   lineageId: string;
   releaseId: string;
-  tableName: string;
   method: string;
   methodVersion: string;
   sourceIds: string[];
@@ -70,6 +69,26 @@ export interface LineageRow {
   /** C37 row citation; the source receipt date remains unchanged. */
   rowRetrievalDate?: string;
   providerUpdatedOn?: string | null;
+}
+
+export type TableLineage = LineageCommon & {
+  link: 'table';
+  tableName: string;
+  artefactPath?: never;
+  artefactSha256?: never;
+};
+export type ArtefactLineage = LineageCommon & {
+  link: 'artefact';
+  artefactPath: string;
+  artefactSha256: string;
+  tableName?: never;
+};
+export type LineageRow = TableLineage | ArtefactLineage;
+
+export interface ReleaseArtefact {
+  releaseId: string;
+  path: string;
+  sha256: string;
 }
 
 export interface ReleaseRecord {
@@ -123,6 +142,7 @@ export interface RegistryInput {
   facts: readonly FactBinding[];
   releases: readonly ReleaseRecord[];
   tables: readonly ReleaseTable[];
+  artefacts: readonly ReleaseArtefact[];
   lineages: readonly LineageRow[];
   sources: readonly SourceRow[];
 }
@@ -131,6 +151,9 @@ export type MissingLink =
   | 'fact'
   | 'release'
   | 'table'
+  | 'artefact'
+  | 'artefact_hash'
+  | 'link_kind'
   | 'lineage'
   | 'method'
   | 'method_version'
@@ -152,11 +175,13 @@ export type Resolution =
   | { status: 'loading' }
   | { status: 'no_data' }
   | { status: 'refused'; missing: MissingLink }
-  | {
+  | ({
       status: 'ready';
       binding: FactBinding;
       lineage: LineageRow;
       sources: SourceRow[];
-      table: ReleaseTable;
       display: ChainDisplay;
-    };
+    } & (
+      | { link: 'table'; table: ReleaseTable; artefact?: never }
+      | { link: 'artefact'; artefact: ReleaseArtefact; table?: never }
+    ));

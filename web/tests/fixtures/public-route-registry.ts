@@ -14,6 +14,7 @@ export function routeRegistry(body: { facts: Fact[]; payload: LayerPayload }) {
     sha256: 'ab'.repeat(32),
   }));
   const lineages = [...new Set(facts.map((f) => f.lineage_ref))].map((id) => ({
+    link: 'table' as const,
     lineageId: id,
     releaseId: facts[0]!.release_id,
     tableName: id.replace('lin_', ''),
@@ -34,6 +35,7 @@ export function routeRegistry(body: { facts: Fact[]; payload: LayerPayload }) {
     })),
     lineages,
     sources,
+    artefacts: [],
     tables: lineages.map((l) => ({
       tableName: l.tableName,
       releaseId: l.releaseId,

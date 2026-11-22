@@ -14,7 +14,12 @@ import {
   type SourceKind,
   type SourceRow,
 } from '../../src/facts/registry';
-import type { Fact, Reliability, EvidenceStatus } from '../../src/facts/types';
+import type {
+  Fact,
+  Reliability,
+  EvidenceStatus,
+  TableLineage,
+} from '../../src/facts/types';
 
 const RELEASE =
   'a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8';
@@ -84,8 +89,11 @@ export function makeSource(overrides: Partial<SourceRow> = {}): SourceRow {
   };
 }
 
-export function makeLineage(overrides: Partial<LineageRow> = {}): LineageRow {
+export function makeLineage(
+  overrides: Partial<TableLineage> = {},
+): TableLineage {
   return {
+    link: 'table',
     lineageId: 'lin_sample_chain',
     releaseId: RELEASE,
     tableName: 'sample_counts',
@@ -110,6 +118,7 @@ export function completeInput(): RegistryInput {
   return {
     facts: [makeBinding()],
     releases: [{ releaseId: RELEASE }],
+    artefacts: [],
     tables: [{ releaseId: RELEASE, tableName: 'sample_counts' }],
     lineages: [makeLineage()],
     sources: [makeSource()],
@@ -257,3 +266,10 @@ export function calendarFact(
 }
 
 export { RELEASE };
+
+/** The unchanged server table wire shape, before the client adapter. */
+export function tableWire(row: LineageRow) {
+  const { link, ...wire } = row;
+  void link;
+  return wire;
+}

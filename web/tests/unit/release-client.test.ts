@@ -1,7 +1,8 @@
+import * as registryModule from '../../src/facts/registry';
 import { describe, expect, it, vi } from 'vitest';
 import { loadBasemapUrl, loadRegistryInput } from '../../src/api/release';
 import { createRegistry } from '../../src/facts/registry';
-import { completeInput } from '../fixtures/facts';
+import { completeInput, tableWire } from '../fixtures/facts';
 
 function transport() {
   const input = completeInput();
@@ -12,6 +13,7 @@ function transport() {
     release_kind: 'public_only',
     rules_version_id: 'INVENTED-rules',
     tables: input.tables,
+    artefacts: input.artefacts,
     hour_keys: [],
     day_keys: [],
     month_keys: [],
@@ -21,7 +23,7 @@ function transport() {
   const chain = {
     fact_id: fact.fact_id,
     release_id: fact.release_id,
-    lineage: input.lineages[0],
+    lineage: tableWire(input.lineages[0]!),
     sources: input.sources,
     binding: {
       metricKey: binding.metricKey,
@@ -202,4 +204,168 @@ describe('mounted basemap selection', () => {
     await expect(loadBasemapUrl()).rejects.toThrow('chain_refused');
     vi.unstubAllGlobals();
   });
+});
+
+// D0 new transport cases; table wire fixtures above retain their closed shape.
+function artefactTransport() {
+  const held = transport();
+  const { tableName: _table, ...common } = held.chain.lineage!;
+  void _table;
+  const lineage = {
+    ...common,
+    link: 'artefact',
+    artefactPath: 'artefacts/SYN-height.json',
+    artefactSha256: 'ab'.repeat(32),
+  };
+  const artefact = {
+    releaseId: held.fact.release_id,
+    path: lineage.artefactPath,
+    sha256: lineage.artefactSha256,
+  };
+  Object.assign(held.chain, { lineage });
+  Object.assign(held.release, { artefacts: [artefact] });
+  return { ...held, lineage, artefact };
+}
+it('adapts the exact legacy table wire shape in the decoder only', async () => {
+  const { fact } = transport();
+  const input = await loadRegistryInput([fact]);
+  expect(input.lineages[0]!.link).toBe('table');
+  expect(input.artefacts).toEqual([]);
+  vi.unstubAllGlobals();
+});
+it('decodes and retains the trusted release artefact inventory', async () => {
+  const { fact, artefact } = artefactTransport();
+  const input = await loadRegistryInput([fact]);
+  expect(input.artefacts).toEqual([artefact]);
+  expect(createRegistry(input).resolve(fact.fact_id)).toMatchObject({
+    status: 'ready',
+    link: 'artefact',
+    artefact,
+  });
+  vi.unstubAllGlobals();
+});
+it.each([
+  'unknown',
+  'table-link',
+  'missing',
+  'hash',
+  'mixed',
+  'inventory-release',
+  'inventory-hash',
+  'inventory-path',
+  'inventory-extra',
+])(
+  'refuses the independent %s link plant with chain_refused',
+  async (plant) => {
+    const { fact, chain, release, lineage, artefact } = artefactTransport();
+    if (plant === 'unknown') lineage.link = 'unknown';
+    if (plant === 'table-link') {
+      const held = transport();
+      Object.assign(held.chain.lineage!, { link: 'table' });
+      await expect(loadRegistryInput([held.fact])).rejects.toThrow(
+        /^chain_refused$/,
+      );
+      vi.unstubAllGlobals();
+      return;
+    }
+    if (plant === 'missing') Object.assign(release, { artefacts: [] });
+    if (plant === 'hash') lineage.artefactSha256 = 'cd'.repeat(32);
+    if (plant === 'mixed')
+      Object.assign(lineage, { tableName: 'sample_counts' });
+    if (plant === 'inventory-release') artefact.releaseId = 'foreign';
+    if (plant === 'inventory-hash') artefact.sha256 = 'not-a-hash';
+    if (plant === 'inventory-path') artefact.path = '';
+    if (plant === 'inventory-extra')
+      Object.assign(artefact, { extra: 'INVENTED' });
+    void chain;
+    await expect(loadRegistryInput([fact])).rejects.toThrow(/^chain_refused$/);
+    vi.unstubAllGlobals();
+  },
+);
+it('refuses an artefact lineage conflict rather than overwriting it', async () => {
+  const { fact, chain, release } = artefactTransport();
+  const second = { ...fact, fact_id: 'f_' + 'cd'.repeat(16) };
+  vi.stubGlobal('fetch', async (path: string) => {
+    const next = structuredClone(chain);
+    if (path.includes(second.fact_id)) {
+      next.fact_id = second.fact_id;
+      Object.assign(next.lineage!, { methodVersion: 'v2' });
+    }
+    return {
+      ok: true,
+      json: async () => (path === '/api/release' ? release : next),
+    };
+  });
+  await expect(loadRegistryInput([fact, second])).rejects.toThrow(
+    /^chain_refused$/,
+  );
+  vi.unstubAllGlobals();
+});
+
+it.each(['missing', 'hash'])(
+  'the decoder refuses %s before constructing a registry',
+  async (plant) => {
+    const { fact, release, lineage } = artefactTransport();
+    const spy = vi.spyOn(registryModule, 'createRegistry');
+    try {
+      if (plant === 'missing') Object.assign(release, { artefacts: [] });
+      else lineage.artefactSha256 = 'cd'.repeat(32);
+      await expect(loadRegistryInput([fact])).rejects.toThrow(
+        /^chain_refused$/,
+      );
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      spy.mockRestore();
+      vi.unstubAllGlobals();
+    }
+  },
+);
+it.each(['release', 'hash'])(
+  'validates inventory %s even without any fact',
+  async (plant) => {
+    const { artefact } = artefactTransport();
+    if (plant === 'release') artefact.releaseId = 'foreign';
+    else artefact.sha256 = 'not-a-hash';
+    await expect(loadBasemapUrl()).rejects.toThrow(/^chain_refused$/);
+    vi.unstubAllGlobals();
+  },
+);
+it('refuses table-only citation fields on an artefact lineage', async () => {
+  const { fact, lineage } = artefactTransport();
+  Object.assign(lineage, {
+    rowRetrievalDate: '2026-01-02',
+    providerUpdatedOn: null,
+  });
+  await expect(loadRegistryInput([fact])).rejects.toThrow(/^chain_refused$/);
+  vi.unstubAllGlobals();
+});
+
+it('compares artefact identity in the shared-lineage conflict check', async () => {
+  const { fact, chain, release, artefact } = artefactTransport();
+  const second = { ...fact, fact_id: 'f_' + 'cd'.repeat(16) };
+  const otherPath = 'artefacts/SYN-other-height.json';
+  Object.assign(release, {
+    artefacts: [artefact, { ...artefact, path: otherPath }],
+  });
+  vi.stubGlobal('fetch', async (path: string) => {
+    const next = structuredClone(chain);
+    if (path.includes(second.fact_id)) {
+      next.fact_id = second.fact_id;
+      Object.assign(next.lineage!, { artefactPath: otherPath });
+    }
+    return {
+      ok: true,
+      json: async () => (path === '/api/release' ? release : next),
+    };
+  });
+  const spy = vi.spyOn(registryModule, 'createRegistry');
+  try {
+    await expect(loadRegistryInput([fact, second])).rejects.toThrow(
+      /^chain_refused$/,
+    );
+    expect(spy).not.toHaveBeenCalled();
+  } finally {
+    spy.mockRestore();
+    vi.unstubAllGlobals();
+  }
 });

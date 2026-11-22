@@ -362,6 +362,7 @@ describe('fix pass 2', () => {
         }),
       ],
       releases: [{ releaseId: makeFact().release_id }],
+      artefacts: [],
       tables: [{ releaseId: makeFact().release_id, tableName: 'pub_place' }],
       lineages: [
         makeLineage({ tableName: 'pub_place', inputClasses: ['synthetic'] }),

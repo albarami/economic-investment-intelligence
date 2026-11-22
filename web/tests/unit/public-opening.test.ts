@@ -11,7 +11,7 @@ import {
 import { loadRegistryInput } from '../../src/api/release';
 import { catalogue } from '../../src/brief/catalogue';
 import { createRegistry } from '../../src/facts/registry';
-import { completeInput, factId } from '../fixtures/facts';
+import { completeInput, factId, tableWire } from '../fixtures/facts';
 import { contextInput } from '../fixtures/public-context';
 import type { Fact } from '../../src/facts/types';
 import type { ContextPayload } from '../../src/cards/PublicContextCard';
@@ -211,6 +211,7 @@ function transport() {
     release_kind: 'public_only',
     rules_version_id: 'INVENTED-rules',
     tables: input.tables,
+    artefacts: input.artefacts,
     hour_keys: [],
     day_keys: [],
     month_keys: [],
@@ -255,8 +256,10 @@ function transport() {
     return Response.json({
       fact_id: binding.fact.fact_id,
       release_id: binding.fact.release_id,
-      lineage: input.lineages.find(
-        (row) => row.lineageId === binding.fact.lineage_ref,
+      lineage: tableWire(
+        input.lineages.find(
+          (row) => row.lineageId === binding.fact.lineage_ref,
+        )!,
       ),
       sources: input.sources,
       binding: {
@@ -733,4 +736,31 @@ describe('wider outline request', () => {
     expect(story.rings).toBeNull();
     expect(requests(fetch)).toHaveLength(0);
   });
+});
+
+// D0 new merge cases, independent of the pre-existing table-path assertions.
+it('retains a manifest artefact while merging the same snapshot twice', () => {
+  const input = completeInput();
+  const artefact = {
+    releaseId: input.releases[0]!.releaseId,
+    path: 'artefacts/SYN-height.json',
+    sha256: 'ab'.repeat(32),
+  };
+  Object.assign(input, { artefacts: [artefact] });
+  expect(mergeInputs([input, input]).artefacts).toEqual([artefact]);
+});
+it('refuses one path with two hashes as chain_conflict', () => {
+  const input = completeInput();
+  Object.assign(input, {
+    artefacts: [
+      {
+        releaseId: input.releases[0]!.releaseId,
+        path: 'artefacts/SYN-height.json',
+        sha256: 'ab'.repeat(32),
+      },
+    ],
+  });
+  const changed = structuredClone(input);
+  Object.assign(changed.artefacts[0]!, { sha256: 'cd'.repeat(32) });
+  expect(() => mergeInputs([input, changed])).toThrow(/^chain_conflict$/);
 });

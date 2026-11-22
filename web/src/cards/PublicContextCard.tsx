@@ -122,7 +122,7 @@ export function contextAccepted(
   if (
     binding.metricKey !== spec.metric ||
     fact.unit !== spec.unit ||
-    table.tableName !== spec.table ||
+    table?.tableName !== spec.table ||
     fact.label_en !== spec.label
   )
     return false;
@@ -213,7 +213,13 @@ function ContextEvidence({
   language: Language;
 }) {
   const fields = [
-    ['drawer.release', resolved.table.tableName, resolved.binding.fact.fact_id],
+    [
+      'drawer.release',
+      resolved.link === 'table'
+        ? resolved.table.tableName
+        : resolved.binding.fact.release_id,
+      resolved.binding.fact.fact_id,
+    ],
     ['drawer.method', resolved.lineage.method, resolved.lineage.lineageId],
   ] as const;
   return (

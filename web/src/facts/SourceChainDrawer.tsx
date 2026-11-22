@@ -17,6 +17,9 @@ const MISSING_KEY: Record<MissingLink, StringKey> = {
   fact: 'drawer.link.fact',
   release: 'drawer.link.release',
   table: 'drawer.link.table',
+  artefact: 'drawer.link.artefact',
+  artefact_hash: 'drawer.link.artefact_hash',
+  link_kind: 'drawer.link.link_kind',
   lineage: 'drawer.link.lineage',
   method: 'drawer.link.method',
   method_version: 'drawer.link.method_version',
@@ -189,18 +192,31 @@ function ReadyChain({
       </div>
       <ol data-part="why" className="thread">
         <li data-part="fact">{text(language, 'drawer.fact')}</li>
-        <li data-part="table">
-          <span className="chain-label">
-            {text(language, 'drawer.release')}
-          </span>
-          <FactChip
-            variant="reference"
-            language={language}
-            kind="published_text"
-            value={resolution.table.tableName}
-            recordId={resolution.table.tableName}
-          />
-        </li>
+        {resolution.link === 'table' ? (
+          <li data-part="table">
+            <span className="chain-label">
+              {text(language, 'drawer.release')}
+            </span>
+            <FactChip
+              variant="reference"
+              language={language}
+              kind="published_text"
+              value={resolution.table.tableName}
+              recordId={resolution.table.tableName}
+            />
+          </li>
+        ) : null}
+        {resolution.link === 'artefact' ? (
+          <li data-part="release">
+            <FactChip
+              variant="reference"
+              kind="published_text"
+              value={fact.release_id}
+              recordId={fact.release_id}
+              language={language}
+            />
+          </li>
+        ) : null}
         <li data-part="method">
           <Pair
             label={text(language, 'drawer.method')}

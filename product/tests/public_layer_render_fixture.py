@@ -121,6 +121,7 @@ def registry_input(body, store):
         method, version = rows[0]["transform"].rsplit("@", 1)
         lineages.append(
             dict(
+                link="table",
                 lineageId=ref,
                 releaseId=store.release_id,
                 tableName=rows[0]["table_name"],
@@ -145,6 +146,7 @@ def registry_input(body, store):
             dict(tableName=line["tableName"], releaseId=store.release_id)
             for line in lineages
         ],
+        artefacts=[],
         lineages=lineages,
         sources=[
             dict(

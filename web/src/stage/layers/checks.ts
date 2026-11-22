@@ -199,7 +199,7 @@ function companyFactProblem(
   if (resolved.status !== 'ready') return 'incomplete_source_chain';
   if (resolved.binding.fact.provenance !== 'public') return 'not_public';
   if (
-    resolved.table.tableName !== entry.table ||
+    resolved.table?.tableName !== entry.table ||
     !entry.metricKeys.includes(resolved.binding.metricKey)
   )
     return 'measure_on_named_feature';
@@ -382,7 +382,7 @@ export function fcSectionProblem(
     if (fact.provenance !== 'public')
       return refuseSection('legend_count_unbound');
     if (fact.unit !== 'count') return refuseSection('legend_count_unbound');
-    if (!tables.includes(resolved.table.tableName)) {
+    if (!tables.includes(resolved.table?.tableName ?? '')) {
       return refuseSection('legend_count_unbound');
     }
     const year = (countFacts ?? []).find((row) => row.fact_id === band.fact_id);
@@ -490,7 +490,7 @@ export function fdiReferenceProblem(
     if (resolved.status !== 'ready') return 'incomplete_source_chain';
     if (resolved.binding.fact.provenance !== 'public') return 'not_public';
     if (
-      resolved.table.tableName !== 'fdi_projects' ||
+      resolved.table?.tableName !== 'fdi_projects' ||
       resolved.binding.metricKey !== 'fdi_field' ||
       resolved.binding.fact.unit !== segment.referenceKind ||
       resolved.binding.fact.value !== segment.value
@@ -545,7 +545,7 @@ export function publishedFdiPoint(
       (resolved) =>
         resolved.binding.metricKey === 'fdi_location' &&
         resolved.binding.fact.provenance === 'public' &&
-        resolved.table.tableName === 'fdi_projects' &&
+        resolved.table?.tableName === 'fdi_projects' &&
         resolved.binding.fact.unit === 'decimal_degree',
     ) &&
     lon.binding.fact.value === position[0] &&
@@ -581,7 +581,7 @@ export function bindingProblem(
       return 'measure_on_named_feature';
     if (resolved.binding.fact.provenance !== feature.provenance)
       return 'not_public';
-    if (!tables.includes(resolved.table.tableName))
+    if (!tables.includes(resolved.table?.tableName ?? ''))
       return 'measure_on_named_feature';
     if (entry.key === 'fc_firms_per_tower') {
       const geography = resolved.binding.fact.geography;

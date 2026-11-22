@@ -7,6 +7,7 @@ import type {
   LineageRow,
   RegistryInput,
   ReleaseTable,
+  ReleaseArtefact,
   SourceRow,
 } from '../facts/types';
 
@@ -110,6 +111,7 @@ async function readRelease() {
     'release_kind',
     'rules_version_id',
     'tables',
+    'artefacts',
     'hour_keys',
     'day_keys',
     'month_keys',
@@ -127,12 +129,18 @@ async function readRelease() {
       throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     return { releaseId, tableName: text(row.tableName) };
   });
+  const artefacts: ReleaseArtefact[] = list(release.artefacts).map((value) => {
+    const row = closed(value, ['releaseId', 'path', 'sha256']);
+    if (row.releaseId !== releaseId || !/^[0-9a-f]{64}$/.test(text(row.sha256)))
+      throw new Error('chain_refused');
+    return { releaseId, path: text(row.path), sha256: text(row.sha256) };
+  });
   if (
     release.basemap_url !== null &&
     release.basemap_url !== '/tiles/basemap.pmtiles'
   )
     throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
-  return { releaseId, tables, basemapUrl: release.basemap_url };
+  return { releaseId, tables, artefacts, basemapUrl: release.basemap_url };
 }
 
 export async function loadBasemapUrl(): Promise<string | null> {
@@ -142,7 +150,7 @@ export async function loadBasemapUrl(): Promise<string | null> {
 export async function loadRegistryInput(
   facts: readonly Fact[],
 ): Promise<RegistryInput> {
-  const { releaseId, tables } = await readRelease();
+  const { releaseId, tables, artefacts } = await readRelease();
   const bindings: FactBinding[] = [];
   const lineages: LineageRow[] = [];
   const sources: SourceRow[] = [];
@@ -165,14 +173,23 @@ export async function loadRegistryInput(
     ]);
     if (chain.fact_id !== fact.fact_id || chain.release_id !== releaseId)
       throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
+    const linked =
+      typeof chain.lineage === 'object' &&
+      chain.lineage !== null &&
+      Object.hasOwn(chain.lineage, 'link');
+    const artefact =
+      linked && (chain.lineage as Record<string, unknown>).link === 'artefact';
     const citation =
+      !artefact &&
       typeof chain.lineage === 'object' &&
       chain.lineage !== null &&
       Object.hasOwn(chain.lineage, 'rowRetrievalDate');
     const row = closed(chain.lineage, [
       'lineageId',
       'releaseId',
-      'tableName',
+      ...(artefact
+        ? ['link', 'artefactPath', 'artefactSha256']
+        : ['tableName']),
       'method',
       'methodVersion',
       'sourceIds',
@@ -189,7 +206,13 @@ export async function loadRegistryInput(
       factId: fact.fact_id,
       lineageId: text(row.lineageId),
       releaseId,
-      tableName: text(row.tableName),
+      ...(artefact
+        ? {
+            link: 'artefact' as const,
+            artefactPath: text(row.artefactPath),
+            artefactSha256: text(row.artefactSha256),
+          }
+        : { link: 'table' as const, tableName: text(row.tableName) }),
       method: text(row.method),
       methodVersion: text(row.methodVersion),
       sourceIds: list(row.sourceIds).map(text),
@@ -204,12 +227,28 @@ export async function loadRegistryInput(
           }
         : {}),
     };
-    if (!tables.some((table) => table.tableName === lineage.tableName))
+    if (lineage.link === 'artefact') {
+      if (
+        !artefacts.some(
+          (entry) =>
+            entry.releaseId === lineage.releaseId &&
+            entry.path === lineage.artefactPath &&
+            entry.sha256 === lineage.artefactSha256,
+        )
+      )
+        throw new Error('chain_refused');
+    } else if (!tables.some((table) => table.tableName === lineage.tableName))
       throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const base = (row: LineageRow) => ({
       lineageId: row.lineageId,
       releaseId: row.releaseId,
-      tableName: row.tableName,
+      ...(row.link === 'table'
+        ? { link: row.link, tableName: row.tableName }
+        : {
+            link: row.link,
+            artefactPath: row.artefactPath,
+            artefactSha256: row.artefactSha256,
+          }),
       method: row.method,
       methodVersion: row.methodVersion,
       sourceIds: row.sourceIds,
@@ -265,6 +304,7 @@ export async function loadRegistryInput(
     facts: bindings,
     releases: [{ releaseId }],
     tables,
+    artefacts,
     lineages,
     sources,
   };

@@ -83,6 +83,7 @@ export function contextInput() {
   return {
     facts,
     releases: [{ releaseId }],
+    artefacts: [],
     tables: tables.map((tableName) => ({ releaseId, tableName })),
     lineages: tables.map((tableName) =>
       makeLineage({

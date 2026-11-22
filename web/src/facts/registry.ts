@@ -10,6 +10,8 @@ import type {
   Provenance,
   RegistryInput,
   Resolution,
+  ReleaseArtefact,
+  ReleaseTable,
   SourceKind,
   SourceRow,
 } from './types';
@@ -114,18 +116,39 @@ function chainOf(
   if (blank(lineage.method)) return refused('method');
   if (blank(lineage.methodVersion)) return refused('method_version');
   if (lineage.releaseId !== fact.release_id) return refused('release_identity');
-  if (input.tables.length === 0) return refused('table');
-  const table = input.tables.find(
-    (row) =>
-      row.releaseId === fact.release_id && row.tableName === lineage.tableName,
-  );
-  if (!table) {
-    const sameRelease = input.tables.some(
-      (row) => row.releaseId === fact.release_id,
+  let table: ReleaseTable | undefined;
+  let artefact: ReleaseArtefact | undefined;
+  if (lineage.link === 'table') {
+    if ('artefactPath' in lineage || 'artefactSha256' in lineage)
+      return refused('link_kind');
+    if (input.tables.length === 0) return refused('table');
+    table = input.tables.find(
+      (row) =>
+        row.releaseId === fact.release_id &&
+        row.tableName === lineage.tableName,
     );
-    return refused(sameRelease ? 'table' : 'release_identity');
-  }
-  if (blank(table.tableName)) return refused('table');
+    if (!table) {
+      const sameRelease = input.tables.some(
+        (row) => row.releaseId === fact.release_id,
+      );
+      return refused(sameRelease ? 'table' : 'release_identity');
+    }
+    if (blank(table.tableName)) return refused('table');
+  } else if (lineage.link === 'artefact') {
+    if ('tableName' in lineage) return refused('link_kind');
+    artefact = input.artefacts.find(
+      (row) =>
+        row.releaseId === fact.release_id && row.path === lineage.artefactPath,
+    );
+    if (!artefact) {
+      const foreign = input.artefacts.some(
+        (row) => row.path === lineage.artefactPath,
+      );
+      return refused(foreign ? 'release_identity' : 'artefact');
+    }
+    if (blank(artefact.sha256) || artefact.sha256 !== lineage.artefactSha256)
+      return refused('artefact_hash');
+  } else return refused('link_kind');
   if (lineage.sourceIds.length === 0) return refused('source');
   if (lineage.inputClasses.length === 0) return refused('input_class_source');
   if (!classSetsAgree(fact.input_classes, lineage.inputClasses))
@@ -150,8 +173,18 @@ function chainOf(
   }
   const companion = companionGap(binding, input, stack);
   if (companion) return refused('companion');
-  const display = fact.provenance === 'suppressed' ? 'withheld' : 'value';
-  return { status: 'ready', binding, lineage, sources, table, display };
+  const display: 'withheld' | 'value' =
+    fact.provenance === 'suppressed' ? 'withheld' : 'value';
+  const ready = {
+    status: 'ready' as const,
+    binding,
+    lineage,
+    sources,
+    display,
+  };
+  return table
+    ? { ...ready, link: 'table', table }
+    : { ...ready, link: 'artefact', artefact: artefact! };
 }
 
 function classSetsAgree(
@@ -222,6 +255,7 @@ export function createRegistry(input: RegistryInput): FactRegistry {
     facts,
     releases: [...input.releases],
     tables: [...input.tables],
+    artefacts: [...input.artefacts],
     lineages: [...input.lineages],
     sources: [...input.sources],
   };

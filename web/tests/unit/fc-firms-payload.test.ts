@@ -139,6 +139,7 @@ function registryReadyForAnyId(): FactRegistry {
   return {
     resolve: () => ({
       status: 'ready',
+      link: 'table',
       binding: {
         metricKey: 'firms_per_tower',
         presentation: 'ordinary',
@@ -161,6 +162,7 @@ function registryReadyForAnyId(): FactRegistry {
         },
       },
       lineage: {
+        link: 'table',
         lineageId: 'lin-sample',
         releaseId: 'rel-sample',
         tableName: 'pub_register_company',

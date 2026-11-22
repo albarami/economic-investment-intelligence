@@ -34,7 +34,7 @@
 16. No model ever calculates. Every displayed number comes from deterministic, tested code in `eii_core.calc`, the release build, or a fixed application-schema read function listed by the data contracts and covered by tests. Nothing else computes, rounds or compares a number.
 17. Comparisons, rounding, ranking and selection of numbers are calculations too. Models never perform them; code returns comparison facts for catalogue slots.
 18. No model writes SQL, Cypher, another query, a tool argument outside its closed schema, or a number. Numeric arguments come only from closed schema values, typed user inputs or returned facts.
-19. Apply the sanad rule: every fact resolves through fact → release table → method and version → source, licence, retrieval date and hash.
+19. Apply the sanad rule: every fact resolves through fact → release table → method and version → source, licence, retrieval date and hash. Proposed decision 0088 item 2 records the narrow release-artefact alternative for S3-P1b; review and acceptance are owed.
 20. Never weaken the accounting gate. Check sources, assumptions, invention, scope and limits before display; fall back to the template writer and log failure.
 21. No model-written prose reaches the screen. Models select and order catalogue claims, components, fragments, questions and stage directives; application-owned templates render every word.
 22. Keep claim, component, fragment and question catalogues closed, versioned and typed. Reject unknown keys, properties, wrong fact slots and invalid layouts; one repair, then template fallback.

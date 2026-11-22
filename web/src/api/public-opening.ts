@@ -115,6 +115,10 @@ export function mergeInputs(inputs: readonly RegistryInput[]): RegistryInput {
       inputs.flatMap((i) => i.tables),
       (r) => r.releaseId + ':' + r.tableName,
     ),
+    artefacts: unique(
+      inputs.flatMap((i) => i.artefacts),
+      (r) => r.releaseId + ':' + r.path,
+    ),
     lineages: unique(
       inputs.flatMap((i) => i.lineages),
       (r) => r.lineageId + ':' + r.factId,

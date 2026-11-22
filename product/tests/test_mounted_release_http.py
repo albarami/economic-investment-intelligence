@@ -78,6 +78,7 @@ def test_mounted_release_closed_projection(mounted):
         "release_kind",
         "rules_version_id",
         "tables",
+        "artefacts",
         "hour_keys",
         "day_keys",
         "month_keys",

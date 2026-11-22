@@ -165,6 +165,8 @@ S3-T28 operation reconciliation: [0072](decisions/0072-loopback-activation-and-r
 
 | [0061](decisions/0061-public-routes-of-slice-s3.md) | Public routes of slice S3, class method and bounded session shapes | Proposed, 2026-11-19; pass 1 only |
 
+| [0088](decisions/0088-building-facts-through-release-artefacts.md) | Building facts through release artefacts, the closed link migration and building geography | Proposed by task S3-P1b D0; review owed |
+
 ## Identifiers and change control
 
 1. A requirement ID has its document prefix and a number. It is defined exactly once, as the bare first cell of a requirement-table row; other documents may reference it only after confirming that definition.

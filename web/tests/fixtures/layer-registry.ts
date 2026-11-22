@@ -46,6 +46,7 @@ export function layerRegistry(rows: readonly LayerFactSpec[]): FactRegistry {
       }),
     ),
     releases: [{ releaseId: release }],
+    artefacts: [],
     tables: rows.map((row) => ({ releaseId: release, tableName: row.table })),
     lineages: rows.map((row, index) =>
       makeLineage({

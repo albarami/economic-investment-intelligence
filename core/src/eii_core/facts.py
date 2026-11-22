@@ -238,7 +238,7 @@ class Fact(BaseModel):
         elif set(geo) == {"kind", "public_code"} and geo["kind"] == "public":
             if (
                 re.fullmatch(
-                    r"(zone|municipality|district|place|cell|feature):.+",
+                    r"(zone|municipality|district|place|cell|feature|building):.+",
                     geo["public_code"],
                 )
                 is None
@@ -246,6 +246,15 @@ class Fact(BaseModel):
                 raise ValueError("geography_invalid")
         else:
             raise ValueError("geography_invalid")
+        if geo.get("public_code", "").startswith("building:"):
+            if (
+                self.provenance != "public"
+                or self.input_classes != ["public"]
+                or self.evidence_status not in {"observed", "inferred"}
+            ):
+                raise ValueError("building_status_invalid")
+            if self.unit != "metres":
+                raise ValueError("building_unit_invalid")
         if (
             geo.get("public_code", "").startswith(("cell:", "feature:"))
             or self.unit in {"square_metre", "qar_per_ft2", "qar_per_m2"}
@@ -424,15 +433,9 @@ def validate_chain(
         if len(sources) != 1:
             return "source_missing"
         source = sources[0]
-        for key in ("publisher", "title", "licence", "url"):
-            if not isinstance(source.get(key), str) or not str(source[key]).strip():
-                return "source_" + key + "_missing"
-        digest = source.get("sha256")
-        if not isinstance(digest, str) or HASH.fullmatch(digest) is None:
-            return "source_hash_missing"
-        retrieved = source.get("retrieved_on")
-        if type(retrieved) is not date:
-            return "source_retrieval_missing"
+        problem = _source_problem(source)
+        if problem is not None:
+            return problem
         resolved.append(source)
     for required in required_sources:
         if not any(
@@ -455,4 +458,81 @@ def validate_chain(
             for s in resolved
         ):
             return "lineage_inputs_incomplete"
+    return None
+
+
+def _source_problem(source: Mapping[str, object]) -> str | None:
+    """Common Public source contract for table and manifest-artefact links."""
+    for key in ("publisher", "title", "licence", "url"):
+        if not isinstance(source.get(key), str) or not str(source[key]).strip():
+            return "source_" + key + "_missing"
+    digest = source.get("sha256")
+    if not isinstance(digest, str) or HASH.fullmatch(digest) is None:
+        return "source_hash_missing"
+    retrieved = source.get("retrieved_on")
+    if type(retrieved) is not date:
+        return "source_retrieval_missing"
+    return None
+
+
+def validate_artefact_chain(
+    lineage_ref: str,
+    lineage_rows: Sequence[Mapping[str, object]],
+    source_rows: Sequence[Mapping[str, object]],
+    artefacts: Sequence[Mapping[str, object]],
+    release_id: str,
+) -> str | None:
+    """Validate a manifest link independently of the unchanged table contract."""
+    lines = [r for r in lineage_rows if r.get("lineage_id") == lineage_ref]
+    if not lines:
+        return "lineage_missing"
+    fields = {
+        "lineage_id",
+        "release_id",
+        "artefact_path",
+        "artefact_sha256",
+        "method",
+        "method_version",
+        "source_id",
+        "input_class",
+    }
+    for line in lines:
+        if set(line) != fields:
+            return "artefact_link_invalid"
+        if line["release_id"] != release_id:
+            return "artefact_release_mismatch"
+        entries = [r for r in artefacts if r.get("path") == line["artefact_path"]]
+        if len(entries) != 1:
+            return "artefact_missing"
+        digest = line["artefact_sha256"]
+        if (
+            not isinstance(digest, str)
+            or HASH.fullmatch(digest) is None
+            or digest != entries[0].get("sha256")
+        ):
+            return "artefact_hash_mismatch"
+        for field, reason in (
+            ("method", "artefact_method_missing"),
+            ("method_version", "artefact_method_version_missing"),
+        ):
+            value = line[field]
+            if not isinstance(value, str) or not value.strip():
+                return reason
+        if line["input_class"] != "public":
+            return "lineage_class_invalid"
+        sources = [r for r in source_rows if r.get("source_id") == line["source_id"]]
+        if len(sources) != 1:
+            return "source_missing"
+        problem = _source_problem(sources[0])
+        if problem is not None:
+            return problem
+    first = lines[0]
+    if any(
+        any(
+            line[k] != first[k]
+            for k in ("artefact_path", "artefact_sha256", "method", "method_version")
+        )
+        for line in lines
+    ):
+        return "artefact_chain_conflict"
     return None
