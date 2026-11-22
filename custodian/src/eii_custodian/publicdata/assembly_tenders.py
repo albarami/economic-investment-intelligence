@@ -6,6 +6,7 @@ import json
 import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import cast
 
 from .assembly import AssemblyError
 from .assembly_io import local, read_object
@@ -43,7 +44,9 @@ def verify_intake_match(cache: Path, body: bytes, stamp: str) -> None:
 def terms_body_hash(
     cache: Path, entry: Entry, rows: Sequence[Mapping[str, object]]
 ) -> str:
-    """Select this run's raw terms body, retaining the review's hash convention."""
+    """Authenticate this run's raw terms snapshot and visible-text reading."""
+    if any(not isinstance(row, Mapping) for row in rows):
+        raise AssemblyError("assembly_tender_terms_incomplete")
     matches = [row for row in rows if row.get("key") == entry.key]
     if len(matches) != 1:
         raise AssemblyError("assembly_tender_terms_incomplete")
@@ -68,6 +71,31 @@ def terms_body_hash(
     except (OSError, ValueError):
         raise AssemblyError("assembly_tender_terms_incomplete") from None
     return digest
+
+
+def terms_visible_hash(
+    cache: Path, entry: Entry, rows: Sequence[Mapping[str, object]]
+) -> str:
+    """Return the reviewed visible-text hash after authenticating its raw body."""
+    terms_body_hash(cache, entry, rows)
+    row = next(row for row in rows if row.get("key") == entry.key)
+    return cast(str, row["terms_sha256"])
+
+
+def verify_archive_terms(body: bytes, receipt: Mapping[str, object]) -> None:
+    """Bind the archived page bytes to the reviewed visible terms hash."""
+    try:
+        document = json.loads(body)
+    except (TypeError, ValueError, UnicodeError):
+        raise AssemblyError("assembly_tender_terms_incomplete") from None
+    digest = receipt.get("terms_sha256")
+    if (
+        not isinstance(document, dict)
+        or not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+        or document.get("terms_sha256") != digest
+    ):
+        raise AssemblyError("assembly_tender_terms_incomplete")
 
 
 def archive_pages(
@@ -166,6 +194,7 @@ def archive_pages(
                 "method": "assembly-tender-pages.v1",
                 "pages": pages,
                 "readings": readings,
+                "terms_sha256": terms_sha256,
             },
             sort_keys=True,
         )

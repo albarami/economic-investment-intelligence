@@ -2397,3 +2397,13 @@ These coarse tasks are refined at the slice S10 gate without weakening their cri
 - Delivery: routine; personas as the items require; status queued.
 
 **slice S11 gate.** Three rehearsals are complete, including one with PostgreSQL stopped and one offline; versions are frozen; the freeze carries a recorded human review of the release and passes the export-register check; the independent reviewer returns `APPROVED`; and the owner records go or no-go.
+
+## S2-TSEP round-2 re-cut: preserved dependency history (2026-11-22)
+
+The following S7-T09 dependency row is retained verbatim from the S2-TSKIP and S2-P40 parents for the append-only join. The active S7-T09 row above adds decision 0084 item 6's start-day check.
+
+```
+- Depends: S7-T02, S7-T03, S7-T08, S5-T10, S2-T12, S2-T13, S2-T29, S6-T07, S6-T31, S6-T38.
+```
+
+The S2-TSKIP status line is historical: S2-TSEP now tests the pinned pick-up in the separate lane. Its earlier `own_run_pickup_unbuilt` refusal applied only before that join. No S2-T13 or S2-T19 acceptance box is ticked by these offline tests.

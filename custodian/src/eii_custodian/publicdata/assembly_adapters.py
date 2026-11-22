@@ -175,7 +175,10 @@ class Production:
             from .singles.families import decode_family_archive
 
             decode = decode_family_archive
-        from .fetch.own_run import is_own_run_entry, own_run_cache
+        from .fetch.own_run import is_own_run_entry, is_tender_entry, own_run_cache
+
+        if is_tender_entry(entry) and not is_own_run_entry(entry):
+            raise AssemblyError("snapshot_selection_invalid")
 
         source_cache = (
             own_run_cache(self.cache) if is_own_run_entry(entry) else self.cache
@@ -239,35 +242,21 @@ class Production:
             raise AssemblyError("assembly_fetch_refused")
         if self.intake_refusal:
             raise AssemblyError(self.intake_refusal)
-        from .assembly_tenders import archive_pages, terms_body_hash
         from .fetch.own_run import is_own_run_entry
 
-        pages = {}
-        for entry in self.entries:
-            if (
-                entry.kind != "paged_cards"
-                or entry.skip_reason
-                or is_own_run_entry(entry)
-            ):
-                continue
-            terms_hash = (
-                terms_body_hash(self.cache, entry, self.fetched.terms)
-                if entry.source_id == "tenders_pub"
-                else ""
-            )
-            pages[entry.key] = archive_pages(
-                self.cache,
-                entry,
-                self.stamp or self.clock(),
-                retrieved_utc=getattr(self.fetched, "reused_times", {}).get(entry.key),
-                terms_sha256=terms_hash,
-            )
+        if any(
+            entry.kind == "paged_cards"
+            and not entry.skip_reason
+            and not is_own_run_entry(entry)
+            for entry in self.entries
+        ):
+            raise AssemblyError("assembly_tender_pages_incomplete")
         return self.record(
             "fetch_archive",
             {
                 "lines": self.fetched.lines,
                 "manifests": self.fetched.manifests,
-                "tender_archives": pages,
+                "tender_archives": {},
             },
         )
 
@@ -305,7 +294,13 @@ class Production:
             load_confirmation,
             own_run_pending,
         )
-        from .fetch.own_run import is_own_run_entry, own_run_cache
+        from .fetch.own_run import is_own_run_entry, is_tender_entry, own_run_cache
+
+        if any(
+            is_tender_entry(entry) and not is_own_run_entry(entry)
+            for entry in self.entries
+        ):
+            raise AssemblyError("snapshot_selection_invalid")
 
         confirmation = (
             load_confirmation(self.review / "s2_t13_confirmation.yaml")
@@ -364,8 +359,9 @@ class Production:
             if is_own_run_entry(entry):
                 assert confirmation is not None
                 completion_evidence(confirmation, entry, snapshot.sidecar)
-                from .assembly_tenders import verify_intake_match
+                from .assembly_tenders import verify_archive_terms, verify_intake_match
 
+                verify_archive_terms(snapshot.body, snapshot.sidecar)
                 verify_intake_match(
                     self.cache, snapshot.body, self.stamp or self.clock()
                 )

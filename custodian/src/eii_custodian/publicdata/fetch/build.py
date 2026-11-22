@@ -35,6 +35,7 @@ from eii_custodian.publicdata.fetch.kinds import (
 from eii_custodian.publicdata.fetch.own_run import (
     handoff_completed_archive,
     is_own_run_entry,
+    is_tender_entry,
 )
 from eii_custodian.publicdata.fetch.partitions import (
     PartitionError,
@@ -708,6 +709,18 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
+        if is_tender_entry(entry) and not _own_run and entry.skip_reason:
+            failure = FetchFailure(
+                1, entry.source_id, "", "own_run_row_changed", "", entry.skip_reason
+            )
+            lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
+            break
+        if is_tender_entry(entry) and not is_own_run_entry(entry):
+            failure = FetchFailure(
+                1, entry.source_id, "", "own_run_row_changed", "", ""
+            )
+            lines.append(fail_line(entry.key, "", failure.check, "", ""))
+            break
         if is_own_run_entry(entry) and not _own_run:
             lines.append(skip_line(entry.key, "own_run"))
             if _run is not None:
@@ -1519,16 +1532,14 @@ def run_tenders_only(
     resume: bool = False,
 ) -> BuildOutcome:
     """Acquire exactly the registered tender entry, without a whole-pack claim."""
-    from eii_custodian.publicdata.assembly_tenders import archive_pages, terms_body_hash
+    from eii_custodian.publicdata.assembly_tenders import (
+        archive_pages,
+        terms_visible_hash,
+    )
 
     rows = tuple(entries)
     if len(rows) != 1 or not is_own_run_entry(rows[0]):
-        failure = FetchFailure(
-            1, "tenders_pub", "", "own_run_inventory_invalid", "", ""
-        )
-        return BuildOutcome(
-            (fail_line("tenders_pub", "", failure.check, "", ""),), failure
-        )
+        return _own_run_failure(tender_cache, None, "own_run_inventory_invalid")
     entry = rows[0]
     try:
         run = RunRecord.begin(
@@ -1538,8 +1549,7 @@ def run_tenders_only(
         reason = (
             str(exc) if isinstance(exc, ResumeError) else "resume_record_write_failed"
         )
-        failure = FetchFailure(1, entry.source_id, "", reason, "", "")
-        return BuildOutcome((fail_line(entry.key, "", reason, "", ""),), failure)
+        return _own_run_failure(tender_cache, entry, reason)
     if not resume:
         try:
             adopted = handoff_completed_archive(
@@ -1556,24 +1566,30 @@ def run_tenders_only(
                 run.finish()
             except OSError:
                 return _own_run_failure(
-                    tender_cache, entry, "tender_handoff_write_failed"
+                    tender_cache,
+                    entry,
+                    "tender_handoff_write_failed",
+                    BuildOutcome(tuple(lines), None, terms=(terms_row,)),
                 )
             return BuildOutcome(tuple(lines), None)
-    outcome = run_build(
-        rows,
-        transport,
-        tender_cache,
-        clock,
-        sleep,
-        environ=environ,
-        _fetch_only=True,
-        _run=run,
-        _own_run=True,
-    )
+    try:
+        outcome = run_build(
+            rows,
+            transport,
+            tender_cache,
+            clock,
+            sleep,
+            environ=environ,
+            _fetch_only=True,
+            _run=run,
+            _own_run=True,
+        )
+    except OSError:
+        return _own_run_failure(tender_cache, entry, "own_run_fetch_write_failed")
     if outcome.failure is not None:
         return outcome
     try:
-        terms_hash = terms_body_hash(tender_cache, entry, outcome.terms)
+        terms_hash = terms_visible_hash(tender_cache, entry, outcome.terms)
         state = run.row["entries"][entry.key]["fetch"]
         retrieved = state["retrieved_utc"]
         if not isinstance(retrieved, str):
@@ -1596,19 +1612,24 @@ def run_tenders_only(
 
 
 def _own_run_failure(
-    cache: Path, entry: Entry, reason: str, outcome: BuildOutcome | None = None
+    cache: Path, entry: Entry | None, reason: str, outcome: BuildOutcome | None = None
 ) -> BuildOutcome:
-    failure = FetchFailure(1, entry.source_id, "", reason, "", "")
+    source_id = entry.source_id if entry is not None else "tenders_pub"
+    key = entry.key if entry is not None else "tenders_pub"
+    failure = FetchFailure(1, source_id, "", reason, "", "")
     lines = [
         *(outcome.lines if outcome else ()),
-        fail_line(entry.key, "", reason, "", ""),
+        fail_line(key, "", reason, "", ""),
     ]
-    _write_log(
-        cache,
-        lines,
-        outcome.terms if outcome else (),
-        list(outcome.terms_attempts) if outcome else [],
-    )
+    try:
+        _write_log(
+            cache,
+            lines,
+            outcome.terms if outcome else (),
+            list(outcome.terms_attempts) if outcome else [],
+        )
+    except OSError:
+        pass
     return BuildOutcome(tuple(lines), failure)
 
 

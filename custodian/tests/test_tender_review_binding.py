@@ -1,6 +1,5 @@
 """The committed tender review joins to a fresh, invented archive receipt."""
 
-import json
 import re
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -32,7 +31,7 @@ REVIEW = (
 )
 
 
-def _fresh(tmp_path):
+def _fresh(tmp_path, *, terms_hash=None):
     entry = tender_entry()
     confirmation = load_confirmation(REVIEW)
     stamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -43,7 +42,10 @@ def _fresh(tmp_path):
     ]
     _write_pages(tmp_path / entry.key, pages, readings)
     identity = archive_pages(
-        tmp_path, entry, stamp, terms_sha256=confirmation.tender.terms_sha256
+        tmp_path,
+        entry,
+        stamp,
+        terms_sha256=terms_hash or confirmation.tender.terms_sha256,
     )
     receipt = read_snapshot(tmp_path / entry.key, identity).sidecar
     return confirmation, entry, receipt
@@ -72,37 +74,41 @@ def test_changed_terms_on_resume_gets_new_receipt(tmp_path):
         completion_evidence(confirmation, entry, second)
 
 
-def test_split_whitespace_keeps_visible_text_but_changes_reviewed_raw_body(
+def test_split_whitespace_keeps_distinct_raw_snapshots_and_immutable_archive(
     tmp_path, monkeypatch
 ):
     from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 
-    confirmation, entry, first_receipt = _fresh(tmp_path)
     first_body = b"<html>Invented terms</html>"
     second_body = b"<html>Invented  terms</html>"
+    confirmation, entry, first_receipt = _fresh(
+        tmp_path, terms_hash=terms_text_sha256(first_body)
+    )
     assert terms_text_sha256(first_body) == terms_text_sha256(second_body)
     assert sha256_hex(first_body) != sha256_hex(second_body)
     receipts = []
+    raw_hashes = []
     for body in (first_body, second_body):
         _, rows = _real_terms(tmp_path, monkeypatch, body)
         digest = terms_body_hash(tmp_path, entry, rows)
+        raw_hashes.append(digest)
         identity = archive_pages(
             tmp_path,
             entry,
             first_receipt["retrieved_utc"],
             retrieved_utc=first_receipt["retrieved_utc"],
-            terms_sha256=digest,
+            terms_sha256=terms_text_sha256(body),
         )
         receipts.append(read_snapshot(tmp_path / entry.key, identity).sidecar)
-    assert receipts[0]["terms_sha256"] == sha256_hex(first_body)
-    assert receipts[1]["terms_sha256"] == sha256_hex(second_body)
+    assert raw_hashes == [sha256_hex(first_body), sha256_hex(second_body)]
+    assert receipts[0] == receipts[1]
+    assert receipts[0] == first_receipt
     reviewed = replace(
         confirmation,
-        tender=replace(confirmation.tender, terms_sha256=sha256_hex(first_body)),
+        tender=replace(confirmation.tender, terms_sha256=terms_text_sha256(first_body)),
     )
     assert completion_evidence(reviewed, entry, receipts[0]) == reviewed
-    with pytest.raises(ValueError, match="do not confirm tender"):
-        completion_evidence(reviewed, entry, receipts[1])
+    assert completion_evidence(reviewed, entry, receipts[1]) == reviewed
 
 
 @pytest.mark.parametrize(
@@ -279,34 +285,51 @@ def test_terms_row_order_does_not_change_unique_selection(
 def test_adapter_uses_this_run_terms_for_both_archive_paths(
     tmp_path, monkeypatch, reused
 ):
-    from custodian.tests.test_production_adapters import context
+    from custodian.tests.test_build_own_run import _fake_tender_adapter
 
-    from eii_custodian.publicdata.fetch.build import BuildOutcome
-    from eii_custodian.publicdata.review.cache_fixture import read_cached
+    from eii_custodian.publicdata import assembly_tenders
+    from eii_custodian.publicdata.fetch.build import run_tenders_only
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 
-    confirmation, entry, _ = _fresh(tmp_path)
-    build = context(tmp_path, (entry,))
-    reused_times = {entry.key: "2026-11-21T00:00:00Z"} if reused else {}
+    confirmation = load_confirmation(REVIEW)
+    entry = tender_entry()
     for body, expected in (
         (b"<html>Invented terms</html>", True),
         (b"<html>Different invented terms</html>", False),
     ):
-        _, rows = _real_terms(tmp_path, monkeypatch, body)
-        build.fetcher = lambda rows=tuple(rows): BuildOutcome(
-            (),
-            None,
-            terms=rows,
-            reused_times=reused_times,
-        )
-        build.fetch_archive()
-        stage = json.loads((tmp_path / "assembly/fetch_archive.json").read_text())
-        digest = stage["tender_archives"][entry.key]
-        receipt = read_cached(tmp_path, entry, digest=digest, extension="json").sidecar
+        case = tmp_path / ("match" if expected else "mismatch")
+        own = case / "public_cache_tenders"
+        _fake_tender_adapter(monkeypatch, [], body)
+
+        def run(resume=False, case=case, own=own):
+            return run_tenders_only(
+                (entry,),
+                lambda _url: pytest.fail("network called"),
+                case / "public_cache",
+                own,
+                lambda: "2026-11-21T00:00:00Z",
+                lambda _: None,
+                resume=resume,
+            )
+
+        if reused:
+            archive = assembly_tenders.archive_pages
+            monkeypatch.setattr(
+                assembly_tenders,
+                "archive_pages",
+                lambda *_a, **_k: (_ for _ in ()).throw(AssemblyError("plant")),
+            )
+            assert run().failure is not None
+            monkeypatch.setattr(assembly_tenders, "archive_pages", archive)
+        assert run(resume=reused).failure is None
+        digest = next((own / entry.key / "index").glob("*.json")).stem
+        receipt = read_snapshot(own / entry.key, digest).sidecar
+        assert receipt["terms_sha256"] == terms_text_sha256(body)
         reviewed = replace(
             confirmation,
             tender=replace(
                 confirmation.tender,
-                terms_sha256=sha256_hex(b"<html>Invented terms</html>"),
+                terms_sha256=terms_text_sha256(b"<html>Invented terms</html>"),
             ),
         )
         if expected:

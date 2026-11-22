@@ -2,7 +2,6 @@
 
 import json
 from dataclasses import replace
-from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -12,6 +11,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
+from eii_custodian.publicdata.assembly_tenders import verify_archive_terms
 from eii_custodian.publicdata.confirm_s2_t13 import (
     completion_evidence,
     load_confirmation,
@@ -21,7 +21,13 @@ from eii_custodian.publicdata.fetch import build as fetch_build
 from eii_custodian.publicdata.fetch import kinds
 from eii_custodian.publicdata.fetch.checks import AttemptFailure
 from eii_custodian.publicdata.fetch.kinds import Prepared, TermsPage
-from eii_custodian.publicdata.fetch.own_run import OWN_RUN_CAVEAT, OWN_RUN_REASON
+from eii_custodian.publicdata.fetch.own_run import (
+    OWN_RUN_CACHE_RELATIVE,
+    OWN_RUN_CAVEAT,
+    OWN_RUN_REASON,
+    is_tender_entry,
+    own_run_cache,
+)
 from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
 from eii_custodian.publicdata.singles.tenders import (
     LIST_PATHS,
@@ -52,6 +58,47 @@ def test_pending_is_closed_to_every_other_key(value: str) -> None:
         Path("custodian/publicdata/review/s2_t13_confirmation.yaml")
     )
     assert not own_run_pending(committed, row, None)
+    with pytest.raises(
+        ValueError, match=r"^registry and fetched evidence do not confirm tender$"
+    ):
+        completion_evidence(committed, row, None)
+
+
+@pytest.mark.parametrize(
+    "body,receipt",
+    [
+        (b"not JSON", {"terms_sha256": "a" * 64}),
+        (b"[]", {"terms_sha256": "a" * 64}),
+        (json.dumps({"terms_sha256": "a" * 64}).encode(), {}),
+        (
+            json.dumps({"terms_sha256": "bad"}).encode(),
+            {"terms_sha256": "bad"},
+        ),
+        (
+            json.dumps({"terms_sha256": "b" * 64}).encode(),
+            {"terms_sha256": "a" * 64},
+        ),
+    ],
+    ids=[
+        "invalid_json",
+        "non_object",
+        "missing_receipt",
+        "bad_digest",
+        "body_mismatch",
+    ],
+)
+def test_archive_terms_refuses_one_invalid_field(
+    body: bytes, receipt: dict[str, str]
+) -> None:
+    with pytest.raises(AssemblyError, match=r"^assembly_tender_terms_incomplete$"):
+        verify_archive_terms(body, receipt)
+
+
+def test_archive_terms_accepts_matching_body_and_receipt() -> None:
+    verify_archive_terms(
+        json.dumps({"terms_sha256": "a" * 64}).encode(),
+        {"terms_sha256": "a" * 64},
+    )
 
 
 @pytest.mark.parametrize(
@@ -70,6 +117,8 @@ def test_pending_is_closed_to_every_other_key(value: str) -> None:
         ("release_tables", ()),
         ("basis_note", ""),
         ("skip_reason", "unavailable"),
+        ("terms_words", "SYN changed terms words"),
+        ("terms_read_on", "2000-01-01"),
     ],
 )
 def test_pending_rejects_changed_binding(field: str, value: object) -> None:
@@ -78,6 +127,10 @@ def test_pending_rejects_changed_binding(field: str, value: object) -> None:
         Path("custodian/publicdata/review/s2_t13_confirmation.yaml")
     )
     assert not own_run_pending(committed, row, None)
+    with pytest.raises(
+        ValueError, match=r"^registry and fetched evidence do not confirm tender$"
+    ):
+        completion_evidence(committed, row, None)
 
 
 def test_present_receipt_and_missing_other_pin_never_become_pending(
@@ -99,6 +152,118 @@ def test_present_receipt_and_missing_other_pin_never_become_pending(
 
 def test_pending_reason_is_exact() -> None:
     assert OWN_RUN_REASON == "own_run_pending"
+
+
+def test_own_run_cache_relative_path(tmp_path: Path) -> None:
+    assert own_run_cache(tmp_path / "data/public_cache") == (
+        tmp_path / OWN_RUN_CACHE_RELATIVE
+    )
+
+
+def test_ordinary_archive_refuses_unexpected_active_paged_source(
+    tmp_path: Path,
+) -> None:
+    row = replace(tender_entry(), source_id="SYN-other")
+    build = context(tmp_path, (row,))
+    build.fetcher = lambda: fetch_build.BuildOutcome((), None)
+    with pytest.raises(AssemblyError, match=r"^assembly_tender_pages_incomplete$"):
+        build.fetch_archive()
+
+
+@given(st.text(), st.text())
+def test_tender_identity_is_key_or_source_id(key: str, source_id: str) -> None:
+    row = replace(tender_entry(), key=key, source_id=source_id)
+    assert is_tender_entry(row) is ("tenders_pub" in {key, source_id})
+
+
+@pytest.mark.parametrize(
+    "key,source_id,expected",
+    [
+        ("tenders_pub", "SYN-other", True),
+        ("SYN-other", "tenders_pub", True),
+        ("SYN-other", "SYN-other", False),
+    ],
+)
+def test_tender_identity_named_by_either_field(
+    key: str, source_id: str, expected: bool
+) -> None:
+    row = replace(tender_entry(), key=key, source_id=source_id)
+    assert is_tender_entry(row) is expected
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("kind", "https_file"),
+        ("key", "SYN-other"),
+        ("source_id", "SYN-other"),
+        ("skip_reason", "unavailable"),
+    ],
+)
+def test_changed_tender_row_refuses_before_transport(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str, value: str
+) -> None:
+    calls: list[str] = []
+    monkeypatch.setattr(kinds, "_paged_cards", lambda *_: calls.append("list"))
+    monkeypatch.setattr(
+        fetch_build, "read_terms_page", lambda *_: calls.append("terms")
+    )
+    row = replace(tender_entry(), **{field: value})
+    outcome = fetch_build.run_build(
+        (row,),
+        lambda url: calls.append(url),
+        tmp_path,
+        lambda: "2026-11-21T00:00:00Z",
+        lambda _: None,
+        _fetch_only=True,
+    )
+    assert calls == []
+    assert outcome.failure is not None
+    assert outcome.failure.check == "own_run_row_changed"
+    if field == "skip_reason":
+        assert outcome.failure.observed == value
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("kind", "https_file"),
+        ("key", "SYN-other"),
+        ("source_id", "SYN-other"),
+        ("skip_reason", "unavailable"),
+    ],
+)
+def test_changed_tender_row_pin_refuses_before_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, field: str, value: str
+) -> None:
+    from eii_custodian.publicdata import assembly_adapters
+
+    row = replace(tender_entry(), **{field: value})
+    (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: "a" * 64}))
+    build = context(tmp_path, (row,))
+    monkeypatch.setattr(
+        assembly_adapters,
+        "read_snapshot",
+        lambda *_: pytest.fail("snapshot read before refusal"),
+    )
+    with pytest.raises(AssemblyError, match=r"^snapshot_selection_invalid$"):
+        build.reviewed_selections()
+
+
+def test_changed_tender_row_raw_refuses_before_cache_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from eii_custodian.publicdata import assembly_adapters
+
+    row = replace(tender_entry(), kind="https_file")
+    build = context(tmp_path, (row,))
+    monkeypatch.setattr(
+        assembly_adapters,
+        "read_cached",
+        lambda *_args, **_kwargs: pytest.fail("cache read before refusal"),
+    )
+    with pytest.raises(AssemblyError, match=r"^snapshot_selection_invalid$"):
+        build.raw(row)
 
 
 def test_pending_completeness_and_gate_have_one_absence_no_table(
@@ -132,7 +297,11 @@ def test_pending_completeness_and_gate_have_one_absence_no_table(
     ]
     evidence = g.tender_evidence(committed, row, None, "s2_t13_confirmation.yaml")
     assert evidence.absence_reasons == {row.key: OWN_RUN_REASON}
-    assert evidence.details == {"state": "NO_DATA", "reason": OWN_RUN_REASON}
+    assert evidence.details == {
+        "state": "NO_DATA",
+        "reason": OWN_RUN_REASON,
+        "caveat": OWN_RUN_CAVEAT,
+    }
     rows = g.confirmations([evidence], [row], {})
     tender_row = next(item for item in rows if item["task"] == "S2-T13")
     assert tender_row["state"] == "recorded"
@@ -144,6 +313,32 @@ def test_pending_completeness_and_gate_have_one_absence_no_table(
     )
 
 
+@pytest.mark.parametrize("plant", ["key", "kind", "receipt"])
+def test_gate_refuses_foreign_pending_evidence(plant: str) -> None:
+    from eii_custodian.publicdata import gate_report as g
+
+    row = tender_entry()
+    if plant == "key":
+        row = replace(row, key="SYN-other")
+    elif plant == "kind":
+        row = replace(row, kind="https_file")
+    receipts = {row.key: {"sha256": "a" * 64}} if plant == "receipt" else {}
+    evidence = g.ConfirmationEvidence(
+        "S2-T13",
+        (row.key,),
+        ("s2_t13_confirmation.yaml",),
+        {"completion_evidence": True},
+        absence_reasons={row.key: OWN_RUN_REASON},
+    )
+    result = next(
+        item
+        for item in g.confirmations([evidence], [row], receipts)
+        if item["task"] == "S2-T13"
+    )
+    assert result["state"] == "pending"
+    assert result["reason"] == "confirmation_pending"
+
+
 def test_pinned_tender_missing_or_malformed_bytes_never_downgrades(
     tmp_path: Path,
 ) -> None:
@@ -151,14 +346,17 @@ def test_pinned_tender_missing_or_malformed_bytes_never_downgrades(
     digest = "a" * 64
     (tmp_path / "snapshot_pins.json").write_text(json.dumps({row.key: digest}))
     build = context(tmp_path, (row,))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"^snapshot_index_invalid$"):
         build.reviewed_selections()
     assert not build.source_tables
     assert not build.tables
 
 
-def _fake_tender_adapter(monkeypatch: pytest.MonkeyPatch, seen: list[str]) -> None:
-    body = b"<html>SYN tender terms</html>"
+def _fake_tender_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+    seen: list[str],
+    body: bytes = b"<html>SYN tender terms</html>",
+) -> None:
 
     def pages(row, _sleep, cache):
         seen.append(row.key)
@@ -195,13 +393,18 @@ def _fake_tender_adapter(monkeypatch: pytest.MonkeyPatch, seen: list[str]) -> No
     )
 
 
-def _own_run(tmp_path: Path, *, resume: bool = False):
+def _own_run(
+    tmp_path: Path,
+    *,
+    resume: bool = False,
+    stamp: str = "2026-11-21T00:00:00Z",
+):
     return fetch_build.run_tenders_only(
         (tender_entry(),),
         lambda _url: pytest.fail("ordinary tender transport called"),
         tmp_path / "public_cache",
         tmp_path / "public_cache_tenders",
-        lambda: "2026-11-21T00:00:00Z",
+        lambda: stamp,
         lambda _seconds: None,
         resume=resume,
     )
@@ -238,6 +441,7 @@ def test_only_exactly_one_tender_entry_can_enter_own_run(
     assert outcome.failure is not None
     assert outcome.failure.check == "own_run_inventory_invalid"
     assert not (tmp_path / "own" / "build-run.json").exists()
+    assert "own_run_inventory_invalid" in (tmp_path / "own/build-log.json").read_text()
 
 
 def test_own_run_fetches_one_entry_and_keeps_main_journal_separate(
@@ -293,6 +497,7 @@ def test_archive_failure_keeps_journal_interrupted_then_resume_reuses_pages(
     first = _own_run(tmp_path)
     own = tmp_path / "public_cache_tenders"
     assert first.failure is not None
+    assert first.failure.check == "assembly_tender_pages_incomplete"
     assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
     assert "assembly_tender_pages_incomplete" in (own / "build-log.json").read_text()
     monkeypatch.setattr(assembly_tenders, "archive_pages", archive)
@@ -361,22 +566,34 @@ def test_resume_refetches_changed_tender_input(
     [
         ("entries", "resume_record_invalid"),
         ("seed", "resume_seed_mismatch"),
+        ("head", "resume_head_mismatch"),
         ("complete", "resume_not_interrupted"),
     ],
 )
 def test_own_run_resume_refuses_wrong_journal(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, plant: str, expected: str
 ) -> None:
+    from eii_custodian.publicdata import assembly_tenders
+
     _fake_tender_adapter(monkeypatch, [])
-    assert _own_run(tmp_path).failure is None
+    monkeypatch.setattr(
+        assembly_tenders,
+        "archive_pages",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssemblyError("SYN stop")),
+    )
+    first = _own_run(tmp_path)
+    assert first.failure is not None
+    assert first.failure.check == "assembly_tender_pages_incomplete"
     path = tmp_path / "public_cache_tenders/build-run.json"
     row = json.loads(path.read_bytes())
     if plant == "entries":
         row["entries"]["SYN-extra"] = {"completed": False}
-        row["state"] = "interrupted"
     elif plant == "seed":
         row["seed"] = 1
-        row["state"] = "interrupted"
+    elif plant == "head":
+        row["head"] = "a" * 40
+    else:
+        row["state"] = "complete"
     path.write_text(json.dumps(row))
     result = _own_run(tmp_path, resume=True)
     assert result.failure is not None
@@ -420,6 +637,9 @@ def test_own_run_failure_never_completes_or_overwrites_main(
     (main / "snapshot_pins.json").write_text("{}")
     result = _own_run(tmp_path)
     assert result.failure is not None
+    assert result.failure.check == (
+        "SYN_fetch_failure" if plant == "fetch" else "assembly_tender_pages_incomplete"
+    )
     own = tmp_path / "public_cache_tenders"
     assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
     assert "FAIL" in (own / "build-log.json").read_text()
@@ -428,16 +648,27 @@ def test_own_run_failure_never_completes_or_overwrites_main(
     assert (main / "snapshot_pins.json").read_text() == "{}"
 
 
-def _prior_archive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, str]:
-    from eii_custodian.publicdata import confirm_s2_t13
+def _prior_archive(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    stamped_hash: str | None = None,
+) -> tuple[Path, str]:
+    from eii_custodian.publicdata import assembly_tenders, confirm_s2_t13
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
     _fake_tender_adapter(monkeypatch, [])
+    visible_hash = terms_text_sha256(b"<html>SYN tender terms</html>")
+    if stamped_hash is not None:
+        monkeypatch.setattr(
+            assembly_tenders, "terms_visible_hash", lambda *_: stamped_hash
+        )
     real = load_confirmation(
         Path("custodian/publicdata/review/s2_t13_confirmation.yaml")
     )
-    raw_hash = sha256(b"<html>SYN tender terms</html>").hexdigest()
-    invented = replace(real, tender=replace(real.tender, terms_sha256=raw_hash))
+    invented = replace(
+        real, tender=replace(real.tender, terms_sha256=stamped_hash or visible_hash)
+    )
     monkeypatch.setattr(confirm_s2_t13, "load_confirmation", lambda *_: invented)
     main = tmp_path / "data/public_cache"
     outcome = fetch_build.run_tenders_only(
@@ -451,12 +682,66 @@ def _prior_archive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Pat
     assert outcome.failure is None
     index = next((main / "tenders_pub/index").glob("*.json"))
     identity = index.stem
-    assert (
-        read_snapshot(main / "tenders_pub", identity).sidecar["terms_sha256"]
-        == raw_hash
+    assert read_snapshot(main / "tenders_pub", identity).sidecar["terms_sha256"] == (
+        stamped_hash or visible_hash
     )
     (main / "snapshot_pins.json").write_text(json.dumps({"tenders_pub": identity}))
     return main, identity
+
+
+def _archive_with_mismatched_body_terms(directory: Path, identity: str) -> str:
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import (
+        publish_snapshot,
+        read_snapshot,
+    )
+
+    original = read_snapshot(directory, identity)
+    payload = json.loads(original.body)
+    payload["terms_sha256"] = "f" * 64
+    body = (json.dumps(payload, sort_keys=True) + "\n").encode()
+    receipt = dict(original.sidecar, sha256=sha256_hex(body), bytes=len(body))
+    return publish_snapshot(directory, "json", body, receipt).sha256
+
+
+def test_handoff_refuses_archive_body_terms_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    main, identity = _prior_archive(tmp_path, monkeypatch)
+    forged = _archive_with_mismatched_body_terms(main / "tenders_pub", identity)
+    (main / "snapshot_pins.json").write_text(json.dumps({"tenders_pub": forged}))
+    own = tmp_path / "data/public_cache_tenders"
+    result = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+    )
+    assert result.failure is not None
+    assert result.failure.check == "tender_handoff_refused"
+
+
+def test_pickup_refuses_archive_body_terms_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    main, identity = _prior_archive(tmp_path, monkeypatch)
+    own = tmp_path / "data/public_cache_tenders"
+    adopted = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+    )
+    assert adopted.failure is None
+    forged = _archive_with_mismatched_body_terms(own / "tenders_pub", identity)
+    (main / "snapshot_pins.json").write_text(json.dumps({"tenders_pub": forged}))
+    build = context(main, (tender_entry(),))
+    with pytest.raises(AssemblyError, match=r"^assembly_tender_terms_incomplete$"):
+        build.reviewed_selections()
 
 
 def test_verified_handoff_keeps_identity_date_terms_and_avoids_request(
@@ -598,3 +883,122 @@ def test_handoff_refuses_unproven_prior_result_and_records_refusal(
     assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
     assert "tender_handoff_refused" in (own / "build-log.json").read_text()
     assert (main / "snapshot_pins.json").exists()
+
+
+def test_own_run_log_write_failure_returns_named_refusal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        fetch_build,
+        "_write_log",
+        lambda *_args: (_ for _ in ()).throw(OSError("SYN log write failure")),
+    )
+    result = _own_run(tmp_path)
+    assert result.failure is not None
+    assert result.failure.check == "own_run_fetch_write_failed"
+    assert "FAIL tenders_pub own_run_fetch_write_failed" in result.lines
+    journal = json.loads(
+        (tmp_path / "public_cache_tenders/build-run.json").read_bytes()
+    )
+    assert journal["state"] == "interrupted"
+
+
+def test_handoff_refuses_proofless_main_skip_marker(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    main, _identity = _prior_archive(tmp_path, monkeypatch)
+    journal_path = main / "build-run.json"
+    journal = json.loads(journal_path.read_bytes())
+    journal["entries"]["tenders_pub"] = {"completed": True}
+    journal_path.write_text(json.dumps(journal))
+    own = tmp_path / "data/public_cache_tenders"
+    result = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+    )
+    assert result.failure is not None
+    assert result.failure.check == "tender_handoff_refused"
+    assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
+
+
+def test_handoff_refuses_archive_stamp_that_disagrees_with_verified_terms_log(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    main, _identity = _prior_archive(tmp_path, monkeypatch, stamped_hash="f" * 64)
+    own = tmp_path / "data/public_cache_tenders"
+    result = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+    )
+    assert result.failure is not None
+    assert result.failure.check == "tender_handoff_refused"
+    assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
+
+
+@pytest.mark.parametrize("plant", ["log", "finish"])
+def test_handoff_write_failure_retains_identity_record_and_refetches_on_resume(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, plant: str
+) -> None:
+    from eii_custodian.publicdata.fetch.resume import RunRecord
+
+    main, identity = _prior_archive(tmp_path, monkeypatch)
+    own = tmp_path / "data/public_cache_tenders"
+    original_log = fetch_build._write_log
+    original_finish = RunRecord.finish
+    if plant == "log":
+        calls = 0
+
+        def fail_handoff_log(*args):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise OSError("SYN handoff log failure")
+            return original_log(*args)
+
+        monkeypatch.setattr(fetch_build, "_write_log", fail_handoff_log)
+    else:
+        monkeypatch.setattr(
+            RunRecord,
+            "finish",
+            lambda _self: (_ for _ in ()).throw(OSError("SYN finish failure")),
+        )
+    failed = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+    )
+    assert failed.failure is not None
+    assert failed.failure.check == "tender_handoff_write_failed"
+    assert f"HANDOFF tenders_pub sha256={identity}" in failed.lines
+    assert "FAIL tenders_pub tender_handoff_write_failed" in failed.lines
+    log = json.loads((own / "build-log.json").read_bytes())
+    assert log["terms"]
+    assert f"HANDOFF tenders_pub sha256={identity}" in log["lines"]
+    assert json.loads((own / "build-run.json").read_bytes())["state"] == "interrupted"
+    monkeypatch.setattr(fetch_build, "_write_log", original_log)
+    monkeypatch.setattr(RunRecord, "finish", original_finish)
+    resumed = fetch_build.run_tenders_only(
+        (tender_entry(),),
+        lambda _url: pytest.fail("network called"),
+        main,
+        own,
+        lambda: "2026-11-21T01:00:00Z",
+        lambda _: None,
+        resume=True,
+    )
+    assert resumed.failure is None
+    if plant == "finish":
+        assert "REFETCH tenders_pub resume_input_unproven" in resumed.lines
+    else:
+        assert any(line.startswith("PASS tenders_pub ") for line in resumed.lines)

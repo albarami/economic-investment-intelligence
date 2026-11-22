@@ -15,8 +15,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
-from eii_custodian.publicdata.fetch.allowlist import host_of
+from eii_custodian.publicdata.fetch.allowlist import host_of, safe_https_shape
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import utc
 
@@ -35,6 +36,21 @@ OUTCOMES = frozenset(
 BASES = frozenset({"dataset", "portal_terms", "provider_terms", ""})
 RECORDED = OUTCOMES - {"not_yet_recorded", "none_found"}
 CAVEAT = "No public tender source is recorded"
+
+
+def _same_reviewed_origin(url: str, origin: str) -> bool:
+    """Bind a reviewed URL to the HTTPS endpoint of the registered fetch URL."""
+    if not safe_https_shape(url) or not safe_https_shape(origin):
+        return False
+    parts, registered = urlsplit(url), urlsplit(origin)
+    return (
+        "\\" not in parts.netloc
+        and "\\" not in registered.netloc
+        and parts.netloc.isascii()
+        and registered.netloc.isascii()
+        and bool(host_of(origin))
+        and host_of(url) == host_of(origin)
+    )
 
 
 @dataclass(frozen=True)
@@ -296,11 +312,11 @@ def _registry_matches(tender: Tender, registry: Entry) -> bool:
         registry.source_id == "tenders_pub"
         and registry.publisher == tender.publisher
         and registry.key == tender.source_id
-        and registry.fetch_host == host_of(registry.url)
-        and registry.fetch_host == host_of(tender.page)
+        and registry.fetch_host.casefold() == host_of(registry.url)
+        and _same_reviewed_origin(tender.page, registry.url)
         and (
             (tender.outcome == "terms_absent" and not tender.terms_url)
-            or registry.fetch_host == host_of(tender.terms_url)
+            or _same_reviewed_origin(tender.terms_url, registry.url)
         )
         and registry.terms_url == tender.terms_url
         and registry.licence_id == tender.licence_id
@@ -330,6 +346,8 @@ def own_run_pending(
         and is_own_run_entry(registry)
         and tender.outcome in RECORDED
         and _registry_matches(tender, registry)
+        and registry.terms_words == tender.terms_words
+        and registry.terms_read_on == tender.terms_read_on
     )
 
 

@@ -23,6 +23,11 @@ def is_own_run_entry(entry: Entry) -> bool:
     )
 
 
+def is_tender_entry(entry: Entry) -> bool:
+    """Name a tender row before kind or skip changes can reach transport."""
+    return entry.key in OWN_RUN_KEYS or entry.source_id == "tenders_pub"
+
+
 def own_run_cache(cache: Path) -> Path:
     """Keep the second cache a sibling of the ordinary public cache."""
     return cache.parent / "public_cache_tenders"
@@ -55,6 +60,7 @@ def handoff_completed_archive(
     """Adopt only a pinned, completed and fully evidenced ordinary archive."""
     from eii_custodian.publicdata.assembly_tenders import (
         terms_body_hash,
+        verify_archive_terms,
         verify_intake_match,
     )
     from eii_custodian.publicdata.confirm_s2_t13 import (
@@ -85,6 +91,7 @@ def handoff_completed_archive(
             entry, item, legacy_intake=True
         )
         archive = read_snapshot(main_cache / entry.key, identity)
+        verify_archive_terms(archive.body, archive.sidecar)
         completion_evidence(
             load_confirmation(
                 main_cache.parent.parent
@@ -94,7 +101,7 @@ def handoff_completed_archive(
             archive.sidecar,
         )
         raw_terms = terms_body_hash(main_cache, entry, terms)
-        if archive.sidecar.get("terms_sha256") != raw_terms:
+        if archive.sidecar.get("terms_sha256") != terms[0].get("terms_sha256"):
             raise ValueError("tender_handoff_terms_invalid")
         verify_intake_match(main_cache, archive.body, stamp)
         _copy_snapshot(main_cache / entry.key, tender_cache / entry.key, identity)

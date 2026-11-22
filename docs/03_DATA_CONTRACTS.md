@@ -2317,7 +2317,7 @@ the quality measure of DAT-24.
   for real use in document 17. Under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md), reading terms is not a condition of fetching or showing:
   `pub_tender` is built and tenders are shown in full regardless of those terms. With no recorded public source
   readable as a visitor, requests still return `NO_DATA` with the PUB-93 caveat.
-  Proposed [decision 0083](decisions/0083-tender-review-binding-for-fresh-fetches.md) makes the S2-T13 release handoff require a fresh archive receipt whose source, registry URL, host, reviewed metadata and raw terms-body hash bind to the committed confirmation. Its page hash and retrieval time remain historical review evidence, not values a new archive must reproduce.
+  Proposed [decision 0083](decisions/0083-tender-review-binding-for-fresh-fetches.md) makes the S2-T13 release handoff require a fresh archive receipt whose source, registry URL, host, reviewed metadata and verified visible-text terms hash bind to the committed confirmation, after the raw terms-body hash authenticates its immutable snapshot. Its page hash and retrieval time remain historical review evidence, not values a new archive must reproduce.
 - OPEN: whether count indicators of the added Public tables join the attacker-view public totals
   (DAT-128, PRV-115) is decided with the public-totals selection of OI-24 at slice S5.
 - OPEN: document 07 (C12) fixes which supply layers, modes, cut-offs and presence keys
