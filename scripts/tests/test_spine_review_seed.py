@@ -1,7 +1,7 @@
 """Seed-shopping regression and derivation invariants; invented inputs only."""
 
 import json
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
@@ -89,19 +89,33 @@ def refused_history(case: Any) -> dict[str, object]:
     refused = {
         **audit_record(decisions, read_review_csv(paths[1]), makers),
         "errors": 1,
+        "draw_sha256": "a" * 64,
+        "review_rows": [asdict(row) for row in decisions],
     }
-    case.review.with_name("activity_spine_audits.json").write_text(
-        json.dumps([refused])
-    )
+    from test_spine_refusals import commit_refusals
+
+    commit_refusals(case, [refused])
     return refused
 
 
-def seed_oracle(decisions: object, previous: object | None = None) -> int:
+def seed_oracle(decisions: object, previous: dict[str, Any] | None = None) -> int:
     import hashlib
 
     encoder = json.JSONEncoder(
         ensure_ascii=False, sort_keys=True, separators=(",", ":")
     )
+    if previous is not None:
+        previous = {
+            key: previous[key]
+            for key in (
+                "codes",
+                "review_rows_sha256",
+                "seed",
+                "sampled_codes",
+                "errors",
+            )
+        }
+        previous["codes"] = sorted(previous["codes"])
     prior = (
         b""
         if previous is None
@@ -234,7 +248,18 @@ def test_refused_history_retains_core_zero_error_admission(workflow: Any) -> Non
     from eii_custodian.publicdata.review.activity import SpineError
     from spine_review import prepare_review_inputs
 
-    refused_history(workflow)
+    prior = refused_history(workflow)
+    workflow.review.with_name("activity_spine_audits.json").write_text(
+        json.dumps(
+            [
+                {
+                    key: value
+                    for key, value in prior.items()
+                    if key not in ("draw_sha256", "review_rows")
+                }
+            ]
+        )
+    )
     prepared = prepare_review_inputs(
         workflow.root,
         workflow.cache,

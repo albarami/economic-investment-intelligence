@@ -68,8 +68,7 @@ def test_audit_order_and_decision_integrity(rejected: list[bool], seed: int) -> 
             if row.reason == "reviewer_rejected"
             else "reviewer_rejected",
         )
-        with pytest.raises(Refusal, match=r"^audit_decision_differs$"):
-            audit_record(signed, (changed, *audited[1:]), makers)
+        assert audit_record(signed, (changed, *audited[1:]), makers)["errors"] == 1
 
 
 @given(st.lists(st.sampled_from(("5610", "9999", "56", "561099")), max_size=40))
@@ -182,16 +181,23 @@ def test_draw_hash_ties_break_by_code() -> None:
         assert audit_sample(tuple(reversed(codes)), 3141592653) == codes[:30]
 
 
-@given(st.lists(st.booleans(), max_size=50), st.text(), st.integers(min_value=1))
+@given(
+    st.lists(st.booleans(), max_size=50),
+    st.text(),
+    st.integers(min_value=1, max_value=30),
+)
 @example([], "", 1)
 @example([False], "نشاط مخترع", 1)
-@example([True] * 30, "fused split\n\t", 2)
+@example([True] * 30, "fused split\n\t", 30)
 @example([False] * 31, " ] , [ ", 3)
 def test_derived_seed_projection_and_latest_refusal(
     rejected: list[bool], text: str, errors: int
 ) -> None:
+    from dataclasses import asdict
+
     from test_spine_review_seed import seed_oracle
 
+    from eii_custodian.publicdata.review.activity import audit_rows_sha256
     from spine_review import derived_audit_seed
 
     signed = tuple(
@@ -211,18 +217,25 @@ def test_derived_seed_projection_and_latest_refusal(
         dict(code=row.code, status=row.status, isic_class=row.isic_class)
         for row in signed
     ]
-    first = dict(
-        codes=[row.code for row in signed],
-        errors=errors,
-        batch_id="invented-first",
-        note=text,
+    codes = [row.code for row in signed]
+    first: dict[str, object] = dict(
+        codes=codes,
+        review_rows_sha256=audit_rows_sha256(signed),
+        seed=seed_oracle(projected),
+        errors=min(errors, len(codes), 30),
+        review_rows=[asdict(row) for row in signed],
     )
-    latest = {**first, "batch_id": "invented-latest"}
-    unrelated = dict(codes=["9999999"], errors=1)
-    admitted = {**first, "errors": 0}
+    first["sampled_codes"] = list(audit_sample(codes, seed_oracle(projected)))
+    if not signed:
+        assert derived_audit_seed(signed, []) == seed_oracle([])
+        with pytest.raises(Refusal, match=r"^refusal_record_invalid$"):
+            derived_audit_seed(signed, [first])
+        return
+    latest = {**first, "seed": seed_oracle(projected, first)}
+    latest["sampled_codes"] = list(audit_sample(codes, seed_oracle(projected, first)))
     assert derived_audit_seed(signed, []) == seed_oracle(projected)
     expected = seed_oracle(projected, latest)
-    assert derived_audit_seed(signed, [first, latest, unrelated, admitted]) == expected
+    assert derived_audit_seed(signed, [first, latest]) == expected
     altered = tuple(
         replace(
             row,
@@ -233,9 +246,9 @@ def test_derived_seed_projection_and_latest_refusal(
         )
         for row in reversed(signed)
     )
-    assert derived_audit_seed(altered, [latest]) == expected
-    reordered = {**latest, "codes": [row.code for row in reversed(signed)]}
-    assert derived_audit_seed(signed, [reordered]) == seed_oracle(projected, reordered)
+    assert derived_audit_seed(altered, [first, latest]) == expected
+    reordered = {**latest, "codes": list(reversed(codes))}
+    assert derived_audit_seed(signed, [first, reordered]) == expected
     assert 1000000000 <= expected <= 4294967295
 
 

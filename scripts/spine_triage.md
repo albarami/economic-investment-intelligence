@@ -86,7 +86,7 @@ reviewed basket membership. It writes `queue.csv`, `membership.json`,
 `data/public_cache/spine_review/<run-id>/`. `signer_packet.json` lists every eligible code. The packet contains only code, exact
 Arabic name, prefix and source-provided English and Arabic class titles; an
 absent Arabic title stays empty. The manifest binds the exact baskets, review,
-existing binding and audit bytes, source receipts and attribution, recomputed
+existing binding, audit and refusal-archive bytes, source receipts and attribution, recomputed
 membership, spine input identities and output hashes. Standard output contains
 only eligible-code, mandatory-acknowledgement and excluded-pattern-group counts.
 The preparer's maker is frozen with the packet.
@@ -100,21 +100,47 @@ acknowledgements by a person; model-review roles on these rows refuse with
 `acknowledgement_role_invalid`. All names and code lengths stay unchanged.
 Signed rows need the actual ISO signing date.
 
-The seed is derived, never chosen (L-1469, reading of decision 0075 item 3).
-Use `derived_audit_seed` in `scripts/spine_review.py` to fill `makers.json`:
+The seed is derived, never chosen (L-1469 as amended by L-1471 and L-1472,
+reading of decision 0075 item 3). Use `derived_audit_seed` in
+`scripts/spine_review.py` with the signed eligible rows and the list returned by
+`previous_refusals(root, review)` to fill `makers.json`:
 `1000000000 + int(sha256(b"oi203-audit-seed:" + J + b":" + P)) % 3294967296`.
 J is compact canonical UTF-8 JSON (`ensure_ascii=False`, sorted keys, separators
 `(',', ':')`, no newline) of the eligible decisions sorted by code, holding
 exactly `code`, `status`, `isic_class`. P is the ASCII hex SHA-256 of the latest
-earlier refused audit record for that same code set in the committed audit
-history, or empty bytes. Hash that record with the same canonical JSON encoding;
-refused means a positive integer `errors` count. A batch id, run id, date, role,
-reason or other free text never enters J. Changing metadata or repeating a draw
-cannot change the seed. Any different recorded seed refuses with
-`audit_seed_not_derived` in maker reading, draw and assembly. After a refusal,
-record that refused audit in the committed history before preparing the newly
-signed batch; its hash changes P and the next derived seed. The recorded seed's
-range, sample size, freshness and zero-error admission requirements stay unchanged.
+refusal's canonical projection containing exactly sorted `codes`,
+`review_rows_sha256`, `seed`, `sampled_codes` and `errors`, for that same code set;
+without a prior refusal P is empty bytes. Batch ids, dates, roles, extra keys,
+JSON key order and original code order never enter the projection. No free text
+enters J. A different recorded seed refuses `audit_seed_not_derived`.
+
+Refusals live only in `activity_spine_refusals.json` beside the review; the
+admission history `activity_spine_audits.json` keeps zero-error records only.
+The initially empty refusal list must already be committed. Preparation, drawing
+and assembly require the refusal file to be git-tracked and byte-identical to
+HEAD, else `refusal_history_uncommitted`; staging changed bytes is insufficient.
+The preparation manifest freezes its exact hash. Duplicate JSON keys, malformed
+JSON or a non-list archive refuse `refusal_record_invalid`. Every historical
+refusal retains `review_rows` (the signed eligible ReviewRow objects), so its
+same-code batch and `review_rows_sha256` can be verified even after a later
+re-signing changes dates or decisions. Its recorded seed must equal the derived
+seed over the refusals preceding it; its ordered sample must reproduce and its
+integer error count must be positive and no larger than that sample. A broken
+link, row hash or sample refuses `refusal_record_invalid`.
+
+On `audit_decision_differs`, assembly writes only `refusal.json` in the selected
+fresh run folder, then exits with refusal. It records the audit fields, the count
+of differing sampled codes, the exact `draw_sha256` and historical `review_rows`.
+The lead appends that object **unchanged** to the refusal list, retaining all
+previous records, and **commits the refusal file before drawing again**. Do not
+put it in the zero-error audit history. Then prepare a fresh manifest (the old
+one freezes the earlier archive), triage with provider none, arrange fresh
+code-by-code signing, derive the next seed from the committed archive, draw and
+obtain a new independent audit. An unchanged re-signing receives a fresh seed
+through P. Never edit the auditor's disagreement into agreement. The remaining
+fabrication risk and the lead's capability-demonstration ruling are recorded
+under OI-203 in OPEN_ITEMS.md; the committed archive and its Git history retain
+the evidence. Seed range, sample size and the core zero-error guard are unchanged.
 
 Freeze the signer's returned file and maker record, then run `--mode draw`
 before sending anything to the auditor. It writes `draw.json` and
@@ -134,12 +160,12 @@ case. The signer differs from both preparer and auditor. The seed, date,
 independence, draw and zero-error requirements are decision 0075 item 4's
 existing admission contract. A disagreement refuses the batch; arrange fresh
 code-by-code signing and a fresh seeded audit under item 3, never edit the
-auditor's decision to match. A seed already in any earlier audit refuses with
+auditor's decision to match. A seed already in any earlier audit or refusal refuses with
 `audit_seed_reused`, including a draw for an empty eligible batch. Empty eligible
 batches produce no new audit record and preserve the earlier audit file's bytes.
 
 `assemble` rederives frozen inputs and verifies returned coverage and decisions
-before publishing anything. `--draw` is mandatory; a misderived recorded draw
+before publishing a candidate. `--draw` is mandatory; a misderived recorded draw
 seed refuses with `audit_seed_not_derived`; a changed manifest, signer file,
 maker record, batch id or sample refuses with `draw_changed`.
 It preserves earlier review rows outside the queue and parses the review file's
@@ -152,7 +178,8 @@ into a fresh run folder. The binding hashes the exact emitted audit bytes;
 `assembly.json` hashes the frozen manifest, draw, returned files and emitted trio.
 Rejections bind their prefix's classification title just as approvals bind
 their class title. Temporary validation files are removed on refusal; no
-candidate folder is published.
+candidate review is published. A judgement disagreement publishes only the
+refusal record described above, after rechecking frozen inputs and return hashes.
 
 `finalise-check` rederives membership and inputs from the preparation manifest,
 loads the selected candidate through the ordinary spine admission guards and
@@ -169,7 +196,8 @@ Offline-mode exit 0 means the stated output was published; exit 3 means refusal.
 New helper refusals have closed reason tokens, including
 `frozen_inputs_changed`, `prepared_output_changed`, `signer_coverage_differs`,
 `signer_maker_conflict`, `audit_decision_differs` and
-`mandatory_review_missing`. Invalid JSON (including duplicate keys), missing
+`mandatory_review_missing`, `refusal_record_invalid` and
+`refusal_history_uncommitted`. Invalid JSON (including duplicate keys), missing
 files, malformed source inputs and other admission failures remain refusals;
 CLI diagnostics never echo source text or a path. Invented-fixture success does
 not sign the real queue or close OI-203.

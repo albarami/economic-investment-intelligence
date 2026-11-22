@@ -33,6 +33,8 @@ from eii_custodian.publicdata.review.activity import (
     write_queue_csv,
     write_review_csv,
 )
+from spine_refusals import derived_audit_seed as derived_audit_seed
+from spine_refusals import previous_refusals
 from spine_triage_io import (
     Context,
     Refusal,
@@ -90,12 +92,14 @@ def derive(root: Path, cache: Path, review: Path) -> tuple[Context, dict[str, ob
         review_path=review,
         selections=selected,
     )
+    previous_refusals(root, review)
     hashes, receipts = source_receipts(cache, selected)
     for name, path in (
         ("review", review),
         ("baskets", baskets),
         ("binding", binding_path(review)),
         ("audits", audit_path),
+        ("refusals", review.with_name("activity_spine_refusals.json")),
     ):
         hashes[name] = file_hash(path) if path.exists() else "absent"
     membership = dict(
@@ -242,43 +246,6 @@ def frozen_context(root: Path, manifest: Path) -> tuple[Context, dict[str, Any]]
     return context, payload
 
 
-def derived_audit_seed(decisions: tuple[ReviewRow, ...], audits: list[Any]) -> int:
-    """L-1469: decision-only J and the latest refused same-code batch's hash P.
-
-    Refused records have a positive integer errors count. Match by codes, never
-    the lead-editable batch id. Both JSON values use compact, sorted UTF-8 JSON.
-    """
-    judgements = [
-        dict(code=row.code, status=row.status, isic_class=row.isic_class)
-        for row in sorted(decisions, key=lambda row: row.code)
-    ]
-    previous = next(
-        (
-            row
-            for row in reversed(audits)
-            if isinstance(row, dict)
-            and isinstance(row.get("codes"), list)
-            and sorted(row["codes"]) == [entry["code"] for entry in judgements]
-            and type(row.get("errors")) is int
-            and row["errors"] > 0
-        ),
-        None,
-    )
-
-    def canonical(value: object) -> bytes:
-        return json.dumps(
-            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode("utf-8")
-
-    prior = (
-        hashlib.sha256(canonical(previous)).hexdigest().encode("ascii")
-        if previous is not None
-        else b""
-    )
-    digest = hashlib.sha256(b"oi203-audit-seed:" + canonical(judgements) + b":" + prior)
-    return 1000000000 + int(digest.hexdigest(), 16) % 3294967296
-
-
 def read_makers(
     root: Path,
     path: Path,
@@ -350,6 +317,7 @@ def audit_record(
     if {row.code for row in audited} != set(sampled):
         raise Refusal("auditor_coverage_differs")
     by_code = {row.code: row for row in signed}
+    errors = 0
     for row in audited:
         if (
             row.reviewed_by_role != makers["auditor_role"]
@@ -364,16 +332,16 @@ def audit_record(
             expected.status,
             expected.reason,
         ):
-            raise Refusal("audit_decision_differs")
+            errors += 1
     return dict(
         batch_id=makers["batch_id"],
         codes=sorted(by_code),
         review_rows_sha256=audit_rows_sha256(signed),
         seed=makers["seed"],
-        sampled_codes=sampled,
+        sampled_codes=list(sampled),
         signer_role=makers["signer_role"],
         auditor_role=makers["auditor_role"],
-        errors=0,
+        errors=errors,
         audit_date=makers["audit_date"],
     )
 
@@ -445,11 +413,12 @@ def draw_audit(
     fresh_target(context, run_id)
     signed = read_review_csv(contained(root, signer_rows))
     _, earlier = previous_audits(root, Path(frozen["review"]))
+    refusals = previous_refusals(root, Path(frozen["review"]))
     makers, decisions = read_makers(
-        root, maker_record, frozen["preparer_maker"], context, signed, earlier
+        root, maker_record, frozen["preparer_maker"], context, signed, refusals
     )
-    require_fresh_seed(earlier, makers["seed"])
-    drawn = draw_record(evidence, decisions, makers, earlier)
+    require_fresh_seed(earlier + refusals, makers["seed"])
+    drawn = draw_record(evidence, decisions, makers, refusals)
     packet = json.loads(
         (contained(root, manifest).parent / "signer_packet.json").read_bytes()
     )
@@ -486,21 +455,40 @@ def assemble_audited_review(
     evidence = input_hashes(root, returned)
     signed = read_review_csv(contained(root, signer_rows))
     old_bytes, old_audits = previous_audits(root, Path(frozen["review"]))
+    refusals = previous_refusals(root, Path(frozen["review"]))
     makers, decisions = read_makers(
-        root, maker_record, frozen["preparer_maker"], context, signed, old_audits
+        root, maker_record, frozen["preparer_maker"], context, signed, refusals
     )
     drawn = read_object(root, draw)
-    expected_draw = draw_record(evidence, decisions, makers, old_audits)
+    expected_draw = draw_record(evidence, decisions, makers, refusals)
     if drawn.get("seed") != expected_draw["seed"]:
         raise Refusal("audit_seed_not_derived")
     if drawn != expected_draw:
         raise Refusal("draw_changed")
     audited = read_review_csv(contained(root, auditor_rows))
+    require_fresh_seed(old_audits + refusals, makers["seed"])
     batch = audit_record(decisions, audited, makers)
+    if batch["errors"]:
+        frozen_context(root, manifest)
+        if input_hashes(root, returned) != evidence:
+            raise Refusal("returned_inputs_changed")
+        publish(
+            context,
+            run_id,
+            {
+                "refusal.json": json_bytes(
+                    {
+                        **batch,
+                        "draw_sha256": evidence["draw"],
+                        "review_rows": [asdict(row) for row in decisions],
+                    }
+                )
+            },
+        )
+        raise Refusal("audit_decision_differs")
     previous = read_review_csv(contained(root, Path(frozen["review"])))
     queue_codes = {row.code for row in signed}
     candidate = tuple(row for row in previous if row.code not in queue_codes) + signed
-    require_fresh_seed(old_audits, makers["seed"])
     audits = append_audit(old_bytes, old_audits, batch if decisions else None)
     binding = {
         **binding_document(context.inputs),

@@ -51795,3 +51795,88 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
   `.overnight/evidence/r3/freshness-plant/`. This addition changes records only;
   the final tested production/test source hashes remain unchanged. The bundle
   and final return identity are regenerated from the amended single commit.
+
+## S2-P60 round 4 — committed refusal chain
+
+- Date: 2026-11-22. Base: `1a128a2aa2e63f35f35c6c7c98ab8b14ff46df2a`.
+  Red-first local commit: `6659c8c6b64c9a5e1abe942070404bb17b19898f`, amended
+  into the requested single delivery commit; its final full identity and bundle
+  checksum are recorded in `.overnight/RETURN.md` to avoid a self-referential
+  commit hash in this committed record.
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies equivalent TDD,
+  systematic-debugging and verification-before-completion rules.
+- Authority: lead rulings L-1471 and L-1472 amend L-1469's P under decision 0075
+  item 3. Refusals live in a separate, strictly parsed, committed archive whose
+  exact bytes are frozen in preparation. Preparation, draw and assembly refuse
+  untracked or HEAD-different bytes with `refusal_history_uncommitted`.
+  Each record retains historical signed rows: their codes and canonical hash,
+  ordered sample, error bounds and seed chain are checked before use, else
+  `refusal_record_invalid`. P hashes only the ruled projection, with sorted codes.
+  Metadata, JSON key order and code ordering cannot change that projection.
+- Assembly counts differing sampled codes and publishes `refusal.json` before
+  `audit_decision_differs`; it rechecks frozen inputs and returned hashes first.
+  Freshness covers both archives before either outcome. Zero-error admission
+  history and the core guard remain unchanged. The procedure copies the refusal
+  object unchanged, commits it, prepares again, signs, draws and audits anew.
+- Red on the unchanged base: the cf3 probe produced five seeds from five
+  hand-written records (3351316034, 1022983301, 1230559174, 2210797427,
+  3512274674). It and twelve commitment regressions exited 1: 13 failed.
+  Evidence: `.overnight/evidence/r4/red-baseline.log`; command was
+  `uv run --locked python -m pytest scripts/tests/test_spine_refusals.py -k 'cf3_five or uncommitted' -q -p no:cacheprovider`.
+- Final focused command:
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py scripts/tests/test_spine_refusals.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112264`
+  exited 0, 298 passed and 21 subtests passed. It includes byte-preserved refusal
+  copying, byte-identical unchanged re-signing, a fresh seed, independent-maker
+  role audit, zero-error assembly and successful finalise-check on invented inputs.
+  Properties retain empty batches, singletons, sample boundaries, both seed
+  endpoints, arbitrary Unicode/text, ordering and varied valid error counts.
+- Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  Ruff 0.17.4, mypy 2.4.1; `UV_OFFLINE=1`, provider none; generated test/cache/
+  bytecode paths inside this workspace. No network or real data, .env or .private
+  input. The mounted Git metadata is read-only; delivery uses an isolated Git
+  directory inside `.overnight/`, based on the exact base revision. Failed
+  attempts to write the mounted metadata made no repository change.
+- Development corrections are retained in the logs: initial Ruff import-order
+  failures; mypy explicit-reexport and test annotations; tuple/list fixture
+  normalization, the bool-versus-int assertion, an unsuppressed Hypothesis nested
+  import health check, a missing test role constant, and the retained core test's
+  extra archive fields. Corrected without weakening a guard, suppressing a check,
+  retrying a random failure or changing the core. Self-review reused `_audit_codes`
+  rather than duplicating its code validation and moved assembly freshness ahead
+  of both possible outcomes; checks were rerun after these changes.
+- The remaining fabrication risk is explicitly recorded under OI-203: correctly
+  chained fabricated refusals remain possible, visible in the committed archive
+  and Git history, which L-1471 rules sufficient for this capability demonstration.
+  This establishes consistency and committed bytes, not audit authenticity.
+  OI-203 real-feed signing and different-maker review remain lead-owned; no task
+  box, gate, push, merge or independent approval is claimed.
+- Code practice: no copied block; the existing derivation was extracted into
+  single-purpose helpers, with one canonical encoder and reuse of `_pairs`,
+  `_audit_codes`, `git_environment`, row hashing, sampling and the existing frozen
+  and candidate checks. Per-file counts and longest functions are in the return.
+- Final Unicode correction: an escaped unpaired surrogate in a historical
+  signed-row string initially escaped as UnicodeEncodeError (red exit 1,
+  `test_refusal_signed_rows_with_unpaired_surrogate`). The wrapper now maps
+  UnicodeError to `refusal_record_invalid`; the same test exits 0, and the
+  required focused suite exits 0 with 298 passed and 21 subtests passed.
+  No core parser or hash function was changed.
+- Final guard-removal replay: 41 isolated plants on the final source bytes,
+  each red exit 1, exact byte restoration and green exit 0. Results, argv,
+  old/new source text and restored source hashes are retained under
+  `.overnight/evidence/r4/plants-sealed/`; the return includes every row and
+  its exact focused test node. Earlier 30-pair and intermediate 40-pair runs
+  remain supplemental records, not substituted for this final replay.
+- Required triage unittest command: `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`,
+  exit 0, 96 tests. Final Ruff check, Ruff format --check, mypy, check_docs,
+  check_tree, instruction cmp and diff checks exit 0 (actual argv and logs in
+  `.overnight/evidence/r4/checks.json`). After appending this record the
+  document/tree/instruction/diff checks are recorded separately in
+  `.overnight/evidence/r4/post-record.json`; no source is changed by those checks.
+- Core unchanged proof: SHA-256
+  `6063a7d12d10ae01addfd3ff036ce46c91fb73573893158c67a8bf8333aa57eb`,
+  equal to the base's activity.py. Strict builder self-review: APPROVE for
+  this bounded r4 delivery, not independent-maker approval. Muhasabah PASS
+  for the sourced claims, explicit residual and completed requested mechanics.

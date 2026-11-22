@@ -32,6 +32,9 @@ class SpineReviewTest(unittest.TestCase):
         self.cache = self.root / "data/public_cache"
         self.review = self.cache / "review.csv"
         self.preparer = "invented_preparer"
+        from test_spine_refusals import commit_refusals
+
+        commit_refusals(self, [])
         # Empty reviewed baskets are valid membership, never a mapping approval.
         self.baskets = self.cache / "baskets.yaml"
         self.baskets.write_text(
@@ -87,7 +90,7 @@ class SpineReviewTest(unittest.TestCase):
         )
         from spine_review import derived_audit_seed
 
-        history = self.review.with_name("activity_spine_audits.json")
+        history = self.review.with_name("activity_spine_refusals.json")
         audits = json.loads(history.read_bytes()) if history.exists() else []
         seed = derived_audit_seed(
             tuple(row for row in rows if row.code_length == 7), audits
@@ -394,6 +397,9 @@ class SpineReviewTest(unittest.TestCase):
         self.baskets.rename(folder / "baskets.yaml")
         self.review = folder / "activity_spine.csv"
         self.baskets = folder / "baskets.yaml"
+        from test_spine_refusals import commit_refusals
+
+        commit_refusals(self, [])
         first = self.prepare()
         signed, audited, makers = self.returns(first)
         # First candidate contains a person-signed acknowledgement and audited decisions.
@@ -965,7 +971,9 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
         write_review_csv(paths[1], audited)
         with self.assertRaisesRegex(Refusal, "^" + reason + "$"):
             self.assemble(prepared, paths)
-        self.assertFalse((self.cache / "spine_review/invented-assembled").exists())
+        output = self.cache / "spine_review/invented-assembled"
+        self.assertEqual(output.exists(), plant == "audit_disagreement")
+        self.assertFalse((output / "activity_spine.csv").exists())
 
     return test
 
