@@ -10,6 +10,7 @@ value below is invented, except the committed open anchors read from
 
 from __future__ import annotations
 
+import itertools
 import json
 import tempfile
 from pathlib import Path
@@ -18,8 +19,6 @@ import pytest
 from custodian.tests.test_production_adapters import context
 from custodian.tests.test_public_data_stage import INVENTED_PUB_71
 from custodian.tests.test_public_series import series_cache
-from hypothesis import given
-from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.fetch.registry import load_registry
@@ -181,18 +180,16 @@ def test_owned_figure_changed_after_series_refuses_final_audit(
 
 
 @pytest.mark.public_data
-@given(
-    st.tuples(
-        st.sampled_from(STATES),
-        st.sampled_from(STATES[:3]),
-        st.sampled_from(STATES[:3]),
-    )
+@pytest.mark.parametrize(
+    "states", list(itertools.product(STATES, STATES[:3], STATES[:3]))
 )
 def test_final_audit_refuses_exactly_a_mismatch_or_an_unrecorded_figure(
     states: tuple[str, str, str],
 ) -> None:
-    """Whole domain of the unowned figures: PUB-72 and PUB-73 have committed
-    anchors, so only PUB-71 can be produced without its expectations record."""
+    """Whole domain of the unowned figures, enumerated exhaustively (36 cases):
+    PUB-72 and PUB-73 have committed anchors, so only PUB-71 can be produced
+    without its expectations record. Each case runs a full final audit, so
+    the domain is enumerated rather than sampled under a per-example timer."""
     plan = dict(zip(UNOWNED, states, strict=True))
     with tempfile.TemporaryDirectory() as folder:
         cache = Path(folder)

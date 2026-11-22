@@ -6220,3 +6220,7 @@ matching and core match counters, with no height-order change. The landmark
 hand list (S2-P50), basemap ids, both real snapshot selections and real measured
 pairs remain open. This entry does not close OI-310 or S2-T20#5; DHA-102 only
 tracks the split file keys under its existing permission record.
+
+## S2-18-RF1 — Hosted timing failure of one section 10 property test (2026-11-22, lead)
+
+Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-11-22 on train S2-18 head `8f75f027a1` failed one test: `custodian/tests/test_assembly_section10.py::test_final_audit_refuses_exactly_a_mismatch_or_an_unrecorded_figure`, with Hypothesis `DeadlineExceeded` (273 ms against the 200 ms default) on the all-absent case. The other 15184 tests passed. Cause: each example runs a full final audit, which parses the 1.2 MB source registry. Locally the runtime is up to 195 ms on a dedicated core, so the test sits at the timer's edge. Disposition: the domain is finite (4 × 3 × 3 = 36 states), so the test now enumerates all of it with `pytest.mark.parametrize` and has no per-example timer. This is exhaustive, so it is a stronger test than a sample, with no assertion change. The same class was handled for the tender tests under PO-S2-P46-03. A green rerun alone did not close this item; it closes when the train merges with the change.
