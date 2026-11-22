@@ -739,6 +739,9 @@ class Production:
         )
         from .series.figures import validate_figure
 
+        # build_series has cleared series/regression; the unowned figures are
+        # written after it and compared by final_audit.
+        section10 = self.section10()
         names = sorted(
             {table for source in selected for table, _ in FIELD_MAP[source].values()}
         )
@@ -767,7 +770,13 @@ class Production:
             produced[name] = self.tables[name]
             row_sources[name] = envelope["row_sources"]
         output = self.record(
-            "series_stage", {**result, "tables": produced, "row_sources": row_sources}
+            "series_stage",
+            {
+                **result,
+                "tables": produced,
+                "row_sources": row_sources,
+                "section10": list(section10),
+            },
         )
         # run_stage names a missing required (owned) figure as the mismatch.
         # Unowned section 10 figures stay in ``missing`` and final_audit
@@ -775,6 +784,27 @@ class Production:
         if result["mismatch"]:
             raise AssemblyError("assembly_regression_refused")
         return output
+
+    def section10(self) -> tuple[str, ...]:
+        """PUB-71 and PUB-72 from their selected snapshots; none selected, none written."""
+        from .series.section10 import SECTION10_REFUSED, SOURCES, Input, produce
+
+        inputs: dict[str, Input] = {}
+        try:
+            for entry in self.entries:
+                if (
+                    entry.source_id not in SOURCES
+                    or entry.skip_reason
+                    or entry.key not in self.selected
+                ):
+                    continue
+                if entry.source_id in inputs:
+                    raise ValueError("duplicate_source")
+                payload = self.raw(entry)
+                inputs[entry.source_id] = (entry, payload, self.receipts[entry.key])
+            return produce(self.cache, self.review, inputs)
+        except (ValueError, KeyError, TypeError):
+            raise AssemblyError(SECTION10_REFUSED) from None
 
     def heights(self) -> dict[str, str]:
         from .building_inputs import BUILDING_MANIFEST_RELATIVE
@@ -910,7 +940,12 @@ class Production:
         section = run_stage(self.cache, evidence=True)
         if section.mismatch or section.unrecorded:
             raise AssemblyError("assembly_regression_refused")
-        self.audit = gather_audit(self)
+        # The audit reports this complete comparison, not the series stage's
+        # earlier one, which ran before the unowned figures were written.
+        self.audit = {
+            **gather_audit(self),
+            "regressions": {"missing": list(section.missing), "mismatch": ""},
+        }
         return self.record("final_audit", self.audit)
 
     def draw(self) -> dict[str, str]:
