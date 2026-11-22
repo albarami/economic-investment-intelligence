@@ -51245,3 +51245,96 @@ Additional F4 preservation proof: a read-only Git script compares each original 
 | 2026-11-22 | Decision 0090 acceptance | The owner accepted decision 0090 as written, in the words "I accept". Records-only edits: the decision's status and acceptance section, document 04 PUB-17, decision 0077 item 2, the decision index and an OPEN_ITEMS line. No code, test, check or bound changes. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | Correction to the S2-P51 row | The builder model named in the S2-P51 row as "GPT-6" is OpenAI gpt-6.1-sol, run through Codex. The earlier row is not rewritten. | Lead (Anthropic Opus 5.5) |
 - Join correction (2026-11-22, lead): the lead's whole test on the joined head c24380ec (seed 3318094039) failed one test, `scripts/tests/test_moved_boxes.py::test_s2_t35_box_retained_and_c12_part_moved_to_s6_t13`, because its assertion `[ ] {RESTRICTED_BOX}; [ ] ` also pinned S2-T35 box 2 unticked, which gate round 7 ticks. The assertion now ends at `; [`: it still proves the first criterion stays first and unticked (planted: ticking that box turns the test red, exit 1), and no longer pins the next box. A forced test difference of the join: confirmed by another maker before merge (rule 33).
+
+## S2-P61 — flagship area origins from every active registry building part
+
+| Date | Task | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-P61, S2-T06 correction; inspected base `154333b5238adda52e529a1222fb6bdc8fd3c01a` | `_cache_points` reuses `_buildings_from_registry`, the stage's active, receipted Parquet selection, for building origins outside `FILE_KEYS`. The fetch list and `building_inputs.BUILDING_PARTS` are unchanged. Missing resolved points of keyed flagship candidates raise the closed `PlacesError("flagship_point_missing")`; the area producer records `REFUSED flagship_point_missing`, and the stage retains its existing PlacesError refusal channel. Places notes describe the shared part set. No source fetched or real cache read; no S2-T06 criterion or slice gate is ticked. | OpenAI Codex; senior Python engineer for geospatial data pipelines; strict self-review persona: sanad auditor. |
+
+**Skills and method.** Applied `project-orientation`, `task-standards`,
+`github-flow`, `sanad-provenance`, `strict-reviewer` and `muhasabah-gate`.
+The brief supplies the equivalent test-first, systematic-debugging and
+verification-before-completion rules; their superpowers skill files are not in
+this session's installed skill catalogue. Reused the existing registry resolver
+and invented Parquet, receipt and review fixtures; no copied implementation or
+duplicate helper. Self-review is not independent different-maker approval; the
+lead retains that review and the merge gate.
+
+**Environment and commands.** Linux, bash, Python 3.14.6, pytest 9.2.0,
+Hypothesis 6.170.15, profile `eii`, seed `6101`; every uv invocation used
+`UV_OFFLINE=1`. Test basetemps and evidence are under `.overnight/tmp/`.
+No network, `.env`, `.private`, real `data/` input, service command, push or
+merge. The final delivery commit is recorded after committing in
+`.overnight/RETURN.md`, avoiding a self-referential hash in this commit.
+
+The final regression command (exit **0**, **1102 passed**, no failed or skipped
+tests, **113.28 seconds**) was:
+
+```sh
+UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places*.py custodian/tests/test_assembly_readers.py custodian/tests/test_public_snapshots.py custodian/tests/test_publicdata_unblocked_round3.py custodian/tests/test_snapshot_refusals.py custodian/tests/test_building_workflow.py custodian/tests/test_publicdata_besttime_build.py custodian/tests/test_publicdata_buildings.py custodian/tests/test_series_frame.py -q --hypothesis-seed=6101 --basetemp=.overnight/tmp/pytest-regressions-final
+```
+
+An AST scan found **16** direct importers of the changed modules. The command
+covers all of them and all places tests, **47** files in total; the explicit
+selection is in `.overnight/tmp/test-selection.json`. The earlier run, before
+the supplementary property and PlacesError routing correction, exited **0**,
+**1101 passed**. Only import formatting changed during the final broad run;
+the focused suite was rerun on the final test bytes.
+
+**Red, refusal and restoration evidence.** The initial five-case suite exited
+**1**, **3 failed / 2 passed**: the extra registry part lost its point, the
+dependent negative first encountered that missing origin, and the producer
+logged `areas: nothing to do`. The negative was then isolated on the fixed
+part; changing only the valid point map by deleting its candidate pair exited
+**1**, **1 failed**, specifically `DID NOT RAISE`. After implementation the same
+five cases exited **0**, **5 passed**. The final suite includes a supplementary
+property over nonempty source/record strings and every closed mode/cutoff:
+both exact keys are needed even with wrong-source and wrong-record decoys.
+It exited **0**, **6 passed**. There is one new refusal branch, the required
+flagship's missing point; the negative asserts the anchored exact reason
+`flagship_point_missing`. Existing optional-showcase and malformed-key handling,
+receipt guards and parser exclusions are retained.
+
+| Plant, changed alone | Red exit and evidence | Byte restoration and green exit |
+|---|---|---|
+| Restore the base `_cache_points` fixed-key loop | 1; 1 failed / 5 passed, extra-part point is `{}` | Exact original fixed bytes restored; 0, 6 passed |
+| Delete only the new missing-point refusal, restoring the silent skip | 1; 3 failed / 3 passed, exact-reason negatives and property report `DID NOT RAISE` | Exact fixed bytes restored; 0, 6 passed |
+| Remove only `required=True` from the flagship request call | 1; 2 failed / 4 passed, required flagship and producer-log negatives fail | Exact fixed bytes restored; 0, 6 passed |
+
+Plant commands were the focused `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py -vv --hypothesis-seed=6101`
+with a distinct `.overnight/tmp/pytest-...` basetemp per run. Actual commands,
+exits and summaries are retained in `.overnight/tmp/plants.json`. Both modified
+production files were compared byte-for-byte with their saved fixes after
+restoration. No privacy rule, gate, baseline, skip or tolerance changed.
+
+**Other checks.** `uv run --locked ruff check .` exit **0**;
+`uv run --locked ruff format --check .` exit **0**, **939** files formatted;
+`uv run --locked mypy` exit **0**, **500** source files;
+`python3 scripts/check_docs.py` exit **0**, **1272** text files / **143** Markdown
+files in the first run; `python3 scripts/check_tree.py` exit **0**, **8** rules;
+`cmp AGENTS.md CLAUDE.md` exit **0**; `git diff --check` exit **0**.
+Initial lint/format checks exited **1** for a non-raw anchored regex and line
+wrapping in the new test. The formatter exited **0** and changed only that
+test; the later added Hypothesis import needed splitting, lint exit **1**, then
+**0** after correction. These are explained corrections, not random failures.
+Final post-record checks and the exact bundle checksum are in the return.
+
+**Delivery constraint.** Creating a branch in the supplied worktree exited
+**128** because its shared Git refs are read-only. A workspace-local shared
+bare clone under `.overnight/tmp/delivery.git` was created (exit **0**) and its
+own branch and index were initialized at the full base hash above. The delivery
+commit and bundle use only that local Git metadata; the supplied shared Git
+metadata is unchanged. No permission bypass, push or remote operation is used.
+
+**Code practice and limits.** Longest new function:
+`test_registry_building_supplies_flagship_point_and_all_requests`, **29** lines
+by AST span. Changed production functions `_cache_points` and `_remember` are
+**28** and **32** lines. No block copied; existing loops moved within the same
+function and the registry resolver was reused. No new arithmetic, rounding,
+geospatial method or privacy/leak rule; the property supplements the scoped
+origin-presence and exact-key cases rather than asserting new numeric coverage.
+Fixture evidence proves the point/request and closed-refusal correction only;
+live flagship areas, source review and different-maker acceptance remain with
+the lead. Muhasabah self-audit: **PASS** for this scoped implementation.

@@ -206,26 +206,26 @@ def _cache_points(
 ) -> dict[tuple[str, str], tuple[float, float]]:
     found: dict[tuple[str, str], tuple[float, float]] = {}
     tag = _tag(review)
-    for key in FILE_KEYS:
+    for key in (key for key in FILE_KEYS if key.startswith(_PLACES_SOURCE)):
         located = _opened_place(cache, key)
         if located is None:
             continue
         path, _receipt = located
         try:
-            if key.startswith(_PLACES_SOURCE):
-                if tag == "":
-                    continue
-                for row in read_place_file(path, tag):
-                    found[(_PLACES_SOURCE, row.place_id)] = (
-                        float(row.lon),
-                        float(row.lat),
-                    )
-            else:
-                for building in read_building_file(path, frame_box=_FRAME):
-                    found[(_BUILDINGS_SOURCE, building.building_id)] = (
-                        float(building.lon),
-                        float(building.lat),
-                    )
+            if tag == "":
+                continue
+            for row in read_place_file(path, tag):
+                found[(_PLACES_SOURCE, row.place_id)] = (float(row.lon), float(row.lat))
+        except PlacesError:
+            continue
+    building_paths, _receipts = _buildings_from_registry(cache, load_registry())
+    for path in building_paths:
+        try:
+            for building in read_building_file(path, frame_box=_FRAME):
+                found[(_BUILDINGS_SOURCE, building.building_id)] = (
+                    float(building.lon),
+                    float(building.lat),
+                )
         except PlacesError:
             continue
     return found
