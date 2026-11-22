@@ -6,7 +6,7 @@ import json
 from dataclasses import replace
 
 import pytest
-from custodian.tests.test_s2_t29_awards import STAMP, profile, row
+from custodian.tests.test_s2_t29_awards import STAMP, profile, proof_row, row
 
 from eii_custodian.publicdata.fetch import awards
 from eii_custodian.publicdata.fetch.award_checks import AwardError
@@ -240,7 +240,7 @@ def test_publish_entry_guards(tmp_path, plant):
     )
     with pytest.raises(AwardError, match=r"^receipt_missing$"):
         awards.publish_awards(
-            entry, tmp_path, batch(), profile(), STAMP, 73, lambda _: row(), []
+            entry, tmp_path, batch(), profile(), STAMP, 73, lambda _: proof_row(), []
         )
 
 
@@ -257,7 +257,7 @@ def test_publish_entry_pending_basis_is_published_as_written(tmp_path, value):
         profile(),
         STAMP,
         73,
-        lambda _: row(),
+        lambda _: proof_row(),
         [{"registration": "SYN-reg", "name": "SYN Company"}],
     )
     assert result.sidecar["licence_basis"] == value
@@ -282,7 +282,7 @@ def test_publish_preserves_full_lineage_and_canonical_body(tmp_path):
         profile(),
         STAMP,
         73,
-        lambda _: row(),
+        lambda _: proof_row(),
         registers,
         inputs,
     )

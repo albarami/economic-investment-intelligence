@@ -372,7 +372,8 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
     monkeypatch.setattr(awards, "check_all_awards", check)
     result = fetch(entry, tmp_path, body)
     assert seen == dec["reviewed_urls"]
-    assert result.sidecar["award_check"]["mismatched"] == 2
+    assert result.sidecar["award_check"]["matched"] == 2
+    assert result.sidecar["award_check"]["matched_name_not_compared"] == 2
 
 
 @pytest.mark.parametrize(

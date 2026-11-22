@@ -1,7 +1,7 @@
 """Invented multi-winner proofs and malformed portal card nesting."""
 
 import pytest
-from custodian.tests.test_s2_t29_awards import profile, row
+from custodian.tests.test_s2_t29_awards import profile, proof_row, row
 from custodian.tests.test_s2_t29_live_shapes import declaration, entry
 
 from eii_custodian.publicdata.fetch.award_checks import check_awards
@@ -73,10 +73,17 @@ def test_award_shape_plants(plant):
 
 def test_sample_matches_every_intake_winner_without_selecting_one():
     first = row()
-    second = dict(row(), syn_company="SYN Other", syn_reg="SYN-other", syn_value="7")
-    result = check_awards([first, second], profile(), 73, lambda _: [second, first])
+    second = dict(
+        row(), syn_company="SYN Other", syn_reg="SYN-other", syn_value="7.00 QAR"
+    )
+    result = check_awards(
+        [first, second],
+        profile(),
+        73,
+        lambda _: [dict(second, syn_value="7.00"), proof_row()],
+    )
     assert result["matched"] == 1 and result["mismatched"] == 0
-    mismatch = check_awards([first, second], profile(), 73, lambda _: [first])
+    mismatch = check_awards([first, second], profile(), 73, lambda _: [proof_row()])
     assert mismatch["matched"] == 0 and mismatch["mismatched"] == 1
 
 

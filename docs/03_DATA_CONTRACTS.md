@@ -1171,13 +1171,16 @@ Whitespace-only registrations never match, and duplicate register entries remain
 ambiguous. Awarded values never become turnover or sales, and identifiers stay in
 the custodian matching boundary. Release consumers remain separate tasks.
 
-Under decision 0064 item 41, the same receipt also carries `award_links`, with
+Under decision 0064 item 41, amended by [decision 0088](decisions/0088-award-proof-check-over-the-real-formats.md) items 2 to 5, the same receipt also carries `award_links`, with
 `method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
 `report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
-`failed_fetches`, `match_rate`, `incomplete`, `status` and `results`. Every link is
+`failed_fetches`, `matched_name_not_compared`, `intake_value_absent`,
+`proof_value_absent`, `proof_mismatch`, `match_rate`, `incomplete`, `status` and `results`. Every link is
 checked once in URL order through the existing bounded retry reader and reviewed proof scope.
-Each result has `report_url`, `result` and `reason`: a match uses `matched`, a
-mismatch uses `proof_mismatch`, and fetch failures use only `proof_fetch_failed`,
+Each result has `report_url`, `result` and `reason`: a `matched` result uses
+`matched` or `matched_name_not_compared`; a `mismatched` result uses, in fixed
+precedence, `intake_value_absent`, `proof_value_absent` or `proof_mismatch`;
+fetch failures use only `proof_fetch_failed`,
 `unreachable`, `http_status` or `body_bytes`. Links whose bounded read fails stay in the checked
 denominator; `match_rate` is matched divided by checked, null for an empty frame.
 Empty frames or any failed fetch set `incomplete` and `award_links_incomplete`;
@@ -1189,6 +1192,26 @@ excluding `results` and `report_urls`; the full per-link record stays on the sou
 receipt. The audit explicitly labels the separate sample; assembly refuses absent or incomplete
 full-link evidence even when its sample passed. OI-277's live evidence remains
 the lead's work; invented-response tests do not establish a live match rate.
+
+The intake value must match `([0-9]{1,3}(,[0-9]{3})*|[0-9]+)\.[0-9]{2} QAR`
+by full-string match. Proof values retain the existing comma-group/two-decimal
+`رق` format and become canonical two-decimal text for comparison. Empty cells
+and suffix-only cells are blank, never zero; other malformed proof-page values
+still refuse `schema_missing`, while malformed intake strings yield
+`proof_mismatch`. Registrations compare as nonempty sets of stripped tokens split
+on literal ` | `, with exact token equality. Normalised names are classified by
+Unicode letters: all letters named `ARABIC` is `arabic`, all named `LATIN` is
+`latin`, no letters is `none`, and any other-script letter or combination is
+`mixed`. Nonletters do not set a script. Only equal non-`none` classes undergo
+exact name equality; otherwise registration and value may earn
+`matched_name_not_compared`. Every winner needs a candidate match; prefer a
+compared-name match, then a match without name comparison, then the fixed
+mismatch precedence. Any failing winner defeats the link; otherwise any name
+not compared labels it. `matched_name_not_compared` is a subset of `matched`,
+and the three mismatch-reason counts sum to `mismatched`. The card shows the
+matched total and the name-not-compared subset separately. The seeded sample
+retains the same closed reasons and counters; both receipt validators recompute
+them. This changes no register join, denominator, incompleteness or fetch rule.
 
 Page terms, raw bytes and parsed tables, and intake proofs, raw bytes and parsed
 rows, are staged together within the cache. A failed write or final validation

@@ -389,6 +389,8 @@ def awards(
         record = {}
         for (name, kind), node in zip(columns, raw, strict=True):
             text = node.text().strip()
+            if kind == "number" and text == "رق":
+                text = ""
             if kind == "number" and text:
                 # Source uses comma groups, two decimals and the literal currency suffix.
                 m = re.fullmatch(

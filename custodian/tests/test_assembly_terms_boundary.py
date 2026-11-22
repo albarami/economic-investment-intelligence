@@ -91,20 +91,21 @@ def test_every_admitted_registry_slot_reaches_assembly_whatever_terms(
             sources[table].append(row.key)
     for table, payload in expected.items():
         state.table(table, payload, sources[table])
-    from custodian.tests.test_s2_t29_awards import profile
+    from custodian.tests.test_s2_t29_awards import profile, proof_row
     from custodian.tests.test_s2_t29_awards import row as award_row
 
     from eii_custodian.publicdata.fetch.award_checks import check_awards
     from eii_custodian.publicdata.fetch.award_links import check_all_awards
 
     awards = [award_row(index) for index in range(30)]
-    lookup = {item["report_url"]: item for item in awards}
+    lookup = {item["report_url"]: proof_row(index) for index, item in enumerate(awards)}
     state.receipts["awards_owner_scrape"].update(
         award_check=check_awards(awards, profile(), state.seed, lookup.__getitem__),
         award_check_scope="sample",
         award_links=check_all_awards(awards, profile(), lookup.__getitem__),
         registration_double_space_only=0,
     )
+    assert state.receipts["awards_owner_scrape"]["award_check"]["matched"] == 30
     outputs = state.record(
         "gis_property_singles",
         {"tables": state.tables, "source_tables": state.source_tables},
