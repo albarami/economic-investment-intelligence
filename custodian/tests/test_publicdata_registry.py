@@ -984,8 +984,9 @@ def test_registry_counts_follow_decision_0026() -> None:
         key.startswith("bldg_ovt/stac-part-") for key in BLDG_OVT_KEYS
     )
     assert (
-        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1 - 3 + stac_item_count
-    )  # The fixed non-item count stays; STAC items use the committed closed tuple.
+        len(entries)
+        == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1 - 3 + 1 + stac_item_count
+    )  # GBA now has two file rows; STAC items use the committed closed tuple.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.

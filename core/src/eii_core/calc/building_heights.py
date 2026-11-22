@@ -14,7 +14,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 
-from .public_series import CALC_CONTEXT, ZERO, finite
+from .public_series import CALC_CONTEXT, ZERO, count, finite
 
 ORDER = ("recorded", "floor_count", "3dglobfp", "wsf3d")
 FALLBACKS = ORDER[1:]
@@ -250,6 +250,125 @@ def errors_by_class(
     }
 
 
+GBA_EXCLUSIONS = (
+    "geometry_null",
+    "geometry_empty",
+    "geometry_invalid",
+    "height_null",
+    "height_nodata",
+    "height_non_finite",
+    "height_non_positive",
+)
+GBA_COUNTERS = ("rows_in_bounds", "rows_kept", *GBA_EXCLUSIONS, "bbox_null")
+
+
+def gba_exclusion(geometry_reason: str, value: Decimal | None, nodata: Decimal) -> str:
+    """Geometry first, then height; exactly one outcome for each bounded row."""
+    if geometry_reason:
+        return geometry_reason
+    if value is None:
+        return "height_null"
+    if value.is_finite() and value == nodata:
+        return "height_nodata"
+    if not value.is_finite():
+        return "height_non_finite"
+    if not positive_height(value):
+        return "height_non_positive"
+    return ""
+
+
+def gba_read_counts(outcomes: Iterable[str]) -> dict[str, int]:
+    """Count an exclusive row partition, including kept rows."""
+    counts = dict.fromkeys(GBA_COUNTERS, 0)
+    for reason in outcomes:
+        if reason and reason not in GBA_EXCLUSIONS:
+            raise ValueError("gba row outcome")
+        counts["rows_in_bounds"] += 1
+        counts[reason or "rows_kept"] += 1
+    return counts
+
+
+def sum_gba_read_counts(files: Iterable[Mapping[str, int]]) -> dict[str, int]:
+    """Verify the bounded partition; sum it and the separate NULL-bbox count."""
+    total = dict.fromkeys(GBA_COUNTERS, 0)
+    for counts in files:
+        if set(counts) != set(GBA_COUNTERS):
+            raise ValueError("gba row accounting")
+        for value in counts.values():
+            count(value)
+        if counts["rows_in_bounds"] != counts["rows_kept"] + sum(
+            counts[name] for name in GBA_EXCLUSIONS
+        ):
+            raise ValueError("gba row accounting")
+        for name in GBA_COUNTERS:
+            total[name] += counts[name]
+    return total
+
+
+def tied_height(matches: Iterable[tuple[Decimal, str, int, Decimal]]) -> bool:
+    """A winning-area tie at a different raw height, shared by both reports."""
+    rows = list(matches)
+    winner = largest_overlap(rows)
+    return winner is not None and any(
+        match[0] == winner[0] and match[-1] != winner[-1] for match in rows
+    )
+
+
+def gba_match_counts(
+    rows: Iterable[tuple[Decimal | None, Iterable[tuple[Decimal, str, int, Decimal]]]],
+) -> dict[str, int]:
+    """Count recorded buildings, match outcomes and distinct shared footprints.
+
+    largest_overlap accepts zero area, so there is no separate no_overlap
+    outcome: no_footprint means no covering candidate. A shared footprint is
+    one distinct (file, row) winning for more than one recorded building.
+    """
+    counts = dict.fromkeys(
+        (
+            "recorded_buildings",
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+            "tied_height",
+            "shared_footprint",
+        ),
+        0,
+    )
+    winners: dict[tuple[str, int], int] = {}
+    for recorded, candidates in rows:
+        if recorded is None:
+            continue
+        counts["recorded_buildings"] += 1
+        matches = list(candidates)
+        winner = largest_overlap(matches)
+        if winner is None:
+            counts["no_footprint"] += 1
+            continue
+        key = (winner[1], winner[2])
+        winners[key] = winners.get(key, 0) + 1
+        if tied_height(matches):
+            counts["tied_height"] += 1
+        if height_value(winner[-1]) is None:
+            counts["unusable_height"] += 1
+        elif height_value(recorded) is None:
+            counts["recorded_height_unusable"] += 1
+        else:
+            counts["matched"] += 1
+    counts["shared_footprint"] = sum(count > 1 for count in winners.values())
+    if counts["recorded_buildings"] != sum(
+        counts[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    ):
+        raise ValueError("gba match accounting")
+    return counts
+
+
 def height_counts(
     choices: Iterable[HeightChoice],
     globfp_matches: Iterable[Iterable[tuple[Decimal, str, int, Decimal]]],
@@ -287,10 +406,7 @@ def height_counts(
                 raise ValueError("candidate outside the closed order")
             reason = f"{name}_value_not_positive"
             no_value[reason] = no_value.get(reason, 0) + 1
-        winner = largest_overlap(matches)
-        if winner is not None and any(
-            match[0] == winner[0] and match[-1] != winner[-1] for match in matches
-        ):
+        if tied_height(matches):
             tied_height_buildings += 1
     return HeightCounts(
         by_source,

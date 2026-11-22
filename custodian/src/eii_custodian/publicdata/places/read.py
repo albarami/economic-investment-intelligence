@@ -252,17 +252,22 @@ def building_source_rows(path: Path) -> Iterator[dict[str, Any]]:
         connection.close()
 
 
-def _building_crs(connection: Any, path: Path) -> None:
-    """GeoParquet's absent CRS means CRS84; explicit unknown/lat-first refuses."""
+def geoparquet_metadata(connection: Any, path: Path) -> Any:
+    """Decode the shared geo footer; callers own their structural refusals."""
     rows = connection.execute(
         "SELECT key, value FROM parquet_kv_metadata(?)", [str(path)]
     ).fetchall()
+    metadata = {
+        key.decode() if isinstance(key, bytes) else str(key): value
+        for key, value in rows
+    }
+    return json.loads(metadata["geo"])
+
+
+def _building_crs(connection: Any, path: Path) -> None:
+    """GeoParquet's absent CRS means CRS84; explicit unknown/lat-first refuses."""
     try:
-        metadata = {
-            key.decode() if isinstance(key, bytes) else str(key): value
-            for key, value in rows
-        }
-        geo = json.loads(metadata["geo"])
+        geo = geoparquet_metadata(connection, path)
         if geo["primary_column"] != "geometry":
             raise ValueError
         column = geo["columns"]["geometry"]
@@ -284,6 +289,11 @@ def _building_crs(connection: Any, path: Path) -> None:
             raise ValueError
     except (KeyError, TypeError, ValueError, AttributeError):
         raise PlacesError("crs") from None
+
+
+# Public reuse names; legacy bindings and monkeypatch seams remain intact.
+connect_parquet = _connect
+require_crs84 = _building_crs
 
 
 def _require_schema(connection: Any, path: Path) -> None:

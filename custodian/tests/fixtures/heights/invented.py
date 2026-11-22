@@ -47,12 +47,6 @@ GLOBFP_FIELDS = (
     ("Height", "N", 24, 15),
     ("FID_1", "N", 24, 15),
 )
-GBA_FIELDS = (
-    ("FID", "N", 18, 0),
-    ("Height", "N", 24, 15),
-    ("SYN_class", "C", 8, 0),
-    ("FID_1", "N", 24, 15),
-)
 
 
 def square(x: float, y: float, size: float) -> list:
@@ -226,18 +220,64 @@ def globfp_zip(
     return shapefile_zip(shapes, records, fields, stem=stem, **kwargs)
 
 
-def gba_zip(features: list, stem: str = "syn.tile.01", **kwargs) -> bytes:
-    """INVENTED: GBA tile with height and SYN_class per footprint."""
-    shapes = []
-    records = []
-    for geometry, height, class_name in features:
-        if isinstance(geometry[0][0], (int, float)):
-            shapes.append([cw(geometry)])
-        else:
-            shapes.append([cw(ring) for ring in geometry])
-        records.append([str(len(records) + 1), height, class_name, ""])
-    fields = [list(item) for item in GBA_FIELDS]
-    return shapefile_zip(shapes, records, fields, stem=stem, **kwargs)
+def gba_parquet(path, features, *, geo=None, projection="*") -> bytes:
+    """Invented seven-column mirror shape; defects alter one projected input."""
+    import duckdb
+    from shapely.geometry import Polygon
+
+    if geo is None:
+        geo = {
+            "version": "1.1.0",
+            "primary_column": "geometry",
+            "columns": {"geometry": {"encoding": "WKB", "geometry_types": ["Polygon"]}},
+        }
+    connection = duckdb.connect()
+    try:
+        connection.execute("SET enable_geoparquet_conversion = false")
+        connection.execute("""CREATE TABLE tile (
+            source VARCHAR, id VARCHAR, height DOUBLE, var DOUBLE, region VARCHAR,
+            bbox STRUCT(xmin DOUBLE, ymin DOUBLE, xmax DOUBLE, ymax DOUBLE),
+            geometry BLOB)""")
+        for index, (shape, height) in enumerate(features):
+            if isinstance(shape, list):
+                shape = Polygon(shape)
+            bounds = (
+                shape.bounds
+                if shape is not None
+                and not isinstance(shape, bytes)
+                and not shape.is_empty
+                else (0, 0, 1, 1)
+            )
+            wkb = (
+                shape
+                if isinstance(shape, bytes)
+                else None
+                if shape is None
+                else shape.wkb
+            )
+            connection.execute(
+                "INSERT INTO tile VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    "SYN-source",
+                    f"SYN-row-{index}",
+                    height,
+                    "2",
+                    "SYN-region",
+                    dict(zip(("xmin", "ymin", "xmax", "ymax"), bounds, strict=True)),
+                    wkb,
+                ],
+            )
+        metadata = (
+            ""
+            if geo is False
+            else ", KV_METADATA {geo: '" + json.dumps(geo).replace("'", "''") + "'}"
+        )
+        connection.execute(
+            f"COPY (SELECT {projection} FROM tile) TO '{str(path).replace(chr(39), chr(39) * 2)}' (FORMAT parquet, COMPRESSION zstd{metadata})"
+        )
+    finally:
+        connection.close()
+    return path.read_bytes()
 
 
 def dbf_fields(dbf: bytes) -> list:
@@ -447,12 +487,12 @@ def rules_document(
                 "class_field": "",
             },
             "bldg_gba": {
-                "format": "shapefile_zip",
-                "field": "Height",
-                "class_field": "SYN_class",
+                "format": "geoparquet",
+                "field": "height",
+                "class_field": "",
                 "unit": "m",
-                "nodata": "",
-                "crs": "EPSG:4326",
+                "nodata": "-999",
+                "crs": "OGC:CRS84",
             },
         },
     }

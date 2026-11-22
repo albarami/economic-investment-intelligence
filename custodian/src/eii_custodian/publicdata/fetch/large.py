@@ -38,6 +38,8 @@ REQUIRED_KEYS = (
     "bldg_ovt/part-00384",
     "bldg_ovt/part-00385",
     "bldg_wsf3d",
+    "bldg_gba/e050_n25_e055_n20",
+    "bldg_gba/e050_n30_e055_n25",
 )
 JSON_CHUNK_CHARS = 65536
 # An object cannot occupy more than the former whole-export memory allowance.
