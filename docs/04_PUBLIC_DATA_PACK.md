@@ -2097,9 +2097,24 @@ All retrieved 2026-11-11 unless stated.
 - Overture Maps Foundation: release catalogue `https://stac.overturemaps.org/2026-10-21.0/catalog.json`;
   places guide `https://docs.overturemaps.org/guides/places`; attribution page
   `https://docs.overturemaps.org/attribution/`.
-  The four buildings STAC metadata registry rows follow the same release's
-  `bldg_ovt` licence fields exactly, including its terms wording and date read;
-  `commit_allowed` remains false. Item addresses still require confirmation.
+  The committed collection and three unconfirmed item placeholders follow the
+  same release's `bldg_ovt` licence fields exactly, including terms wording and
+  date read; `commit_allowed` remains false. S2-P47 part A adds the offline
+  `scripts/stac_item_rows.py` write/check helper and the literal `BLDG_OVT_KEYS`
+  tuple consumed by `SOURCE_COMPONENTS`. On invented absolute href/rel/type
+  links it replaces placeholders, emits reviewed `https_file` JSON rows and
+  checks exact committed field/key equality. The lead supplies the observed
+  filename regex; no default filename shape or item address is guessed. The
+  real collection's item rows remain a separate lead records step. The helper
+  binds each row's basis note to the pinned collection's SHA-256 and decision
+  0077 item 2, uses the item address as its landing URL, and preserves the
+  collection template's fetch cadence and nightly flag. The companion
+  `scripts/stac_item_pins.py` verifies indexed snapshots and writes new-key
+  proposals only to a new file outside the cache. An equal existing pin is
+  untouched; ambiguity, damaged receipts and conflicting pins refuse. Only
+  the lead's subsequent review makes a proposal a pin. Rule 44 lists both
+  commands; neither contacts a source. No national-completeness ruling is
+  changed by this fixture-only work.
 - Community Data License Agreement Permissive 2.0, `https://cdla.dev/permissive-2-0/`.
 - OpenStreetMap copyright and licence, `https://www.openstreetmap.org/copyright`; Qatar extract
   `https://download.openstreetmap.fr/extracts/asia/qatar-latest.osm.pbf`.

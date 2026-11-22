@@ -5777,7 +5777,7 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "json"
-    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 item 2."
   - key: "bldg_ovt/stac-part-00288"
     refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
@@ -5806,7 +5806,7 @@ sources:
     reconciliation: "none"
     skip_reason: "direct_url_unconfirmed"
     extension: "json"
-    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 item 2."
   - key: "bldg_ovt/stac-part-00384"
     refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
@@ -5835,7 +5835,7 @@ sources:
     reconciliation: "none"
     skip_reason: "direct_url_unconfirmed"
     extension: "json"
-    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 item 2."
   - key: "bldg_ovt/stac-part-00385"
     refetch: {value: monthly, family: overture_release, evidence: "decision 0045 item 4; EII check schedule"}
     source_id: "bldg_ovt"
@@ -5864,7 +5864,7 @@ sources:
     reconciliation: "none"
     skip_reason: "direct_url_unconfirmed"
     extension: "json"
-    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 (proposed)."
+    basis_note: "STAC metadata via the existing HTTPS transport. Item URLs require the lead reading of the pinned collection; no guessed URL. Licence fields follow the release's bldg_ovt row. Decision 0077 item 2."
 
 # S2-T17 — PUB-103 / C30 source admission, not backtest eligibility.
   - key: "ntl_blackmarble/2024-01"

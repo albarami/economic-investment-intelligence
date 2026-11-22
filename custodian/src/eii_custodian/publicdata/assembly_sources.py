@@ -262,19 +262,20 @@ PACK_IDENTITIES: dict[str, tuple[str, ...]] = {
 
 # Closed component keys from the joined registry contracts of S2-T14,
 # S2-T15, S2-T19 and S2-T28; runtime registry rows cannot define this list.
+BLDG_OVT_KEYS: tuple[str, ...] = (
+    "bldg_ovt",
+    "bldg_ovt/part-00288",
+    "bldg_ovt/part-00384",
+    "bldg_ovt/part-00385",
+    "bldg_ovt/stac-collection",
+    "bldg_ovt/stac-part-00288",
+    "bldg_ovt/stac-part-00384",
+    "bldg_ovt/stac-part-00385",
+)
+
 SOURCE_COMPONENTS: dict[str, frozenset[str]] = {
     "bldg_3dglobfp": frozenset(("bldg_3dglobfp/1636", "bldg_3dglobfp/1639")),
-    "bldg_ovt": frozenset(
-        (
-            "bldg_ovt/part-00288",
-            "bldg_ovt/part-00384",
-            "bldg_ovt/part-00385",
-            "bldg_ovt/stac-collection",
-            "bldg_ovt/stac-part-00288",
-            "bldg_ovt/stac-part-00384",
-            "bldg_ovt/stac-part-00385",
-        )
-    ),
+    "bldg_ovt": frozenset(BLDG_OVT_KEYS),
     "completions_ext": frozenset(
         (
             "completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month",

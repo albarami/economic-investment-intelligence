@@ -977,10 +977,15 @@ def test_skip_reason_must_not_name_a_licence_or_terms(tmp_path: Path) -> None:
 
 def test_registry_counts_follow_decision_0026() -> None:
     """No none_stated row remains, and every owner_decision row names 0026."""
+    from eii_custodian.publicdata.assembly_sources import BLDG_OVT_KEYS
+
     entries = load_registry()
+    stac_item_count = sum(
+        key.startswith("bldg_ovt/stac-part-") for key in BLDG_OVT_KEYS
+    )
     assert (
-        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1
-    )  # S2-T41 backup; S2-T36 page; S2-T20 atlas; S2-T49 file declarations; S2-T20L STAC metadata; S2-T48 company web.
+        len(entries) == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1 - 3 + stac_item_count
+    )  # The fixed non-item count stays; STAC items use the committed closed tuple.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
@@ -1260,3 +1265,17 @@ def test_gravity_and_atlas_registry_pending_and_nightly_policy() -> None:
         if not entry.nightly_live_fetch and entry.kind != "citation_only"
     }
     assert changed != expected
+
+
+def test_bldg_ovt_closed_keys_equal_registry_in_both_directions() -> None:
+    from eii_custodian.publicdata.assembly_sources import (
+        BLDG_OVT_KEYS,
+        SOURCE_COMPONENTS,
+    )
+
+    expected = frozenset(
+        row.key for row in load_registry() if row.source_id == "bldg_ovt"
+    )
+    assert len(BLDG_OVT_KEYS) == len(set(BLDG_OVT_KEYS))
+    assert frozenset(BLDG_OVT_KEYS) == expected, "bldg_ovt_closed_keys"
+    assert SOURCE_COMPONENTS["bldg_ovt"] == expected, "bldg_ovt_component_keys"
