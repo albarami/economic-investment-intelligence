@@ -50935,3 +50935,75 @@ Lead shell (Anthropic Opus 5.5), real public cache, offline. The pinned collecti
 - 2026-11-22 S2-P47 lead test fix after the records step: `test_check_and_placeholder_replacement` assumed the committed STAC item section held only the three fixture placeholders. After the 512 real rows it failed with a `KeyError` (1 failed, 395 passed). The test now asserts that the replaced STAC item section holds exactly the generated keys, and that every row outside that section is unchanged. `test_stac_item_rows.py` gives 59 passed.
 - 2026-11-22 S2-P47 records after review S2-P47.rvB (OpenAI gpt-6.1-sol via Codex B, APPROVED 69eb78eb on read-only review): records-only R1 (document 04 sources paragraph now names the 512 committed item rows) and R2 (OPEN_ITEMS correction: outside-part file committed). The reviewer's three named plants were run by the lead on 69eb78eb: corner touch refuses `straddling`; two outside parts with one listed refuse `unlisted`; another boundary hash refuses `national_boundary_review_stale`. All 3 pass. With the predicate at `building_inputs.py` planted to treat a touching part as outside, 3 tests fail; restored, green.
 - 2026-11-22 S2-P47 lead test-speed fix (forced by the join's registry growth; rule 33 needs another maker's confirmation). The 512 item rows grow `sources.yaml` from 13119 to 29415 lines. Hypothesis tests that re-read the registry inside every example slowed to typical 90-156 ms per example on two quiet dedicated cores, against the unchanged 200 ms deadline: `test_build_own_run.py` (four properties, through `singles_entries.tender_entry`), `test_stac_item_pins.py::test_snapshot_cardinality_property` and `test_stac_item_rows.py::test_order_independence_and_injective_key_property`. On main, at typical 38-78 ms, the same two `test_build_own_run.py` properties already failed the deadline three runs of three on one loaded core with seed 61473, and passed on dedicated cores (PO-S2-P46-03). Fix: the registry is read once per process. `singles_entries._registry` is cached (the frozen `Entry` rows are immutable), and the two STAC property tests take a once-read registry. No assertion, example count or deadline is changed. Typical runtime is now under 1 ms; `test_build_own_run.py` gives 51 passed in 1.28 s.
+
+## S2-P53 — Reviewed landmark cache record and citation snapshots — 2026-11-22
+
+- Maker: OpenAI Codex; model: GPT-6 family (exact serving revision not exposed).
+  Builder persona: senior provenance engineer for reference datasets. Strict
+  self-review persona: sanad reviewer of copied height tokens and hashed pages.
+  Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer, muhasabah-gate; the brief's TDD and
+  verification-before-completion rules were applied. No independent maker's
+  review or approval is claimed.
+- Base: `e7edf546135657e09bfa0497822d216e8572bf71`.
+  Implementation commit: `19183a0685ddc3ad5ae231c7d03c5c3a96a606e2`.
+  The provided Git metadata is read-only: branch creation exited 128. The
+  implementation commit is on `feat/s2-p53-landmark-cache` in the separate
+  workspace-local Git directory; its bundle is the delivery, with no push,
+  merge, external write or change to the provided Git metadata.
+- Implemented: deterministic selection with the four ordered refusal reasons,
+  literal metric unit tokens and all-researched-page numeric-token conflict
+  checking; seven exact-name/footprint tie outcomes; code-emitted rows bound to
+  verified page snapshots and receipts; required roof/architectural kind; one
+  local cache record with the committed file retained as an empty format sample;
+  excerpt and duplicate-YAML-key refusals; closed empty-list pending reporting.
+  The manifest hashes the bytes retained with the parsed record, without a later
+  read of the mutable hand-list file.
+- Fetch path: existing `public_page`, version-two `citation_snapshot`, empty
+  shape/columns/period fields and no release tables, `commit_allowed: false`.
+  Existing bounded acquisition, exact URL/host policy, sanitization, archive,
+  receipt and source-publication helpers are reused. One source per publisher
+  and multiple page keys are tested on invented metadata. The actual command
+  reaches a citation PASS and verified raw snapshot, then the deliberately
+  incomplete fixture stops at `assembly/snapshot_selection_invalid`; this is
+  not a successful whole public build. `_validate` and its `commit_refused`
+  guard are byte-unchanged, and existing public-page refusal test files are
+  unchanged.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  PyYAML 6.0.3, Shapely 2.2.0, ruff 0.17.4, mypy 2.4.1. Final tests use seed 53
+  and the unchanged `eii` Hypothesis profile. No network, source-host call,
+  real-cache read, credential file, full `./eii test`, push or hosted run.
+- `uv run --locked python -m pytest custodian/tests/test_landmark*.py custodian/tests/test_publicdata_heights.py custodian/tests/test_heights_fixture_clock.py custodian/tests/test_page*.py custodian/tests/test_s2_t29*.py custodian/tests/test_publicdata_registry.py custodian/tests/test_registry*.py -q --hypothesis-seed=53`: exit 0, 1325 passed, one warning from the existing invented duplicate-ZIP-member plant. Earlier runs on earlier implementation states passed 1314 and 1322 respectively; no failure was hidden by those runs.
+- `uv run --locked python -m pytest custodian/tests/test_landmark*.py -q --hypothesis-seed=53`: final post-deletion exit 0, 75 passed. This also checks the last two fixture repairs, which reduce the duplicate-claim plants to one changed field apiece.
+- `uv run --locked python -m pytest scripts/tests/test_commands.py scripts/tests/test_public_assembly_command.py scripts/tests/test_build_public_token_scope.py -q --hypothesis-seed=53`: exit 0, 67 passed and 46 subtests passed.
+- Transport/importer check of the modules using ordinary HTTPS, plus receipt completeness: exit 0, 521 passed. `uv run --locked python -m pytest custodian/tests/test_public_snapshots.py custodian/tests/test_snapshot_refusals.py -q --hypothesis-seed=53`: exit 0, 103 passed. The complete transport command and all fail-first/check exits are retained in the delivery's verification ledger.
+- Isolated guard deletion: final full pass covers 56 branches, each individual
+  pytest run exits 1, with every original source hash restored. The two repaired
+  duplicate-claim fixture cases were then replayed separately: both deletion
+  runs exit 1; the 75-test restoration check exits 0. Source hashes of all final
+  deletion cases match the implementation commit above. Earlier historical
+  deletion passes (55, 55 and 56 cases) are retained separately. The protected
+  `page_records._validate` commit guard was never deleted or edited.
+- Final `uv run --locked ruff check .`: exit 0. `uv run --locked ruff format --check .`: exit 0, 945 files formatted. `uv run --locked mypy`: exit 0, 502 source files. `python3 scripts/check_docs.py`: exit 0, 1278 text files and 144 Markdown files before this evidence append. `python3 scripts/check_tree.py`: exit 0, eight rules. `cmp AGENTS.md CLAUDE.md`: exit 0. `git diff --check` and the local staged-diff check: exit 0.
+- Failures remain recorded: fail-first tests and guard deletions are expected
+  red results; initial import/format and test-fixture defects were repaired.
+  One EOF-less mocked response was interrupted with exit 130, then fixed to
+  return body and EOF. An inappropriate unittest invocation exited 1 because
+  its module paths were wrong; the supported pytest invocation above exercises
+  the tests. A diagnostic docs check under the alternate Git context exited 1
+  on operational files; the prescribed command includes new untracked source
+  files and passed without changing an exclusion or a check. Details and the
+  premature-wording correction are appended in OPEN_ITEMS.md.
+- Limits: the brief simultaneously requires concrete publisher/page rows and
+  host admission and forbids committing their researched URLs/hosts. No such
+  metadata was installed or guessed; this missing admission is explicit in
+  OPEN_ITEMS.md and the return. The shape-only reading also does not confirm
+  the research's semantic subject-kind token. Live fetch, real selection/ties,
+  independent row review, per-reference-kind error and OI-310 remain open.
+  Proposed decision 0093 requires owner acceptance before code merge. No
+  S2-T20 box is ticked and C-20 is unclaimed.
+- Code practice: longest new function is `load_landmark_record`, 45 lines by
+  AST span; no new function exceeds 100 lines. None copied: existing entry
+  validation and serialization were moved into shared helpers; the existing
+  award normalizer, visible-text parser and acquisition machinery are reused.
+  The return gives additions/removals per file against the base.
