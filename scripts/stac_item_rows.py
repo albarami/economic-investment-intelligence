@@ -71,7 +71,7 @@ def _item(link: dict[str, Any], collection_url: str, pattern: str) -> tuple[str,
         raise ValueError("stac_item_host")
     folder = collection_url.rsplit("/", 1)[0] + "/"
     match = re.fullmatch(re.escape(folder) + "(?:" + pattern + ")", url)
-    part = match.groupdict().get("part", "") if match else ""
+    part = (match.groupdict().get("part") or "") if match else ""
     if re.fullmatch(r"[0-9]{5}", part) is None:
         raise ValueError("stac_item_shape")
     return "bldg_ovt/stac-part-" + part, url

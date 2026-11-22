@@ -425,3 +425,26 @@ def test_invalid_filename_pattern_refuses_without_writes(
     )
     assert capsys.readouterr().err == "stac_item_rows: registry_refused\n"
     assert original == (registry.read_bytes(), components.read_bytes())
+
+
+UNMATCHED_PART = r"syn-part-[0-9]{5}-[ab]\.json|(?P<part>[0-9]{5})-unused"
+
+
+def test_unmatched_part_group_refuses_as_shape() -> None:
+    with pytest.raises(ValueError, match=r"^stac_item_shape$"):
+        generate(pattern=UNMATCHED_PART)
+    document = collection()
+    document["links"][0]["href"] += "-suffix"
+    with pytest.raises(ValueError, match=r"^stac_item_shape$"):
+        generate(document, pattern=PATTERN + "|.*")
+
+
+def test_unmatched_part_group_refuses_without_writes(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    cache, registry, components = fixture_run(tmp_path)
+    original = (registry.read_bytes(), components.read_bytes())
+    args = [str(cache), "--registry", str(registry), "--components", str(components)]
+    assert rows.main([*args, "--item-name-pattern", UNMATCHED_PART]) == 1
+    assert capsys.readouterr().err == "stac_item_rows: registry_refused\n"
+    assert original == (registry.read_bytes(), components.read_bytes())
