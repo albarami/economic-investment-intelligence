@@ -231,6 +231,22 @@ def test_exact_hosts_and_pack_list():
         "www.edu.gov.qa",
         "myschool.edu.gov.qa",
         "myschools.edu.gov.qa",
+        # S2-P53-cit: reviewed citation page and terms hosts.
+        "dezzzme.wordpress.com",
+        "en.wikiarquitectura.com",
+        "en.wikipedia.org",
+        "foundation.wikimedia.org",
+        "inside.fifa.com",
+        "megatalls.com",
+        "nabkmastclimber.com",
+        "qm.org.qa",
+        "skyscraperpage.com",
+        "stadiumdb.com",
+        "www.businessdestinations.com",
+        "www.scraperbase.com",
+        "www.skyscrapercenter.com",
+        "www.thenationalnews.com",
+        "www.wernersobek.com",
     }
     assert ALLOWED_HOSTS == baseline | added
     pub03 = next(

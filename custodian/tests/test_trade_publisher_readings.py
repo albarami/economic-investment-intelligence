@@ -1,6 +1,7 @@
 """Publisher metadata review integrity; all mutations are INVENTED, no network."""
 
 import re
+import sys
 from copy import deepcopy
 from datetime import date
 from pathlib import Path
@@ -8,7 +9,7 @@ from urllib.parse import urlsplit
 
 import pytest
 
-from eii_custodian.publicdata.fetch import allowlist
+from eii_custodian.publicdata.fetch import allowlist, page_records
 from eii_custodian.publicdata.fetch.allowlist import approve
 from eii_custodian.publicdata.fetch.registry import (
     load_registry,
@@ -284,6 +285,16 @@ def p18_fetch_hosts():
     return hosts
 
 
+def p53_fetch_hosts():
+    """Exact landmark page/terms frames; no reading-only or inferred redirect host."""
+    return {
+        urlsplit(url).hostname
+        for key, declaration in read_yaml(page_records.REVIEW)["sources"].items()
+        if key.startswith("landmark_")
+        for url in declaration["reviewed_urls"]
+    }
+
+
 def check_p18_fetch_host_delta():
     read_hosts = {
         urlsplit(page["url"]).hostname
@@ -298,11 +309,23 @@ def check_p18_fetch_host_delta():
     # (S2-T24)), not on a P18 reading.
     fetch_hosts = p18_fetch_hosts()
     assert fetch_hosts == P29_LEAD_READ_HOSTS
+    # Decision 0093 item 3 preserves the chain. Document 04's dated S2-P53-cit
+    # reading explicitly admits these exact page/terms hosts under PUB-03.
+    p53_reading = (
+        (ROOT / "docs/04_PUBLIC_DATA_PACK.md")
+        .read_text()
+        .split("### S2-P53-cit terms readings and PUB-03 hosts", 1)[1]
+        .split("\n\nPublisher words", 1)[0]
+    )
+    p53_read_hosts = set(re.findall(r"`([a-z0-9.-]+)`", p53_reading))
+    landmark_hosts = p53_fetch_hosts()
+    assert landmark_hosts == p53_read_hosts, "p53_reviewed_fetch_hosts"
     assert PRE_P18 <= allowlist.ALLOWED_HOSTS
     assert (
         allowlist.ALLOWED_HOSTS - PRE_P18
-        == (read_hosts | P29_LEAD_READ_HOSTS) & fetch_hosts
-    )
+        == (((read_hosts | P29_LEAD_READ_HOSTS) & fetch_hosts) | landmark_hosts)
+        - PRE_P18
+    ), "pub03_fetch_host_delta"
 
 
 def test_pub03_fetch_host_delta_matches_readings_and_fetch_configuration():
@@ -314,7 +337,7 @@ def test_pub03_fetch_host_delta_rejects_planted_extra_host(monkeypatch):
     monkeypatch.setattr(
         allowlist, "ALLOWED_HOSTS", allowlist.ALLOWED_HOSTS | {"www.imf.org"}
     )
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError, match=r"^pub03_fetch_host_delta(?:\n|$)"):
         check_p18_fetch_host_delta()
 
 
@@ -323,7 +346,19 @@ def test_pub03_rejects_planted_read_only_host(monkeypatch):
     monkeypatch.setattr(
         allowlist, "ALLOWED_HOSTS", allowlist.ALLOWED_HOSTS | {"www.worldbank.org"}
     )
-    with pytest.raises(AssertionError):
+    with pytest.raises(AssertionError, match=r"^pub03_fetch_host_delta(?:\n|$)"):
+        check_p18_fetch_host_delta()
+
+
+def test_pub03_rejects_unreviewed_landmark_frame_host(monkeypatch):
+    check_p18_fetch_host_delta()
+    hosts = p53_fetch_hosts()
+    monkeypatch.setattr(
+        sys.modules[__name__],
+        "p53_fetch_hosts",
+        lambda: hosts | {"syn-unlisted-landmark.invalid"},
+    )
+    with pytest.raises(AssertionError, match=r"^p53_reviewed_fetch_hosts(?:\n|$)"):
         check_p18_fetch_host_delta()
 
 

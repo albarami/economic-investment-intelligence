@@ -295,9 +295,7 @@ def fetch_page(
     pin: Pin | None = None,
 ) -> Snapshot:
     """Fetch through the normal seam, parse before publishing, retain both inputs."""
-    review = (
-        declaration if declaration is not None else load_declaration(entry.source_id)
-    )
+    review = declaration if declaration is not None else load_declaration(entry.key)
     if entry.source_id == "suppliers_tawteen" and (
         review.get("version") != 2 or review.get("kind") != "refusal"
     ):

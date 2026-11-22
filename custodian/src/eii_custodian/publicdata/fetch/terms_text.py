@@ -58,9 +58,14 @@ def terms_text_sha256(body: bytes) -> str:
         tags are removed, HTML entities are decoded, white space is collapsed
         and the text is Unicode NFC.
     """
+    collapsed = _SPACE.sub(" ", visible_text(body)).strip()
+    normalised = unicodedata.normalize("NFC", collapsed)
+    return sha256_hex(normalised.encode("utf-8"))
+
+
+def visible_text(body: bytes) -> str:
+    """Decode page text, retaining its whitespace and non-breaking spaces."""
     parser = _VisibleText()
     parser.feed(body.decode("utf-8", errors="replace"))
     parser.close()
-    collapsed = _SPACE.sub(" ", parser.text()).strip()
-    normalised = unicodedata.normalize("NFC", collapsed)
-    return sha256_hex(normalised.encode("utf-8"))
+    return parser.text()

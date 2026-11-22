@@ -143,6 +143,8 @@
 | [0091](decisions/0091-award-proof-acquisition-and-offline-replay.md) | Per-link award proof acquisition, refusal retention, offline replay and bounded readers | Proposed, 2026-11-22; S2-P46, lead review pending |
 | [0094](decisions/0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md) | S2-T09 closes at slice S2 with the three C6 neighbour and two C7 shared-reach result pins pending under OI-283 for S6-T10 and S7-T05; TST-198 amended by one sentence; the S7 gate's rule over every pin unchanged | Accepted by the owner, 2026-11-22 20:14 |
 
+| [0093](decisions/0093-landmark-hand-list-in-one-reviewed-cache-record.md) | Landmark hand list in one uncommitted reviewed cache record; placement only, no value lost | Accepted, 2026-11-22; lead ruling L-1475 |
+
 ## Identifiers and change control
 
 1. A requirement ID has its document prefix and a number. It is defined exactly once, as the bare first cell of a requirement-table row; other documents may reference it only after confirming that definition.

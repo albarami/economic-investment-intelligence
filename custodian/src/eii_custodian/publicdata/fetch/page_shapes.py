@@ -412,6 +412,8 @@ def parse(
     if review["hold"] is not None:
         raise ShapeError(review["hold"])
     kind, shape, columns = review["kind"], review["shape"], review["columns"]
+    if kind == "citation_snapshot":
+        return []
     if kind == "fc_company_cards":
         from ..fc_register.parse import fragment, project
 

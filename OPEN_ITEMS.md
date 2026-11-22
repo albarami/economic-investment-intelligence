@@ -6299,3 +6299,109 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 
 - PO-S2-RDP-01 — PROPOSED OPEN ITEM, 2026-11-22 (S2-RDP H1). (1) Area-type landmarks of `showcase_gazetteer.yaml` (the four area names) stay null unless exactly one receipted open place carries one of their names after `trim_collapse_whitespace_casefold`; which public point stands for an area needs a lead ruling, and no point is picked by hand (rule 8). (2) Verified at main `154333b5`: `places/fetch.py` `FILE_KEYS` holds `places_ovt/part-00014`, `bldg_ovt/part-00384` and `bldg_ovt/part-00385`, and `places/integrate.py` `_cache_points` builds area-request points from those keys only, while the stage resolves buildings from every receipted `bldg_ovt` parquet entry of the registry (`_buildings_from_registry`). Today the registry's only other parquet part, `bldg_ovt/part-00288`, carries skip reason `not_required_part_decision_0090`, so the two sets agree; a part added to the registry later would be resolved by the stage but would get no walk or drive area. H1 reads every receipted part, as the stage does. Needed: the lead states whether `_cache_points` should follow the registry.
 - UPDATE (2026-11-22, S2-RDP H1 round 4), PO-S2-RDP-01: ruling L-1462 accepted two round-2 deviations of H1. (a) H1 does not evaluate `_keep`'s `no_cell` exclusion, because the frame grid needs the whole frame; a key for a place outside the real grid is refused by the stage as `record_missing`, so no wrong key reaches a build; this stays open for the later task that gives H1 the frame grid. (b) Duplicate resolution runs with an empty `inside` set and empty status, which is conservative (H1 may leave null a row the stage would accept, and never writes one the stage drops); the build stage is the final gate. Point (1) of this item, the area-type landmarks: the rule in force is the exactly-one-normalised-name rule H1 already applies, so no point is picked by hand. Point (2) stays open.
+
+## S2-P53 — Landmark calibration and live follow-up (2026-11-22)
+
+- Proposed decision 0093 needs owner acceptance before code merge, per R9.
+  Placement is decided for the build (R0); no A-versus-B or licence question
+  is reopened and no value cut is proposed.
+- Resolve the brief's requirement to install publisher/page registry rows and
+  PUB-03 hosts against its explicit prohibition on committing researched URLs,
+  hosts and names. No concrete research metadata was installed offline. The
+  lead must make the reviewed metadata admission before live citation fetch.
+- Confirm the research's semantic `subject_kind` token against the selector's
+  documented completed-high-rise contract. Only keys, nesting and types were
+  inspected under the brief's shape-only restriction; no live selector count
+  is claimed. The corrected research remains the lead's live input.
+- Fetch admitted pages, run selection and exact ties in the lead's shell,
+  independently review the one local record, and load/verify it before clearing
+  pending. Unresolved ties remain counted; any manual tie would need separate
+  lead review and is not implemented. A zero-row list stays pending.
+- Error by reference height kind (roof versus architectural) is not computed
+  by the current GBA measurement. Mixed kinds and the measurement basis remain
+  explicit limitations; OI-310 and C-20 stay open.
+- Permanent page revision links, any share-alike notice needed for local use,
+  and the research's unresolved secondary corroboration lead need the lead's
+  source review. No researched page text or value is recorded here.
+- Test-harness correction: a new mocked HTTPS response initially returned
+  bytes indefinitely instead of EOF. That test process was interrupted (exit
+  130); the fixture now returns body then EOF. This was a deterministic fixture
+  defect, not a random failure or a transport retry. Its subsequent failing
+  assertion and passing check are recorded in the S2-P53 return.
+
+S2-P53 self-review correction: the new mutable cache placement requires the
+manifest hash to bind the bytes actually parsed, rather than a later file read.
+`LandmarkRecord` now keeps that body with the validated rows and pending status.
+The corresponding regression and the final repeated guard-deletion pass are
+recorded in the return. No privacy, source-selection or licence rule changed.
+
+S2-P53 check-context correction: a diagnostic documentation check using the
+standalone Git directory scanned operational `.overnight` files because it
+did not inherit the provided worktree's exclusions (exit 1). The prescribed
+`python3 scripts/check_docs.py` command uses the provided Git context, includes
+new untracked source files, and passed. No check, exclusion policy or committed
+ignore file was changed. This was a deterministic command-context error, not a
+random failure closed by a green rerun.
+
+S2-P53 negative-fixture correction: duplicate-point and duplicate-building
+plants now change one field each (one selected name, or one point geometry).
+Their earlier forms changed more than one independent input. Both specific
+refusals and their isolated guard deletions were rechecked after this repair;
+no production tie rule changed.
+
+Correction to the preceding S2-P53 sentence: the six refusal cases had passed
+when it was written; the isolated deletion repeats were still pending then.
+Their actual exits, rather than that premature wording, are recorded in the
+return and its deletion evidence.
+
+S2-P53 fixture-deletion follow-up: both corrected duplicate-claim guards were
+then deleted separately; each test run exited 1 and each source hash restored.
+The final task-specific run after restoration exited 0 with 75 tests passing.
+
+
+## S2-P53-cit — Publisher terms still to be read (2026-11-22)
+
+The supplied research marks the following readings `terms_not_found`; the
+registry uses `terms to be read` with checked date 2026-11-22. Under decision
+0026 item 3 these remain admitted with `owner_decision`, not excluded. The
+lead must obtain and record the terms reading; no permission is inferred.
+
+- Business Destinations, `landmark_business_destinations`: no terms page located in the supplied research.
+- Dezzzme, `landmark_dezzzme`: no terms page located in the supplied research.
+- FIFA, `landmark_fifa`: no terms page located in the supplied research.
+- NABK Mast Climber Rental Qatar, `landmark_nabk_mast_climber_rental_qatar`: linked terms page could not be read.
+- Scraperbase.com, `landmark_scraperbase_com`: no terms page located in the supplied research.
+- StadiumDB.com, `landmark_stadiumdb_com`: no terms page located in the supplied research.
+- Werner Sobek AG, `landmark_werner_sobek_ag`: no terms page located in the supplied research.
+
+The registry and host-installation hold in the historical S2-P53 entries is
+addressed by this part; it supplies no live acquisition, receipt, tie or
+height-completeness proof. Independent different-maker review remains with
+the lead, as do S2-T20, C-20 and OI-310.
+
+
+## S2-P53-cit3 — Whole-folder execution interrupted by SIGTERM
+
+On 2026-11-22 the worker's full `custodian/tests` execution returned exit 143
+(SIGTERM), with no pytest summary or reported assertion failure. Base:
+`0077ed22dd6722550a5a0b26d235abd1803ec593`; seed 53, `UV_OFFLINE=1`.
+Command: `uv run --locked python -m pytest custodian/tests -q
+-p no:cacheprovider --hypothesis-seed=53
+--basetemp=.overnight/tmp/pytest-full`. Evidence:
+`.overnight/OUT/custodian-full.log`, 4488 completed-test dots; next collected
+case `test_gis_snapshot.py::test_all_dates_mode_is_separate_complete_and_explicitly_selected[plant9]`.
+The termination's source is unconfirmed. A separately recorded whole-folder
+supervised run does not, by itself, identify or close this interruption.
+The lead owns runner diagnosis; no test or bound is weakened.
+
+
+S2-P53-cit3 supervised outcome: the separate full-folder command with
+`--basetemp=.overnight/tmp/pytest-full-supervised` ran from
+2026-11-22T18:38:46.391306+00:00 to 2026-11-22T18:56:46.460622+00:00, then its explicitly recorded
+eighteen-minute remaining-time bound stopped the process group. Child exit:
+143; 7230 completed-test dots, no final pytest
+summary. This known deadline stop does not establish the cause of the
+original SIGTERM or a completed full-suite result. The six regression fixes
+have 107 passing focused tests. Before acceptance, the lead must obtain a
+complete `custodian/tests` result under the existing test policy; no test,
+plant, timeout or tolerance is weakened.

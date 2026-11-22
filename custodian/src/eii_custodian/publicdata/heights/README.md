@@ -164,3 +164,79 @@ The offline implementation uses the pinned DuckDB series and retreat series in
 (conversion setting) and P11 (ordering). Supplied footer research is dated
 2026-11-22; no real tile is needed by a test. The live measured error, landmark
 hand list and owner's order placement remain open (S2-T20, C-20, OI-310).
+## Reviewed landmark cache record (S2-P53)
+
+Under accepted decision 0093, the production list is one local, independently
+reviewed `review/landmark_heights.yaml` beneath the public cache. The old
+committed file remains only an empty format sample; it is used as pending
+when the local record does not exist. No source row is copied into that sample.
+Every publisher uses the same loader. Each entry requires `height_kind` from
+`roof` or `architectural`; the manifest retains it and counts entries by kind.
+The `gba_calibration` block records `landmark_count`, `by_kind` and `pending`.
+An empty list with no pending string reports `landmark_list_empty`. Clearing
+pending requires a nonempty list that passes loading and receipt verification.
+This does not decide the GBA order or claim C-20.
+
+The lead calls `landmark_select.select_landmarks` with the research document's
+`landmarks` sequence. The candidate shape is the primary page plus optional
+`second_page` and each page's `additional_heights`. The subject contract is
+`subject_kind: completed_highrise_building` with a nonempty `completed` field,
+as confirmed by the lead for S2-P53 round 2. The subject code must match exactly;
+compound values with qualifiers and `completed high-rise` are not admitted.
+Selection checks building status, the page's roof/architectural label, literal
+metric token/excerpt agreement, then numeric-token conflicts of the same kind
+across all pages and their additional heights. It accepts `m`, `metre`,
+`metres`, `meter`, `meters` case-insensitively, without conversion. Word-valued
+heights are not numeric disagreements; different precision tokens disagree.
+One page suffices. Counts use the closed reasons `not_building`,
+`kind_not_admitted`, `excerpt_mismatch`, `same_kind_disagreement`, plus
+`admitted`. Licence admission is absent.
+
+`landmark_tie.tie_landmarks` takes admitted candidates, reviewed national
+landmark points in CRS84, and the canonical Overture building inventory.
+Names and aliases match by exact equality after the existing award-name
+normalizer. Aliases stay local. Footprints cover points, including boundaries.
+The outcomes are `tied`, `no_point`, `several_points`, `point_in_no_building`,
+`point_in_several_buildings`, `point_claimed_twice`, `building_claimed_twice`.
+All claimants of a duplicate point or building are withheld. There is no manual
+fallback. Output heights and excerpts come from the admitted page tokens;
+the page hash and date come from its verified snapshot and receipt.
+`write_landmark_heights` serializes the result to a temporary local YAML,
+loads and verifies it, then atomically replaces the single cache record.
+Independent review of that record remains lead-owned.
+
+Citation acquisition reuses `public_page` and the version-two
+`citation_snapshot` declaration: empty shape, columns and period fields,
+no release tables, zero rows and `commit_allowed: false`. Each publisher has
+one source ID and each page a distinct `source_id/page-key`; declarations
+are keyed by that complete key. The normal fetch entry publishes a parsed
+envelope and `inputs/input-0` snapshot using its existing receipt, archive,
+byte bound, obstacle, exact-URL and host checks. The original `commit_refused`
+guard remains intact. Ordinary HTTPS requests identify the generic client
+without a contact detail. A citation excerpt must occur in the snapshot's
+visible text after HTML unescaping and ASCII-whitespace collapse; non-breaking
+spaces remain significant. An absent excerpt refuses
+`landmark_heights_citation` / `excerpt_absent`; an unrelated height or kind
+refuses `height_excerpt_mismatch`.
+
+Malformed citation envelopes, including invalid UTF-8 and empty inputs, refuse
+`landmark_heights_citation` / `page_snapshot`. Citation reads reuse the page
+archive's constrained cache directory helper; absolute keys, parent traversal
+and symlinked entry directories refuse with that same closed reason.
+
+S2-P53-cit installs the supplied public citation metadata and PUB-03 hosts.
+`scripts/landmark_citation_rows.py RESEARCH OUTPUT` deterministically emits
+JSON source rows, page declarations and hosts from the research publisher list
+and primary/second-page URLs, reusing `researched_pages`. It copies no height,
+name or excerpt. Review and install its output into `sources.yaml`,
+`review/s2_t29_sources.yaml` and `fetch/allowlist.py`; no fetch occurs.
+Landmark registry loading refuses unadmitted page or terms hosts. The
+committed-metadata test resolves every declaration through `_registry_entry`;
+generator tests use invented inputs only. Live acquisition and record review
+remain lead-owned.
+
+The cache loader retains the validated bytes, rows and pending status together
+in an immutable `LandmarkRecord`. The height manifest hashes those same bytes;
+it does not reread a mutable review file after using its heights. Duplicate
+YAML keys are refused as `landmark_heights` / `duplicate_key` rather than
+silently replacing a cited value.

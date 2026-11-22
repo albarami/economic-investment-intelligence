@@ -14,6 +14,8 @@ from eii_core.calc.building_heights import (
     sum_gba_read_counts,
 )
 
+from .landmark_select import KINDS
+from .landmarks import LandmarkHeight
 from .match import globfp_candidates, globfp_index, representative_point
 from .model import Building
 from .read import GBA_CLASS_ALL, SourceResult
@@ -103,3 +105,17 @@ def gba_calibration(
 
 
 __all__ = ["gba_calibration"]
+
+
+def landmark_calibration(
+    landmarks: tuple[LandmarkHeight, ...], pending: str
+) -> dict[str, object]:
+    """Readiness is cleared only for the nonempty, receipt-verified list."""
+    by_kind = dict.fromkeys(KINDS, 0)
+    for row in landmarks:
+        by_kind[row.height_kind] += 1
+    return {
+        "landmark_count": len(landmarks),
+        "pending": pending or ("" if landmarks else "landmark_list_empty"),
+        "by_kind": by_kind,
+    }

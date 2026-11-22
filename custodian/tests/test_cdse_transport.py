@@ -275,14 +275,16 @@ def test_registry_source_cannot_enter_ordinary_kind_or_release():
     from eii_custodian.publicdata.fetch.registry import (
         RegistryError,
         _entry,
-        load_registry,
         read_yaml,
         registry_path,
     )
 
-    entry = next(e for e in load_registry() if e.source_id == "satellite_cdse_backup")
     document = read_yaml(registry_path())
-    row = next(r for r in document["sources"] if r["key"] == entry.key)
+    row = next(r for r in document["sources"] if r["key"] == "satellite_cdse_backup")
+    # The transport fixture intentionally admits only its invented endpoint.
+    # Validate this CDSE declaration without loading unrelated public sources.
+    entry = _entry(row)
+    assert entry.source_id == "satellite_cdse_backup"
     assert _entry(row) == entry
     for change in (
         {"kind": "https_file"},
@@ -290,7 +292,9 @@ def test_registry_source_cannot_enter_ordinary_kind_or_release():
         {"nightly_live_fetch": True},
         {"source_id": "other"},
     ):
-        with pytest.raises(RegistryError):
+        with pytest.raises(
+            RegistryError, match="CDSE backup must remain optional and unread"
+        ):
             _entry({**row, **change})
 
 
