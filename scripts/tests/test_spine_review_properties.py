@@ -180,3 +180,74 @@ def test_draw_hash_ties_break_by_code() -> None:
         "eii_custodian.publicdata.review.activity.hashlib.sha256", return_value=tied
     ):
         assert audit_sample(tuple(reversed(codes)), 3141592653) == codes[:30]
+
+
+@given(st.lists(st.booleans(), max_size=50), st.text(), st.integers(min_value=1))
+@example([], "", 1)
+@example([False], "نشاط مخترع", 1)
+@example([True] * 30, "fused split\n\t", 2)
+@example([False] * 31, " ] , [ ", 3)
+def test_derived_seed_projection_and_latest_refusal(
+    rejected: list[bool], text: str, errors: int
+) -> None:
+    from test_spine_review_seed import seed_oracle
+
+    from spine_review import derived_audit_seed
+
+    signed = tuple(
+        ReviewRow(
+            f"5610{index:03d}",
+            7,
+            text,
+            "" if reject else "5610",
+            "not_mappable_rejected" if reject else "mapped",
+            text,
+            text,
+            text,
+        )
+        for index, reject in enumerate(rejected)
+    )
+    projected = [
+        dict(code=row.code, status=row.status, isic_class=row.isic_class)
+        for row in signed
+    ]
+    first = dict(
+        codes=[row.code for row in signed],
+        errors=errors,
+        batch_id="invented-first",
+        note=text,
+    )
+    latest = {**first, "batch_id": "invented-latest"}
+    unrelated = dict(codes=["9999999"], errors=1)
+    admitted = {**first, "errors": 0}
+    assert derived_audit_seed(signed, []) == seed_oracle(projected)
+    expected = seed_oracle(projected, latest)
+    assert derived_audit_seed(signed, [first, latest, unrelated, admitted]) == expected
+    altered = tuple(
+        replace(
+            row,
+            name_ar=text + "x",
+            reason="different",
+            reviewed_on="different",
+            reviewed_by_role="different",
+        )
+        for row in reversed(signed)
+    )
+    assert derived_audit_seed(altered, [latest]) == expected
+    reordered = {**latest, "codes": [row.code for row in reversed(signed)]}
+    assert derived_audit_seed(signed, [reordered]) == seed_oracle(projected, reordered)
+    assert 1000000000 <= expected <= 4294967295
+
+
+def test_derived_seed_range_endpoints() -> None:
+    from types import SimpleNamespace
+    from unittest.mock import patch
+
+    from spine_review import derived_audit_seed
+
+    for digest, expected in (("0", 1000000000), (format(3294967295, "x"), 4294967295)):
+        with patch(
+            "spine_review.hashlib.sha256",
+            return_value=SimpleNamespace(hexdigest=lambda digest=digest: digest),
+        ):
+            assert derived_audit_seed((), []) == expected

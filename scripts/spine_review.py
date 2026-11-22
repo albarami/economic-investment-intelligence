@@ -242,7 +242,51 @@ def frozen_context(root: Path, manifest: Path) -> tuple[Context, dict[str, Any]]
     return context, payload
 
 
-def read_makers(root: Path, path: Path, preparer: str) -> dict[str, Any]:
+def derived_audit_seed(decisions: tuple[ReviewRow, ...], audits: list[Any]) -> int:
+    """L-1469: decision-only J and the latest refused same-code batch's hash P.
+
+    Refused records have a positive integer errors count. Match by codes, never
+    the lead-editable batch id. Both JSON values use compact, sorted UTF-8 JSON.
+    """
+    judgements = [
+        dict(code=row.code, status=row.status, isic_class=row.isic_class)
+        for row in sorted(decisions, key=lambda row: row.code)
+    ]
+    previous = next(
+        (
+            row
+            for row in reversed(audits)
+            if isinstance(row, dict)
+            and isinstance(row.get("codes"), list)
+            and sorted(row["codes"]) == [entry["code"] for entry in judgements]
+            and type(row.get("errors")) is int
+            and row["errors"] > 0
+        ),
+        None,
+    )
+
+    def canonical(value: object) -> bytes:
+        return json.dumps(
+            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+
+    prior = (
+        hashlib.sha256(canonical(previous)).hexdigest().encode("ascii")
+        if previous is not None
+        else b""
+    )
+    digest = hashlib.sha256(b"oi203-audit-seed:" + canonical(judgements) + b":" + prior)
+    return 1000000000 + int(digest.hexdigest(), 16) % 3294967296
+
+
+def read_makers(
+    root: Path,
+    path: Path,
+    preparer: str,
+    context: Context,
+    signed: tuple[ReviewRow, ...],
+    audits: list[Any],
+) -> tuple[dict[str, Any], tuple[ReviewRow, ...]]:
     record = read_object(root, path)
     if not isinstance(record, dict) or set(record) != {
         "preparer_maker",
@@ -264,7 +308,10 @@ def read_makers(root: Path, path: Path, preparer: str) -> dict[str, Any]:
         or not 1000000000 <= record["seed"] <= 4294967295
     ):
         raise Refusal("audit_seed_invalid")
-    return record
+    decisions = decision_rows(context, signed, record["signer_role"])
+    if record["seed"] != derived_audit_seed(decisions, audits):
+        raise Refusal("audit_seed_not_derived")
+    return record, decisions
 
 
 def decision_rows(
@@ -373,17 +420,19 @@ def append_audit(
 
 
 def draw_record(
-    evidence: dict[str, str], decisions: tuple[ReviewRow, ...], makers: dict[str, Any]
+    evidence: dict[str, str],
+    decisions: tuple[ReviewRow, ...],
+    makers: dict[str, Any],
+    audits: list[Any],
 ) -> dict[str, Any]:
+    seed = derived_audit_seed(decisions, audits)
     return dict(
         manifest_sha256=evidence["manifest"],
         signer_rows_sha256=evidence["signer"],
         maker_record_sha256=evidence["makers"],
-        seed=makers["seed"],
+        seed=seed,
         batch_id=makers["batch_id"],
-        sampled_codes=list(
-            audit_sample([row.code for row in decisions], makers["seed"])
-        ),
+        sampled_codes=list(audit_sample([row.code for row in decisions], seed)),
     )
 
 
@@ -394,13 +443,13 @@ def draw_audit(
     evidence = input_hashes(root, returned)
     context, frozen = frozen_context(root, manifest)
     fresh_target(context, run_id)
-    makers = read_makers(root, maker_record, frozen["preparer_maker"])
-    decisions = decision_rows(
-        context, read_review_csv(contained(root, signer_rows)), makers["signer_role"]
-    )
+    signed = read_review_csv(contained(root, signer_rows))
     _, earlier = previous_audits(root, Path(frozen["review"]))
+    makers, decisions = read_makers(
+        root, maker_record, frozen["preparer_maker"], context, signed, earlier
+    )
     require_fresh_seed(earlier, makers["seed"])
-    drawn = draw_record(evidence, decisions, makers)
+    drawn = draw_record(evidence, decisions, makers, earlier)
     packet = json.loads(
         (contained(root, manifest).parent / "signer_packet.json").read_bytes()
     )
@@ -435,17 +484,22 @@ def assemble_audited_review(
         draw=draw,
     )
     evidence = input_hashes(root, returned)
-    makers = read_makers(root, maker_record, frozen["preparer_maker"])
     signed = read_review_csv(contained(root, signer_rows))
-    decisions = decision_rows(context, signed, makers["signer_role"])
-    if read_object(root, draw) != draw_record(evidence, decisions, makers):
+    old_bytes, old_audits = previous_audits(root, Path(frozen["review"]))
+    makers, decisions = read_makers(
+        root, maker_record, frozen["preparer_maker"], context, signed, old_audits
+    )
+    drawn = read_object(root, draw)
+    expected_draw = draw_record(evidence, decisions, makers, old_audits)
+    if drawn.get("seed") != expected_draw["seed"]:
+        raise Refusal("audit_seed_not_derived")
+    if drawn != expected_draw:
         raise Refusal("draw_changed")
     audited = read_review_csv(contained(root, auditor_rows))
     batch = audit_record(decisions, audited, makers)
     previous = read_review_csv(contained(root, Path(frozen["review"])))
     queue_codes = {row.code for row in signed}
     candidate = tuple(row for row in previous if row.code not in queue_codes) + signed
-    old_bytes, old_audits = previous_audits(root, Path(frozen["review"]))
     require_fresh_seed(old_audits, makers["seed"])
     audits = append_audit(old_bytes, old_audits, batch if decisions else None)
     binding = {

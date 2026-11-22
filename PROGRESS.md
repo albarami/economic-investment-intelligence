@@ -51706,3 +51706,92 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
   0. Earlier uses of "unique" refer to named run records, not distinct mutation
   cases; the return now states both counts. No required guard proof is missing,
   and no source or test change accompanies this append-only clarification.
+
+
+## S2-P60 round 3 — derived audit seed
+
+- Date: 2026-11-22. Base: `9fc271ef773d61e6176eaa5ce25840a57be7d280`.
+  Test-first local commit: `74c37f36eb2257d7415cac847efb67b7ad0b96f7` on that base;
+  it is amended into the one requested delivery commit. The delivery hash,
+  bundle checksum and per-file counts are in `.overnight/RETURN.md`.
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies equivalent TDD,
+  systematic-debugging and verification-before-completion rules.
+- Authority: lead ruling L-1469, supplied with the round-3 brief, reading
+  decision 0075 item 3. `derived_audit_seed` derives J from only eligible code,
+  status and isic_class, sorted by code, and P from the canonical hash of the
+  latest earlier refused same-code batch in the frozen committed history.
+  Historical code ordering and lead-editable batch/run metadata cannot select
+  the seed. The existing range and freshness checks remain. Both maker-record
+  and draw-record seed mismatches refuse `audit_seed_not_derived`. Draw
+  construction, drawing, maker reading and assembly share the derivation.
+- Red first: the C1 regression ran against the unchanged base and exited 1
+  after proving admission with errors 0: all 35 invented codes were audited,
+  disagreements on 5610000 and 5610001 were hidden by shopping seed 1000000001,
+  and only sampled auditor rows were submitted. Its log explicitly reaches
+  admitted output before the safety assertion fails. After the fix the same
+  attack refuses the exact new reason. The draw-seed reason test also ran red
+  first (exit 1, old draw_changed instead of audit_seed_not_derived).
+- Environment, measured locally: Linux, Python 3.14.6, pytest 9.2.0,
+  Hypothesis 6.170.15, Ruff 0.17.4, mypy 2.4.1. `UV_OFFLINE=1`, provider none,
+  all generated cache/temporary/bytecode paths inside this workspace. Only
+  invented fixture inputs; no network, .env, .private or real data/ input.
+  Hypothesis seed 2026112263. No real signing, task box or gate verdict.
+- Required checks and actual exits on the final code:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exit 0, 96 tests;
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -q -p no:cacheprovider --hypothesis-seed=2026112263`
+  exit 0, 236 passed and 21 subtests passed;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0;
+  `uv run --locked mypy` exit 0;
+  `python3 scripts/check_docs.py` initially exit 1 on untracked workspace
+  metadata, then exit 0 (1277 text files, 143 Markdown files) after restoring
+  the isolated Git metadata's local .overnight/ exclusion; no checked source
+  or checker was changed to resolve that harness configuration error;
+  `python3 scripts/check_tree.py` exit 0;
+  `cmp AGENTS.md CLAUDE.md` exit 0;
+  `git diff --check 9fc271ef` exit 0. Post-record checks and source hashes are
+  retained with the return report. Initial and corrected logs both remain.
+- Plant evidence: 28 recorded red-1/restored-green-0 pairs, with exact byte
+  restoration, covering 26 distinct cases (maker comparison and omission of
+  P repeated after the history-order correction). Every new refusal guard and
+  the retained raises in changed functions has a focused deletion proof.
+  Empty/single decisions, sample boundaries, hash ties, inclusive seed bounds,
+  mapped/rejected decisions, text/Unicode, order, latest/other/admitted history,
+  duplicate JSON keys and core zero-error admission have recorded plants.
+  Property tests use an independent JSONEncoder/int.from_bytes oracle.
+- Development corrections: initial lint exit 1 (imports and lambda capture)
+  was fixed; development mypy exit 0. An initial shared-bytecode plant run
+  incorrectly let the modulus mutation pass (exit 0). A same-size/same-mtime
+  fixture reproduced stale cache reuse, exit 0, with values 1/shared 1/isolated
+  2. Counted plant runs use a separate bytecode directory for every red and
+  every restored run. The failed initial proof attempt remains recorded and
+  is excluded from the 28 pairs. No random application failure is claimed.
+- Limit, retained under OI-203: the correctly re-signed unchanged refused
+  batch gets a different derived seed and a fresh draw. The unchanged core
+  admission schema still refuses a history containing a nonzero-error record;
+  the new integration-limit test proves the exact error. Refusal persistence
+  and an archival layout for real post-refusal assembly need the lead's
+  resolution; no successful post-refusal assembly is claimed. The no-P
+  negatives target maker reading and drawing, whose correct-seed counterfactual
+  is valid, not an otherwise-invalid assembly fixture. Strict self-review is
+  REJECT for end-to-end post-refusal readiness; the bounded seed mechanics pass.
+- Code practice: one derivation helper; reuse existing sampling, strict JSON,
+  decision validation and frozen/candidate checks. The existing large-batch
+  test reuses the new fixture helper. No copied block; no new function exceeds
+  100 lines. Exact additions/removals and longest new function are in the return.
+  Core/custodian and committed review inputs are unchanged. No push, merge or
+  different-maker approval is claimed. Muhasabah passes for the bounded,
+  evidenced claims and explicit unresolved integration work.
+
+- S2-P60 round 3 final proof addition: deletion of the retained
+  `audit_seed_reused` raise is now also proved this round by the seed-freshness
+  property, red exit 1, exact byte restoration, green exit 0. This supplements
+  the earlier 28-pair record: the final inventory is 29 pairs covering 27
+  distinct mutation cases. Raw argv, exits and logs are under
+  `.overnight/evidence/r3/freshness-plant/`. This addition changes records only;
+  the final tested production/test source hashes remain unchanged. The bundle
+  and final return identity are regenerated from the amended single commit.

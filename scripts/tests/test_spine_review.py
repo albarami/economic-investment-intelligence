@@ -85,6 +85,13 @@ class SpineReviewTest(unittest.TestCase):
                 if row.code_length == 7
             ],
         )
+        from spine_review import derived_audit_seed
+
+        history = self.review.with_name("activity_spine_audits.json")
+        audits = json.loads(history.read_bytes()) if history.exists() else []
+        seed = derived_audit_seed(
+            tuple(row for row in rows if row.code_length == 7), audits
+        )
         record.write_text(
             json.dumps(
                 dict(
@@ -92,7 +99,7 @@ class SpineReviewTest(unittest.TestCase):
                     signer_role=signer,
                     auditor_role=auditor,
                     batch_id="invented-batch",
-                    seed=3141592653,
+                    seed=seed,
                     audit_date="2026-11-22",
                 )
             )
@@ -141,7 +148,9 @@ class SpineReviewTest(unittest.TestCase):
         binding_path(self.review).write_text(json.dumps(binding))
         return old_bytes
 
-    def next_batch(self, seed: int) -> tuple[Path, tuple[Path, Path, Path], bytes]:
+    def next_batch(
+        self, seed: int | None = None
+    ) -> tuple[Path, tuple[Path, Path, Path], bytes]:
         from eii_custodian.publicdata.fetch.registry import load_registry
         from eii_custodian.publicdata.review.cache_fixture import (
             real_feed_body,
@@ -177,7 +186,13 @@ class SpineReviewTest(unittest.TestCase):
         paths = self.returns(prepared)
         makers = json.loads(paths[2].read_bytes())
         paths[2].write_text(
-            json.dumps({**makers, "seed": seed, "batch_id": "invented-second-batch"})
+            json.dumps(
+                {
+                    **makers,
+                    "seed": makers["seed"] if seed is None else seed,
+                    "batch_id": "invented-second-batch",
+                }
+            )
         )
         return prepared, paths, old_bytes
 
@@ -393,8 +408,6 @@ class SpineReviewTest(unittest.TestCase):
         )
         self.assertEqual(read_review_csv(prepared / "queue.csv"), ())
         paths = self.returns(prepared)
-        makers = json.loads(paths[2].read_bytes())
-        paths[2].write_text(json.dumps({**makers, "seed": 3141592654}))
         second = self.assemble(prepared, paths, "invented-second-assembled")
         self.assertEqual(read_review_csv(second / "activity_spine.csv"), earlier)
         self.assertEqual(
@@ -425,6 +438,13 @@ class SpineReviewTest(unittest.TestCase):
         )
         write_review_csv(paths[0], signed)
         write_review_csv(paths[1], audited)
+        from spine_review import derived_audit_seed
+
+        makers = json.loads(paths[2].read_bytes())
+        makers["seed"] = derived_audit_seed(
+            tuple(row for row in signed if row.code_length == 7), []
+        )
+        paths[2].write_text(json.dumps(makers))
         result = self.assemble(prepared, paths)
         self.assertEqual(
             read_review_csv(result / "activity_spine.csv")[0].status,
@@ -541,27 +561,33 @@ class SpineReviewTest(unittest.TestCase):
 
     def test_seed_types_bounds_and_role_format(self) -> None:
         from eii_custodian.publicdata.review.activity import SpineError
-        from spine_review import read_makers
+        from spine_review import frozen_context, read_makers
         from spine_triage_io import Refusal
 
         prepared = self.prepare()
         paths = self.returns(prepared)
         record = json.loads(paths[2].read_text())
+        context, _ = frozen_context(self.root, prepared / "manifest.json")
+        signed = read_review_csv(paths[0])
         for seed in (True, 1.5, "3141592653", 999999999, 4294967296):
             paths[2].write_text(json.dumps({**record, "seed": seed}))
             with (
                 self.subTest(seed=seed),
                 self.assertRaisesRegex(Refusal, "^audit_seed_invalid$"),
             ):
-                read_makers(self.root, paths[2], self.preparer)
+                read_makers(self.root, paths[2], self.preparer, context, signed, [])
         for seed in (1000000000, 4294967295):
             paths[2].write_text(json.dumps({**record, "seed": seed}))
-            self.assertEqual(
-                read_makers(self.root, paths[2], self.preparer)["seed"], seed
-            )
+            with patch("spine_review.derived_audit_seed", return_value=seed):
+                self.assertEqual(
+                    read_makers(
+                        self.root, paths[2], self.preparer, context, signed, []
+                    )[0]["seed"],
+                    seed,
+                )
         paths[2].write_text(json.dumps({**record, "signer_role": "invalid"}))
         with self.assertRaisesRegex(SpineError, "^model audit role is malformed$"):
-            read_makers(self.root, paths[2], self.preparer)
+            read_makers(self.root, paths[2], self.preparer, context, signed, [])
 
     def test_changed_return_during_validation_refuses(self) -> None:
         import spine_review
@@ -595,7 +621,7 @@ class SpineReviewTest(unittest.TestCase):
                 manifest_sha256=file_hash(prepared / "manifest.json"),
                 signer_rows_sha256=file_hash(paths[0]),
                 maker_record_sha256=file_hash(paths[2]),
-                seed=3141592653,
+                seed=json.loads(paths[2].read_bytes())["seed"],
                 batch_id="invented-batch",
                 sampled_codes=["5610901", "5610902"],
             ),
@@ -716,33 +742,16 @@ class SpineReviewTest(unittest.TestCase):
         self.assertFalse((self.cache / "spine_review").exists())
 
     def test_draw_only_samples_thirty_blind_packets(self) -> None:
-        from eii_custodian.publicdata.fetch.registry import load_registry
-        from eii_custodian.publicdata.review.activity import audit_sample
-        from eii_custodian.publicdata.review.cache_fixture import (
-            real_feed_body,
-            write_cached,
-        )
+        from test_spine_review_seed import many_returns
 
-        entry = next(e for e in load_registry() if e.key == "lic_active")
-        write_cached(
-            self.cache,
-            entry,
-            real_feed_body(
-                "lic_active",
-                [
-                    dict(
-                        activity_code=f"5610{index:03d}",
-                        activity_name_ar="نشاط مخترع",
-                        active_count=1,
-                    )
-                    for index in range(35)
-                ],
-            ),
-        )
-        prepared = self.prepare()
-        paths = self.returns(prepared)
+        from eii_custodian.publicdata.review.activity import audit_sample
+
+        prepared, paths = many_returns(self)
         drawn = self.draw(prepared, paths)
-        sample = audit_sample([r.code for r in read_review_csv(paths[0])], 3141592653)
+        sample = audit_sample(
+            [r.code for r in read_review_csv(paths[0])],
+            json.loads(paths[2].read_bytes())["seed"],
+        )
         packet = json.loads(drawn.with_name("audit_packet.json").read_bytes())
         self.assertEqual(len(packet), 30)
         self.assertEqual([row["code"] for row in packet], list(sample))
@@ -772,11 +781,11 @@ class SpineReviewTest(unittest.TestCase):
             require_fresh_seed([{"seed": 3141592653}], 3141592653)
         require_fresh_seed([{"seed": 3141592653}], 3141592654)
 
-    def test_draw_refuses_seed_from_earlier_valid_batch(self) -> None:
+    def test_draw_refuses_chosen_seed_for_later_batch(self) -> None:
         from spine_triage_io import Refusal
 
         prepared, paths, _ = self.next_batch(3141592653)
-        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+        with self.assertRaisesRegex(Refusal, "^audit_seed_not_derived$"):
             self.draw(prepared, paths)
         self.assertFalse((prepared.parent / (prepared.name + "-draw")).exists())
 
@@ -791,23 +800,32 @@ class SpineReviewTest(unittest.TestCase):
         )
         paths = self.returns(prepared)
         self.assertEqual(read_review_csv(prepared / "queue.csv"), ())
-        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+        makers = json.loads(paths[2].read_bytes())
+        history = json.loads(
+            self.review.with_name("activity_spine_audits.json").read_bytes()
+        )
+        paths[2].write_text(json.dumps({**makers, "seed": history[0]["seed"]}))
+        with self.assertRaisesRegex(Refusal, "^audit_seed_not_derived$"):
             self.draw(prepared, paths)
         self.assertFalse((prepared.parent / "invented-empty-draw").exists())
 
     def test_assemble_rechecks_seed_from_earlier_valid_batch(self) -> None:
         from spine_triage_io import Refusal
 
-        prepared, paths, _ = self.next_batch(3141592653)
-        # Isolate assembly's guard: emulate a draw emitted with its seed check removed.
-        with patch("spine_review.require_fresh_seed"):
-            drawn = self.draw(prepared, paths)
-        with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
-            self.assemble(prepared, paths, "invented-second-assembled", draw=drawn)
+        prepared, paths, old_bytes = self.next_batch()
+        seed = json.loads(old_bytes)[0]["seed"]
+        makers = json.loads(paths[2].read_bytes())
+        paths[2].write_text(json.dumps({**makers, "seed": seed}))
+        # Force a hash collision to isolate the unchanged freshness guard.
+        with patch("spine_review.derived_audit_seed", return_value=seed):
+            with patch("spine_review.require_fresh_seed"):
+                drawn = self.draw(prepared, paths)
+            with self.assertRaisesRegex(Refusal, "^audit_seed_reused$"):
+                self.assemble(prepared, paths, "invented-second-assembled", draw=drawn)
         self.assertFalse((prepared.parent / "invented-second-assembled").exists())
 
     def test_fresh_second_batch_preserves_prior_record_bytes(self) -> None:
-        prepared, paths, old_bytes = self.next_batch(3141592654)
+        prepared, paths, old_bytes = self.next_batch()
         candidate = self.assemble(prepared, paths, "invented-second-assembled")
         body = (candidate / "activity_spine_audits.json").read_bytes()
         self.assertTrue(body.startswith(old_bytes[: old_bytes.rfind(b"]")]))
@@ -981,7 +999,8 @@ def draw_change_case(field: str) -> Callable[[SpineReviewTest], None]:
                 "maker_record_sha256": "0" * 64,
             }[field]
             drawn.write_text(json.dumps(record))
-        with self.assertRaisesRegex(Refusal, "^draw_changed$"):
+        reason = "audit_seed_not_derived" if field == "seed" else "draw_changed"
+        with self.assertRaisesRegex(Refusal, "^" + reason + "$"):
             self.assemble(prepared, paths, draw=drawn)
         self.assertFalse((prepared.parent / "invented-assembled").exists())
 

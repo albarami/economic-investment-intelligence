@@ -83,7 +83,7 @@ uv run --locked python scripts/spine_triage.py --mode finalise-check --manifest 
 `prepare` reuses the assembly's verified active and cancelled feed readers and
 reviewed basket membership. It writes `queue.csv`, `membership.json`,
 `queue.binding.json`, `signer_packet.json` and `manifest.json` under
-`data/public_cache/spine_review/<run-id>/`. The packet contains only code, exact
+`data/public_cache/spine_review/<run-id>/`. `signer_packet.json` lists every eligible code. The packet contains only code, exact
 Arabic name, prefix and source-provided English and Arabic class titles; an
 absent Arabic title stays empty. The manifest binds the exact baskets, review,
 existing binding and audit bytes, source receipts and attribution, recomputed
@@ -100,13 +100,31 @@ acknowledgements by a person; model-review roles on these rows refuse with
 `acknowledgement_role_invalid`. All names and code lengths stay unchanged.
 Signed rows need the actual ISO signing date.
 
+The seed is derived, never chosen (L-1469, reading of decision 0075 item 3).
+Use `derived_audit_seed` in `scripts/spine_review.py` to fill `makers.json`:
+`1000000000 + int(sha256(b"oi203-audit-seed:" + J + b":" + P)) % 3294967296`.
+J is compact canonical UTF-8 JSON (`ensure_ascii=False`, sorted keys, separators
+`(',', ':')`, no newline) of the eligible decisions sorted by code, holding
+exactly `code`, `status`, `isic_class`. P is the ASCII hex SHA-256 of the latest
+earlier refused audit record for that same code set in the committed audit
+history, or empty bytes. Hash that record with the same canonical JSON encoding;
+refused means a positive integer `errors` count. A batch id, run id, date, role,
+reason or other free text never enters J. Changing metadata or repeating a draw
+cannot change the seed. Any different recorded seed refuses with
+`audit_seed_not_derived` in maker reading, draw and assembly. After a refusal,
+record that refused audit in the committed history before preparing the newly
+signed batch; its hash changes P and the next derived seed. The recorded seed's
+range, sample size, freshness and zero-error admission requirements stay unchanged.
+
 Freeze the signer's returned file and maker record, then run `--mode draw`
 before sending anything to the auditor. It writes `draw.json` and
 `audit_packet.json` in a fresh run folder. The draw binds the exact preparation
 manifest, signer-file and maker-record hashes, seed, batch id and ordered sampled
 codes. The audit packet copies only those codes' minimal entries from
 `signer_packet.json`; it contains no signer status, reason or role. Preserve the
-draw as the pre-audit evidence. Give the independent auditor only that packet,
+draw as the pre-audit evidence. Since `signer_packet.json` lists every eligible
+code, restriction of the auditor to the sample rests on the packet the lead sends.
+Give the independent auditor only `audit_packet.json`,
 without signer answers. The auditor returns the same CSV contract for exactly
 the sampled codes, its own role and the actual audit date. Its decisions must
 match in every judgement field. The maker record is a JSON object with exactly
@@ -121,8 +139,9 @@ auditor's decision to match. A seed already in any earlier audit refuses with
 batches produce no new audit record and preserve the earlier audit file's bytes.
 
 `assemble` rederives frozen inputs and verifies returned coverage and decisions
-before publishing anything. `--draw` is mandatory; a changed manifest, signer
-file, maker record, seed, batch id or sample refuses with `draw_changed`.
+before publishing anything. `--draw` is mandatory; a misderived recorded draw
+seed refuses with `audit_seed_not_derived`; a changed manifest, signer file,
+maker record, batch id or sample refuses with `draw_changed`.
 It preserves earlier review rows outside the queue and parses the review file's
 adjacent `activity_spine_audits.json` with duplicate-key refusal. Earlier audit
 record bytes remain intact when appending; with no new batch the whole file is
