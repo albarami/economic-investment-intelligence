@@ -2097,7 +2097,8 @@ All retrieved 2026-11-11 unless stated.
 - Overture Maps Foundation: release catalogue `https://stac.overturemaps.org/2026-10-21.0/catalog.json`;
   places guide `https://docs.overturemaps.org/guides/places`; attribution page
   `https://docs.overturemaps.org/attribution/`.
-  The committed collection and three unconfirmed item placeholders follow the
+  The committed collection and its 512 item rows, generated from the pinned
+  collection by the lead's records step of S2-P47, follow the
   same release's `bldg_ovt` licence fields exactly, including terms wording and
   date read; `commit_allowed` remains false. S2-P47 part A adds the offline
   `scripts/stac_item_rows.py` write/check helper and the literal `BLDG_OVT_KEYS`
@@ -2105,7 +2106,9 @@ All retrieved 2026-11-11 unless stated.
   links it replaces placeholders, emits reviewed `https_file` JSON rows and
   checks exact committed field/key equality. The lead supplies the observed
   filename regex; no default filename shape or item address is guessed. The
-  real collection's item rows remain a separate lead records step. The helper
+  lead's records step wrote the real collection's 512 item rows with the
+  observed name pattern `(?P<part>[0-9]{5})/(?P=part)\.json`; its `--check`
+  form passes on the committed registry. The helper
   binds each row's basis note to the pinned collection's SHA-256 and decision
   0077 item 2, uses the item address as its landing URL, and preserves the
   collection template's fetch cadence and nightly flag. The companion
