@@ -481,7 +481,7 @@ def test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch(
         "report_url": link,
         "Company name": "SYN Company",
         "Commercial Registration Number": "SYN-reg",
-        "Approved Value": "12.50",
+        "Approved Value": "12.50 QAR",
         "Approved Value Number": "12.5",
     }
     ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"

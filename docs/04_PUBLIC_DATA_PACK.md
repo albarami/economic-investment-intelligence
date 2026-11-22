@@ -779,6 +779,25 @@ outcomes and stays labelled `sample`. Document 03, S2-T29 cached page and awards
 contracts, specifies the full record and assembly refusals. The lead still records
 the live all-link rate and registration-match evidence under OI-277.
 
+[Decision 0088](decisions/0088-award-proof-check-over-the-real-formats.md) items 2
+to 5 amend the proof check over the lead's real formats, leaving the separate
+awards-to-register join and its name-consistency check unchanged. Intake values
+use the strict two-decimal, optional comma-group format ending in ` QAR`; proof
+values retain their strict two-decimal ` رق` format. Suffix-only or blank cells
+stay absent, never zero. Other malformed proof-page text refuses `schema_missing`;
+malformed intake strings yield `proof_mismatch`. Proof registrations compare as
+nonempty equal sets of stripped tokens split on literal ` | `. Normalised names
+are `arabic` when every Unicode letter's name contains `ARABIC`, `latin` when
+every letter's name contains `LATIN`, `none` when there are no letters, and
+`mixed` otherwise, including other-script letters. Nonletters are ignored for
+classification. Exact name comparison applies only to equal non-`none` classes.
+The closed match reasons are `matched` and `matched_name_not_compared`; mismatch
+reasons, in fixed precedence, are `intake_value_absent`, `proof_value_absent` and
+`proof_mismatch`. Fetch reasons remain `proof_fetch_failed`, `unreachable`,
+`http_status` and `body_bytes`. Both checks and summaries retain reason counts;
+`matched_name_not_compared` stays inside `matched` and is shown separately on the
+card. No fuzzy score, transliteration, tolerance or passing threshold is added.
+
 ### S2-T19 source reading and collection boundary
 
 The lead's structure readings of 2026-11-15 confirm the declarations below (PUB-07,

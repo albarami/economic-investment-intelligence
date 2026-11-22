@@ -47,7 +47,10 @@ def test_proof_comparison_normalises_spaces_and_keeps_both_consistency_checks() 
         ({"syn_company": "SYN Other"}, 0),
     ):
         result = check_awards(
-            [source], profile(), 73, lambda _, changes=changes: dict(source, **changes)
+            [source],
+            profile(),
+            73,
+            lambda _, changes=changes: dict(source, syn_value="12.50", **changes),
         )
         assert result["matched"] == matched
         assert result["mismatched"] == 1 - matched
