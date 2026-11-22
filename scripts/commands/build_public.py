@@ -18,8 +18,14 @@ from eii_custodian.publicdata.benchmarks.config import Policy as BenchmarkPolicy
 from eii_custodian.publicdata.benchmarks.config import load_policies
 from eii_custodian.publicdata.company_web.build import run_company_web
 from eii_custodian.publicdata.fetch.allowlist import host_of
-from eii_custodian.publicdata.fetch.build import CACHE_RELATIVE, run_build, utc_now
+from eii_custodian.publicdata.fetch.build import (
+    CACHE_RELATIVE,
+    run_build,
+    run_tenders_only,
+    utc_now,
+)
 from eii_custodian.publicdata.fetch.certificate_pins import PinError
+from eii_custodian.publicdata.fetch.own_run import OWN_RUN_CACHE_RELATIVE
 from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
     load_registry,
@@ -94,7 +100,7 @@ def run(
     """Validate the arguments before any input or credential read.
 
     No argument, ``--seed N`` (the draw seed), ``--company-web``,
-    ``--seed N --resume``, ``--cdse-backup`` alone or
+    ``--seed N --resume``, ``--tenders-only [--resume]``, ``--cdse-backup`` alone or
     ``--gis-imagery-snapshot`` alone;
     anything else is a usage error and opens nothing.
     """
@@ -116,9 +122,10 @@ def run(
         )
         print(f"satellite_cdse_backup omitted: {reason}")
         return 0
+    tenders_only = tuple(args) in {("--tenders-only",), ("--tenders-only", "--resume")}
     seed = 0
     resume = len(args) == 3 and args[2] == "--resume"
-    if args:
+    if args and not tenders_only:
         if (
             (len(args) != 2 and not resume)
             or args[0] != "--seed"
@@ -127,13 +134,15 @@ def run(
             table.write_usage()
             return 2
         seed = int(args[1])
-    token = earthdata_token(environ)
+    token = "" if tenders_only else earthdata_token(environ)
     opener = open_https if transport is None else transport
     if transport is None and token:
         opener = partial(open_https, token=token)
     pause = time.sleep if sleep is None else sleep
     bound = None if transport is not None else open_attempt
-    slots = slot_secrets(environ, injected=transport is not None)
+    slots = (
+        None if tenders_only else slot_secrets(environ, injected=transport is not None)
+    )
     try:
         entries = tuple(
             entry
@@ -142,6 +151,8 @@ def run(
         )
     except RegistryError as exc:
         return exits.finish(1, "build-public", exc.detail)
+    if tenders_only:
+        entries = tuple(entry for entry in entries if entry.key == "tenders_pub")
     baci_config: Config | None = None
     gravity_config: GravityConfig | None = None
     atlas_config: AtlasConfig | None = None
@@ -190,22 +201,25 @@ def run(
                 atlas_bound = partial(
                     open_https_stream, reviewed_urls=atlas_config.reviewed_urls
                 )
-        try:
-            benchmark_policies = load_policies()
-        except ValueError:
-            return exits.finish(
-                1, "build-public", "benchmark configuration_unreadable NO_DATA"
+        if not tenders_only:
+            try:
+                benchmark_policies = load_policies()
+            except ValueError:
+                return exits.finish(
+                    1, "build-public", "benchmark configuration_unreadable NO_DATA"
+                )
+            benchmark_urls = tuple(
+                dict.fromkeys(
+                    url
+                    for policy in benchmark_policies.values()
+                    for url in policy.reviewed_urls
+                )
             )
-        benchmark_urls = tuple(
-            dict.fromkeys(
-                url
-                for policy in benchmark_policies.values()
-                for url in policy.reviewed_urls
-            )
-        )
-        groups.append(benchmark_urls)
-        if benchmark_bound is None:
-            benchmark_bound = partial(open_https_stream, reviewed_urls=benchmark_urls)
+            groups.append(benchmark_urls)
+            if benchmark_bound is None:
+                benchmark_bound = partial(
+                    open_https_stream, reviewed_urls=benchmark_urls
+                )
         terms_urls = frozenset(entry.terms_url for entry in entries if entry.terms_url)
 
         def reviewed_metadata(url: str) -> Response:
@@ -227,6 +241,25 @@ def run(
             return open_https(url, token=token)
 
         opener = reviewed_metadata
+    if tenders_only:
+        outcome = run_tenders_only(
+            entries,
+            opener,
+            root / CACHE_RELATIVE,
+            root / OWN_RUN_CACHE_RELATIVE,
+            utc_now,
+            pause,
+            environ=environ,
+            resume=len(args) == 2,
+        )
+        for line in outcome.lines:
+            print(line)
+        print(log_line(f"{OWN_RUN_CACHE_RELATIVE}/build-log.json"))
+        return (
+            exits.finish(outcome.failure.code, "build-public", outcome.failure.detail)
+            if outcome.failure is not None
+            else 0
+        )
     outcome = run_build(
         entries,
         opener,

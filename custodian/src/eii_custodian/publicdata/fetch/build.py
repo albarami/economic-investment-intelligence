@@ -32,7 +32,10 @@ from eii_custodian.publicdata.fetch.kinds import (
     prepare,
     read_terms_page,
 )
-from eii_custodian.publicdata.fetch.own_run import is_tender_entry
+from eii_custodian.publicdata.fetch.own_run import (
+    handoff_completed_archive,
+    is_own_run_entry,
+)
 from eii_custodian.publicdata.fetch.partitions import (
     PartitionError,
     bounded_partition_reader,
@@ -461,6 +464,7 @@ def _seeded_assembly(
     seed: int | None,
     resume: bool,
     code_roots: CodeRoots | None,
+    _own_run: bool = False,
 ) -> BuildOutcome:
     """Open the run journal, fetch under it, then run the production assembly."""
     from eii_custodian.publicdata.assembly import AssemblyError
@@ -519,6 +523,7 @@ def _seeded_assembly(
             large_stream=large_stream,
             _fetch_only=True,
             _run=_run,
+            _own_run=_own_run,
         )
 
     build = Production(
@@ -639,9 +644,14 @@ def run_build(
     resume: bool = False,
     _run: RunRecord | None = None,
     code_roots: CodeRoots | None = None,
+    _own_run: bool = False,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
     entries = tuple(entry for entry in entries if entry.kind != "company_web")
+    if _own_run and (
+        not _fetch_only or len(entries) != 1 or not is_own_run_entry(entries[0])
+    ):
+        raise ValueError("own_run_inventory_invalid")
     if seed is not None:
         return _seeded_assembly(
             entries,
@@ -667,6 +677,7 @@ def run_build(
             seed=seed,
             resume=resume,
             code_roots=code_roots,
+            _own_run=_own_run,
         )
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
@@ -697,19 +708,7 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
-        if is_tender_entry(entry) and entry.skip_reason:
-            # Decision 0084: a row the registry names as the tender source is
-            # never fetched by the ordinary run; a changed row with a skip
-            # reason is refused by name before any adapter is called.
-            failure = FetchFailure(
-                1, entry.source_id, "", "own_run_row_changed", "", entry.skip_reason
-            )
-            lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
-            break
-        if is_tender_entry(entry):
-            # Decision 0084: no list, page or terms request for the source
-            # that has its own run, whatever its row's kind; its absence is
-            # recorded at assembly.
+        if is_own_run_entry(entry) and not _own_run:
             lines.append(skip_line(entry.key, "own_run"))
             if _run is not None:
                 try:
@@ -1293,6 +1292,7 @@ def run_build(
             tuple(terms_attempts),
             reused_times=reused_times,
         )
+
     attempt_failure = _archive_investment_attempts(
         entries, investment_attempts, cache, clock, lines
     )
@@ -1505,6 +1505,111 @@ def run_build(
         cache, lines, terms if failure is None else previous_terms, terms_attempts
     )
     return BuildOutcome(tuple(lines), failure, manifests)
+
+
+def run_tenders_only(
+    entries: Sequence[Entry],
+    transport: Transport,
+    main_cache: Path,
+    tender_cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+    *,
+    environ: Mapping[str, str] | None = None,
+    resume: bool = False,
+) -> BuildOutcome:
+    """Acquire exactly the registered tender entry, without a whole-pack claim."""
+    from eii_custodian.publicdata.assembly_tenders import archive_pages, terms_body_hash
+
+    rows = tuple(entries)
+    if len(rows) != 1 or not is_own_run_entry(rows[0]):
+        failure = FetchFailure(
+            1, "tenders_pub", "", "own_run_inventory_invalid", "", ""
+        )
+        return BuildOutcome(
+            (fail_line("tenders_pub", "", failure.check, "", ""),), failure
+        )
+    entry = rows[0]
+    try:
+        run = RunRecord.begin(
+            tender_cache, rows, 0, clock(), resume=resume, environ=environ
+        )
+    except (ResumeError, OSError) as exc:
+        reason = (
+            str(exc) if isinstance(exc, ResumeError) else "resume_record_write_failed"
+        )
+        failure = FetchFailure(1, entry.source_id, "", reason, "", "")
+        return BuildOutcome((fail_line(entry.key, "", reason, "", ""),), failure)
+    if not resume:
+        try:
+            adopted = handoff_completed_archive(
+                main_cache, tender_cache, entry, clock()
+            )
+        except ValueError:
+            return _own_run_failure(tender_cache, entry, "tender_handoff_refused")
+        if adopted is not None:
+            identity, terms_row = adopted
+            lines = [f"HANDOFF {entry.key} sha256={identity}"]
+            try:
+                _write_log(tender_cache, lines, [terms_row], [])
+                run.note(entry)
+                run.finish()
+            except OSError:
+                return _own_run_failure(
+                    tender_cache, entry, "tender_handoff_write_failed"
+                )
+            return BuildOutcome(tuple(lines), None)
+    outcome = run_build(
+        rows,
+        transport,
+        tender_cache,
+        clock,
+        sleep,
+        environ=environ,
+        _fetch_only=True,
+        _run=run,
+        _own_run=True,
+    )
+    if outcome.failure is not None:
+        return outcome
+    try:
+        terms_hash = terms_body_hash(tender_cache, entry, outcome.terms)
+        state = run.row["entries"][entry.key]["fetch"]
+        retrieved = state["retrieved_utc"]
+        if not isinstance(retrieved, str):
+            raise ValueError("tender_retrieval_missing")
+        archive = archive_pages(
+            tender_cache,
+            entry,
+            clock(),
+            retrieved_utc=retrieved,
+            terms_sha256=terms_hash,
+        )
+        lines = [*outcome.lines, f"ARCHIVE {entry.key} sha256={archive}"]
+        _write_log(tender_cache, lines, outcome.terms, list(outcome.terms_attempts))
+        run.finish()
+    except (OSError, ValueError, KeyError, TypeError):
+        return _own_run_failure(
+            tender_cache, entry, "assembly_tender_pages_incomplete", outcome
+        )
+    return BuildOutcome(tuple(lines), None, outcome.manifests, terms=outcome.terms)
+
+
+def _own_run_failure(
+    cache: Path, entry: Entry, reason: str, outcome: BuildOutcome | None = None
+) -> BuildOutcome:
+    failure = FetchFailure(1, entry.source_id, "", reason, "", "")
+    lines = [
+        *(outcome.lines if outcome else ()),
+        fail_line(entry.key, "", reason, "", ""),
+    ]
+    _write_log(
+        cache,
+        lines,
+        outcome.terms if outcome else (),
+        list(outcome.terms_attempts) if outcome else [],
+    )
+    return BuildOutcome(tuple(lines), failure)
 
 
 def _archive_investment_attempts(

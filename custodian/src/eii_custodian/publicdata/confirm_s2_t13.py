@@ -15,9 +15,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from datetime import date
 from pathlib import Path
-from urllib.parse import urlsplit
 
-from eii_custodian.publicdata.fetch.allowlist import host_of, safe_https_shape
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import utc
 
@@ -36,23 +35,6 @@ OUTCOMES = frozenset(
 BASES = frozenset({"dataset", "portal_terms", "provider_terms", ""})
 RECORDED = OUTCOMES - {"not_yet_recorded", "none_found"}
 CAVEAT = "No public tender source is recorded"
-
-
-def _same_reviewed_origin(url: str, origin: str) -> bool:
-    """Bind a reviewed URL to the HTTPS endpoint of the registered fetch URL."""
-    if not safe_https_shape(url) or not safe_https_shape(origin):
-        return False
-    parts, registered = urlsplit(url), urlsplit(origin)
-    return (
-        # Backslash checks are parser-differential defence in depth.
-        "\\" not in parts.netloc
-        and "\\" not in registered.netloc
-        # Non-ASCII netloc checks refuse casefold-equivalent hosts.
-        and parts.netloc.isascii()
-        and registered.netloc.isascii()
-        and bool(host_of(origin))
-        and host_of(url) == host_of(origin)
-    )
 
 
 @dataclass(frozen=True)
@@ -268,22 +250,6 @@ def load_confirmation(path: Path) -> Confirmation:
     return c
 
 
-def _registry_binds(tender: Tender, registry: Entry) -> bool:
-    """Registry fields both the shown and the own-run pending bindings compare."""
-    return (
-        registry.source_id == "tenders_pub"
-        and registry.publisher == tender.publisher
-        and registry.terms_url == tender.terms_url
-        and registry.licence_id == tender.licence_id
-        and registry.licence_basis == tender.basis_of_use
-        and registry.decision_record == tender.decision_record
-        and registry.period_first == tender.period_first
-        and registry.period_last == tender.period_last
-        and registry.release_tables == tender.release_tables
-        and registry.skip_reason == ""
-    )
-
-
 def tender_disposition(
     tender: Tender, registry: Entry | None, receipt: Mapping[str, object] | None
 ) -> Disposition:
@@ -307,17 +273,7 @@ def tender_disposition(
         "release_tables": list(tender.release_tables),
         "switched_off": False,
     }
-    registry_matches = (
-        _registry_binds(tender, registry)
-        and registry.key == tender.source_id
-        and registry.fetch_host.casefold() == host_of(registry.url)
-        and _same_reviewed_origin(tender.page, registry.url)
-        and (
-            (tender.outcome == "terms_absent" and not tender.terms_url)
-            or _same_reviewed_origin(tender.terms_url, registry.url)
-        )
-        and bool(registry.basis_note.strip())
-    )
+    registry_matches = _registry_matches(tender, registry)
     digest = receipt.get("sha256")
     retrieved = receipt.get("retrieved_utc")
     try:
@@ -334,35 +290,46 @@ def tender_disposition(
     return Disposition(True, "SHOWN", "")
 
 
+def _registry_matches(tender: Tender, registry: Entry) -> bool:
+    """The P40 registry binding shared by present and pending tender evidence."""
+    return (
+        registry.source_id == "tenders_pub"
+        and registry.publisher == tender.publisher
+        and registry.key == tender.source_id
+        and registry.fetch_host == host_of(registry.url)
+        and registry.fetch_host == host_of(tender.page)
+        and (
+            (tender.outcome == "terms_absent" and not tender.terms_url)
+            or registry.fetch_host == host_of(tender.terms_url)
+        )
+        and registry.terms_url == tender.terms_url
+        and registry.licence_id == tender.licence_id
+        and registry.licence_basis == tender.basis_of_use
+        and registry.decision_record == tender.decision_record
+        and registry.period_first == tender.period_first
+        and registry.period_last == tender.period_last
+        and registry.release_tables == tender.release_tables
+        and bool(registry.basis_note.strip())
+        and registry.skip_reason == ""
+    )
+
+
 def own_run_pending(
     confirmation: Confirmation,
     registry: Entry | None,
     receipt: Mapping[str, object] | None,
 ) -> bool:
-    """Allow the own-run source's true absence (decision 0084), never a receipt.
-
-    The binding is every registry field the review records in the same form,
-    the terms words and reading date included. The present-receipt binding
-    of ``tender_disposition`` also compares the full page address and the basis note's words; S2-P40 rebinds those two and
-    is not on this base, so the absent case binds the page's host (the
-    registry address's host and fetch host both) and a non-empty basis note.
-    """
-    from .fetch.allowlist import host_of
+    """Allow one recorded source's true absence, never a malformed receipt."""
     from .fetch.own_run import is_own_run_entry
 
     _validate(confirmation)
-    t = confirmation.tender
+    tender = confirmation.tender
     return (
         registry is not None
         and receipt is None
-        and t.outcome in RECORDED
         and is_own_run_entry(registry)
-        and registry.key == t.source_id
-        and _registry_binds(t, registry)
-        and registry.terms_words == t.terms_words
-        and registry.terms_read_on == t.terms_read_on
-        and host_of(registry.url) == registry.fetch_host == host_of(t.page)
-        and bool(registry.basis_note.strip())
+        and tender.outcome in RECORDED
+        and _registry_matches(tender, registry)
     )
 
 

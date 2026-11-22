@@ -16,14 +16,35 @@ from .fetch.terms_text import FINGERPRINT_VISIBLE_TEXT, terms_text_sha256
 from .singles.tenders import AWARD_CONTINUITY_PAGES, LIST_PATHS, TenderError
 
 
-def terms_body_hash(cache: Path, entry: Entry, rows: Sequence[object]) -> str:
+def verify_intake_match(cache: Path, body: bytes, stamp: str) -> None:
+    """Bind both awarded-language readings to this assembly's verified intake."""
+    from .fetch.awards import intake_cutoff
+
+    try:
+        document = json.loads(body)
+        readings = document["readings"]
+        awarded = [r for r in readings if r["list_name"] == "awarded"]
+        cutoff, reason, digest = intake_cutoff(cache, stamp)
+        if (
+            len(awarded) != 2
+            or {r["language"] for r in awarded} != {"en", "ar"}
+            or any(
+                r.get("award_cutoff") != cutoff
+                or r.get("workbook_sha256") != digest
+                or r.get("cutoff_reason", "") != reason
+                for r in awarded
+            )
+        ):
+            raise AssemblyError("assembly_tender_pages_incomplete")
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+        raise AssemblyError("assembly_tender_pages_incomplete") from None
+
+
+def terms_body_hash(
+    cache: Path, entry: Entry, rows: Sequence[Mapping[str, object]]
+) -> str:
     """Select this run's raw terms body, retaining the review's hash convention."""
-    matches: list[Mapping[str, object]] = []
-    for row in rows:
-        if not isinstance(row, Mapping):
-            raise AssemblyError("assembly_tender_terms_incomplete")
-        if row.get("key") == entry.key:
-            matches.append(row)
+    matches = [row for row in rows if row.get("key") == entry.key]
     if len(matches) != 1:
         raise AssemblyError("assembly_tender_terms_incomplete")
     row = matches[0]
@@ -145,7 +166,6 @@ def archive_pages(
                 "method": "assembly-tender-pages.v1",
                 "pages": pages,
                 "readings": readings,
-                "terms_sha256": terms_sha256,
             },
             sort_keys=True,
         )
