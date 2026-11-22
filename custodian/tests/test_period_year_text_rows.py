@@ -2,7 +2,8 @@
 
 The live shape pack's Mismatches item 2 names 44 portal rows whose ``year`` field
 is four-digit text while their registry rule declared ``form=date``. Only those
-rows move to the existing ``year_text`` form. Date parsing is not broadened: the
+rows move to the existing ``year_text`` form. S2-P38 adds the import export on
+the lead's separate format evidence. Date parsing is not broadened: the
 form list is closed and every other row keeps its strict form. All rows below are
 invented; no fetched value is copied.
 """
@@ -76,12 +77,14 @@ EVIDENCED = frozenset(
         "utilities_ext/total-water-consumption-by-sectors",
     }
 )
-# Rows that still declare the strict date form: their exports were not evidenced
-# as annual text (one passed under it; one is over the size ceiling of class 8).
+# S2-P38: .overnight/IN/lead-probe.txt (2026-11-21) evidences the import
+# JSON export as four-digit year text. Keep the original hashed shape-pack
+# review's EVIDENCED set separate; that review did not evidence this export.
+YEAR_TEXT_KEYS = EVIDENCED | {"trade_ext/qatar-imports-2014-2018"}
+# The remaining export passed under the strict date form.
 STRICT = frozenset(
     {
         "completions_ext/building-completion-certificates-issued-by-type-of-certificate-and-month-al-shahhaniya-municipality",
-        "trade_ext/qatar-imports-2014-2018",
     }
 )
 
@@ -141,14 +144,15 @@ def _fetch(tmp_path: Path, entry: Entry, years: list[object]):
 def test_exactly_the_evidenced_rows_declare_annual_text() -> None:
     entries = _entries()
     assert len(EVIDENCED) == 44
-    assert EVIDENCED <= set(entries)
-    for key in sorted(EVIDENCED):
+    assert YEAR_TEXT_KEYS <= set(entries)
+    for key in sorted(YEAR_TEXT_KEYS):
         entry = entries[key]
         assert entry.period_field == YEAR_TEXT, key
         assert len(entry.period_first) == 4 and entry.period_first.isdigit(), key
         assert len(entry.period_last) == 4 and entry.period_last.isdigit(), key
         assert entry.period_first <= entry.period_last, key
-        assert "mismatch 2" in entry.basis_note, key
+        if key in EVIDENCED:
+            assert "mismatch 2" in entry.basis_note, key
     for key in sorted(STRICT):
         assert entries[key].period_field == DATE_RULE, key
         assert entries[key].period_last.endswith("-01-01"), key

@@ -231,10 +231,15 @@ class Production:
         if self.intake_refusal:
             raise AssemblyError(self.intake_refusal)
         from .assembly_tenders import archive_pages
+        from .fetch.own_run import is_tender_entry
 
         pages = {}
         for entry in self.entries:
-            if entry.kind == "paged_cards" and not entry.skip_reason:
+            if (
+                entry.kind == "paged_cards"
+                and not entry.skip_reason
+                and not is_tender_entry(entry)
+            ):
                 reused_times = getattr(self.fetched, "reused_times", {})
                 if entry.key in reused_times:
                     pages[entry.key] = archive_pages(
@@ -285,7 +290,14 @@ class Production:
 
     def reviewed_selections(self) -> dict[str, str]:
         selected = reviewed_selections(self.cache)
-        if not selected:
+        from .fetch.own_run import OWN_RUN_PIN_REFUSAL, is_tender_entry
+
+        # Any tender row, whatever its kind, refuses its pin before any read.
+        tender = [entry for entry in self.entries if is_tender_entry(entry)]
+        if any(entry.key in selected for entry in tender):
+            raise AssemblyError(OWN_RUN_PIN_REFUSAL)
+        pending = self._own_run_pending(tender)
+        if not selected and (not self.entries or len(pending) != len(self.entries)):
             raise AssemblyError("snapshot_selection_invalid")
         keys = {entry.key for entry in self.entries}
         investment_keys = {
@@ -303,6 +315,8 @@ class Production:
                 read_native(self, entry, selected[entry.key])
                 continue
             if entry.skip_reason or entry.kind in {"citation_only", "besttime"}:
+                continue
+            if entry.key in pending:
                 continue
             if entry.key not in selected:
                 raise AssemblyError("snapshot_selection_invalid")
@@ -341,6 +355,17 @@ class Production:
                 ),
             },
         )
+
+    def _own_run_pending(self, own_run: list[Entry]) -> set[str]:
+        """Keys of own-run entries absent for decision 0084's technical reason."""
+        if not own_run:
+            return set()
+        from .confirm_s2_t13 import load_confirmation, own_run_pending
+
+        confirmation = load_confirmation(self.review / "s2_t13_confirmation.yaml")
+        return {
+            entry.key for entry in own_run if own_run_pending(confirmation, entry, None)
+        }
 
     def frame(self) -> dict[str, str]:
         from .building_inputs import (

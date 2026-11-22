@@ -17,9 +17,14 @@ from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from eii_custodian.publicdata.completeness import in_use
-from eii_custodian.publicdata.confirm_s2_t13 import Confirmation
+from eii_custodian.publicdata.confirm_s2_t13 import Confirmation, own_run_pending
 from eii_custodian.publicdata.confirm_s2_t13 import (
     completion_evidence as tender_completion_evidence,
+)
+from eii_custodian.publicdata.fetch.own_run import (
+    OWN_RUN_CAVEAT,
+    OWN_RUN_REASON,
+    is_own_run_entry,
 )
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.method_card_validation import (
@@ -230,6 +235,7 @@ class ConfirmationEvidence:
     open_entries: tuple[str, ...] = ()
     receipt_sha256: Mapping[str, str] = field(default_factory=dict)
     absence_reasons: Mapping[str, str] = field(default_factory=dict)
+    details: Mapping[str, object] = field(default_factory=dict)
 
 
 def confirmations(
@@ -267,20 +273,27 @@ def confirmations(
                         and item.absence_reasons.get(key) == rows[key].skip_reason
                         and key not in receipts
                     )
+                    or (
+                        task == "S2-T13"
+                        and is_own_run_entry(rows[key])
+                        and item.absence_reasons.get(key) == OWN_RUN_REASON
+                        and key not in receipts
+                    )
                 )
                 for key in item.source_keys
             )
         )
-        result.append(
-            {
-                "task": task,
-                "state": "recorded" if recorded else "pending",
-                "reason": "" if recorded else "confirmation_pending",
-                "references": list(item.references) if item else [],
-                "open_entries": list(item.open_entries) if item else [],
-                "absences": dict(item.absence_reasons) if item else {},
-            }
-        )
+        row: dict[str, object] = {
+            "task": task,
+            "state": "recorded" if recorded else "pending",
+            "reason": "" if recorded else "confirmation_pending",
+            "references": list(item.references) if item else [],
+            "open_entries": list(item.open_entries) if item else [],
+            "absences": dict(item.absence_reasons) if item else {},
+        }
+        if item and item.details:
+            row["details"] = dict(item.details)
+        result.append(row)
     return result
 
 
@@ -291,8 +304,10 @@ def tender_evidence(
     reference: str,
 ) -> ConfirmationEvidence:
     """Reuse S2-T13's existing validation instead of duplicating its loader."""
+    pending = False
     try:
         tender_completion_evidence(confirmation, row, receipt)
+        pending = own_run_pending(confirmation, row, receipt)
     except ValueError:
         confirmed = False
     else:
@@ -305,8 +320,12 @@ def tender_evidence(
         receipt_sha256={row.key: str(receipt["sha256"])}
         if row and receipt and "sha256" in receipt
         else {},
-        absence_reasons={row.key: row.skip_reason}
-        if row and row.skip_reason and confirmed
+        absence_reasons={row.key: OWN_RUN_REASON if pending else row.skip_reason}
+        if row and confirmed and (row.skip_reason or pending)
+        else {},
+        # Decision 0085 item 9, row C-09: the technical-reason branch.
+        details={"state": "NO_DATA", "reason": OWN_RUN_REASON, "caveat": OWN_RUN_CAVEAT}
+        if pending
         else {},
     )
 

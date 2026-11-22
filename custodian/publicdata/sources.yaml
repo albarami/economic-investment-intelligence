@@ -11595,7 +11595,7 @@ sources:
     commit_allowed: false
     release_tables:
     - pub_tender
-    caveat_keys: []
+    caveat_keys: [tender_fetch_own_run]
     columns: []
     reconciliation: none
     skip_reason: ''
@@ -11826,9 +11826,9 @@ sources:
     licence_url: https://creativecommons.org/licenses/by/4.0/
     row_count_min: 644486
     row_count_max: 644486
-    period_first: '2014-01-01'
-    period_last: '2018-01-01'
-    period_field: "sit=row;form=date;field=year"
+    period_first: '2014'
+    period_last: '2018'
+    period_field: "sit=row;form=year_text;field=year"
   - key: utilities_ext/operational-peak-district-cooling-load
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: utilities_ext

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def build_layers(build: Production) -> None:
-    from .confirm_s2_t13 import completion_evidence, load_confirmation
+    from .confirm_s2_t13 import completion_evidence, load_confirmation, own_run_pending
     from .frame.crosswalk import load_municipality_names, read_csv
     from .gis.layers import (
         address_rows,
@@ -156,6 +156,11 @@ def build_layers(build: Production) -> None:
             family_rows[table].extend(asdict(cell) for cell in cells)
             family_sources[table].add(entry.key)
         elif source == "tenders_pub":
+            confirmation = load_confirmation(build.review / "s2_t13_confirmation.yaml")
+            if entry.key not in build.selected:
+                if own_run_pending(confirmation, entry, None):
+                    continue
+                raise AssemblyError("snapshot_selection_invalid")
             payload = build.raw(entry, standard_json=True)
             if not isinstance(payload, dict) or not isinstance(
                 payload.get("pages"), list
@@ -166,7 +171,7 @@ def build_layers(build: Production) -> None:
                 for row in payload["pages"]
             )
             completion_evidence(
-                load_confirmation(build.review / "s2_t13_confirmation.yaml"),
+                confirmation,
                 entry,
                 build.receipts[entry.key],
             )

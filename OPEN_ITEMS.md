@@ -3073,6 +3073,26 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - NEEDED: the lead's written rule, in full, that every timed job's brief carries an `IN/CORES` file naming cores recorded in `tmp/cores.reserved` and that a job with no such file refuses rather than falling back to cores 0-3; S5RC-J1's timings rerun on reserved cores before any timing is used.
 - NEEDED BY: the next timed job (S5RC-J1 timings rerun) and the next train ledger.
 
+## OI-370 — tenders own run, pinned pick-up and review binding in the background lane
+
+- ID: OI-370
+- TYPE: OPEN (background lane)
+- RAISED BY: S2-TSKIP builder (Anthropic Claude Opus 5.5), under lead ruling L-1408, 2026-11-21
+- CONCERNS: decision 0084 items 1, 3, 4, 5 and 6; `custodian/src/eii_custodian/publicdata/fetch/own_run.py`; `Production.reviewed_selections`; `confirm_s2_t13.own_run_pending`.
+- EVIDENCE: S2-TSKIP built only the ordinary run's `own_run` skip and the `own_run_pending` absence; any tender pin in the main cache refuses with `own_run_pickup_unbuilt`. The pending binding compares the page's host and a non-empty basis note, because main's committed S2-T13 review and registry row differ on the full page address and the basis note's words, which S2-P40 (decision 0083) rebinds. The ordinary skip notes the tender entry `completed` in the main journal without page proofs (S2-TSEP review RV-F5); a later handoff must refuse such an entry.
+- NEEDED: the `--tenders-only [--resume]` form, the identity-bound pick-up that replaces the `own_run_pickup_unbuilt` refusal, the completed-result handoff, and S2-P40's review binding, carried over from S2-TSEP with their own review; the pending binding then reuses the decision 0083 registry binding.
+- NEEDED BY: the day S7-T09 starts (decision 0084 item 6); no slice S2 gate dependency.
+
+## OI-374 — S2-TSKIP round 2: the own-run journal failure block is one more copy for OI-368
+
+- ID: OI-374
+- TYPE: OPEN (nit; no behaviour change)
+- RAISED BY: S2-TSKIP RV1 reviewer (OpenAI Codex, GPT-6), finding C1, recorded by the S2-TSKIP round-2 builder (Anthropic Claude Opus 5.5), 2026-11-21
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/build.py`, the `own_run` skip branch of `run_build`.
+- EVIDENCE: RV1 C1: the new `_run.note` / `resume_record_write_failed` block repeats the block OI-368 counts. Round 2 did not extract the helper: one helper used once would not remove the repetition, and replacing every copy is a change of its own beyond the brief's "small and safe" limit. The branch now has its own committed test, `test_own_run_journal_note_failure_is_named`, which a shared helper must keep red-for-its-reason. RV1 C2 was taken: `confirm_s2_t13._registry_binds` holds the registry comparisons common to the shown and pending bindings.
+- NEEDED: the helper of OI-368, covering this copy too.
+- NEEDED BY: with OI-368.
+
 ## S2-P30 — Audit-box dispositions: closing lines — 2026-11-21
 
 These lines close the three entries of the section "S2-P30 — Audit-box dispositions — 2026-11-21" further below, which say they await a different maker's confirmation; the entries themselves are not edited.
@@ -3116,6 +3136,102 @@ These lines close the three entries of the section "S2-P30 — Audit-box disposi
 - EVIDENCE: the suite limits now sum to 10,800 s, and the custodian worst case rose from 1,200 s to 3,600 s. On a very slow runner the job cap could cancel the run before any per-suite kill reports. The same gap held before this change (8,400 s summed), and `ci.yml` was left unchanged.
 - NEEDED: read each green hosted run's job time against the cap. If a run comes within 15 minutes of it, a recorded change to the cap or to the parts.
 - NEEDED BY: watched at every merge until the S2 gate.
+
+New records proposed for merge train S2-13 at WORK `8697b3ce3b3d18387b3d83a2dc3912c1f567adea`, pull request 114.
+Requests from supplied review-return PROPOSED OPEN ITEMS sections and the S2-13 specification-update brief are included.
+Next free number at the joined HEAD is OI-375; runtime preparation renumbers the whole block if needed.
+No existing open item is closed by this input. Sources resolve under `.overnight/IN/evidence/`.
+
+## OI-375 — S2-T14 no-key test observations
+
+- ID: OI-375
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-T14.krv1.return.md, PROPOSED OPEN ITEMS, both bullets
+- CONCERNS: TASKS.md S2-T14 sixth acceptance item; custodian/tests/test_night_lights.py, test_night_absent_key_build_succeeds
+- EVIDENCE: The reviewer observes that the empty glob is also empty when the directory never exists, and that snapshot_selection_invalid cannot arise under the fetch-stage seam. It still approves the scoped test; these observations do not establish a missing production guard.
+- NEEDED: Retain the observations for the next test edit: consider an explicit directory-nonexistence assertion and describe the assembly assertion as seam documentation. No assertion or seam is changed by this ledger input.
+- NEEDED BY: No gate; next edit of this test.
+
+## OI-376 — S2-P39 confirmation-four wording follow-up
+
+- ID: OI-376
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-P39.cf4.return.md, N1, N2 and PROPOSED OPEN ITEMS item 1
+- CONCERNS: custodian/tests/test_fetch_fingerprint.py, test_preloaded_repo_module_outside_runtime_dirs_is_bound; decision 0081 item 4
+- EVIDENCE: The xfail reason still attributes the production-set proof to the real-roots test; decision 0081 still describes an unbound remainder although the new production-shape test asserts an empty set.
+- NEEDED: In a later reviewed change, name test_production_shape_loads_no_checkout_module_outside_the_bound_set in the reason, and delete the remainder parenthetical or state that the set is empty. Do not weaken either test or claim a new approval here.
+- NEEDED BY: Next wording correction; the source marks these findings non-rejecting.
+
+## OI-377 — S2-P39 round-four ledger attribution and code-practice figures
+
+- ID: OI-377
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-P39.cf4.return.md, N3 and PROPOSED OPEN ITEMS items 2-4
+- CONCERNS: PROGRESS.md S2-P39 round 4; AGENTS.md rule 38
+- EVIDENCE: The round-four row cites an untracked member-removal script and its parent rather than the final commit. The reviewer gives four files at +133/-5, test file +117/-2 and longest new function about 40 lines, plus copied-body observations. log.ready.md supplies the attributed correction and tracked test anchors; it has not been appended to PROGRESS.md.
+- NEEDED: Append those correction inputs with original 84c63fdf3964aa16b14b885b62f529866050a677 and its full pick from commits.json, the tracked deciders and the attributed figures. Preserve all earlier rows. Close only when the correction is recorded.
+- NEEDED BY: Train S2-13 ledger, pull request 114.
+
+## OI-378 — S2-GW working-paper wording needs recorded application
+
+- ID: OI-378
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.rv1.return.md, PROPOSED OPEN ITEMS item 4
+- CONCERNS: Decision 0085 items 4, 5 and 9; gate checklist C-P4, C-P5 and C-09
+- EVIDENCE: The builder did not change the untracked working papers, while the tracked record states their new wording. A later application record is NOT FOUND IN EVIDENCE. The working papers were not read by this preparation.
+- NEEDED: The lead applies the already-reviewed decision wording to the working papers and records that the papers now carry it. No new gate rule is proposed.
+- NEEDED BY: Before the gate review uses those papers.
+
+## OI-379 — S2-GW conditional S2-T44 move needs the measurement outcome
+
+- ID: OI-379
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.rv1.return.md, PROPOSED OPEN ITEMS item 5
+- CONCERNS: Decision 0085 item 2; TASKS.md S2-T44 criterion 1; document 14 ENHANCEMENT BACKLOG, Slow work moved by decision 0085
+- EVIDENCE: The move is conditional on the measurement round running when the record was filed not settling criterion 1. Its outcome is NOT FOUND IN EVIDENCE in the supplied sources. Existing OI-319, OI-341 and PO-S2-129 retain the underlying performance work; this item is only the requested condition record.
+- NEEDED: The lead records that round outcome. If it settles the criterion, apply the decision own reversal condition and tick only on its proof; otherwise retain the moved/open status. No new measurement round is requested.
+- NEEDED BY: Before relying on the conditional move in gate evidence.
+
+## OI-380 — S2-GW confirmation wording in decision 0085
+
+- ID: OI-380
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.cf1.return.md, Findings — PROPOSED OPEN ITEMS items 1-2
+- CONCERNS: Decision 0085 Decision items 1 and 8; document 14 PLN-32 and ENHANCEMENT BACKLOG
+- EVIDENCE: After the two-stage update, item 1 quotes the earlier PLN-32 wording without identifying it as such; item 8 retains the word-for-word label that the document 14 row has already corrected. The confirmer marks both as records-only and non-rejecting.
+- NEEDED: Make item 1 identify or incorporate the two-stage extension, and relabel item 8 as unchanged in depth, bound and plants or copy the source text verbatim. Use a reviewed records correction; change no requirement or bound.
+- NEEDED BY: Next decision-record wording correction.
+
+## OI-381 — S2-TSKIP staged amendment inventory in decision 0084
+
+- ID: OI-381
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-TSKIP.rv1.return.md, Proposed open items P1
+- CONCERNS: Decision 0084 Amends row and item 7; document 14 Slice S2 gate bullet
+- EVIDENCE: The reviewer says the Amends row lists documents and rule files whose command/pick-up changes are deferred by item 7. The joined decision 0085 now supplies the tender two-state gate wording, so the old missing-gate-wording observation is superseded; the broad amendment inventory still needs stage attribution.
+- NEEDED: Clarify the staged amendment inventory in the background-lane documentation change, distinguishing already-landed gate wording from the deferred command, handoff and pick-up work. OI-370 already owns that implementation; this item adds no new implementation scope.
+- NEEDED BY: The background-lane documentation change, before its dependent starts.
+
+## OI-382 — S2-TSKIP append-only commit and verdict correction
+
+- ID: OI-382
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-TSKIP.rv1.return.md, Proposed open items P3
+- CONCERNS: PROGRESS.md S2-TSKIP local/uncommitted row; AGENTS.md rule 38
+- EVIDENCE: The original work is committed as 9cf80a091bd8b57f0d8a35d4af8bfdaab929e817. rv1 rejected that target; subsequent cf1 rejected the second commit and cf2 approved the final target. log.ready.md carries the sourced correction and commits.json the full mapping, but no tracked row has been changed here.
+- NEEDED: Append the initial original/pick and historical rejection, followed by the final original/pick and cf2 approval, using the complete mapping. Do not rewrite the local/uncommitted historical row or imply approval of the rejected initial target.
+- NEEDED BY: Train S2-13 ledger, pull request 114.
+
+## OI-383 — Tender own run must retain the intake-triple resume check
+
+- ID: OI-383
+- TYPE: PROPOSED OPEN ITEM (own-run integration requirement)
+- OWNER: S2-TSEP
+- RAISED BY: `.overnight/BRIEF.md`, DO item 3
+- CONCERNS: Decision 0084 items 1, 5 and 7; decision 0081 intake-triple binding; S2-P39 F4
+- EVIDENCE: Lead repair a0232ada retains `test_changed_intake_triple_refetches_tenders` with the ordinary tender skip lifted and adds `test_ordinary_resume_skips_the_tender_row`. This proves no own-run integration; decision 0084 item 7 defers that run.
+- NEEDED: The tender row's own run must call the resume plan's intake-triple check (`ResumePlan._fingerprint_matches`) and carry F4's changed-triple refetch test through its own-run path without lifting the ordinary skip. Preserve the ordinary-run skip test and the existing intake proof; record the deciding check in S2-TSEP's evidence. OI-370 remains the wider own-run/pick-up item.
+- NEEDED BY: S2-TSEP own-run resume delivery, before the decision 0084 item 6 S7-T09 start check.
 
 ## Change control
 
@@ -5864,3 +5980,31 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - CLOSED (2026-11-21, S2-P32 round 2, S2 gate item 14 and only the C12 part of item 15; lead ruling L-1320): owner's decision of 2026-11-21 05:34 (.overnight/IN/OWNER-YES.md; .overnight/IN/PROOFS.md items 14 and 15) carries S2-T12 box 2 word for word into a new unticked S3-T12 box and only the card C12, MTH-46 part of S2-T35 box 1 into the new unticked S6-T13 box. The whole original S2-T35 first box remains unticked, word for word and in its original place, retaining PUB-71 and every other unpinned-value criterion; the exact notice says only its C12 part moved. S2-T12's notice and both target boxes stay as round 1 wrote them. scripts/tests/test_moved_boxes.py guards source retention, exact target wording, unticked status, C12 scope and notices; removing the S2-T35 source box in scratch fails (exit 1). Closure concerns the stated requirements transfer only; the rest of S2 gate item 15 is not closed here and S2-T35 box 2 is unchanged. The round-2 full unittest command also exits 1 (979 tests, seven test_clean_environment failures; both sync failures report the offline pyyaml 6.0.3 wheel absent); this environment limitation remains unresolved for the lead, without retry, fetch, skip or weakened test. Evidence: PROGRESS.md S2-P32 row and .overnight/RETURN.md.
 
 - OI-285 UPDATE 2026-11-22 — **CLOSED by [decision 0086](docs/decisions/0086-custodian-part-limit-and-watch.md), which supersedes this item's former 600-second remedy.** The advisor's hosted readings were part 1 at 342 and 528 seconds on the same tests, and part 2 at 428, 452 and 516 seconds, followed by no result within 600 seconds on the main run; the earlier OI-285 reading was 569 seconds. The three-part local build measured 208.69, 287.77 and 237.97 seconds and 3,690 + 3,533 + 3,552 = 10,775 passing cases. The owner-approved response keeps three parts, raises only their limit to 1,200 seconds everywhere and watches green hosted times above 720 seconds for a further recorded split. No green hosted result of this new head is asserted; its timing remains follow-up evidence, not a condition for reopening this superseded item.
+- PO-S2-P38-01 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P38. LIVE-S2.r16 stopped on `trade_ext/qatar-imports-2014-2018` with period_form/NO_DATA (`.overnight/IN/live-fail.txt`). The lead's supplied portal probe (`.overnight/IN/lead-probe.txt`, 2026-11-21) evidences four-digit text in the export, distinct from the grouped-record date rendering. The local correction pins year_text and 2014..2018, preserves both 644486 count bounds and all other source fields, and has streamed red/green and old-date/other-form refusal proof (PROGRESS.md, S2-P38; `.overnight/RETURN.md`). NEEDED: independent maker review and the lead's resumed live intake before claiming this live failure resolved; no source fetch was run by this worker. Also retain the required full-suite failure in `custodian/tests/test_build_resume.py::test_reuse_log_survives_later_terms_exception` (1 failed, 2136 passed, seed 380022, exit 1). The same test fails on the exact starting HEAD archive (exit 1); it expects a failed build after a terms exception but receives failure=None. It predates this period correction and needs a separate lead disposition; no green rerun, skip, weakened assertion or unrelated fix closes it here. No acceptance box is ticked.
+
+- UPDATE (2026-11-21, S2-T14 keyless build), OI-103: `custodian/tests/test_night_lights.py::test_night_absent_key_build_succeeds` now shows a keyless build-public run exit 0 with one OMIT line, no ntl_blackmarble request, no grids and the OMIT in the build log, using the existing `Production.fetch_archive` seam; three plants red. Pending independent review; the two older no-key tests keep exit 1 and are unchanged.
+- PO-S2-P39-01 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39, recorded for a later task and not built. `run_build`'s kept scopes lazily import `busyness.*`, `building_inputs`, `series` and `places.integrate`, which sit inside the computed machinery closure (195 modules under this checkout) even though they run after the fetch loop. Moving them into named post-fetch scopes — where they truly run only after the loop — would shrink the machinery and widen the reuse kept by `--resume`; the F13 audit is the place to prove where they run. NEEDED: a separate approved task; no code change here. Evidence: decision 0081, `.overnight/RETURN.md`.
+- PO-S2-P39-01 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39, recorded for a later task and not built. `run_build`'s kept scopes lazily import `busyness.*`, `building_inputs`, `series` and `places.integrate`, which sit inside the computed machinery closure (195 modules under this checkout) even though they run after the fetch loop. Moving them into named post-fetch scopes — where they truly run only after the loop — would shrink the machinery and widen the reuse kept by `--resume`; the F13 audit is the place to prove where they run. NEEDED: a separate approved task; no code change here. Evidence: decision 0081, `PROGRESS.md` S2-P39.
+
+- PO-S2-P39-02 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 2, recorded for the lead. Owner condition 2 asked for the gain measured on the r16 journal — how many of its 246 entries a one-entry fix still reuses. Decision 0081 gives a replay of the last 40 commits instead; the r16 count was not measured by this build. NEEDED: the lead's disposition — either measure the r16 reuse count or record that it stays unmeasured.
+
+- PO-S2-P39-03 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 3, recorded for the lead. The file-hash and module-scan caches key `st_mtime_ns`, `st_ctime_ns` and size; the confirmation-2 reviewer's `test_same_tick_same_size_same_mtime_edit` shows a write, hash, rewrite and mtime restore inside one coarse clock tick still returns the cached digest (about 199 of 200 in a no-pause loop). It is unreachable for a repository file older than one tick when hashed at run start, so no tracked fix is built; the attack stays red by design and is not planted in the tracked suite. NEEDED: the lead's disposition — accept the documented residual or bypass the cache in `closure_intact` (which would also remove the tracked test's 50 ms sleep). Evidence: `.overnight/IN/cf2-attacks/test_cf2.py`, decision 0081.
+
+- PO-S2-P39-04 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 3, recorded for the lead. The tracked F1 test `test_module_level_load_before_begin_is_bound_by_hash` imports the hidden module itself, so its seven forms exercise one mechanism repeated rather than seven distinct forms; the confirmation-2 review notes the forms inside `syn_preload` decide nothing. NEEDED: the lead's disposition — either load the hidden module only through `syn_preload` for the forms that really load it, or accept the single-mechanism coverage. Evidence: decision 0081, `custodian/tests/test_fetch_fingerprint.py`.
+
+- PO-S2-P39-05 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 4, recorded for the lead. Confirmation 3 found two members of the F6 loaded-modules class that are unreachable in a build: `additions/split_policy.py`'s `workspace_descriptors()` can read `docs/03_DATA_CONTRACTS.md` but nothing under `custodian/src` or `scripts/` calls it, and `places/area_engine.py` and `gis/snapshot_policy.py` start child processes (`python -m valhalla`, `ionice`) that run locked or system tools only — the stated out-of-process limit of decision 0081 item 3. NEEDED: the lead's disposition — name both in the F6 record or accept their unreachable status. Evidence: decision 0081, `custodian/src/eii_custodian/publicdata/additions/split_policy.py`.
+
+- PO-S2-P39-06 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 4, recorded for the lead. The closed refusal set of decision 0081 item 3 does not name `__code__`, `get_code`, `marshal`, `pydoc`, `site` or any `<module>.sys` chain (for example `logging.sys.modules`); two of them — `type(lambda: 0)(loader.get_code("x"), {})()` and `f.__code__ = loader.get_code("x")` — give stale reuse through unregistered execution, and none of the 209 bound modules uses them today, so they fall under the stated limit of item 3. NEEDED: a separate approved task if a later refusal of these forms is wanted; no code change here. Evidence: decision 0081 item 3, `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py`.
+
+- PO-S2-P39-07 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 4, recorded for the lead. The gain section of decision 0081 counts "assembly family of 6" inside the 26 unbound post-fetch modules and separately names the six bound assembly modules "the six assembly modules"; confirmation 3 read it correctly but easy to misread, and suggests "the other six assembly modules" for the six counted among the 26. NEEDED: the lead's disposition — reword the 26-module list or accept the current wording. Evidence: decision 0081 gain section.
+
+- PO-S2-P39-08 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 4, carried over from review rv1 and confirmation 2, recorded for rule 35. The ledger is to state the builder's maker and commit trailer plainly: the S2-P39 builder is Devin (Cognition SWE-2 High), and its commits carry the `Co-Authored-By: Claude Opus 5.5` trailer (the noreply Anthropic address recorded in the commits; an e-mail address may not be written here). NEEDED: the lead's disposition on where the plain statement should live. Evidence: `PROGRESS.md` S2-P39 rows, commits `6349712b`, `3f78cf15`, `2261c68e`.
+
+- PO-S2-P39-09 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P39 round 5, recorded for the lead. `_git_tracked` in `fetch/fingerprint.py` decodes the `git ls-files -z` listing without guarding `ValueError`: a malformed listing — a name carrying a NUL byte, or bytes that are not UTF-8 — escapes both `except (FingerprintUnavailable, OSError)` wrappers (`scan_run`'s `_global_input` call and `RunRecord.begin`) and crashes the build instead of leaving items `resume_fingerprint_unavailable`; real `git -z` output cannot contain the delimiter byte and every tracked name in this checkout is ASCII, so the window is the malformed-runtime class only. NEEDED: the lead's disposition — fold `ValueError`/`UnicodeError` into `tracked_listing_failed` or accept the crash on malformed listings. Evidence: `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py` (`_git_tracked`), the `split("\n")` plant run on `test_git_tracked_binds_exactly_the_listed_names` (2026-11-21).
+## Decision 0085 — items carried open under the slow-work rule (2026-11-21)
+
+- 2026-11-21 S2-GW — OI-319: stays OPEN. Carried by [decision 0085](docs/decisions/0085-the-slice-s2-gate-wording-under-the-slow-work-rule.md) item 2 with S2-T44 criterion 1, moved word for word to document 14 **ENHANCEMENT BACKLOG**, "Slow work moved by decision 0085" (PLN-32, TST-280); release: after go-live. Its NEEDED text and rule 39 are unchanged: only the evidence it names closes it, never a green re-run, a retry, a skip or a wider limit.
+- 2026-11-21 S2-GW — OI-341: stays OPEN. Carried by decision 0085 item 2 with S2-T44 criterion 1 to the same backlog row; its NEEDED text and rule 39 are unchanged.
+- 2026-11-21 S2-GW — PO-S2-129: stays OPEN for its retained readiness-margin follow-up (its assertion part remains closed by decision 0073 item 3). Carried by decision 0085 item 2 with S2-T44 criterion 1 to the same backlog row; outside S2-T10's criteria 3 and 4 under that task's exclusion line.
+- 2026-11-21 S2-GW — OI-360: stays OPEN. Carried by decision 0085 item 3 with the tenders own run of decision 0084: it is settled on that run's evidence before the S7-T09 start check of decision 0084 item 6, never by a green run alone. Its NEEDED text is unchanged.
+- No other item is carried by decision 0085. These lines close nothing and rewrite no earlier line.
