@@ -29,7 +29,16 @@ SEED = "1794000000"
 GOOD = {"suite": {"result": "success"}, "web-spikes": {"result": "success"}}
 WORKFLOW = str(ci_support.WORKFLOW_DIR / "ci.yml")
 GUARDS_LINE = "          - python-guards\n"
-PLANTED_VARIABLES = ("SHELLOPTS", "BASHOPTS", "BASH_ENV", "ENV", "PATH")
+PLANTED_VARIABLES = ("SHELLOPTS", "BASHOPTS", "BASH_ENV", "ENV", "PATH", "CI")
+# YAML values a variable can hold: null, false and 0 included.
+ENV_VALUES = st.one_of(st.none(), st.just("x"), st.booleans(), st.integers(-1, 1))
+SCALARS = st.one_of(
+    st.none(),
+    st.booleans(),
+    st.integers(-1, 1),
+    st.sampled_from([0.0, 1.0]),
+    st.text(max_size=1),
+)
 FORBIDDEN_JOB_KEYS = (
     "container",
     "services",
@@ -66,6 +75,11 @@ LOCK = "      - name: Check the lock\n        run: uv lock --check\n"
 VERSIONS = (
     "      - name: Check versions\n"
     "        run: uv run --locked python scripts/check_versions.py\n"
+)
+PRINT_VERSIONS = (
+    "      - name: Sync the locked environment with the engine group\n"
+    "        run: uv sync --managed-python --all-packages --locked --group engine\n"
+    "      - name: Print tool versions\n"
 )
 
 
@@ -121,6 +135,69 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
         COMPARE + "        env:\n          SHELLOPTS: noexec\n",
         "FAIL step-env: web-spikes: Compare spike screenshots: SHELLOPTS",
     ),
+    # A null value is a present key: it never matches an absent declaration.
+    (
+        "permissions:\n",
+        "env:\n  SHELLOPTS:\npermissions:\n",
+        "FAIL workflow-env: SHELLOPTS",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90\n    env:\n      SHELLOPTS: null\n",
+        "FAIL job-env: suite: SHELLOPTS",
+    ),
+    (
+        SUITE_ENV,
+        SUITE_ENV + "          SHELLOPTS: ~\n",
+        "FAIL step-env: suite: Run one suite: SHELLOPTS",
+    ),
+    (
+        COMPARE,
+        COMPARE + "        env:\n          CI: null\n",
+        "FAIL step-env: web-spikes: Compare spike screenshots: CI",
+    ),
+    (
+        SUITE_ENV,
+        SUITE_ENV + "          1: x\n",
+        "FAIL step-env: suite: Run one suite: 1",
+    ),
+    # An explicit null env is not a mapping at any scope.
+    ("permissions:\n", "env:\npermissions:\n", "FAIL workflow-env: not a mapping"),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90\n    env: null\n",
+        "FAIL job-env: suite: not a mapping",
+    ),
+    (
+        COMPARE,
+        COMPARE + "        env: null\n",
+        "FAIL step-env: web-spikes: Compare spike screenshots: not a mapping",
+    ),
+)
+# Family sweep: a declared value is matched by type as well as value, so
+# 0 never passes for false, 90.0 never for 90 and a key 1 never for true.
+TYPE_ROWS: tuple[tuple[str, str, str], ...] = (
+    (
+        "      fail-fast: false\n",
+        "      fail-fast: 0\n",
+        "FAIL strategy-keys: the suite strategy is not fail-fast false alone",
+    ),
+    (
+        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 90.0\n",
+        "FAIL job-value: suite: timeout-minutes",
+    ),
+    (
+        TESTS_CHECKOUT,
+        TESTS_CHECKOUT.replace("false", "0"),
+        "FAIL step-missing: tests: Check out",
+    ),
+    (
+        "          package-manager-cache: false\n" + PRINT_VERSIONS,
+        "          package-manager-cache: 0\n" + PRINT_VERSIONS,
+        "FAIL step-missing: static-checks: Install Node from .nvmrc",
+    ),
+    ("\non:\n", "\n1:\n", "FAIL workflow-key: 1"),
 )
 # Vector 2: a step not declared, a reordered step, a changed setup step.
 STEP_ROWS: tuple[tuple[str, str, str], ...] = (
@@ -634,6 +711,9 @@ class Aggregate(unittest.TestCase):
     def test_vector_4_step_keys_are_an_allow_list(self) -> None:
         self.assert_rows(STEP_KEY_ROWS)
 
+    def test_vector_5_declared_values_match_by_type(self) -> None:
+        self.assert_rows(TYPE_ROWS)
+
     def test_shape_alone_refuses_without_any_job_result(self) -> None:
         """Row 8 is refused by static-checks, which needs no job and is never skipped."""
         out = io.StringIO()
@@ -663,7 +743,7 @@ class Aggregate(unittest.TestCase):
 
     @given(
         st.sets(st.sampled_from([*FORBIDDEN_JOB_KEYS, "timeout-minutes", "name"])),
-        st.dictionaries(st.sampled_from(PLANTED_VARIABLES), st.just("x")),
+        st.dictionaries(st.sampled_from(PLANTED_VARIABLES), ENV_VALUES),
     )
     def test_job_passes_exactly_with_its_declared_keys(
         self, keys: set[str], env: dict[str, str]
@@ -681,7 +761,7 @@ class Aggregate(unittest.TestCase):
     @given(
         st.integers(0, len(ci_aggregate.JOB_STEPS["suite"]) - 1),
         st.sets(st.sampled_from([*FORBIDDEN_STEP_KEYS, "name"])),
-        st.dictionaries(st.sampled_from([*PLANTED_VARIABLES, "SUITE"]), st.just("x")),
+        st.dictionaries(st.sampled_from([*PLANTED_VARIABLES, "SUITE"]), ENV_VALUES),
     )
     def test_step_passes_exactly_with_its_declared_keys_and_env(
         self, index: int, keys: set[str], env: dict[str, str]
@@ -708,13 +788,25 @@ class Aggregate(unittest.TestCase):
         found = ci_aggregate.step_problems("tests", steps)
         self.assertEqual(found == [], order == sorted(order))
 
-    @given(st.dictionaries(st.sampled_from(PLANTED_VARIABLES), st.just("noexec")))
-    def test_any_inherited_variable_fails(self, env: dict[str, str]) -> None:
+    @given(
+        st.dictionaries(
+            st.one_of(st.sampled_from(PLANTED_VARIABLES), st.integers(0, 2)),
+            st.one_of(st.just("noexec"), ENV_VALUES),
+        )
+    )
+    def test_any_inherited_variable_fails(self, env: dict[object, object]) -> None:
         self.assertEqual(ci_aggregate.env_problems("e", env, {}) == [], not env)
         self.assertEqual(
             ci_aggregate.env_problems("e", env, {}),
-            [f"FAIL e: {k}" for k in sorted(env)],
+            [f"FAIL e: {k}" for k in sorted(str(k) for k in env)],
         )
+
+    @given(SCALARS, SCALARS)
+    def test_same_is_equality_by_type_and_value(self, a: object, b: object) -> None:
+        strict = type(a) is type(b) and a == b
+        self.assertEqual(ci_aggregate.same(a, b), strict)
+        self.assertEqual(ci_aggregate.same({"k": a}, {"k": b}), strict)
+        self.assertEqual(ci_aggregate.same({a: 0}, {b: 0}), strict)
 
     def test_unreadable_workflow_names_its_reason(self) -> None:
         status, out = self.verdict(GOOD, self.edited("jobs:\n", "jobs: [\n"))

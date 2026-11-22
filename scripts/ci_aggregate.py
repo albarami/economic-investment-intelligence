@@ -8,7 +8,7 @@ declared keys, ``contents: read``, the bash run shell and no ``env``; jobs
 ``static-checks``, ``suite``, ``web-spikes`` and ``tests`` hold only their
 declared keys and values and no ``env``, and their steps equal the declared
 sequence of JOB_STEPS key for key, each step's ``env`` equal to its declared
-mapping; job ``suite`` has one matrix axis, ``suite``, equal to the SUITES
+mapping, every value matched by type, a null variable present, not absent; job ``suite`` has one matrix axis, ``suite``, equal to the SUITES
 table, under ``fail-fast: false`` alone; job ``tests`` needs exactly ``suite``
 and ``web-spikes`` and always runs. So no inherited variable such as
 ``SHELLOPTS: noexec``, added step, key or changed setup step can stop a suite
@@ -168,6 +168,18 @@ JUDGED_ELSEWHERE = {"suite": {"strategy"}, "tests": {"needs", "if"}}
 STRATEGY_REST = {"fail-fast": False}
 
 
+def same(got: object, want: object) -> bool:
+    """Equal by type as well as value, so 0 never matches false nor 1.0 one."""
+    if type(got) is not type(want):
+        return False
+    if isinstance(got, dict) and isinstance(want, dict):
+        keys = {(type(k), k) for k in got}
+        return keys == {(type(k), k) for k in want} and all(
+            same(got[k], want[k]) for k in got
+        )
+    return got == want
+
+
 def matrix_problems(matrix: object) -> list[str]:
     """Return one FAIL line per difference between the matrix list and SUITES."""
     if not isinstance(matrix, list) or not all(isinstance(n, str) for n in matrix):
@@ -191,7 +203,7 @@ def matrix_shape_problems(job: Mapping[str, object]) -> list[str]:
     if not isinstance(strategy, dict) or not isinstance(matrix, dict):
         return [NO_AXIS]
     rest = {key: value for key, value in strategy.items() if key != "matrix"}
-    if rest != STRATEGY_REST:
+    if not same(rest, STRATEGY_REST):
         return ["FAIL strategy-keys: the suite strategy is not fail-fast false alone"]
     extra = sorted(str(key) for key in matrix if key != "suite")
     if extra:
@@ -200,13 +212,15 @@ def matrix_shape_problems(job: Mapping[str, object]) -> list[str]:
 
 
 def env_problems(label: str, env: object, want: Mapping[str, object]) -> list[str]:
-    """Refuse an ``env`` that adds, changes or drops a variable of WANT."""
-    if env is None:
-        env = {}
+    """Refuse an ``env`` that adds, changes or drops a variable of WANT.
+
+    A key present with a null value is present: it never matches an absent one.
+    """
     if not isinstance(env, dict):
         return [f"FAIL {label}: not a mapping"]
-    names = sorted({str(key) for key in env} | set(want))
-    return [f"FAIL {label}: {k}" for k in names if env.get(k) != want.get(k)]
+    bad = [k for k in env if k not in want or not same(env[k], want[k])]
+    bad += [k for k in want if k not in env]
+    return [f"FAIL {label}: {k}" for k in sorted({str(k) for k in bad})]
 
 
 def step_problems(name: str, steps: list[object]) -> list[str]:
@@ -233,8 +247,8 @@ def step_problems(name: str, steps: list[object]) -> list[str]:
         ]
         env = want.get("env")
         env = env if isinstance(env, dict) else {}
-        found += env_problems(f"step-env: {label}", step.get("env"), env)
-        if any(step.get(k) != v for k, v in want.items() if k != "env"):
+        found += env_problems(f"step-env: {label}", step.get("env", {}), env)
+        if any(not same(step.get(k), v) for k, v in want.items() if k != "env"):
             found.append(f"FAIL step-missing: {label}")
     return found
 
@@ -248,9 +262,9 @@ def job_problems(name: str, job: object) -> list[str]:
     found += [
         f"FAIL job-value: {name}: {k}"
         for k, v in JOB_VALUES[name].items()
-        if job.get(k) != v
+        if not same(job.get(k), v)
     ]
-    found += env_problems(f"job-env: {name}", job.get("env"), {})
+    found += env_problems(f"job-env: {name}", job.get("env", {}), {})
     steps = job.get("steps")
     return found + step_problems(name, steps if isinstance(steps, list) else [])
 
@@ -269,8 +283,12 @@ def tests_problems(job: Mapping[str, object]) -> list[str]:
 
 def root_problems(root: Mapping[object, object]) -> list[str]:
     """The workflow root holds exactly its declared keys and no environment."""
-    found = [f"FAIL workflow-key: {k}" for k in root if k not in ROOT_KEYS]
-    found += env_problems("workflow-env", root.get("env"), {})
+    found = [
+        f"FAIL workflow-key: {k}"
+        for k in root
+        if not any(same(k, key) for key in ROOT_KEYS)
+    ]
+    found += env_problems("workflow-env", root.get("env", {}), {})
     if root.get("permissions") != PERMISSIONS:
         found.append("FAIL workflow-permissions: not contents read alone")
     if root.get("defaults") != BASH:
