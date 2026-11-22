@@ -128,11 +128,6 @@ def _registry_entry(row: LandmarkHeight) -> Entry:
     return entry
 
 
-def _bind_citation_registry(row: LandmarkHeight) -> None:
-    """Require the citation page to name a registry row with matching evidence."""
-    _registry_entry(row)
-
-
 def _page_directory(cache: Path, entry: Entry) -> Path:
     """A public page's bytes are its raw snapshot; a file's are the row's own."""
     from eii_custodian.publicdata.fetch.receipts import cache_directory
@@ -263,7 +258,7 @@ def load_landmark_record(path: Path | None = None) -> LandmarkRecord:
             skip_registry = False
         if not skip_registry:
             for loaded in rows:
-                _bind_citation_registry(loaded)
+                _registry_entry(loaded)
     return LandmarkRecord(tuple(rows), pending, body)
 
 

@@ -12,6 +12,7 @@ from eii_core.calc.building_heights import (
     largest_overlap,
 )
 
+from .landmark_select import KINDS
 from .landmarks import LandmarkHeight
 from .match import globfp_candidates, globfp_index, representative_point
 from .model import Building
@@ -103,7 +104,7 @@ def landmark_calibration(
     landmarks: tuple[LandmarkHeight, ...], pending: str
 ) -> dict[str, object]:
     """Readiness is cleared only for the nonempty, receipt-verified list."""
-    by_kind = {"roof": 0, "architectural": 0}
+    by_kind = dict.fromkeys(KINDS, 0)
     for row in landmarks:
         by_kind[row.height_kind] += 1
     return {

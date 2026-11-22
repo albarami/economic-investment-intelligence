@@ -47,7 +47,9 @@ def fetched_selection(tmp_path, monkeypatch):
     assert result.failure is None
     select_fixture(tmp_path, row.key, result.manifests[row.key])
     monkeypatch.setattr(landmarks, "_registry_by_url", lambda: {row.url: row})
-    selected = select_landmarks([candidate(page_url=row.url)]).admitted
+    selected = select_landmarks(
+        [candidate(page_url=row.url, retrieved_on="2026-11-20")]
+    ).admitted
     point = LandmarkPoint("SYN-P-A", "SYN Example Tower", Point(0, 1))
     return selected, point
 
