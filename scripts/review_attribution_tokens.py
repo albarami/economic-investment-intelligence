@@ -5,7 +5,8 @@ worksheet (token, count) of the distinct ``dataset`` tokens of the record-level
 ``sources[]`` entry, the token ``_keep`` of the places build looks up, of the
 places inside the frame box. An empty token and an OpenStreetMap token are not
 listed (the build never looks them up). It prints the number of tokens only and
-never writes ``places_ovt_attribution.csv``; the reviewer does.
+never writes ``places_ovt_attribution.csv``; the reviewer does, before H1 runs.
+An expected failure prints one closed reason and no text of the failure.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from eii_custodian.publicdata.places.read import (
     require_receipt,
 )
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
+from review_place_keys import EXPECTED, refusal
 
 REVIEW = Path(__file__).resolve().parents[1] / "custodian" / "publicdata" / "review"
 REVIEW_FILE = "places_ovt_attribution.csv"
@@ -71,11 +73,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         require_receipt(path, receipt)
         counted = tokens(read_place_file(path, _tag(REVIEW), frame_box=BOX))
         write_worksheet(args.output, counted)
-    except PlacesError as exc:
-        print(f"REFUSED {exc.reason}")
-        return 2
-    except FileExistsError:
-        print("REFUSED output_exists")
+    except EXPECTED as exc:
+        print(f"REFUSED {refusal(exc)}")
         return 2
     print(f"tokens={len(counted)}")
     return 0
