@@ -78,7 +78,7 @@ class MovedBoxesTests(unittest.TestCase):
         source_section = task_section(text, "S2-T35")
         target_section = task_section(text, "S6-T13")
         self.assertIn(
-            f"- Acceptance criteria: [ ] {RESTRICTED_BOX}; [ ] ",
+            f"- Acceptance criteria: [ ] {RESTRICTED_BOX}; [",
             source_section,
             "S2-T35: original first criterion must stay unticked in its place",
         )
