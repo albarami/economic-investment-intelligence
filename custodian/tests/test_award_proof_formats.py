@@ -116,6 +116,26 @@ def test_registration_requires_nonempty_equal_token_sets(registration):
     )
 
 
+def test_number_column_is_not_used_by_the_proof_compare():
+    """Row S4: the intake number column is recorded only; the text column decides."""
+    left = intake(**{"Approved Value Number": "9.00"})
+    assert reason(left) == "matched"
+    assert reason(left, proof(**{"Approved Value": "9.00"})) == "proof_mismatch"
+
+
+def test_registration_digit_slash_tokens_compare_as_sets():
+    """Row S7: the digits/digits token form, in reversed order, matches as a set."""
+    left = intake(**{"Commercial Registration Number": "17/23 | SYN/17"})
+    assert (
+        reason(left, proof(**{"Commercial Registration Number": "SYN/17 | 17/23"}))
+        == "matched"
+    )
+    assert (
+        reason(left, proof(**{"Commercial Registration Number": "SYN/17 | 17/24"}))
+        == "proof_mismatch"
+    )
+
+
 def test_registration_order_duplicates_and_token_edge_spaces_are_irrelevant():
     assert (
         reason(

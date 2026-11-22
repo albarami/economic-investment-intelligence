@@ -376,6 +376,40 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
     assert result.sidecar["award_check"]["matched_name_not_compared"] == 2
 
 
+def test_suffix_only_proof_value_is_absent_on_the_real_path(tmp_path, monkeypatch):
+    """Row S6: a proof value cell of the currency suffix alone reaches
+    proof_value_absent through the real parse_body and proof reader, never
+    schema_missing and never zero (the suffix-only cell is a version-2 page form).
+    """
+    entry, _dec, body = setup(tmp_path, monkeypatch, version=2)
+    assert b"12.50 \xd8\xb1\xd9\x82" in body
+    body = body.replace(b"12.50 \xd8\xb1\xd9\x82", b"\xd8\xb1\xd9\x82")
+    from eii_custodian.publicdata.fetch import award_links
+
+    original = award_links.check_all_awards
+    projected_values = []
+    results = []
+
+    def check(rows, schema, proof_reader):
+        def proof(url):
+            projected = proof_reader(url)
+            projected_values.extend(row["syn_value"] for row in projected)
+            return projected
+
+        outcome = original(rows, schema, proof)
+        results.extend(outcome["results"])
+        return outcome
+
+    monkeypatch.setattr(awards, "check_all_awards", check)
+    result = fetch(entry, tmp_path, body)
+    assert "" in projected_values and "0" not in projected_values
+    assert results and {(item["result"], item["reason"]) for item in results} == {
+        ("mismatched", "proof_value_absent")
+    }
+    summary = result.sidecar["award_check"]
+    assert summary["proof_value_absent"] == len(results) and summary["matched"] == 0
+
+
 @pytest.mark.parametrize(
     "plant,reason", [("oversize", "metadata_bytes"), ("empty", "schema_missing")]
 )
