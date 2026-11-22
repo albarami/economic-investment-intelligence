@@ -6415,3 +6415,42 @@ plant, timeout or tolerance is weakened.
 - PROPOSED OPEN ITEM PO-S2-20-PICK1-01: decision 0032 item 2 requires another maker to confirm the forced code/test combination before this train is accepted. S2-P53's registry count includes main's second GBA row and its citation pages. S2-P63's pending-state reset and declared output set coexist with main's refusal logging in `Production.run`; main's refusal-test stub expects no files for the unbound `method_pins` phase, retaining every assertion and case. Exact differences and validation outcomes are in `.overnight/RETURN.md` and the workspace evidence logs. The local builder's strict self-review does not supply independent confirmation. Hosted checks and the lead's exact-merge fresh-seed whole test remain owed.
 
 - PO-S2-20-PICK1-02: the final broad importer selection is incomplete/failed (real exit 130), with exact log `.overnight/OUT/importers.log`. The task time limit requires return now; no pass is claimed. Complete that required selection before accepting this join.
+## PO-S2-P66-01 — Exact non-award headings and lead replay (2026-11-22)
+
+OPEN. The S2-P66 brief and supplied diagnosis name four tender portal heading
+classes but give none of their exact text. The builder requested the four strings
+and has no reply. Do not infer strings from their translated descriptions or read
+stored pages to fill them. The production awards declaration retains its empty
+`shape.sections` list, so the thirteen diagnosed headed pages are not established
+as recognised by this delivery. Supply the four exact reviewed h3 strings in
+`custodian/publicdata/review/s2_t29_sources.yaml`, retain exact equality, and verify
+them on invented pages before different-maker review. Decision 0095 is Proposed;
+its null-date behavior is tested offline, not claimed as real-cache evidence. The
+lead replays the stored proofs offline after merge; no worker replay occurred.
+Lead update, 2026-11-22: the lead read the stored award pages in the lead's own shell and found
+thirteen pages without the award heading, carrying four distinct h3 texts. It wrote those four exact
+strings into the awards declaration's `shape.sections` in
+`custodian/publicdata/review/s2_t29_sources.yaml` (exact equality kept), without printing them.
+An offline replay (`scripts/awards_proofs.py replay`) on the lead's cache then exited 0 with
+`refused_count` 0, `proof_award_absent` 13, `incomplete` false, and no cache file written. The
+strings item is CLOSED; different-maker review remains.
+S2-T29 and OI-277 remain open. No random failure was introduced; the oversized
+extra test selection was deliberately interrupted (exit 130), not counted as a
+passing run. The required focused selection then passed without retries or skips.
+
+S2-P66 round-two correction to PO-S2-P66-01 (2026-11-22): the committed
+heading test now loads all four reviewed entries from the production declaration,
+one at a time and together, and refuses one appended unreviewed heading.
+The date marker required by L-1495 is recorded separately from comparison
+reasons under proposed decision 0095. The strings item remains closed;
+independent different-maker review and the lead's offline replay of the
+round-two marker remain open. No worker replay or real-cache result is claimed.
+
+S2-P66 round-three correction to PO-S2-P66-01 (2026-11-22): the supplied cf1
+review rejected a dated parser row losing only `award_date` at the version-two
+reader boundary. The correction requires all projected source keys and validates
+the date/marker pair after projection, with exact `schema_missing` one-key
+negatives and red/green guard plants. Local tests and checks are recorded in
+PROGRESS.md; this does not stand in for different-maker approval or the lead's
+stored-proof replay. Both remain open; no random failure or new source input is
+introduced.

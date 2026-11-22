@@ -83,6 +83,8 @@ def test_awards_build_checks_all_links_once_and_labels_the_sample(
         "intake_value_absent": 0,
         "proof_value_absent": 0,
         "proof_mismatch": 0,
+        "proof_award_absent": 0,
+        "proof_date_absent": 0,
         "mismatched": 0,
         "failed_fetches": 0,
         "match_rate": "1",

@@ -141,9 +141,9 @@
 | [0089](decisions/0089-c8-national-census-release-indicators.md) | Two national-only C8 release indicator/unit pairs and the Table 76 producer; audit-count pairs unchanged | Accepted by the lead under L-1443, 2026-11-22; S2-P48, PO-S2-48 |
 | [0090](decisions/0090-reviewed-outside-boundary-parts-and-the-required-building-part-set.md) | Reviewed wholly-outside boundary parts admitted by a committed hash list bound to the boundary snapshot, with the frame box unchanged; the required building parts are the STAC items meeting the bounds of the inside parts | Accepted by the owner, 2026-11-22 |
 | [0091](decisions/0091-award-proof-acquisition-and-offline-replay.md) | Per-link award proof acquisition, refusal retention, offline replay and bounded readers | Proposed, 2026-11-22; S2-P46, lead review pending |
-| [0094](decisions/0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md) | S2-T09 closes at slice S2 with the three C6 neighbour and two C7 shared-reach result pins pending under OI-283 for S6-T10 and S7-T05; TST-198 amended by one sentence; the S7 gate's rule over every pin unchanged | Accepted by the owner, 2026-11-22 20:14 |
-
 | [0093](decisions/0093-landmark-hand-list-in-one-reviewed-cache-record.md) | Landmark hand list in one uncommitted reviewed cache record; placement only, no value lost | Accepted, 2026-11-22; lead ruling L-1475 |
+| [0094](decisions/0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md) | S2-T09 closes at slice S2 with the three C6 neighbour and two C7 shared-reach result pins pending under OI-283 for S6-T10 and S7-T05; TST-198 amended by one sentence; the S7 gate's rule over every pin unchanged | Accepted by the owner, 2026-11-22 20:14 |
+| [0095](decisions/0095-award-pages-without-an-award-section-or-date.md) | Closed no-award-section mismatch and nullable empty awarded date; amends decision 0091 item 4 | Proposed, 2026-11-22; S2-P66; reviewed headings supplied; round-two independent review and lead replay pending |
 
 ## Identifiers and change control
 
