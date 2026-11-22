@@ -11,6 +11,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from commands import build_public
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.build import BuildOutcome
 from eii_custodian.publicdata.fetch.page_requests import active, page_requests
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
@@ -91,7 +92,7 @@ def test_trailing_dot_archive_host_follows_the_allow_list_normalisation() -> Non
     fully qualified archive host is the same authority for the allow-list, the
     transport's header rule and this token scope; one rule, not two."""
     url = "https://ladsweb.modaps.eosdis.nasa.gov./SYN"
-    assert build_public.host_of(url) == "ladsweb.modaps.eosdis.nasa.gov"
+    assert host_of(url) == "ladsweb.modaps.eosdis.nasa.gov"
     assert build_public._archive_token(url, "SYN-archive-token") == "SYN-archive-token"
     double = "https://ladsweb.modaps.eosdis.nasa.gov../SYN"
     assert build_public._archive_token(double, "SYN-archive-token") == ""
