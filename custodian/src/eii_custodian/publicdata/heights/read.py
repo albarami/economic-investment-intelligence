@@ -537,15 +537,20 @@ def _parse_gba(
     outcomes: list[str] = []
     try:
         _gba_structure(connection, checked, structure.field)
+        bbox_null = connection.execute(
+            """SELECT count(*) FROM read_parquet(?)
+            WHERE bbox IS NULL OR bbox.xmin IS NULL OR bbox.ymin IS NULL
+                OR bbox.xmax IS NULL OR bbox.ymax IS NULL""",
+            [str(checked)],
+        ).fetchone()[0]
         for wkb, text in _gba_rows(connection, checked, structure.field, bounds):
             geometry, geometry_reason = _gba_geometry(wkb)
             value = None if text is None else Decimal(text)
             reason = gba_exclusion(geometry_reason, value, nodata)
             outcomes.append(reason)
             if not reason:
-                assert geometry is not None and value is not None, (
-                    "gba_kept_row_required"
-                )
+                if geometry is None or value is None:
+                    raise HeightError("gba_kept_row_required")
                 kept.append((geometry, value, GBA_CLASS_ALL))
     except duckdb.Error:
         raise HeightError("structure_mismatch", "parquet") from None
@@ -556,6 +561,7 @@ def _parse_gba(
     finally:
         connection.close()
     counts = gba_read_counts(outcomes)
+    counts["bbox_null"] = bbox_null
     sum_gba_read_counts([counts])
     return tuple(kept), counts
 

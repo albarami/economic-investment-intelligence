@@ -4122,6 +4122,66 @@ def test_gba_geoparquet_bounds_and_file_order(tmp_path):
     assert result.files[0]["read_counts"]["rows_in_bounds"] == 2
 
 
+@pytest.mark.parametrize("child", [None, "xmin", "ymin", "xmax", "ymax"])
+@pytest.mark.parametrize("bounds", [(0, 0, 4, 4), None])
+def test_gba_null_bbox_is_counted_outside_the_bounded_partition(
+    tmp_path, child, bounds
+):
+    from eii_core.calc.building_heights import fallback_errors, gba_read_counts
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+    from eii_custodian.publicdata.heights.manifest import manifest_block
+
+    null_bbox = (
+        "NULL::STRUCT(xmin DOUBLE, ymin DOUBLE, xmax DOUBLE, ymax DOUBLE)"
+        if child is None
+        else "struct_pack("
+        + ", ".join(
+            f"{name} := {'NULL::DOUBLE' if name == child else 'bbox.' + name}"
+            for name in ("xmin", "ymin", "xmax", "ymax")
+        )
+        + ")"
+    )
+    rows = [
+        invented.entry("bldg_gba", key=f"bldg_gba/SYN-{index}", extension="parquet")
+        for index in range(2)
+    ]
+    bodies = [
+        (
+            row,
+            invented.gba_parquet(
+                tmp_path / f"tile-{index}.parquet",
+                [*_GBA_GOOD, *_GBA_GOOD],
+                projection=f"* REPLACE(CASE WHEN id = 'SYN-row-0' THEN {null_bbox} ELSE bbox END AS bbox)",
+            ),
+        )
+        for index, row in enumerate(rows)
+    ]
+    results = _sources(tmp_path, rows, bodies=bodies, bounds=bounds)
+    source = results["bldg_gba"]
+    expected = {**gba_read_counts([] if bounds is None else [""]), "bbox_null": 1}
+    assert source.read_counts == (expected, expected)
+    assert [item["read_counts"] for item in source.files] == [expected, expected]
+    assert [len(features) for _name, features in source.gba] == (
+        [0, 0] if bounds is None else [1, 1]
+    )
+    total = {**gba_read_counts([] if bounds is None else ["", ""]), "bbox_null": 2}
+    calibration = gba_calibration([], source)
+    assert calibration["read_counts"] == total
+    block = manifest_block(
+        load_rules(invented.rules_file(tmp_path / "rules.yaml")),
+        results,
+        height_counts([], []),
+        fallback_errors([]),
+        [],
+        gba_calibration=calibration,
+    )
+    assert all(
+        block["sources"]["bldg_gba"][key] == value for key, value in total.items()
+    )
+    assert block["gba_calibration"]["read_counts"] == total
+    assert [item["read_counts"] for item in block["files"]] == [expected, expected]
+
+
 @pytest.mark.parametrize("features", [[], _GBA_GOOD])
 def test_gba_geoparquet_empty_bounds_read_no_rows(tmp_path, features):
     result = _geoparquet_sources(tmp_path, features=features, bounds=None)
@@ -4463,5 +4523,5 @@ def test_gba_internal_kept_row_invariant_has_a_named_failure(
     from eii_custodian.publicdata.heights import read
 
     monkeypatch.setattr(read, "gba_exclusion", lambda *_args: "")
-    with pytest.raises(AssertionError, match=r"^gba_kept_row_required$"):
+    with pytest.raises(HeightError, match=r"^gba_kept_row_required$"):
         _geoparquet_sources(tmp_path, features=[(shape, height)])

@@ -102,6 +102,9 @@ no spatial extension. The schema is checked even for an empty building table.
 Only rows with a source bbox intersecting the building table bounds are read;
 `bounds is None` reads no rows. **Stated limit:** an incorrect source bbox can
 omit an intersecting footprint; this path cannot check that bbox against WKB.
+Rows with a NULL bbox struct or any NULL bbox child are counted as `bbox_null`
+per file and in source and calibration totals, outside the in-bounds partition,
+even when the building table has no bounds; their geometry is not read.
 Rows are ordered by `file_row_number`. Heights are selected as VARCHAR and
 parsed as Decimal; no Python float conversion or early rounding occurs.
 

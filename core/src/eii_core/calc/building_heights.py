@@ -259,7 +259,7 @@ GBA_EXCLUSIONS = (
     "height_non_finite",
     "height_non_positive",
 )
-GBA_COUNTERS = ("rows_in_bounds", "rows_kept", *GBA_EXCLUSIONS)
+GBA_COUNTERS = ("rows_in_bounds", "rows_kept", *GBA_EXCLUSIONS, "bbox_null")
 
 
 def gba_exclusion(geometry_reason: str, value: Decimal | None, nodata: Decimal) -> str:
@@ -289,7 +289,7 @@ def gba_read_counts(outcomes: Iterable[str]) -> dict[str, int]:
 
 
 def sum_gba_read_counts(files: Iterable[Mapping[str, int]]) -> dict[str, int]:
-    """Verify each file's complete partition before summing the manifest rows."""
+    """Verify the bounded partition; sum it and the separate NULL-bbox count."""
     total = dict.fromkeys(GBA_COUNTERS, 0)
     for counts in files:
         if set(counts) != set(GBA_COUNTERS):

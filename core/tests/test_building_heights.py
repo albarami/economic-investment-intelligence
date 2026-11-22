@@ -910,12 +910,12 @@ def test_gba_accounting_refuses_unknown_outcome():
         gba_read_counts(["SYN-unknown"])
 
 
-def test_gba_accounting_refuses_negative_count():
+@pytest.mark.parametrize("counter", ["height_null", "bbox_null"])
+def test_gba_accounting_refuses_negative_count(counter):
     from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
 
     counts = gba_read_counts([])
-    counts["height_null"] = -1
-    counts["rows_in_bounds"] = -1
+    counts[counter] = -1
     with pytest.raises(ValueError, match=r"^non-negative integer count required$"):
         sum_gba_read_counts([counts])
 
@@ -975,14 +975,26 @@ def test_gba_exclusions_partition_rows_with_geometry_precedence(rows):
     assert sum_gba_read_counts([counts]) == counts
 
 
+@pytest.mark.parametrize("counter", ["rows_kept", "bbox_null"])
 @pytest.mark.parametrize("value", [False, "0", None])
-def test_gba_accounting_refuses_non_integer_counter(value):
+def test_gba_accounting_refuses_non_integer_counter(value, counter):
     from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
 
     counts = gba_read_counts([])
-    counts["rows_kept"] = value
+    counts[counter] = value
     with pytest.raises(ValueError, match=r"^non-negative integer count required$"):
         sum_gba_read_counts([counts])
+
+
+def test_gba_bbox_null_totals_stay_outside_the_bounded_partition():
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    first = gba_read_counts(["", "height_null"])
+    second = gba_read_counts([""])
+    first["bbox_null"] = 2
+    second["bbox_null"] = 3
+    total = sum_gba_read_counts([first, second])
+    assert total == {**gba_read_counts(["", "height_null", ""]), "bbox_null": 5}
 
 
 @given(
