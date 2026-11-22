@@ -1,5 +1,6 @@
 """Command seed validation happens before inputs, credentials or connections."""
 
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from unittest.mock import Mock
@@ -23,6 +24,8 @@ from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
         ["--seed", "1", "--cdse-backup"],
         ["--cdse-backup", "--seed", "1"],
         ["--cdse-backup", "x"],
+        ["--tenders-only", "--seed", "1"],
+        ["--tenders-only", "extra"],
     ],
 )
 def test_invalid_seed_has_no_reads_or_connections(
@@ -109,9 +112,42 @@ def test_only_closed_assembly_refusals_reach_output(
 
 
 def test_usage_shows_effective_public_draw_seed() -> None:
-    from commands.table import by_word
+    from commands.table import COMMANDS, by_word
 
     assert by_word("build-public").form == "build-public [--seed N]"
+    assert [row.form for row in COMMANDS if row.word == "build-public"] == [
+        "build-public [--seed N]",
+        "build-public --tenders-only [--resume]",
+        "build-public --gis-imagery-snapshot",
+        "build-public --cdse-backup",
+    ]
+
+
+@pytest.mark.parametrize("args", [["--tenders-only"], ["--tenders-only", "--resume"]])
+def test_tenders_command_selects_exact_key_before_own_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, args: list[str]
+) -> None:
+    from custodian.tests.singles_entries import tender_entry
+
+    tender = tender_entry()
+    other = replace(tender, key="awards_owner_scrape")
+    monkeypatch.setattr(build_public, "load_registry", lambda: (tender, other))
+    monkeypatch.setattr(
+        build_public, "earthdata_token", lambda *_: pytest.fail("key read")
+    )
+    monkeypatch.setattr(
+        build_public, "slot_secrets", lambda *_a, **_k: pytest.fail("slot key read")
+    )
+    runner = Mock(return_value=BuildOutcome((), None))
+    monkeypatch.setattr(build_public, "run_tenders_only", runner)
+    assert (
+        build_public.run(
+            tmp_path, {}, args, transport=lambda _url: pytest.fail("network")
+        )
+        == 0
+    )
+    assert runner.call_args.args[0] == (tender,)
+    assert runner.call_args.kwargs["resume"] is (len(args) == 2)
 
 
 @pytest.mark.parametrize(

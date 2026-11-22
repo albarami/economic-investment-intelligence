@@ -15,6 +15,7 @@ usage() {
     'down' \
     'test [--seed N]' \
     'build-public [--seed N]' \
+    'build-public --tenders-only [--resume]' \
     'build-public --gis-imagery-snapshot' \
     'build-public --cdse-backup' \
     'build-world' \

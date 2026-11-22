@@ -382,11 +382,14 @@ def gather_audit(build: Production) -> dict[str, Any]:
     from .fetch.own_run import OWN_RUN_CAVEAT, OWN_RUN_REASON
 
     tender = next((e for e in build.entries if e.source_id == "tenders_pub"), None)
-    confirmation = load_confirmation(build.review / "s2_t13_confirmation.yaml")
     if (
         tender is not None
         and tender.key not in build.selected
-        and own_run_pending(confirmation, tender, build.receipts.get(tender.key))
+        and own_run_pending(
+            load_confirmation(build.review / "s2_t13_confirmation.yaml"),
+            tender,
+            build.receipts.get(tender.key),
+        )
     ):
         absences[tender.key] = c.Absence(OWN_RUN_REASON, OWN_RUN_CAVEAT)
     catalogue = c.table_catalogue(
@@ -427,12 +430,16 @@ def gather_audit(build: Production) -> dict[str, Any]:
                 },
             )
         )
+    tender = next((e for e in build.entries if e.source_id == "tenders_pub"), None)
     evidence.append(
         tender_evidence(
-            confirmation,
+            load_confirmation(build.review / "s2_t13_confirmation.yaml"),
             tender,
             build.receipts.get(tender.key) if tender else None,
             "s2_t13_confirmation.yaml",
+            build.raw(tender, standard_json=True)
+            if tender and tender.key in build.selected
+            else None,
         )
     )
     fsq = next((e for e in build.entries if e.key == "places_fsq/copy"), None)

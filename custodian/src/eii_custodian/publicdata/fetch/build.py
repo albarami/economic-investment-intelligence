@@ -32,7 +32,11 @@ from eii_custodian.publicdata.fetch.kinds import (
     prepare,
     read_terms_page,
 )
-from eii_custodian.publicdata.fetch.own_run import is_tender_entry
+from eii_custodian.publicdata.fetch.own_run import (
+    handoff_completed_archive,
+    is_own_run_entry,
+    is_tender_entry,
+)
 from eii_custodian.publicdata.fetch.partitions import (
     PartitionError,
     bounded_partition_reader,
@@ -63,7 +67,11 @@ from eii_custodian.publicdata.fetch.report import (
     terms_host_line,
     terms_unread_line,
 )
-from eii_custodian.publicdata.fetch.resume import ResumeError, RunRecord
+from eii_custodian.publicdata.fetch.resume import (
+    ResumeError,
+    RunRecord,
+    repository_head,
+)
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import (
     Opener,
@@ -461,6 +469,7 @@ def _seeded_assembly(
     seed: int | None,
     resume: bool,
     code_roots: CodeRoots | None,
+    _own_run: bool = False,
 ) -> BuildOutcome:
     """Open the run journal, fetch under it, then run the production assembly."""
     from eii_custodian.publicdata.assembly import AssemblyError
@@ -519,6 +528,7 @@ def _seeded_assembly(
             large_stream=large_stream,
             _fetch_only=True,
             _run=_run,
+            _own_run=_own_run,
         )
 
     build = Production(
@@ -572,6 +582,7 @@ def _seeded_assembly(
             "assembly_regression_refused",
             "assembly_intake_invalid",
             "assembly_tender_pages_incomplete",
+            "assembly_tender_terms_incomplete",
         }:
             reason = str(exc)
         assembly_failure = FetchFailure(
@@ -638,9 +649,14 @@ def run_build(
     resume: bool = False,
     _run: RunRecord | None = None,
     code_roots: CodeRoots | None = None,
+    _own_run: bool = False,
 ) -> BuildOutcome:
     """Run the production assembly when a seed is supplied; retain the fetch seam."""
     entries = tuple(entry for entry in entries if entry.kind != "company_web")
+    if _own_run and (
+        not _fetch_only or len(entries) != 1 or not is_own_run_entry(entries[0])
+    ):
+        raise ValueError("own_run_inventory_invalid")
     if seed is not None:
         return _seeded_assembly(
             entries,
@@ -666,6 +682,7 @@ def run_build(
             seed=seed,
             resume=resume,
             code_roots=code_roots,
+            _own_run=_own_run,
         )
     # One injected UTC clock sample governs every verification in this build.
     started = clock()
@@ -696,19 +713,19 @@ def run_build(
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
     for entry in entries:
-        if is_tender_entry(entry) and entry.skip_reason:
-            # Decision 0084: a row the registry names as the tender source is
-            # never fetched by the ordinary run; a changed row with a skip
-            # reason is refused by name before any adapter is called.
+        if is_tender_entry(entry) and not _own_run and entry.skip_reason:
             failure = FetchFailure(
                 1, entry.source_id, "", "own_run_row_changed", "", entry.skip_reason
             )
             lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
             break
-        if is_tender_entry(entry):
-            # Decision 0084: no list, page or terms request for the source
-            # that has its own run, whatever its row's kind; its absence is
-            # recorded at assembly.
+        if is_tender_entry(entry) and not is_own_run_entry(entry):
+            failure = FetchFailure(
+                1, entry.source_id, "", "own_run_row_changed", "", ""
+            )
+            lines.append(fail_line(entry.key, "", failure.check, "", ""))
+            break
+        if is_own_run_entry(entry) and not _own_run:
             lines.append(skip_line(entry.key, "own_run"))
             if _run is not None:
                 try:
@@ -1292,6 +1309,7 @@ def run_build(
             tuple(terms_attempts),
             reused_times=reused_times,
         )
+
     attempt_failure = _archive_investment_attempts(
         entries, investment_attempts, cache, clock, lines
     )
@@ -1504,6 +1522,123 @@ def run_build(
         cache, lines, terms if failure is None else previous_terms, terms_attempts
     )
     return BuildOutcome(tuple(lines), failure, manifests)
+
+
+def run_tenders_only(
+    entries: Sequence[Entry],
+    transport: Transport,
+    main_cache: Path,
+    tender_cache: Path,
+    clock: Clock,
+    sleep: Sleeper,
+    *,
+    environ: Mapping[str, str] | None = None,
+    resume: bool = False,
+) -> BuildOutcome:
+    """Acquire exactly the registered tender entry, without a whole-pack claim."""
+    from eii_custodian.publicdata.assembly_tenders import (
+        archive_pages,
+        terms_visible_hash,
+    )
+
+    rows = tuple(entries)
+    if len(rows) != 1 or not is_own_run_entry(rows[0]):
+        return _own_run_failure(tender_cache, None, "own_run_inventory_invalid")
+    entry = rows[0]
+    try:
+        run = RunRecord.begin(
+            tender_cache, rows, 0, clock(), resume=resume, environ=environ
+        )
+    except (ResumeError, OSError) as exc:
+        reason = (
+            str(exc) if isinstance(exc, ResumeError) else "resume_record_write_failed"
+        )
+        return _own_run_failure(tender_cache, entry, reason)
+    # Version-2 journals no longer refuse a head change inside RunRecord.
+    # The own-run resume still names that refusal before any fetch.
+    if resume and run.row.get("head") != repository_head():
+        return _own_run_failure(tender_cache, entry, "resume_head_mismatch")
+    if not resume:
+        try:
+            adopted = handoff_completed_archive(
+                main_cache, tender_cache, entry, clock()
+            )
+        except ValueError:
+            return _own_run_failure(tender_cache, entry, "tender_handoff_refused")
+        if adopted is not None:
+            identity, terms_row = adopted
+            lines = [f"HANDOFF {entry.key} sha256={identity}"]
+            try:
+                _write_log(tender_cache, lines, [terms_row], [])
+                run.note(entry)
+                run.finish()
+            except OSError:
+                return _own_run_failure(
+                    tender_cache,
+                    entry,
+                    "tender_handoff_write_failed",
+                    BuildOutcome(tuple(lines), None, terms=(terms_row,)),
+                )
+            return BuildOutcome(tuple(lines), None)
+    try:
+        outcome = run_build(
+            rows,
+            transport,
+            tender_cache,
+            clock,
+            sleep,
+            environ=environ,
+            _fetch_only=True,
+            _run=run,
+            _own_run=True,
+        )
+    except OSError:
+        return _own_run_failure(tender_cache, entry, "own_run_fetch_write_failed")
+    if outcome.failure is not None:
+        return outcome
+    try:
+        terms_hash = terms_visible_hash(tender_cache, entry, outcome.terms)
+        state = run.row["entries"][entry.key]["fetch"]
+        retrieved = state["retrieved_utc"]
+        if not isinstance(retrieved, str):
+            raise ValueError("tender_retrieval_missing")
+        archive = archive_pages(
+            tender_cache,
+            entry,
+            clock(),
+            retrieved_utc=retrieved,
+            terms_sha256=terms_hash,
+        )
+        lines = [*outcome.lines, f"ARCHIVE {entry.key} sha256={archive}"]
+        _write_log(tender_cache, lines, outcome.terms, list(outcome.terms_attempts))
+        run.finish()
+    except (OSError, ValueError, KeyError, TypeError):
+        return _own_run_failure(
+            tender_cache, entry, "assembly_tender_pages_incomplete", outcome
+        )
+    return BuildOutcome(tuple(lines), None, outcome.manifests, terms=outcome.terms)
+
+
+def _own_run_failure(
+    cache: Path, entry: Entry | None, reason: str, outcome: BuildOutcome | None = None
+) -> BuildOutcome:
+    source_id = entry.source_id if entry is not None else "tenders_pub"
+    key = entry.key if entry is not None else "tenders_pub"
+    failure = FetchFailure(1, source_id, "", reason, "", "")
+    lines = [
+        *(outcome.lines if outcome else ()),
+        fail_line(key, "", reason, "", ""),
+    ]
+    try:
+        _write_log(
+            cache,
+            lines,
+            outcome.terms if outcome else (),
+            list(outcome.terms_attempts) if outcome else [],
+        )
+    except OSError:
+        pass
+    return BuildOutcome(tuple(lines), failure)
 
 
 def _archive_investment_attempts(
@@ -1814,7 +1949,15 @@ def _read_terms_apart(
     archive_auxiliary(
         entry, cache / entry.key, "terms", read.body, retrieved, entry.terms_url
     )
-    _record_terms(entry, read.sha256, retrieved, previous, lines, terms)
+    _record_terms(
+        entry,
+        read.sha256,
+        retrieved,
+        previous,
+        lines,
+        terms,
+        body_sha256=sha256_hex(read.body) if entry.source_id == "tenders_pub" else "",
+    )
 
 
 def _record_terms(
@@ -1824,19 +1967,22 @@ def _record_terms(
     previous: dict[str, str],
     lines: list[str],
     terms: list[dict[str, object]],
+    *,
+    body_sha256: str = "",
 ) -> None:
     """Record the visible-text fingerprint. A changed fingerprint of this kind is named."""
-    terms.append(
-        {
-            "key": entry.key,
-            "retrieved_utc": retrieved,
-            "terms_sha256": digest,
-            "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
-            "terms_url": entry.terms_url,
-            "terms_words": entry.terms_words,
-            "terms_read_on": entry.terms_read_on,
-        }
-    )
+    row: dict[str, object] = {
+        "key": entry.key,
+        "retrieved_utc": retrieved,
+        "terms_sha256": digest,
+        "terms_fingerprint": FINGERPRINT_VISIBLE_TEXT,
+        "terms_url": entry.terms_url,
+        "terms_words": entry.terms_words,
+        "terms_read_on": entry.terms_read_on,
+    }
+    if body_sha256:
+        row["terms_body_sha256"] = body_sha256
+    terms.append(row)
     prior = previous.get(entry.key)
     if prior is not None and prior != digest:
         lines.append(terms_changed_line(entry.key, entry.terms_url))

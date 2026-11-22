@@ -11,6 +11,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from commands import build_public
+from eii_custodian.publicdata.fetch.allowlist import host_of
 from eii_custodian.publicdata.fetch.build import BuildOutcome
 from eii_custodian.publicdata.fetch.page_requests import active, page_requests
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
@@ -73,7 +74,6 @@ def test_command_routes_archive_token(
         "SYN-relative/path",
         "https://ladsweb.modaps.eosdis.nasa.gov.example.test/SYN",
         "https://syn-ladsweb.modaps.eosdis.nasa.gov/SYN",
-        "https://ladsweb.modaps.eosdis.nasa.gov./SYN",
         "https://ladsweb.modaps.eosdis.nasa.gov" + "@" + "other.example.test/SYN",
         "https://other.example.test/ladsweb.modaps.eosdis.nasa.gov",
         "https://other.example.test/?host=ladsweb.modaps.eosdis.nasa.gov",
@@ -85,6 +85,17 @@ def test_command_routes_archive_token(
 )
 def test_other_authorities_withhold_archive_token(url: str) -> None:
     assert build_public._archive_token(url, "SYN-archive-token") == ""
+
+
+def test_trailing_dot_archive_host_follows_the_allow_list_normalisation() -> None:
+    """Join of S2-P43 with decision 0083: host_of drops one trailing dot, so the
+    fully qualified archive host is the same authority for the allow-list, the
+    transport's header rule and this token scope; one rule, not two."""
+    url = "https://ladsweb.modaps.eosdis.nasa.gov./SYN"
+    assert host_of(url) == "ladsweb.modaps.eosdis.nasa.gov"
+    assert build_public._archive_token(url, "SYN-archive-token") == "SYN-archive-token"
+    double = "https://ladsweb.modaps.eosdis.nasa.gov../SYN"
+    assert build_public._archive_token(double, "SYN-archive-token") == ""
 
 
 @given(
