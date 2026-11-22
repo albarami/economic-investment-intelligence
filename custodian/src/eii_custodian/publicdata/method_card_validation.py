@@ -1,10 +1,14 @@
 """MTH-03 source checks and fail-closed S2/S7 completion evidence.
 
-Pass 1 defines an explicit interchange contract for invented fixtures. The live
-S2-T08 artifact/config adapters and their plan-r2 module placement need
-confirmation. This module never produces a pin, calculates a public figure, or
-opens a source snapshot. An artifact comparison is additional to independent
-source replay and a different maker's review, never a replacement for either.
+Pass 1 defines an explicit interchange contract for invented fixtures. The
+production writer of S2-P63 persists the artifact and the recorded generation
+configuration as the pair ``assembly/s2_t09_pin_artifact.json`` and
+``assembly/s2_t09_pin_generation_config.json`` from the producer inputs bound
+to the build; the checked rows' ``settings_sha256`` binds the persisted
+configuration bytes. This module never produces a pin, calculates a public
+figure, or opens a source snapshot. An artifact comparison is additional to
+independent source replay and a different maker's review, never a replacement
+for either.
 
 Card synchronization binds only the document sections this record governs:
 section 3 and cards C5, C6, C7 and C14, each found by its exact heading text.
@@ -486,7 +490,10 @@ def validate_source_check_record(
 
     A checked row binds exact values, complete lineage and recorded settings to
     the supplied producer artifact and the SHA-256 of the actual config bytes.
-    The same schema-valid pending record is deliberately rejected by completion.
+    A pending deferred row of decision 0094 binds its artifact row to the same
+    closed pending representation: empty values and empty lineage, never a
+    stand-in beside an unpinned record row. The same schema-valid pending
+    record is deliberately rejected by completion.
     """
     registry_by_source = _registry_by_source(registry) if registry is not None else None
     receipts_by_key = dict(receipts) if receipts is not None else None
@@ -522,6 +529,20 @@ def validate_source_check_record(
         if pin not in REQUIRED_PINS or pin in produced:
             raise ValueError("pin_artifact_duplicate_or_unknown")
         produced[pin] = row
+    for pin, entry in entries.items():
+        # Decision 0094 at the consumer: a pending deferred record row binds
+        # its artifact row to the closed pending representation. A stand-in
+        # value or lineage beside an unpinned record row is refused, never
+        # credited as a checked result.
+        if entry.checked_against_source or pin not in S7_DEFERRED_PINS:
+            continue
+        pending_row = produced.get(pin)
+        if pending_row is None:
+            raise ValueError("pin_artifact_missing")
+        if pending_row["values"] != {}:
+            raise ValueError("pin_pending_value_forbidden")
+        if pending_row["source_lineage"] != []:
+            raise ValueError("pin_pending_lineage_forbidden")
     for entry in checked:
         if entry.settings_sha256 != hashlib.sha256(config_body).hexdigest():
             raise ValueError("pin_settings_hash_mismatch")

@@ -2,7 +2,8 @@
 
 Names here are not projected from the adapter map. Each phase owns one evidence
 manifest; that manifest binds the builder's real files and source identities.
-The spine also owns its two parquet files. Nested grids/places belong to frame.
+The spine also owns its two parquet files, and method_pins owns the S2-T09 pin
+artifact and its generation configuration. Nested grids/places belong to frame.
 """
 
 from __future__ import annotations
@@ -120,8 +121,18 @@ INVENTORY = (
         ("assembly/busyness.json",),
     ),
     InventoryItem(
+        "method_pins",
+        ("reviewed_selections", "receipts", "pin_generation_config", "pin_rows"),
+        (
+            "assembly/method_pins.json",
+            "assembly/s2_t09_pin_artifact.json",
+            "assembly/s2_t09_pin_generation_config.json",
+        ),
+    ),
+    InventoryItem(
         "final_audit",
         (
+            "method_pins",
             "frame",
             "register_tables",
             "spine_graph",

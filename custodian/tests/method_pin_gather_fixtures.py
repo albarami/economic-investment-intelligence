@@ -17,6 +17,7 @@ from custodian.tests.method_card_pin_fixtures import (
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_production_adapters import context
 
+from eii_custodian.publicdata.assembly_io import write_record
 from eii_custodian.publicdata.assembly_reports import gather_audit
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.gate_report import CONFIRMATION_TASKS
@@ -38,8 +39,13 @@ def stage_method_pin_gather_build(
     mutate: Callable[..., None] | None = None,
     stage_outputs: bool = True,
     stage_record: bool = True,
-) -> tuple[Any, dict[str, object], dict[str, object]]:
-    """Return a Production build whose gather_audit path can collect S2-T09 evidence."""
+) -> tuple[Any, dict[str, object], dict[str, object], dict[str, object]]:
+    """Return a Production build whose gather_audit path can collect S2-T09 evidence.
+
+    The returned configuration is the same recorded generation configuration
+    the staged (or phase-written) outputs were built from, so a test can bind
+    it straight to the production ``method_pins`` phase inputs.
+    """
     root = tmp_path / "gather-root"
     for relative in _GATHER_ROOT_FILES:
         destination = root / relative
@@ -65,7 +71,7 @@ def stage_method_pin_gather_build(
         write_yaml(root / "custodian/publicdata/review" / _S2_T09_RECORD, record)
     if stage_outputs:
         write_json(cache / "assembly/s2_t09_pin_artifact.json", artifact)
-        write_json(cache / "assembly/s2_t09_pin_generation_config.json", config)
+        write_record(cache, "assembly/s2_t09_pin_generation_config.json", config)
     shutil.copy(paths[3], root / "docs/07_ECONOMIC_METHODS.md")
     entries = (*load_registry(), *ctx["registry"])
     build = replace(
@@ -74,7 +80,7 @@ def stage_method_pin_gather_build(
         review=root / "custodian/publicdata/review",
     )
     build.receipts.update(ctx["receipts"])
-    return build, record, artifact
+    return build, record, artifact, config
 
 
 def gathered_s2_t09_confirmation(build) -> dict[str, object]:

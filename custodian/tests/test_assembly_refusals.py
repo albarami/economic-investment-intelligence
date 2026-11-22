@@ -121,7 +121,10 @@ def invented_adapters(build, stage, fault, calls):
             if item.name == stage:
                 raise fault
             output = {}
-            for path in item.outputs:
+            # Main's S2-P56 stub combines with S2-P63's pending pin phase:
+            # without bound inputs, that phase's expected output set is empty.
+            outputs = () if item.name == "method_pins" else item.outputs
+            for path in outputs:
                 output.update(write_record(build.cache, path, {"syn": True}))
             return output
 

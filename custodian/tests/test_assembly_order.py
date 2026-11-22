@@ -7,6 +7,7 @@ import pytest
 from eii_custodian.publicdata.assembly import AssemblyError, Step, run_steps
 
 # Plan r3, section 4 item 2. Grids and places belong to the single frame call.
+# Main's S2-P64 register phase and S2-P63's pin phase both belong to this order.
 ORDER = (
     "intake_evidence",
     "fetch_archive",
@@ -22,6 +23,7 @@ ORDER = (
     "heights",
     "trade_reconciliation",
     "busyness",
+    "method_pins",
     "final_audit",
     "draw",
     "reports",
