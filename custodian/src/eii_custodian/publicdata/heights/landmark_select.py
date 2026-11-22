@@ -14,6 +14,7 @@ REASONS = (
     "same_kind_disagreement",
 )
 KINDS = ("roof", "architectural")
+ADMITTED_SUBJECT_KIND = "completed_highrise_building"
 VALUE_TOKEN = re.compile(r"[0-9]+(?:\.[0-9]+)?")
 UNITS = frozenset({"m", "metre", "metres", "meter", "meters"})
 
@@ -79,7 +80,7 @@ def _page_reason(page: Mapping[str, Any]) -> str:
 
 
 def _select(candidate: Mapping[str, Any]) -> tuple[Mapping[str, Any] | None, str]:
-    if candidate.get("subject_kind") != "completed high-rise" or not candidate.get(
+    if candidate.get("subject_kind") != ADMITTED_SUBJECT_KIND or not candidate.get(
         "completed"
     ):
         return None, "not_building"

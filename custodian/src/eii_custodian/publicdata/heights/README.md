@@ -125,8 +125,9 @@ This does not decide the GBA order or claim C-20.
 The lead calls `landmark_select.select_landmarks` with the research document's
 `landmarks` sequence. The candidate shape is the primary page plus optional
 `second_page` and each page's `additional_heights`. The subject contract is
-`subject_kind: completed high-rise` with a nonempty `completed` field; this
-semantic token must be confirmed against the lead's research before live use.
+`subject_kind: completed_highrise_building` with a nonempty `completed` field,
+as confirmed by the lead for S2-P53 round 2. The subject code must match exactly;
+compound values with qualifiers and `completed high-rise` are not admitted.
 Selection checks building status, the page's roof/architectural label, literal
 metric token/excerpt agreement, then numeric-token conflicts of the same kind
 across all pages and their additional heights. It accepts `m`, `metre`,

@@ -39,7 +39,7 @@ def candidate(**changes):
     row.update(
         {
             "landmark_id": "SYN-LM-A",
-            "subject_kind": "completed high-rise",
+            "subject_kind": "completed_highrise_building",
             "status_as_written": "SYN completed",
             "row_role": "SYN primary",
             "disagrees": False,
@@ -51,6 +51,23 @@ def candidate(**changes):
     )
     row.update(changes)
     return row
+
+
+def test_research_subject_kind_is_admitted():
+    row = candidate(subject_kind="completed_highrise_building")
+    result = select_landmarks([row])
+    assert result.outcomes == (("SYN-LM-A", "admitted"),)
+    assert result.admitted[0].page is row
+
+
+@pytest.mark.parametrize(
+    "subject_kind",
+    ["completed_highrise_building; under_review", "completed high-rise"],
+)
+def test_subject_kind_requires_the_exact_research_code(subject_kind):
+    result = select_landmarks([candidate(subject_kind=subject_kind)])
+    assert result.outcomes == (("SYN-LM-A", "not_building"),)
+    assert not result.admitted
 
 
 def test_one_page_is_enough_and_counts_are_closed():
