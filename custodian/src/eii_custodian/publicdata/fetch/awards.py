@@ -18,6 +18,7 @@ from typing import Any
 
 from .allowlist import approve, host_of
 from .award_checks import (
+    AWARD_ABSENT,
     AwardError,
     double_space_only,
     match_register,
@@ -521,6 +522,8 @@ def _proof_reader(
             body = store.save(url, response)
         _obstacle(body)
         rows = parse_body(body, proof_entry, declaration)
+        if version_two and rows == [AWARD_ABSENT]:
+            return [dict(AWARD_ABSENT)]
         if not rows:
             raise AwardError("schema_missing")
         if version_two:

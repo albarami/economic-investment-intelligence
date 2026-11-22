@@ -21,7 +21,13 @@ def normalise_name(value: str) -> str:
 
 
 MATCH_REASONS = ("matched", "matched_name_not_compared")
-MISMATCH_REASONS = ("intake_value_absent", "proof_value_absent", "proof_mismatch")
+AWARD_ABSENT = {"proof_outcome": "proof_award_absent"}
+MISMATCH_REASONS = (
+    "proof_award_absent",
+    "intake_value_absent",
+    "proof_value_absent",
+    "proof_mismatch",
+)
 REASON_COUNTS = ("matched_name_not_compared", *MISMATCH_REASONS)
 FETCH_REASONS = frozenset(
     {"proof_fetch_failed", "unreachable", "http_status", "body_bytes"}

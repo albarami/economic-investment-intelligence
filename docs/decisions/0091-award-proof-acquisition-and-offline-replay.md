@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed; S2-P46 task brief authorizes the offline implementation; lead review pending |
+| Status | Proposed; S2-P46 task brief authorizes the offline implementation; lead review pending; item 4 amended by 0095 (proposed) |
 | Date | 2026-11-22 |
 | Scope | PUB-04; document 03 **S2-T29 cached page and awards contracts**; decision 0088 item 5; decision 0081 reuse boundary |
 

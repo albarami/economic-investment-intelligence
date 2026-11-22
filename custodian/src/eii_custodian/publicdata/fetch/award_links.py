@@ -9,6 +9,7 @@ from typing import Any
 
 from .allowlist import approve
 from .award_checks import (
+    AWARD_ABSENT,
     FETCH_REASONS,
     MATCH_REASONS,
     REASON_COUNTS,
@@ -97,7 +98,11 @@ def _check_links(
                 not isinstance(item, Mapping) for item in candidates
             ):
                 raise AwardError("schema_missing")
-            reason = proof_reason(frame[url], candidates, profile)
+            reason = (
+                "proof_award_absent"
+                if candidates == [AWARD_ABSENT]
+                else proof_reason(frame[url], candidates, profile)
+            )
             result = "matched" if reason in MATCH_REASONS else "mismatched"
         except (AwardError, PageError, ShapeError) as exc:
             if str(exc) in SHAPE_REASONS:

@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlsplit
 
+from .award_checks import AWARD_ABSENT
 from .page_html import ShapeError, Tree, table_rows
 from .page_schema import json_body, path, scalar, typed, validate
 from .page_workbook import read_sheet
@@ -367,7 +368,14 @@ def awards(
     body: bytes, shape: Mapping[str, Any], columns: list[list[str]]
 ) -> list[dict[str, object]]:
     root = Tree(body).root
-    headers = [n for n in root.find("h3") if n.text().strip() == shape["headers"][0]]
+    headings = root.find("h3")
+    headers = [n for n in headings if n.text().strip() == shape["headers"][0]]
+    date_text = root.one("span#lblAwardedDate").text().strip()
+    if not headers:
+        reviewed = {section["heading"] for section in shape["sections"]}
+        if any(heading.text().strip() not in reviewed for heading in headings):
+            raise ShapeError("schema_missing")
+        return [dict(AWARD_ABSENT)]
     if len(headers) != 1:
         raise ShapeError("schema_missing")
     heading = headers[0]
@@ -379,11 +387,12 @@ def awards(
     rows = table_rows(table, shape["headers"][1:])
     if not rows:
         raise ShapeError("schema_missing")
-    date_text = root.one("span#lblAwardedDate").text().strip()
-    try:
-        awarded_date = datetime.strptime(date_text, "%d/%m/%Y").date().isoformat()
-    except ValueError:
-        raise ShapeError("snapshot_date_missing") from None
+    awarded_date = None
+    if date_text:
+        try:
+            awarded_date = datetime.strptime(date_text, "%d/%m/%Y").date().isoformat()
+        except ValueError:
+            raise ShapeError("snapshot_date_missing") from None
     result = []
     for raw in rows:
         record = {}
