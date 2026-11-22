@@ -91,6 +91,19 @@ CONFIGURATION_PINS = frozenset(
         "c7.speed_regime",
     }
 )
+# Decision 0094: the C6 neighbour and C7 shared-reach result pins that the S2
+# gate accepts pending, each only under its own OI-283 row; the S7 gate still
+# refuses every pending pin by name.
+S7_DEFERRED_PINS = frozenset(
+    {
+        "c6.expected_clq",
+        "c6.expected_p",
+        "c6.expected_q",
+        "c7.shared_b_given_a",
+        "c7.shared_a_given_b",
+    }
+)
+S7_DEFERRAL_ITEM = "OI-283: "
 _SHA = re.compile(r"[a-f0-9]{64}")
 _HEADING = re.compile(r"^(#{1,6}) ")
 _BLOCK = re.compile(
@@ -585,6 +598,13 @@ def verify_method_cards_sync(record_path: Path, methods_doc_path: Path) -> None:
         raise ValueError("card_sync_baseline_or_missing_value")
 
 
+def _deferred_to_s7(entry: CheckedPinEntry) -> bool:
+    """A pending C6/C7 result pin whose reason names its OI-283 row."""
+    return entry.pin_id in S7_DEFERRED_PINS and (
+        entry.unpinned_reason or ""
+    ).startswith(S7_DEFERRAL_ITEM)
+
+
 def completion_evidence(
     record_path: Path,
     s2_t08_artifact_path: Path,
@@ -595,7 +615,12 @@ def completion_evidence(
     registry: Sequence[Entry] | None = None,
     receipts: Mapping[str, Mapping[str, object]] | None = None,
 ) -> dict[str, CheckedPinEntry]:
-    """The MTH-03 check for either slice gate; an open item never clears it."""
+    """The MTH-03 check for either slice gate; an open item never clears it.
+
+    Decision 0094: at S2 only, a pending pin of ``S7_DEFERRED_PINS`` whose
+    reason names its OI-283 row is accepted; the S7 gate refuses every
+    pending pin by name.
+    """
     if gate not in ("S2", "S7"):
         raise ValueError("pin_gate_unknown")
     entries, _ = _record(
@@ -605,18 +630,14 @@ def completion_evidence(
         else None,
         receipts_by_key=dict(receipts) if receipts is not None else None,
     )
-    if any(not entry.checked_against_source for entry in entries.values()):
-        raise ValueError(
-            gate
-            + ":unpinned:"
-            + ",".join(
-                sorted(
-                    pin
-                    for pin, entry in entries.items()
-                    if not entry.checked_against_source
-                )
-            )
-        )
+    unpinned = sorted(
+        pin
+        for pin, entry in entries.items()
+        if not entry.checked_against_source
+        and not (gate == "S2" and _deferred_to_s7(entry))
+    )
+    if unpinned:
+        raise ValueError(gate + ":unpinned:" + ",".join(unpinned))
     entries = validate_source_check_record(
         record_path,
         s2_t08_artifact_path,
