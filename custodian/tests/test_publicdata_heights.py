@@ -432,11 +432,11 @@ def test_the_committed_rules_file_loads_with_the_declared_structures() -> None:
     assert wsf.crs == "EPSG:4326"
     assert wsf.dtype == "int16"
     gba = rules.structures["bldg_gba"]
-    assert gba.format == "to be confirmed"
-    assert gba.field == "to be confirmed"
-    assert gba.class_field == "to be confirmed"
+    assert gba.format == "geoparquet"
+    assert gba.field == "height"
+    assert gba.class_field == ""
     assert gba.unit == "m"
-    assert gba.crs == "EPSG:4326"
+    assert gba.crs == "OGC:CRS84"
 
 
 def test_input_contract_refusals(tmp_path: Path) -> None:
@@ -747,7 +747,8 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
         "bldg_3dglobfp/1636",
         "bldg_3dglobfp/1639",
         "bldg_wsf3d",
-        "bldg_gba",
+        "bldg_gba/e050_n25_e055_n20",
+        "bldg_gba/e050_n30_e055_n25",
     ]
     for entry in entries:
         assert entry.source_id in {"bldg_3dglobfp", "bldg_wsf3d", "bldg_gba"}
@@ -760,7 +761,8 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
                 entry.publisher
                 == "Technical University of Munich (GlobalBuildingAtlas)"
             )
-            assert entry.skip_reason == "direct_url_unconfirmed"
+            assert entry.skip_reason == ""
+            assert entry.extension == "parquet"
         else:
             assert entry.licence_id == "CC-BY-4.0"
         assert entry.licence_basis == "dataset"
@@ -782,7 +784,7 @@ def test_committed_rows_load_with_their_basis_and_no_credit() -> None:
     assert wsf.extension == "tif"
     gba = entries[3]
     assert gba.fetch_host == "data.source.coop"
-    assert gba.extension == "zip"
+    assert gba.extension == "parquet"
     pack = (REPO / "docs" / "04_PUBLIC_DATA_PACK.md").read_text()
     assert '"Che et al. 2024"' in pack
     document = yaml.safe_load(
@@ -2868,21 +2870,23 @@ def test_a_landmark_recorded_conflict_is_refused(tmp_path: Path) -> None:
 
 
 def test_gba_fetches_through_the_allow_list(tmp_path: Path) -> None:
-    """The GBA registry row is read from an invented zip on an allow-listed host."""
+    """The GBA registry row is read from invented Parquet on an allow-listed host."""
     row = invented.entry(
         "bldg_gba",
-        extension="zip",
+        extension="parquet",
         fetch_host="data.source.coop",
         licence_id="CC-BY-NC-4.0",
-        url="https://data.source.coop/SYN/invented-gba.zip",
+        url="https://data.source.coop/SYN/invented-gba.parquet",
     )
-    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
-    results = _sources(tmp_path, (row,), bodies=((row, body),))
+    body = invented.gba_parquet(
+        tmp_path / "tile.parquet", [(invented.square(0, 0, 1), "90")]
+    )
+    results = _sources(tmp_path, (row,), bodies=((row, body),), bounds=(0, 0, 4, 4))
     assert results["bldg_gba"].state == "read"
     assert len(results["bldg_gba"].gba) == 1
     _geometry, height, class_name = results["bldg_gba"].gba[0][1][0]
     assert height == Decimal("90")
-    assert class_name == "tower"
+    assert class_name == "all"
     assert approve(row.url).ok
 
 
@@ -2907,10 +2911,10 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     wsf_row = invented.entry("bldg_wsf3d", extension="tif")
     gba_row = invented.entry(
         "bldg_gba",
-        extension="zip",
+        extension="parquet",
         fetch_host="data.source.coop",
         licence_id="CC-BY-NC-4.0",
-        url="https://data.source.coop/SYN/invented-gba.zip",
+        url="https://data.source.coop/SYN/invented-gba.parquet",
     )
     cache = tmp_path / "cache"
     invented.store(
@@ -2931,11 +2935,12 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     invented.store(
         cache,
         gba_row,
-        invented.gba_zip(
+        invented.gba_parquet(
+            tmp_path / "tile.parquet",
             [
-                (invented.square(0.05, 0.05, 0.6), "90", "tower"),
-                (invented.square(2.05, 0.05, 0.6), "55", "lowrise"),
-            ]
+                (invented.square(0.05, 0.05, 0.6), "90"),
+                (invented.square(2.05, 0.05, 0.6), "55"),
+            ],
         ),
     )
     out_dir = tmp_path / "out"
@@ -2954,10 +2959,15 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     assert calibration["overall"]["count"] == 2
     assert calibration["overall"]["mean_signed_error_m"] == "-2.50"
     by_class = calibration["by_class"]
-    assert by_class["lowrise"]["count"] == 1
-    assert by_class["lowrise"]["mean_signed_error_m"] == "5.00"
-    assert by_class["tower"]["count"] == 1
-    assert by_class["tower"]["mean_signed_error_m"] == "-10.00"
+    assert set(by_class) == {"all"}
+    assert by_class["all"] == calibration["overall"]
+    assert calibration["class_basis"] == "none_published"
+    assert calibration["matched"] == 2
+    assert calibration["recorded_height_unusable"] == 0
+    assert calibration["recorded_buildings"] == 2
+    assert calibration["no_footprint"] == calibration["unusable_height"] == 0
+    counts = _manifest(out_dir)["sources"]["bldg_gba"]
+    assert counts["rows_in_bounds"] == counts["rows_kept"] == 2
     assert any("PASS heights" in line for line in lines)
 
 
@@ -3635,6 +3645,10 @@ def test_gba_calibration_drops_a_recorded_height_below_the_precision() -> None:
         "median_absolute_error_m": "0.00",
         "reason": "",
     }
+    assert block["recorded_height_unusable"] == 1
+    assert block["recorded_buildings"] == 2
+    assert block["matched"] == block["overall"]["count"]
+    assert block["no_footprint"] == block["unusable_height"] == 0
     assert set(block["by_class"]) == {"tower"}
     with pytest.raises(ValueError, match="recorded must be positive"):
         fallback_errors([{"recorded": Decimal("0.004"), "3dglobfp": Decimal("40")}])
@@ -3845,7 +3859,7 @@ def _gba_rules(tmp_path: Path, **gba) -> Path:
 def test_class_field_rules_have_their_own_refusals(tmp_path: Path) -> None:
     """A class field belongs to the field form only and is text."""
     base = load_rules(_gba_rules(tmp_path / "ok"))
-    assert base.structures["bldg_gba"].class_field == "SYN_class"
+    assert base.structures["bldg_gba"].class_field == ""
     document = invented.rules_document()
     document["sources"]["bldg_wsf3d"]["class_field"] = "SYN_class"
     path = invented.write_rules(tmp_path / "band.yaml", document)
@@ -3853,128 +3867,6 @@ def test_class_field_rules_have_their_own_refusals(tmp_path: Path) -> None:
     for value in (7, ["SYN_class"], None):
         path = _gba_rules(tmp_path / f"type-{type(value).__name__}", class_field=value)
         _refused(lambda path=path: load_rules(path), "rules_class_field", "")
-
-
-def test_a_gba_class_field_still_to_be_confirmed_keeps_the_source_absent(
-    tmp_path: Path,
-) -> None:
-    rules = _gba_rules(tmp_path, class_field="to be confirmed")
-    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
-    row = invented.entry("bldg_gba", extension="zip")
-    results = _sources(tmp_path, (row,), bodies=((row, body),), rules=rules)
-    assert results["bldg_gba"].state == "absent"
-    assert results["bldg_gba"].reason == "structure_unconfirmed"
-    assert results["bldg_gba"].gba == ()
-
-
-def test_gba_rules_without_a_class_field_refuse_before_parse(tmp_path: Path) -> None:
-    rules = _gba_rules(tmp_path, class_field="")
-    body = invented.gba_zip([(invented.square(0, 0, 1), "90", "tower")])
-    row = invented.entry("bldg_gba", extension="zip")
-    _refused(
-        lambda: _sources(tmp_path, (row,), bodies=((row, body),), rules=rules),
-        "structure_mismatch",
-        "class_field_undeclared",
-    )
-
-
-def _gba_zip_fields(fields, class_values) -> bytes:
-    """An invented GBA tile with its own field list (class column may differ)."""
-    shapes = []
-    records = []
-    for index, class_value in enumerate(class_values):
-        shapes.append([invented.cw(invented.square(index * 2, 0, 1))])
-        record = [str(index + 1), "90"]
-        if class_value is not None:
-            record.append(class_value)
-        record.append("")
-        records.append(record)
-    return invented.shapefile_zip(shapes, records, [list(item) for item in fields])
-
-
-_NO_CLASS_FIELDS = (
-    ("FID", "N", 18, 0),
-    ("Height", "N", 24, 15),
-    ("FID_1", "N", 24, 15),
-)
-_NUMERIC_CLASS_FIELDS = (
-    ("FID", "N", 18, 0),
-    ("Height", "N", 24, 15),
-    ("SYN_class", "N", 8, 0),
-    ("FID_1", "N", 24, 15),
-)
-
-
-@pytest.mark.parametrize(
-    ("body", "detail"),
-    [
-        (lambda: _gba_zip_fields(_NO_CLASS_FIELDS, [None]), "class_field_absent"),
-        (lambda: _gba_zip_fields(_NUMERIC_CLASS_FIELDS, ["5"]), "class_field_type"),
-        (
-            lambda: invented.gba_zip(
-                [
-                    (invented.square(0, 0, 1), "90", "tower"),
-                    (invented.square(2, 0, 1), "40", ""),
-                ]
-            ),
-            "class_record_blank",
-        ),
-    ],
-)
-def test_a_gba_class_column_defect_has_its_own_refusal(
-    tmp_path: Path, body, detail: str
-) -> None:
-    row = invented.entry("bldg_gba", extension="zip")
-    _refused(
-        lambda: _sources(tmp_path, (row,), bodies=((row, body()),)),
-        "structure_mismatch",
-        detail,
-    )
-
-
-def _gba_dbf(class_values=("tower", "lowrise")) -> bytes:
-    members = invented.shapefile_members(
-        [[invented.cw(invented.square(i * 2, 0, 1))] for i in range(len(class_values))],
-        [[str(i + 1), "90", value, ""] for i, value in enumerate(class_values)],
-        [list(item) for item in invented.GBA_FIELDS],
-    )
-    return members["dbf"]
-
-
-def test_the_class_column_reader_refuses_each_malformed_table() -> None:
-    """Direct plants of the class-column reader's own table and record checks."""
-    from eii_custodian.publicdata.heights.read import _dbf_text_field
-
-    dbf = _gba_dbf()
-    assert _dbf_text_field(dbf, "SYN_class") == ("tower", "lowrise")
-    name_offset = 32 + 2 * 32
-    header_len = int.from_bytes(dbf[8:10], "little")
-    record_len = int.from_bytes(dbf[10:12], "little")
-    plants = {
-        "class_table": [dbf[:40], b"\x00" + dbf[1:]],
-        "class_header": [
-            dbf[: header_len - 1] + b"\x00" + dbf[header_len:],
-        ],
-        "class_descriptor": [
-            dbf[:name_offset] + b"\xff" + dbf[name_offset + 1 :],
-        ],
-        "class_record_length": [
-            dbf[:10] + (record_len + 1).to_bytes(2, "little") + dbf[12:] + b"\x20\x20",
-        ],
-    }
-    offset, size = invented.dbf_field_offset(dbf, "SYN_class")
-    plants["class_record"] = [
-        invented.dbf_patch(dbf, 1, 0, b"*"),
-        invented.dbf_patch(dbf, 1, offset, b"\xe9"),
-    ]
-    plants["class_record_blank"] = [invented.dbf_patch(dbf, 1, offset, b" " * size)]
-    for detail, bodies in plants.items():
-        for planted in bodies:
-            _refused(
-                lambda planted=planted: _dbf_text_field(planted, "SYN_class"),
-                "structure_mismatch",
-                detail,
-            )
 
 
 def assert_nc_height_sources_listed(entries, document):
@@ -4006,3 +3898,630 @@ def test_invented_nc_height_missing_from_dha102_is_refused():
     )
     with pytest.raises(AssertionError, match=r"^bldg_syn_missing$"):
         assert_nc_height_sources_listed((row,), document)
+
+
+_GBA_GEO = {
+    "version": "1.1.0",
+    "primary_column": "geometry",
+    "columns": {"geometry": {"encoding": "WKB", "geometry_types": ["Polygon"]}},
+}
+_GBA_GOOD = [(invented.square(0, 0, 1), "12.25")]
+
+
+def _geoparquet_sources(
+    tmp_path,
+    *,
+    features=None,
+    geo=None,
+    projection="*",
+    rules=None,
+    extension="parquet",
+    bounds=(0, 0, 4, 4),
+    body=None,
+):
+    row = invented.entry("bldg_gba", extension=extension)
+    if body is None:
+        body = invented.gba_parquet(
+            tmp_path / "tile.parquet",
+            _GBA_GOOD if features is None else features,
+            geo=geo,
+            projection=projection,
+        )
+    return _sources(
+        tmp_path, (row,), bodies=((row, body),), bounds=bounds, rules=rules
+    )["bldg_gba"]
+
+
+@pytest.mark.parametrize(
+    ("mutation", "name", "detail"),
+    [
+        ({"body": b"SYN-not-parquet"}, "structure_mismatch", "parquet"),
+        ({"geo": False}, "structure_mismatch", "geo_metadata"),
+        (
+            {"geo": {**_GBA_GEO, "primary_column": "other"}},
+            "structure_mismatch",
+            "geo_metadata",
+        ),
+        (
+            {
+                "geo": {
+                    **_GBA_GEO,
+                    "columns": {
+                        "geometry": {"encoding": "WKT", "geometry_types": ["Polygon"]}
+                    },
+                }
+            },
+            "structure_mismatch",
+            "geometry_encoding",
+        ),
+        (
+            {
+                "geo": {
+                    **_GBA_GEO,
+                    "columns": {
+                        "geometry": {
+                            "encoding": "WKB",
+                            "geometry_types": ["MultiPolygon"],
+                        }
+                    },
+                }
+            },
+            "structure_mismatch",
+            "geometry_type",
+        ),
+        (
+            {
+                "geo": {
+                    **_GBA_GEO,
+                    "columns": {
+                        "geometry": {
+                            "encoding": "WKB",
+                            "geometry_types": ["Polygon"],
+                            "crs": {"id": {"authority": "EPSG", "code": 3857}},
+                        }
+                    },
+                }
+            },
+            "reference_system",
+            "",
+        ),
+        (
+            {
+                "geo": {
+                    **_GBA_GEO,
+                    "columns": {
+                        "geometry": {
+                            "encoding": "WKB",
+                            "geometry_types": ["Polygon"],
+                            "crs": {
+                                "id": {"authority": "OGC", "code": "CRS84"},
+                                "coordinate_system": {
+                                    "axis": [
+                                        {"direction": "north"},
+                                        {"direction": "east"},
+                                    ]
+                                },
+                            },
+                        }
+                    },
+                }
+            },
+            "reference_system",
+            "",
+        ),
+        ({"projection": "* EXCLUDE(height)"}, "structure_mismatch", "field_absent"),
+        (
+            {"projection": "* REPLACE(CAST(height AS VARCHAR) AS height)"},
+            "structure_mismatch",
+            "height_type",
+        ),
+        (
+            {"projection": "* REPLACE('SYN' AS geometry)"},
+            "structure_mismatch",
+            "geometry_type",
+        ),
+        (
+            {
+                "projection": "* REPLACE(struct_pack(xmin := bbox.xmin, ymin := bbox.ymin, xmax := bbox.xmax) AS bbox)"
+            },
+            "structure_mismatch",
+            "bbox_type",
+        ),
+        (
+            {
+                "projection": "* REPLACE(struct_pack(xmin := CAST(bbox.xmin AS VARCHAR), ymin := bbox.ymin, xmax := bbox.xmax, ymax := bbox.ymax) AS bbox)"
+            },
+            "structure_mismatch",
+            "bbox_type",
+        ),
+        (
+            {"features": [(b"SYN-bad-wkb", "12.25")]},
+            "structure_mismatch",
+            "geometry_wkb",
+        ),
+        (
+            {"features": [(Polygon(invented.square(0, 0, 1)).wkb[:10], "12.25")]},
+            "structure_mismatch",
+            "geometry_wkb",
+        ),
+        ({"features": [(Point(0, 0), "12.25")]}, "structure_mismatch", "geometry_type"),
+        ({"extension": "zip"}, "cache_receipt_mismatch", ""),
+    ],
+)
+def test_gba_geoparquet_refusal(tmp_path, mutation, name, detail):
+    # One changed input over the observed seven-column valid fixture.
+    with pytest.raises(HeightError, match=f"^{name}$") as caught:
+        _geoparquet_sources(tmp_path, **mutation)
+    assert caught.value.detail == detail
+
+
+@pytest.mark.parametrize(
+    ("change", "name", "detail"),
+    [
+        ({"crs": "EPSG:4326"}, "declared_reference_system", ""),
+        ({"unit": "ft"}, "declared_unit", ""),
+        ({"nodata": "SYN-invalid"}, "structure_mismatch", "nodata"),
+        ({"nodata": "NaN"}, "structure_mismatch", "nodata"),
+    ],
+)
+def test_gba_geoparquet_declared_refusal(tmp_path, change, name, detail):
+    rules = _gba_rules(tmp_path, **change)
+    with pytest.raises(HeightError, match=f"^{name}$") as caught:
+        _geoparquet_sources(tmp_path, rules=rules)
+    assert caught.value.detail == detail
+
+
+def test_gba_other_format_stays_unconfirmed(tmp_path):
+    result = _geoparquet_sources(
+        tmp_path, rules=_gba_rules(tmp_path, format="shapefile_zip")
+    )
+    assert (result.state, result.reason) == ("absent", "structure_unconfirmed")
+
+
+@pytest.mark.parametrize(
+    ("shape", "height", "reason"),
+    [
+        (None, "12.25", "geometry_null"),
+        (Polygon(), "12.25", "geometry_empty"),
+        (
+            Polygon([(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)]),
+            "12.25",
+            "geometry_invalid",
+        ),
+        (Polygon(invented.square(0, 0, 1)), None, "height_null"),
+        (Polygon(invented.square(0, 0, 1)), "-999", "height_nodata"),
+        (Polygon(invented.square(0, 0, 1)), "NaN", "height_non_finite"),
+        (Polygon(invented.square(0, 0, 1)), "Infinity", "height_non_finite"),
+        (Polygon(invented.square(0, 0, 1)), "-Infinity", "height_non_finite"),
+        (Polygon(invented.square(0, 0, 1)), "0", "height_non_positive"),
+        (Polygon(invented.square(0, 0, 1)), "-5", "height_non_positive"),
+    ],
+)
+def test_gba_geoparquet_counted_exclusion(tmp_path, shape, height, reason):
+    from eii_core.calc.building_heights import gba_read_counts
+
+    result = _geoparquet_sources(tmp_path, features=[(shape, height), *_GBA_GOOD])
+    counts = result.files[0]["read_counts"]
+    assert counts == gba_read_counts([reason, ""])
+    assert counts["rows_in_bounds"] == 2
+    assert counts["rows_kept"] == 1
+    assert counts[reason] == 1
+    assert len(result.gba[0][1]) == 1
+
+
+def test_gba_geoparquet_bounds_and_file_order(tmp_path):
+    result = _geoparquet_sources(
+        tmp_path,
+        features=[
+            *_GBA_GOOD,
+            (invented.square(20, 20, 1), "15"),
+            (invented.square(0, 0, 1), "22"),
+        ],
+    )
+    assert [row[1] for row in result.gba[0][1]] == [Decimal("12.25"), Decimal("22")]
+    assert result.files[0]["read_counts"]["rows_in_bounds"] == 2
+
+
+@pytest.mark.parametrize("child", [None, "xmin", "ymin", "xmax", "ymax"])
+@pytest.mark.parametrize("bounds", [(0, 0, 4, 4), None])
+def test_gba_null_bbox_is_counted_outside_the_bounded_partition(
+    tmp_path, child, bounds
+):
+    from eii_core.calc.building_heights import fallback_errors, gba_read_counts
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+    from eii_custodian.publicdata.heights.manifest import manifest_block
+
+    null_bbox = (
+        "NULL::STRUCT(xmin DOUBLE, ymin DOUBLE, xmax DOUBLE, ymax DOUBLE)"
+        if child is None
+        else "struct_pack("
+        + ", ".join(
+            f"{name} := {'NULL::DOUBLE' if name == child else 'bbox.' + name}"
+            for name in ("xmin", "ymin", "xmax", "ymax")
+        )
+        + ")"
+    )
+    rows = [
+        invented.entry("bldg_gba", key=f"bldg_gba/SYN-{index}", extension="parquet")
+        for index in range(2)
+    ]
+    bodies = [
+        (
+            row,
+            invented.gba_parquet(
+                tmp_path / f"tile-{index}.parquet",
+                [*_GBA_GOOD, *_GBA_GOOD],
+                projection=f"* REPLACE(CASE WHEN id = 'SYN-row-0' THEN {null_bbox} ELSE bbox END AS bbox)",
+            ),
+        )
+        for index, row in enumerate(rows)
+    ]
+    results = _sources(tmp_path, rows, bodies=bodies, bounds=bounds)
+    source = results["bldg_gba"]
+    expected = {**gba_read_counts([] if bounds is None else [""]), "bbox_null": 1}
+    assert source.read_counts == (expected, expected)
+    assert [item["read_counts"] for item in source.files] == [expected, expected]
+    assert [len(features) for _name, features in source.gba] == (
+        [0, 0] if bounds is None else [1, 1]
+    )
+    total = {**gba_read_counts([] if bounds is None else ["", ""]), "bbox_null": 2}
+    calibration = gba_calibration([], source)
+    assert calibration["read_counts"] == total
+    block = manifest_block(
+        load_rules(invented.rules_file(tmp_path / "rules.yaml")),
+        results,
+        height_counts([], []),
+        fallback_errors([]),
+        [],
+        gba_calibration=calibration,
+    )
+    assert all(
+        block["sources"]["bldg_gba"][key] == value for key, value in total.items()
+    )
+    assert block["gba_calibration"]["read_counts"] == total
+    assert [item["read_counts"] for item in block["files"]] == [expected, expected]
+
+
+@pytest.mark.parametrize("features", [[], _GBA_GOOD])
+def test_gba_geoparquet_empty_bounds_read_no_rows(tmp_path, features):
+    result = _geoparquet_sources(tmp_path, features=features, bounds=None)
+    assert result.gba[0][1] == ()
+    assert result.files[0]["read_counts"]["rows_in_bounds"] == 0
+
+
+def test_gba_manifest_refuses_broken_row_identity(tmp_path):
+    from eii_core.calc.building_heights import fallback_errors
+    from eii_custodian.publicdata.heights.manifest import manifest_block
+
+    row = invented.entry("bldg_gba", extension="parquet")
+    body = invented.gba_parquet(tmp_path / "tile.parquet", _GBA_GOOD)
+    results = _sources(tmp_path, (row,), bodies=((row, body),), bounds=(0, 0, 4, 4))
+    results["bldg_gba"].read_counts[0]["rows_kept"] = 0
+    with pytest.raises(ValueError, match=r"^gba row accounting$"):
+        manifest_block(
+            load_rules(invented.rules_file(tmp_path / "rules.yaml")),
+            results,
+            height_counts([], []),
+            fallback_errors([]),
+            [],
+        )
+
+
+def test_gba_geometry_precedence_over_missing_height(tmp_path):
+    result = _geoparquet_sources(
+        tmp_path,
+        features=[
+            (None, None),
+            (Polygon(), "-999"),
+            (Polygon([(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)]), "NaN"),
+        ],
+    )
+    counts = result.files[0]["read_counts"]
+    assert (
+        counts["geometry_null"]
+        == counts["geometry_empty"]
+        == counts["geometry_invalid"]
+        == 1
+    )
+    assert (
+        counts["height_null"]
+        == counts["height_nodata"]
+        == counts["height_non_finite"]
+        == 0
+    )
+    assert counts["rows_in_bounds"] == 3 and counts["rows_kept"] == 0
+
+
+def test_gba_index_preserves_exhaustive_winners_and_counts(monkeypatch):
+    from eii_core.calc.building_heights import largest_overlap
+    from eii_custodian.publicdata.heights import calibration
+
+    buildings, source = _gba_case(
+        (("15", "10", "all"), ("0.004", "10", "all"), ("25", "20", "all"))
+    )
+    source = replace(
+        source,
+        gba=(
+            ("SYN-b", source.gba[0][1]),
+            (
+                "SYN-a",
+                (
+                    (buildings[0].geometry, Decimal("18"), "all"),
+                    (buildings[0].geometry, Decimal("19"), "all"),
+                ),
+            ),
+        ),
+    )
+    # Duplicate geometry with a new building identity gives one shared footprint.
+    buildings.append(replace(buildings[0], building_id="SYN-B-shared"))
+    buildings.append(
+        replace(
+            buildings[0],
+            geometry=Polygon(invented.square(20, 20, 1)),
+            building_id="SYN-B-missing",
+        )
+    )
+    baseline = calibration.gba_calibration(buildings, source)
+    indexed = calibration.globfp_candidates
+    for building in buildings:
+        point = representative_point(building.geometry)
+        index = globfp_index(
+            tuple(
+                (name, tuple((geometry, height) for geometry, height, _ in rows))
+                for name, rows in source.gba
+            )
+        )
+
+        def exhaustive(point, footprint, index):
+            return [
+                (Decimal(str(geometry.intersection(footprint).area)), name, row, height)
+                for geometry, (name, row, height) in zip(
+                    index.tree.geometries, index.metas, strict=True
+                )
+                if geometry.covers(point)
+            ]
+
+        assert largest_overlap(
+            indexed(point, building.geometry, index)
+        ) == largest_overlap(exhaustive(point, building.geometry, index))
+    monkeypatch.setattr(calibration, "globfp_candidates", exhaustive)
+    assert calibration.gba_calibration(buildings, source) == baseline
+    assert {
+        key: baseline[key]
+        for key in (
+            "recorded_buildings",
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+            "tied_height",
+            "shared_footprint",
+        )
+    } == {
+        "recorded_buildings": 5,
+        "matched": 3,
+        "no_footprint": 1,
+        "unusable_height": 1,
+        "recorded_height_unusable": 0,
+        "tied_height": 2,
+        "shared_footprint": 1,
+    }
+
+
+def test_gba_two_files_use_lowest_file_then_source_row(tmp_path):
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    rows = [
+        invented.entry("bldg_gba", key="bldg_gba/SYN-b", extension="parquet"),
+        invented.entry("bldg_gba", key="bldg_gba/SYN-a", extension="parquet"),
+    ]
+    bodies = [
+        (
+            row,
+            invented.gba_parquet(
+                tmp_path / f"tile-{i}.parquet",
+                [(invented.square(0, 0, 1), height) for height in heights],
+            ),
+        )
+        for i, (row, heights) in enumerate(
+            zip(rows, [("22",), ("-999", "18", "19")], strict=True)
+        )
+    ]
+    source = _sources(tmp_path, rows, bodies=bodies, bounds=(0, 0, 1, 1))["bldg_gba"]
+    buildings, _ = _gba_case((("15", "10", "all"),))
+    # Use a common exact footprint so both files and both source rows tie.
+    buildings[0] = replace(buildings[0], geometry=Polygon(invented.square(0, 0, 1)))
+    result = gba_calibration(buildings, source)
+    assert result["overall"]["mean_signed_error_m"] == "8.00"
+    assert result["tied_height"] == 1
+    assert result["read_counts"]["rows_in_bounds"] == 4
+    assert result["read_counts"]["height_nodata"] == 1
+
+
+@pytest.mark.parametrize("column", [None, []])
+def test_gba_malformed_geometry_metadata_refuses(tmp_path, column):
+    with pytest.raises(HeightError, match=r"^structure_mismatch$") as caught:
+        _geoparquet_sources(tmp_path, geo={**_GBA_GEO, "columns": {"geometry": column}})
+    assert caught.value.detail == "geo_metadata"
+
+
+def test_gba_explicit_crs84_and_bounded_empty_table(tmp_path):
+    geo = {
+        **_GBA_GEO,
+        "columns": {
+            "geometry": {
+                **_GBA_GEO["columns"]["geometry"],
+                "crs": {
+                    "id": {"authority": "OGC", "code": "CRS84"},
+                    "coordinate_system": {
+                        "axis": [{"direction": "east"}, {"direction": "north"}]
+                    },
+                },
+            }
+        },
+    }
+    source = _geoparquet_sources(tmp_path, features=[], geo=geo)
+    assert source.files[0]["read_counts"]["rows_in_bounds"] == 0
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    block = gba_calibration([], source)
+    assert block["overall"]["reason"] == "no_pairs"
+    assert block["by_class"] == {"all": block["overall"]}
+    assert block["recorded_buildings"] == block["matched"] == 0
+
+
+def test_gba_shared_places_helpers_keep_legacy_bindings():
+    from eii_custodian.publicdata.places import read
+
+    assert read.connect_parquet is read._connect
+    assert read.require_crs84 is read._building_crs
+
+
+def test_gba_duplicate_unread_ids_are_not_join_keys(tmp_path):
+    result = _geoparquet_sources(
+        tmp_path,
+        features=[*_GBA_GOOD, (invented.square(2, 0, 1), "22")],
+        projection="* REPLACE('SYN-same-id' AS id)",
+    )
+    assert [row[1] for row in result.gba[0][1]] == [Decimal("12.25"), Decimal("22")]
+    assert result.files[0]["read_counts"]["rows_kept"] == 2
+
+
+@pytest.mark.parametrize("tile", ["e050_n25_e055_n20", "e050_n30_e055_n25"])
+def test_gba_keys_use_stream_publication_and_verified_read(tmp_path, tile):
+    from custodian.tests.test_large_intake import stream
+
+    from eii_custodian.publicdata.fetch.build import _fetch_row
+    from eii_custodian.publicdata.fetch.large import REQUIRED_KEYS
+
+    row = invented.entry(
+        "bldg_gba",
+        key=f"bldg_gba/{tile}",
+        extension="parquet",
+        fetch_host="data.source.coop",
+        url="https://data.source.coop/SYN/tile.parquet",
+    )
+    assert row.key in REQUIRED_KEYS
+    body = invented.gba_parquet(tmp_path / "tile.parquet", _GBA_GOOD)
+    cache = tmp_path / "cache"
+    fetched, failure = _fetch_row(
+        row,
+        lambda _url: pytest.fail("whole-body fetch"),
+        cache,
+        _clock,
+        _sleep,
+        large_stream=stream(row, [body], len(body)),
+    )
+    assert failure is None and fetched is not None
+    select_fixture(cache, row.key, fetched.digest)
+    result = read_sources(
+        cache,
+        [row],
+        load_rules(invented.rules_file(tmp_path / "rules.yaml")),
+        (0, 0, 4, 4),
+    )["bldg_gba"]
+    assert result.state == "read"
+    assert result.files[0]["sha256"] == sha256_hex(body)
+    assert result.gba[0][1][0][1:] == (Decimal("12.25"), "all")
+
+
+def test_a_gba_class_field_still_to_be_confirmed_keeps_the_source_absent(tmp_path):
+    result = _geoparquet_sources(
+        tmp_path, rules=_gba_rules(tmp_path, class_field="to be confirmed")
+    )
+    assert (result.state, result.reason) == ("absent", "structure_unconfirmed")
+    assert result.gba == ()
+
+
+def test_gba_reader_refuses_a_planted_broken_partition(tmp_path, monkeypatch):
+    from eii_core.calc.building_heights import gba_read_counts
+    from eii_custodian.publicdata.heights import read
+
+    def broken(outcomes):
+        counts = gba_read_counts(outcomes)
+        counts["rows_kept"] = 0
+        return counts
+
+    monkeypatch.setattr(read, "gba_read_counts", broken)
+    with pytest.raises(ValueError, match=r"^gba row accounting$"):
+        _geoparquet_sources(tmp_path)
+
+
+def test_gba_calibration_refuses_a_planted_broken_partition(tmp_path):
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    result = _geoparquet_sources(tmp_path)
+    result.read_counts[0]["rows_kept"] = 0
+    with pytest.raises(ValueError, match=r"^gba row accounting$"):
+        gba_calibration([], result)
+
+
+@pytest.mark.parametrize(
+    "outside",
+    [
+        invented.square(6, 1, 1),
+        invented.square(-2, 1, 1),
+        invented.square(1, 6, 1),
+        invented.square(1, -2, 1),
+    ],
+    ids=["east", "west", "north", "south"],
+)
+def test_gba_each_bbox_limit_excludes_an_outside_row(tmp_path, outside):
+    result = _geoparquet_sources(tmp_path, features=[*_GBA_GOOD, (outside, "22")])
+    assert result.files[0]["read_counts"]["rows_in_bounds"] == 1
+    assert [row[1] for row in result.gba[0][1]] == [Decimal("12.25")]
+
+
+def test_gba_bbox_limits_include_touching_edges(tmp_path):
+    features = [
+        (invented.square(x, y, 1), "12.25")
+        for x, y in [(-1, 1), (4, 1), (1, -1), (1, 4)]
+    ]
+    result = _geoparquet_sources(tmp_path, features=features)
+    assert result.files[0]["read_counts"]["rows_kept"] == 4
+
+
+@pytest.mark.parametrize(
+    ("height", "matched", "unusable"), [("0.004", 0, 1), ("0.005", 1, 0)]
+)
+def test_gba_reader_keeps_raw_subprecision_values_for_core_rounding(
+    tmp_path, height, matched, unusable
+):
+    from eii_custodian.publicdata.heights.calibration import gba_calibration
+
+    source = _geoparquet_sources(
+        tmp_path, features=[(invented.square(0, 0, 1), height)]
+    )
+    assert source.gba[0][1][0][1] == Decimal(height)
+    assert source.files[0]["read_counts"]["rows_kept"] == 1
+    buildings, _ = _gba_case((("12.25", "10", "all"),))
+    buildings[0] = replace(buildings[0], geometry=Polygon(invented.square(0, 0, 1)))
+    block = gba_calibration(buildings, source)
+    assert block["matched"] == block["overall"]["count"] == matched
+    assert block["unusable_height"] == unusable
+
+
+def test_gba_places_parquet_error_keeps_its_named_mapping(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.heights import read
+    from eii_custodian.publicdata.places import PlacesError
+
+    def unreadable(_connection, _path):
+        raise PlacesError("parquet")
+
+    monkeypatch.setattr(read, "require_crs84", unreadable)
+    with pytest.raises(HeightError, match=r"^structure_mismatch$") as caught:
+        _geoparquet_sources(tmp_path)
+    assert caught.value.detail == "parquet"
+
+
+@pytest.mark.parametrize(
+    ("shape", "height"), [(None, "12.25"), (Polygon(invented.square(0, 0, 1)), None)]
+)
+def test_gba_internal_kept_row_invariant_has_a_named_failure(
+    tmp_path, monkeypatch, shape, height
+):
+    from eii_custodian.publicdata.heights import read
+
+    monkeypatch.setattr(read, "gba_exclusion", lambda *_args: "")
+    with pytest.raises(HeightError, match=r"^gba_kept_row_required$"):
+        _geoparquet_sources(tmp_path, features=[(shape, height)])

@@ -10,6 +10,8 @@ from dataclasses import replace
 from decimal import ROUND_UP, Decimal, localcontext
 
 import pytest
+from hypothesis import example, given
+from hypothesis import strategies as st
 
 from eii_core.calc.building_heights import (
     NO_PAIRS,
@@ -862,3 +864,305 @@ def test_height_counts_counts_each_tied_building() -> None:
     choice = HeightChoice(Decimal(7), "3dglobfp", "", ())
     counts = height_counts([choice, choice], [matches, matches])
     assert counts.tied_height_buildings == 2
+
+
+def test_gba_counts_no_footprint_zero_overlap_unusable_ties_and_shared():
+    from eii_core.calc.building_heights import gba_match_counts
+
+    winner = (Decimal("2"), "SYN-a", 0, Decimal("20"))
+    other = (Decimal("2"), "SYN-b", 0, Decimal("30"))
+    tiny = (Decimal("1"), "SYN-c", 0, Decimal("0.004"))
+    zero = (Decimal("0"), "SYN-z", 0, Decimal("15"))
+    assert gba_match_counts(
+        [
+            (None, []),
+            (Decimal("10"), []),
+            (Decimal("10"), [tiny]),
+            (Decimal("10"), [other, winner]),
+            (Decimal("10"), [winner]),
+            (Decimal("10"), [winner]),
+            (Decimal("10"), [zero]),
+        ]
+    ) == {
+        "recorded_buildings": 6,
+        "matched": 4,
+        "no_footprint": 1,
+        "unusable_height": 1,
+        "recorded_height_unusable": 0,
+        "tied_height": 1,
+        "shared_footprint": 1,
+    }
+
+
+def test_gba_accounting_refuses_a_planted_identity_break():
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    counts = gba_read_counts(["", "height_null"])
+    counts["rows_in_bounds"] = 1
+    with pytest.raises(ValueError, match=r"^gba row accounting$"):
+        sum_gba_read_counts([counts])
+
+
+def test_gba_accounting_refuses_unknown_outcome():
+    from eii_core.calc.building_heights import gba_read_counts
+
+    with pytest.raises(ValueError, match=r"^gba row outcome$"):
+        gba_read_counts(["SYN-unknown"])
+
+
+@pytest.mark.parametrize("counter", ["height_null", "bbox_null"])
+def test_gba_accounting_refuses_negative_count(counter):
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    counts = gba_read_counts([])
+    counts[counter] = -1
+    with pytest.raises(ValueError, match=r"^non-negative integer count required$"):
+        sum_gba_read_counts([counts])
+
+
+def test_gba_accounting_refuses_unknown_counter():
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    counts = gba_read_counts([])
+    counts["SYN-extra"] = 0
+    with pytest.raises(ValueError, match=r"^gba row accounting$"):
+        sum_gba_read_counts([counts])
+
+
+@given(
+    st.lists(
+        st.tuples(
+            st.sampled_from(
+                ["", "geometry_null", "geometry_empty", "geometry_invalid"]
+            ),
+            st.one_of(st.none(), st.decimals(allow_nan=True, allow_infinity=True)),
+        )
+    )
+)
+@example([])
+@example([("", Decimal("-999"))])
+@example([("geometry_null", None), ("geometry_empty", Decimal("NaN"))])
+def test_gba_exclusions_partition_rows_with_geometry_precedence(rows):
+    from collections import Counter
+
+    from eii_core.calc.building_heights import (
+        gba_exclusion,
+        gba_read_counts,
+        sum_gba_read_counts,
+    )
+
+    expected = Counter()
+    for geometry_reason, value in rows:
+        if geometry_reason:
+            reason = geometry_reason
+        elif value is None:
+            reason = "height_null"
+        elif not value.is_finite():
+            reason = "height_non_finite"
+        elif value == Decimal("-999"):
+            reason = "height_nodata"
+        elif value <= 0:
+            reason = "height_non_positive"
+        else:
+            reason = ""
+        expected[reason] += 1
+    outcomes = [gba_exclusion(reason, value, Decimal("-999")) for reason, value in rows]
+    counts = gba_read_counts(outcomes)
+    assert counts["rows_in_bounds"] == len(rows)
+    assert counts["rows_kept"] == expected[""]
+    for reason in counts.keys() - {"rows_in_bounds", "rows_kept"}:
+        assert counts[reason] == expected[reason]
+    assert sum_gba_read_counts([counts]) == counts
+
+
+@pytest.mark.parametrize("counter", ["rows_kept", "bbox_null"])
+@pytest.mark.parametrize("value", [False, "0", None])
+def test_gba_accounting_refuses_non_integer_counter(value, counter):
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    counts = gba_read_counts([])
+    counts[counter] = value
+    with pytest.raises(ValueError, match=r"^non-negative integer count required$"):
+        sum_gba_read_counts([counts])
+
+
+def test_gba_bbox_null_totals_stay_outside_the_bounded_partition():
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    first = gba_read_counts(["", "height_null"])
+    second = gba_read_counts([""])
+    first["bbox_null"] = 2
+    second["bbox_null"] = 3
+    total = sum_gba_read_counts([first, second])
+    assert total == {**gba_read_counts(["", "height_null", ""]), "bbox_null": 5}
+
+
+@given(
+    st.lists(
+        st.lists(
+            st.sampled_from(
+                [
+                    "",
+                    "geometry_null",
+                    "geometry_empty",
+                    "geometry_invalid",
+                    "height_null",
+                    "height_nodata",
+                    "height_non_finite",
+                    "height_non_positive",
+                ]
+            )
+        )
+    )
+)
+@example([])
+@example([[""], ["height_nodata", "height_null"]])
+def test_gba_read_counts_are_additive_and_order_independent(files):
+    from eii_core.calc.building_heights import gba_read_counts, sum_gba_read_counts
+
+    counts = [gba_read_counts(rows) for rows in files]
+    combined = sum_gba_read_counts(counts)
+    assert combined == gba_read_counts([reason for rows in files for reason in rows])
+    assert sum_gba_read_counts(reversed(counts)) == combined
+
+
+_GBA_MATCHES = st.lists(
+    st.tuples(
+        st.decimals(
+            min_value=0,
+            max_value=100,
+            places=3,
+            allow_nan=False,
+            allow_infinity=False,
+        ),
+        st.sampled_from(["SYN-a", "SYN-b"]),
+        st.integers(min_value=0, max_value=3),
+        st.decimals(
+            min_value="0.001",
+            max_value="100",
+            places=3,
+            allow_nan=False,
+            allow_infinity=False,
+        ),
+    ),
+    unique_by=lambda row: (row[1], row[2]),
+)
+
+
+@given(st.lists(_GBA_MATCHES))
+@example([])
+@example([[]])
+def test_gba_match_counts_ignore_input_scan_order(rows):
+    from eii_core.calc.building_heights import gba_match_counts
+
+    recorded = Decimal("10")
+    forward = gba_match_counts([(recorded, matches) for matches in rows])
+    assert forward == gba_match_counts(
+        [(recorded, list(reversed(matches))) for matches in reversed(rows)]
+    )
+    assert forward["matched"] + forward["no_footprint"] + forward[
+        "unusable_height"
+    ] == len(rows)
+    assert forward["recorded_buildings"] == len(rows)
+
+
+def test_gba_shared_footprint_counts_distinct_reused_keys():
+    from eii_core.calc.building_heights import gba_match_counts
+
+    first = [(Decimal("1"), "SYN-a", 0, Decimal("20"))]
+    second = [(Decimal("1"), "SYN-a", 1, Decimal("20"))]
+    rows = [
+        (Decimal("10"), matches) for matches in (first, first, second, second, second)
+    ]
+    assert gba_match_counts(rows)["shared_footprint"] == 2
+
+
+def test_gba_match_counts_withhold_an_unusable_recorded_pair():
+    from eii_core.calc.building_heights import gba_match_counts
+
+    matches = [(Decimal("1"), "SYN-a", 0, Decimal("20"))]
+    result = gba_match_counts([(Decimal("0.004"), matches)])
+    assert result == {
+        "recorded_buildings": 1,
+        "matched": 0,
+        "no_footprint": 0,
+        "unusable_height": 0,
+        "recorded_height_unusable": 1,
+        "tied_height": 0,
+        "shared_footprint": 0,
+    }
+    assert result["recorded_buildings"] == sum(
+        result[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    )
+
+
+@pytest.mark.parametrize("recorded", [None, Decimal("0.004")])
+@pytest.mark.parametrize(
+    ("height", "outcome"),
+    [
+        (None, "no_footprint"),
+        (Decimal("0.004"), "unusable_height"),
+        (Decimal("20"), "recorded_height_unusable"),
+    ],
+)
+def test_gba_match_outcome_precedence(recorded, height, outcome):
+    from eii_core.calc.building_heights import gba_match_counts
+
+    matches = [] if height is None else [(Decimal("1"), "SYN-a", 0, height)]
+    result = gba_match_counts([(recorded, matches)])
+    assert result["recorded_buildings"] == int(recorded is not None)
+    for name in (
+        "matched",
+        "no_footprint",
+        "unusable_height",
+        "recorded_height_unusable",
+    ):
+        assert result[name] == int(recorded is not None and name == outcome)
+
+
+@given(
+    st.lists(
+        st.tuples(
+            st.one_of(st.none(), st.decimals(allow_nan=True, allow_infinity=True)),
+            _GBA_MATCHES,
+        )
+    )
+)
+@example([(Decimal("0.004"), [(Decimal("1"), "SYN-a", 0, Decimal("20"))])])
+def test_gba_match_outcomes_partition_recorded_buildings(rows):
+    from eii_core.calc.building_heights import gba_match_counts
+
+    result = gba_match_counts(rows)
+    assert result["recorded_buildings"] == sum(
+        recorded is not None for recorded, _ in rows
+    )
+    assert result["recorded_buildings"] == sum(
+        result[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    )
+
+
+def test_gba_match_accounting_refuses_a_planted_count(monkeypatch):
+    from eii_core.calc import building_heights
+
+    class BrokenCounts:
+        @staticmethod
+        def fromkeys(keys, value):
+            counts = dict.fromkeys(keys, value)
+            counts["recorded_buildings"] = 1
+            return counts
+
+    monkeypatch.setattr(building_heights, "dict", BrokenCounts, raising=False)
+    with pytest.raises(ValueError, match=r"^gba match accounting$"):
+        building_heights.gba_match_counts([])

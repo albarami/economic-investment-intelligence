@@ -10,6 +10,7 @@ import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,7 @@ from .assembly_intake import write_intake_evidence
 from .assembly_inventory import INVENTORY, validate_inventory
 from .assembly_io import bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
-from .fetch.registry import Entry, read_yaml
+from .fetch.registry import Entry, RegistryError, parse_yaml, read_yaml
 from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
 from .fetch.transport import Transport
 from .frame.build import FrameResult, build_public_frame, read_cached
@@ -398,20 +399,21 @@ class Production:
             write_municipality_output,
         )
         from .heights.model import BUILDINGS_RELATIVE
-        from .places.integrate import areas_before_stage
+        from .places.integrate import areas_before_stage, build_lines
 
         invalidate_buildings(self.cache)
         areas_before_stage(self.cache, self.lines, self.review)
         try:
-            result = build_public_frame(
-                self.cache,
-                self.entries,
-                self.review,
-                selections=self.selected,
-                build_date=datetime.fromisoformat(
-                    self.stamp or self.clock().replace("Z", "+00:00")
-                ).date(),
-            )
+            with build_lines(self.lines):
+                result = build_public_frame(
+                    self.cache,
+                    self.entries,
+                    self.review,
+                    selections=self.selected,
+                    build_date=datetime.fromisoformat(
+                        self.stamp or self.clock().replace("Z", "+00:00")
+                    ).date(),
+                )
         except BuildingError as exc:
             self.lines.append(f"FAIL buildings check={exc.name}")
             if exc.name == "building_frame_absent":
@@ -508,27 +510,24 @@ class Production:
 
     def spine_graph(self) -> dict[str, str]:
         from .review.activity import (
-            SupplierMembership,
-            decode_review_code,
+            SpineError,
+            basket_membership,
             load_activity_inputs,
+            read_activity_rows,
         )
         from .review.graph import build_graph, read_allowlist, write_graph
 
-        membership = read_object(self.cache, "review/activity_membership.json")
-        if (
-            set(membership) != {"playbook_codes", "supplier_codes", "supplier_complete"}
-            or membership["supplier_complete"] is not True
-        ):
-            raise AssemblyError("assembly_membership_invalid")
-        codes = []
-        for key in ("playbook_codes", "supplier_codes"):
-            if not isinstance(membership[key], list):
-                raise AssemblyError("assembly_membership_invalid")
-            codes.append(tuple(decode_review_code(value) for value in membership[key]))
+        activities, _, _ = read_activity_rows(self.cache, self.entries, self.selected)
+        try:
+            baskets_bytes = (self.review / "baskets.yaml").read_bytes()
+            baskets = parse_yaml(baskets_bytes)
+            playbook, suppliers = basket_membership(baskets, activities)
+        except (SpineError, OSError, RegistryError, KeyError, TypeError) as error:
+            raise AssemblyError("assembly_membership_invalid") from error
         inputs = load_activity_inputs(
             self.cache,
-            codes[0],
-            supplier_membership=SupplierMembership(codes[1], True),
+            playbook,
+            supplier_membership=suppliers,
             registry=self.entries,
             review_path=self.review / "activity_spine.csv",
             selections=self.selected,
@@ -558,6 +557,12 @@ class Production:
             "spine_graph",
             {
                 "spine": inputs.spine,
+                "membership": {
+                    "playbook_codes": playbook,
+                    "supplier_codes": suppliers.codes,
+                    "supplier_classes": sorted({code[:4] for code in suppliers.codes}),
+                    "baskets_sha256": sha256(baskets_bytes).hexdigest(),
+                },
                 "manifest": inputs.manifest,
                 "left_out": inputs.left_out,
             },
@@ -764,7 +769,10 @@ class Production:
         output = self.record(
             "series_stage", {**result, "tables": produced, "row_sources": row_sources}
         )
-        if result["mismatch"] or result["missing"]:
+        # run_stage names a missing required (owned) figure as the mismatch.
+        # Unowned section 10 figures stay in ``missing`` and final_audit
+        # compares them after every producer has run.
+        if result["mismatch"]:
             raise AssemblyError("assembly_regression_refused")
         return output
 
@@ -892,9 +900,16 @@ class Production:
 
     def final_audit(self) -> dict[str, str]:
         from .assembly_reports import gather_audit
+        from .stage import run_stage
 
         bound_files(self.cache, self.files)
         bound_files(self.cache.parent, self.data_files)
+        # Every section 10 record produced in this run (series_stage cleared
+        # the folder) is compared again; one the series stage does not own is
+        # compared only here. A figure no producer wrote stays not measured.
+        section = run_stage(self.cache, evidence=True)
+        if section.mismatch or section.unrecorded:
+            raise AssemblyError("assembly_regression_refused")
         self.audit = gather_audit(self)
         return self.record("final_audit", self.audit)
 

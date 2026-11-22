@@ -1927,6 +1927,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - NEEDED BY: task S2-T08 (the Public pack assembly) for any figure by activity class; before the slice S2 gate.
 - UPDATE: 2026-11-20, package P25, decision 0075 items 1 to 5; remains OPEN. The owner answered "i agree." that the same signer as OI-16 performs this review. Decision 0075 expressly supersedes the no-model-signature ruling of 2026-11-15 recorded in WHY above: the signer is a bilingual Arabic-English economic-classification specialist model of a maker other than the queue-preparing lead, judging each code independently, followed by a seeded 30-code audit (all when fewer) by an auditor of another maker, with zero errors. Next step belongs to the lead: recompute the queue with the reviewed baskets' supplier membership on the real cache, obtain signing and audit, and fill the review rows and version/title/audit binding. This package reads no real cache, writes no review row or populated audit record, and ticks no S2-T04 box. Its audit file is empty; fixture tests establish guards only (final touched-file run exit 0, 77 passed; required guard-removal plants each red exit 1). The historical count of 243 is not a recomputed queue count.
 
+- DONE SO FAR: 2026-11-22, S2-P57 BT-1: assembly derives mandatory playbook and supplier review membership from the reviewed baskets and verified active/cancelled feeds; its stage record binds the baskets hash and records the classes and codes. Invented-fixture tests include a cancelled-only supplier and planted R1–R5 refusals; evidence is recorded in PROGRESS.md. No real cache is read, mapping signed or acceptance box ticked; the lead's recomputation, signing and independent audit remain owed under decision 0075 item 5.
+
 ## OI-204 — The terms of the classification file are not read
 
 - ID: OI-204
@@ -6182,3 +6184,43 @@ This append-only section supersedes the round-6 OPEN state of the items it names
 - **CLOSED — OI-365 and PO-S2-REC1-2 (F5), 2026-11-22.** The different-maker review of the exact S2-T35 box 2 wording is Zhipu GLM-5.3 via Droid (S2-gate.r6rv), APPROVED `375a49c165bf9dba03a838581985dfa93228ba13` with the wording result EXACT. On that reviewed tree the lead ran the value-free guard in the lead's shell: exit 0, no new copy (files with copies 2, three baseline files); a planted new copy of one expected value in a new tracked document was refused, exit 1. Counts only; no value is recorded. TASKS.md S2-T35 box 2 is ticked by the S2-GATE-R7 line.
 - **RECORDED — PO-S2-51, lead part (F2/C-03), 2026-11-22.** The lead's real-cache replay owed by this item ran in the lead's shell on 2026-11-22 at S2-P48 `a3eed2d2` (merged by PR 121 as `c4e86604`): `custodian/data_tests/test_pinned_methods.py`, 10 passed, exit 0, including `test_pinned_c1` (both denominators and both quotients) and `test_pinned_c8`. PO-S2-51's card data test of the frame's population table remains as written; PO-S2-52 still waits for the signed activity spine (OI-203). C-03 stays NOT MET on PO-S2-52.
 - **RECORDS-ONLY corrections from S2-gate.r6rv, 2026-11-22.** (1) In the PROGRESS.md "Refreshed canonical task table" of round 6, the TASKS-status cells of S2-T28, S2-T31, S2-T33, S2-T42 and S2-T51 are fragments of the status text; the status of each is the full status line of TASKS.md, which governs. (2) The phrase "through Abacus.AI" in the round-6 OI-131 bullet and in PROGRESS statement 17 comes from the supplied review return's own reviewer label, not from the round-6 brief.
+
+- PO-S2-P55-01 — PROPOSED OPEN ITEM, 2026-11-22: section 10 figures PUB-71, PUB-72 and PUB-73 have no producer on the assembly path. No code under `custodian/src` writes `series/regression/PUB-71.json`, `PUB-72.json` or `PUB-73.json`, or the legacy `figures/` files. PUB-71 is computed only by the lead-shell replay in `custodian/data_tests/local_expectations.py`, and a C1 density like PUB-72's only by `custodian/data_tests/test_pinned_methods.py::test_pinned_c1`; neither writes a figure record. PUB-73 has no computing code. After S2-P55 the series stage no longer refuses on these three. `final_audit` compares any record a later producer writes, and refuses a mismatch or a produced PUB-71 without its local record. Until each has a producer, it stays in the regressions `missing` list (not measured, never a pass), and `assembly_reports.require_complete` refuses `assembly_gate_pending`. The audit's `regressions` are still read from `assembly/series_stage.json`, so a future producer that runs after the series stage must also update that source (or the audit must read the final comparison); otherwise its figure stays listed as missing. NEEDED: the lead decides, for each of the three figures, which stage produces its record on the assembly path (PUB-72 from `lic_active` and `pop_muni`; PUB-73 from `places_ovt` and `est_census`; PUB-71 from `census_zone_sector`, with its expected values only in the uncommitted local record), or records why it stays not measured.
+
+
+## S2-P52 — PROPOSED OPEN ITEMS (2026-11-22)
+
+These are proposals for the lead, not newly assigned owner decisions or closed
+slice conditions. Source: S2-T20, decision 0064 item 25 and S2-P52 lead rulings
+Q1–Q6 / DR2–DR3 / DR7.
+
+- Sentinel meaning: `-999` is declared as nodata and counted, but its meaning
+  remains unconfirmed by the publisher. Keep the exclusion visible; obtain a
+  field-specific statement before treating the sentinel as publisher-declared.
+- Mixed licence component: supplied research reports the ODbL polygon notice
+  alongside CC BY-NC 4.0 but contains no verbatim component sentence. DR2 needs
+  the exact publisher quotation for both registry rows and document 04. The
+  original supplied quotation is retained; no invented quotation or blanket
+  mirror licence is asserted.
+  - CORRECTION 2026-11-22 (lead records commit of S2-P52, after review rv1 R3
+    and rv2 finding 2): the component notice is now quoted verbatim in both
+    rows' terms_words and in document 04, from the License Notice of the original repository (https://github.com/zhu-xlab/GlobalBuildingAtlas#license-notice), read by the lead on 2026-11-22, README sha256 457739ed96b61d3eaa8eb085942b1d67727974f6b869bd564fd1921e45d26f0b; the quotation
+    part of this item is resolved.
+- First live answering host: supplied research records direct file responses;
+  the lead must confirm the answering host for each full fetch. No redirect
+  host is newly admitted. An unlisted redirect remains refused and needs a
+  reviewed registry/PUB-03 change if encountered.
+- Bbox filtering limit: the reader trusts each row's bbox for frame selection.
+  A wrong bbox can omit a real intersecting polygon, and no spatial extension
+  checks bbox/WKB consistency. Keep this limit beside the read counters.
+
+OI-310 partial evidence: S2-P52 adds offline GeoParquet intake, counted exclusive
+exclusions, one declared `all` class (`none_published`), deterministic indexed
+matching and core match counters, with no height-order change. The landmark
+hand list (S2-P50), basemap ids, both real snapshot selections and real measured
+pairs remain open. This entry does not close OI-310 or S2-T20#5; DHA-102 only
+tracks the split file keys under its existing permission record.
+
+## S2-18-RF1 — Hosted timing failure of one section 10 property test (2026-11-22, lead)
+
+Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-11-22 on train S2-18 head `8f75f027a1` failed one test: `custodian/tests/test_assembly_section10.py::test_final_audit_refuses_exactly_a_mismatch_or_an_unrecorded_figure`, with Hypothesis `DeadlineExceeded` (273 ms against the 200 ms default) on the all-absent case. The other 15184 tests passed. Cause: each example runs a full final audit, which parses the 1.2 MB source registry. Locally the runtime is up to 195 ms on a dedicated core, so the test sits at the timer's edge. Disposition: the domain is finite (4 × 3 × 3 = 36 states), so the test now enumerates all of it with `pytest.mark.parametrize` and has no per-example timer. This is exhaustive, so it is a stronger test than a sample, with no assertion change. The same class was handled for the tender tests under PO-S2-P46-03. A green rerun alone did not close this item; it closes when the train merges with the change.

@@ -413,10 +413,13 @@ def read_yaml(path: Path) -> object:
 
     A malformed file raises RegistryError, the package's own error.
     """
+    return parse_yaml(path.read_text(encoding="utf-8"))
+
+
+def parse_yaml(content: str | bytes) -> object:
+    """Parse captured YAML with the same safe loader and refusal as read_yaml."""
     try:
-        loaded: object = yaml.load(
-            path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader
-        )
+        loaded: object = yaml.load(content, Loader=yaml.CSafeLoader)
     except yaml.YAMLError as exc:
         raise RegistryError("malformed yaml") from exc
     return loaded
