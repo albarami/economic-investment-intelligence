@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Mapping, Sequence
-from contextlib import contextmanager
-from contextvars import ContextVar
+from collections.abc import Mapping, Sequence
 from datetime import date
 from pathlib import Path
 
@@ -12,6 +10,9 @@ import yaml
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
+from eii_custodian.publicdata.assembly_log import _BUILD_LINES as _BUILD_LINES
+from eii_custodian.publicdata.assembly_log import build_lines as build_lines
+from eii_custodian.publicdata.assembly_log import observe
 from eii_custodian.publicdata.building_inputs import BuildingError, invalidate_buildings
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.snapshots import (
@@ -43,20 +44,7 @@ _TAG_FILE = "arabic_tag.txt"
 _PLACES_SOURCE = "places_ovt"
 _BUILDINGS_SOURCE = "bldg_ovt"
 _FRAME = (FRAME_BOX.west, FRAME_BOX.south, FRAME_BOX.east, FRAME_BOX.north)
-_BUILD_LINES: ContextVar[list[str] | None] = ContextVar(
-    "eii_places_build_lines", default=None
-)
 _READER_ERRORS = (yaml.YAMLError, OSError, UnicodeError, ValueError, TypeError)
-
-
-@contextmanager
-def build_lines(lines: list[str]) -> Iterator[None]:
-    """Route nested places notes to this build, restoring the caller's log."""
-    token = _BUILD_LINES.set(lines)
-    try:
-        yield
-    finally:
-        _BUILD_LINES.reset(token)
 
 
 def frame_when_ready(
@@ -122,7 +110,8 @@ def areas_before_stage(
     """Produce areas after the road receipt. A matching manifest does nothing."""
     try:
         road_sha = road_receipt(cache)
-    except AreaError:
+    except AreaError as exc:
+        _observe(exc)
         return
     chosen = review if review is not None else _review_directory(cache)
     if chosen is None:
@@ -130,13 +119,14 @@ def areas_before_stage(
     try:
         requests = area_requests(chosen, _cache_points(cache, chosen))
     except AreaError as exc:
-        lines.append(f"REFUSED {exc.reason}")
+        _area_refusal(lines, exc)
         return
     except PlacesError as exc:
-        lines.append(f"REFUSED {exc.reason}")
+        _area_refusal(lines, exc)
         return
-    except _READER_ERRORS:
+    except _READER_ERRORS as exc:
         lines.append(_REVIEW_UNREADABLE)
+        _observe(exc)
         return
     if not requests or manifest_agrees(cache, requests, road_sha):
         lines.append(_NOTHING)
@@ -145,7 +135,7 @@ def areas_before_stage(
         engine = open_pinned_engine()
         produce_areas(engine, requests, cache=cache, frame_box=_FRAME)
     except AreaError as exc:
-        lines.append(f"REFUSED {exc.reason}")
+        _area_refusal(lines, exc)
 
 
 def run_places_before_gazetteer(
@@ -224,7 +214,8 @@ def _cache_points(
                 continue
             for row in read_place_file(path, tag):
                 found[(_PLACES_SOURCE, row.place_id)] = (float(row.lon), float(row.lat))
-        except PlacesError:
+        except PlacesError as exc:
+            _observe(exc)
             continue
     for key in (key for key in FILE_KEYS if key.startswith(_BUILDINGS_SOURCE + "/")):
         _opened_place(cache, key)
@@ -241,7 +232,8 @@ def _cache_points(
                     float(building.lon),
                     float(building.lat),
                 )
-        except PlacesError:
+        except PlacesError as exc:
+            _observe(exc)
             continue
     return found
 
@@ -316,7 +308,8 @@ def _receipt_of(cache: Path, entry: Entry) -> tuple[Path, FileReceipt] | None:
         return snapshot.path, FileReceipt(
             entry.key, snapshot.sha256, retrieved, publisher
         )
-    except SnapshotError:
+    except SnapshotError as exc:
+        _observe(exc)
         return None
 
 
@@ -326,10 +319,22 @@ def _refuse_stage(cache: Path, lines: list[str] | None, reason: str) -> None:
     _note(lines, "places", reason)
 
 
+def _observe(error: Exception) -> None:
+    observe("frame", error)
+
+
+def _area_refusal(lines: list[str], error: AreaError | PlacesError) -> None:
+    if not observe("frame", error, lines=lines):
+        lines.append(f"REFUSED {error.reason}")
+
+
 def _note(lines: list[str] | None, stage: str, reason: str) -> None:
-    if lines is None or not _closed(stage) or not _closed(reason):
+    if lines is None or stage not in {"frame", "places"}:
         return
-    lines.append(f"stage {stage} {reason}")
+    if observe("frame", PlacesError(reason), lines=lines):
+        return
+    if _closed(reason):
+        lines.append(f"stage {stage} {reason}")
 
 
 def _closed(value: str) -> bool:

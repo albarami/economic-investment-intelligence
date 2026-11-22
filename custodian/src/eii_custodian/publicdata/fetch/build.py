@@ -550,7 +550,11 @@ def _seeded_assembly(
         # No exception text crosses the source/credential boundary. Preserve
         # an existing structured fetch failure and its network exit code.
         if build.fetched is not None and build.fetched.failure is not None:
-            return cast(BuildOutcome, build.fetched)
+            fetched = cast(BuildOutcome, build.fetched)
+            _write_log(
+                cache, build.lines, list(fetched.terms), list(fetched.terms_attempts)
+            )
+            return replace(fetched, lines=tuple(build.lines))
         if build.fetched is None:
             from eii_custodian.publicdata.busyness.security import assert_clean
 

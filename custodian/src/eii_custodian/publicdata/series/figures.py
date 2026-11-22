@@ -955,11 +955,17 @@ def build_series(
             else:
                 checks.update(compute_checks(group, receipts=receipts))
         except OSError as exc:
+            from ..assembly_log import observe
+
+            observe("series_stage", exc)
             blocked[source] = (
                 *blocked.get(source, ()),
                 "regression: " + type(exc).__name__,
             )
         except (ValueError, KeyError, SpineError) as exc:
+            from ..assembly_log import observe
+
+            observe("series_stage", exc)
             blocked[source] = (*blocked.get(source, ()), "regression: " + str(exc))
     if "PUB-65" in checks:
         checks["PUB-65"]["basket_excludes_noodles"] = str(basket_checked).lower()

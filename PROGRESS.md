@@ -52000,3 +52000,62 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
 - The first broad importer run had 588 passes and one inherited C14 synchronization failure (exit 1): round 1's approved code pointer changed a governed documentation span without updating `governed_sections_sha256`. The validator's own span/hash functions computed the corrected record value; all 174 method-card tests then passed (exit 0), and the final broad run passed 589 tests. No method pin, gate expectation or tolerance changed.
 - Final repository evidence on the corrected working tree: `UV_OFFLINE=1 uv run --locked ruff check .` exit 0; `UV_OFFLINE=1 uv run --locked ruff format --check .` exit 0 (942 files); `UV_OFFLINE=1 uv run --locked mypy` exit 0 (501 files); `python3 scripts/check_docs.py` exit 0; `python3 scripts/check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Full commit hash, exact command inventory, per-file counts, refusal inventory and bundle verification are in `.overnight/RETURN.md`. Independent-maker review remains pending; no live receipt, held-series result or slice-gate approval is claimed.
 - S2-P65 round 3 on base `14013b8bac3f1f5489ad61a7755a6837abe0522d` (round-2 builder persona, strict self-review and skills): the uncorrupted foreign-date control failed first with exactly `price_as_of_mismatch` (exit 1); moving only the residential registration to Q3 made the control and both exact `price_as_of_missing` plants pass (2 passed, exit 0). Deleting only annual pre-registration date validation made both plants fail (exit 1); exact restoration passed (2 passed, exit 0). Required property-sale, price-as-of, quarter and assembly-report modules: 101 passed, exit 0; ruff check, ruff format check (942 files), mypy (501 files), docs check, rule-file identity and diff check each exit 0. Full commit, counts, commands and refusal inventory are in `.overnight/RETURN.md`; independent review remains pending.
+
+## S2-P56 — closed refusal reasons across assembly stages — 2026-11-22
+
+OpenAI Codex (GPT-6), senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects dropped refusal names, exception-controlled log
+text and changed refusal conditions. Skills: project-orientation, task-standards,
+github-flow, sanad-provenance, al-muhasibi, strict-reviewer and muhasabah-gate;
+test-driven-development, systematic-debugging and verification-before-completion
+equivalent rules are supplied by the brief. Base `36efeb02c8bc9935e5597218f3f5578ba425824c`; the single resulting
+commit and bundle checksum are recorded in `.overnight/RETURN.md`. Linux, managed
+Python, `UV_OFFLINE=1 EII_DECISION_PROVIDER=none`; temporary, Hypothesis, Ruff and
+mypy paths remain under `.overnight/tmp/`. Final Hypothesis seed 56; invented
+Production seed 17. No network, live cache, repository `data/`, `.env` or `.private`
+input was read. Shared Git metadata is read-only: the branch and commit use the
+workspace-local metadata copy, without changing the shared repository metadata.
+
+The existing `build_lines` binding is shared with an assembly-only observer. It
+records `REFUSED <stage> <reason>` from a closed literal vocabulary, handles escaped
+and caught refusals, retains distinct closed causes, and preserves the exception
+object, existing FAIL reason and exits. The failed-fetch outcome retains the same
+failure object and network exit while its pending stage line is flushed. Legacy
+producer logging and the fetch fingerprint boundary are preserved.
+
+The supplied study's 265 inventory rows include three explicit non-refusal rows;
+262 refusal rows have 908 distinct invented exception/message delivery
+plants in `test_assembly_refusals.py`. The first base run gives 543 missing-line
+assertion failures. Silent-refusal, caught-series/wrapped-cause and fetch-exit
+plants were shown red before their changes. 30 individual guard/observation
+deletions each fail an actual targeted test with exit 1 in an isolated process;
+root files are unchanged by these probes. Every original producer raise and its
+enclosing if conditions compare equal to the base in `refusal-invariants.json`.
+
+| Command or check | Actual result | Exit |
+|---|---|---|
+| Changed/importer run over the recorded 131-file selection, with raise-site trace and seed 56 | 5225 passed, 192 warnings in 1393.59s (0:23:13) | 0 |
+| Final focused file and original context-binding tests | 49 passed, 908 deselected in 4.72s | 0 |
+| Final invented-URL persisted-log plants | 2 passed | 0 |
+| Ruff check and format check | clean | 0 each |
+| mypy | no issues in 503 source files | 0 |
+| check_docs.py; check_tree.py on workspace-local index | clean | 0 each |
+| cmp AGENTS.md CLAUDE.md; git diff --check | clean | 0 each |
+
+The first importer run had six failures (exit 1): an assembly import entered the
+fetch fingerprint and standalone legacy note output changed. Both were corrected
+by the dependency-free binding and optional assembly callback; all original tests
+remain unchanged. Exploratory generator defects (null/surrogate class names and
+duplicate parameter IDs), the build-log test filename and failure-field typo are
+recorded with their real exits in the return. No random failure is closed merely
+by a green rerun. The final importer collection preceded the last small test-only
+additions and replacement of two fault-message URLs by invented URLs; the final
+focused and persisted-log plants cover those final test inputs. Production code
+is unchanged throughout the final importer run. Checked code/fixture fingerprint:
+`a0cf19c69f8c35ce2532885d40eb38142024f5ca799ecd8e79cae2399c920309`, with the exact file/hash list in `checked-source-manifest.json`.
+
+Full commands, source-row/word/test coverage, edge classes, every guard deletion,
+all earlier real exits and per-file line counts are in `.overnight/RETURN.md` and
+`.overnight/tmp/p56-evidence/commands.jsonl`. No acceptance box is ticked, no live
+release or slice gate is claimed, and independent maker review remains pending
+under PO-S2-P56-01.

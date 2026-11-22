@@ -92,38 +92,44 @@ class Production:
         }
 
     def run(self) -> tuple[str, ...]:
-        if type(self.seed) is not int:
-            raise AssemblyError("figure_seed_invalid")
-        adapters = self.adapters()
-        validate_inventory(adapters)
-        paths = [local(self.cache, path) for item in INVENTORY for path in item.outputs]
-        graph = local(self.cache, "assembly/graph")
-        for path in paths:
-            path.unlink(missing_ok=True)
-        if graph.exists():
-            graph.rmdir()
-        self.fetched = None
-        self.lines.clear()
-        self.files.clear()
-        self.data_files.clear()
-        self.tables.clear()
-        self.source_tables.clear()
-        self.table_sources.clear()
-        self.receipts.clear()
-        self.selected.clear()
-        self.audit.clear()
-        self.frame_result = None
-        self.intake_refusal = ""
-        # Persist the seed before the clock, review, cache or source reader.
-        write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
-        self.stamp = self.clock()
-        steps = tuple(
-            Step(item.name, adapters[item.name], item.outputs) for item in INVENTORY
-        )
-        completed = run_steps(self.cache, steps)
+        from .assembly_refusals import stage_refusals
+
+        with stage_refusals(self.lines, "require_complete"):
+            if type(self.seed) is not int:
+                raise AssemblyError("figure_seed_invalid")
+            adapters = self.adapters()
+            validate_inventory(adapters)
+            paths = [
+                local(self.cache, path) for item in INVENTORY for path in item.outputs
+            ]
+            graph = local(self.cache, "assembly/graph")
+            for path in paths:
+                path.unlink(missing_ok=True)
+            if graph.exists():
+                graph.rmdir()
+            self.fetched = None
+            self.lines.clear()
+            self.files.clear()
+            self.data_files.clear()
+            self.tables.clear()
+            self.source_tables.clear()
+            self.table_sources.clear()
+            self.receipts.clear()
+            self.selected.clear()
+            self.audit.clear()
+            self.frame_result = None
+            self.intake_refusal = ""
+            # Persist the seed before the clock, review, cache or source reader.
+            write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
+            self.stamp = self.clock()
+            steps = tuple(
+                Step(item.name, adapters[item.name], item.outputs) for item in INVENTORY
+            )
+        completed = run_steps(self.cache, steps, lines=self.lines)
         from .assembly_reports import require_complete
 
-        require_complete(self.audit)
+        with stage_refusals(self.lines, "require_complete"):
+            require_complete(self.audit)
         return completed
 
     def record(self, phase: str, value: object) -> dict[str, str]:
@@ -402,7 +408,8 @@ class Production:
         from .places.integrate import areas_before_stage, build_lines
 
         invalidate_buildings(self.cache)
-        areas_before_stage(self.cache, self.lines, self.review)
+        with build_lines(self.lines):
+            areas_before_stage(self.cache, self.lines, self.review)
         try:
             with build_lines(self.lines):
                 result = build_public_frame(

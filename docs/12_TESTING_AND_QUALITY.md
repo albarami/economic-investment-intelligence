@@ -938,3 +938,16 @@ no published immutable shard state, and successfully writes the same shard after
 The existing resume/selection gap checks retain their eligibility rules. Separate
 tracked-file archives prove the new plants red on the prior commit and each new
 producer/pre-publication guard red when removed alone, then restored green.
+
+## Closed assembly refusal diagnostics (S2-P56)
+
+The public assembly build log records `REFUSED <stage> <reason>` through the
+shared build-log binding. Stage names and reason words come from closed tables;
+fixed diagnostic patterns return literal words and never captured exception text.
+Escaping exceptions, output-validation failures and caught places, area and series
+refusals use the same observer. Distinct closed causes in an exception chain are
+recorded once each. The original exception object, refusal conditions, existing
+`FAIL` reason and exit code are preserved, including a previously recorded fetch
+failure. The observer is bound only for assembly execution, so legacy producer
+logging and the fetch fingerprint's exclusion of assembly dependencies remain
+unchanged. Inventory plants use invented producer outputs and no acquisition.
