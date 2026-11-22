@@ -59,7 +59,7 @@ INVENTORY = (
             "reviewed_selections",
             "frame",
             "activity_spine.csv",
-            "membership.json",
+            "baskets.yaml",
             "place_categories",
         ),
         (

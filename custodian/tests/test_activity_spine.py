@@ -8,6 +8,9 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.test_baskets import invented_review
+from hypothesis import example, given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.review.activity import (
@@ -1599,3 +1602,122 @@ def _review_file(folder: Path, *rows: str) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+BASKET_REFUSALS = (
+    ("R1", "basket file is not reviewed"),
+    ("R2", "incomplete review fields"),
+    ("R3", "supplier class is not four digits: 463"),
+    ("R4", "supplier class has no activity code: 9999"),
+    ("R5", "playbook classes differ from the baskets"),
+)
+
+
+def invalid_basket(refusal, monkeypatch):
+    from eii_custodian.publicdata.review import activity
+
+    document = invented_review()
+    document["status"] = "reviewed: invented fixture"
+    item = document["activities"][0]["inputs"][0]
+    if refusal == "R1":
+        document["status"] = "pending"
+    elif refusal == "R2":
+        del item["reviewer_role"]
+    elif refusal == "R3":
+        item["supplier_isic"] = "463"
+    elif refusal == "R4":
+        item["supplier_isic"] = "9999"
+    elif refusal == "R5":
+        monkeypatch.setattr(activity, "PLAYBOOK_CLASSES", frozenset({"5610", "5630"}))
+    return document
+
+
+@pytest.mark.parametrize(
+    "refusal,detail", BASKET_REFUSALS, ids=[r[0] for r in BASKET_REFUSALS]
+)
+def test_basket_membership_refusals(refusal, detail, monkeypatch):
+    from eii_custodian.publicdata.review import activity
+
+    document = invalid_basket(refusal, monkeypatch)
+    with pytest.raises(SpineError) as error:
+        activity.basket_membership(document, (_activity("4630001", 0, 1),))
+    assert error.value.detail == detail
+
+
+def test_playbook_classes_match_reviewed_basket_activities():
+    from eii_custodian.publicdata.review.activity import PLAYBOOK_CLASSES
+    from eii_custodian.publicdata.series.baskets import ACTIVITIES
+
+    assert PLAYBOOK_CLASSES == ACTIVITIES
+
+
+@given(
+    st.lists(
+        st.tuples(
+            st.sampled_from(("4630", "5610", "5510", "5630", "4100")),
+            st.text(alphabet="0123456789", min_size=0, max_size=9),
+        ),
+        max_size=30,
+    )
+)
+@example([])
+@example([("4630", "001"), ("4630", "001"), ("4100", "999")])
+@example([("4630", "000"), ("4630", "999")])
+@example([("5510", "000"), ("5630", "999"), ("4630", "00"), ("4630", "0000")])
+def test_basket_membership_selection_and_order(candidates):
+    from eii_custodian.publicdata.review.activity import basket_membership
+
+    document = invented_review()
+    document["status"] = "reviewed: invented fixture"
+    rows = [_activity("4630001", 0, 1)] + [
+        _activity(group + suffix, 0, 1) for group, suffix in candidates
+    ]
+    playbook, suppliers = basket_membership(document, rows)
+    expected_playbook = set()
+    expected_suppliers = {"4630001"}
+    for group, suffix in candidates:
+        if len(suffix) == 3:
+            if group == "4630":
+                expected_suppliers.add(group + suffix)
+            elif group != "4100":
+                expected_playbook.add(group + suffix)
+    assert playbook == tuple(sorted(expected_playbook))
+    assert suppliers == SupplierMembership(tuple(sorted(expected_suppliers)), True)
+    assert basket_membership(document, list(reversed(rows))) == (playbook, suppliers)
+    assert basket_membership(document, rows + rows) == (playbook, suppliers)
+
+
+def test_basket_membership_empty_baskets_have_complete_empty_suppliers():
+    from eii_custodian.publicdata.review.activity import basket_membership
+
+    document = invented_review()
+    document["status"] = "reviewed: invented fixture"
+    for row in document["activities"]:
+        row["inputs"] = []
+    assert basket_membership(document, ()) == ((), SupplierMembership((), True))
+
+
+@pytest.mark.parametrize("suffix", (None, "", "00", "0000", "0000000"))
+def test_basket_membership_requires_seven_digit_supplier(suffix):
+    from eii_custodian.publicdata.review.activity import basket_membership
+
+    document = invented_review()
+    document["status"] = "reviewed: invented fixture"
+    with pytest.raises(SpineError) as error:
+        basket_membership(
+            document, () if suffix is None else (_activity("4630" + suffix, 0, 1),)
+        )
+    assert error.value.detail == "supplier class has no activity code: 4630"
+
+
+@pytest.mark.parametrize(
+    "status", (None, "unreviewed", "reviewed", " reviewed: fixture")
+)
+def test_basket_membership_requires_reviewed_document(status):
+    from eii_custodian.publicdata.review.activity import basket_membership
+
+    document = invented_review()
+    document["status"] = status
+    with pytest.raises(SpineError) as error:
+        basket_membership(document, (_activity("4630001", 0, 1),))
+    assert error.value.detail == "basket file is not reviewed"

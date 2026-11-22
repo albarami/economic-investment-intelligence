@@ -21,6 +21,7 @@ from pathlib import Path
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.cache_fixture import read_cached, read_rows
+from eii_custodian.publicdata.series.baskets import ACTIVITIES, reviewed_inputs
 from eii_custodian.publicdata.series.parse import FIELD_MAP, confirmed_rows
 
 STATUSES = (
@@ -423,6 +424,60 @@ def binding_path(review_path: Path) -> Path:
     return review_path.with_name(review_path.stem + ".binding.json")
 
 
+def basket_membership(
+    baskets_document: object, activities: Sequence[ActivityRow]
+) -> tuple[tuple[str, ...], SupplierMembership]:
+    """Derive review scope only, never mapping approval, from reviewed baskets."""
+    if not isinstance(baskets_document, dict) or not str(
+        baskets_document.get("status", "")
+    ).startswith("reviewed:"):
+        raise SpineError("basket file is not reviewed")
+    try:
+        inputs = [
+            item
+            for activity in sorted(ACTIVITIES)
+            for item in reviewed_inputs(baskets_document, activity)
+        ]
+    except ValueError as error:
+        raise SpineError(str(error)) from error
+    if {row["activity"] for row in baskets_document["activities"]} != PLAYBOOK_CLASSES:
+        raise SpineError("playbook classes differ from the baskets")
+    supplier_classes = {str(item["supplier_isic"]) for item in inputs}
+    codes = {row.code for row in activities if len(row.code) == 7}
+    for supplier in sorted(supplier_classes):
+        if _CLASS_DIGITS.fullmatch(supplier) is None:
+            raise SpineError("supplier class is not four digits: " + supplier)
+        if not any(code[:4] == supplier for code in codes):
+            raise SpineError("supplier class has no activity code: " + supplier)
+    playbook = tuple(sorted(code for code in codes if code[:4] in PLAYBOOK_CLASSES))
+    suppliers = tuple(sorted(code for code in codes if code[:4] in supplier_classes))
+    return playbook, SupplierMembership(suppliers, True)
+
+
+def read_activity_rows(
+    cache: Path, entries: Sequence[Entry], selected: Mapping[str, str]
+) -> tuple[tuple[ActivityRow, ...], tuple[tuple[str, str], ...], tuple[LeftOut, ...]]:
+    """Read and verify both licence feeds, retaining their hashes and exclusions."""
+    active_entry = entry_by_key(entries, "lic_active")
+    cancelled_entry = entry_by_key(entries, "lic_cancelled")
+    active_body = read_cached(
+        cache, active_entry, digest=selected.get(active_entry.key, "")
+    )
+    cancelled_body = read_cached(
+        cache, cancelled_entry, digest=selected.get(cancelled_entry.key, "")
+    )
+    active = parse_feed_rows(read_rows(active_body), active_entry)
+    cancelled = parse_feed_rows(read_rows(cancelled_body), cancelled_entry)
+    return (
+        merge_feed_rows(active.rows, cancelled.rows),
+        (
+            _source_hash("lic_active", active_body.sidecar),
+            _source_hash("lic_cancelled", cancelled_body.sidecar),
+        ),
+        active.left_out + cancelled.left_out,
+    )
+
+
 def load_activity_inputs(
     cache: Path,
     playbook_codes: Sequence[str],
@@ -436,22 +491,12 @@ def load_activity_inputs(
     """Read the three cached keys, the review file and the spine they derive."""
     entries = load_registry() if registry is None else registry
     selected = reviewed_selections(cache) if selections is None else selections
-    active_entry = entry_by_key(entries, "lic_active")
-    cancelled_entry = entry_by_key(entries, "lic_cancelled")
+    activities, feed_hashes, left_out = read_activity_rows(cache, entries, selected)
     class_entry = entry_by_key(entries, _ISIC_FEED)
-    active_body = read_cached(
-        cache, active_entry, digest=selected.get(active_entry.key, "")
-    )
-    cancelled_body = read_cached(
-        cache, cancelled_entry, digest=selected.get(cancelled_entry.key, "")
-    )
     class_body = read_cached(
         cache, class_entry, digest=selected.get(class_entry.key, "")
     )
-    active = parse_feed_rows(read_rows(active_body), active_entry)
-    cancelled = parse_feed_rows(read_rows(cancelled_body), cancelled_entry)
     class_read = parse_isic_rows(read_rows(class_body))
-    activities = merge_feed_rows(active.rows, cancelled.rows)
     path = review_path if review_path is not None else spine_path()
     reviews = read_review_csv(path)
     spine = build_spine(
@@ -467,11 +512,7 @@ def load_activity_inputs(
     manifest = ReviewManifest(
         code_system_version=code_system_version,
         method_version=METHOD_VERSION,
-        source_hashes=(
-            _source_hash("lic_active", active_body.sidecar),
-            _source_hash("lic_cancelled", cancelled_body.sidecar),
-            _source_hash(_ISIC_FEED, class_body.sidecar),
-        ),
+        source_hashes=(*feed_hashes, _source_hash(_ISIC_FEED, class_body.sidecar)),
         review_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         class_title_sha256=_class_title_sha256(class_read.classes),
     )
@@ -480,7 +521,7 @@ def load_activity_inputs(
         activities=activities,
         classes=class_read.classes,
         manifest=manifest,
-        left_out=active.left_out + cancelled.left_out + class_read.left_out,
+        left_out=left_out + class_read.left_out,
     )
 
 

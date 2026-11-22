@@ -3,24 +3,89 @@
 import json
 import shutil
 from dataclasses import replace
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
+from custodian.tests.test_activity_spine import BASKET_REFUSALS
+from custodian.tests.test_baskets import invented_review
 from custodian.tests.test_production_adapters import context
 
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.fetch.bounded import file_hash
 from eii_custodian.publicdata.fetch.build import BuildOutcome
+from eii_custodian.publicdata.fetch.registry import RegistryError
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.build import FrameResult
-from eii_custodian.publicdata.review.cache_fixture import write_cached
+from eii_custodian.publicdata.review.cache_fixture import (
+    class_csv,
+    read_cached,
+    real_feed_body,
+    write_cached,
+)
+
+
+def _spine_build(tmp_path: Path):
+    from custodian.tests import test_activity_graph as fixture
+
+    fixture._write_cached_feeds(tmp_path)
+    write_cached(
+        tmp_path,
+        fixture._entry("lic_cancelled"),
+        real_feed_body(
+            "lic_cancelled",
+            [
+                {
+                    "activity_code": "4630001",
+                    "activity_name_ar": "مورد تجريبي",
+                    "cancelled_count": 1,
+                }
+            ],
+        ),
+    )
+    write_cached(
+        tmp_path,
+        fixture._entry("cls_isic4"),
+        class_csv([("5610", fixture._RESTAURANT), ("4630", "Invented supplier")]),
+    )
+    review = tmp_path / "committed-review"
+    review.mkdir()
+    path = fixture._review_csv(review)
+    fixture._binding_beside(
+        path,
+        titles=(("5610", fixture._RESTAURANT, ""), ("4630", "Invented supplier", "")),
+    )
+    path.rename(review / "activity_spine.csv")
+    path.with_suffix(".binding.json").rename(review / "activity_spine.binding.json")
+    fixture._allowlist_csv(review).rename(review / "category_allowlist.csv")
+    baskets = invented_review()
+    baskets["status"] = "reviewed: invented fixture"
+    (review / "baskets.yaml").write_text(json.dumps(baskets))
+    points = tmp_path / "places_s2_t06/pub_place.jsonl"
+    points.parent.mkdir()
+    points.write_text(json.dumps({"category": "restaurant"}) + "\n")
+    build = context(
+        tmp_path,
+        tuple(
+            fixture._entry(key)
+            for key in ("lic_active", "lic_cancelled", "cls_isic4", "places_ovt")
+        ),
+    )
+    build.review = review
+    build.selected = reviewed_selections(tmp_path)
+    build.receipts = {
+        entry.key: read_cached(
+            tmp_path, entry, digest=build.selected[entry.key]
+        ).sidecar
+        for entry in build.entries
+    }
+    build.files[points.relative_to(tmp_path).as_posix()] = file_hash(points)
+    return build
 
 
 def test_graph_calls_existing_spine_and_graph_in_release_mode(
     tmp_path: Path, monkeypatch
 ) -> None:
-    from custodian.tests import test_activity_graph as fixture
-
     from eii_custodian.publicdata.review import graph as graph_module
 
     actual_build, actual_write = graph_module.build_graph, graph_module.write_graph
@@ -37,32 +102,7 @@ def test_graph_calls_existing_spine_and_graph_in_release_mode(
     monkeypatch.setattr(graph_module, "build_graph", build_graph)
     monkeypatch.setattr(graph_module, "write_graph", write_graph)
 
-    fixture._write_cached_feeds(tmp_path)
-    review = tmp_path / "review"
-    review.mkdir()
-    path = fixture._review_csv(review)
-    fixture._binding_beside(path, titles=(("5610", fixture._RESTAURANT, ""),))
-    path.rename(review / "activity_spine.csv")
-    path.with_suffix(".binding.json").rename(review / "activity_spine.binding.json")
-    fixture._allowlist_csv(review).rename(review / "category_allowlist.csv")
-    (review / "activity_membership.json").write_text(
-        json.dumps(
-            {"playbook_codes": [], "supplier_codes": [], "supplier_complete": True}
-        )
-    )
-    points = tmp_path / "places_s2_t06/pub_place.jsonl"
-    points.parent.mkdir()
-    points.write_text(json.dumps({"category": "restaurant"}) + "\n")
-    build = context(
-        tmp_path,
-        tuple(
-            fixture._entry(key)
-            for key in ("lic_active", "lic_cancelled", "cls_isic4", "places_ovt")
-        ),
-    )
-    build.review = review
-    build.selected = reviewed_selections(tmp_path)
-    build.files[points.relative_to(tmp_path).as_posix()] = file_hash(points)
+    build = _spine_build(tmp_path)
     output = build.spine_graph()
     assert set(output) == {
         "assembly/spine_graph.json",
@@ -76,6 +116,124 @@ def test_graph_calls_existing_spine_and_graph_in_release_mode(
     (tmp_path / "assembly/graph/graph_node.parquet").write_bytes(b"SYN-changed")
     with pytest.raises(AssemblyError, match="assembly_output_invalid"):
         build.final_audit()
+
+
+def test_spine_membership_from_baskets_queues_cancelled_only_supplier(
+    tmp_path: Path,
+) -> None:
+    build = _spine_build(tmp_path)
+    assert not (build.cache / "review/activity_membership.json").exists()
+    build.spine_graph()
+    record = json.loads((build.cache / "assembly/spine_graph.json").read_text())
+    assert {"lic_active", "lic_cancelled", "cls_isic4"} <= set(record["source_chain"])
+    assert record["membership"] == {
+        "playbook_codes": ["5610101"],
+        "supplier_codes": ["4630001"],
+        "supplier_classes": ["4630"],
+        "baskets_sha256": file_hash(build.review / "baskets.yaml"),
+    }
+    queued = {row["code"]: row for row in record["spine"]["queue"]}
+    assert queued["4630001"]["status"] == "unreviewed"
+    assert queued["4630001"]["reason"] == "awaiting_human_review"
+    assert queued["4630001"]["isic_class"] == ""
+
+
+def test_spine_baskets_hash_binds_the_bytes_parsed(tmp_path, monkeypatch):
+    build = _spine_build(tmp_path)
+    path = build.review / "baskets.yaml"
+    original = path.read_bytes()
+    reads = []
+
+    def changing_reader(reader):
+        def read(target, *args, **kwargs):
+            content = reader(target, *args, **kwargs)
+            if target == path:
+                reads.append(content)
+                path.write_bytes(original + b"\n# changed after the read\n")
+            return content
+
+        return read
+
+    monkeypatch.setattr(Path, "read_text", changing_reader(Path.read_text))
+    monkeypatch.setattr(Path, "read_bytes", changing_reader(Path.read_bytes))
+    build.spine_graph()
+    record = json.loads((build.cache / "assembly/spine_graph.json").read_text())
+    assert record["membership"]["supplier_codes"] == ["4630001"]
+    assert record["membership"]["baskets_sha256"] == sha256(original).hexdigest()
+    assert reads == [original]
+
+
+@pytest.mark.parametrize(
+    "case,cause",
+    [
+        ("absent", FileNotFoundError),
+        ("unreadable", PermissionError),
+        ("malformed", RegistryError),
+        ("missing_activity", KeyError),
+        ("missing_inputs", KeyError),
+        ("null_inputs", TypeError),
+    ],
+)
+def test_spine_stage_wraps_basket_read_errors(tmp_path, monkeypatch, case, cause):
+    build = _spine_build(tmp_path)
+    path = build.review / "baskets.yaml"
+    if case == "absent":
+        path.unlink()
+    elif case == "unreadable":
+
+        def refusing_reader(reader):
+            def read(target, *args, **kwargs):
+                if target == path:
+                    raise PermissionError("invented unreadable baskets")
+                return reader(target, *args, **kwargs)
+
+            return read
+
+        monkeypatch.setattr(Path, "read_text", refusing_reader(Path.read_text))
+        monkeypatch.setattr(Path, "read_bytes", refusing_reader(Path.read_bytes))
+    elif case == "malformed":
+        path.write_bytes(b"activities: [")
+    else:
+        document = json.loads(path.read_text())
+        if case == "null_inputs":
+            document["activities"][0]["inputs"] = None
+        else:
+            del document["activities"][0][case.removeprefix("missing_")]
+        path.write_text(json.dumps(document))
+    with pytest.raises(AssemblyError, match=r"^assembly_membership_invalid$") as error:
+        build.spine_graph()
+    assert isinstance(error.value.__cause__, cause)
+    assert not (build.cache / "assembly/spine_graph.json").exists()
+    assert not (build.cache / "assembly/graph").exists()
+
+
+@pytest.mark.parametrize(
+    "refusal,detail", BASKET_REFUSALS, ids=[r[0] for r in BASKET_REFUSALS]
+)
+def test_spine_stage_wraps_basket_refusals(tmp_path, monkeypatch, refusal, detail):
+    from custodian.tests.test_activity_spine import invalid_basket
+
+    from eii_custodian.publicdata.review.activity import SpineError
+
+    build = _spine_build(tmp_path)
+    (build.review / "baskets.yaml").write_text(
+        json.dumps(invalid_basket(refusal, monkeypatch))
+    )
+    with pytest.raises(AssemblyError) as error:
+        build.spine_graph()
+    assert str(error.value) == "assembly_membership_invalid"
+    assert isinstance(error.value.__cause__, SpineError)
+    assert error.value.__cause__.detail == detail
+    assert not (build.cache / "assembly/spine_graph.json").exists()
+    assert not (build.cache / "assembly/graph").exists()
+
+
+def test_spine_stage_refuses_existing_graph_directory(tmp_path):
+    build = _spine_build(tmp_path)
+    (build.cache / "assembly/graph").mkdir(parents=True)
+    with pytest.raises(AssemblyError, match=r"^assembly_graph_exists$"):
+        build.spine_graph()
+    assert not (build.cache / "assembly/spine_graph.json").exists()
 
 
 def test_frame_invokes_real_nested_build_and_refuses_missing_inventory(
