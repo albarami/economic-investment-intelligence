@@ -285,21 +285,78 @@ def test_stand_in_area_is_not_evidence(tmp_path: Path) -> None:
     assert report["decision"] != "SYN-CAND"
 
 
-def test_committed_keys_stay_pending_and_a_missing_record_is_refused() -> None:
-    """Null keys stay pending S2-T06. A filled key with no record is refused."""
+_POINT = {"lon": "51.500000", "lat": "25.300000"}
+_POINT_GRID = [{"cell": h3.str_to_int(h3.latlng_to_cell(25.30, 51.50, 9))}]
+
+
+def _invented_spec(place_key: str, source: object, record: object) -> dict[str, object]:
+    return {
+        "place_key": place_key,
+        "kind": "landmark",
+        "name_en": "SYN Place",
+        "name_ar": "مكان تجريبي",
+        "aliases": None,
+        "source_id": source,
+        "record_key": record,
+        "arabic_review": "pending native review",
+    }
+
+
+@pytest.mark.parametrize(
+    ("source", "record"),
+    [
+        (None, None),
+        ("places_ovt", None),
+        (None, "SYN-LAND"),
+        ("", "SYN-LAND"),
+        ("places_ovt", ""),
+    ],
+)
+def test_an_unfilled_key_stays_pending(source: object, record: object) -> None:
+    """A key with either half null or empty stays pending S2-T06, even with a point."""
+    points = {("places_ovt", "SYN-LAND"): _POINT}
+    spec = _invented_spec("SYN-A", source, record)
+    assert resolve_review((spec,), points, _POINT_GRID) == (
+        [],
+        ("gazetteer: source point pending S2-T06: SYN-A",),
+    )
+    assert resolve_review((), points, _POINT_GRID) == ([], ())
+
+
+def test_a_filled_key_without_its_record_is_refused() -> None:
+    """A filled key whose record is absent is record_missing, though another is present."""
+    points = {("places_ovt", "SYN-OTHER"): _POINT}
+    spec = _invented_spec("SYN-A", "places_ovt", "SYN-MISSING")
+    with pytest.raises(PlacesError) as caught:
+        resolve_review((spec,), points, _POINT_GRID)
+    assert caught.value.reason == "record_missing"
+
+
+def test_the_committed_filled_key_resolves_when_its_record_is_present() -> None:
+    """The one reviewed key resolves from an invented point; the other ten stay pending."""
     review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     specs = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
     candidates = load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]
-    resolved, report = resolve_review((*specs, *candidates), {}, [])
-    assert resolved == []
-    assert len(report) == 11
-    assert all("pending S2-T06" in line for line in report)
-    filled = dict(specs[0])
-    filled["source_id"] = "places_ovt"
-    filled["record_key"] = "SYN-MISSING"
-    with pytest.raises(PlacesError) as caught:
-        resolve_review((filled,), {}, [])
-    assert caught.value.reason == "record_missing"
+    everything = (*specs, *candidates)
+    filled = [
+        (spec["place_key"], spec["source_id"], spec["record_key"])
+        for spec in everything
+        if spec["record_key"] is not None
+    ]
+    reviewed_key = "6f576882-17f2-4dbd-9e61-f9c98c439391"
+    assert filled == [("landmark:2", "places_ovt", reviewed_key)]
+    points = {("places_ovt", reviewed_key): _POINT}
+    resolved, report = resolve_review(everything, points, _POINT_GRID)
+    assert [(row["place_key"], row["source_id"]) for row in resolved] == [
+        ("landmark:2", "places_ovt")
+    ]
+    assert resolved[0]["cell"] == _POINT_GRID[0]["cell"]
+    assert report == tuple(
+        f"gazetteer: source point pending S2-T06: {spec['place_key']}"
+        for spec in everything
+        if spec["record_key"] is None
+    )
+    assert len(report) == 10
 
 
 def test_a_decision_file_names_its_candidate_and_a_list_stays_pending(
