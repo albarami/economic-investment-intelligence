@@ -51699,3 +51699,10 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
   forty unique red-1/restored-green-0 proof pairs. Candidate-index document/tree,
   source checksums, unchanged review/core and staged whitespace checks also exit
   0. The delivery head and verified bundle checksum are in the workspace return.
+
+- S2-P60 round 2 accounting clarification: the forty final recorded plant
+  pairs cover thirty-nine distinct proof cases. The hash-tie case appears in
+  both the edge set and the final confirmation set, each red 1 / restored green
+  0. Earlier uses of "unique" refer to named run records, not distinct mutation
+  cases; the return now states both counts. No required guard proof is missing,
+  and no source or test change accompanies this append-only clarification.
