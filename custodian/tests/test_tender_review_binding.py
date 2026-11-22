@@ -29,11 +29,17 @@ from eii_custodian.publicdata.singles.tenders import (
 REVIEW = (
     Path(__file__).resolve().parents[1] / "publicdata/review/s2_t13_confirmation.yaml"
 )
+_DERIVED_TERMS = (
+    b'<html><meta name="request-token" content="SYN-token">Invented terms</html>'
+)
 
 
 def _fresh(tmp_path, *, terms_hash=None):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
     entry = tender_entry()
     confirmation = load_confirmation(REVIEW)
+    derived = terms_text_sha256(_DERIVED_TERMS)
     stamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     pairs = [(name, language) for name, _ in LIST_PATHS for language in ("en", "ar")]
     pages = [(name, language, 1, b"<html>SYN-page</html>") for name, language in pairs]
@@ -45,17 +51,32 @@ def _fresh(tmp_path, *, terms_hash=None):
         tmp_path,
         entry,
         stamp,
-        terms_sha256=terms_hash or confirmation.tender.terms_sha256,
+        terms_sha256=derived if terms_hash is None else terms_hash,
     )
     receipt = read_snapshot(tmp_path / entry.key, identity).sidecar
+    if terms_hash is None:
+        confirmation = replace(
+            confirmation,
+            tender=replace(confirmation.tender, terms_sha256=derived),
+        )
     return confirmation, entry, receipt
 
 
 def test_committed_review_accepts_fresh_archive(tmp_path):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
     confirmation, entry, receipt = _fresh(tmp_path)
     assert receipt["retrieved_utc"] != confirmation.tender.retrieved_utc
     assert receipt["sha256"] != confirmation.tender.page_sha256
+    assert receipt["terms_sha256"] == terms_text_sha256(_DERIVED_TERMS)
+    assert receipt["terms_sha256"] != sha256_hex(_DERIVED_TERMS)
     assert completion_evidence(confirmation, entry, receipt) == confirmation
+
+
+def test_committed_terms_hash_names_visible_text():
+    confirmation = load_confirmation(REVIEW)
+    assert re.fullmatch(r"[0-9a-f]{64}", confirmation.tender.terms_sha256)
+    assert "visible text" in confirmation.tender.review_reason
 
 
 def test_changed_terms_on_resume_gets_new_receipt(tmp_path):
@@ -620,3 +641,112 @@ def test_every_malformed_sha_is_refused(value):
     from eii_custodian.publicdata.confirm_s2_t13 import tender_disposition
 
     assert not tender_disposition(t, entry, receipt).shown
+
+
+def _terms_page(token: str, clause: str) -> bytes:
+    return (
+        b'<html><meta name="request-token" content="'
+        + token.encode("ascii")
+        + b'">'
+        + clause.encode("ascii")
+        + b"</html>"
+    )
+
+
+def _drive_own_run(tmp_path, monkeypatch, body: bytes):
+    import json
+
+    from custodian.tests.test_build_own_run import _fake_tender_adapter
+
+    from eii_custodian.publicdata.assembly_tenders import terms_visible_hash
+    from eii_custodian.publicdata.fetch.build import run_tenders_only
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    entry = tender_entry()
+    _fake_tender_adapter(monkeypatch, [], body)
+    own = tmp_path / "public_cache_tenders"
+    outcome = run_tenders_only(
+        (entry,),
+        lambda _url: pytest.fail("network called"),
+        tmp_path / "public_cache",
+        own,
+        lambda: "2026-11-21T00:00:00Z",
+        lambda _: None,
+    )
+    assert outcome.failure is None
+    identity = next((own / entry.key / "index").glob("*.json")).stem
+    archive = read_snapshot(own / entry.key, identity)
+    visible = terms_text_sha256(body)
+    raw = sha256_hex(body)
+    assert terms_visible_hash(own, entry, outcome.terms) == visible
+    assert terms_body_hash(own, entry, outcome.terms) == raw
+    assert read_snapshot(own / entry.key / "terms", raw).body == body
+    assert archive.sidecar["terms_sha256"] == visible
+    assert json.loads(archive.body)["terms_sha256"] == visible
+    assert visible != raw
+    return entry, outcome, archive, own
+
+
+def test_own_run_visible_text_reaches_completion_evidence(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    body = _terms_page("SYN-token-a", "Invented clause")
+    same_clause = _terms_page("SYN-token-b", "Invented clause")
+    entry, outcome, archive, _own = _drive_own_run(tmp_path, monkeypatch, body)
+    visible = terms_text_sha256(body)
+    assert visible == terms_text_sha256(same_clause)
+    assert sha256_hex(body) != sha256_hex(same_clause)
+    recorded = load_confirmation(REVIEW)
+    confirmation = replace(
+        recorded, tender=replace(recorded.tender, terms_sha256=visible)
+    )
+    assert confirmation.tender.terms_sha256 != sha256_hex(body)
+    assert outcome.terms[0]["terms_sha256"] == visible
+    assert completion_evidence(confirmation, entry, archive.sidecar) == confirmation
+
+
+def test_raw_digest_confirmation_refuses_terms_authentication(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.assembly_tenders import terms_visible_hash
+
+    body = _terms_page("SYN-token-a", "Invented clause")
+    entry, outcome, _archive, own = _drive_own_run(tmp_path, monkeypatch, body)
+    recorded = load_confirmation(REVIEW)
+    confirmation = replace(
+        recorded,
+        tender=replace(recorded.tender, terms_sha256=sha256_hex(body)),
+    )
+    rows = [dict(outcome.terms[0], terms_sha256=confirmation.tender.terms_sha256)]
+    with pytest.raises(AssemblyError, match=r"^assembly_tender_terms_incomplete$"):
+        terms_visible_hash(own, entry, rows)
+
+
+def test_changed_visible_word_refuses_review(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    body = _terms_page("SYN-token-a", "Invented clause")
+    changed = _terms_page("SYN-token-b", "Invented clause altered")
+    visible = terms_text_sha256(body)
+    assert visible != terms_text_sha256(changed)
+    entry, _outcome, archive, _own = _drive_own_run(
+        tmp_path / "changed", monkeypatch, changed
+    )
+    recorded = load_confirmation(REVIEW)
+    confirmation = replace(
+        recorded, tender=replace(recorded.tender, terms_sha256=visible)
+    )
+    with pytest.raises(
+        ValueError, match=r"^registry and fetched evidence do not confirm tender$"
+    ):
+        completion_evidence(confirmation, entry, archive.sidecar)
+
+
+@given(token=st.text(alphabet="abcdefghijklmnopqrstuvwxyz0123456789", max_size=24))
+def test_attribute_token_does_not_change_visible_terms_hash(token):
+    from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+
+    plain = b"<html>Invented clause</html>"
+    tagged = _terms_page(token, "Invented clause")
+    assert terms_text_sha256(tagged) == terms_text_sha256(plain)
+    if token:
+        assert sha256_hex(tagged) != sha256_hex(plain)
+        assert sha256_hex(tagged) != terms_text_sha256(tagged)

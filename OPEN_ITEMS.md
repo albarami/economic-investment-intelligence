@@ -3082,6 +3082,9 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - EVIDENCE: S2-TSKIP built only the ordinary run's `own_run` skip and the `own_run_pending` absence; any tender pin in the main cache refuses with `own_run_pickup_unbuilt`. The pending binding compares the page's host and a non-empty basis note, because main's committed S2-T13 review and registry row differ on the full page address and the basis note's words, which S2-P40 (decision 0083) rebinds. The ordinary skip notes the tender entry `completed` in the main journal without page proofs (S2-TSEP review RV-F5); a later handoff must refuse such an entry.
 - NEEDED: the `--tenders-only [--resume]` form, the identity-bound pick-up that replaces the `own_run_pickup_unbuilt` refusal, the completed-result handoff, and S2-P40's review binding, carried over from S2-TSEP with their own review; the pending binding then reuses the decision 0083 registry binding.
 - NEEDED BY: the day S7-T09 starts (decision 0084 item 6); no slice S2 gate dependency.
+### OI-370 visible-text live check (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.
 
 ## OI-374 — S2-TSKIP round 2: the own-run journal failure block is one more copy for OI-368
 
@@ -6030,6 +6033,10 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - PROPOSED OPEN ITEM, CF1 item 3 / CR1 item 4: the lead's first permitted live terms check should compare two raw-body reads, since per-request bytes could make a raw-body binding unstable. The live equality of the committed terms hash remains open in PO-S2-P40; no worker live read is claimed.
 - PROPOSED OPEN ITEM, CF2 PO-A/PO-B: the reviewer reports that `utc()` accepts a negative zero offset and truncates nine fractional-second digits to microseconds, while refusing leap seconds and lowercase `z`. Record these timestamp semantics or explicitly refuse them; this round changes no timestamp parsing.
 - CARRIED, already recorded above: the decision 0083 conflict with accepted decision 0059 item 1, the IDN spelling case, and live raw terms-body equality remain open. CF2 proposed those again without adding a new decision or approval.
+### PO-S2-P40 round 4 — visible-text confirmation (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. The committed terms hash is the SHA-256 of the normalised visible text of terms snapshot 52cc0c2ca6 retrieved 2026-11-21. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.
+
 ## OI-370 — Select and pick up the separate tender archive before S7-T09
 
 - TYPE: OPEN; raised by S2-TSEP on 2026-11-21 under [decision 0084](docs/decisions/0084-public-tenders-in-a-separate-run.md) items 4 and 6.
@@ -6039,3 +6046,6 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 
 - EVIDENCE: an invented-input plant replaces a completed main tender journal entry's `fetch` and `page_meta` proofs with the ordinary skip marker `{"completed": true}`. The separate handoff returns `tender_handoff_refused`, writes its refusal log and leaves its journal interrupted. The cache-relative-path test confirms the separate root's convention. Review CR1 RV-F5 and RV-F6 prompted these tests; they establish no live archive.
 - NEEDED: the lead's live handoff must distinguish an older completed tender entry with rehashed page, list and terms proofs from a newer ordinary-run skip marker with no such proofs. Only the former may be adopted, after the decision 0084 item 4 intake and receipt checks. A refused marker requires a separate later fetch, and the start-day and pre-freeze identity checks of item 6 remain open.
+### OI-370 visible-text live check (2026-11-22)
+
+- CORRECTION, 2026-11-22: the live check compares the verified visible-text terms hash with the confirmation's re-reviewed visible-text value, not raw body equality. A changed visible text needs a new review. The raw terms-body digest remains only the proof of the immutable snapshot.

@@ -19,3 +19,5 @@ The existing build-public terms read records a visible-text fingerprint and arch
 ## Limits
 
 This change does not confirm a live fetch, grant reuse permission, change the tender parser, or approve the slice S2 gate. The historical confirmation and registry rows are unchanged. A changed terms body requires a new human review and confirmation rather than an automatic hash update.
+
+The 2026-11-22 correction records the committed confirmation's `terms_sha256` as the SHA-256 of the normalised visible text of terms snapshot 52cc0c2ca6 retrieved 2026-11-21, re-read on 2026-11-22 as the same clause. It is not the raw terms-body digest. A changed visible text needs a new review. The raw terms-body digest remains the proof of the immutable snapshot. The limits sentence that the historical confirmation row is unchanged described the record before this re-review.
