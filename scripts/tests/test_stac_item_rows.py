@@ -33,6 +33,12 @@ def _committed_rows() -> tuple[dict[str, Any], ...]:
     return tuple(registry_rows())
 
 
+# Read the committed rows once at import: the registry parse measured up to
+# 95 ms and more across runs, and a lazily filled cache would land inside
+# the property test's first Hypothesis deadline.
+_COMMITTED_ROWS = _committed_rows()
+
+
 def collection(numbers: Any = NUMBERS) -> dict[str, Any]:
     return {
         "type": "Collection",
@@ -213,7 +219,7 @@ def test_component_assignment_roundtrip() -> None:
 )
 def test_order_independence_and_injective_key_property(numbers: list[int]) -> None:
     names = [f"{number:05d}" for number in numbers]
-    registry = _committed_rows()
+    registry = _COMMITTED_ROWS
     output = generate(collection(names), registry)
     assert [{k: v for k, v in row.items() if k != "basis_note"} for row in output] == [
         {k: v for k, v in row.items() if k != "basis_note"}

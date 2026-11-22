@@ -23,6 +23,10 @@ from eii_custodian.publicdata.frame.checks import FrameError
 
 TABLE = "pub_census_national"
 RETRIEVED = "2026-11-21T00:00:00Z"
+# Read the committed registry entry once at import: its parse of the large
+# sources.yaml measured over 100 ms, and a lazily filled cache would land
+# inside the property test's first Hypothesis deadline.
+CENSUS_ENTRY = entry("census_2020_workbook")
 
 
 def changed_workbook(body, cells=None, *, missing_table=False):
@@ -56,7 +60,7 @@ def changed_workbook(body, cells=None, *, missing_table=False):
 
 def release_rows(body):
     return census.census_rows(
-        entry("census_2020_workbook"), census.workbook_rows(body), RETRIEVED, TABLE
+        CENSUS_ENTRY, census.workbook_rows(body), RETRIEVED, TABLE
     )[0]
 
 
