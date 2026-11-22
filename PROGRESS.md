@@ -51408,3 +51408,95 @@ The implementation remains exactly `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`;
 this follow-up changes only TASKS.md, PROGRESS.md and OPEN_ITEMS.md. The exact
 non-award headings, independent review and lead replay remain pending.
 | 2026-11-22 | S2-P66 lead declaration commit | The lead wrote the four exact non-award h3 headings (read from the stored pages in the lead's shell) into the awards declaration's `shape.sections`. Focused award and declaration tests: 844 passed, exit 0. Offline `scripts/awards_proofs.py replay` on the lead's cache: exit 0, `refused_count` 0, `proof_award_absent` 13, `incomplete` false, no cache file written. |
+
+
+## S2-P66 round two — ruled date marker and declared-heading regression (2026-11-22)
+
+| Date | Task | Evidence | Maker and personas |
+|---|---|---|---|
+| 2026-11-22 | S2-P66 round two; S2-T29, ruling L-1495, proposed decision 0095 items 2 to 4 | Base `1efc5438230c202de569fd69372780660513037c`. Restores the ruled date marker as `proof_date_status: proof_date_absent`, separately from comparison reasons; company, registration and value alone still decide the result. Shared receipt totals count marked links once. Production headings are loaded from the lead declaration, never copied. Local isolated plants: 26 × red 1 / restored green 0. Final delivery verification and implementation hash are appended below. | OpenAI Codex; principal award-proof engineer; strict self-review: sanad auditor |
+
+Skills used: project-orientation, task-standards, github-flow, sanad-provenance, property-based-testing, strict-reviewer (self-review only), muhasabah-gate. The requested test-driven-development and verification-before-completion skill files were not found among the installed skill roots; the brief's equivalent rules were applied: tests first, isolated one-change negatives, exact refusal reasons, individual guard deletion and real exits. No new library or pin was used. Independent different-maker review remains lead-owned.
+
+Plan executed: add invented-page marker and production-heading tests; preserve and validate the marker through the existing parser/reader/shared checker; recompute the counter through the existing totals helper; update decision 0095, document 03 and task records; plant each relevant guard separately; restore exact bytes, verify and package local commits.
+
+Retained development evidence, seed 6667: the initial new-test command (`uv run --locked python -m pytest custodian/tests/test_award_date_marker.py -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-first`) exited 1 with 23 failed and 8 passed before implementation. The first implementation run of that file exited 0 with 31 passed. An initial broad award/declaration run exited 1 with 12 failed and 996 passed: eleven expected dictionaries omitted the newly required marker/counter, and one mocked version-two parser row omitted the date field. The expectations now include the new fields and that mock carries the production parser's date shape. No assertion, skip, retry, tolerance or baseline was removed. Initial format check exited 1 for two unformatted files; applying the formatter corrected it.
+
+The first unknown-marker deletion produced red 0 / restored green 0 because the pair guard redundantly checked the marker's value. The pair guard now checks field presence, leaving the unknown-value guard independently necessary; its isolated deletion now produces red 1 / restored green 0. The initial malformed-date plant runner stopped with exit 1 before mutation because its source snippet matched twice. A unique awarded-date snippet fixed the harness; the isolated run then produced red 1 / restored green 0. These are deterministic authoring/plant findings, not random failures; no green rerun alone closes a random failure.
+
+The first expanded green run passed 1,234 tests and 2 subtests, exit 0. Three further additive edge tests (multiple proof rows counted once, missing proof value and name-not-compared) were then added. The final new file passed 42 tests, exit 0 (`uv run --locked python -m pytest custodian/tests/test_award_date_marker.py -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-final-new`). A final expanded run on that additive test state is recorded in the delivery append.
+
+Expanded award, declaration, page-shape and direct-importer command (all invented fixtures, no network):
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_date_marker.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6667 -q --basetemp=.overnight/tmp/pytest-r2-required
+```
+
+Every uv command uses `UV_OFFLINE=1`. Final commands and plants use `PYTHONHASHSEED=0`; test seed is 6667, with the unchanged installed Hypothesis `eii` profile. Temporary paths and command logs are inside `.overnight/tmp/`. No `.env`, `.private`, repository `data/`, real proof cache or source host was read by the worker, and no service start/stop or lead-only replay occurred. Earlier lead-cache evidence remains attributed to the lead's supplied record.
+
+Plant commands all use `uv run --locked python -m pytest -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-plants` followed by the listed node(s). Individual argv, source paths, exits and byte-restoration assertions are retained in `.overnight/tmp/r2-plants/results.json`; each raw red and green log is adjacent.
+
+| Plant | Test node(s) | Red exit | Restored exit |
+|---|---|---|---|
+| `parsed_marker` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `dated_marker` | `custodian/tests/test_award_date_marker.py::test_date_count_is_orthogonal_to_comparison` | 1 | 0 |
+| `unknown_marker` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-unknown]` | 1 | 0 |
+| `marker_date_pair` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-missing]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-dated]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-no_date]` | 1 | 0 |
+| `reader_validation` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-unknown]` | 1 | 0 |
+| `reader_forwarding` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `checker_validation` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-missing]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-dated]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-unknown]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-no_date]` | 1 | 0 |
+| `checker_forwarding` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `date_counter` | `custodian/tests/test_award_date_marker.py::test_date_count_is_orthogonal_to_comparison` | 1 | 0 |
+| `full_recompute` | `custodian/tests/test_award_date_marker.py::test_date_counter_mismatch_refuses[mismatch-award_links]` | 1 | 0 |
+| `sample_recompute` | `custodian/tests/test_award_date_marker.py::test_date_counter_mismatch_refuses[mismatch-award_check]` | 1 | 0 |
+| `receipt_unknown_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[unknown-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[unknown-award_check]` | 1 | 0 |
+| `receipt_fetch_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[fetch_failed-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[fetch_failed-award_check]` | 1 | 0 |
+| `receipt_absent_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[award_absent-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[award_absent-award_check]` | 1 | 0 |
+| `production_heading_guard` | `custodian/tests/test_award_date_marker.py::test_production_reviewed_headings_on_invented_pages` | 1 | 0 |
+| `malformed_date` | `custodian/tests/test_award_page_states.py::test_malformed_nonempty_awarded_date_refuses` | 1 | 0 |
+| `two_award_headers` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[two_awards]` | 1 | 0 |
+| `missing_date_span` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[no_date]` | 1 | 0 |
+| `duplicate_date_span` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[two_dates]` | 1 | 0 |
+| `missing_sibling` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[no_sibling]` | 1 | 0 |
+| `table_selector` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[no_table]` | 1 | 0 |
+| `empty_table` | `custodian/tests/test_award_page_states.py::test_empty_table_with_empty_date_refuses` | 1 | 0 |
+| `malformed_amount` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[currency]` | 1 | 0 |
+| `reader_url` | `custodian/tests/test_s2_p46_awards.py::test_proof_reader_exact_url_refusal` | 1 | 0 |
+| `reader_empty` | `custodian/tests/test_s2_p46_awards.py::test_empty_parsed_proof_refuses_in_reader` | 1 | 0 |
+| `checker_candidates` | `custodian/tests/test_award_checks_survivors_1.py::test_empty_or_nonmapping_proof_refuses` | 1 | 0 |
+
+S2-P66 round-two final verification append: the exact final source and test state
+passes **1,237 tests and 2 subtests, exit 0**, seed 6667, in the expanded command
+above (31 test files). The final marker file separately passes 42 tests, exit 0.
+The unchanged property profile exercises date absence independently of match
+outcomes, duplicate intake links, empty/one frames and the thirty/thirty-one
+sample boundary; multiple proof rows count date absence once. All 26 isolated
+plants produce red 1 / restored green 0 with exact byte restoration. Individual
+logs are in `.overnight/tmp/r2-checks/` and `.overnight/tmp/r2-plants/`.
+
+Environment observed locally: Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+Ruff 0.17.4, mypy 2.4.1, decision provider `none`. The required static commands
+(`uv run --locked ruff check .`, `uv run --locked ruff format --check .`,
+`uv run --locked mypy`, `python3 scripts/check_docs.py`,
+`python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and
+`git diff --check`) all exit 0. Ruff reports 942 formatted files; mypy checks
+500 source files. Raw output and argv/exits are retained under
+`.overnight/tmp/r2-checks/`.
+
+Packaging correction: the planned commit delivery was refused when normal
+`git add` exited 128 because the shared worktree Git metadata is read-only.
+No task commit was created, so the full containing base commit remains
+`1efc5438230c202de569fd69372780660513037c`. The brief explicitly allows a patch
+when commits are refused: deliver `.overnight/patches/S2-P66-r2.patch` and
+`SHA256SUMS`, with the checksum and code-practice counts in `.overnight/RETURN.md`.
+No bundle is claimed. The ordinary tree check exits 0 on the unchanged shared
+index. A disposable index and object directory inside this workspace stage all
+task paths, including the new test file, for verification only: task-index
+`python3 scripts/check_tree.py` and `git diff --cached --check` both exit 0
+(`.overnight/tmp/r2-index-check.json`). Shared Git state is untouched.
+
+Self-audit: PASS for the worker implementation and evidence; no independent
+approval or lead-cache replay is claimed. Proposed decision 0095 remains
+proposed, S2-T29/OI-277 remain open, and review plus the lead's replay of the
+round-two marker remain the only S2-P66 follow-ups. No source schema, trust,
+privacy, retry, publication or assembly refusal was relaxed.

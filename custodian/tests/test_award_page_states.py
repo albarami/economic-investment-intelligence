@@ -135,6 +135,7 @@ def test_empty_awarded_date_is_null_and_not_compared(date):
         "report_url": URL,
         "result": "matched",
         "reason": "matched",
+        "proof_date_status": "proof_date_absent",
     }
 
 
@@ -147,6 +148,7 @@ def test_empty_date_still_compares_declared_fields(field):
         "report_url": URL,
         "result": "mismatched",
         "reason": "proof_mismatch",
+        "proof_date_status": "proof_date_absent",
     }
 
 
@@ -330,6 +332,7 @@ def test_closed_states_publish_and_pass_assembly(tmp_path, absent):
     )
     summary = awards_evidence(snapshot.sidecar, 66)["award_links"]
     assert summary["proof_award_absent"] == (30 if absent else 0)
+    assert summary["proof_date_absent"] == (0 if absent else 30)
     assert summary["mismatched"] == (30 if absent else 0)
     assert summary["matched"] == (0 if absent else 30)
     assert summary["incomplete"] is False

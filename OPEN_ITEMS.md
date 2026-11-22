@@ -6248,3 +6248,11 @@ strings item is CLOSED; different-maker review remains.
 S2-T29 and OI-277 remain open. No random failure was introduced; the oversized
 extra test selection was deliberately interrupted (exit 130), not counted as a
 passing run. The required focused selection then passed without retries or skips.
+
+S2-P66 round-two correction to PO-S2-P66-01 (2026-11-22): the committed
+heading test now loads all four reviewed entries from the production declaration,
+one at a time and together, and refuses one appended unreviewed heading.
+The date marker required by L-1495 is recorded separately from comparison
+reasons under proposed decision 0095. The strings item remains closed;
+independent different-maker review and the lead's offline replay of the
+round-two marker remain open. No worker replay or real-cache result is claimed.

@@ -22,6 +22,7 @@ from .award_checks import (
     AwardError,
     double_space_only,
     match_register,
+    proof_date_marker,
     validate_check_receipt,
 )
 from .award_links import (
@@ -529,10 +530,14 @@ def _proof_reader(
         if version_two:
             return [
                 {
-                    profile[key]: ""
-                    if row[profile["proof_columns"][key]] is None
-                    else str(row[profile["proof_columns"][key]])
-                    for key in ("company", "registration", "value")
+                    **{
+                        profile[key]: ""
+                        if row[profile["proof_columns"][key]] is None
+                        else str(row[profile["proof_columns"][key]])
+                        for key in ("company", "registration", "value")
+                    },
+                    "award_date": str(row.get("award_date") or ""),
+                    **proof_date_marker(row),
                 }
                 for row in rows
             ]

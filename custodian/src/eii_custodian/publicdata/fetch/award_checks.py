@@ -29,6 +29,8 @@ MISMATCH_REASONS = (
     "proof_mismatch",
 )
 REASON_COUNTS = ("matched_name_not_compared", *MISMATCH_REASONS)
+DATE_ABSENT = "proof_date_absent"
+DETAIL_COUNTS = (*REASON_COUNTS, DATE_ABSENT)
 FETCH_REASONS = frozenset(
     {"proof_fetch_failed", "unreachable", "http_status", "body_bytes"}
 )
@@ -37,6 +39,17 @@ RESULT_REASONS = {
     "mismatched": frozenset(MISMATCH_REASONS),
     "fetch_failed": FETCH_REASONS,
 }
+
+
+def proof_date_marker(row: Mapping[str, object]) -> dict[str, str]:
+    """Validate the date outcome separately from all comparison reasons."""
+    marker = row.get("proof_date_status")
+    if "proof_date_status" in row and marker != DATE_ABSENT:
+        raise AwardError("schema_missing")
+    absent = "award_date" in row and row["award_date"] in (None, "")
+    if ("proof_date_status" in row) != absent:
+        raise AwardError("schema_missing")
+    return {"proof_date_status": DATE_ABSENT} if absent else {}
 
 
 def name_script(value: str) -> str:
@@ -163,7 +176,7 @@ def validate_check_receipt(receipt: Mapping[str, object]) -> None:
         "incomplete",
         "status",
         "results",
-        *REASON_COUNTS,
+        *DETAIL_COUNTS,
     }
     if (
         receipt.get("source_id") != "awards_owner_scrape"
@@ -177,7 +190,7 @@ def validate_check_receipt(receipt: Mapping[str, object]) -> None:
         "matched",
         "mismatched",
         "failed_fetches",
-        *REASON_COUNTS,
+        *DETAIL_COUNTS,
     )
     if (
         any(type(check[key]) is not int or check[key] < 0 for key in counts)

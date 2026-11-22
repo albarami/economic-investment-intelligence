@@ -10,11 +10,14 @@ from typing import Any
 from .allowlist import approve
 from .award_checks import (
     AWARD_ABSENT,
+    DATE_ABSENT,
+    DETAIL_COUNTS,
     FETCH_REASONS,
     MATCH_REASONS,
     REASON_COUNTS,
     RESULT_REASONS,
     AwardError,
+    proof_date_marker,
     proof_reason,
     validate_check_receipt,
 )
@@ -91,6 +94,7 @@ def _check_links(
     active = pool or ReaderPool()
 
     def read(url: str) -> dict[str, str]:
+        date_status = {}
         try:
             proof = proof_reader(url)
             candidates = [proof] if isinstance(proof, Mapping) else list(proof)
@@ -98,12 +102,14 @@ def _check_links(
                 not isinstance(item, Mapping) for item in candidates
             ):
                 raise AwardError("schema_missing")
+            markers = [proof_date_marker(item) for item in candidates]
             reason = (
                 "proof_award_absent"
                 if candidates == [AWARD_ABSENT]
                 else proof_reason(frame[url], candidates, profile)
             )
             result = "matched" if reason in MATCH_REASONS else "mismatched"
+            date_status = next((marker for marker in markers if marker), {})
         except (AwardError, PageError, ShapeError) as exc:
             if str(exc) in SHAPE_REASONS:
                 result, reason = "refused", str(exc)
@@ -120,7 +126,7 @@ def _check_links(
         except OSError:
             result, reason = "fetch_failed", "unreachable"
             active.reduce(reason)
-        return {"report_url": url, "result": result, "reason": reason}
+        return {"report_url": url, "result": result, "reason": reason, **date_status}
 
     return active.read(urls, read)
 
@@ -129,6 +135,9 @@ def _totals(results: Sequence[Mapping[str, str]]) -> dict[str, Any]:
     matched = sum(item["result"] == "matched" for item in results)
     return {
         "matched": matched,
+        DATE_ABSENT: sum(
+            item.get("proof_date_status") == DATE_ABSENT for item in results
+        ),
         **{
             reason: sum(item["reason"] == reason for item in results)
             for reason in REASON_COUNTS
@@ -191,7 +200,7 @@ def validate_links_receipt(
         "matched",
         "mismatched",
         "failed_fetches",
-        *REASON_COUNTS,
+        *DETAIL_COUNTS,
     }
     required = counts | {
         "method",
@@ -249,9 +258,17 @@ def valid_result(item: Any) -> bool:
     """Closed per-link schema shared by full and seeded receipt validators."""
     return (
         isinstance(item, dict)
-        and set(item) == {"report_url", "result", "reason"}
+        and set(item) - {"proof_date_status"} == {"report_url", "result", "reason"}
         and all(isinstance(value, str) for value in item.values())
         and approve(item["report_url"]).ok
         and item["result"] in RESULT_REASONS
         and item["reason"] in RESULT_REASONS[item["result"]]
+        and (
+            "proof_date_status" not in item
+            or (
+                item["proof_date_status"] == DATE_ABSENT
+                and item["result"] in {"matched", "mismatched"}
+                and item["reason"] != "proof_award_absent"
+            )
+        )
     )

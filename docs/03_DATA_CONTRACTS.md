@@ -1186,13 +1186,19 @@ items 1 and 2, a page without an award section returns the closed
 headings, every h3's complete stripped text in the declaration's closed
 `shape.sections[*].heading` list and exactly one awarded-date span. Unknown or
 prefix-only headings, multiple award headings and missing or duplicate date
-spans still refuse `schema_missing`. The exact production non-award headings
-remain pending lead input; no string is guessed. The table is bound to its preceding award heading, excluding the
+spans still refuse `schema_missing`. The four production non-award headings
+were supplied by the lead in declaration commit `1efc5438`. The table is bound to
+its preceding award heading, excluding the
 opened-bids table, and the award date is read from `span#lblAwardedDate`.
-With a nonempty award table an empty or whitespace-only date is null; nonempty
-malformed dates still refuse `snapshot_date_missing`. The proof comparison
-projects and compares only company, registration and approved value, never the
-date, so no `proof_date_absent` reason is introduced. The registration match report retains every original
+With a nonempty award table an empty or whitespace-only date is null and carries
+`proof_date_status: proof_date_absent`; a set date has no marker. Nonempty
+malformed dates still refuse `snapshot_date_missing`. The proof reader preserves
+the date (null becomes empty text) and marker; it and the checker refuse
+`schema_missing` for an unknown marker or inconsistent date/marker pair. The
+comparison still uses only company, registration and approved value, never the
+date. A per-link marker is recorded beside the result, never as a comparison
+reason, so date absence alone changes neither match nor mismatch.
+The registration match report retains every original
 row and its match/refusal reason. Registration equality precedes exact company
 name equality after the closed normalization in document 04, section 2.4.
 Whitespace-only registrations never match, and duplicate register entries remain
@@ -1203,7 +1209,7 @@ Under decision 0064 item 41, amended by [decision 0088](decisions/0088-award-pro
 `method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
 `report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
 `failed_fetches`, `matched_name_not_compared`, `intake_value_absent`,
-`proof_value_absent`, `proof_mismatch`, `proof_award_absent`, `match_rate`, `incomplete`, `status` and `results`. Every link is
+`proof_value_absent`, `proof_mismatch`, `proof_award_absent`, `proof_date_absent`, `match_rate`, `incomplete`, `status` and `results`. Every link is
 checked once, with results in URL order, through the existing bounded retry reader and reviewed proof scope.
 S2-P46 adds the per-link acquisition and offline replay contract of
 [proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
@@ -1213,7 +1219,13 @@ The immutable `proof_checks` receipt retains the full diagnostic result list and
 `award_readers` records declared width, fallback flag and closed fallback reason.
 The publication receipt retains `award_readers`; proposed decision 0095 item 4
 adds the closed `proof_award_absent` mismatch reason and counter to `award_links`.
-Each result has `report_url`, `result` and `reason`: a `matched` result uses
+Each result has `report_url`, `result` and `reason`, plus optional
+`proof_date_status: proof_date_absent` only for a compared award table with an
+empty date. Both full-link and sample receipts recompute the separate
+`proof_date_absent` counter from these markers, once per link; it adds to none of
+`matched`, `mismatched` or `failed_fetches`. Unknown markers, markers on
+fetch/refused/no-award results and inconsistent counters refuse the existing
+closed metadata validation. A `matched` result uses
 `matched` or `matched_name_not_compared`; the no-award marker produces
 `mismatched` with reason `proof_award_absent`. Other mismatches use, in fixed
 precedence, `intake_value_absent`, `proof_value_absent` or `proof_mismatch`;

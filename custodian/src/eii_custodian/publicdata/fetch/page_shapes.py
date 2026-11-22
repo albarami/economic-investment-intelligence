@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlsplit
 
-from .award_checks import AWARD_ABSENT
+from .award_checks import AWARD_ABSENT, DATE_ABSENT
 from .page_html import ShapeError, Tree, table_rows
 from .page_schema import json_body, path, scalar, typed, validate
 from .page_workbook import read_sheet
@@ -410,6 +410,8 @@ def awards(
                 text = m[1].replace(",", "")
             record[name] = scalar(text, kind)
         record["award_date"] = awarded_date
+        if awarded_date is None:
+            record["proof_date_status"] = DATE_ABSENT
         result.append(record)
     return result
 
