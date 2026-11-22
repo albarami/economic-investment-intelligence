@@ -472,18 +472,21 @@ def assemble_audited_review(
         frozen_context(root, manifest)
         if input_hashes(root, returned) != evidence:
             raise Refusal("returned_inputs_changed")
+        refusal = {
+            **batch,
+            "draw_sha256": evidence["draw"],
+            "review_rows": [asdict(row) for row in decisions],
+        }
         publish(
             context,
             run_id,
-            {
-                "refusal.json": json_bytes(
-                    {
-                        **batch,
-                        "draw_sha256": evidence["draw"],
-                        "review_rows": [asdict(row) for row in decisions],
-                    }
-                )
-            },
+            {"refusal.json": json_bytes(refusal)},
+        )
+        refusal_path = contained(
+            root, Path(frozen["review"]).with_name("activity_spine_refusals.json")
+        )
+        refusal_path.write_bytes(
+            append_audit(refusal_path.read_bytes(), refusals, refusal)
         )
         raise Refusal("audit_decision_differs")
     previous = read_review_csv(contained(root, Path(frozen["review"])))

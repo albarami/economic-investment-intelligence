@@ -33,9 +33,10 @@ def git(root: Path, *args: str) -> None:
     )
 
 
-def commit_refusals(case: Any, records: list[Any]) -> Path:
+def commit_refusals(case: Any, records: list[Any] | None = None) -> Path:
     path: Path = case.review.with_name("activity_spine_refusals.json")
-    path.write_text(json.dumps(records, ensure_ascii=False))
+    if records is not None:
+        path.write_text(json.dumps(records, ensure_ascii=False))
     if not (case.root / ".git").exists():
         git(case.root, "init")
     git(case.root, "add", str(path.relative_to(case.root)))
@@ -186,13 +187,12 @@ def test_invalid_refusal_record_exact_reason(field: str, value: Any) -> None:
         derived_audit_seed(signed, [{**record, field: value}])
 
 
-def test_refused_resigned_fresh_audit_finalises(case: Any) -> None:
-    from spine_review import finalise_check, prepare_review_inputs
-
+def refuse_audit(case: Any) -> tuple[Path, tuple[Path, Path, Path], Path, bytes, bytes]:
     prepared = case.prepare()
     paths = case.returns(prepared)
     signed_before = paths[0].read_bytes()
     drawn = case.draw(prepared, paths)
+    agreeing = paths[1].read_bytes()
     audited = list(read_review_csv(paths[1]))
     audited[0] = replace(
         audited[0],
@@ -203,12 +203,19 @@ def test_refused_resigned_fresh_audit_finalises(case: Any) -> None:
     write_review_csv(paths[1], audited)
     with pytest.raises(Refusal, match=r"^audit_decision_differs$"):
         case.assemble(prepared, paths, draw=drawn)
+    return prepared, paths, drawn, agreeing, signed_before
+
+
+def test_refused_resigned_fresh_audit_finalises(case: Any) -> None:
+    from spine_review import finalise_check, prepare_review_inputs
+
+    prepared, _, drawn, _, signed_before = refuse_audit(case)
     refused = prepared.parent / "invented-assembled/refusal.json"
     record = json.loads(refused.read_bytes())
     assert record["errors"] == 1
     assert record["draw_sha256"] == hashlib.sha256(drawn.read_bytes()).hexdigest()
     assert not (refused.parent / "activity_spine.csv").exists()
-    archive = commit_refusals(case, [record])
+    archive = commit_refusals(case)
     assert refused.read_bytes().rstrip() in archive.read_bytes()
     resigned = prepare_review_inputs(
         case.root, case.cache, case.review, "invented-resigned", case.preparer

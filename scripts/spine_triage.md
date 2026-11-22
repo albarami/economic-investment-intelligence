@@ -66,8 +66,9 @@ There is no application import, table, screen or automatic mapping.
 
 The lead order is **prepare, triage with provider none, sign, draw, audit, assemble,
 finalise-check**, followed by the lead's review and commit of the candidate trio.
-These modes never construct a gateway, fetch a source or change committed review
-files. Use a fresh run identifier for every output folder. All paths must be
+These modes never construct a gateway or fetch a source. A refused assembly
+appends its record to the tracked refusal archive as described below; the other
+committed review files are unchanged. Use a fresh run identifier for every output folder. All paths must be
 inside the repository without symlinks or traversal; the verified cache must be
 under `data/public_cache`. The examples are later lead-shell commands, not worker
 instructions to read a real cache.
@@ -128,11 +129,13 @@ seed over the refusals preceding it; its ordered sample must reproduce and its
 integer error count must be positive and no larger than that sample. A broken
 link, row hash or sample refuses `refusal_record_invalid`.
 
-On `audit_decision_differs`, assembly writes only `refusal.json` in the selected
-fresh run folder, then exits with refusal. It records the audit fields, the count
+On `audit_decision_differs`, assembly writes `refusal.json` in the selected
+fresh run folder and appends the identical object to the working-tree
+`activity_spine_refusals.json` with the existing JSON writer, retaining every
+earlier record's bytes, then exits with refusal. It records the audit fields, the count
 of differing sampled codes, the exact `draw_sha256` and historical `review_rows`.
-The lead appends that object **unchanged** to the refusal list, retaining all
-previous records, and **commits the refusal file before drawing again**. Do not
+Assembly appends; the lead commits. Every later prepare, draw or assemble refuses
+`refusal_history_uncommitted` until the lead **commits the refusal file**. Do not
 put it in the zero-error audit history. Then prepare a fresh manifest (the old
 one freezes the earlier archive), triage with provider none, arrange fresh
 code-by-code signing, derive the next seed from the committed archive, draw and
