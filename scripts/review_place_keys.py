@@ -12,16 +12,30 @@ and the reviewer's table come first), and ``resolve_duplicates``. A repeated
 ``place_key`` and a selected building part that does not verify are refused.
 Every other row stays null with a closed reason. It prints counts and booleans
 per place_key, never a name, id or coordinate; an expected failure prints one
-closed reason and no text of the failure. Neither file is left changed on a
-refusal: a failed replacement restores the file already replaced, and a restore
-that itself fails prints ``FAILED rollback_failed``, exits 3 and leaves the
-original beside its file. ``--check`` re-derives every filled key and fails one
-whose place the build excludes.
+closed reason and no text of the failure. ``--check`` re-derives every filled
+key and fails one whose place the build excludes.
+
+The writing contract. At each filesystem call of ``write_reviewed`` and its
+helpers (each write, copy, ``copymode``, reload, ``os.replace``, restore,
+unlink and close), the only fault raises ``OSError`` or ``KeyboardInterrupt``.
+The outcome is then exactly one of:
+
+(a) both files unchanged, with ``REFUSED filesystem_refused`` and exit 2, or
+    the interrupt passing through after a full restore;
+(b) ``FAILED rollback_failed`` and exit 3, with every unrestored original kept
+    beside its file and no path printed;
+(c) success: both files replaced.
+
+Cleanup only follows an outcome already decided, so a fault in it, an
+interrupt included, never replaces that outcome; it only leaves its own
+temporary file. Once a restore has failed, nothing later replaces (b); once
+both files are replaced, nothing later replaces (c).
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import json
 import os
@@ -236,18 +250,15 @@ def write_beside(path: Path, data: bytes) -> Path:
     return written
 
 
-def discard(paths: Sequence[Path]) -> OSError | None:
-    """Remove each path, each in its own try; return the first failure.
+def discard(paths: Sequence[Path]) -> None:
+    """Remove each path, each in its own try; a failure leaves only that path.
 
-    A failure never stops the removal of the remaining paths.
+    A failure, an interrupt included, neither stops the removal of the rest
+    nor escapes: cleanup never replaces the outcome it follows.
     """
-    failure = None
     for path in paths:
-        try:
+        with contextlib.suppress(BaseException):
             path.unlink(missing_ok=True)
-        except OSError as error:
-            failure = failure or error
-    return failure
 
 
 def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> Path:
@@ -287,8 +298,8 @@ def write_reviewed(
 
     A refusal or a failed replacement leaves neither target changed and no
     temporary file. A failed restore raises ``rollback_failed`` and leaves each
-    unrestored original beside its target; no cleanup failure replaces it. A
-    cleanup failure is raised only when nothing else is. An original is at risk
+    unrestored original beside its target. A cleanup failure replaces no
+    outcome (see the module's writing contract). An original is at risk
     from just before its target's replacement, unless that replacement raises
     ``OSError``; an interrupt unwinds like any failure, and an at-risk original
     is unlinked only by its own restore.
@@ -320,9 +331,7 @@ def write_reviewed(
         if unrestored:
             raise ReviewError(ROLLBACK_FAILED) from None
         raise
-    failure = discard(temporaries())
-    if failure is not None:
-        raise failure
+    discard(temporaries())
 
 
 def load_inputs(

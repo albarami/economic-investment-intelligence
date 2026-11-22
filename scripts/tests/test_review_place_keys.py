@@ -8,6 +8,7 @@ import importlib
 import io
 import json
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -37,6 +38,7 @@ from eii_custodian.publicdata.places.read import (
     RecordLevel,
     read_place_file,
 )
+from eii_custodian.publicdata.places.review import load_attribution
 from eii_custodian.publicdata.review.cache_fixture import write_cached
 
 # The custodian's own invented archive builder, loaded by name: the fixture is
@@ -983,14 +985,13 @@ class CleanupNeverMasks(Pair):
         blocked, loose = self.scratch / "syn-folder", self.scratch / "syn-file"
         blocked.mkdir()
         loose.write_bytes(b"syn")
-        failure = keys_tool.discard([blocked, loose])
-        self.assertIsInstance(failure, IsADirectoryError)
+        keys_tool.discard([blocked, loose])
         self.assertEqual([blocked.exists(), loose.exists()], [True, False])
 
     @settings(deadline=None)
     @given(st.lists(st.sampled_from(("blocked", "loose", "absent")), max_size=6))
     def test_discard_over_every_order_of_kinds(self, kinds: list[str]) -> None:
-        """Every loose file goes; every blocked one stays; the first failure."""
+        """Every loose file goes; every blocked one stays; nothing escapes."""
         with tempfile.TemporaryDirectory() as folder:
             paths = [Path(folder) / f"syn-{index}" for index in range(len(kinds))]
             for path, kind in zip(paths, kinds, strict=True):
@@ -998,21 +999,18 @@ class CleanupNeverMasks(Pair):
                     path.mkdir()
                 elif kind == "loose":
                     path.write_bytes(b"syn")
-            failure = keys_tool.discard(paths)
+            keys_tool.discard(paths)
             exists = [path.exists() for path in paths]
             self.assertEqual(exists, [kind == "blocked" for kind in kinds])
-            first = kinds.index("blocked") if "blocked" in kinds else None
-            if first is None:
-                self.assertIsNone(failure)
-            else:
-                assert isinstance(failure, IsADirectoryError)
-                self.assertEqual(failure.filename, str(paths[first]))
 
-    def test_cleanup_failure_after_both_replacements_is_raised(self) -> None:
+    def test_cleanup_failure_after_both_replacements_keeps_the_success(self) -> None:
+        """Both files are replaced: success (c), never a refusal of a change."""
         self.write(self.valid())
+        before = set(self.files())
         with self.read_only_from(GAZETTEER, after=True):
             run = self.run_tool()
-        self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
+        self.assertEqual(run[0], 0)
+        self.assertEqual(len(set(self.files()) - before), 2)
         self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
         self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
 
@@ -1103,6 +1101,231 @@ class InterruptedUnwinding(Pair):
             run = self.settled()
         self.assertEqual(run, (3, "FAILED rollback_failed\n"))
         self.kept_original(before)
+
+
+FAULTS: tuple[type[BaseException], ...] = (OSError, KeyboardInterrupt)
+Plan = dict[int, type[BaseException]]
+
+
+class Stream:
+    """A written file whose write and close are fault points; close always closes."""
+
+    def __init__(self, inner: io.BufferedWriter, injector: Injector) -> None:
+        self.inner, self.injector = inner, injector
+
+    def __enter__(self) -> Stream:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()
+
+    def write(self, data: bytes) -> int:
+        self.injector.point("write", None)
+        return self.inner.write(data)
+
+    def close(self) -> None:
+        try:
+            self.injector.point("close", None)
+        finally:
+            self.inner.close()
+
+
+class Injector:
+    """Counts each filesystem call of write_reviewed; plan[i] replaces call i.
+
+    The fault is raised instead of the call. A call nested inside a counted
+    one (a loader's own read) is not counted; os.replace inside restore is
+    counted as "restore".
+    """
+
+    def __init__(self, plan: Plan) -> None:
+        self.plan = plan
+        self.calls: list[str] = []
+        self.faulted: list[tuple[str, object]] = []
+        self.active = self.restoring = False
+        self.depth = 0
+
+    def point(self, kind: str, subject: object) -> None:
+        if kind == "replace" and self.restoring:
+            kind = "restore"
+        fault = self.plan.get(len(self.calls))
+        self.calls.append(kind)
+        if fault is not None:
+            self.faulted.append((kind, subject))
+            raise fault("syn")
+
+    def wrap(self, kind: str, real: Callable[..., object]) -> Callable[..., object]:
+        def call(*args: object, **kwargs: object) -> object:
+            if not self.active or self.depth:
+                return real(*args, **kwargs)
+            self.point(kind, args[0] if args else None)
+            self.depth += 1
+            try:
+                return real(*args, **kwargs)
+            finally:
+                self.depth -= 1
+
+        return call
+
+    def flagged(self, flag: str, real: Callable[..., object]) -> Callable[..., object]:
+        def call(*args: object) -> object:
+            setattr(self, flag, True)
+            try:
+                return real(*args)
+            finally:
+                setattr(self, flag, False)
+
+        return call
+
+    @contextlib.contextmanager
+    def patched(self) -> Iterator[None]:
+        opened = self.wrap("fdopen", os.fdopen)
+
+        def fdopen(*args: object) -> object:
+            stream = opened(*args)
+            live = self.active and not self.depth
+            return Stream(stream, self) if live else stream  # type: ignore[arg-type]
+
+        counted = (
+            (tempfile, "mkstemp"),
+            (shutil, "copymode"),
+            (os, "replace"),
+            (Path, "read_bytes"),
+            (Path, "unlink"),
+        )
+        files = tuple((n, s, self.wrap("reload", f)) for n, s, f in keys_tool.FILES)
+        restore = self.flagged("restoring", keys_tool.restore)
+        with contextlib.ExitStack() as stack:
+            for owner, name in counted:
+                real = getattr(owner, name)
+                stack.enter_context(patch.object(owner, name, self.wrap(name, real)))
+            stack.enter_context(patch.object(os, "fdopen", fdopen))
+            stack.enter_context(patch.object(keys_tool, "FILES", files))
+            stack.enter_context(patch.object(keys_tool, "restore", restore))
+            active = self.flagged("active", keys_tool.write_reviewed)
+            stack.enter_context(patch.object(keys_tool, "write_reviewed", active))
+            yield
+
+
+class ExhaustiveFaults(Pair):
+    """Every fault at every filesystem call keeps the contract (R8, REVIEW-CF5).
+
+    Outcomes: (a) both targets unchanged with ``REFUSED filesystem_refused``
+    exit 2, or the interrupt passing through; (b) ``FAILED rollback_failed``
+    exit 3, exactly when a restore failed, each target's original kept; (c)
+    success. A leftover file is only one whose own unlink faulted, or (b)'s
+    kept original.
+    """
+
+    CALLS = 30
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.write(self.valid())
+        licences = load_attribution(self.review / keys_tool.ATTRIBUTION, None)
+        inputs = keys_tool.load_inputs(
+            self.cache, list(self.registry.values()), BOUNDARY, "ar", licences[1]
+        )
+        for name, value in (("load_inputs", inputs), ("load_registry", [])):
+            patcher = patch.object(keys_tool, name, return_value=value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.before, self.modes = self.files(), self.stats()
+        self.success, control = self.case({})
+        self.assertEqual(self.success[0], 0)
+        self.published = self.files()
+        self.control = control.calls
+
+    def stats(self) -> dict[str, int]:
+        return {item.name: item.stat().st_mode for item in self.review.iterdir()}
+
+    def case(self, plan: Plan) -> tuple[tuple[int, str] | str, Injector]:
+        for item in self.review.iterdir():
+            if item.name.startswith(".review-"):
+                item.unlink()
+        self.write(self.valid())
+        injector = Injector(plan)
+        outcome: tuple[int, str] | str
+        with injector.patched():
+            try:
+                outcome = self.run_tool()
+            except KeyboardInterrupt:
+                outcome = "KeyboardInterrupt"
+        return outcome, injector
+
+    def holds(self, outcome: tuple[int, str] | str, injector: Injector) -> None:
+        after, targets = self.files(), (FLAGSHIP, GAZETTEER)
+        extra = set(after) - set(self.before)
+        kinds = [kind for kind, _subject in injector.faulted]
+        unlinked = {Path(str(s)).name for k, s in injector.faulted if k == "unlink"}
+        if outcome == (3, "FAILED rollback_failed\n"):
+            self.assertIn("restore", kinds)
+            originals = [self.before[name] for name in targets]
+            for name in targets:
+                kept = [after[item] for item in extra] + [after[name]]
+                self.assertIn(self.before[name], kept)
+            for item in extra - unlinked:
+                self.assertIn(after[item], originals)
+            return
+        self.assertNotIn("restore", kinds, "a failed restore ends in rollback_failed")
+        self.assertLessEqual(extra, unlinked)
+        self.assertEqual(
+            {n: self.stats()[n] for n in targets}, {n: self.modes[n] for n in targets}
+        )
+        if outcome == self.success:
+            self.assertEqual(
+                [after[n] for n in targets], [self.published[n] for n in targets]
+            )
+            return
+        if outcome == "KeyboardInterrupt":
+            self.assertIn(KeyboardInterrupt, injector.plan.values())
+        else:
+            self.assertEqual(outcome, (2, "REFUSED filesystem_refused\n"))
+        self.assertEqual([after[n] for n in targets], [self.before[n] for n in targets])
+
+    def sweep(self, plans: Sequence[Plan]) -> list[tuple[Plan, Injector]]:
+        """Run and check every plan, each in its own subtest."""
+        done = []
+        for plan in plans:
+            label = ",".join(f"{i}:{f.__name__}" for i, f in sorted(plan.items()))
+            with self.subTest(plan=label):
+                outcome, injector = self.case(plan)
+                done.append((plan, injector))
+                self.holds(outcome, injector)
+        return done
+
+    def deeper(self, runs: Sequence[tuple[Plan, Injector]]) -> list[Plan]:
+        """One more fault at every later call of each run, of each kind."""
+        return [
+            {**plan, index: fault}
+            for plan, injector in runs
+            for index in range(max(plan) + 1, len(injector.calls))
+            for fault in FAULTS
+        ]
+
+    def singles(self) -> list[Plan]:
+        return [{index: fault} for index in range(self.CALLS) for fault in FAULTS]
+
+    def test_the_success_run_has_every_counted_call(self) -> None:
+        self.assertEqual(len(self.control), self.CALLS)
+        writes = ["mkstemp", "fdopen", "write", "close", "copymode"]
+        staged = [*writes, "reload"]
+        kept = ["read_bytes", *writes]
+        expected = [*staged, *staged, *kept, *kept, "replace", "replace"]
+        self.assertEqual(self.control, [*expected, *["unlink"] * 4])
+
+    def test_every_single_fault(self) -> None:
+        self.assertEqual(len(self.sweep(self.singles())), 60)
+
+    def test_every_second_fault(self) -> None:
+        firsts = self.sweep(self.singles())
+        self.assertEqual(len(self.sweep(self.deeper(firsts))), 296)
+
+    def test_every_later_fault_after_a_failed_restore(self) -> None:
+        """REVIEW-CF5: cleanup, or a second interrupt, never replaces (b)."""
+        pairs = self.sweep(self.deeper(self.sweep(self.singles())))
+        failed = [run for run in pairs if "restore" in (k for k, _ in run[1].faulted)]
+        self.assertEqual(len(self.sweep(self.deeper(failed))), 52)
 
 
 SECRETS = ("SYN-P-1", "Syn Souq", "syn souq", "51.1", "25.1", "/")
