@@ -2,6 +2,7 @@
 
 import copy
 import json
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,12 @@ def registry_rows() -> list[dict[str, Any]]:
     assert isinstance(document, dict)
     result: list[dict[str, Any]] = document["sources"]
     return result
+
+
+@cache
+def _committed_rows() -> tuple[dict[str, Any], ...]:
+    """The committed registry rows, read once for the property test only."""
+    return tuple(registry_rows())
 
 
 def collection(numbers: Any = NUMBERS) -> dict[str, Any]:
@@ -206,10 +213,11 @@ def test_component_assignment_roundtrip() -> None:
 )
 def test_order_independence_and_injective_key_property(numbers: list[int]) -> None:
     names = [f"{number:05d}" for number in numbers]
-    output = generate(collection(names))
+    registry = _committed_rows()
+    output = generate(collection(names), registry)
     assert [{k: v for k, v in row.items() if k != "basis_note"} for row in output] == [
         {k: v for k, v in row.items() if k != "basis_note"}
-        for row in generate(collection(list(reversed(names))))
+        for row in generate(collection(list(reversed(names))), registry)
     ]
     assert {row["key"].rsplit("-", 1)[1] for row in output} == set(names)
     assert len(output) == len(names)

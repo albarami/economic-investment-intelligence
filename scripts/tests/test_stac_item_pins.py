@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import replace
+from functools import cache
 from pathlib import Path
 
 import pytest
@@ -107,6 +108,12 @@ def test_output_never_writes_pins_and_never_overwrites(
     assert not (cache / "snapshot_pins.json").exists()
 
 
+@cache
+def _collection_entry() -> Entry:
+    """The committed collection row, read once (the registry is large)."""
+    return next(e for e in load_registry() if e.key == "bldg_ovt/stac-collection")
+
+
 @given(
     st.lists(st.binary(min_size=1, max_size=40), min_size=1, max_size=3, unique=True)
 )
@@ -115,7 +122,7 @@ def test_snapshot_cardinality_property(
 ) -> None:
     # A new directory per example avoids a history shared by generated cases.
     cache = tmp_path_factory.mktemp("pins")
-    entry = next(e for e in load_registry() if e.key == "bldg_ovt/stac-collection")
+    entry = _collection_entry()
     for body in bodies:
         store(cache, entry, body)
     if len(bodies) == 1:

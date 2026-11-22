@@ -6,6 +6,7 @@ Each helper is the loaded registry row of that key. The row is the truth
 
 from __future__ import annotations
 
+from functools import cache
 from pathlib import Path
 
 from custodian.tests.repository_root import repository_root
@@ -20,10 +21,16 @@ TENDER_TERMS = (
 )
 
 
+@cache
+def _registry() -> tuple[Entry, ...]:
+    """The committed registry, read once per test process (rows are frozen)."""
+    path = repository_root(Path(__file__)) / "custodian/publicdata/sources.yaml"
+    return load_registry(path)
+
+
 def _loaded(key: str) -> Entry:
     """Return the registry row for key. The helper does not restate the row."""
-    path = repository_root(Path(__file__)) / "custodian/publicdata/sources.yaml"
-    return next(entry for entry in load_registry(path) if entry.key == key)
+    return next(entry for entry in _registry() if entry.key == key)
 
 
 def tender_entry() -> Entry:
