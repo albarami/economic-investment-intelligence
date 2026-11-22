@@ -53,6 +53,8 @@ jobs:
         run: uv run --locked ruff format --check .
       - name: Check Python types
         run: uv run --locked mypy
+      - name: Check the suite matrix and the tests verdict
+        run: uv run --locked python scripts/ci_aggregate.py .github/workflows/ci.yml
       - name: Install web dependencies
         run: npm ci
         working-directory: web

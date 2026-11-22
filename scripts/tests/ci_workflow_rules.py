@@ -19,7 +19,7 @@ WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
 # A workflow file change changes its pin in the same commit, so it is seen in review.
 PINNED_SHA256 = {
-    "ci.yml": "95820c9ad23d72f981507092d59ecae9a7ae0c30fc38613759d9c515c6dca251",
+    "ci.yml": "8ed31e6b6120eeebff667e2d54b19271de501adca16d51631e7f28c2abee411d",
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }
@@ -57,9 +57,7 @@ SCANNER_FETCH = "uv run --locked python scripts/hooks_gitleaks.py fetch"
 # The one admitted condition: the final `tests` job waits for every shard and
 # always runs, so a failed, cancelled or skipped shard reaches its verdict.
 AGGREGATE_LINES = "    needs: [suite, web-spikes]\n    if: ${{ always() }}\n"
-AGGREGATE_RUN = (
-    'uv run --locked python scripts/ci_aggregate.py .github/workflows/ci.yml "$NEEDS"'
-)
+AGGREGATE_RUN = ci_aggregate.AGGREGATE_RUN
 
 _WEAKENER_STEP_RE = re.compile(r"(?m)^\s*continue-on-error:\s*true\s*$")
 
@@ -210,7 +208,7 @@ def check_required_jobs(workflows: dict[str, Any]) -> list[str]:
 
 
 def _shard_problems(document: object) -> list[str]:
-    """Require the suite matrix to equal SUITES and `tests` to judge every shard."""
+    """Fail-fast false, then the aggregate's own shape check, shared."""
     jobs = document.get("jobs") if isinstance(document, dict) else None
     if not isinstance(jobs, dict):
         return []
@@ -218,24 +216,8 @@ def _shard_problems(document: object) -> list[str]:
     strategy = suite.get("strategy") if isinstance(suite, dict) else None
     if not isinstance(strategy, dict) or strategy.get("fail-fast") is not False:
         return ["ci.yml: job suite is not a matrix with fail-fast false"]
-    matrix = strategy.get("matrix")
-    if (
-        not isinstance(matrix, dict)
-        or set(matrix) != {"suite"}
-        or ci_aggregate.matrix_problems(matrix["suite"])
-    ):
-        return ["ci.yml: job suite matrix differs from the SUITES table"]
-    tests = jobs.get("tests")
-    if not isinstance(tests, dict):
-        return []
-    if tests.get("needs") != sorted(ci_aggregate.NEEDED):
-        return ["ci.yml: job tests does not need exactly the aggregated jobs"]
-    if tests.get("if") != "${{ always() }}":
-        return ["ci.yml: job tests does not always run"]
-    runs = [str(step.get("run", "")).strip() for step in tests.get("steps") or []]
-    if AGGREGATE_RUN not in runs:
-        return ["ci.yml: job tests does not run the aggregate verdict"]
-    return []
+    found = ci_aggregate.shape_problems(document)
+    return [f"ci.yml: {line.removeprefix('FAIL ')}" for line in found]
 
 
 def check_required_steps(

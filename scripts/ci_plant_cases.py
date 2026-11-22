@@ -97,18 +97,18 @@ def plant_token_history(copy: Path, environment: Mapping[str, str]) -> None:
     git(copy, environment, "commit", "-q", "-m", "chore: remove")
 
 
-def remove_text(path: str, text: str) -> Plant:
-    """Return a plant that removes the first occurrence of a text from a file.
+def remove_text(path: str, text: str, new: str = "") -> Plant:
+    """Return a plant that replaces the first occurrence of a text in a file.
 
-    An absent text leaves the file unchanged, so the planted copy passes and the
-    harness reports the case as not blocked.
+    By default the text is removed. An absent text leaves the file unchanged, so
+    the planted copy passes and the harness reports the case as not blocked.
     """
 
     def plant(copy: Path, environment: Mapping[str, str]) -> None:
         del environment
         target = copy / path
         old = target.read_text(encoding="utf-8")
-        target.write_text(old.replace(text, "", 1), encoding="utf-8")
+        target.write_text(old.replace(text, new, 1), encoding="utf-8")
 
     return plant
 
@@ -166,6 +166,14 @@ PLANTS: dict[str, Plant] = {
     "dropped-guards": combine(
         write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
         remove_text(".github/workflows/ci.yml", "          - python-guards\n"),
+    ),
+    "excluded-guards": combine(
+        write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
+        remove_text(
+            ".github/workflows/ci.yml",
+            "          - web-unit\n",
+            "          - web-unit\n        exclude:\n          - suite: python-guards\n",
+        ),
     ),
 }
 
@@ -263,6 +271,13 @@ CASES: tuple[Case, ...] = (
         "FAIL matrix-missing: python-guards",
     ),
     Case(
+        "tests-aggregate-excluded-guards",
+        "tests-matrix-excluded",
+        AGGREGATE,
+        "excluded-guards",
+        "FAIL matrix-keys: exclude",
+    ),
+    Case(
         "secrets-token-in-history",
         "secrets",
         SCAN,
@@ -287,5 +302,6 @@ CLASSES = (
     "tests-shard-failed",
     "tests-shard-skipped",
     "tests-matrix-dropped",
+    "tests-matrix-excluded",
     "secrets",
 )

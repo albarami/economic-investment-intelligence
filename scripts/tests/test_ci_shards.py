@@ -163,13 +163,259 @@ class Aggregate(unittest.TestCase):
             (
                 "      matrix:\n",
                 "      matrix-off:\n",
-                "FAIL matrix-unreadable: the suite matrix is not a list of names",
+                ci_aggregate.NO_AXIS,
             ),
         )
         for old, new, line in rows:
             with self.subTest(line=line):
                 status, out = self.verdict(GOOD, self.edited(old, new))
                 self.assertEqual((status, out), (1, f"{line}\nRESULT: FAILED\n"))
+
+    def test_each_shape_refusal_names_its_reason(self) -> None:
+        """Rows 1 to 10 of the S2-CI round-3 family, one change each."""
+        listed = "".join(f"          - {name}\n" for name in NAMES)
+        matrix = "      matrix:\n        suite:\n" + listed
+        run = '        run: ./eii test --seed 2026111201 --suite "$SUITE"\n'
+        env = "        env:\n          SUITE: ${{ matrix.suite }}\n"
+        compare = "        run: npm run test:spike:glyphs\n"
+        aggregate = f"        run: {rules.AGGREGATE_RUN}\n"
+        shape = f"        run: {ci_aggregate.SHAPE_RUN}\n"
+        shell = "\n".join(
+            [
+                "      - name: Run one suite",
+                '        run: ./eii test --seed 2026111201 --suite "$SUITE"',
+                "        shell: sh {0}",
+                "",
+            ]
+        )
+        rows = (
+            # 1 exclude, 2 include, 3 another axis
+            (
+                "          - web-unit\n",
+                "          - web-unit\n        exclude:\n          - suite: python-guards\n",
+                "FAIL matrix-keys: exclude",
+            ),
+            (
+                "          - web-unit\n",
+                "          - web-unit\n        include:\n          - suite: web-unit\n"
+                "            extra: x\n",
+                "FAIL matrix-keys: include",
+            ),
+            (
+                "      matrix:\n",
+                "      matrix:\n        os: [ubuntu-24.04]\n",
+                "FAIL matrix-keys: os",
+            ),
+            # 4 the matrix, the strategy or the list written as an expression
+            (matrix, "      matrix: ${{ fromJSON(vars.M) }}\n", ci_aggregate.NO_AXIS),
+            (
+                "    strategy:\n      fail-fast: false\n" + matrix,
+                "    strategy: ${{ fromJSON(vars.S) }}\n",
+                ci_aggregate.NO_AXIS,
+            ),
+            (
+                "        suite:\n" + listed,
+                "        suite: ${{ fromJSON(vars.L) }}\n",
+                ci_aggregate.NOT_A_LIST,
+            ),
+            # 5 job continue-on-error, 9 job condition
+            (
+                "    timeout-minutes: 90\n",
+                "    timeout-minutes: 90\n    continue-on-error: true\n",
+                "FAIL job-key: suite: continue-on-error",
+            ),
+            (
+                "    timeout-minutes: 90\n",
+                "    timeout-minutes: 90\n    if: ${{ true }}\n",
+                "FAIL job-key: suite: if",
+            ),
+            (
+                "    timeout-minutes: 90\n",
+                "    timeout-minutes: 90\n    defaults:\n      run:\n        shell: sh\n",
+                "FAIL job-key: suite: defaults",
+            ),
+            (
+                "    timeout-minutes: 90\n",
+                "    timeout-minutes: 90\n    needs: [static-checks]\n",
+                "FAIL job-key: suite: needs",
+            ),
+            # 6 step continue-on-error, 7 step condition, shell or command
+            (
+                run,
+                run + "        continue-on-error: true\n",
+                "FAIL step-key: suite: Run one suite: continue-on-error",
+            ),
+            (
+                run,
+                run + "        if: ${{ true }}\n",
+                "FAIL step-key: suite: Run one suite: if",
+            ),
+            (
+                run,
+                shell.split("\n", 1)[1],
+                "FAIL step-key: suite: Run one suite: shell",
+            ),
+            (
+                run,
+                '        run: ./eii test --seed 2026111201 --suite "$SUITE" || true\n',
+                "FAIL step-missing: suite: Run one suite",
+            ),
+            (
+                run,
+                '        run: ./eii test --seed 2026111201 --suite "$SUITE"; true\n',
+                "FAIL step-missing: suite: Run one suite",
+            ),
+            (
+                run,
+                '        run: set +e; ./eii test --seed 2026111201 --suite "$SUITE"\n',
+                "FAIL step-missing: suite: Run one suite",
+            ),
+            (
+                run,
+                "        run: ./eii test --seed 2026111201 --suite python-core\n",
+                "FAIL step-missing: suite: Run one suite",
+            ),
+            (
+                env,
+                "        env:\n          SUITE: python-core\n",
+                "FAIL step-missing: suite: Run one suite",
+            ),
+            # 8 the tests job
+            (
+                "    if: ${{ always() }}\n",
+                "",
+                "FAIL tests-condition: job tests does not always run",
+            ),
+            (
+                "    if: ${{ always() }}\n",
+                "    if: ${{ success() }}\n",
+                "FAIL tests-condition: job tests does not always run",
+            ),
+            (
+                "    needs: [suite, web-spikes]\n",
+                "    needs: [suite]\n",
+                "FAIL tests-needs: job tests does not need exactly suite, web-spikes",
+            ),
+            (
+                "    needs: [suite, web-spikes]\n",
+                "    needs: [web-spikes]\n",
+                "FAIL tests-needs: job tests does not need exactly suite, web-spikes",
+            ),
+            (
+                "    timeout-minutes: 10\n",
+                "    timeout-minutes: 10\n    continue-on-error: true\n",
+                "FAIL job-key: tests: continue-on-error",
+            ),
+            (
+                aggregate,
+                aggregate + "        continue-on-error: true\n",
+                "FAIL step-key: tests: "
+                + ci_aggregate.AGGREGATE_NAME
+                + ": continue-on-error",
+            ),
+            (
+                aggregate,
+                aggregate.rstrip("\n") + " || true\n",
+                "FAIL step-missing: tests: " + ci_aggregate.AGGREGATE_NAME,
+            ),
+            # 10 web-spikes
+            (
+                "    timeout-minutes: 45\n",
+                "    timeout-minutes: 45\n    continue-on-error: true\n",
+                "FAIL job-key: web-spikes: continue-on-error",
+            ),
+            (
+                "    timeout-minutes: 45\n",
+                "    timeout-minutes: 45\n    if: ${{ true }}\n",
+                "FAIL job-key: web-spikes: if",
+            ),
+            (
+                "    timeout-minutes: 45\n",
+                "    timeout-minutes: 45\n    strategy:\n      matrix:\n        x: [1]\n",
+                "FAIL job-key: web-spikes: strategy",
+            ),
+            (
+                compare,
+                compare + "        continue-on-error: true\n",
+                "FAIL step-key: web-spikes: Compare spike screenshots: continue-on-error",
+            ),
+            (
+                compare,
+                compare + "        if: ${{ false }}\n",
+                "FAIL step-key: web-spikes: Compare spike screenshots: if",
+            ),
+            (
+                compare,
+                "        run: npm run test:spike:glyphs || true\n",
+                "FAIL step-missing: web-spikes: Compare spike screenshots",
+            ),
+            # the independent shape check in static-checks
+            (
+                shape,
+                shape.rstrip("\n") + " || true\n",
+                "FAIL step-missing: static-checks: " + ci_aggregate.SHAPE_NAME,
+            ),
+            (
+                "    timeout-minutes: 25\n",
+                "    timeout-minutes: 25\n    needs: [suite]\n",
+                "FAIL job-key: static-checks: needs",
+            ),
+            (
+                "defaults:\n  run:\n    shell: bash\n",
+                "defaults:\n  run:\n    shell: sh\n",
+                "FAIL workflow-defaults: the run shell is not bash",
+            ),
+            (
+                "  suite:\n    name: suite\n",
+                "  suites:\n    name: suite\n",
+                "FAIL job-missing: suite",
+            ),
+        )
+        for old, new, line in rows:
+            with self.subTest(line=line, new=new):
+                status, out = self.verdict(GOOD, self.edited(old, new))
+                self.assertEqual((status, out), (1, f"{line}\nRESULT: FAILED\n"))
+
+    def test_shape_alone_refuses_without_any_job_result(self) -> None:
+        """Row 8 is refused by static-checks, which needs no job and is never skipped."""
+        out = io.StringIO()
+        self.assertEqual(ci_aggregate.main([WORKFLOW], out), 0)
+        self.assertEqual(out.getvalue(), "RESULT: PASSED\n")
+        out = io.StringIO()
+        edited = self.edited("    if: ${{ always() }}\n", "")
+        self.assertEqual(ci_aggregate.main([edited], out), 1)
+        self.assertEqual(
+            out.getvalue(),
+            "FAIL tests-condition: job tests does not always run\nRESULT: FAILED\n",
+        )
+        jobs = rules._parse_workflow(Path(WORKFLOW).read_text(encoding="utf-8"))["jobs"]
+        static = jobs["static-checks"]
+        self.assertFalse({"needs", "if", "continue-on-error"} & set(static))
+        self.assertIn(ci_aggregate.SHAPE_RUN, [s.get("run") for s in static["steps"]])
+
+    @given(st.sets(st.sampled_from(["suite", "exclude", "include", "os", ""])))
+    def test_matrix_passes_exactly_with_the_one_suite_axis(
+        self, keys: set[str]
+    ) -> None:
+        matrix = {key: list(NAMES) for key in keys}
+        job = {"strategy": {"fail-fast": False, "matrix": matrix}}
+        self.assertEqual(
+            ci_aggregate.matrix_shape_problems(job) == [], keys == {"suite"}
+        )
+
+    @given(
+        st.sets(st.sampled_from([*ci_aggregate.JOB_KEYS, "timeout-minutes"])),
+        st.sets(st.sampled_from([*ci_aggregate.STEP_KEYS, "id"])),
+    )
+    def test_job_passes_exactly_without_an_escape_key(
+        self, job_keys: set[str], step_keys: set[str]
+    ) -> None:
+        step = dict(ci_aggregate.REQUIRED_STEPS["web-spikes"][0])
+        steps = [{**step, **{key: "x" for key in step_keys}}]
+        steps += list(ci_aggregate.REQUIRED_STEPS["web-spikes"][1:])
+        job = {"steps": steps, **{key: "x" for key in job_keys}}
+        clean = not (job_keys - {"timeout-minutes"}) and not (step_keys - {"id"})
+        self.assertEqual(ci_aggregate.job_problems("web-spikes", job) == [], clean)
 
     def test_unreadable_workflow_names_its_reason(self) -> None:
         status, out = self.verdict(GOOD, self.edited("jobs:\n", "jobs: [\n"))
@@ -230,9 +476,6 @@ class Aggregate(unittest.TestCase):
         self.assertEqual(ci_aggregate.main([], out), 2)
         self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
         out = io.StringIO()
-        self.assertEqual(ci_aggregate.main([json.dumps(GOOD)], out), 2)
-        self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
-        out = io.StringIO()
         self.assertEqual(ci_aggregate.main([WORKFLOW, json.dumps(GOOD), "x"], out), 2)
         self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
 
@@ -275,31 +518,31 @@ class ShardContract(unittest.TestCase):
                 "fail-fast: true",
                 "is not a matrix with fail-fast false",
             ),
-            ("          - web-unit\n", "", "matrix differs from the SUITES table"),
+            ("          - web-unit\n", "", "matrix-missing: web-unit"),
             (
                 "      matrix:\n",
                 "      matrix:\n        os: [ubuntu-24.04]\n",
-                "matrix differs from the SUITES table",
+                "matrix-keys: os",
             ),
             (
                 "          - web-unit\n",
                 "          - web-unit\n          - web-extra\n",
-                "matrix differs from the SUITES table",
+                "matrix-unexpected: web-extra",
             ),
             (
                 "    needs: [suite, web-spikes]\n",
                 "    needs: [suite]\n",
-                "does not need exactly the aggregated jobs",
+                "tests-needs: job tests does not need exactly suite, web-spikes",
             ),
             (
                 "    if: ${{ always() }}\n",
                 "    if: ${{ success() }}\n",
-                "does not always run",
+                "tests-condition: job tests does not always run",
             ),
             (
                 f"run: {rules.AGGREGATE_RUN}",
                 'run: uv run --locked python scripts/ci_aggregate.py "$NEEDS"',
-                "does not run the aggregate verdict",
+                "step-missing: tests: " + ci_aggregate.AGGREGATE_NAME,
             ),
         )
         for old, new, reason in rows:
@@ -307,9 +550,19 @@ class ShardContract(unittest.TestCase):
                 self.assertEqual(
                     self.planted(old, new),
                     [f"ci.yml: job suite {reason}"]
-                    if "matrix" in reason
-                    else [f"ci.yml: job tests {reason}"],
+                    if "fail-fast" in reason
+                    else [f"ci.yml: {reason}"],
                 )
+
+    def test_guard_shares_the_aggregate_shape_check(self) -> None:
+        """An excluded suite fails the workflow guard with the aggregate's reason."""
+        self.assertEqual(
+            self.planted(
+                "          - web-unit\n",
+                "          - web-unit\n        exclude:\n          - suite: python-guards\n",
+            ),
+            ["ci.yml: matrix-keys: exclude"],
+        )
 
     def test_condition_elsewhere_is_still_a_weakener(self) -> None:
         problems = self.planted(
@@ -381,16 +634,22 @@ class ShardPlants(unittest.TestCase):
                 self.assertEqual(status, 1, out)
                 self.assertIn(case.expect, out)
 
-    def test_dropped_suite_plant_fails_the_aggregate_alone(self) -> None:
-        case = next(c for c in cases.CASES if c.check == "tests-matrix-dropped")
-        cases.PLANTS["passing-shards"](self.root, support.parent_env())
-        self.assertEqual(plants.run_shards(self.root, support.parent_env())[0], 0)
-        cases.PLANTS[case.plant](self.root, support.parent_env())
+    def test_dropped_or_excluded_suite_plant_fails_the_aggregate_alone(self) -> None:
         self.assertEqual(run_tests.SUITES[0].name, "python-guards")
-        status, out = plants.run_shards(self.root, support.parent_env())
-        self.assertEqual(status, 1, out)
-        self.assertIn(case.expect, out)
-        self.assertEqual(out.count("FAIL "), 1, out)
+        for check in ("tests-matrix-dropped", "tests-matrix-excluded"):
+            with self.subTest(check=check):
+                case = next(c for c in cases.CASES if c.check == check)
+                shutil.copy2(
+                    ci_support.WORKFLOW_DIR / "ci.yml", self.root / plants.WORKFLOW
+                )
+                cases.PLANTS["passing-shards"](self.root, support.parent_env())
+                status, out = plants.run_shards(self.root, support.parent_env())
+                self.assertEqual(status, 0, out)
+                cases.PLANTS[case.plant](self.root, support.parent_env())
+                status, out = plants.run_shards(self.root, support.parent_env())
+                self.assertEqual(status, 1, out)
+                self.assertIn(case.expect, out)
+                self.assertEqual(out.count("FAIL "), 1, out)
 
 
 if __name__ == "__main__":
