@@ -723,10 +723,8 @@ def stale_reload(target: str) -> keys_tool.Loader:
     return load
 
 
-class BothFilesStaged(World):
-    """Both files are staged and reloaded before either is replaced (lens 2, 1)."""
-
-    KINDS = ("aliases_form", "overwrite_refused", "duplicate_place_key")
+class Pair(World):
+    """A valid flagship and gazetteer pair that fills one key in each file."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -744,6 +742,18 @@ class BothFilesStaged(World):
             GAZETTEER: [spec("landmark:0", "Syn Souq")],
         }
 
+    def files(self) -> dict[str, bytes]:
+        return {item.name: item.read_bytes() for item in self.review.iterdir()}
+
+    def write(self, rows: Mapping[str, Sequence[Mapping[str, object]]]) -> None:
+        self.review_files(flagship=rows[FLAGSHIP], gazetteer=rows[GAZETTEER])
+
+
+class BothFilesStaged(Pair):
+    """Both files are staged and reloaded before either is replaced (lens 2, 1)."""
+
+    KINDS = ("aliases_form", "overwrite_refused", "duplicate_place_key")
+
     def plant(
         self, rows: dict[str, list[dict[str, object]]], name: str, kind: str
     ) -> None:
@@ -755,12 +765,6 @@ class BothFilesStaged(World):
             row["source_id"] = "bldg_ovt" if name == FLAGSHIP else "places_ovt"
         elif kind == "duplicate_place_key":
             rows[name].append(spec(str(row["place_key"]), "Syn Other"))
-
-    def files(self) -> dict[str, bytes]:
-        return {item.name: item.read_bytes() for item in self.review.iterdir()}
-
-    def write(self, rows: Mapping[str, Sequence[Mapping[str, object]]]) -> None:
-        self.review_files(flagship=rows[FLAGSHIP], gazetteer=rows[GAZETTEER])
 
     def test_valid_pair_writes_both_and_leaves_no_staged_file(self) -> None:
         self.write(self.valid())
@@ -812,6 +816,72 @@ class BothFilesStaged(World):
                         run = self.run_tool()
                     self.assertEqual(run, (2, f"REFUSED {kind}\n"))
                     self.assertEqual(self.files(), before)
+
+
+class SecondReplaceFailure(Pair):
+    """A failed replacement restores every replaced target (lens 1, R1)."""
+
+    def failing(
+        self, target: str, failures: Mapping[str, int], at: int = 1
+    ) -> contextlib.AbstractContextManager[object]:
+        """target (a function of keys_tool.os or .shutil) raising PermissionError.
+
+        failures maps a review file name, found in argument at, to the 1-based
+        call on it that fails. For os.replace call 1 publishes the staged file
+        and call 2 restores the original; for shutil.copymode call 1 stages and
+        call 2 keeps the original.
+        """
+        module, name = target.split(".")
+        owner = getattr(keys_tool, module)
+        real = getattr(owner, name)
+        calls: dict[str, int] = {}
+
+        def fail(*args: str | Path) -> None:
+            key = Path(args[at]).name
+            calls[key] = calls.get(key, 0) + 1
+            if failures.get(key) == calls[key]:
+                raise PermissionError("syn")
+            real(*args)
+
+        return patch.object(owner, name, fail)
+
+    def modes(self) -> dict[str, int]:
+        return {item.name: item.stat().st_mode for item in self.review.iterdir()}
+
+    def refused(self, failures: Mapping[str, int]) -> None:
+        self.write(self.valid())
+        before, modes = self.files(), self.modes()
+        with self.failing("os.replace", failures):
+            run = self.run_tool()
+        self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
+        self.assertEqual(self.files(), before)
+        self.assertEqual(self.modes(), modes)
+
+    def test_second_replacement_failure_restores_the_first(self) -> None:
+        self.refused({GAZETTEER: 1})
+
+    def test_first_replacement_failure_changes_neither(self) -> None:
+        self.refused({FLAGSHIP: 1})
+
+    def test_failed_restore_is_its_own_reason_and_keeps_the_original(self) -> None:
+        self.write(self.valid())
+        before = self.files()
+        with self.failing("os.replace", {GAZETTEER: 1, FLAGSHIP: 2}):
+            run = self.run_tool()
+        self.assertEqual(run, (3, "FAILED rollback_failed\n"))
+        after = self.files()
+        self.assertEqual(after[GAZETTEER], before[GAZETTEER])
+        kept = sorted(set(after) - set(before))
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(after[kept[0]], before[FLAGSHIP])
+
+    def test_failed_copy_of_the_second_original_changes_neither(self) -> None:
+        self.write(self.valid())
+        before = self.files()
+        with self.failing("shutil.copymode", {GAZETTEER: 2}, at=0):
+            run = self.run_tool()
+        self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
+        self.assertEqual(self.files(), before)
 
 
 SECRETS = ("SYN-P-1", "Syn Souq", "syn souq", "51.1", "25.1", "/")

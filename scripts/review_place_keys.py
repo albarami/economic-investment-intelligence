@@ -12,8 +12,11 @@ and the reviewer's table come first), and ``resolve_duplicates``. A repeated
 ``place_key`` and a selected building part that does not verify are refused.
 Every other row stays null with a closed reason. It prints counts and booleans
 per place_key, never a name, id or coordinate; an expected failure prints one
-closed reason and no text of the failure. ``--check`` re-derives every filled
-key and fails one whose place the build excludes.
+closed reason and no text of the failure. Neither file is left changed on a
+refusal: a failed replacement restores the file already replaced, and a restore
+that itself fails prints ``FAILED rollback_failed``, exits 3 and leaves the
+original beside its file. ``--check`` re-derives every filled key and fails one
+whose place the build excludes.
 """
 
 from __future__ import annotations
@@ -22,6 +25,7 @@ import argparse
 import csv
 import json
 import os
+import shutil
 import sys
 import tempfile
 from collections.abc import Callable, Mapping, Sequence
@@ -72,6 +76,7 @@ FILES: tuple[tuple[str, str, Loader], ...] = (
     ("showcase_gazetteer.yaml", PLACES, load_showcase_gazetteer),
 )
 UNPARSABLE = (yaml.YAMLError, UnicodeError, csv.Error)
+ROLLBACK_FAILED = "rollback_failed"
 
 
 class ReviewError(Exception):
@@ -214,17 +219,31 @@ def apply(
     return result
 
 
+def write_beside(path: Path, data: bytes) -> Path:
+    """Write data to a new temporary file beside path, with path's mode.
+
+    The file is removed on a failure.
+    """
+    handle, name = tempfile.mkstemp(prefix=".review-", dir=path.parent)
+    written = Path(name)
+    try:
+        with os.fdopen(handle, "wb") as stream:
+            stream.write(data)
+        shutil.copymode(path, written)
+    except BaseException:
+        written.unlink(missing_ok=True)
+        raise
+    return written
+
+
 def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> Path:
     """Write a temporary file beside path and load it with the build's reader.
 
     The staged path is returned; on any failure it is removed first.
     """
     text = json.dumps(list(rows), ensure_ascii=False, indent=2) + "\n"
-    handle, name = tempfile.mkstemp(prefix=".review-", dir=path.parent)
-    staged = Path(name)
+    staged = write_beside(path, text.encode("utf-8"))
     try:
-        with os.fdopen(handle, "w", encoding="utf-8") as stream:
-            stream.write(text)
         if list(loader(staged, None)[1]) != json.loads(text):
             raise ReviewError("reload_mismatch")
     except BaseException:
@@ -233,19 +252,46 @@ def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> P
     return staged
 
 
+def restore(replaced: Sequence[tuple[Path, Path]]) -> list[Path]:
+    """Move each kept original back over its target; return those not restored."""
+    unrestored = []
+    for original, path in replaced:
+        try:
+            os.replace(original, path)
+        except OSError:
+            unrestored.append(original)
+    return unrestored
+
+
 def write_reviewed(
     planned: Sequence[tuple[Path, Sequence[Mapping[str, object]], Loader]],
 ) -> None:
-    """Stage and reload every file, then replace the targets; none on a refusal."""
+    """Stage, reload and keep each original, then replace the targets.
+
+    A refusal or a failed replacement leaves neither target changed and no
+    temporary file. A failed restore raises ``rollback_failed`` and leaves each
+    unrestored original beside its target.
+    """
     staged: list[tuple[Path, Path]] = []
+    originals: list[tuple[Path, Path]] = []
+    unrestored: list[Path] = []
     try:
         for path, rows, loader in planned:
             staged.append((stage(path, rows, loader), path))
-        for temporary, path in staged:
-            os.replace(temporary, path)
+        for _temporary, path in staged:
+            originals.append((write_beside(path, path.read_bytes()), path))
+        for index, (temporary, path) in enumerate(staged):
+            try:
+                os.replace(temporary, path)
+            except BaseException:
+                unrestored = restore(originals[:index])
+                if unrestored:
+                    raise ReviewError(ROLLBACK_FAILED) from None
+                raise
     finally:
-        for temporary, _path in staged:
-            temporary.unlink(missing_ok=True)
+        for temporary, _path in (*staged, *originals):
+            if temporary not in unrestored:
+                temporary.unlink(missing_ok=True)
 
 
 def load_inputs(
@@ -401,7 +447,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             lines, agrees = fill(args.review, inputs), True
     except EXPECTED as exc:
-        print(f"REFUSED {refusal(exc)}")
+        reason = refusal(exc)
+        if reason == ROLLBACK_FAILED:
+            print(f"FAILED {reason}")
+            return 3
+        print(f"REFUSED {reason}")
         return 2
     for line in lines:
         print(line)
