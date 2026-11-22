@@ -508,27 +508,23 @@ class Production:
 
     def spine_graph(self) -> dict[str, str]:
         from .review.activity import (
-            SupplierMembership,
-            decode_review_code,
+            SpineError,
+            basket_membership,
             load_activity_inputs,
+            read_activity_rows,
         )
         from .review.graph import build_graph, read_allowlist, write_graph
 
-        membership = read_object(self.cache, "review/activity_membership.json")
-        if (
-            set(membership) != {"playbook_codes", "supplier_codes", "supplier_complete"}
-            or membership["supplier_complete"] is not True
-        ):
-            raise AssemblyError("assembly_membership_invalid")
-        codes = []
-        for key in ("playbook_codes", "supplier_codes"):
-            if not isinstance(membership[key], list):
-                raise AssemblyError("assembly_membership_invalid")
-            codes.append(tuple(decode_review_code(value) for value in membership[key]))
+        activities, _, _ = read_activity_rows(self.cache, self.entries, self.selected)
+        baskets = read_yaml(self.review / "baskets.yaml")
+        try:
+            playbook, suppliers = basket_membership(baskets, activities)
+        except SpineError as error:
+            raise AssemblyError("assembly_membership_invalid") from error
         inputs = load_activity_inputs(
             self.cache,
-            codes[0],
-            supplier_membership=SupplierMembership(codes[1], True),
+            playbook,
+            supplier_membership=suppliers,
             registry=self.entries,
             review_path=self.review / "activity_spine.csv",
             selections=self.selected,
@@ -558,6 +554,12 @@ class Production:
             "spine_graph",
             {
                 "spine": inputs.spine,
+                "membership": {
+                    "playbook_codes": playbook,
+                    "supplier_codes": suppliers.codes,
+                    "supplier_classes": sorted({code[:4] for code in suppliers.codes}),
+                    "baskets_sha256": file_hash(self.review / "baskets.yaml"),
+                },
                 "manifest": inputs.manifest,
                 "left_out": inputs.left_out,
             },
