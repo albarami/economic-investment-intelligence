@@ -528,19 +528,23 @@ def _proof_reader(
         if not rows:
             raise AwardError("schema_missing")
         if version_two:
-            return [
-                {
+            projected = []
+            for row in rows:
+                if not {"award_date", *profile["proof_columns"].values()} <= row.keys():
+                    raise AwardError("schema_missing")
+                proof = {
                     **{
                         profile[key]: ""
                         if row[profile["proof_columns"][key]] is None
                         else str(row[profile["proof_columns"][key]])
                         for key in ("company", "registration", "value")
                     },
-                    "award_date": str(row.get("award_date") or ""),
+                    "award_date": str(row["award_date"] or ""),
                     **proof_date_marker(row),
                 }
-                for row in rows
-            ]
+                proof_date_marker(proof)
+                projected.append(proof)
+            return projected
         return [
             {key: "" if value is None else str(value) for key, value in row.items()}
             for row in rows

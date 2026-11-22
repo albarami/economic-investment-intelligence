@@ -45,9 +45,11 @@ round-two marker remains lead-owned.
    `award_date` (null becomes empty text) and the optional `proof_date_status`
    marker. The reader and shared link checker refuse `schema_missing` for an
    unknown marker, an absent marker beside an empty date, or a marker beside a
-   set or missing date field. Checkers record the marker beside the comparison
-   result, never as its reason: a matching proof remains `matched`, and a
-   mismatch retains its own reason. Dates remain uncompared.
+   set or missing date field. The version-two reader requires every projected
+   source key, including `award_date`, and revalidates the projected row before
+   returning it; a missing key refuses `schema_missing`. Checkers record the
+   marker beside the comparison result, never as its reason: a matching proof
+   remains `matched`, and a mismatch retains its own reason. Dates remain uncompared.
 4. Add `proof_award_absent` to the closed mismatch vocabulary and its receipt
    counter. It contributes to `mismatched`, never `matched` or `failed_fetches`.
    The existing counter and result validators recompute it and reject unknown
