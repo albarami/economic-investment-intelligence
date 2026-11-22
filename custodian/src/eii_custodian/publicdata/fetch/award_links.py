@@ -8,14 +8,19 @@ from decimal import Decimal
 from typing import Any
 
 from .allowlist import approve
-from .award_checks import AwardError, _same, validate_check_receipt
+from .award_checks import (
+    FETCH_REASONS,
+    MATCH_REASONS,
+    REASON_COUNTS,
+    RESULT_REASONS,
+    AwardError,
+    proof_reason,
+    validate_check_receipt,
+)
 from .certificate_pins import PinError
 from .snapshots import SnapshotError
 
 METHOD = "awards.report_links@v1"
-FETCH_REASONS = frozenset(
-    {"proof_fetch_failed", "unreachable", "http_status", "body_bytes"}
-)
 
 
 class ProofFetchError(AwardError):
@@ -48,8 +53,30 @@ def check_all_awards(
     archive and schema refusals still stop publication; none becomes a match.
     """
     frame = _frame(rows)
+    results = _check_links(frame, profile, proof_reader, sorted(frame))
+    totals = _totals(results)
+    incomplete = not results or totals["failed_fetches"] > 0
+    return {
+        "method": METHOD,
+        "scope": "all_links",
+        "report_urls": sorted(frame),
+        "distinct_frame_count": len(frame),
+        "checked_count": len(results),
+        **totals,
+        "incomplete": incomplete,
+        "status": "award_links_incomplete" if incomplete else "all_links_recorded",
+        "results": results,
+    }
+
+
+def _check_links(
+    frame: Mapping[str, Sequence[Mapping[str, str]]],
+    profile: Mapping[str, Any],
+    proof_reader: Callable[[str], Mapping[str, str] | Sequence[Mapping[str, str]]],
+    urls: Sequence[str],
+) -> list[dict[str, str]]:
     results: list[dict[str, str]] = []
-    for url in sorted(frame):
+    for url in urls:
         try:
             proof = proof_reader(url)
         except (PinError, SnapshotError):
@@ -69,32 +96,20 @@ def check_all_awards(
                 not isinstance(item, Mapping) for item in candidates
             ):
                 raise AwardError("schema_missing")
-            agrees = all(
-                any(_same(row, candidate, profile) for candidate in candidates)
-                for row in frame[url]
-            )
-            result = "matched" if agrees else "mismatched"
-            reason = "matched" if agrees else "proof_mismatch"
+            reason = proof_reason(frame[url], candidates, profile)
+            result = "matched" if reason in MATCH_REASONS else "mismatched"
         results.append({"report_url": url, "result": result, "reason": reason})
-    totals = _totals(results)
-    incomplete = not results or totals["failed_fetches"] > 0
-    return {
-        "method": METHOD,
-        "scope": "all_links",
-        "report_urls": sorted(frame),
-        "distinct_frame_count": len(frame),
-        "checked_count": len(results),
-        **totals,
-        "incomplete": incomplete,
-        "status": "award_links_incomplete" if incomplete else "all_links_recorded",
-        "results": results,
-    }
+    return results
 
 
 def _totals(results: Sequence[Mapping[str, str]]) -> dict[str, Any]:
     matched = sum(item["result"] == "matched" for item in results)
     return {
         "matched": matched,
+        **{
+            reason: sum(item["reason"] == reason for item in results)
+            for reason in REASON_COUNTS
+        },
         "mismatched": sum(item["result"] == "mismatched" for item in results),
         "failed_fetches": sum(item["result"] == "fetch_failed" for item in results),
         "match_rate": str(Decimal(matched) / Decimal(len(results)))
@@ -105,18 +120,28 @@ def _totals(results: Sequence[Mapping[str, str]]) -> dict[str, Any]:
 
 def sample_from_links(check: Mapping[str, Any], seed: int) -> dict[str, Any]:
     """Retain the original sample contract, reusing outcomes without any fetch."""
+    selected = _sample_urls(check["report_urls"], seed)
+    by_url = {item["report_url"]: item for item in check["results"]}
+    return _sample(
+        len(check["report_urls"]), [dict(by_url[url]) for url in selected], seed
+    )
+
+
+def _sample_urls(urls: list[str], seed: int) -> list[str]:
     if type(seed) is not int:
         raise AwardError("award_seed_pending")
-    urls = check["report_urls"]
-    selected = random.Random(seed).sample(urls, 30) if len(urls) > 30 else urls
-    by_url = {item["report_url"]: item["result"] for item in check["results"]}
-    results = [{"report_url": url, "result": by_url[url]} for url in selected]
+    return random.Random(seed).sample(urls, 30) if len(urls) > 30 else urls
+
+
+def _sample(
+    frame_count: int, results: list[dict[str, str]], seed: int
+) -> dict[str, Any]:
     totals = _totals(results)
-    incomplete = len(selected) < 30 or totals["failed_fetches"] > 0
+    incomplete = len(results) < 30 or totals["failed_fetches"] > 0
     return {
         "seed": seed,
-        "distinct_frame_count": len(urls),
-        "selected_count": len(selected),
+        "distinct_frame_count": frame_count,
+        "selected_count": len(results),
         **totals,
         "incomplete": incomplete,
         "status": "award_check_incomplete" if incomplete else "sample_recorded",
@@ -139,6 +164,7 @@ def validate_links_receipt(
         "matched",
         "mismatched",
         "failed_fetches",
+        *REASON_COUNTS,
     }
     required = counts | {
         "method",
@@ -173,20 +199,8 @@ def validate_links_receipt(
         or (rows is not None and urls != sorted(_frame(rows)))
     ):
         raise AwardError("award_links_metadata_missing")
-    reasons = {
-        "matched": {"matched"},
-        "mismatched": {"proof_mismatch"},
-        "fetch_failed": FETCH_REASONS,
-    }
     for url, item in zip(urls, results, strict=True):
-        if (
-            not isinstance(item, dict)
-            or set(item) != {"report_url", "result", "reason"}
-            or any(not isinstance(value, str) for value in item.values())
-            or item["report_url"] != url
-            or item["result"] not in reasons
-            or item["reason"] not in reasons[item["result"]]
-        ):
+        if not valid_result(item) or item["report_url"] != url:
             raise AwardError("award_links_metadata_missing")
     totals = _totals(results)
     incomplete = not results or totals["failed_fetches"] > 0
@@ -202,3 +216,15 @@ def validate_links_receipt(
         check, receipt["award_check"]["seed"]
     ):
         raise AwardError("award_links_metadata_missing")
+
+
+def valid_result(item: Any) -> bool:
+    """Closed per-link schema shared by full and seeded receipt validators."""
+    return (
+        isinstance(item, dict)
+        and set(item) == {"report_url", "result", "reason"}
+        and all(isinstance(value, str) for value in item.values())
+        and approve(item["report_url"]).ok
+        and item["result"] in RESULT_REASONS
+        and item["reason"] in RESULT_REASONS[item["result"]]
+    )

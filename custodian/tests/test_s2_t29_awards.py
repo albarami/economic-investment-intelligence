@@ -26,10 +26,15 @@ def row(index=0):
     return {
         "syn_company": "SYN Company",
         "syn_reg": "SYN-reg",
-        "syn_value": "12.50",
+        "syn_value": "12.50 QAR",
         "syn_date": "03/02/2024",
         "report_url": URL + str(index),
     }
+
+
+def proof_row(index=0):
+    """The proof parser's canonical value; intake text keeps its QAR suffix."""
+    return dict(row(index), syn_value="12.50")
 
 
 def test_awards_intake_dates_blanks(tmp_path):
@@ -105,11 +110,10 @@ def test_awards_seeded_proof_sample(count):
     if count:
         rows.append(row())
     calls = []
-    by_url = {item["report_url"]: item for item in rows}
 
     def proof(url):
         calls.append(url)
-        return by_url[url]
+        return proof_row(int(url.rsplit("/", 1)[1]))
 
     result = check_awards(rows, profile(), 73, proof)
     selected = tuple(calls)
@@ -133,7 +137,7 @@ def test_awards_rate_mismatch_and_failed_fetch():
         index = int(url.rsplit("/", 1)[1])
         if index == 0:
             raise OSError("SYN-private-error")
-        return dict(row(index), syn_value="13" if index == 1 else "12.50")
+        return dict(row(index), syn_value="13.00" if index == 1 else "12.50")
 
     result = check_awards(rows, profile(), 73, proof)
     assert result["matched"] == 2
@@ -196,7 +200,7 @@ def test_awards_weekly_append(tmp_path):
         "csv",
     )
     first = publish_awards(
-        entry, tmp_path, batch, profile(), STAMP, 73, lambda _: row(), []
+        entry, tmp_path, batch, profile(), STAMP, 73, lambda _: proof_row(), []
     )
     validate_check_receipt(first.sidecar)
     other = replace(
@@ -209,7 +213,7 @@ def test_awards_weekly_append(tmp_path):
         profile(),
         "2024-02-10T00:00:00Z",
         73,
-        lambda _: row(),
+        lambda _: proof_row(),
         [],
     )
     assert first.sha256 != second.sha256
@@ -317,7 +321,7 @@ def test_awards_normal_command_intake(tmp_path, monkeypatch):
         '<table id="syn"><tr>'
         + "".join(f"<th>{c}</th>" for c in schema["columns"])
         + "</tr><tr>"
-        + "".join(f"<td>{row()[c]}</td>" for c in schema["columns"])
+        + "".join(f"<td>{proof_row()[c]}</td>" for c in schema["columns"])
         + "</tr></table>"
     ).encode()
     assert (
@@ -388,7 +392,7 @@ def test_aggregate_profile_counts_never_replace_measured_counts(tmp_path):
     body = (
         ",".join(schema["columns"])
         + "\n"
-        + ",".join(row()[c] for c in schema["columns"])
+        + ",".join(proof_row()[c] for c in schema["columns"])
         + "\n"
     ).encode()
     source.write_bytes(body)

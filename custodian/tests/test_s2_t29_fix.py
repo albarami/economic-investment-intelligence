@@ -5,7 +5,7 @@ from dataclasses import replace
 
 import pytest
 from custodian.tests.support.fetch_build import run_build
-from custodian.tests.test_s2_t29_awards import profile, row
+from custodian.tests.test_s2_t29_awards import profile, proof_row, row
 from custodian.tests.test_s2_t29_pages import BODY, STAMP, URL, page_entry, review
 from custodian.tests.test_s2_t29_transport import pin
 
@@ -207,7 +207,7 @@ def award_intake(tmp_path, monkeypatch):
     )
 
     def proof(url):
-        cells = row(int(url.rsplit("/", 1)[1]))
+        cells = proof_row(int(url.rsplit("/", 1)[1]))
         body = (
             '<table id="syn"><tr>'
             + "".join(f"<th>{c}</th>" for c in schema["columns"])
@@ -443,7 +443,7 @@ def test_awards_existing_identity_conflict(tmp_path):
         "csv",
     )
     first = publish_awards(
-        entry, tmp_path, batch, profile(), STAMP, 73, lambda _: row(), []
+        entry, tmp_path, batch, profile(), STAMP, 73, lambda _: proof_row(), []
     )
     changed = first.body + b" "
     side = dict(first.sidecar, sha256=sha256(changed).hexdigest(), bytes=len(changed))
@@ -532,7 +532,7 @@ def test_successful_intake_keeps_every_proof(tmp_path, monkeypatch):
 
     def proof(url):
         cells = dict(row(int(url.rsplit("/", 1)[1])))
-        cells["syn_value"] = "13" if url.endswith("/1") else "12.50"
+        cells["syn_value"] = "13.00" if url.endswith("/1") else "12.50"
         body = (
             '<table id="syn"><tr>'
             + "".join(f"<th>{c}</th>" for c in schema["columns"])
