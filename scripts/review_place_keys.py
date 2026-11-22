@@ -214,10 +214,11 @@ def apply(
     return result
 
 
-def write_reviewed(
-    path: Path, rows: Sequence[Mapping[str, object]], loader: Loader
-) -> None:
-    """Write a temporary file, load it with the build's reader, then replace."""
+def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> Path:
+    """Write a temporary file beside path and load it with the build's reader.
+
+    The staged path is returned; on any failure it is removed first.
+    """
     text = json.dumps(list(rows), ensure_ascii=False, indent=2) + "\n"
     handle, name = tempfile.mkstemp(prefix=".review-", dir=path.parent)
     staged = Path(name)
@@ -226,9 +227,25 @@ def write_reviewed(
             stream.write(text)
         if list(loader(staged, None)[1]) != json.loads(text):
             raise ReviewError("reload_mismatch")
-        os.replace(staged, path)
-    finally:
+    except BaseException:
         staged.unlink(missing_ok=True)
+        raise
+    return staged
+
+
+def write_reviewed(
+    planned: Sequence[tuple[Path, Sequence[Mapping[str, object]], Loader]],
+) -> None:
+    """Stage and reload every file, then replace the targets; none on a refusal."""
+    staged: list[tuple[Path, Path]] = []
+    try:
+        for path, rows, loader in planned:
+            staged.append((stage(path, rows, loader), path))
+        for temporary, path in staged:
+            os.replace(temporary, path)
+    finally:
+        for temporary, _path in staged:
+            temporary.unlink(missing_ok=True)
 
 
 def load_inputs(
@@ -301,8 +318,12 @@ def review_rows(path: Path, loader: Loader) -> tuple[Mapping[str, object], ...]:
 
 
 def fill(review: Path, inputs: Inputs) -> list[str]:
-    """Propose keys for null rows and write each file; return the summary lines."""
+    """Propose keys for null rows of both files, then write them together.
+
+    Every refusal is found before either file is replaced.
+    """
     lines = []
+    planned = []
     for name, source_id, loader in FILES:
         path = review / name
         rows = review_rows(path, loader)
@@ -311,7 +332,7 @@ def fill(review: Path, inputs: Inputs) -> list[str]:
             for row in rows
         ]
         if any(item is not None and item.key is not None for item in proposals):
-            write_reviewed(path, apply(rows, proposals, source_id), loader)
+            planned.append((path, apply(rows, proposals, source_id), loader))
         for item in proposals:
             if item is None:
                 continue
@@ -321,6 +342,7 @@ def fill(review: Path, inputs: Inputs) -> list[str]:
                 f"footprints={_bucket(item.footprints)} inside={_flag(item.inside)} "
                 f"written={_flag(item.key is not None)} reason={item.reason}"
             )
+    write_reviewed(planned)
     return lines
 
 

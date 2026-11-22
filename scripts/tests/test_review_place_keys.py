@@ -635,7 +635,7 @@ class Refusals(World):
             "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
         )
         with self.assertRaises(keys_tool.ReviewError) as caught:
-            keys_tool.write_reviewed(path, [changed], other)
+            keys_tool.write_reviewed([(path, [changed], other)])
         self.assertEqual(caught.exception.reason, "reload_mismatch")
         self.assertEqual(path.read_bytes(), before)
         self.assertEqual(
@@ -704,6 +704,114 @@ class SelectedParts(World):
         self.assertEqual(
             (self.review / "flagship_candidates.yaml").read_bytes(), before
         )
+
+
+FLAGSHIP = "flagship_candidates.yaml"
+GAZETTEER = "showcase_gazetteer.yaml"
+LOADERS = {name: loader for name, _source, loader in keys_tool.FILES}
+
+
+def stale_reload(target: str) -> keys_tool.Loader:
+    """The target file's own loader, returning no row for a staged copy only."""
+
+    def load(
+        path: Path, cache: Path | None
+    ) -> tuple[str, tuple[Mapping[str, object], ...]]:
+        version, rows = LOADERS[target](path, cache)
+        return (version, ()) if path.name.startswith(".review-") else (version, rows)
+
+    return load
+
+
+class BothFilesStaged(World):
+    """Both files are staged and reloaded before either is replaced (lens 2, 1)."""
+
+    KINDS = ("aliases_form", "overwrite_refused", "duplicate_place_key")
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.cache_places(
+            [
+                place("SYN-P-1", 51.105, 25.105, "Syn Tower"),
+                place("SYN-P-2", 51.2, 25.2, "Syn Souq"),
+            ]
+        )
+        self.cache_buildings(0, [building("SYN-B-1", 51.1, 25.1)])
+
+    def valid(self) -> dict[str, list[dict[str, object]]]:
+        return {
+            FLAGSHIP: [spec("building:0", "Syn Tower")],
+            GAZETTEER: [spec("landmark:0", "Syn Souq")],
+        }
+
+    def plant(
+        self, rows: dict[str, list[dict[str, object]]], name: str, kind: str
+    ) -> None:
+        """Change ONE input of one file so that file alone refuses with kind."""
+        row = rows[name][0]
+        if kind == "aliases_form":
+            row["aliases"] = "syn alias"
+        elif kind == "overwrite_refused":
+            row["source_id"] = "bldg_ovt" if name == FLAGSHIP else "places_ovt"
+        elif kind == "duplicate_place_key":
+            rows[name].append(spec(str(row["place_key"]), "Syn Other"))
+
+    def files(self) -> dict[str, bytes]:
+        return {item.name: item.read_bytes() for item in self.review.iterdir()}
+
+    def write(self, rows: Mapping[str, Sequence[Mapping[str, object]]]) -> None:
+        self.review_files(flagship=rows[FLAGSHIP], gazetteer=rows[GAZETTEER])
+
+    def test_valid_pair_writes_both_and_leaves_no_staged_file(self) -> None:
+        self.write(self.valid())
+        before = set(self.files())
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
+        self.assertEqual(set(self.files()), before)
+
+    def test_refusal_in_the_second_file_changes_neither(self) -> None:
+        for kind in self.KINDS:
+            with self.subTest(kind=kind):
+                rows = self.valid()
+                self.plant(rows, GAZETTEER, kind)
+                self.write(rows)
+                before = self.files()
+                self.assertEqual(self.run_tool(), (2, f"REFUSED {kind}\n"))
+                self.assertEqual(self.files(), before)
+
+    def test_reload_mismatch_of_the_second_file_changes_neither(self) -> None:
+        self.write(self.valid())
+        before = self.files()
+        files = tuple(
+            (name, source, stale_reload(name) if name == GAZETTEER else loader)
+            for name, source, loader in keys_tool.FILES
+        )
+        with patch.object(keys_tool, "FILES", files):
+            self.assertEqual(self.run_tool(), (2, "REFUSED reload_mismatch\n"))
+        self.assertEqual(self.files(), before)
+
+    def test_every_location_and_kind_changes_neither(self) -> None:
+        """Exhaustive over the domain: kind x {first, second, both} files."""
+        for kind in (*self.KINDS, "reload_mismatch"):
+            for where in ((FLAGSHIP,), (GAZETTEER,), (FLAGSHIP, GAZETTEER)):
+                with self.subTest(kind=kind, where=where):
+                    rows = self.valid()
+                    files = keys_tool.FILES
+                    if kind == "reload_mismatch":
+                        files = tuple(
+                            (name, source, stale_reload(name) if name in where else f)
+                            for name, source, f in keys_tool.FILES
+                        )
+                    else:
+                        for name in where:
+                            self.plant(rows, name, kind)
+                    self.write(rows)
+                    before = self.files()
+                    with patch.object(keys_tool, "FILES", files):
+                        run = self.run_tool()
+                    self.assertEqual(run, (2, f"REFUSED {kind}\n"))
+                    self.assertEqual(self.files(), before)
 
 
 SECRETS = ("SYN-P-1", "Syn Souq", "syn souq", "51.1", "25.1", "/")
