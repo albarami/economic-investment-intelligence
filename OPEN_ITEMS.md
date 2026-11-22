@@ -6238,6 +6238,13 @@ as recognised by this delivery. Supply the four exact reviewed h3 strings in
 them on invented pages before different-maker review. Decision 0095 is Proposed;
 its null-date behavior is tested offline, not claimed as real-cache evidence. The
 lead replays the stored proofs offline after merge; no worker replay occurred.
+Lead update, 2026-11-22: the lead read the stored award pages in the lead's own shell and found
+thirteen pages without the award heading, carrying four distinct h3 texts. It wrote those four exact
+strings into the awards declaration's `shape.sections` in
+`custodian/publicdata/review/s2_t29_sources.yaml` (exact equality kept), without printing them.
+An offline replay (`scripts/awards_proofs.py replay`) on the lead's cache then exited 0 with
+`refused_count` 0, `proof_award_absent` 13, `incomplete` false, and no cache file written. The
+strings item is CLOSED; different-maker review remains.
 S2-T29 and OI-277 remain open. No random failure was introduced; the oversized
 extra test selection was deliberately interrupted (exit 130), not counted as a
 passing run. The required focused selection then passed without retries or skips.

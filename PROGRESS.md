@@ -51407,3 +51407,4 @@ again exits 0; actual argv/exits are in `.overnight/tmp/delivery-checks.json`.
 The implementation remains exactly `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`;
 this follow-up changes only TASKS.md, PROGRESS.md and OPEN_ITEMS.md. The exact
 non-award headings, independent review and lead replay remain pending.
+| 2026-11-22 | S2-P66 lead declaration commit | The lead wrote the four exact non-award h3 headings (read from the stored pages in the lead's shell) into the awards declaration's `shape.sections`. Focused award and declaration tests: 844 passed, exit 0. Offline `scripts/awards_proofs.py replay` on the lead's cache: exit 0, `refused_count` 0, `proof_award_absent` 13, `incomplete` false, no cache file written. |
