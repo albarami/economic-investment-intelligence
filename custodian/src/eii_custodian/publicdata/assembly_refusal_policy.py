@@ -848,9 +848,9 @@ TEXT_REASONS: Mapping[type[Exception], tuple[tuple[re.Pattern[str], str], ...]] 
         is_not_text|.*\ is\ not\ text
         changed_shape|.* changed_shape
         required|.*:\ required
+        missing_fields_unknown_fields|missing\ fields\ .*;\ unknown\ fields\ .*
         missing|missing\ .*
         expected_eight_digits_lengths_require_review|.*\ .*:\ expected\ eight\ digits;\ lengths\ require\ review
-        missing_fields_unknown_fields|missing\ fields\ .*;\ unknown\ fields\ .*
         english_month_name_required|.*\ .*:\ English\ month\ name\ required
         one_component_required|.*:\ one\ component\ required:\ .*
         one_field_required_for|.*:\ one\ field\ required\ for\ .*
@@ -864,7 +864,6 @@ TEXT_REASONS: Mapping[type[Exception], tuple[tuple[re.Pattern[str], str], ...]] 
         source_fields|.*\ source\ fields:\ .*
         field_type|.*\ field\ type:\ .*
         unpinned|.*:unpinned:.*
-        basket_line_source_mismatch|basket_line_source_mismatch:\ .*\ .*\ .*
         basket_line_unreviewed|basket_line_unreviewed:\ .*\ .*\ .*
     """),
         }

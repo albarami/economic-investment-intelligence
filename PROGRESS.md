@@ -52085,3 +52085,22 @@ exception-delivery limit; PO-S2-P56-02 leaves R2's separate `plan` stage open.
 | Round | Commands, counts, real exits and evidence |
 |---|---|
 | S2-P56 R2 | `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_assembly_refusals.py -k test_exception_chains_keep_closed_lines_and_exception_identity --hypothesis-seed=56`: context-only plant 2 failed, 2 passed, 955 deselected, exit 1; restored source 4 passed, 955 deselected, exit 0. The same pytest command without `-k`, adding `custodian/tests/test_places_build_lines.py custodian/tests/test_fetch_fingerprint.py`: 1145 passed, exit 0. `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check`: exit 0 each. `python3 scripts/check_docs.py`: first exit 1 because the workspace-local Git metadata lacked the existing `.overnight/` exclusion; after copying the original local exclusion policy, exit 0. Initial local-Git setup exited 1 because `.git` is read-only; explicit workspace-local `GIT_DIR`/`GIT_WORK_TREE` resolved it, without changing shared metadata. Full commands and logs: `.overnight/tmp/p56-r2-evidence/commands.jsonl` and sibling logs (initial documentation-scan local paths and identity redacted). Independent maker approval and lead-owned integration evidence remain pending; no slice gate is claimed. |
+
+
+## S2-P56 round 3 — reachable rows in every refusal class table — 2026-11-22
+
+OpenAI Codex, senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects any specific reason that falls into a broader
+word. Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate; test-driven-development and
+verification-before-completion equivalent rules supplied by the brief (the
+skill packages are not installed). Base `f26877525301f54dfe9707ccb6502a338d601f0b`;
+the single delivered commit and bundle checksum are recorded in
+`.overnight/RETURN.md`. Linux, Python 3.14.6, `UV_OFFLINE=1`,
+`EII_DECISION_PROVIDER=none`, Hypothesis seed 56, invented Production seed 17;
+all temporary files, tool caches and delivery Git metadata are workspace-local.
+No network, real cache, `.env`, `.private` or repository `data/` input was read.
+
+| Round | Commands, counts, real exits and evidence |
+|---|---|
+| S2-P56 R3 | `uv run --locked python -m pytest custodian/tests/test_assembly_refusals.py -q -k all_policy_words --hypothesis-seed=56` with a distinct workspace-local `--basetemp`: class guard first on the base, 2 failed (the specific missing-fields row and the dead basket duplicate), 474 passed, 958 deselected, exit 1; fixed policy and fixtures, 475 passed, 959 deselected, exit 0. Delete only the specific missing-fields rule: 1 failed, 473 passed, 959 deselected, exit 1; restore, reintroduce only the dead duplicate: 1 failed, 475 passed, 959 deselected, exit 1; restore bytes, `cmp` exit 0; final focused run 475 passed, 959 deselected, exit 0. The same pytest command without `-k`: 1434 passed in 147.93s, exit 0. The guard covers all 474 pattern rows of 14 class tables, asserting the first matching row's identity and its exact closed word. Fixture rows `gis_property_singles:25` and `final_audit:06` assert `missing_fields_unknown_fields`; 909 inventory plants remain. Ruff check and format check initially exited 1 for import ordering and assertion wrapping; corrected, each exits 0. `uv run --locked mypy`: 503 source files, exit 0. `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md`, `git diff --check`: exit 0 each. Exact argv and logs: `.overnight/tmp/p56-r3-evidence/commands.jsonl` and sibling logs. No producer refusal condition changed or new refusal branch was added. PO-S2-P56-03 leaves exact-type subclass fallback detail open; independent maker review remains pending, with no slice-gate claim. |

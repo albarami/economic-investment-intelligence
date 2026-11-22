@@ -19,6 +19,7 @@ from eii_custodian.publicdata.assembly import PHASES, AssemblyError, Step, run_s
 from eii_custodian.publicdata.assembly_adapters import Production
 from eii_custodian.publicdata.assembly_inventory import INVENTORY
 from eii_custodian.publicdata.assembly_io import write_record
+from eii_custodian.publicdata.assembly_refusal_policy import TEXT_REASONS
 from eii_custodian.publicdata.fetch.build import run_build
 
 INVENTORY_CASES = json.loads(
@@ -226,6 +227,34 @@ def test_all_policy_words_are_closed_and_known():
         for word in words:
             assert re.fullmatch("[a-z0-9_]+", word)
             assert not re.search(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])", word)
+
+
+@pytest.mark.parametrize(
+    "kind,index,pattern,word",
+    [
+        (kind, index, pattern, word)
+        for kind, rows in TEXT_REASONS.items()
+        for index, (pattern, word) in enumerate(rows)
+    ],
+    ids=lambda value: value.__name__ if isinstance(value, type) else str(value),
+)
+def test_all_policy_words_rows_are_reachable(kind, index, pattern, word):
+    from eii_custodian.publicdata.assembly_refusals import closed_reason
+
+    # Current policy patterns contain literal text and .* wildcards only.
+    witness = re.sub(r"\\(.)", r"\1", pattern.pattern.replace(".*", "SYN"))
+    assert pattern.fullmatch(witness) is not None, "extend the witness generator"
+    first = next(
+        (position, reason)
+        for position, (candidate, reason) in enumerate(TEXT_REASONS[kind])
+        if candidate.fullmatch(witness) is not None
+    )
+    # Row identity also rejects dead duplicates that return the same word.
+    assert first == (index, word), f"shadowed {kind.__name__} row: {pattern.pattern}"
+    assert (
+        closed_reason("gis_property_singles", planted_error(kind.__name__, witness))
+        == word
+    )
 
 
 @given(
