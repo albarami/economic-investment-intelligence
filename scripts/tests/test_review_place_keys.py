@@ -1103,8 +1103,9 @@ class InterruptedUnwinding(Pair):
         self.kept_original(before)
 
 
-FAULTS: tuple[type[BaseException], ...] = (OSError, KeyboardInterrupt)
-Plan = dict[int, type[BaseException]]
+Fault = type[BaseException]
+FAULTS: tuple[Fault, ...] = (OSError, KeyboardInterrupt)
+Plan = dict[int, Fault]
 
 
 class Stream:
@@ -1207,6 +1208,11 @@ class Injector:
             yield
 
 
+def decisive(injector: Injector) -> Plan:
+    """The plan without its cleanup faults: every counted unlink is cleanup."""
+    return {i: f for i, f in injector.plan.items() if injector.calls[i] != "unlink"}
+
+
 class ExhaustiveFaults(Pair):
     """Every fault at every filesystem call keeps the contract (R8, REVIEW-CF5).
 
@@ -1230,6 +1236,7 @@ class ExhaustiveFaults(Pair):
             patcher = patch.object(keys_tool, name, return_value=value)
             patcher.start()
             self.addCleanup(patcher.stop)
+        self.outcomes: dict[frozenset[tuple[int, Fault]], tuple[int, str] | str] = {}
         self.before, self.modes = self.files(), self.stats()
         self.success, control = self.case({})
         self.assertEqual(self.success[0], 0)
@@ -1251,6 +1258,7 @@ class ExhaustiveFaults(Pair):
                 outcome = self.run_tool()
             except KeyboardInterrupt:
                 outcome = "KeyboardInterrupt"
+        self.outcomes[frozenset(plan.items())] = outcome
         return outcome, injector
 
     def holds(self, outcome: tuple[int, str] | str, injector: Injector) -> None:
@@ -1278,7 +1286,7 @@ class ExhaustiveFaults(Pair):
             )
             return
         if outcome == "KeyboardInterrupt":
-            self.assertIn(KeyboardInterrupt, injector.plan.values())
+            self.assertIn(KeyboardInterrupt, decisive(injector).values())
         else:
             self.assertEqual(outcome, (2, "REFUSED filesystem_refused\n"))
         self.assertEqual([after[n] for n in targets], [self.before[n] for n in targets])
@@ -1292,7 +1300,20 @@ class ExhaustiveFaults(Pair):
                 outcome, injector = self.case(plan)
                 done.append((plan, injector))
                 self.holds(outcome, injector)
+                self.assertEqual(outcome, self.decided(injector), "cleanup masked it")
         return done
+
+    def decided(self, injector: Injector) -> tuple[int, str] | str:
+        """The outcome of the same plan without its cleanup faults (CF6-01).
+
+        A cleanup fault is suppressed and shifts no later call, so the
+        outcome decided before cleanup, type and reason or exit and line,
+        is the outcome of the whole plan.
+        """
+        plan = decisive(injector)
+        if frozenset(plan.items()) not in self.outcomes:
+            self.case(plan)
+        return self.outcomes[frozenset(plan.items())]
 
     def deeper(self, runs: Sequence[tuple[Plan, Injector]]) -> list[Plan]:
         """One more fault at every later call of each run, of each kind."""
@@ -1313,6 +1334,14 @@ class ExhaustiveFaults(Pair):
         kept = ["read_bytes", *writes]
         expected = [*staged, *staged, *kept, *kept, "replace", "replace"]
         self.assertEqual(self.control, [*expected, *["unlink"] * 4])
+
+    def test_copy_failure_then_cleanup_interrupt_keeps_the_refusal(self) -> None:
+        """CF6-01: the staged copy fails, then its own cleanup is interrupted."""
+        outcome, injector = self.case({4: OSError, 5: KeyboardInterrupt})
+        self.assertEqual([kind for kind, _ in injector.faulted], ["copymode", "unlink"])
+        self.assertEqual(outcome, (2, "REFUSED filesystem_refused\n"))
+        after = self.files()
+        self.assertEqual({n: after[n] for n in self.before}, self.before)
 
     def test_every_single_fault(self) -> None:
         self.assertEqual(len(self.sweep(self.singles())), 60)
