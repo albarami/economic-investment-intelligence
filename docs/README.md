@@ -142,6 +142,8 @@
 | [0090](decisions/0090-reviewed-outside-boundary-parts-and-the-required-building-part-set.md) | Reviewed wholly-outside boundary parts admitted by a committed hash list bound to the boundary snapshot, with the frame box unchanged; the required building parts are the STAC items meeting the bounds of the inside parts | Proposed by task S2-P47; owner acceptance owed |
 | [0091](decisions/0091-award-proof-acquisition-and-offline-replay.md) | Per-link award proof acquisition, refusal retention, offline replay and bounded readers | Proposed, 2026-11-22; S2-P46, lead review pending |
 
+| [0093](decisions/0093-landmark-hand-list-in-one-reviewed-cache-record.md) | Landmark hand list in one uncommitted reviewed cache record; placement only, no value lost | Proposed, 2026-11-22; owner acceptance required before code merge |
+
 ## Identifiers and change control
 
 1. A requirement ID has its document prefix and a number. It is defined exactly once, as the bare first cell of a requirement-table row; other documents may reference it only after confirming that definition.

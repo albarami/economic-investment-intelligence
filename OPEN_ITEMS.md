@@ -6102,3 +6102,61 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - PO-S2-P47-B-01 — **PROPOSED OPEN ITEM** (2026-11-22), S2-P47 part B, recorded for the lead. Part B removed part 00288 from `FILE_KEYS` and so from `BUILDING_PARTS` (decision 0089, Proposed; owner acceptance owed). Three points stay open: (1) the registry row `bldg_ovt/part-00288` is still registered and unskipped, and the key is still in `fetch/large.py` `REQUIRED_KEYS`, so `is_place_file` no longer selects it and an ordinary `./eii build-public` would route it to the large-intake path (with a large stream) or the plain file path (without one) and change its resume fingerprint class from `place_file` to `large`; part B changed no registry row because part A owns the `bldg_ovt` rows of `sources.yaml`. NEEDED: the lead's disposition — a skip reason on that row, or its removal from `REQUIRED_KEYS`, in part A or a follow-up. (2) The real review file `custodian/publicdata/review/national_boundary_outside.json` is owed from lead step L4; until it is committed a real build with the three islets refuses `national_boundary_outside_frame_box` (detail `unreviewed`). (3) Decision 0089 took the next free number at write time; renumber if another open record holds it. Evidence: `PROGRESS.md` S2-P47 part B row; `.overnight/RETURN.md`.
 - 2026-11-22 S2-P47 join (lead) — correction to PO-S2-P47-B-01: the part B record is renumbered decision 0090, since 0089 is the census record of task S2-P48. Point 1 of PO-S2-P47-B-01 is resolved in the join: the part row `bldg_ovt/part-00288` carries the skip reason `not_required_part_decision_0090` and leaves `fetch/large.py` `REQUIRED_KEYS`, so no build fetches it; its STAC item row stays. Point 2 (the lead's reviewed outside-part file) and the owner's acceptance of decision 0090 remain open.
 - 2026-11-22 S2-P47 join (lead) — correction to PO-S2-P47-B-01, point 2: the lead's reviewed outside-part file `custodian/publicdata/review/national_boundary_outside.json` is committed in `2fbf8549`, with the PROGRESS row "S2-P47 lead records step on the real cache". The owner's acceptance of decision 0090 and the national-buildings data test on a real build remain open.
+
+## S2-P53 — Landmark calibration and live follow-up (2026-11-22)
+
+- Proposed decision 0093 needs owner acceptance before code merge, per R9.
+  Placement is decided for the build (R0); no A-versus-B or licence question
+  is reopened and no value cut is proposed.
+- Resolve the brief's requirement to install publisher/page registry rows and
+  PUB-03 hosts against its explicit prohibition on committing researched URLs,
+  hosts and names. No concrete research metadata was installed offline. The
+  lead must make the reviewed metadata admission before live citation fetch.
+- Confirm the research's semantic `subject_kind` token against the selector's
+  documented completed-high-rise contract. Only keys, nesting and types were
+  inspected under the brief's shape-only restriction; no live selector count
+  is claimed. The corrected research remains the lead's live input.
+- Fetch admitted pages, run selection and exact ties in the lead's shell,
+  independently review the one local record, and load/verify it before clearing
+  pending. Unresolved ties remain counted; any manual tie would need separate
+  lead review and is not implemented. A zero-row list stays pending.
+- Error by reference height kind (roof versus architectural) is not computed
+  by the current GBA measurement. Mixed kinds and the measurement basis remain
+  explicit limitations; OI-310 and C-20 stay open.
+- Permanent page revision links, any share-alike notice needed for local use,
+  and the research's unresolved secondary corroboration lead need the lead's
+  source review. No researched page text or value is recorded here.
+- Test-harness correction: a new mocked HTTPS response initially returned
+  bytes indefinitely instead of EOF. That test process was interrupted (exit
+  130); the fixture now returns body then EOF. This was a deterministic fixture
+  defect, not a random failure or a transport retry. Its subsequent failing
+  assertion and passing check are recorded in the S2-P53 return.
+
+S2-P53 self-review correction: the new mutable cache placement requires the
+manifest hash to bind the bytes actually parsed, rather than a later file read.
+`LandmarkRecord` now keeps that body with the validated rows and pending status.
+The corresponding regression and the final repeated guard-deletion pass are
+recorded in the return. No privacy, source-selection or licence rule changed.
+
+S2-P53 check-context correction: a diagnostic documentation check using the
+standalone Git directory scanned operational `.overnight` files because it
+did not inherit the provided worktree's exclusions (exit 1). The prescribed
+`python3 scripts/check_docs.py` command uses the provided Git context, includes
+new untracked source files, and passed. No check, exclusion policy or committed
+ignore file was changed. This was a deterministic command-context error, not a
+random failure closed by a green rerun.
+
+S2-P53 negative-fixture correction: duplicate-point and duplicate-building
+plants now change one field each (one selected name, or one point geometry).
+Their earlier forms changed more than one independent input. Both specific
+refusals and their isolated guard deletions were rechecked after this repair;
+no production tie rule changed.
+
+Correction to the preceding S2-P53 sentence: the six refusal cases had passed
+when it was written; the isolated deletion repeats were still pending then.
+Their actual exits, rather than that premature wording, are recorded in the
+return and its deletion evidence.
+
+S2-P53 fixture-deletion follow-up: both corrected duplicate-claim guards were
+then deleted separately; each test run exited 1 and each source hash restored.
+The final task-specific run after restoration exited 0 with 75 tests passing.

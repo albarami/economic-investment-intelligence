@@ -17,6 +17,7 @@ SCHOOL_FIELDS = tuple(
     )
 )
 SHAPES = {
+    "citation_snapshot": set(),
     "embedded_json": {
         "element",
         "attribute",
@@ -256,6 +257,8 @@ def validate(review: Mapping[str, Any]) -> None:
                 raise ValueError
         except ValueError:
             raise ShapeError("snapshot_date_missing") from None
+    if review["kind"] == "citation_snapshot" and (columns or review["period_fields"]):
+        raise ShapeError("schema_missing")
     if review["kind"] == "fc_company_cards":
         from ..fc_register.constants import COLUMNS, SHAPE, URL
 

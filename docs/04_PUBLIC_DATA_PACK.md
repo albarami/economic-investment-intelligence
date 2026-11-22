@@ -2267,3 +2267,25 @@ prepare and verify, not evidence that monthly files already exist. It introduces
 no further environment setting. Separate lead-reviewed byte hashes pin both
 sibling indexes, so an index overwrite cannot silently change historical
 selection. Who retains future monthly files remains open.
+
+## S2-P53 landmark hand-list placement and citation snapshots
+
+Proposed [decision 0093](decisions/0093-landmark-hand-list-in-one-reviewed-cache-record.md)
+item 1 amends PUB-106's committed-list sentence: the hand list is one
+uncommitted, independently reviewed `review/landmark_heights.yaml` beneath
+the public cache, for every publisher. The committed file is an empty format
+sample only. Every entry carries `roof` or `architectural`, the cited public
+page, publisher, retrieval date, snapshot hash and verbatim height excerpt.
+No value or source is removed by placement, and no licence admission is added.
+Decision 0026 item 5 and decision 0059 item 3 remain in force.
+
+Citation source rows use one source per publisher and one key per page,
+`landmark_<publisher-key>/<page-key>`, kind `public_page`, version-two
+`citation_snapshot` declaration, no columns or release tables and
+`commit_allowed: false`. The normal fetch path retains the page input and
+receipt with zero parsed rows. Publisher terms and basis remain records.
+PUB-03's existing host policy applies; no researched host is admitted by this
+text. The offline brief forbids committing researched URLs/hosts, so concrete
+publisher/page registry rows and their host additions remain a lead-owned
+reviewed metadata step. This is an explicit missing admission, not evidence
+that any live page is fetchable. S2-T20 and C-20 remain unclaimed.
