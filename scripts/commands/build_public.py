@@ -32,6 +32,7 @@ from eii_custodian.publicdata.fetch.registry import (
 )
 from eii_custodian.publicdata.fetch.report import log_line
 from eii_custodian.publicdata.fetch.transport import (
+    AUTHORIZATION_HOSTS,
     Response,
     SlotReader,
     StreamTransport,
@@ -83,6 +84,11 @@ def slot_secrets(environ: Mapping[str, str], *, injected: bool) -> SlotReader | 
     if injected:
         return None
     return _SlotAccess(environ)
+
+
+def _archive_token(url: str, token: str) -> str:
+    """Keep the archive credential out of every other host's transport call."""
+    return token if host_of(url) in AUTHORIZATION_HOSTS else ""
 
 
 def run(
@@ -137,7 +143,11 @@ def run(
     token = "" if tenders_only else earthdata_token(environ)
     opener = open_https if transport is None else transport
     if transport is None and token:
-        opener = partial(open_https, token=token)
+
+        def keyed_opener(url: str) -> Response:
+            return open_https(url, token=_archive_token(url, token))
+
+        opener = keyed_opener
     pause = time.sleep if sleep is None else sleep
     bound = None if transport is not None else open_attempt
     slots = (
@@ -237,8 +247,10 @@ def run(
                 return tenders.terms_https(chain_rows[0], url)
             for reviewed in groups:
                 if url in reviewed:
-                    return open_https(url, token=token, reviewed_urls=reviewed)
-            return open_https(url, token=token)
+                    return open_https(
+                        url, token=_archive_token(url, token), reviewed_urls=reviewed
+                    )
+            return open_https(url, token=_archive_token(url, token))
 
         opener = reviewed_metadata
     if tenders_only:
