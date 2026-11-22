@@ -13,6 +13,9 @@ import landmark_citation_rows as generator
 from eii_custodian.publicdata.fetch import allowlist, page_records, registry
 from eii_custodian.publicdata.fetch.page_acquire import validate_entry
 from eii_custodian.publicdata.fetch.page_schema import validate
+from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+from eii_custodian.publicdata.fetch.terms_text import terms_text_sha256
+from eii_custodian.publicdata.fetch.transport import Response
 from eii_custodian.publicdata.heights import landmarks
 from eii_custodian.publicdata.heights.model import HeightError
 
@@ -97,6 +100,82 @@ def test_open_licence_and_unread_terms_remain_truthful():
     assert row["terms_read_on"] == "2026-11-22"
     assert row["licence_basis"] == "owner_decision"
     assert row["skip_reason"] == ""
+
+
+@given(
+    st.one_of(
+        st.none(),
+        st.just(""),
+        st.just(URL),
+        st.from_regex(
+            r"https://syn-terms\.example\.invalid/[a-z]{1,20}", fullmatch=True
+        ),
+    )
+)
+@example(None)
+@example("")
+@example(URL)
+@example("https://syn-terms.example.invalid/terms")
+def test_declaration_reviews_page_then_distinct_nonempty_terms(terms_url):
+    document = research()
+    document["publishers"][0]["terms_url"] = terms_url
+    output = generator.generate(document)
+    for row in output["sources"]:
+        declaration = output["declarations"][row["key"]]
+        expected = [row["url"]]
+        if terms_url and terms_url != row["url"]:
+            expected.append(terms_url)
+        assert declaration["reviewed_urls"] == expected
+
+
+@pytest.mark.parametrize("omit_terms", [False, True])
+def test_citation_fetch_distinct_terms_keeps_exact_frame(
+    tmp_path, monkeypatch, omit_terms
+):
+    document = research()
+    terms_url = "https://syn-terms.example.invalid/terms"
+    document["publishers"][0]["terms_url"] = terms_url
+    output = generator.generate(document)
+    monkeypatch.setattr(
+        allowlist, "ALLOWED_HOSTS", allowlist.ALLOWED_HOSTS | set(output["hosts"])
+    )
+    row = registry._entry(output["sources"][0])
+    declaration = output["declarations"][row.key]
+    if omit_terms:
+        declaration["reviewed_urls"] = [row.url]
+    bodies = {row.url: b"<p>SYN citation</p>", terms_url: b"<p>SYN terms</p>"}
+    requested = []
+
+    def send(url):
+        requested.append(url)
+        return Response(url, bodies[url], ())
+
+    def fetch():
+        return page_records.fetch_page(
+            row,
+            send,
+            tmp_path,
+            lambda: "2026-11-22T00:00:00Z",
+            lambda _: None,
+            declaration=declaration,
+        )
+
+    if omit_terms:
+        with pytest.raises(page_records.PageError, match=r"^blocked_host$"):
+            fetch()
+        assert requested == [row.url]
+        assert not (tmp_path / row.key / "index").exists()
+        return
+    snapshot = fetch()
+    payload = json.loads(snapshot.body)
+    assert requested == [row.url, terms_url]
+    assert payload["rows"] == []
+    assert [item["url"] for item in payload["inputs"]] == [row.url, terms_url]
+    assert snapshot.sidecar["terms_sha256"] == terms_text_sha256(bodies[terms_url])
+    for item in payload["inputs"]:
+        raw = read_snapshot(tmp_path / row.key / item["key"], item["identity"])
+        assert raw.body == bodies[item["url"]]
+        assert raw.sidecar["fetch_url"] == item["url"]
 
 
 @pytest.mark.parametrize(
@@ -304,6 +383,11 @@ def test_committed_landmark_pages_resolve_exactly_once(monkeypatch):
         assert len(matching) == 1
         entry = matching[0]
         assert entry.key == key
+        if entry.terms_url:
+            assert entry.terms_url in declaration["reviewed_urls"]
+        assert len(declaration["reviewed_urls"]) == len(
+            set(declaration["reviewed_urls"])
+        )
         assert (
             landmarks._registry_entry(
                 citation(entry.url, entry.publisher, entry.licence_basis)

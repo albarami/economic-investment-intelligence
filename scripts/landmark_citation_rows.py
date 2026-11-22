@@ -107,12 +107,12 @@ def _row(url: str, publisher: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _declaration(url: str) -> dict[str, Any]:
+def _declaration(url: str, terms_url: str) -> dict[str, Any]:
     return {
         "version": 2,
         "kind": "citation_snapshot",
         "url": url,
-        "reviewed_urls": [url],
+        "reviewed_urls": list(dict.fromkeys(u for u in (url, terms_url) if u)),
         "columns": [],
         "as_of": "retrieval_date",
         "publisher_date": None,
@@ -155,7 +155,9 @@ def generate(document: object) -> dict[str, Any]:
     }
     return {
         "sources": rows,
-        "declarations": {row["key"]: _declaration(row["url"]) for row in rows},
+        "declarations": {
+            row["key"]: _declaration(row["url"], row["terms_url"]) for row in rows
+        },
         "hosts": sorted(hosts),
     }
 

@@ -51130,3 +51130,69 @@ Lead shell (Anthropic Opus 5.5), real public cache, offline. The pinned collecti
   new production function `_row`, 43 lines. None copied. Strict self-review:
   APPROVE for this bounded metadata implementation and bundle handoff;
   independent different-maker approval is still lead-owned. Muhasabah: PASS.
+
+## S2-P53-cit2 — Landmark citation terms frame corrections — 2026-11-22
+
+- Brief: S2-P53-cit round two, findings 1 and 2 of the supplied independent
+  review. Base commit: `7c1549079921da61c5227759e013daa1330b22f6`.
+  The delivery commit and bundle checksum are recorded in the return report.
+- Builder persona: senior public-data registry engineer. Strict self-review
+  persona: citation-frame auditor; the fetch frame stays exactly as strict,
+  only declarations change. Skills: project-orientation, task-standards,
+  github-flow, sanad-provenance, property-based-testing, strict-reviewer and
+  muhasabah-gate. The brief's TDD and verification rules apply directly;
+  no installed skill package supplies those named superpowers skills.
+- `_declaration` now takes the row's terms URL and emits the page first and
+  each distinct nonempty terms URL once. No acquisition, transport, URL/host
+  check, privacy rule or numeric method changes. PUB-106 now places the list
+  in the uncommitted independently reviewed cache record under decision 0093
+  item 1; the committed file is described only as the empty format sample.
+- Regeneration used `scripts/landmark_citation_rows.py` with the same supplied
+  research: SHA-256
+  `431265e3013067cc8e3826fe754a27b316a58f0b3d8e7e125ac2b6367006477f`.
+  The generated declarations replace only their reviewed-URL lists, retaining
+  the surrounding YAML formatting. Offline equality audit: exit 0; all 70
+  landmark declarations exactly match generated output, 63 gained a distinct
+  terms URL, and every generated source row still matches committed metadata.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis
+  6.170.15, PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1. Seed 53; unchanged
+  repository Hypothesis profile. Test temporary files stay under
+  `.overnight/tmp/`; no network or source snapshots are used.
+- Failing-first command: `uv run --locked python -m pytest
+  custodian/tests/test_landmark_registry.py custodian/tests/test_publicdata_registry.py
+  custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+  --hypothesis-seed=53 --basetemp=.overnight/tmp/pytest-red`:
+  exit 1, 3 failed and 167 passed. Failures were the page/terms property,
+  distinct-terms fetch (`blocked_host`), and committed terms membership.
+- An intermediate run with `--basetemp=.overnight/tmp/pytest-green` began
+  before declaration regeneration completed: exit 1, 1 failed and 169 passed,
+  solely the committed membership assertion. Two initial textual regeneration
+  attempts exited 1 before writing any file because the longest YAML keys use
+  explicit-key syntax. Supporting that existing syntax completed regeneration;
+  the exact metadata audit above proves the resulting declarations.
+- Five isolated plants each exited 1: omit terms, keep empty terms, duplicate
+  equal page/terms, reverse page/terms order, and delete one committed terms
+  URL. The first four exercise the new property; the last exercises committed
+  metadata. Both planted files were restored byte for byte before final tests.
+  Commands, exits, logs and restoration hashes are in `.overnight/OUT/`.
+- No production refusal branch is added or changed. The negative fetch case
+  changes only `reviewed_urls` to omit the otherwise valid terms URL, asserts
+  exactly `blocked_host`, proves the terms transport was never called, and
+  proves no snapshot index was published. The existing frame check is unchanged;
+  there is no new guard requiring an isolated deletion test.
+- Final prescribed pytest selection, same command as the failing-first run
+  with `--basetemp=.overnight/tmp/pytest-final`: exit 0, 170 passed. This
+  includes every restored property/metadata plant and the exact-frame negative.
+- Verification: `uv run --locked ruff check .`, `uv run --locked ruff format
+  --check .` (947 files), `uv run --locked mypy` (503 source files),
+  `python3 scripts/check_docs.py` (1280 text files, 144 Markdown files),
+  `cmp AGENTS.md CLAUDE.md` and `git diff --check`: each exit 0. After adding
+  these records the docs and whitespace checks run again before packaging.
+  The acquisition, request-frame, page-records, allow-list and registry modules
+  are byte-identical to the base. Longest new function is the fetch regression
+  test at 47 lines; changed production `_declaration` is 18 lines; none copied.
+- Strict self-review: APPROVE for the bounded two-finding correction and
+  offline handoff; muhasabah PASS. Independent different-maker review stays
+  with the lead. No live acquisition, source reading, height acceptance,
+  readiness, S2-T20 completion or C-20 claim is made. Existing terms follow-ups
+  remain open. No network, forbidden input, push or merge was used.
