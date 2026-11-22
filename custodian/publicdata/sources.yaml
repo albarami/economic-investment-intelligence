@@ -28430,7 +28430,7 @@ sources:
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/tge-labs/globalbuildingatlas-lod1/e050_n25_e055_n20.parquet"
     terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
-    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
+    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license. This dataset is provided in three parts: ODbL-licensed polygons (GBA.ODbLPolygon), CC BY-NC 4.0 polygons and LoD1 building models (GBA.Polygon and GBA.LoD1), and CC BY-NC 4.0 height maps (GBA.Height)."
     terms_read_on: "2026-11-20"
     landing_url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
     nightly_live_fetch: false
@@ -28459,7 +28459,7 @@ sources:
     fetch_host: "data.source.coop"
     url: "https://data.source.coop/tge-labs/globalbuildingatlas-lod1/e050_n30_e055_n25.parquet"
     terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
-    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
+    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license. This dataset is provided in three parts: ODbL-licensed polygons (GBA.ODbLPolygon), CC BY-NC 4.0 polygons and LoD1 building models (GBA.Polygon and GBA.LoD1), and CC BY-NC 4.0 height maps (GBA.Height)."
     terms_read_on: "2026-11-20"
     landing_url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
     nightly_live_fetch: false
