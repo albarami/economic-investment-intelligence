@@ -51880,3 +51880,79 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
   equal to the base's activity.py. Strict builder self-review: APPROVE for
   this bounded r4 delivery, not independent-maker approval. Muhasabah PASS
   for the sourced claims, explicit residual and completed requested mechanics.
+
+
+## S2-P60 round 5 — automatic refusal persistence
+
+- Builder: OpenAI Codex, senior engineer for data-governance and audit tooling.
+  Strict self-review persona: the sanad auditor. Skills: project-orientation,
+  task-standards, github-flow, sanad-provenance, property-based-testing,
+  strict-reviewer and muhasabah-gate; the brief supplies TDD,
+  systematic-debugging and verification-before-completion rules.
+- Base: `55135a9e8f3f18adc843123ffe5ce47ff490dcf2`. Failing-first regression:
+  `de71e37e29b27f4fc3b6efed0dfb1e09be3c51e6`. Validated code and documents:
+  `3a2899e0ee1262f994ee98d78599aef7a0620b66`. Final records-commit identity,
+  bundle checksum, per-file counts and full command list are in
+  `.overnight/RETURN.md`.
+- Authority: lead ruling L-1489, amending L-1471 under decision 0075 item 3,
+  takes REVIEW-CF5 finding F1's code fix. A refused assembly now publishes
+  `refusal.json` and appends the identical object to the working-tree refusal
+  archive with the existing `append_audit` and `json_bytes` helpers. Earlier
+  record bytes remain intact. The existing committed-byte check blocks every
+  later prepare, draw and assemble with `refusal_history_uncommitted` until
+  that archive is committed. No core audit rule or refusal parser changed.
+- Failing first on the unchanged base: four tests failed with exit 1. The F1
+  same-draw/new-run-id agreeing audit was admitted (DID NOT RAISE Refusal);
+  prepare and draw also proceeded, and the archive stayed empty. The committed
+  regression and initial green used seed 2026112296; green exit 0, four tests.
+  Final added coverage comprises nine tests, including three history-size
+  cases, a generated arbitrary-binary-suffix property and committed-history
+  recovery. The shared refusal fixture is extracted from the existing recovery
+  test, retaining its pre-refusal signing-byte capture; it is reused, not copied.
+- Final eight-file command, exact round-4 seven-file set plus the new file:
+  `uv run --locked python -m pytest scripts/tests/test_spine_review.py scripts/tests/test_spine_review_properties.py scripts/tests/test_spine_review_seed.py scripts/tests/test_spine_refusals.py scripts/tests/test_spine_refusal_persistence.py custodian/tests/test_activity_model_audits.py custodian/tests/test_activity_real_shape.py custodian/tests/test_activity_spine.py -vv --hypothesis-seed=2026112296`
+  exited 0: 307 passed, 21 subtests passed. The required
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exited 0: 96 tests. Final Ruff check and format check exited 0; mypy exited 0
+  over 507 source files; instruction cmp exited 0. Post-record document, tree
+  and diff checks, their actual exits and the final commit are retained in the
+  return report and `.overnight/evidence/r5/`.
+- Eight isolated plants on the final source all gave red exit 1, cmp exit 0
+  after exact-byte restoration and green exit 0: delete the append; replace
+  raw-byte append with JSON reserialization; delete the committed-byte check;
+  delete the refusal-path returned-input check; delete the audit-disagreement
+  raise; delete the assembly draw-seed check; delete the assembly draw-record
+  check; delete the success-path returned-input check. Each red was an intended
+  test assertion failure, not a collection or setup failure. Exact argv,
+  deleted text, output and restored hashes are in
+  `.overnight/evidence/r5/sealed-plants/` and
+  `.overnight/evidence/r5/assembly-guard-plants/`.
+- Development failures are disclosed: the first broad-suite invocation named
+  a nonexistent audit test file and exited 4 without collecting tests. It was
+  corrected from the round-4 command above. Initial Ruff import/noqa/style
+  findings, a mypy missing annotation and a later unused fixture binding were
+  corrected without changing a guard or tolerance; their logs remain. There
+  were no random failures. Earlier successful suite runs are supplemental;
+  final evidence uses the exact code revision named above.
+- Environment: Linux, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15;
+  `UV_OFFLINE=1`, provider none, no network. Fixture caches, uv cache and
+  temporary paths stay inside the workspace. No existing data/, .env or
+  .private inputs were read. Workspace-local Git metadata holds the commits
+  because the shared worktree metadata is outside the writable workspace.
+  No push, merge, real review, acceptance-box change or slice verdict is claimed.
+- The supplied 73-row independent attack report remains prior evidence;
+  it was not rerun as a new independent attack. Every existing test remains
+  present. The core activity module and the entire refusal-chain module are
+  byte-identical to the base; the core SHA-256 remains
+  `6063a7d12d10ae01addfd3ff036ce46c91fb73573893158c67a8bf8333aa57eb`.
+- OI-203 retains the lead-owned real review and independent audit. Its appended
+  L-1489 correction records automatic persistence, deliberate reversion or
+  local reset before push, and the unbounded fabricated-free-field seed choice.
+  The runbook says assembly appends; the lead commits. This proves consistency
+  and committed bytes, not audit authenticity. Strict builder self-review:
+  APPROVE for this bounded fix only; different-maker review remains owed.
+  Muhasabah: PASS for attributable evidence, disclosed residuals and scope.
+  Code practice: no copied block and no new production helper; existing JSON,
+  append, fixture and Git helpers are reused. The longest new function is
+  `test_autoappend_keeps_prior_record_bytes`, 32 lines; the changed production
+  function `assemble_audited_review` is 84 lines.
