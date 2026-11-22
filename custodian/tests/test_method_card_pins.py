@@ -1271,6 +1271,96 @@ def test_producer_refuses_schema_version(tmp_path, version):
         produce_pin_artifact(planted, rows)
 
 
+# S2-P63: the closed pending representation of decision 0094, exercised at the
+# producer. A deferred result pin may stay pending with empty values and empty
+# lineage, never a stand-in value; no other pin may take that shape.
+PENDING_LINEAGE_CASES = (
+    # pin, pending values, lineage mode, exact refusal or None when accepted
+    ("c6.expected_clq", True, "empty", None),
+    ("c6.expected_q", True, "empty", None),
+    ("c7.shared_a_given_b", True, "empty", None),
+    ("c6.expected_clq", True, "link", "pin_pending_lineage_forbidden"),
+    ("c7.shared_b_given_a", True, "link", "pin_pending_lineage_forbidden"),
+    ("c6.expected_p", False, "empty", "pin_source_lineage_required"),
+    ("c5.hhi", True, "empty", "pin_pending_not_deferred"),
+    ("c5.trend", True, "link", "pin_pending_not_deferred"),
+    ("c14.medians_2025", True, "empty", "pin_pending_not_deferred"),
+    ("c7.district_weights", True, "empty", "pin_pending_not_deferred"),
+    ("wilson.period", True, "empty", "pin_pending_not_deferred"),
+    ("c6.max_shown", True, "empty", "pin_pending_not_deferred"),
+    ("wilson.period", False, "link", "pin_configuration_lineage_forbidden"),
+)
+
+
+@pytest.mark.parametrize("pin,pend,mode,code", PENDING_LINEAGE_CASES)
+def test_producer_pin_row_pending_shapes(tmp_path, pin, pend, mode, code):
+    from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
+
+    _paths, record, _, config = case(tmp_path)
+    rows = _producer_rows(record)
+    row = next(item for item in rows if item["pin_id"] == pin)
+    link = [dict(item["source_lineage"][0]) for item in rows if item["source_lineage"]]
+    if pend:
+        row["values"] = {}
+    if mode == "empty":
+        row["source_lineage"] = []
+    else:
+        row["source_lineage"] = link
+    if code is None:
+        built = produce_pin_artifact(config, rows)
+        produced = next(item for item in built["pins"] if item["pin_id"] == pin)
+        assert produced["values"] == row["values"]
+        assert produced["source_lineage"] == row["source_lineage"]
+    else:
+        with pytest.raises(ValueError, match="^" + re.escape(code) + "$"):
+            produce_pin_artifact(config, rows)
+
+
+@hypothesis_settings(deadline=None, max_examples=60)
+@given(
+    pin=st.sampled_from(PINS),
+    pend=st.booleans(),
+    carries_lineage=st.booleans(),
+)
+def test_property_producer_pin_row_shape_oracle(pin, pend, carries_lineage):
+    # Oracle written from decision 0094 and the pass-1 configuration rule, not
+    # from the producer's code: only a deferred result pin may carry the pending
+    # shape, only without lineage; a valued row keeps the existing rules.
+    from eii_custodian.publicdata.method_card_producer import produce_pin_artifact
+
+    with tempfile.TemporaryDirectory() as folder:
+        _paths, record, _, config = case(Path(folder))
+        rows = _producer_rows(record)
+        row = next(item for item in rows if item["pin_id"] == pin)
+        link = next(
+            dict(item["source_lineage"][0]) for item in rows if item["source_lineage"]
+        )
+        row["values"] = {} if pend else {"value": "invented:" + pin}
+        row["source_lineage"] = [link] if carries_lineage else []
+        deferred = pin in DEFERRED_TO_S7
+        if pend:
+            expected = (
+                None
+                if deferred and not carries_lineage
+                else (
+                    "pin_pending_lineage_forbidden"
+                    if deferred
+                    else "pin_pending_not_deferred"
+                )
+            )
+        elif pin in CONFIGURATION_PINS:
+            expected = (
+                None if not carries_lineage else "pin_configuration_lineage_forbidden"
+            )
+        else:
+            expected = None if carries_lineage else "pin_source_lineage_required"
+        if expected is None:
+            assert produce_pin_artifact(config, rows) is not None
+        else:
+            with pytest.raises(ValueError, match="^" + expected + "$"):
+                produce_pin_artifact(config, rows)
+
+
 def test_artifact_matches_config_accepts_matching_artifact(tmp_path):
     from eii_custodian.publicdata.method_card_producer import artifact_matches_config
 

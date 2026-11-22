@@ -1,10 +1,14 @@
 """MTH-03 source checks and fail-closed S2/S7 completion evidence.
 
-Pass 1 defines an explicit interchange contract for invented fixtures. The live
-S2-T08 artifact/config adapters and their plan-r2 module placement need
-confirmation. This module never produces a pin, calculates a public figure, or
-opens a source snapshot. An artifact comparison is additional to independent
-source replay and a different maker's review, never a replacement for either.
+Pass 1 defines an explicit interchange contract for invented fixtures. The
+production writer of S2-P63 persists the artifact and the recorded generation
+configuration as the pair ``assembly/s2_t09_pin_artifact.json`` and
+``assembly/s2_t09_pin_generation_config.json`` from the producer inputs bound
+to the build; the checked rows' ``settings_sha256`` binds the persisted
+configuration bytes. This module never produces a pin, calculates a public
+figure, or opens a source snapshot. An artifact comparison is additional to
+independent source replay and a different maker's review, never a replacement
+for either.
 
 Card synchronization binds only the document sections this record governs:
 section 3 and cards C5, C6, C7 and C14, each found by its exact heading text.

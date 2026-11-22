@@ -55,6 +55,8 @@ class Production:
     environ: Mapping[str, str]
     fetcher: Callable[[], Any] | None = None
     reconciliation_selection: Selection | None = None
+    pin_generation_config: Mapping[str, object] | None = None
+    pin_rows: Sequence[Mapping[str, object]] = ()
     selected: dict[str, str] = field(default_factory=dict)
     receipts: dict[str, dict[str, Any]] = field(default_factory=dict)
     tables: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
@@ -85,6 +87,7 @@ class Production:
             "heights": self.heights,
             "trade_reconciliation": self.trade_reconciliation,
             "busyness": self.busyness,
+            "method_pins": self.method_pins,
             "final_audit": self.final_audit,
             "draw": self.draw,
             "reports": self.reports,
@@ -889,6 +892,16 @@ class Production:
             )
         assert_clean(self.environ, self.lines)
         return self.record("busyness", {"manifests": results, "tables": tables})
+
+    def method_pins(self) -> dict[str, str]:
+        from .assembly_method_pins import write_pin_pair
+
+        output = write_pin_pair(self.cache, self.pin_generation_config, self.pin_rows)
+        self.files.update(output)
+        return {
+            **self.record("method_pins", {"outputs": sorted(output)}),
+            **output,
+        }
 
     def final_audit(self) -> dict[str, str]:
         from .assembly_reports import gather_audit

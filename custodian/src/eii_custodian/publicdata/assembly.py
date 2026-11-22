@@ -29,6 +29,7 @@ PHASES = (
     "heights",
     "trade_reconciliation",
     "busyness",
+    "method_pins",
     "final_audit",
     "draw",
     "reports",

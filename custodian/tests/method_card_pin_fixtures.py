@@ -23,6 +23,7 @@ import yaml
 from custodian.tests.test_source_completeness import entry
 from custodian.tests.test_source_completeness import receipt as build_receipt
 
+from eii_custodian.publicdata.assembly_io import write_record
 from eii_custodian.publicdata.method_card_validation import CONFIGURATION_PINS
 
 PIN_GROUPS = {
@@ -187,7 +188,11 @@ def case(tmp_path):
                 "unpinned_reason": None,
             }
         )
-    config_path = write_json(tmp_path / "invented-generation.json", configuration)
+    # The recorded configuration uses the assembly writer's own canonical
+    # serialization, so the persisted production bytes hash to the recorded
+    # settings hash of every checked row.
+    config_path = tmp_path / "invented-generation.json"
+    write_record(tmp_path, "invented-generation.json", configuration)
     for row in rows:
         row["settings_sha256"] = digest(config_path.read_bytes())
     record = {
