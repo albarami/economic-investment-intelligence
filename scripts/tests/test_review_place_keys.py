@@ -7,11 +7,12 @@ import dataclasses
 import importlib
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
 import zipfile
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch
@@ -882,6 +883,126 @@ class SecondReplaceFailure(Pair):
             run = self.run_tool()
         self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
         self.assertEqual(self.files(), before)
+
+
+class CleanupNeverMasks(Pair):
+    """A failed cleanup never replaces the error being unwound (lens 1, R1).
+
+    The review directory turns read-only (0500) at one point, with real OS
+    calls; its mode is restored before the files are read back.
+    """
+
+    @contextlib.contextmanager
+    def read_only_from(self, target: str, after: bool = False) -> Iterator[None]:
+        """os.replace of keys_tool makes the directory read-only around target."""
+        mode, real = self.review.stat().st_mode, os.replace
+
+        def replace(source: str | Path, destination: str | Path) -> None:
+            hit = Path(destination).name == target
+            if hit and not after:
+                self.review.chmod(0o500)
+            real(source, destination)
+            if hit and after:
+                self.review.chmod(0o500)
+
+        try:
+            with patch("review_place_keys.os.replace", replace):
+                yield
+        finally:
+            self.review.chmod(mode)
+
+    def test_read_only_directory_after_first_replacement_is_rollback_failed(
+        self,
+    ) -> None:
+        self.write(self.valid())
+        before = self.files()
+        with self.read_only_from(GAZETTEER):
+            run = self.run_tool()
+        self.assertEqual(run, (3, "FAILED rollback_failed\n"))
+        after = self.files()
+        self.assertEqual(after[GAZETTEER], before[GAZETTEER])
+        extra = set(after) - set(before)
+        kept = [name for name in extra if after[name] == before[FLAGSHIP]]
+        self.assertEqual(len(kept), 1)
+
+    def test_stage_cleanup_failure_keeps_the_reload_refusal(self) -> None:
+        self.write(self.valid())
+        before, mode = self.files(), self.review.stat().st_mode
+
+        def load(
+            path: Path, cache: Path | None
+        ) -> tuple[str, tuple[Mapping[str, object], ...]]:
+            if path.name.startswith(".review-"):
+                self.review.chmod(0o500)
+            return stale_reload(FLAGSHIP)(path, cache)
+
+        files = tuple(
+            (name, source, load if name == FLAGSHIP else loader)
+            for name, source, loader in keys_tool.FILES
+        )
+        try:
+            with patch.object(keys_tool, "FILES", files):
+                run = self.run_tool()
+        finally:
+            self.review.chmod(mode)
+        self.assertEqual(run, (2, "REFUSED reload_mismatch\n"))
+        after = self.files()
+        self.assertEqual(
+            [after[FLAGSHIP], after[GAZETTEER]], [before[FLAGSHIP], before[GAZETTEER]]
+        )
+
+    def test_write_beside_cleanup_failure_keeps_its_own_error(self) -> None:
+        self.write(self.valid())
+        mode = self.review.stat().st_mode
+
+        def copymode(source: Path, destination: Path) -> None:
+            self.review.chmod(0o500)
+            raise keys_tool.ReviewError("syn_copy_failed")
+
+        try:
+            with patch("review_place_keys.shutil.copymode", copymode):
+                with self.assertRaises(keys_tool.ReviewError) as caught:
+                    keys_tool.write_beside(self.review / FLAGSHIP, b"syn")
+        finally:
+            self.review.chmod(mode)
+        self.assertEqual(caught.exception.reason, "syn_copy_failed")
+
+    def test_discard_removes_the_rest_after_a_failure(self) -> None:
+        blocked, loose = self.scratch / "syn-folder", self.scratch / "syn-file"
+        blocked.mkdir()
+        loose.write_bytes(b"syn")
+        failure = keys_tool.discard([blocked, loose])
+        self.assertIsInstance(failure, IsADirectoryError)
+        self.assertEqual([blocked.exists(), loose.exists()], [True, False])
+
+    @settings(deadline=None)
+    @given(st.lists(st.sampled_from(("blocked", "loose", "absent")), max_size=6))
+    def test_discard_over_every_order_of_kinds(self, kinds: list[str]) -> None:
+        """Every loose file goes; every blocked one stays; the first failure."""
+        with tempfile.TemporaryDirectory() as folder:
+            paths = [Path(folder) / f"syn-{index}" for index in range(len(kinds))]
+            for path, kind in zip(paths, kinds, strict=True):
+                if kind == "blocked":
+                    path.mkdir()
+                elif kind == "loose":
+                    path.write_bytes(b"syn")
+            failure = keys_tool.discard(paths)
+            exists = [path.exists() for path in paths]
+            self.assertEqual(exists, [kind == "blocked" for kind in kinds])
+            first = kinds.index("blocked") if "blocked" in kinds else None
+            if first is None:
+                self.assertIsNone(failure)
+            else:
+                assert isinstance(failure, IsADirectoryError)
+                self.assertEqual(failure.filename, str(paths[first]))
+
+    def test_cleanup_failure_after_both_replacements_is_raised(self) -> None:
+        self.write(self.valid())
+        with self.read_only_from(GAZETTEER, after=True):
+            run = self.run_tool()
+        self.assertEqual(run, (2, "REFUSED filesystem_refused\n"))
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
 
 
 SECRETS = ("SYN-P-1", "Syn Souq", "syn souq", "51.1", "25.1", "/")

@@ -231,9 +231,23 @@ def write_beside(path: Path, data: bytes) -> Path:
             stream.write(data)
         shutil.copymode(path, written)
     except BaseException:
-        written.unlink(missing_ok=True)
+        discard([written])
         raise
     return written
+
+
+def discard(paths: Sequence[Path]) -> OSError | None:
+    """Remove each path, each in its own try; return the first failure.
+
+    A failure never stops the removal of the remaining paths.
+    """
+    failure = None
+    for path in paths:
+        try:
+            path.unlink(missing_ok=True)
+        except OSError as error:
+            failure = failure or error
+    return failure
 
 
 def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> Path:
@@ -247,7 +261,7 @@ def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> P
         if list(loader(staged, None)[1]) != json.loads(text):
             raise ReviewError("reload_mismatch")
     except BaseException:
-        staged.unlink(missing_ok=True)
+        discard([staged])
         raise
     return staged
 
@@ -270,11 +284,17 @@ def write_reviewed(
 
     A refusal or a failed replacement leaves neither target changed and no
     temporary file. A failed restore raises ``rollback_failed`` and leaves each
-    unrestored original beside its target.
+    unrestored original beside its target; no cleanup failure replaces it. A
+    cleanup failure is raised only when nothing else is.
     """
     staged: list[tuple[Path, Path]] = []
     originals: list[tuple[Path, Path]] = []
     unrestored: list[Path] = []
+
+    def temporaries() -> list[Path]:
+        every = (*staged, *originals)
+        return [temporary for temporary, _ in every if temporary not in unrestored]
+
     try:
         for path, rows, loader in planned:
             staged.append((stage(path, rows, loader), path))
@@ -288,10 +308,12 @@ def write_reviewed(
                 if unrestored:
                     raise ReviewError(ROLLBACK_FAILED) from None
                 raise
-    finally:
-        for temporary, _path in (*staged, *originals):
-            if temporary not in unrestored:
-                temporary.unlink(missing_ok=True)
+    except BaseException:
+        discard(temporaries())
+        raise
+    failure = discard(temporaries())
+    if failure is not None:
+        raise failure
 
 
 def load_inputs(
