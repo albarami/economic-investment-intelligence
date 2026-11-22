@@ -805,7 +805,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_sector_accounts` | `activity_code` (ISIC Rev.4); `period`; `indicator` string; `value` decimal(18,2); `unit` string |
 | `pub_wage_table` | `table_code` (names the public table, so conflicting tables are never mixed; master OI-03); `period`; `breakdown_key` string (canonical `dimension=value` pairs or `ALL`); `indicator`; `value` decimal(18,2); `unit` |
 | `pub_customs_import` | `tariff_code` string (as published, 12 digits for 2025 onwards); `description_en`, `description_ar` string; `origin_iso3` string; `period`; `value_qar` decimal(18,2); `weight_kg` decimal(18,2) (Y); `quantity` decimal(18,2) (Y); `quantity_unit` string (Y) |
-| `pub_property_sale` | `district_key`; `municipality_code`; `period` (`YYYY`); `property_type` (from the Arabic source field); `deal_count` int; `median_price_per_m2` decimal(12,2) (Y, null when `deal_count` is 0) |
+| `pub_property_sale` | `district_key`; `municipality_code`; `period` (`YYYY`); `property_type` (from the Arabic source field); `deal_count` int; `median_price_per_m2` decimal(12,2) (Y, null when `deal_count` is 0); `as_of` date (Y, null when `deal_count` is 0; retrieval date of the contributing selected snapshot) |
 | `pub_census_zone` | `zone_code`; `period` (`2020`); `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_population_municipality` | `municipality_code`; `period`; `indicator` (`residents`, `employed`); `value` decimal(18,4); `unit` (`persons`); `source_id` |
 | `pub_census_national` | `period`; `indicator` (the audit pairs of DAT-128 plus the two C8 pairs below); `value` decimal(18,4); `unit`; `source_id` |

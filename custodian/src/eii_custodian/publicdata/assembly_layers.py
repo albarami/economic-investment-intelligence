@@ -195,7 +195,9 @@ def build_layers(build: Production) -> None:
             if entry.key in deal_sources
         }
         if sale_sources:
-            sale_rows = sale_aggregates(deals)
+            sale_rows = sale_aggregates(deals, as_of_by_source=as_of_by_source)
+            for row in sale_rows:
+                require_price_as_of(row, as_of_by_source["prop_sales"])
             refuse_release_identifiers(sale_rows, frozenset(identifiers))
             build.table("pub_property_sale", list(sale_rows), tuple(sale_sources))
         quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
