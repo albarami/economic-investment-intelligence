@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 USAGE_PREFIX = "eii: usage error: unknown command or flag."
-TEST_FORM = "test [--seed N]"
+TEST_FORM = "test [--seed N] [--suite NAME]"
 NOT_YET = "not_built (not built yet)"
 CDSE_BOUNDARY = (
     "CDSE backup boundary: possession of both CDSE values, "

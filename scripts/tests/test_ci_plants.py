@@ -55,11 +55,11 @@ class PlantHarness(unittest.TestCase):
         check.assert_not_called()
         self.assertIn("engine sync failed (status 1)", reason or "")
 
-    def test_exact_twelve_cases(self) -> None:
-        self.assertEqual(len(cases.CASES), 12)
-        self.assertEqual(len(cases.CLASSES), 12)
-        self.assertEqual(len({case.check for case in cases.CASES}), 12)
-        self.assertEqual(len({case.name for case in cases.CASES}), 12)
+    def test_exact_sixteen_cases(self) -> None:
+        self.assertEqual(len(cases.CASES), 17)
+        self.assertEqual(len(cases.CLASSES), 17)
+        self.assertEqual(len({case.check for case in cases.CASES}), 17)
+        self.assertEqual(len({case.name for case in cases.CASES}), 17)
         self.assertEqual(tuple(case.check for case in cases.CASES), cases.CLASSES)
 
     def test_one_case_per_guard(self) -> None:
@@ -209,7 +209,7 @@ class PlantHarness(unittest.TestCase):
             status = plants.run_all(support.ROOT, {}, out, err)
         self.assertEqual(status, 0)
         text = out.getvalue()
-        self.assertIn("plants: 12 cases, 12 blocked, 0 failed", text)
+        self.assertIn("plants: 17 cases, 17 blocked, 0 failed", text)
         self.assertIn("RESULT: PASSED", text)
         out_fail = io.StringIO()
         err_fail = io.StringIO()
@@ -220,7 +220,7 @@ class PlantHarness(unittest.TestCase):
         ):
             status_fail = plants.run_all(support.ROOT, {}, out_fail, err_fail)
         self.assertEqual(status_fail, 1)
-        self.assertIn("plants: 12 cases, 11 blocked, 1 failed", out_fail.getvalue())
+        self.assertIn("plants: 17 cases, 16 blocked, 1 failed", out_fail.getvalue())
         self.assertIn("RESULT: FAILED", out_fail.getvalue())
         self.assertIn("FAIL plant", err_fail.getvalue())
         self.assertIn(cases.CASES[-1].name, err_fail.getvalue())

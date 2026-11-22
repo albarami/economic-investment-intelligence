@@ -58,7 +58,7 @@ BANNED_COMPOSE = frozenset(
     {"-v", "--volumes", "rm", "down", "kill", "pull", "run", "exec"}
 )
 USAGE_PREFIX = "eii: usage error: unknown command or flag."
-TEST_FORM = "test [--seed N]"
+TEST_FORM = "test [--seed N] [--suite NAME]"
 ENV_FILE_NAME = "port.env"
 LOOPBACK_PORT = 18080
 ARCH_HEADER = "| Command | Plane | Does | Network | Sandbox |"
