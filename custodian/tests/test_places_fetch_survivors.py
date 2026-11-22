@@ -333,7 +333,7 @@ def test_success_receipt(tmp_path: Path, extension: str, expected_file: str) -> 
     "key,skip,expected",
     [
         ("places_ovt/part-00014", "", True),
-        ("bldg_ovt/part-00288", "", True),
+        ("bldg_ovt/part-00288", "", False),
         ("bldg_ovt/part-00384", "", True),
         ("bldg_ovt/part-00385", "", True),
         ("places_ovt/part-invented", "", False),

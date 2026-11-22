@@ -9,7 +9,7 @@ from shapely.geometry import box
 from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.review.cache_fixture import write_cached
 
-PARTS = tuple(f"bldg_ovt/part-{part}" for part in ("00288", "00384", "00385"))
+PARTS = tuple(f"bldg_ovt/part-{part}" for part in ("00384", "00385"))
 COLLECTION = "bldg_ovt/stac-collection"
 
 
@@ -142,7 +142,7 @@ def world(tmp_path, rows=None, **parquet_options):
             key, parquet(tmp_path / f"part-{index}.parquet", content, **parquet_options)
         )
     links = []
-    for key in keys[4:7]:
+    for key in keys[len(PARTS) + 1 : 2 * len(PARTS) + 1]:
         part = "bldg_ovt/" + key.split("stac-", 1)[-1]
         links.append({"rel": "item", "href": by_key[key].url})
         store(

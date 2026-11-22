@@ -24,7 +24,9 @@
    exactly; `commit_allowed` remains false. Unknown
    item URLs remain unconfirmed, never guessed. An unregistered linked item or
    incomplete part set refuses national completeness. National boundary bounds
-   must fit the PUB-17 frame box. Counts distinguish outside-box rows from
+   must fit the PUB-17 frame box (proposed amendment: [decision 0089](0089-reviewed-outside-boundary-parts-and-the-required-building-part-set.md) admits
+   reviewed wholly-outside boundary parts and states the required part set as a
+   rule; owner acceptance owed). Counts distinguish outside-box rows from
    in-box rows outside the dated boundary; the latter await lead review for
    possible reclaimed land and a boundary amendment.
 3. `height` and `num_floors` mapping is off. Both output slots remain null with
