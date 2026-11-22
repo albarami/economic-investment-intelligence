@@ -78,6 +78,7 @@ class Production:
             "investment_capture": self.investment_capture,
             "reviewed_selections": self.reviewed_selections,
             "frame": self.frame,
+            "register_tables": self.register_tables,
             "spine_graph": self.spine_graph,
             "additions": self.additions,
             "gis_property_singles": self.gis_property_singles,
@@ -512,6 +513,64 @@ class Production:
                 "report": result.report,
                 "files": paths,
                 "data_files": building_paths,
+            },
+        )
+
+    def register_tables(self) -> dict[str, str]:
+        """Consume the lead-staged, pin-verified register projection bundle."""
+        from .registers.bundle import BUNDLE, PIN, load_bundle
+        from .registers.contracts import REGISTRY_KEYS
+
+        cells = frozenset(
+            int(row["cell"]) for row in self.needed_frame().tables["grid_cell"]
+        )
+        bundle = load_bundle(local(self.cache, BUNDLE), local(self.cache, PIN), cells)
+        for item in bundle.receipts:
+            if item["use"] != "current":
+                continue
+            receipt = dict(item["receipt"])
+            # A register file has no fetch address; the reviewed capture digest
+            # stands as the snapshot identity used by the figure draw.
+            receipt["fetch_url"] = ""
+            receipt["sha256"] = item["receipt_sha256"]
+            self.receipts[str(receipt["key"])] = receipt
+        sources = tuple(sorted(REGISTRY_KEYS.values()))
+        row_sources = {
+            name: [REGISTRY_KEYS[str(row["source_id"])] for row in rows]
+            for name, rows in bundle.tables.items()
+        }
+        for name, rows in bundle.tables.items():
+            self.table(name, rows, sources)
+        self.files.update(
+            {
+                PIN: bundle.pin_sha256,
+                BUNDLE + "/manifest.json": bundle.manifest_sha256,
+                **{
+                    BUNDLE + "/tables/" + name + ".parquet": digest
+                    for name, digest in bundle.table_sha256.items()
+                },
+            }
+        )
+        return self.record(
+            "register_tables",
+            {
+                "manifest_sha256": bundle.manifest_sha256,
+                "frame_sha256": bundle.manifest["frame_sha256"],
+                "release_kind": bundle.manifest["release_kind"],
+                "tables": {name: self.tables[name] for name in bundle.tables},
+                "table_files": bundle.table_sha256,
+                "row_sources": row_sources,
+                "receipts": [
+                    {
+                        "key": item["key"],
+                        "source_id": item["receipt"]["source_id"],
+                        "use": item["use"],
+                        "period": item["receipt"]["period"],
+                        "receipt_sha256": item["receipt_sha256"],
+                    }
+                    for item in bundle.receipts
+                ],
+                "snapshot_coverage": bundle.coverage,
             },
         )
 

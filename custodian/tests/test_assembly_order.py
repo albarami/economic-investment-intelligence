@@ -13,6 +13,7 @@ ORDER = (
     "investment_capture",
     "reviewed_selections",
     "frame",
+    "register_tables",
     "spine_graph",
     "additions",
     "gis_property_singles",

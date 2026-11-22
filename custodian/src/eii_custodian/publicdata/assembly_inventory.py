@@ -54,6 +54,11 @@ INVENTORY = (
         ("assembly/frame.json",),
     ),
     InventoryItem(
+        "register_tables",
+        ("frame", "register_bundle"),
+        ("assembly/register_tables.json",),
+    ),
+    InventoryItem(
         "spine_graph",
         (
             "reviewed_selections",
@@ -118,6 +123,7 @@ INVENTORY = (
         "final_audit",
         (
             "frame",
+            "register_tables",
             "spine_graph",
             "additions",
             "gis_property_singles",

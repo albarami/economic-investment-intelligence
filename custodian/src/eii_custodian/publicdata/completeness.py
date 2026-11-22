@@ -215,6 +215,42 @@ def in_use(row: Entry, receipts: Mapping[str, Mapping[str, object]]) -> bool:
     )
 
 
+def register_in_use(row: Entry, receipts: Mapping[str, Mapping[str, object]]) -> bool:
+    """A register file row is in use through its reviewed projection receipt.
+
+    The ``lead_shell_file_input`` dispatch marker is not an evidence absence;
+    the receipt is the file-input shape verified by the bundle reader.
+    """
+    receipt = receipts.get(row.key)
+    if not isinstance(receipt, Mapping):
+        return False
+    digest = receipt.get("sha256")
+    retrieved = receipt.get("retrieved_utc")
+    try:
+        stamp = (
+            datetime.fromisoformat(retrieved.replace("Z", "+00:00"))
+            if isinstance(retrieved, str)
+            else None
+        )
+    except ValueError:
+        stamp = None
+    return (
+        receipt.get("version") == "register_input_v1"
+        and receipt.get("kind") == "register_file"
+        and receipt.get("key") == row.key
+        and receipt.get("source_id") == row.source_id
+        and isinstance(receipt.get("period"), str)
+        and isinstance(digest, str)
+        and re.fullmatch(r"[a-f0-9]{64}", digest) is not None
+        and stamp is not None
+        and stamp.tzinfo is not None
+        and all(
+            isinstance(receipt.get(name), str) and str(receipt[name]).strip()
+            for name in ("publisher", "dataset", "licence_id", "licence_basis")
+        )
+    )
+
+
 def check(
     *,
     entries: Sequence[Entry],
@@ -318,7 +354,14 @@ def check(
         if forbidden_row:
             continue
         absence = absences.get(row.key)
-        if absence is not None or row.skip_reason:
+        if row.kind == "register_file":
+            if not register_in_use(row, receipts):
+                fail(row.key, "source_receipt_missing: missing or invalid receipt")
+            elif set(outputs.get(row.key, ())) != set(row.release_tables):
+                fail(row.key, "source_completeness: output tables")
+            else:
+                add(row.key, "in use")
+        elif absence is not None or row.skip_reason:
             # Reuse the registry's refusal markers, including for direct Entry
             # inputs; permission-based omissions are forbidden by D4 as well.
             if any(

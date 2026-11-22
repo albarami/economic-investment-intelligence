@@ -6273,3 +6273,26 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 - PO-S2-P56-03 — **PROPOSED OPEN ITEM** (round 3, 2026-11-22): lens-2 finding 3 remains a design limitation: exception subclasses absent from the exact-type policy tables classify to the plain `<stage>_unexpected` fallback. Explicit entries for subclasses of the pinned libraries, each with a plant, are a later reviewed choice. This round changes no subclass policy and claims no class-suffix detail for those exceptions.
 
 - PO-S2-P56-01 round-4 evidence clarification, 2026-11-22: the unchanged fixture guard is red on the base and the inventory moves to a Python literal with exact payload and expanded-case equivalence (262 rows, 909 cases). Both joined reader observers have individual deletion plants. This confirms the forced join locally; fresh different-maker review and lead-owned integration evidence remain required. No release criterion is closed. See PROGRESS.md, S2-P56 round 4.
+## S2-P64 bounded open records (2026-11-22, task S2-T49)
+
+- DONE SO FAR: `registers/bundle.py` re-verifies a lead-staged, pin-verified
+  projection bundle (`register_bundle/` plus `register_bundle_pin.json` in the
+  allowed cache) and `Production.register_tables` consumes only it; raw register
+  paths and `EII_*_REGISTER_FILE` settings are never opened by assembly. Both
+  tables are credited to keys `biz_register` and `fc_register/file`, bound in
+  `assembly/register_tables.json` with per-period receipt lineage and kept-month
+  coverage, drawn by `draw_tables` and counted "in use" by source completeness.
+  New handoff refusal codes: `register_bundle_missing`, `register_bundle_pin`,
+  `register_bundle_manifest`, `register_bundle_receipt`, `register_bundle_source`,
+  `register_bundle_table`, `register_bundle_period`; existing codes reused for the
+  same rules (`frame_hash_mismatch`, `receipt_*`, `snapshot_*`, `release_*`,
+  `registration_egress`).
+- NEEDED: the lead's real-file adapter run and the staged bundle produced from
+  real, hash-verified inputs; a different-maker review of this offline
+  implementation. Neither is claimed by this record.
+- LIMITS: invented stand-in fixtures only; no live register read, no release
+  command, no admission-policy or registration-key-exception change, no slice
+  gate. The receipt list binds the tables only through the lead's manifest
+  pin: raw files are not retained, so a stale receipt list under a fresh pin
+  is undetectable by the reader; pin review is the sole control. The
+  published-tower basis and sole-proprietor questions stay open as before.
