@@ -200,8 +200,15 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Require every needed job to succeed
-        run: python3 -I scripts/ci_aggregate.py "$NEEDS"
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.11.31"
+          enable-cache: "false"
+      - name: Install Python from .python-version
+        run: uv python install
+      - name: Require the whole suite matrix and every needed job to succeed
+        run: uv run --locked python scripts/ci_aggregate.py .github/workflows/ci.yml "$NEEDS"
         env:
           NEEDS: ${{ toJSON(needs) }}
 

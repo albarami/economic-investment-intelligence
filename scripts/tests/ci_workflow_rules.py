@@ -14,13 +14,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import ci_aggregate  # noqa: E402
-import run_tests  # noqa: E402
 
 WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
 # A workflow file change changes its pin in the same commit, so it is seen in review.
 PINNED_SHA256 = {
-    "ci.yml": "0d1dcce59e0fc7b3ff7342fbd8cc0978a129c016a549537f117c2ea2fb8ee91a",
+    "ci.yml": "95820c9ad23d72f981507092d59ecae9a7ae0c30fc38613759d9c515c6dca251",
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }
@@ -58,7 +57,9 @@ SCANNER_FETCH = "uv run --locked python scripts/hooks_gitleaks.py fetch"
 # The one admitted condition: the final `tests` job waits for every shard and
 # always runs, so a failed, cancelled or skipped shard reaches its verdict.
 AGGREGATE_LINES = "    needs: [suite, web-spikes]\n    if: ${{ always() }}\n"
-AGGREGATE_RUN = 'python3 -I scripts/ci_aggregate.py "$NEEDS"'
+AGGREGATE_RUN = (
+    'uv run --locked python scripts/ci_aggregate.py .github/workflows/ci.yml "$NEEDS"'
+)
 
 _WEAKENER_STEP_RE = re.compile(r"(?m)^\s*continue-on-error:\s*true\s*$")
 
@@ -218,8 +219,11 @@ def _shard_problems(document: object) -> list[str]:
     if not isinstance(strategy, dict) or strategy.get("fail-fast") is not False:
         return ["ci.yml: job suite is not a matrix with fail-fast false"]
     matrix = strategy.get("matrix")
-    names = [item.name for item in run_tests.SUITES]
-    if not isinstance(matrix, dict) or matrix != {"suite": names}:
+    if (
+        not isinstance(matrix, dict)
+        or set(matrix) != {"suite"}
+        or ci_aggregate.matrix_problems(matrix["suite"])
+    ):
         return ["ci.yml: job suite matrix differs from the SUITES table"]
     tests = jobs.get("tests")
     if not isinstance(tests, dict):

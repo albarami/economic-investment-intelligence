@@ -27,6 +27,8 @@ import run_tests
 NAMES = [suite.name for suite in run_tests.SUITES]
 SEED = "1794000000"
 GOOD = {"suite": {"result": "success"}, "web-spikes": {"result": "success"}}
+WORKFLOW = str(ci_support.WORKFLOW_DIR / "ci.yml")
+GUARDS_LINE = "          - python-guards\n"
 
 
 def matrix_names(folder: Path) -> list[str]:
@@ -108,10 +110,89 @@ class SuiteFlag(unittest.TestCase):
 
 
 class Aggregate(unittest.TestCase):
-    def verdict(self, needs: object) -> tuple[int, str]:
+    def verdict(self, needs: object, workflow: str = WORKFLOW) -> tuple[int, str]:
         out = io.StringIO()
         text = needs if isinstance(needs, str) else json.dumps(needs)
-        return ci_aggregate.main([text], out), out.getvalue()
+        return ci_aggregate.main([workflow, text], out), out.getvalue()
+
+    def edited(self, old: str, new: str) -> str:
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, True)
+        path = ci_support.workflow_fixture(home) / "ci.yml"
+        text = path.read_text(encoding="utf-8")
+        self.assertEqual(text.count(old), 1, old)
+        path.write_text(text.replace(old, new), encoding="utf-8")
+        return str(path)
+
+    def test_dropped_python_guards_fails_without_its_own_suite(self) -> None:
+        self.assertIn("python-guards", NAMES)
+        status, out = self.verdict(GOOD, self.edited(GUARDS_LINE, ""))
+        self.assertEqual(
+            (status, out),
+            (1, "FAIL matrix-missing: python-guards\nRESULT: FAILED\n"),
+        )
+
+    def test_each_matrix_refusal_names_its_reason(self) -> None:
+        listed = "".join(f"          - {name}\n" for name in NAMES)
+        rows = (
+            (
+                "        suite:\n" + listed,
+                "        suite: []\n",
+                "FAIL matrix-empty: the suite matrix lists no suite",
+            ),
+            (
+                "        suite:\n" + listed,
+                "        suite: python-guards\n",
+                "FAIL matrix-unreadable: the suite matrix is not a list of names",
+            ),
+            (
+                "          - web-unit\n",
+                "          - web-unit\n          - web-extra\n",
+                "FAIL matrix-unexpected: web-extra",
+            ),
+            (
+                "          - web-unit\n",
+                "          - web-unit\n          - web-checks\n",
+                "FAIL matrix-duplicate: web-checks",
+            ),
+            (
+                GUARDS_LINE + "          - python-core\n",
+                "          - python-core\n" + GUARDS_LINE,
+                "FAIL matrix-order: the suite matrix is not in SUITES order",
+            ),
+            (
+                "      matrix:\n",
+                "      matrix-off:\n",
+                "FAIL matrix-unreadable: the suite matrix is not a list of names",
+            ),
+        )
+        for old, new, line in rows:
+            with self.subTest(line=line):
+                status, out = self.verdict(GOOD, self.edited(old, new))
+                self.assertEqual((status, out), (1, f"{line}\nRESULT: FAILED\n"))
+
+    def test_unreadable_workflow_names_its_reason(self) -> None:
+        status, out = self.verdict(GOOD, self.edited("jobs:\n", "jobs: [\n"))
+        self.assertEqual(status, 1)
+        self.assertTrue(out.startswith("FAIL workflow-unreadable: "), out)
+        status, out = self.verdict(GOOD, WORKFLOW + ".absent")
+        self.assertEqual(status, 1)
+        self.assertTrue(out.startswith("FAIL workflow-unreadable: "), out)
+
+    def test_cancelled_only_matrix_fails(self) -> None:
+        needs = {**GOOD, "suite": {"result": plants.matrix_result(["cancelled"])}}
+        self.assertEqual(
+            self.verdict(needs),
+            (1, "FAIL shard-result: suite: cancelled\nRESULT: FAILED\n"),
+        )
+
+    @given(
+        st.lists(st.sampled_from([*NAMES, "web-extra", ""]), max_size=len(NAMES) + 2)
+    )
+    def test_matrix_passes_exactly_when_it_equals_the_table(
+        self, matrix: list[str]
+    ) -> None:
+        self.assertEqual(ci_aggregate.matrix_problems(matrix) == [], matrix == NAMES)
 
     def test_every_job_succeeded(self) -> None:
         self.assertEqual(self.verdict(GOOD), (0, "RESULT: PASSED\n"))
@@ -149,7 +230,10 @@ class Aggregate(unittest.TestCase):
         self.assertEqual(ci_aggregate.main([], out), 2)
         self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
         out = io.StringIO()
-        self.assertEqual(ci_aggregate.main([json.dumps(GOOD), "x"], out), 2)
+        self.assertEqual(ci_aggregate.main([json.dumps(GOOD)], out), 2)
+        self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
+        out = io.StringIO()
+        self.assertEqual(ci_aggregate.main([WORKFLOW, json.dumps(GOOD), "x"], out), 2)
         self.assertEqual(out.getvalue(), ci_aggregate.USAGE + "\n")
 
     @given(
@@ -193,6 +277,11 @@ class ShardContract(unittest.TestCase):
             ),
             ("          - web-unit\n", "", "matrix differs from the SUITES table"),
             (
+                "      matrix:\n",
+                "      matrix:\n        os: [ubuntu-24.04]\n",
+                "matrix differs from the SUITES table",
+            ),
+            (
                 "          - web-unit\n",
                 "          - web-unit\n          - web-extra\n",
                 "matrix differs from the SUITES table",
@@ -208,8 +297,8 @@ class ShardContract(unittest.TestCase):
                 "does not always run",
             ),
             (
-                'run: python3 -I scripts/ci_aggregate.py "$NEEDS"',
-                "run: python3 -I scripts/ci_aggregate.py",
+                f"run: {rules.AGGREGATE_RUN}",
+                'run: uv run --locked python scripts/ci_aggregate.py "$NEEDS"',
                 "does not run the aggregate verdict",
             ),
         )
@@ -259,9 +348,15 @@ class ShardPlants(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory(prefix="eii-shard-plants-")
         self.addCleanup(tmp.cleanup)
         self.root = support.fixture_root(Path(tmp.name))
+        workflow = self.root / plants.WORKFLOW
+        workflow.parent.mkdir(parents=True)
+        shutil.copy2(ci_support.WORKFLOW_DIR / "ci.yml", workflow)
 
     def test_matrix_result(self) -> None:
-        self.assertEqual(plants.matrix_result([]), "success")
+        self.assertEqual(plants.matrix_result([]), "failure")
+        self.assertEqual(plants.matrix_result(["cancelled"]), "cancelled")
+        self.assertEqual(plants.matrix_result(["success", "cancelled"]), "cancelled")
+        self.assertEqual(plants.matrix_result(["success", "unknown"]), "failure")
         self.assertEqual(plants.matrix_result(["success", "success"]), "success")
         self.assertEqual(plants.matrix_result(["success", "failure"]), "failure")
         self.assertEqual(plants.matrix_result(["skipped", "success"]), "skipped")
@@ -285,6 +380,17 @@ class ShardPlants(unittest.TestCase):
                 status, out = self.run_plant(case.plant)
                 self.assertEqual(status, 1, out)
                 self.assertIn(case.expect, out)
+
+    def test_dropped_suite_plant_fails_the_aggregate_alone(self) -> None:
+        case = next(c for c in cases.CASES if c.check == "tests-matrix-dropped")
+        cases.PLANTS["passing-shards"](self.root, support.parent_env())
+        self.assertEqual(plants.run_shards(self.root, support.parent_env())[0], 0)
+        cases.PLANTS[case.plant](self.root, support.parent_env())
+        self.assertEqual(run_tests.SUITES[0].name, "python-guards")
+        status, out = plants.run_shards(self.root, support.parent_env())
+        self.assertEqual(status, 1, out)
+        self.assertIn(case.expect, out)
+        self.assertEqual(out.count("FAIL "), 1, out)
 
 
 if __name__ == "__main__":

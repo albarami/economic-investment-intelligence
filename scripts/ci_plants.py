@@ -53,6 +53,7 @@ SEED = "1000000001"
 SUITE_TIMEOUT_SECONDS = 300
 SCANNER_FOLDER = Path("data") / "tools" / "gitleaks"
 USAGE = "usage: ci_plants.py run"
+WORKFLOW = Path(".github") / "workflows" / "ci.yml"
 CONTROL_PLANTS = {cases.RUNNER: "passing-test", cases.AGGREGATE: "passing-shards"}
 SHARDS = (
     run_tests.Suite(
@@ -250,15 +251,17 @@ def run_check(
 
 
 def matrix_result(results: Sequence[str]) -> str:
-    """One matrix job's result: failure if a leg failed, else skipped, else success.
+    """One matrix job's result: success only when it has legs and all succeeded.
 
-    A job-level condition cannot read the matrix, so a skipped shard is the whole
-    matrix job skipped; the plant marks that case by naming a shard.
+    Otherwise failure, cancelled or skipped in that order when a leg has it, and
+    failure for no leg or an unknown result. A job-level condition cannot read
+    the matrix, so a skipped shard is the whole matrix job skipped; the plant
+    marks that case by naming a shard.
     """
-    for result in ("failure", "skipped"):
+    for result in ("failure", "cancelled", "skipped"):
         if result in results:
             return result
-    return "success"
+    return "success" if results and set(results) == {"success"} else "failure"
 
 
 def run_shards(copy: Path, environment: Mapping[str, str]) -> tuple[int, str]:
@@ -285,7 +288,7 @@ def run_shards(copy: Path, environment: Mapping[str, str]) -> tuple[int, str]:
         "suite": {"result": matrix_result(results)},
         "web-spikes": {"result": "success"},
     }
-    status = ci_aggregate.main([json.dumps(needs)], buffer)
+    status = ci_aggregate.main([str(copy / WORKFLOW), json.dumps(needs)], buffer)
     return status, buffer.getvalue()
 
 

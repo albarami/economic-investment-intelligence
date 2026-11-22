@@ -97,15 +97,35 @@ def plant_token_history(copy: Path, environment: Mapping[str, str]) -> None:
     git(copy, environment, "commit", "-q", "-m", "chore: remove")
 
 
-def write_files(*files: tuple[str, str]) -> Plant:
-    """Return a plant that writes every listed file."""
-    plants = [write_file(path, text) for path, text in files]
+def remove_text(path: str, text: str) -> Plant:
+    """Return a plant that removes the first occurrence of a text from a file.
+
+    An absent text leaves the file unchanged, so the planted copy passes and the
+    harness reports the case as not blocked.
+    """
+
+    def plant(copy: Path, environment: Mapping[str, str]) -> None:
+        del environment
+        target = copy / path
+        old = target.read_text(encoding="utf-8")
+        target.write_text(old.replace(text, "", 1), encoding="utf-8")
+
+    return plant
+
+
+def combine(*plants: Plant) -> Plant:
+    """Return a plant that applies every listed plant in order."""
 
     def plant(copy: Path, environment: Mapping[str, str]) -> None:
         for each in plants:
             each(copy, environment)
 
     return plant
+
+
+def write_files(*files: tuple[str, str]) -> Plant:
+    """Return a plant that writes every listed file."""
+    return combine(*(write_file(path, text) for path, text in files))
 
 
 PASSING = "def test_planted() -> None:\n    assert True\n"
@@ -142,6 +162,10 @@ PLANTS: dict[str, Plant] = {
     "failing-shard": write_files((SHARD_ONE, PASSING), (SHARD_TWO, FAILING)),
     "skipped-shard": write_files(
         (SHARD_ONE, PASSING), (SHARD_TWO, PASSING), (SKIP_MARKER, "planted-two\n")
+    ),
+    "dropped-guards": combine(
+        write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
+        remove_text(".github/workflows/ci.yml", "          - python-guards\n"),
     ),
 }
 
@@ -232,6 +256,13 @@ CASES: tuple[Case, ...] = (
         "FAIL shard-result: suite: skipped",
     ),
     Case(
+        "tests-aggregate-dropped-guards",
+        "tests-matrix-dropped",
+        AGGREGATE,
+        "dropped-guards",
+        "FAIL matrix-missing: python-guards",
+    ),
+    Case(
         "secrets-token-in-history",
         "secrets",
         SCAN,
@@ -255,5 +286,6 @@ CLASSES = (
     "tests",
     "tests-shard-failed",
     "tests-shard-skipped",
+    "tests-matrix-dropped",
     "secrets",
 )
