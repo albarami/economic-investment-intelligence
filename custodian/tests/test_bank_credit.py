@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
 from custodian.tests.repository_root import repository_root
 from custodian.tests.singles_entries import bank_credit_entry
+from hypothesis import example, given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.singles.bank_credit import (
     CreditError,
@@ -76,6 +79,56 @@ def test_modified_date_does_not_extend_the_period() -> None:
     )
     assert first == "2012-01-01"
     assert last == "2022-01-01"
+
+
+@pytest.mark.parametrize("value", ["0", "0.01", "25.5", "25.50", "1E+2"])
+def test_decimal_credit_is_exact_cents(value: str) -> None:
+    (row,) = parse_bank_credit((_row(value=Decimal(value)),))
+    assert Fraction(row.value) == Fraction(Decimal(value))
+    assert row.value.as_tuple().exponent == -2
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        Decimal("25.555"),
+        Decimal("25.500"),
+        Decimal("-1.5"),
+        Decimal("-0.00"),
+        Decimal("NaN"),
+        Decimal("sNaN"),
+        Decimal("Infinity"),
+        Decimal("-Infinity"),
+        25.5,
+        True,
+    ],
+)
+def test_invalid_credit_value_has_the_closed_reason(value: object) -> None:
+    with pytest.raises(CreditError, match=r"^value$"):
+        parse_bank_credit((_row(value=value),))
+
+
+@given(
+    coefficient=st.integers(-(10**18 - 1), 10**18 - 1),
+    exponent=st.integers(-6, 2),
+)
+@example(coefficient=0, exponent=-2)
+@example(coefficient=1, exponent=-2)
+@example(coefficient=10**18 - 1, exponent=-2)
+@example(coefficient=-15, exponent=-1)
+@example(coefficient=25555, exponent=-3)
+def test_decimal_credit_matches_a_rational_oracle(
+    coefficient: int, exponent: int
+) -> None:
+    # All decimal(18,2) contract values, plus signs and excessive scales.
+    value = Decimal(f"{coefficient}e{exponent}")
+    if coefficient < 0 or exponent < -2:
+        with pytest.raises(CreditError, match=r"^value$"):
+            parse_bank_credit((_row(value=value),))
+    else:
+        (row,) = parse_bank_credit((_row(value=value),))
+        assert Fraction(row.value) == Fraction(coefficient) * Fraction(10) ** exponent
+        assert row.value.as_tuple().exponent == -2
 
 
 def test_unexpected_shape_loads_nothing() -> None:
