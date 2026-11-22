@@ -24,6 +24,7 @@ from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sid
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.layers import SCHEMAS
 from eii_custodian.publicdata.places.fetch import FILE_KEYS
+from eii_custodian.publicdata.places.read import SCHEMA_PYSPARK
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
 from eii_custodian.publicdata.series.figures import METHOD, VERSION
 from eii_custodian.publicdata.series.section10 import produce, pub73
@@ -367,7 +368,9 @@ def places_file(
     addresses: str = f"{ADDRESS}[]",
     columns: str = "id, bbox, addresses",
     qa_rows: int = 0,
+    schema: str | None = SCHEMA_PYSPARK,
 ) -> Path:
+    """Write invented rows; ``schema`` is the file's places schema version."""
     connection = duckdb.connect()
     connection.execute(
         f"CREATE TABLE t (id VARCHAR, bbox {bbox}, addresses {addresses})"
@@ -380,7 +383,14 @@ def places_file(
             "INSERT INTO t SELECT 'invented', ?, [?] FROM range(?)",
             [INSIDE, address("QA"), qa_rows],
         )
-    connection.execute(f"COPY (SELECT {columns} FROM t) TO '{path}' (FORMAT parquet)")
+    copy = f"COPY (SELECT {columns} FROM t) TO ? (FORMAT parquet"
+    if schema is None:
+        connection.execute(copy + ")", [str(path)])
+    else:
+        versions = json.dumps({"overture-schema-pyspark": schema})
+        connection.execute(
+            copy + ", KV_METADATA {schema_versions: ?})", [str(path), versions]
+        )
     connection.close()
     return path
 
@@ -437,59 +447,63 @@ def test_pub73_counts_in_box_qa_records(
     assert places_count(path) == counted
 
 
+# Each malformed places file and its closed reason; every other input is valid.
+MALFORMED = [
+    ({"columns": "id, addresses"}, "places_column_missing"),
+    ({"columns": "id, bbox"}, "places_column_missing"),
+    (
+        {"bbox": "STRUCT(xmin DOUBLE, xmax DOUBLE, ymin DOUBLE)"},
+        "places_bbox_invalid",
+    ),
+    (
+        {"bbox": "STRUCT(xmin INTEGER, xmax DOUBLE, ymin DOUBLE, ymax DOUBLE)"},
+        "places_bbox_invalid",
+    ),
+    ({"rows": [(None, [address("QA")])]}, "places_bbox_invalid"),
+    (
+        {"addresses": "VARCHAR", "rows": [(INSIDE, "QA")]},
+        "places_addresses_invalid",
+    ),
+    (
+        {"addresses": "VARCHAR[]", "rows": [(INSIDE, ["QA"])]},
+        "places_addresses_invalid",
+    ),
+    (
+        {
+            "addresses": "STRUCT(freeform VARCHAR)[]",
+            "rows": [(INSIDE, [{"freeform": "invented"}])],
+        },
+        "places_addresses_invalid",
+    ),
+    (
+        {
+            "addresses": "STRUCT(country INTEGER)[]",
+            "rows": [(INSIDE, [{"country": 1}])],
+        },
+        "places_addresses_invalid",
+    ),
+    ({"schema": None}, "places_schema_invalid"),
+    ({"schema": "1.0.0"}, "places_schema_invalid"),
+    ({"not_parquet": True}, "places_parquet_invalid"),
+]
+
+
+def malformed_file(path: Path, change: dict[str, object]) -> Path:
+    change = dict(change)
+    if change.pop("not_parquet", False):
+        path.write_bytes(b"invented, not parquet")
+        return path
+    rows = change.pop("rows", [(INSIDE, [address("QA")])])
+    return places_file(path, rows, **change)  # type: ignore[arg-type]
+
+
 @pytest.mark.public_data
-@pytest.mark.parametrize(
-    ("change", "reason"),
-    [
-        ({"columns": "id, addresses"}, "places_column_missing"),
-        ({"columns": "id, bbox"}, "places_column_missing"),
-        (
-            {"bbox": "STRUCT(xmin DOUBLE, xmax DOUBLE, ymin DOUBLE)"},
-            "places_bbox_invalid",
-        ),
-        (
-            {"bbox": "STRUCT(xmin INTEGER, xmax DOUBLE, ymin DOUBLE, ymax DOUBLE)"},
-            "places_bbox_invalid",
-        ),
-        ({"rows": [(None, [address("QA")])]}, "places_bbox_invalid"),
-        (
-            {"addresses": "VARCHAR", "rows": [(INSIDE, "QA")]},
-            "places_addresses_invalid",
-        ),
-        (
-            {"addresses": "VARCHAR[]", "rows": [(INSIDE, ["QA"])]},
-            "places_addresses_invalid",
-        ),
-        (
-            {
-                "addresses": "STRUCT(freeform VARCHAR)[]",
-                "rows": [(INSIDE, [{"freeform": "invented"}])],
-            },
-            "places_addresses_invalid",
-        ),
-        (
-            {
-                "addresses": "STRUCT(country INTEGER)[]",
-                "rows": [(INSIDE, [{"country": 1}])],
-            },
-            "places_addresses_invalid",
-        ),
-    ],
-)
+@pytest.mark.parametrize(("change", "reason"), MALFORMED)
 def test_pub73_refuses_another_shape_by_name(
     tmp_path: Path, change: dict[str, object], reason: str
 ) -> None:
-    rows = change.pop("rows", [(INSIDE, [address("QA")])])
-    path = places_file(tmp_path / "places.parquet", rows, **change)  # type: ignore[arg-type]
+    path = malformed_file(tmp_path / "places.parquet", change)
     with pytest.raises(ValueError, match=f"^{reason}$"):
-        places_count(path)
-
-
-@pytest.mark.public_data
-def test_pub73_refuses_a_file_that_is_not_parquet(tmp_path: Path) -> None:
-    path = tmp_path / "places.parquet"
-    path.write_bytes(b"invented, not parquet")
-    with pytest.raises(ValueError, match=r"^places_parquet_invalid$"):
         places_count(path)
 
 
@@ -501,7 +515,10 @@ def test_pub73_establishments_come_from_the_frame_reader(tmp_path: Path) -> None
     assert values == {"places_qa": "1", "establishments_2020": "42"}
 
 
-def write_places(cache: Path, path: Path, key: str = PLACES_KEY) -> str:
+def write_places(
+    cache: Path, path: Path, key: str = PLACES_KEY, **changes: object
+) -> str:
+    """Commit the file under the places key; ``changes`` edit its receipt only."""
     entry = ENTRIES[key]
     body = path.read_bytes()
     digest = sha256_hex(body)
@@ -517,11 +534,13 @@ def write_places(cache: Path, path: Path, key: str = PLACES_KEY) -> str:
         row_count=0,
         terms_sha256="",
     )
-    commit_pair(cache / PLACES_KEY, digest, "parquet", body, receipt)
+    commit_pair(cache / PLACES_KEY, digest, "parquet", body, {**receipt, **changes})
     return digest
 
 
-def anchored_inputs(cache: Path, tmp_path: Path, places_key: str = PLACES_KEY):
+def anchored_inputs(
+    cache: Path, tmp_path: Path, places_key: str = PLACES_KEY, **receipt: object
+):
     """Invented rows that reproduce PUB-73's committed open anchors."""
     anchors = EXPECTED["PUB-73"]
     outside = {**INSIDE, "xmax": BOX.east + 1}
@@ -532,7 +551,7 @@ def anchored_inputs(cache: Path, tmp_path: Path, places_key: str = PLACES_KEY):
     )
     total = int(anchors["establishments_2020"])
     return {
-        PLACES_KEY: write_places(cache, path, places_key),
+        PLACES_KEY: write_places(cache, path, places_key, **receipt),
         "est_census": _write_cached_source(
             cache, "est_census", census_rows(total - 1, 1)
         ),
@@ -581,6 +600,33 @@ def test_pub73_receipt_of_another_key_refuses(tmp_path: Path) -> None:
     with pytest.raises(AssemblyError, match=INPUT_REFUSED):
         build.section10()
     assert not (cache / "series/regression/PUB-73.json").exists()
+
+
+@pytest.mark.public_data
+def test_pub73_receipt_of_another_source_refuses(tmp_path: Path) -> None:
+    """Key, snapshot and every other input valid; only the source differs."""
+    cache = tmp_path / "cache"
+    build = production(cache)
+    build.selected.update(anchored_inputs(cache, tmp_path, source_id="invented_source"))
+    with pytest.raises(AssemblyError, match=INPUT_REFUSED):
+        build.section10()
+    assert not list((cache / "series/regression").glob("*.json"))
+
+
+@pytest.mark.public_data
+@pytest.mark.parametrize(("change", "reason"), MALFORMED)
+def test_pub73_malformed_file_refuses_at_the_adapter(
+    tmp_path: Path, change: dict[str, object], reason: str
+) -> None:
+    """Valid PUB-71 and PUB-72 inputs; a malformed places file writes nothing."""
+    cache = tmp_path / "cache"
+    build = production(cache)
+    build.selected.update(anchored_inputs(cache, tmp_path))
+    path = malformed_file(tmp_path / "malformed.parquet", change)
+    build.selected[PLACES_KEY] = write_places(cache, path)
+    with pytest.raises(AssemblyError, match=INPUT_REFUSED):
+        build.section10()
+    assert not list((cache / "series/regression").glob("*.json"))
 
 
 @pytest.mark.public_data

@@ -34,7 +34,12 @@ from eii_custodian.publicdata.frame.establishments import establishment_rows
 from eii_custodian.publicdata.frame.layers import layer_rows
 from eii_custodian.publicdata.frame.mapping import POP_MAPPING
 from eii_custodian.publicdata.frame.population import population_rows
-from eii_custodian.publicdata.places.read import _column_names, _connect
+from eii_custodian.publicdata.places import PlacesError
+from eii_custodian.publicdata.places.read import (
+    _column_names,
+    _connect,
+    _require_schema,
+)
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
 
 from .figures import CHAIN_FIELDS, METHOD, VERSION, _write, validate_figure
@@ -167,11 +172,18 @@ def _countries(addresses: object) -> list[str | None]:
 def place_records(
     path: Path,
 ) -> Iterator[tuple[tuple[float, float, float, float], list[str | None]]]:
-    """``bbox`` and address countries of each row of a receipt-proven file."""
+    """``bbox`` and address countries of each row of a receipt-proven file.
+
+    The file's places schema version is admitted as every places reader admits it.
+    """
     import duckdb
 
     connection = _connect()
     try:
+        try:
+            _require_schema(connection, path)
+        except PlacesError:
+            raise ValueError("places_schema_invalid") from None
         if not {"bbox", "addresses"} <= _column_names(connection, path):
             raise ValueError("places_column_missing")
         cursor = connection.execute(
