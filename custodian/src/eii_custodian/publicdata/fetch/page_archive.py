@@ -11,6 +11,14 @@ from pathlib import Path
 from .snapshots import SnapshotError
 
 
+def verify_source_directory(destination: Path) -> None:
+    """Refuse source links before acquisition reads or writes outside staging."""
+    if destination.is_symlink() or (
+        destination.exists() and any(p.is_symlink() for p in destination.rglob("*"))
+    ):
+        raise SnapshotError("snapshot_path_invalid")
+
+
 @contextmanager
 def staged_source(cache: Path, key: str) -> Iterator[Path]:
     """Validate/write in a private copy; restore the previous source on failure.
@@ -21,8 +29,7 @@ def staged_source(cache: Path, key: str) -> Iterator[Path]:
     source tree becomes visible. This is a single-writer build seam.
     """
     destination = cache / key
-    if destination.exists() and any(p.is_symlink() for p in destination.rglob("*")):
-        raise SnapshotError("snapshot_path_invalid")
+    verify_source_directory(destination)
     cache.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".page-stage-", dir=cache) as folder:
         stage = Path(folder) / "cache"

@@ -1134,6 +1134,18 @@ publication and explicit selection are specified in document 03, **S2-T29 cached
 page and awards contracts**. The field-limited school query never requests
 contact or capacity fields; source terms never relax that restriction.
 
+S2-P46 separates award proof acquisition from source publication under
+[proposed decision 0089](decisions/0089-award-proof-acquisition-and-offline-replay.md)
+items 1 to 6. Each exact URL has an independently verified immutable dated
+acquisition receipt under `proof_store`; only its operational selection is
+mutable. Missing receipts or changed bytes invalidate that link alone and a live
+read creates a fresh archive without overwriting the old one. Shape/comparison
+changes reuse bytes after rehashing and rerun all checks. Closed shape refusals
+continue through the frame, survive in a `proof_checks` receipt and still block
+publication. The declaration's `max_readers` is an integer one through four,
+currently four; a transport refusal reduces the remaining run to one, recorded
+in the receipt. Offline replay has no transport and refuses a missing proof.
+
 S2-T27's local archive extends this cache. An immutable `index/<identity>.json`
 records source id, entry key, retrieval UTC, byte size, body SHA-256, extension,
 relative body and receipt paths, receipt SHA-256 and publisher modification/version

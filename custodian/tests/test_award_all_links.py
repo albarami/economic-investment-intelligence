@@ -341,15 +341,16 @@ def test_awards_publication_refuses_a_planted_skipped_link(tmp_path, monkeypatch
     entry, _, proof = intake(tmp_path, monkeypatch)
     original = awards.check_all_awards
 
-    def skipped(rows, schema, reader):
+    def skipped(rows, schema, reader, **kwargs):
         # Skip a unique link while preserving the duplicate and blank tail.
-        return original(rows[1:-2], schema, reader)
+        return original(rows[1:-2], schema, reader, **kwargs)
 
     monkeypatch.setattr(awards, "check_all_awards", skipped)
     outcome = run_build((entry,), proof, tmp_path, lambda: STAMP, lambda _: None)
     assert outcome.failure is not None
     assert outcome.failure.check == "award_links_metadata_missing"
-    assert not (tmp_path / entry.key).exists()
+    assert not (tmp_path / entry.key / "index").exists()
+    assert (tmp_path / entry.key / "proof_store").is_dir()
 
 
 def test_awards_publication_rejects_invalid_seed_before_any_proof_read(
@@ -453,7 +454,7 @@ def test_awards_all_link_failure_uses_closed_reasons_only(reason):
     assert "SYN-private-error" not in str(check)
 
 
-@pytest.mark.parametrize("error", ["pin", "snapshot", "host", "schema"])
+@pytest.mark.parametrize("error", ["pin", "snapshot", "host"])
 def test_awards_all_link_check_never_converts_hard_refusals_to_fetch_failures(error):
     from eii_custodian.publicdata.fetch.certificate_pins import PinError
     from eii_custodian.publicdata.fetch.snapshots import SnapshotError
