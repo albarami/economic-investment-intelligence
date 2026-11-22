@@ -482,6 +482,7 @@ def test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch(
         "Company name": "SYN Company",
         "Commercial Registration Number": "SYN-reg",
         "Approved Value": "12.50",
+        "Approved Value Number": "12.5",
     }
     ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     rel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -500,9 +501,15 @@ def test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch(
             (1, schema["columns"]),
             (2, [values.get(c, "") for c in schema["columns"]]),
         ):
+            # the real sheet stores 'Approved Value Number' (H) as formula cells
+            # with cached values; every other cell is plain text
             cells_xml = "".join(
-                f'<c r="{chr(65 + i)}{number}" t="inlineStr"><is><t>{value}</t></is></c>'
-                for i, value in enumerate(cells)
+                f'<c r="H{number}"><f>VALUE(G{number})</f><v>{value}</v></c>'
+                if number > 1 and column == "Approved Value Number"
+                else f'<c r="{chr(65 + i)}{number}" t="inlineStr"><is><t>{value}</t></is></c>'
+                for i, (column, value) in enumerate(
+                    zip(schema["columns"], cells, strict=True)
+                )
             )
             xml_rows.append(f'<row r="{number}">{cells_xml}</row>')
         z.writestr(
@@ -510,6 +517,8 @@ def test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch(
             f'<worksheet xmlns="{ns}"><sheetData>{"".join(xml_rows)}</sheetData></worksheet>',
         )
     body = stream.getvalue()
+    with ZipFile(io.BytesIO(body)) as z:
+        assert b"<f>VALUE(G2)</f><v>12.5</v>" in z.read("xl/worksheets/syn.xml")
     intake(tmp_path, body)
     proof_dec, proof_body = report()
     for old, new in zip(

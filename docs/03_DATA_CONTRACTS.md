@@ -1130,7 +1130,7 @@ remaining live-evidence and independent-review limits.
 `data/public_cache/intake/awards_owner_scrape/`. Its reviewed aggregate profile
 names the original columns and their string/integer/number types, format, sheet and company,
 registration, value and date columns; no real profile or row is committed here.
-CSV and OOXML cells are supported; formulas and unknown structures refuse.
+CSV and OOXML cells are supported; a formula cell is read by its cached value and one without a cached value refuses; unknown structures refuse.
 Aggregate-profile row and dated-row counts remain leads; measured counts always
 come from the admitted bytes. The intake manifest names `file`, `sha256`, `seed`
 and `register_selections`. Each register selection names an archived public
