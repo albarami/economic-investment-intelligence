@@ -43700,6 +43700,407 @@ Seed:      1339069367
 Notes:     Runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
 ```
 
+# Closing record: S2-P42 (pull request 115), carried in the S2-14 train ledger
+
+Task: S2-P42 — award workbook formula cells read by their cached value (slice S2).
+
+- Merge: pull request 115, code commit `1dd1a9f3`, merged as main `cddc9664` (parent `6f40a51a`).
+- Change: `awards._xlsx` reads the intake sheet with `cached_formulas=True`; a formula cell with no cached value, or an empty one, still refuses. Six files: the awards caller, two test files, documents 03 and 04, and PROGRESS.md.
+- Verdict: REJECTED on one records-only finding, so the verdict stands for the `1dd1a9f3` code (standing rule: a records-only finding never rejects). Reviewer: Moonshot Kimi K3.1 Pro rv1, via Abacus (exact model identifier not exposed by the tool). Every behaviour check passed; its own plant (drop `cached_formulas=True`) gave 8 failed, 6 passed, restored byte-identical, 14 passed.
+- Finding F1 (records-only, PROGRESS.md): the S2-P42 PROGRESS row cites a 20-file importer command that names two files absent at that commit (`test_award_links.py`, `test_page_workbook.py`), which exits 4 before collection. Its recorded 20-file result of 857 passed is therefore not reproducible from that command.
+- Correction row (append to PROGRESS.md; the earlier row stays unchanged, rule 38): on code commit `1dd1a9f3ca4fac65556c2bc827820a607911996f` the reviewer's own 21-file command, run from the repository root with `UV_OFFLINE=1 EII_DECISION_PROVIDER=none`, was:
+  `uv run --locked python -m pytest custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_awards_incremental.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_transport.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_tenders.py custodian/tests/test_tender_chain.py custodian/tests/test_page_workbook_survivors_1.py custodian/tests/test_page_workbook_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_assembly_tenders.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_pinned_c8.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py -q -p no:cacheprovider`
+  Result: exit 0; 961 passed, 0 failed, 0 skipped, one earlier duplicate-ZIP warning. `python3 scripts/check_docs.py` then exits 0.
+- Hosted checks: the six required checks were green on the merged head.
+- Lead's whole test on the merge result: 14540 passed, 0 failed, seed 1230558132, result PASSED, exit 0 (main was unchanged at `6f40a51a`, so the head tree was the merge result).
+- Other reviewer checks (all exit 0): ruff check and format check on the three Python files, mypy over 491 source files, check_docs, check_tree, `cmp AGENTS.md CLAUDE.md`.
+- Code practice (reviewer): added/removed lines PROGRESS.md 4/0, awards.py 6/2, test_awards_incremental.py 11/2, test_s2_p42_awards_formulas.py 137/0, docs/03 1/1, docs/04 1/1; longest new function the test helper `book()`, 30 lines; no copied block flagged.
+- Proposed open items from the reviewer: none.
+
+Proposed TASKS.md line (task section to be confirmed by the lead; proposed S2-T29, the source `awards_owner_scrape`, see gaps.json G05):
+`- S2-P42 award intake (2026-11-22): the owner's award workbook stores its approved-value column as formula cells with cached values; the awards caller now reads them by their cached value, and a formula without one still refuses. Merged in pull request 115 as main cddc9664 after another maker's review (F1 records-only, corrected by an appended PROGRESS row). Invented-input tests only; no live result and no acceptance box is ticked.`
+
+# Merge train S2-14 — ledger inputs
+
+Maker: Anthropic. Model: Sonnet 5.5 (Claude Code), adapting the S2-13 preparation script.
+Persona: senior release-records engineer; strict self-review persona: a train confirmer who checks every hash and count against git.
+Skills: project-orientation, task-standards, sanad-provenance, verification-before-completion and muhasabah-gate, applied as read-only checks within the brief's limits. No test, ledger, network or Git write runs during preparation.
+
+BASE `cddc966481a257ccab1fc4ad1a0654bf047dc07b` (main, after S2-P42); WORK `d3627f471fc5b175b8f29edcc2016f9f5899ef75`; pull request 116. The train's merge-base path is `6f40a51a`, then nine linear commits, then the records-only merge `d3627f47` of main `cddc9664`. PR and seed are runtime inputs. Evidence paths resolve under `.overnight/IN/`. Full hashes are in `commits.json` and `identity-proof.json`.
+
+## Pre: closing record of S2-P42 (pull request 115)
+
+See `pre-S2-P42.md`. Merged as main `cddc9664` at `1dd1a9f3`; Moonshot Kimi K3.1 Pro (rv1) one finding F1, records-only (the PROGRESS row cites a 20-file importer command naming two files absent at that commit; the reviewer's own 21-file run: 961 passed, exit 0), so the verdict stands; the correction row states the 21-file command; six hosted checks green; the lead's whole test on the merge result 14540 passed, 0 failed, seed 1230558132. The S2-P42 TASKS.md line is proposed there (gap G05).
+
+## S2-P40 — tender fresh-fetch review binding (proposed decision 0083)
+
+Approved on its own commit `61db1b08` by another maker. Its four train commits (picks) and the approved own changes they carry:
+
+| Approved own change | Train commit |
+|---|---|
+| `83612fbe` | `dfc65b23` |
+| `700d69bb` | `181f5446` |
+| `5db65592` | `1db5b5a6` |
+| `61db1b08` | `57f961d6` |
+
+- The receipt of a fresh tender fetch is bound to its registry row (key, URL, host), to the review's publisher, licence basis, decision record, periods and tables, and to the run's raw terms hash; a resumed receipt is keyed to this run's terms; reviewed page and terms URLs must share the registered HTTPS origin and carry no user-info, query, fragment, backslash, control or non-ASCII netloc; casefold-equivalent non-ASCII host cases reach their own netloc checks.
+- Builder OpenAI GPT-6 (Codex); reviews by other makers: cf1 Anthropic Claude Opus 5.5 REJECTED `700d69bb`; cf2b Zhipu GLM-5.3 CONFIRMED `700d69bb`; cf3 Anthropic Claude Opus 5.5 REJECTED `5db65592`; cf4 Anthropic Claude Opus 5.5 APPROVED `61db1b08`. The task's own PROGRESS rows and open items travel in the train.
+- Offline invented-input tests only; no live tender fetch; no box ticked.
+
+## S2-TSEP — tender own run and pinned pick-up (decision 0084)
+
+Approved on its own commit `776a2e40` by another maker. Train commits: `6d5db3d1` (from `a9605ceb`), `1b121f14` (from `e3ecacb2`), `eae3c904` (from `776a2e40`).
+
+- `./eii build-public --tenders-only [--resume]` runs the single tender entry in its own cache, journal and log; the ordinary run makes no list or terms request for it and the main assembly picks up only a pinned, rehashed, receipt- and intake-bound archive; a missing pin gives one `own_run_pending` row with its caveat. Round 2 keeps own-run failures named, binds the archive terms to the reviewed visible text, and refuses a foreign pending archive; the last commit records the visible-text terms hash in the confirmation.
+- Builders OpenAI GPT-6 (Codex, rounds 1 and 2) and xAI Grok 4.7 (round 3); reviews by other makers: cr1 Zhipu GLM-5.3 APPROVED `3607ca74`; cr2 Moonshot Kimi K3.1 REJECTED `3607ca74`; cf1 Zhipu GLM-5.3 APPROVED `e3ecacb2`; cf3 Moonshot Kimi K3.1 APPROVED `776a2e40` (no finding). The live handoff and pick-up stay with OI-370.
+
+## Join repairs and ruling L-1420
+
+- `b01545d7` (join repair): the fingerprint resume (S2-P39) no longer refuses a version-2 head change inside `RunRecord`; the own-run resume still names `resume_head_mismatch`; the tender assembly imports stay outside the fetch-loop machinery; a tender-named row that is not the registered key stays on the ordinary skip.
+- `a3f1d2d0` (ruling L-1420): the join had narrowed the approved changed-row refusal. The two `run_build` conditions are restored from the approved `776a2e40`, and the ordinary fingerprint resume skips the registered tender row (the fingerprint resume test now uses the registered tender row). Files: `fetch/build.py`, `test_fetch_fingerprint.py` and one PROGRESS row; no new function, no copied block.
+- `d3627f47`: the records-only merge of main `cddc9664` (S2-P42) into the train; PROGRESS.md records kept from both sides.
+- Join-repair maker and model: xAI Grok 4.7 via Cursor (join rounds 1 and 2); the lead (Anthropic Claude Opus 5.5) wrote ruling L-1420 and the merge `d3627f47`.
+
+## Train confirmation CF1 — CONFIRMED for `d3627f47`
+
+Confirmer: Zhipu GLM-5.3 via Droid, another maker than the join builder (xAI) and the lead (Anthropic). Its five checks all PASS: (1) the train holds exactly the 11 commits; (2) the repairs keep `776a2e40`'s two `run_build` conditions byte-identical and narrow no guard; (3) three plants red (exit 1) and green after `cmp` restore; (4) five test files 569 passed, exit 0; ruff and mypy exit 0; AGENTS/CLAUDE parity; (5) `d3627f47` changes only main's S2-P42 files and keeps every PROGRESS line of both parents. Findings, all non-rejecting: (1) records-only, a fused S2-T14 heading in TASKS.md at `dfc65b23`, restored by the TSEP commit; (2) records-only, the `docs/README.md` 0084 index row joins two summaries in one cell, both preserved; (3) cosmetic, a dead guard in `assembly_adapters.py` at `dfc65b23`, absent from the head; (4) `OWN_RUN_EXCLUDED_SCOPES` has no honesty test (OI-384).
+
+Refusal branches of the changed code, each with a one-input negative case asserting the specific reason (all in the extract): `own_run_row_changed` (skip_reason, kind, key and source_id cases), the ordinary `own_run` skip, and `run_tenders_only` journal refusals (`resume_record_invalid`, `resume_seed_mismatch`, `resume_head_mismatch`, `resume_not_interrupted`). CF1 reports the three guard plants red (exit 1) and restored green (exit 0). Code practice of the join repair: PROGRESS.md +1/-0; build.py +9/-1; fingerprint.py +11/-1; test_fetch_fingerprint.py +4/-3; no new function; none copied. CF1's two proposed open items are OI-385 and OI-384 below; the lead's random-failure line is OI-386.
+
+## Identity proof
+
+Sources: `S2-14.identity.p40.txt` and `S2-14.identity.tsep.txt`, written by the lead. `identity-proof.json` recomputes, from git, the ordered added and removed lines of every file of each approved change against its train commit and requires the differing set to equal the lead's lists: S2-P40 nine differing files over four commits (TASKS.md, assembly_adapters.py, confirm_s2_t13.py, docs 04 and 14 at the first; PROGRESS.md and build.py at the second; PROGRESS.md at the third and fourth), S2-TSEP eight over three commits (AGENTS.md, CLAUDE.md, README.md, build.py, docs 14 and the README index at the first; build.py and docs 14 at the second; none at the third); the other files are identical. The lead's proof reports 44 identical file pairs for S2-TSEP. A difference of code or test needs its own confirmation by another maker; CF1 confirms the joined head and the records (CF1 finding 3 covers the one dead guard).
+
+## Open items and boundary
+
+Own items: OI-384, OI-385, OI-386 (`open_items.*.md`). Existing OI-370 and the S2-P40 proposed items (decision 0083 against 0059 item 1, IDN spellings, live terms-body check) stay as they are. This log records supplied evidence and git facts only. It claims no test run, hosted check, whole-suite result or merge; those are the lead's gates. See `gaps.json`.
+
+#### Evidence for the work commit `d3627f471fc5b175b8f29edcc2016f9f5899ef75`
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_assembly_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "35 passed in 3.25s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_pickup_compares_both_awarded_readings_to_main_intake. Source: custodian/tests/test_assembly_tenders.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_awards_incremental.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "61 passed in 1.26s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_activated_workbook_profile_reaches_proof_and_normal_tender_dispatch. Source: custodian/tests/test_awards_incremental.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_build_own_run.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "76 passed in 26.20s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_archive_failure_keeps_journal_interrupted_then_resume_reuses_pages; test_archive_log_failure_keeps_journal_interrupted; test_archive_terms_accepts_matching_body_and_receipt; test_archive_terms_refuses_one_invalid_field; test_changed_tender_row_pin_refuses_before_snapshot; test_changed_tender_row_raw_refuses_before_cache_read; test_changed_tender_row_refuses_before_transport; test_gate_refuses_foreign_pending_evidence; test_handoff_refuses_archive_body_terms_mismatch; test_handoff_refuses_archive_stamp_that_disagrees_with_verified_terms_log; test_handoff_refuses_proofless_main_skip_marker; test_handoff_refuses_unproven_prior_result_and_records_refusal; test_handoff_write_failure_retains_identity_record_and_refetches_on_resume; test_legacy_page_proof_handoff_uses_archive_intake_without_request; test_only_exactly_one_tender_entry_can_enter_own_run; test_ordinary_archive_refuses_unexpected_active_paged_source; test_ordinary_fetch_never_enters_tender_list_or_terms_adapter; test_own_run_cache_relative_path; test_own_run_failure_never_completes_or_overwrites_main; test_own_run_fetches_one_entry_and_keeps_main_journal_separate; test_own_run_log_write_failure_returns_named_refusal; test_own_run_resume_refuses_wrong_journal; test_pending_completeness_and_gate_have_one_absence_no_table; test_pending_is_closed_to_every_other_key; test_pending_reason_is_exact; test_pending_rejects_changed_binding; test_pending_selection_layer_and_gate_without_tender_output; test_pickup_refuses_archive_body_terms_mismatch; test_pinned_archive_never_falls_back_to_another_valid_archive; test_pinned_tender_missing_or_malformed_bytes_never_downgrades; test_present_receipt_and_missing_other_pin_never_become_pending; test_resume_refetches_changed_tender_input; test_tender_identity_is_key_or_source_id; test_tender_identity_named_by_either_field; test_verified_handoff_keeps_identity_date_terms_and_avoids_request. Source: custodian/tests/test_build_own_run.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_build_resume.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "82 passed in 27.54s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_paged_archive_retains_original_retrieval_time. Source: custodian/tests/test_build_resume.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_company_web_revision.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "104 passed in 5.61s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_trailing_dot_website_keeps_earlier_admission. Source: custodian/tests/test_company_web_revision.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_fetch_fingerprint.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "184 passed in 9.47s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_ordinary_resume_skips_the_tender_row. Source: custodian/tests/test_fetch_fingerprint.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_gate_records_survivors_tender.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "9 passed in 0.05s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_tender_failed_validation_is_false_and_preserves_only_supplied_metadata. Source: custodian/tests/test_gate_records_survivors_tender.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_p42_awards_formulas.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "13 passed in 1.57s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_cached_formula_value_is_read_as_stored; test_cached_value_equals_plain_cell_value; test_formula_in_another_column_is_read_by_cached_value; test_formula_without_cached_value_refuses; test_plain_blank_cell_stays_blank_never_zero. Source: custodian/tests/test_s2_p42_awards_formulas.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_s2_t29_transport.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "51 passed in 3.98s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_build_public_own_run_tender_dispatch. Source: custodian/tests/test_s2_t29_transport.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_tender_review_binding.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "92 passed in 6.60s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (A); anchors (changed test functions including decorators): test_adapter_uses_this_run_terms_for_both_archive_paths; test_attribute_token_does_not_change_visible_terms_hash; test_changed_terms_on_resume_gets_new_receipt; test_changed_visible_word_refuses_review; test_committed_review_accepts_fresh_archive; test_committed_terms_hash_names_visible_text; test_each_host_and_key_guard_has_a_single_field_plant; test_equivalent_hostname_forms_are_accepted; test_every_malformed_sha_is_refused; test_host_of_malformed_netloc_returns_empty; test_missing_or_non_utc_retrieval_refused; test_missing_tender_terms_has_named_build_refusal; test_own_run_visible_text_reaches_completion_evidence; test_raw_digest_confirmation_refuses_terms_authentication; test_real_terms_snapshot_single_field_plants; test_receipt_substitutions_refused; test_registry_substitutions_refused; test_reviewed_endpoint_must_be_same_safe_origin; test_reviewed_origin_component_oracle; test_reviewed_origin_valid_spelling_controls; test_reviewed_page_origin_oracle; test_run_terms_record_must_be_unique_and_bound; test_sha_boundaries_refused; test_split_whitespace_keeps_distinct_raw_snapshots_and_immutable_archive; test_terms_read_carries_its_raw_body_hash; test_terms_row_order_does_not_change_unique_selection. Source: custodian/tests/test_tender_review_binding.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest custodian/tests/test_tenders.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "68 passed in 0.84s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_confirmation_block_records_the_visitor_portal. Source: custodian/tests/test_tenders.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_commands.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    8 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_usage_lists_every_command. Source: scripts/tests/test_commands.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m pytest scripts/tests/test_public_assembly_command.py -q -p no:cacheprovider
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "24 passed in 1.73s" (Full pytest passed summary; failed/error/skip/xfail/deselected summaries refused.)
+Seed:      none
+Notes:     Changed test file (M); anchors (changed test functions including decorators): test_invalid_seed_has_no_reads_or_connections; test_tenders_command_selects_exact_key_before_own_run; test_usage_shows_effective_public_draw_seed. Source: scripts/tests/test_public_assembly_command.py at WORK d3627f471fc5b175b8f29edcc2016f9f5899ef75. Counts and exits owed to lead execution; AST is not a case count. Top-level pytest functions; unittest would collect none.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked ruff check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked ruff format --check .
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "923 files already formatted"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked mypy
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "Success: no issues found in 491 source files"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   python3 scripts/check_docs.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 1250 text files, 139 Markdown files: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   python3 scripts/check_tree.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 8 rules: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python scripts/check_versions.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 70 components: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python scripts/check_reference_notes.py
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "checked 2 files, 6 libraries, 367 rows: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv lock --check
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   cmp AGENTS.md CLAUDE.md
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     Rule 2; byte parity, exit owed.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python scripts/sandbox_check.py check-enforcement
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "sandbox enforcement: OK"
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation. No fallback.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    982 passed, 0 failed, 0 skipped
+Seed:      none
+Notes:     Lead ledger command at WORK; no result claimed by preparation. No guessed expect count.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   python3 -I -c "import subprocess,sys; g=sorted(l.replace(chr(9),':') for l in subprocess.run(['git','diff','--name-status','--no-renames','cddc966481a257ccab1fc4ad1a0654bf047dc07b...d3627f471fc5b175b8f29edcc2016f9f5899ef75'],check=True,capture_output=True,text=True).stdout.splitlines()); w='A:custodian/tests/test_tender_review_binding.py A:docs/decisions/0083-tender-review-binding-for-fresh-fetches.md M:AGENTS.md M:CLAUDE.md M:OPEN_ITEMS.md M:PROGRESS.md M:README.md M:TASKS.md M:custodian/publicdata/review/s2_t13_confirmation.yaml M:custodian/src/eii_custodian/publicdata/assembly_adapters.py M:custodian/src/eii_custodian/publicdata/assembly_reports.py M:custodian/src/eii_custodian/publicdata/assembly_tenders.py M:custodian/src/eii_custodian/publicdata/company_web/contracts.py M:custodian/src/eii_custodian/publicdata/confirm_s2_t13.py M:custodian/src/eii_custodian/publicdata/fetch/allowlist.py M:custodian/src/eii_custodian/publicdata/fetch/build.py M:custodian/src/eii_custodian/publicdata/fetch/fingerprint.py M:custodian/src/eii_custodian/publicdata/fetch/own_run.py M:custodian/src/eii_custodian/publicdata/fetch/resume.py M:custodian/src/eii_custodian/publicdata/gate_report.py M:custodian/tests/test_assembly_tenders.py M:custodian/tests/test_build_own_run.py M:custodian/tests/test_build_resume.py M:custodian/tests/test_company_web_revision.py M:custodian/tests/test_fetch_fingerprint.py M:custodian/tests/test_gate_records_survivors_tender.py M:custodian/tests/test_s2_t29_transport.py M:custodian/tests/test_tenders.py M:docs/02_ARCHITECTURE.md M:docs/03_DATA_CONTRACTS.md M:docs/04_PUBLIC_DATA_PACK.md M:docs/12_TESTING_AND_QUALITY.md M:docs/13_DEPLOYMENT_AND_OPERATIONS.md M:docs/14_IMPLEMENTATION_PLAN.md M:docs/README.md M:docs/decisions/0084-public-tenders-in-a-separate-run.md M:eii M:scripts/commands/build_public.py M:scripts/commands/table.py M:scripts/tests/test_commands.py M:scripts/tests/test_public_assembly_command.py'.split(); print(len(g), [x for x in g if x not in w], [x for x in w if x not in g]); sys.exit(0 if g==w else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; output "41 [] []" (paths changed; not expected; missing)
+Seed:      none
+Notes:     Exact read-only Git BASE..WORK name-status; 41 paths.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   python3 -I -c "import re,subprocess,sys; s=subprocess.run(['git','log','--format=%s','cddc966481a257ccab1fc4ad1a0654bf047dc07b..d3627f471fc5b175b8f29edcc2016f9f5899ef75'],check=True,capture_output=True,text=True).stdout.splitlines(); sys.exit(0 if s and all(re.fullmatch(r'(feat|fix|docs|test|chore|refactor|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: .+',x) for x in s) else 1)"
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    not a test suite; exit code 0
+Seed:      none
+Notes:     10 subjects, originals and linear parents checked against literal inventory.
+```
+
+```text
+### MERGE TRAIN S2-14 — Slice S2: task log
+Commit:    d3627f471fc5b175b8f29edcc2016f9f5899ef75
+Command:   ./eii test --seed 1349005855
+Exit code: 0
+Date:      2026-11-22
+Run by:    lead (local)
+Counts:    14672 passed, 0 failed, 0 skipped
+Seed:      1349005855
+Notes:     Runtime seed. The six hosted checks and the fresh-seed whole test on the exact merge result remain separate lead gates.
+```
+
 ## Open questions and assumptions
 
 - The review files, the briefs and the lead's rulings of 2026-11-11 are project records held by the owner and are not in this repository. This ledger gives their counts and verdicts only.

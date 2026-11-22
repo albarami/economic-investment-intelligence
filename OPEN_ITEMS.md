@@ -3236,6 +3236,41 @@ No existing open item is closed by this input. Sources resolve under `.overnight
 - NEEDED: The tender row's own run must call the resume plan's intake-triple check (`ResumePlan._fingerprint_matches`) and carry F4's changed-triple refetch test through its own-run path without lifting the ordinary skip. Preserve the ordinary-run skip test and the existing intake proof; record the deciding check in S2-TSEP's evidence. OI-370 remains the wider own-run/pick-up item.
 - NEEDED BY: S2-TSEP own-run resume delivery, before the decision 0084 item 6 S7-T09 start check.
 
+New records proposed for merge train S2-14 at WORK `d3627f471fc5b175b8f29edcc2016f9f5899ef75`, pull request 116.
+Sources: the PROPOSED OPEN ITEMS of the train confirmation CF1 (two) and the lead's own open-item line (one), both under `.overnight/IN/`.
+Next free number at the joined HEAD is OI-384; runtime preparation renumbers the whole block if needed.
+No existing open item is closed by this input.
+
+## OI-384 — The exclusion list of the own-run fingerprint has no honesty test
+
+- ID: OI-384
+- TYPE: OPEN (train confirmation proposal, nonblocking)
+- RAISED BY: CF1 of train S2-14, finding 4 and OI proposal 1
+- CONCERNS: `custodian/src/eii_custodian/publicdata/fetch/fingerprint.py`, `OWN_RUN_EXCLUDED_SCOPES`; `custodian/tests/test_fetch_fingerprint.py`
+- EVIDENCE: `EXCLUDED_SCOPES` has an honesty test (the exclusion list is honest); `OWN_RUN_EXCLUDED_SCOPES` has none. CF1 treats it as a flag, not a rejection.
+- NEEDED: add the same guard in a later reviewed change: assert that every name in `OWN_RUN_EXCLUDED_SCOPES` is a function of `fetch/own_run.py` and is not reachable from the ordinary fetch loop's closure. Do not weaken any existing test.
+- NEEDED BY: next edit of the fingerprint or its tests.
+
+## OI-385 — Plant recipe for the assembly-side changed-row pin guard
+
+- ID: OI-385
+- TYPE: OPEN (train confirmation observation, nonblocking)
+- RAISED BY: CF1 of train S2-14, OI proposal 2
+- CONCERNS: `custodian/src/eii_custodian/publicdata/assembly_adapters.py`, `Production.reviewed_selections`, the `OWN_RUN_PIN_REFUSAL` branch; `test_changed_tender_row_pin_refuses_before_snapshot`
+- EVIDENCE: plant (i) of the own-run row guard does not redden that test, because it guards a separate branch.
+- NEEDED: record, in the plant recipes of the next review of this area, that the planted violation for the assembly-side changed-row pin guard neuters the `OWN_RUN_PIN_REFUSAL` branch in `Production.reviewed_selections`. No code change is implied.
+- NEEDED BY: next review that plants the tender own-run guards.
+
+## OI-386 — Random failure under load: scripts/tests process identity (S5-T05 round 2)
+
+- ID: OI-386
+- TYPE: RANDOM FAILURE (a green re-run does not close it, AGENTS.md rule 39)
+- RAISED BY: the lead, 2026-11-22 07:05, from the S5-T05 R2 run and its CF1
+- CONCERNS: `scripts/tests` cases `test_s3_t28_fixn::test_n6` and `test_s3_t28_fix1::test_f4` (through `test_s3_t28_boundaries`); `scripts/operations/process.py`
+- EVIDENCE: both failed with `process_identity_mismatch` under concurrent load and passed when run alone. No cause is recorded yet.
+- NEEDED: find why the process identity check mismatches under concurrent load (systematic debugging; record the load shape and the check's inputs), then fix the code or the test's isolation. Do not retry, skip or loosen the check.
+- NEEDED BY: before the next ledger that depends on these cases.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
