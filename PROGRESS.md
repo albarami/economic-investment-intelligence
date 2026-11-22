@@ -51348,3 +51348,62 @@ S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline e
 | 2026-11-22 | S2-P52 verdict | Head `fa872bacc592cd9d4c77ffd7d297b75f50e39f92` (builder OpenAI gpt-6.1-sol via Codex, rounds 1 to 3, lead records commit). Reviewers: Anthropic Opus 5.5 via Claude Code APPROVED `c15df8ed` (round 1) and confirmed APPROVED `fa872bac` with own plants; Moonshot Kimi K3.1 Pro via Abacus confirmed APPROVED `fa872bac`. Two records-only nits (two docstrings; a test monkeypatches a dict) are recorded and do not reject. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | S2-P57 BT-1 verdict | Head `1299da7a700fc441389ab383c6b646559a1b3650` (builder OpenAI gpt-6.1-sol via Codex). Lens 1 Anthropic Opus 5.5 via Claude Code APPROVED `7f658478` with five nits; lens 2 Moonshot Kimi K3.1 Pro via Abacus APPROVED `7f658478`; the lead took nits F1 to F3 as round 2 (`1299da7a`: the baskets hash binds the parsed bytes; read failures refuse as `assembly_membership_invalid`; the PUB-34 cell restored byte for byte); lens 1 confirmed APPROVED `1299da7a`. Lead verify on `1299da7a`: importer suites 5,800 passed, one environmental data test that needs the real cache; ruff, format, mypy, docs, tree, rule-file identity and diff check exit 0. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | Train join identity | `train/s2-18` on main `154333b5`: join commits `df32b699` (S2-P54), `fac3142f` (S2-P55), `a5a24a1d` (S2-P52), `3481d4be` (S2-P57). The lead's script `train_identity.py` proves, file by file, that each join commit holds exactly its task's own change: 39 files identical, 0 differing; PROGRESS.md and OPEN_ITEMS.md conflicts resolved by appending each task's rows after the new base, in order. | Lead (Anthropic Opus 5.5) |
+
+
+## S2-P66 — Closed award page states, partial pending exact headings (2026-11-22)
+
+| Date | Task | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-T29 / PUB-04; proposed decision 0095 amends decision 0091 item 4 | Base `88aea3ca5bde655a6a0e3fccd84fb8600e4bdd69`; implementation `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`. Closed no-award marker, null empty award date, exact marker forwarding and shared mismatch/receipt counter pass the required awards and direct importer suites: 1,195 tests and 2 subtests, exit 0, seed 6666. All 21 isolated plants give red 1 and restored green 0; the first 19 record byte restoration and the last two restore exactly to the staged source. Ruff, formatter, mypy, documents, staged tree, instruction-byte identity and both working/staged diff checks each exit 0. Production heading text remains missing (PO-S2-P66-01); no completion, real rate, independent approval or replay is claimed. | OpenAI Codex; award-proof engineer; strict self-review: sanad auditor |
+
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+property-based-testing, strict-reviewer and muhasabah-gate. Test-driven-development
+and verification-before-completion use the brief's equivalent rules. Environment:
+prepared pinned Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, Ruff 0.17.4, mypy
+2.4.1; `UV_OFFLINE=1`, `PYTHONHASHSEED=0`, provider unset (default `none`), workspace
+temporary and UV-cache paths. No network, stored source page, `.env`, `.private`
+or repository `data/` read; invented fixture paths only. No database or whole-test
+command. Git delivery uses workspace-local `.overnight/git` because the supplied
+shared metadata is read-only; no shared ref, remote or base branch changed.
+
+The exact required test argv (executed with `UV_OFFLINE=1`, workspace `TMPDIR`
+and `UV_CACHE_DIR`) is:
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6666 -q
+```
+
+Append-only failure record: first unit red run 7 failed / 15 passed (exit 1);
+a strengthened receipt assertion and corrected reader-constructor fixture gave
+8 failed / 14 passed (exit 1) before production edits. The first green run passed
+22 tests (exit 0). The initial broad awards run reported six exact-schema
+assertion failures and 550 passes (exit 1): four expected receipt dictionaries
+needed the newly required zero-valued `proof_award_absent` counter. No assertion
+was removed. The focused schema follow-up passed 111 tests (exit 0). The expanded
+new-state file passed 30 tests before the final counter parameter was added; the
+final required run includes that extra case. A later Ruff check caught an assigned
+lambda (exit 1), replaced by a local function; formatter check then caught its
+blank line (exit 1), and the formatter applied that correction. Final checks are
+green. An overbroad 321-file transitive selection was deliberately cancelled
+(exit 130) to respect the timed brief; its log is retained and supplies no passing
+evidence. The final required selection comprises 30 files. These are recorded
+deterministic development failures/cancellation, not an unexplained random failure.
+
+Exact check commands: `uv run --locked ruff check .`,
+`uv run --locked ruff format --check .`, `uv run --locked mypy`,
+`python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`,
+`cmp AGENTS.md CLAUDE.md`, `git diff --check` and
+`git --git-dir=.overnight/git --work-tree=. diff --cached --check`, each exit 0.
+The staged tree check uses workspace-local Git metadata. Test arguments, raw logs,
+real exits and guard substitutions are in `.overnight/tmp/required-tests-command.json`,
+`required-tests.log`, `required-tests-exit.txt`, `plants.json`, `extra-plants.json`
+and `precommit-checks.json`. The return report lists refusal branches, per-file
+line counts, code-practice evidence and both delivery commits. Different-maker
+review and stored-proof replay remain with the lead.
+
+S2-P66 delivery verification append: the final new-state file passes 31 tests,
+exit 0, seed 6666. After restoring all plants, every required static/check command
+again exits 0; actual argv/exits are in `.overnight/tmp/delivery-checks.json`.
+The implementation remains exactly `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`;
+this follow-up changes only TASKS.md, PROGRESS.md and OPEN_ITEMS.md. The exact
+non-award headings, independent review and lead replay remain pending.

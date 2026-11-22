@@ -6224,3 +6224,20 @@ tracks the split file keys under its existing permission record.
 ## S2-18-RF1 — Hosted timing failure of one section 10 property test (2026-11-22, lead)
 
 Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-11-22 on train S2-18 head `8f75f027a1` failed one test: `custodian/tests/test_assembly_section10.py::test_final_audit_refuses_exactly_a_mismatch_or_an_unrecorded_figure`, with Hypothesis `DeadlineExceeded` (273 ms against the 200 ms default) on the all-absent case. The other 15184 tests passed. Cause: each example runs a full final audit, which parses the 1.2 MB source registry. Locally the runtime is up to 195 ms on a dedicated core, so the test sits at the timer's edge. Disposition: the domain is finite (4 × 3 × 3 = 36 states), so the test now enumerates all of it with `pytest.mark.parametrize` and has no per-example timer. This is exhaustive, so it is a stronger test than a sample, with no assertion change. The same class was handled for the tender tests under PO-S2-P46-03. A green rerun alone did not close this item; it closes when the train merges with the change.
+
+
+## PO-S2-P66-01 — Exact non-award headings and lead replay (2026-11-22)
+
+OPEN. The S2-P66 brief and supplied diagnosis name four tender portal heading
+classes but give none of their exact text. The builder requested the four strings
+and has no reply. Do not infer strings from their translated descriptions or read
+stored pages to fill them. The production awards declaration retains its empty
+`shape.sections` list, so the thirteen diagnosed headed pages are not established
+as recognised by this delivery. Supply the four exact reviewed h3 strings in
+`custodian/publicdata/review/s2_t29_sources.yaml`, retain exact equality, and verify
+them on invented pages before different-maker review. Decision 0095 is Proposed;
+its null-date behavior is tested offline, not claimed as real-cache evidence. The
+lead replays the stored proofs offline after merge; no worker replay occurred.
+S2-T29 and OI-277 remain open. No random failure was introduced; the oversized
+extra test selection was deliberately interrupted (exit 130), not counted as a
+passing run. The required focused selection then passed without retries or skips.
