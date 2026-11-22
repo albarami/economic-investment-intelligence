@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Proposed by task S2-P47; owner acceptance owed |
+| Status | Accepted by the owner, 2026-11-22 |
 | Date | 2026-11-22 |
 | Owner | The owner |
-| Decided by | Not yet decided. Proposed by task S2-P47 under the advisor's ruling of option B(b); the owner accepts it himself |
+| Decided by | The owner, 2026-11-22, accepting it as proposed by task S2-P47 under the advisor's ruling of option B(b) |
 | Amends | [Decision 0077](0077-overture-footprints-as-the-national-building-table.md) item 2, the sentence "National boundary bounds must fit the PUB-17 frame box"; document 04 PUB-17 |
 | Purpose | Admit the reviewed islets wholly outside the frame box without moving the box, and state the required building part set as a rule over the STAC items. |
 | Read first | Decision 0077; document 04 PUB-17; the S2-P47 records in PROGRESS.md and OPEN_ITEMS.md |
@@ -91,5 +91,12 @@ Item 00288 lies south of the boundary.
 The builder's tests use invented boundaries and fixtures only. The real review
 file is written by the lead from the real cache with the shared helper and
 committed after review; until then a real build with outside parts refuses
-`national_boundary_outside_frame_box`. This record claims neither owner
-acceptance nor live national coverage.
+`national_boundary_outside_frame_box`. This record claims no live national
+coverage.
+
+## Acceptance
+
+On 2026-11-22 the owner, asked what waited on him, answered of this record
+as written: "I accept". The acceptance is recorded after the merge of the
+pull request that carried the record, as the next records change; no rule,
+check, test or bound changes with it.

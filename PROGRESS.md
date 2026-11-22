@@ -51236,3 +51236,11 @@ Additional F4 preservation proof: a read-only Git script compares each original 
 | Date | Round | Actual execution evidence | By |
 |---|---|---|---|
 | 2026-11-22 | S2-GATE-R7 on `375a49c165bf9dba03a838581985dfa93228ba13` | Different-maker review S2-gate.r6rv (Zhipu GLM-5.3 via Droid): APPROVED `375a49c1`, S2-T35 box 2 wording EXACT; its records-only notes answered in OPEN_ITEMS round 7. Lead's shell: `python3 -I s2t35_value_guard.py` on the reviewed tree exit 0 (scanned 4788 files, value forms 8, files with copies 2, baseline files 3, RESULT PASS); planted new copy in a new tracked document exit 1 (RESULT REFUSED). PO-S2-51 lead replay cited: `test_pinned_methods.py` 10 passed exit 0 at `a3eed2d2`. `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check` exits recorded in the lead's log. No slice-gate approval is claimed. | lead (Anthropic Opus 5.5) |
+
+## Train S2-17 records — 2026-11-22
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | Train S2-16 merge (post-approval evidence) | Pull request 122 merged at its approved head `65b3b075221c9200c219d0a0f626871db93bf7b4` as main `e7edf546135657e09bfa0497822d216e8572bf71`; the six required hosted checks were green on that head. The lead's whole test on that head, which has the same tree as the merge result (its base was the previous main), ran `./eii test --seed 1497961714`: exit 0, 15049 passed, 0 failed, 0 skipped, 8 suites. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | Decision 0090 acceptance | The owner accepted decision 0090 as written, in the words "I accept". Records-only edits: the decision's status and acceptance section, document 04 PUB-17, decision 0077 item 2, the decision index and an OPEN_ITEMS line. No code, test, check or bound changes. | Lead (Anthropic Opus 5.5) |
+| 2026-11-22 | Correction to the S2-P51 row | The builder model named in the S2-P51 row as "GPT-6" is OpenAI gpt-6.1-sol, run through Codex. The earlier row is not rewritten. | Lead (Anthropic Opus 5.5) |
