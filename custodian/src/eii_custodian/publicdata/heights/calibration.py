@@ -8,13 +8,15 @@ from eii_core.calc.building_heights import (
     FallbackError,
     error_from_pairs,
     errors_by_class,
+    gba_match_counts,
     height_value,
     largest_overlap,
+    sum_gba_read_counts,
 )
 
 from .match import globfp_candidates, globfp_index, representative_point
 from .model import Building
-from .read import SourceResult
+from .read import GBA_CLASS_ALL, SourceResult
 
 
 def _error_block(error: FallbackError) -> dict[str, object]:
@@ -63,15 +65,17 @@ def gba_calibration(
     )
     pairs: list[tuple[Decimal, Decimal]] = []
     class_pairs: list[tuple[Decimal, Decimal, str]] = []
+    match_rows = []
     for building in buildings:
         recorded = building.recorded
         if recorded is None:
             continue
+        point = representative_point(building.geometry)
+        matches = globfp_candidates(point, building.geometry, index)
+        match_rows.append((recorded, matches))
         recorded_height = height_value(recorded)
         if recorded_height is None:
             continue
-        point = representative_point(building.geometry)
-        matches = globfp_candidates(point, building.geometry, index)
         winner = largest_overlap(matches)
         if winner is None:
             continue
@@ -81,14 +85,17 @@ def gba_calibration(
         class_name = _class_name(result.gba, winner[1], winner[2])
         pairs.append((gba_height, recorded_height))
         class_pairs.append((gba_height, recorded_height, class_name))
+    class_errors = errors_by_class(class_pairs) or {GBA_CLASS_ALL: error_from_pairs([])}
     return {
         "state": "measured",
         "reason": "",
         "order_status": "pending_owner_decision",
+        "class_basis": "none_published",
+        "read_counts": sum_gba_read_counts(result.read_counts),
+        **gba_match_counts(match_rows),
         "overall": _error_block(error_from_pairs(pairs)),
         "by_class": {
-            name: _error_block(error)
-            for name, error in sorted(errors_by_class(class_pairs).items())
+            name: _error_block(error) for name, error in sorted(class_errors.items())
         },
         "terms_read_on": result.terms_read_on,
         "terms_words": result.terms_words,

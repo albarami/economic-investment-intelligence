@@ -6102,3 +6102,33 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - PO-S2-P47-B-01 — **PROPOSED OPEN ITEM** (2026-11-22), S2-P47 part B, recorded for the lead. Part B removed part 00288 from `FILE_KEYS` and so from `BUILDING_PARTS` (decision 0089, Proposed; owner acceptance owed). Three points stay open: (1) the registry row `bldg_ovt/part-00288` is still registered and unskipped, and the key is still in `fetch/large.py` `REQUIRED_KEYS`, so `is_place_file` no longer selects it and an ordinary `./eii build-public` would route it to the large-intake path (with a large stream) or the plain file path (without one) and change its resume fingerprint class from `place_file` to `large`; part B changed no registry row because part A owns the `bldg_ovt` rows of `sources.yaml`. NEEDED: the lead's disposition — a skip reason on that row, or its removal from `REQUIRED_KEYS`, in part A or a follow-up. (2) The real review file `custodian/publicdata/review/national_boundary_outside.json` is owed from lead step L4; until it is committed a real build with the three islets refuses `national_boundary_outside_frame_box` (detail `unreviewed`). (3) Decision 0089 took the next free number at write time; renumber if another open record holds it. Evidence: `PROGRESS.md` S2-P47 part B row; `.overnight/RETURN.md`.
 - 2026-11-22 S2-P47 join (lead) — correction to PO-S2-P47-B-01: the part B record is renumbered decision 0090, since 0089 is the census record of task S2-P48. Point 1 of PO-S2-P47-B-01 is resolved in the join: the part row `bldg_ovt/part-00288` carries the skip reason `not_required_part_decision_0090` and leaves `fetch/large.py` `REQUIRED_KEYS`, so no build fetches it; its STAC item row stays. Point 2 (the lead's reviewed outside-part file) and the owner's acceptance of decision 0090 remain open.
 - 2026-11-22 S2-P47 join (lead) — correction to PO-S2-P47-B-01, point 2: the lead's reviewed outside-part file `custodian/publicdata/review/national_boundary_outside.json` is committed in `2fbf8549`, with the PROGRESS row "S2-P47 lead records step on the real cache". The owner's acceptance of decision 0090 and the national-buildings data test on a real build remain open.
+
+
+## S2-P52 — PROPOSED OPEN ITEMS (2026-11-22)
+
+These are proposals for the lead, not newly assigned owner decisions or closed
+slice conditions. Source: S2-T20, decision 0064 item 25 and S2-P52 lead rulings
+Q1–Q6 / DR2–DR3 / DR7.
+
+- Sentinel meaning: `-999` is declared as nodata and counted, but its meaning
+  remains unconfirmed by the publisher. Keep the exclusion visible; obtain a
+  field-specific statement before treating the sentinel as publisher-declared.
+- Mixed licence component: supplied research reports the ODbL polygon notice
+  alongside CC BY-NC 4.0 but contains no verbatim component sentence. DR2 needs
+  the exact publisher quotation for both registry rows and document 04. The
+  original supplied quotation is retained; no invented quotation or blanket
+  mirror licence is asserted.
+- First live answering host: supplied research records direct file responses;
+  the lead must confirm the answering host for each full fetch. No redirect
+  host is newly admitted. An unlisted redirect remains refused and needs a
+  reviewed registry/PUB-03 change if encountered.
+- Bbox filtering limit: the reader trusts each row's bbox for frame selection.
+  A wrong bbox can omit a real intersecting polygon, and no spatial extension
+  checks bbox/WKB consistency. Keep this limit beside the read counters.
+
+OI-310 partial evidence: S2-P52 adds offline GeoParquet intake, counted exclusive
+exclusions, one declared `all` class (`none_published`), deterministic indexed
+matching and core match counters, with no height-order change. The landmark
+hand list (S2-P50), basemap ids, both real snapshot selections and real measured
+pairs remain open. This entry does not close OI-310 or S2-T20#5; DHA-102 only
+tracks the split file keys under its existing permission record.

@@ -19,6 +19,7 @@ from eii_core.calc.building_heights import (
     FallbackError,
     HeightChoice,
     HeightCounts,
+    sum_gba_read_counts,
 )
 
 from .model import OUTPUT_COLUMNS, HeightError, Rules
@@ -170,6 +171,11 @@ def manifest_block(
                 "reason": results[source_id].reason,
                 "state": results[source_id].state,
                 "rows": list(results[source_id].rows),
+                **(
+                    sum_gba_read_counts(results[source_id].read_counts)
+                    if source_id == "bldg_gba"
+                    else {}
+                ),
             }
             for source_id in ("bldg_3dglobfp", "bldg_wsf3d", "bldg_gba")
         },

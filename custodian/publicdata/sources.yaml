@@ -28417,22 +28417,22 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "tif"
-  - key: "bldg_gba"
+  - key: "bldg_gba/e050_n25_e055_n20"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_gba"
     slug: ""
     kind: "https_file"
-    title_en: "GlobalBuildingAtlas LoD1 building footprints and heights (calibration only)"
+    title_en: "GlobalBuildingAtlas LoD1 tile e050_n25_e055_n20, 50 E to 55 E, 20 N to 25 N (calibration only)"
     publisher: "Technical University of Munich (GlobalBuildingAtlas)"
     licence_id: "CC-BY-NC-4.0"
     licence_basis: "dataset"
     decision_record: ""
     fetch_host: "data.source.coop"
-    url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
+    url: "https://data.source.coop/tge-labs/globalbuildingatlas-lod1/e050_n25_e055_n20.parquet"
     terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
     terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
     terms_read_on: "2026-11-20"
-    landing_url: "https://github.com/zhu-xlab/GlobalBuildingAtlas/"
+    landing_url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -28442,8 +28442,38 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: "direct_url_unconfirmed"
-    extension: "zip"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; exact ODbL component quotation and publisher meaning of declared nodata remain pending. Calibration only, no published building class."
+
+  - key: "bldg_gba/e050_n30_e055_n25"
+    refetch: {value: none, reason: frequency_unconfirmed}
+    source_id: "bldg_gba"
+    slug: ""
+    kind: "https_file"
+    title_en: "GlobalBuildingAtlas LoD1 tile e050_n30_e055_n25, 50 E to 55 E, 25 N to 30 N (calibration only)"
+    publisher: "Technical University of Munich (GlobalBuildingAtlas)"
+    licence_id: "CC-BY-NC-4.0"
+    licence_basis: "dataset"
+    decision_record: ""
+    fetch_host: "data.source.coop"
+    url: "https://data.source.coop/tge-labs/globalbuildingatlas-lod1/e050_n30_e055_n25.parquet"
+    terms_url: "https://tubvsig-so2sat-vm1.srv.mwn.de/terms_of_use.html"
+    terms_words: "The GlobalBuildingAtlas dataset is provided under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license."
+    terms_read_on: "2026-11-20"
+    landing_url: "https://source.coop/tge-labs/globalbuildingatlas-lod1"
+    nightly_live_fetch: false
+    public_splits: []
+    commit_allowed: false
+    release_tables: []
+    caveat_keys: []
+    columns: []
+    row_count_min: null
+    row_count_max: null
+    reconciliation: "none"
+    skip_reason: ""
+    extension: "parquet"
+    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; exact ODbL component quotation and publisher meaning of declared nodata remain pending. Calibration only, no published building class."
 
   - key: "cepii_baci"
     refetch: {value: none, reason: frequency_unconfirmed}

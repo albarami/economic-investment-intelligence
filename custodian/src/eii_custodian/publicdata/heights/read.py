@@ -17,6 +17,7 @@ import math
 import struct
 import zipfile
 import zlib
+from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal
 from importlib import import_module
@@ -29,13 +30,26 @@ import numpy.typing as npt
 from affine import Affine
 from shapely.geometry.base import BaseGeometry
 
-from eii_core.calc.building_heights import positive_height
+from eii_core.calc.building_heights import (
+    gba_exclusion,
+    gba_read_counts,
+    positive_height,
+    sum_gba_read_counts,
+)
+from eii_core.calc.public_series import finite
 from eii_custodian.publicdata.fetch.receipts import cache_directory
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import (
     SnapshotError,
     read_snapshot,
     reviewed_selections,
+)
+from eii_custodian.publicdata.places import PlacesError
+from eii_custodian.publicdata.places.read import (
+    connect_parquet,
+    decode_wkb,
+    geoparquet_metadata,
+    require_crs84,
 )
 
 from .model import (
@@ -49,6 +63,8 @@ from .model import (
 
 EPSG_WGS84 = 4326
 GLOBFP_FORMAT = "shapefile_zip"
+GBA_FORMAT = "geoparquet"
+GBA_CLASS_ALL = "all"
 WSF_FORMAT = "GTiff"
 UNIT_METRES = "m"
 GLOBFP_EXTENSIONS = ("cpg", "dbf", "prj", "shp", "shx")
@@ -110,6 +126,7 @@ class SourceResult:
     terms_words: str
     terms_read_on: str
     retrieved_utc: str
+    read_counts: tuple[dict[str, int], ...] = ()
 
 
 def sha256_path(path: Path) -> str:
@@ -205,7 +222,8 @@ def _declared_check(structure: SourceStructure) -> None:
     """The declared unit and reference system are the only ones we read (R9g)."""
     if structure.unit != UNIT_METRES:
         raise HeightError("declared_unit")
-    if structure.crs != f"EPSG:{EPSG_WGS84}":
+    expected = "OGC:CRS84" if structure.format == GBA_FORMAT else f"EPSG:{EPSG_WGS84}"
+    if structure.crs != expected:
         raise HeightError("declared_reference_system")
 
 
@@ -361,62 +379,6 @@ def _dbf_heights(dbf: bytes, field_name: str) -> tuple[Decimal, ...]:
     return tuple(heights)
 
 
-def _dbf_text_field(dbf: bytes, field_name: str) -> tuple[str, ...]:
-    """Each live record's fixed-width text field, trimmed and non-empty."""
-    minimum = _DBF_HEADER_BYTES + _DBF_FIELD_BYTES + 2
-    if len(dbf) < minimum or dbf[0:1] != _DBF_VERSION:
-        raise HeightError("structure_mismatch", "class_table")
-    count = int.from_bytes(dbf[4:8], "little")
-    header_len = int.from_bytes(dbf[8:10], "little")
-    record_len = int.from_bytes(dbf[10:12], "little")
-    descriptors = header_len - _DBF_HEADER_BYTES - 1
-    records_end = header_len + count * record_len
-    if (
-        header_len < minimum - 1
-        or descriptors % _DBF_FIELD_BYTES
-        or record_len < 2
-        or len(dbf) < header_len
-        or dbf[header_len - 1] != _DBF_TERMINATOR
-        or len(dbf) < records_end
-    ):
-        raise HeightError("structure_mismatch", "class_header")
-    fields: list[tuple[str, str, int, int]] = []
-    offset = 1
-    for index in range(descriptors // _DBF_FIELD_BYTES):
-        start = _DBF_HEADER_BYTES + index * _DBF_FIELD_BYTES
-        descriptor = dbf[start : start + _DBF_FIELD_BYTES]
-        try:
-            name = descriptor[:11].split(b"\x00", 1)[0].decode("ascii")
-            field_type = descriptor[11:12].decode("ascii")
-        except UnicodeDecodeError:
-            raise HeightError("structure_mismatch", "class_descriptor") from None
-        fields.append((name, field_type, offset, descriptor[16]))
-        offset += descriptor[16]
-    if offset != record_len:
-        raise HeightError("structure_mismatch", "class_record_length")
-    found = [field for field in fields if field[0] == field_name]
-    if len(found) != 1:
-        raise HeightError("structure_mismatch", "class_field_absent")
-    if found[0][1] != "C":
-        raise HeightError("structure_mismatch", "class_field_type")
-    _name, _type, field_offset, field_size = found[0]
-    values: list[str] = []
-    for row in range(count):
-        start = header_len + row * record_len
-        record = dbf[start : start + record_len]
-        if record[0:1] != _DBF_LIVE:
-            raise HeightError("structure_mismatch", "class_record")
-        try:
-            text = record[field_offset : field_offset + field_size].decode("ascii")
-        except UnicodeDecodeError:
-            raise HeightError("structure_mismatch", "class_record") from None
-        stripped = text.strip()
-        if not stripped:
-            raise HeightError("structure_mismatch", "class_record_blank")
-        values.append(stripped)
-    return tuple(values)
-
-
 def _parse_globfp(
     body: bytes, structure: SourceStructure
 ) -> tuple[tuple[BaseGeometry, Decimal], ...]:
@@ -477,54 +439,125 @@ def _parse_globfp(
     return tuple(rows)
 
 
+def _gba_structure(connection: Any, path: Path, field: str) -> None:
+    """Check metadata and physical columns before selecting feature rows."""
+    try:
+        geo = geoparquet_metadata(connection, path)
+        if geo["primary_column"] != "geometry":
+            raise ValueError
+        column = geo["columns"]["geometry"]
+        if not isinstance(column, dict):
+            raise ValueError
+    except (KeyError, TypeError, ValueError):
+        raise HeightError("structure_mismatch", "geo_metadata") from None
+    if column.get("encoding") != "WKB":
+        raise HeightError("structure_mismatch", "geometry_encoding")
+    if column.get("geometry_types") != ["Polygon"]:
+        raise HeightError("structure_mismatch", "geometry_type")
+    require_crs84(connection, path)
+    described = connection.execute(
+        "DESCRIBE SELECT * FROM read_parquet(?)", [str(path)]
+    ).fetchall()
+    columns = {row[0]: row[1] for row in described}
+    if field not in columns:
+        raise HeightError("structure_mismatch", "field_absent")
+    if columns[field] != "DOUBLE":
+        raise HeightError("structure_mismatch", "height_type")
+    if columns.get("geometry") != "BLOB":
+        raise HeightError("structure_mismatch", "geometry_type")
+    if (
+        columns.get("bbox")
+        != "STRUCT(xmin DOUBLE, ymin DOUBLE, xmax DOUBLE, ymax DOUBLE)"
+    ):
+        raise HeightError("structure_mismatch", "bbox_type")
+
+
+def _gba_geometry(value: bytes | None) -> tuple[BaseGeometry | None, str]:
+    """Decode, never repair. A bad WKB or wrong type withdraws the file."""
+    if value is None:
+        return None, "geometry_null"
+    try:
+        geometry = decode_wkb(value)
+    except PlacesError:
+        raise HeightError("structure_mismatch", "geometry_wkb") from None
+    if geometry.geom_type != "Polygon":
+        raise HeightError("structure_mismatch", "geometry_type")
+    if geometry.is_empty:
+        return geometry, "geometry_empty"
+    if not geometry.is_valid:
+        return geometry, "geometry_invalid"
+    return geometry, ""
+
+
+def _gba_rows(
+    connection: Any,
+    path: Path,
+    field: str,
+    bounds: tuple[float, float, float, float] | None,
+) -> Iterator[tuple[bytes | None, str | None]]:
+    """Project only WKB and height text, ordered by the source file's row.
+
+    Stated limit: an incorrect row bbox can omit a real intersecting footprint;
+    no spatial extension checks the source's bbox against its WKB.
+    """
+    if bounds is None:
+        return
+    west, south, east, north = bounds
+    quoted = '"' + field.replace('"', '""') + '"'
+    cursor = connection.execute(
+        f"""SELECT geometry, CAST({quoted} AS VARCHAR)
+        FROM read_parquet(?, file_row_number = true)
+        WHERE bbox.xmin <= ? AND bbox.ymin <= ? AND bbox.xmax >= ? AND bbox.ymax >= ?
+        ORDER BY file_row_number""",
+        [str(path), east, north, west, south],
+    )
+    while batch := cursor.fetchmany(2048):
+        yield from batch
+
+
 def _parse_gba(
-    body: bytes, structure: SourceStructure
-) -> tuple[tuple[BaseGeometry, Decimal, str], ...]:
-    """The published GBA shapefile with a height and a class field per record."""
-    if not structure.class_field:
-        raise HeightError("structure_mismatch", "class_field_undeclared")
-    bodies = _zip_members(body)
-    if bodies["cpg"].strip() != b"ISO-8859-1":
-        raise HeightError("structure_mismatch")
-    rasterio = import_module("rasterio")
-    shapefile = import_module("shapefile")
-    geometry = import_module("shapely.geometry")
+    cache: Path,
+    path: Path,
+    structure: SourceStructure,
+    bounds: tuple[float, float, float, float] | None,
+) -> tuple[tuple[tuple[BaseGeometry, Decimal, str], ...], dict[str, int]]:
+    """Read verified GeoParquet without a whole-file bytes read or float cast."""
+    import duckdb
+
+    checked = _local_file(cache, path)
+    if checked.suffix != ".parquet":
+        raise HeightError("cache_receipt_mismatch")
     try:
-        prj_text = bodies["prj"].decode("utf-8")
-        epsg = rasterio.CRS.from_wkt(prj_text).to_epsg()
-    except (UnicodeDecodeError, rasterio.errors.CRSError):
+        nodata = Decimal(structure.nodata)
+        finite(nodata)
+    except (ArithmeticError, ValueError):
+        raise HeightError("structure_mismatch", "nodata") from None
+    connection = connect_parquet()
+    kept: list[tuple[BaseGeometry, Decimal, str]] = []
+    outcomes: list[str] = []
+    try:
+        _gba_structure(connection, checked, structure.field)
+        for wkb, text in _gba_rows(connection, checked, structure.field, bounds):
+            geometry, geometry_reason = _gba_geometry(wkb)
+            value = None if text is None else Decimal(text)
+            reason = gba_exclusion(geometry_reason, value, nodata)
+            outcomes.append(reason)
+            if not reason:
+                assert geometry is not None and value is not None, (
+                    "gba_kept_row_required"
+                )
+                kept.append((geometry, value, GBA_CLASS_ALL))
+    except duckdb.Error:
+        raise HeightError("structure_mismatch", "parquet") from None
+    except PlacesError as error:
+        if error.reason == "parquet":
+            raise HeightError("structure_mismatch", "parquet") from None
         raise HeightError("reference_system") from None
-    if epsg != EPSG_WGS84:
-        raise HeightError("reference_system")
-    heights = _dbf_heights(bodies["dbf"], structure.field)
-    classes = _dbf_text_field(bodies["dbf"], structure.class_field)
-    if len(classes) != len(heights):
-        raise HeightError("structure_mismatch")
-    try:
-        reader = shapefile.Reader(
-            shp=io.BytesIO(bodies["shp"]), shx=io.BytesIO(bodies["shx"])
-        )
-        records = reader.shapes()
-    except (struct.error, shapefile.ShapefileException):
-        raise HeightError("structure_mismatch") from None
-    if len(records) != len(heights):
-        raise HeightError("structure_mismatch")
-    rows: list[tuple[BaseGeometry, Decimal, str]] = []
-    for record, height, class_name in zip(records, heights, classes, strict=True):
-        if record.shapeType != GLOBFP_SHAPE_TYPE:
-            raise HeightError("structure_mismatch")
-        try:
-            footprint = geometry.shape(record.__geo_interface__)
-        except (IndexError, ValueError):
-            raise HeightError("structure_mismatch") from None
-        if (
-            footprint.is_empty
-            or not footprint.is_valid
-            or footprint.geom_type not in ("Polygon", "MultiPolygon")
-        ):
-            raise HeightError("structure_mismatch")
-        rows.append((footprint, height, class_name))
-    return tuple(rows)
+    finally:
+        connection.close()
+    counts = gba_read_counts(outcomes)
+    sum_gba_read_counts([counts])
+    return tuple(kept), counts
 
 
 def _raster_window(
@@ -659,10 +692,10 @@ def read_sources(
             key=lambda entry: entry.key,
         )
         terms = rows[0] if rows else None
-        globfp_like = source_id in {"bldg_3dglobfp", "bldg_gba"}
         if (
             structure_unconfirmed(structure)
-            or (globfp_like and structure.format != GLOBFP_FORMAT)
+            or (source_id == "bldg_3dglobfp" and structure.format != GLOBFP_FORMAT)
+            or (source_id == "bldg_gba" and structure.format != GBA_FORMAT)
             or (source_id == "bldg_wsf3d" and structure.format != WSF_FORMAT)
         ):
             results[source_id] = SourceResult(
@@ -693,6 +726,7 @@ def read_sources(
         files: list[dict[str, object]] = []
         records: list[dict[str, str]] = []
         retrieved_utc = ""
+        read_counts: list[dict[str, int]] = []
         for row in rows:
             state = "not_fetched"
             reason = row.skip_reason or "not_fetched"
@@ -713,12 +747,12 @@ def read_sources(
                             )
                         )
                     elif source_id == "bldg_gba":
-                        gba.append(
-                            (
-                                file_name,
-                                _parse_gba(body_path.read_bytes(), structure),
-                            )
+                        features, counts = _parse_gba(
+                            cache, body_path, structure, bounds
                         )
+                        gba.append((file_name, features))
+                        files[-1]["read_counts"] = counts
+                        read_counts.append(counts)
                     else:
                         wsf.append(
                             (
@@ -747,6 +781,7 @@ def read_sources(
             terms_words=rows[0].terms_words if rows else "",
             terms_read_on=rows[0].terms_read_on if rows else "",
             retrieved_utc=retrieved_utc,
+            read_counts=tuple(read_counts),
         )
     return results
 
