@@ -29,9 +29,19 @@ The hashes bind an area to its inputs and to the manifest the check saw. The reb
 Building points for area requests and for the places stage both resolve every
 active, receipted Parquet part of `bldg_ovt` from the registry, including parts
 outside that fetch list; STAC metadata is excluded. Each file's receipt is
-checked before the file is read. A reviewed flagship with no resolved point
+checked before the file is read. `_cache_points` resolves against the full
+registry returned by `load_registry()`; the stage uses its supplied registry.
+The area producer refuses an unpinned fixed building-part directory with
+`places_file_unreceipted`, and a fixed or reviewed registry building part whose
+receipt or body check fails with `places_file_digest`. The listing key
+`bldg_ovt` is not subject to the unpinned-directory rule: it parents the parts.
+A reviewed flagship with no resolved point
 refuses area requests with `flagship_point_missing`, recorded in the build log
-as `REFUSED flagship_point_missing`. Tests use invented Parquet and a stand-in
+as `REFUSED flagship_point_missing`. With an area manifest present, the same
+shared request check also refuses inside the stage with `flagship_point_missing`
+before review resolution would give `record_missing`; its build log is
+`stage places flagship_point_missing`. The stage's building-part selection
+is unchanged. Tests use invented Parquet and a stand-in
 transport. They do not fetch those files.
 
 Release listings compare only registered `part-NNNNN` child keys against their

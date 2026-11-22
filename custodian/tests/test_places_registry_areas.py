@@ -1,11 +1,12 @@
 """Invented registry parts must supply every reviewed flagship area origin."""
 
+import json
 from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places.invented import building_row, write_buildings
 from custodian.tests.test_places_area_files import _install_road
-from custodian.tests.test_places_partb_survivors_b import _flag_row, _review
+from custodian.tests.test_places_partb_survivors_b import _flag_row, _review, _show_row
 from custodian.tests.test_places_partb_survivors_c import _receipt, _row
 from custodian.tests.test_places_partb_survivors_d import _PIN
 from hypothesis import given
@@ -90,6 +91,38 @@ def test_area_producer_logs_missing_flagship_point(
     lines: list[str] = []
     integrate.areas_before_stage(cache, lines, review)
     assert lines == ["REFUSED flagship_point_missing"]
+
+
+@pytest.mark.parametrize("part", ["bldg_ovt/part-00384", "bldg_ovt/part-90001"])
+def test_area_producer_refuses_corrupt_reviewed_building_body(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, part: str
+) -> None:
+    cache, review = _candidate(tmp_path, monkeypatch, part)
+    _review(review, show=[_show_row("SYN-SHOW", "bldg_ovt", "SYN-B-A")])
+    _install_road(cache)
+    assert area_requests(review, integrate._cache_points(cache, review))
+    body = cache / part / "syn.parquet"
+    body.write_bytes(body.read_bytes() + b"\n")
+    lines: list[str] = []
+    integrate.areas_before_stage(cache, lines, review)
+    assert lines == ["REFUSED places_file_digest"]
+
+
+def test_area_producer_refuses_unpinned_fixed_building_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    part = "bldg_ovt/part-00384"
+    cache, review = _candidate(tmp_path, monkeypatch, part)
+    _review(review, show=[_show_row("SYN-SHOW", "bldg_ovt", "SYN-B-A")])
+    _install_road(cache)
+    assert area_requests(review, integrate._cache_points(cache, review))
+    pins = cache / "snapshot_pins.json"
+    selected = json.loads(pins.read_text(encoding="utf-8"))
+    del selected[part]
+    pins.write_text(json.dumps(selected), encoding="utf-8")
+    lines: list[str] = []
+    integrate.areas_before_stage(cache, lines, review)
+    assert lines == ["REFUSED places_file_unreceipted"]
 
 
 def test_invented_extra_part_is_outside_the_fetch_list() -> None:

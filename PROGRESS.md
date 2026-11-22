@@ -51338,3 +51338,85 @@ origin-presence and exact-key cases rather than asserting new numeric coverage.
 Fixture evidence proves the point/request and closed-refusal correction only;
 live flagship areas, source review and different-maker acceptance remain with
 the lead. Muhasabah self-audit: **PASS** for this scoped implementation.
+
+## S2-P61 round 2 — retain building-part refusals
+
+**Subject and scope.** Base `a1476ca9f65771ccd15fd4dda1e0851c373160bb`;
+`.overnight/BRIEF.md` and `.overnight/IN/REVIEW-RV1.md`, F1, O1 and O2.
+Builder: OpenAI Codex, senior geospatial data pipelines engineer. Strict
+self-review persona: sanad auditor; no independent-maker approval is claimed.
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate. The brief's test-driven-development,
+systematic-debugging and verification-before-completion rules were applied
+directly; those named skill files are not in the installed skill catalogue.
+
+**Correction.** The earlier S2-P61 statement that receipt guards were retained
+is superseded for building area origins: the round-1 resolver silently skipped
+bad building snapshots. The shared `_building_entries` predicate now supplies
+both registry consumers. The producer first calls `_opened_place` for fixed
+building-part keys, then refuses a selected active registry building entry
+without a valid receipt with `places_file_digest`. The listing parent
+`bldg_ovt` does not receive the unpinned-directory check. Fetch keys and required
+building parts are unchanged.
+
+O1 correction: building-part selection in the stage is unchanged, but the
+round-1 shared request guard also changes its refusal reason when an area
+manifest exists: a missing keyed flagship point raises `flagship_point_missing`
+before later review resolution could produce `record_missing`. A new actual
+stage-boundary test starts with a successful stage and deletes only that point
+from the provider's source-point map; it asserts the anchored exact reason.
+O2: the places README now names `_cache_points`' full `load_registry()` input
+and the stage's supplied registry. Earlier return wording saying simply
+"stage unchanged" must not be used.
+
+**Red and green.** Before changing production code, all three exact-log
+negatives failed on the base: corrupt pinned part-00384, corrupt pinned
+part-90001 outside `FILE_KEYS`, and unpinned part-00384. Each logged
+`areas: nothing to do`; the command exited **1**, **3 failed / 6 deselected**.
+The same base bytes were replayed with the new tests to retain
+`.overnight/tmp/red-recorded.json` and `.log` (same exit and failures).
+Command: `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py -q -p no:cacheprovider
+-k 'corrupt_reviewed or unpinned_fixed' --hypothesis-seed=61`, with the
+recorded distinct `.overnight/tmp/` basetemp. Each negative changes one input
+from a proven valid origin/request: body bytes or one reviewed pin.
+
+Focused command: `uv run --locked python -m pytest
+custodian/tests/test_places_registry_areas.py custodian/tests/test_places_stage.py
+-q -p no:cacheprovider --hypothesis-seed=61`, distinct basetemp per run.
+First green: **21 passed**, exit **0**. Plants were applied individually and
+restored byte-for-byte before each green run; complete commands and exits are
+in `.overnight/tmp/r2-plants.json`.
+
+| Deleted guard alone | Red exit/result | Restored exit/result |
+|---|---|---|
+| Fixed-building `_opened_place` precheck | 1; 1 failed / 20 passed, exact unreceipted log | 0; 21 passed |
+| Reviewed registry building digest refusal | 1; 1 failed / 20 passed, exact extra-part digest log | 0; 21 passed |
+| Required flagship missing-point raise | 1; 4 failed / 17 passed, including the stage-boundary negative | 0; 21 passed |
+
+**Required checks.** All commands used `UV_OFFLINE=1`; test `TMPDIR` and
+basetemp were inside `.overnight/tmp/`, Hypothesis seed **61**. Runtime:
+Python **3.14.6**, Linux/WSL2. No network, real cache, `.env`, `.private` or
+`data/` was read. Required selection:
+`uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider
+-k 'places or building' --basetemp=.overnight/tmp/required-suite
+--hypothesis-seed=61`, exit **0**, **969 passed / 10466 deselected** in
+**126.64 seconds**. `uv run --locked ruff check .`,
+`uv run --locked ruff format --check .` (**939** files),
+`uv run --locked mypy` (**500** source files), `python3 scripts/check_docs.py`
+(**1272** text / **143** Markdown files), `cmp AGENTS.md CLAUDE.md` and
+`git diff --check`: each exit **0**. Logs: `.overnight/tmp/required-suite.log`
+and `.overnight/tmp/r2-checks.json`; final records and packaging checks are
+recorded in the return.
+
+**Code practice and handoff.** No blocks copied; the existing receipt opener,
+receipt reader, registry resolver and invented-fixture helpers are reused.
+Longest new function by AST span is
+`test_area_producer_refuses_unpinned_fixed_building_directory`, **15** lines;
+new production helper `_building_entries` is **9** lines. No function added
+exceeds the brief's limit. The deliverable is one Conventional Commit on the
+full base hash above, created through workspace-local Git metadata to keep
+writes inside this workspace, and a verified bundle; exact commit and checksum
+are in `.overnight/RETURN.md`. Self-review and muhasabah: **PASS** for this
+scoped patch. Different-maker review and live source/flagship evidence remain
+with the lead; no task criterion or slice gate is ticked.

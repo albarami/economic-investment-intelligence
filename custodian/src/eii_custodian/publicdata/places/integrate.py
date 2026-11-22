@@ -218,7 +218,14 @@ def _cache_points(
                 found[(_PLACES_SOURCE, row.place_id)] = (float(row.lon), float(row.lat))
         except PlacesError:
             continue
-    building_paths, _receipts = _buildings_from_registry(cache, load_registry())
+    for key in (key for key in FILE_KEYS if key.startswith(_BUILDINGS_SOURCE + "/")):
+        _opened_place(cache, key)
+    registry = load_registry()
+    selections = reviewed_selections(cache)
+    for entry in _building_entries(registry):
+        if entry.key in selections and _receipt_of(cache, entry) is None:
+            raise AreaError("places_file_digest")
+    building_paths, _receipts = _buildings_from_registry(cache, registry)
     for path in building_paths:
         try:
             for building in read_building_file(path, frame_box=_FRAME):
@@ -261,19 +268,23 @@ def _place_from_registry(
     return None
 
 
+def _building_entries(registry: Sequence[Entry]) -> tuple[Entry, ...]:
+    """Active building Parquet inputs; STAC metadata is not a stage input."""
+    return tuple(
+        entry
+        for entry in registry
+        if entry.source_id == _BUILDINGS_SOURCE
+        and entry.skip_reason == ""
+        and entry.extension == "parquet"
+    )
+
+
 def _buildings_from_registry(
     cache: Path, registry: Sequence[Entry]
 ) -> tuple[tuple[Path, ...], tuple[FileReceipt, ...]]:
     paths: list[Path] = []
     receipts: list[FileReceipt] = []
-    for entry in registry:
-        # STAC receipts prove completeness; they are not Parquet stage inputs.
-        if (
-            entry.source_id != _BUILDINGS_SOURCE
-            or entry.skip_reason != ""
-            or entry.extension != "parquet"
-        ):
-            continue
+    for entry in _building_entries(registry):
         located = _receipt_of(cache, entry)
         if located is None:
             continue
