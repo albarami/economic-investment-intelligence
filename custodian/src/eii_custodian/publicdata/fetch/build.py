@@ -33,6 +33,7 @@ from eii_custodian.publicdata.fetch.kinds import (
     read_terms_page,
 )
 from eii_custodian.publicdata.fetch.own_run import (
+    OWN_RUN_KEYS,
     handoff_completed_archive,
     is_own_run_entry,
     is_tender_entry,
@@ -67,7 +68,11 @@ from eii_custodian.publicdata.fetch.report import (
     terms_host_line,
     terms_unread_line,
 )
-from eii_custodian.publicdata.fetch.resume import ResumeError, RunRecord
+from eii_custodian.publicdata.fetch.resume import (
+    ResumeError,
+    RunRecord,
+    repository_head,
+)
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import (
     Opener,
@@ -715,13 +720,16 @@ def run_build(
             )
             lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
             break
-        if is_tender_entry(entry) and not is_own_run_entry(entry):
+        if not _own_run and entry.key in OWN_RUN_KEYS and not is_own_run_entry(entry):
+            # The registered tender key in any other shape is a changed row.
+            # A different key that only shares the tender source id stays on
+            # the ordinary skip below (decision 0084 items 2 and 7).
             failure = FetchFailure(
                 1, entry.source_id, "", "own_run_row_changed", "", ""
             )
             lines.append(fail_line(entry.key, "", failure.check, "", ""))
             break
-        if is_own_run_entry(entry) and not _own_run:
+        if is_tender_entry(entry) and not _own_run:
             lines.append(skip_line(entry.key, "own_run"))
             if _run is not None:
                 try:
@@ -1550,6 +1558,10 @@ def run_tenders_only(
             str(exc) if isinstance(exc, ResumeError) else "resume_record_write_failed"
         )
         return _own_run_failure(tender_cache, entry, reason)
+    # Version-2 journals no longer refuse a head change inside RunRecord.
+    # The own-run resume still names that refusal before any fetch.
+    if resume and run.row.get("head") != repository_head():
+        return _own_run_failure(tender_cache, entry, "resume_head_mismatch")
     if not resume:
         try:
             adopted = handoff_completed_archive(
