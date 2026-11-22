@@ -3,6 +3,7 @@
 import json
 import shutil
 from dataclasses import replace
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from custodian.tests.test_production_adapters import context
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.fetch.bounded import file_hash
 from eii_custodian.publicdata.fetch.build import BuildOutcome
+from eii_custodian.publicdata.fetch.registry import RegistryError
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.build import FrameResult
 from eii_custodian.publicdata.review.cache_fixture import (
@@ -134,6 +136,75 @@ def test_spine_membership_from_baskets_queues_cancelled_only_supplier(
     assert queued["4630001"]["status"] == "unreviewed"
     assert queued["4630001"]["reason"] == "awaiting_human_review"
     assert queued["4630001"]["isic_class"] == ""
+
+
+def test_spine_baskets_hash_binds_the_bytes_parsed(tmp_path, monkeypatch):
+    build = _spine_build(tmp_path)
+    path = build.review / "baskets.yaml"
+    original = path.read_bytes()
+    reads = []
+
+    def changing_reader(reader):
+        def read(target, *args, **kwargs):
+            content = reader(target, *args, **kwargs)
+            if target == path:
+                reads.append(content)
+                path.write_bytes(original + b"\n# changed after the read\n")
+            return content
+
+        return read
+
+    monkeypatch.setattr(Path, "read_text", changing_reader(Path.read_text))
+    monkeypatch.setattr(Path, "read_bytes", changing_reader(Path.read_bytes))
+    build.spine_graph()
+    record = json.loads((build.cache / "assembly/spine_graph.json").read_text())
+    assert record["membership"]["supplier_codes"] == ["4630001"]
+    assert record["membership"]["baskets_sha256"] == sha256(original).hexdigest()
+    assert reads == [original]
+
+
+@pytest.mark.parametrize(
+    "case,cause",
+    [
+        ("absent", FileNotFoundError),
+        ("unreadable", PermissionError),
+        ("malformed", RegistryError),
+        ("missing_activity", KeyError),
+        ("missing_inputs", KeyError),
+        ("null_inputs", TypeError),
+    ],
+)
+def test_spine_stage_wraps_basket_read_errors(tmp_path, monkeypatch, case, cause):
+    build = _spine_build(tmp_path)
+    path = build.review / "baskets.yaml"
+    if case == "absent":
+        path.unlink()
+    elif case == "unreadable":
+
+        def refusing_reader(reader):
+            def read(target, *args, **kwargs):
+                if target == path:
+                    raise PermissionError("invented unreadable baskets")
+                return reader(target, *args, **kwargs)
+
+            return read
+
+        monkeypatch.setattr(Path, "read_text", refusing_reader(Path.read_text))
+        monkeypatch.setattr(Path, "read_bytes", refusing_reader(Path.read_bytes))
+    elif case == "malformed":
+        path.write_bytes(b"activities: [")
+    else:
+        document = json.loads(path.read_text())
+        if case == "null_inputs":
+            document["activities"][0]["inputs"] = None
+        else:
+            del document["activities"][0][case.removeprefix("missing_")]
+        path.write_text(json.dumps(document))
+    with pytest.raises(AssemblyError, match=r"^assembly_membership_invalid$") as error:
+        build.spine_graph()
+    assert isinstance(error.value.__cause__, cause)
+    assert not (build.cache / "assembly/spine_graph.json").exists()
+    assert not (build.cache / "assembly/graph").exists()
 
 
 @pytest.mark.parametrize(

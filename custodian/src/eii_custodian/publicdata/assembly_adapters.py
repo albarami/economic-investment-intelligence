@@ -10,6 +10,7 @@ import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,7 @@ from .assembly_intake import write_intake_evidence
 from .assembly_inventory import INVENTORY, validate_inventory
 from .assembly_io import bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
-from .fetch.registry import Entry, read_yaml
+from .fetch.registry import Entry, RegistryError, parse_yaml, read_yaml
 from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
 from .fetch.transport import Transport
 from .frame.build import FrameResult, build_public_frame, read_cached
@@ -516,10 +517,11 @@ class Production:
         from .review.graph import build_graph, read_allowlist, write_graph
 
         activities, _, _ = read_activity_rows(self.cache, self.entries, self.selected)
-        baskets = read_yaml(self.review / "baskets.yaml")
         try:
+            baskets_bytes = (self.review / "baskets.yaml").read_bytes()
+            baskets = parse_yaml(baskets_bytes)
             playbook, suppliers = basket_membership(baskets, activities)
-        except SpineError as error:
+        except (SpineError, OSError, RegistryError, KeyError, TypeError) as error:
             raise AssemblyError("assembly_membership_invalid") from error
         inputs = load_activity_inputs(
             self.cache,
@@ -558,7 +560,7 @@ class Production:
                     "playbook_codes": playbook,
                     "supplier_codes": suppliers.codes,
                     "supplier_classes": sorted({code[:4] for code in suppliers.codes}),
-                    "baskets_sha256": file_hash(self.review / "baskets.yaml"),
+                    "baskets_sha256": sha256(baskets_bytes).hexdigest(),
                 },
                 "manifest": inputs.manifest,
                 "left_out": inputs.left_out,
