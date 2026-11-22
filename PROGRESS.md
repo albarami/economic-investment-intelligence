@@ -51500,3 +51500,99 @@ approval or lead-cache replay is claimed. Proposed decision 0095 remains
 proposed, S2-T29/OI-277 remain open, and review plus the lead's replay of the
 round-two marker remain the only S2-P66 follow-ups. No source schema, trust,
 privacy, retry, publication or assembly refusal was relaxed.
+
+
+## S2-P66 round three — required proof keys at the reader boundary (2026-11-22)
+
+| Date | Task | Evidence | Maker and personas |
+|---|---|---|---|
+| 2026-11-22 | S2-P66 round three; S2-T29; proposed decision 0095 item 3 | Base `594b30ddc3f005b0fc64d9a9df0e118b54ff334e`; implementation `925612322a470b13bb7d32c3f02661149460cb2a`. Every projected source key is required in version two; date access no longer supplies a missing-field default, and the projected pair is revalidated through the existing helper. Importer suites: 1,254 passed and 2 subtests passed, exit 0; seed 6668. Two isolated new-guard deletions: each red 1 / restored green 0. | OpenAI Codex; senior data-pipeline engineer, provenance; strict self-review persona: reviewer deleting one field at a time from every valid record. |
+
+The supplied `.overnight/IN/CF1-KIMI.md` finding is reproduced before the fix:
+all seven initial cases fail, exit 1, including a missing dated `award_date`
+returning a row and the other three missing projection keys raising `KeyError`.
+The first implementation run passes 80 tests, exit 0, across the required-key,
+marker and page-state files. The final new file passes 13 tests, exit 0; six
+additional single-side comparison deletions retain decision 0088 items 2 to 4's
+closed comparison outcomes. One Hypothesis generator varies the deleted key,
+dated input and insertion order, without changing the installed profile. The
+final importer run includes all direct importer files found by `rg`, the prior
+round's expanded suite, and the new file; no failed test is retried or skipped.
+
+Skills: project-orientation: reused the existing reader, marker helper and invented-page fixtures; task-standards: adopted the brief's builder and deletion-review personas; github-flow: isolated Conventional Commits on the supplied base without a remote operation; sanad-provenance: bound every result to local command logs and decision 0095; sharp-edges: swept defaults and exposed required-key and falsy-date projection gaps; property-based-testing: generated single-key deletions over all four required keys, dates and key order; spec-to-code-compliance: traced decision 0095 item 3 through the reader and its negatives (requested read-only checker dispatch failed before starting, so this is local tracing, not workflow or independent approval); strict-reviewer: self-reviewed exact refusal reasons and unchanged comparison semantics; muhasabah-gate: checked scope, evidence and unclaimed lead work. Installed copies of test-driven-development, systematic-debugging, executing-plans, using-git-worktrees, verification-before-completion, receiving-code-review and requesting-code-review were not found in the installed skill roots; their brief-equivalent rules were applied: reproduce the finding, sweep its family, write tests first, change only the existing workspace, plant each new guard alone, verify real exits and prepare a reviewable bundle. No new library or pin is used.
+
+Plan executed: reproduce the missing-key failure; add named and generated
+one-deletion negatives; require keys before projection and reuse the existing
+pair validator afterward; classify all defaulted reads in the four-module
+family; delete each new guard separately and restore exact bytes; run importer
+and static checks; append task records; package commits and the return report.
+The sweep table, refusal-branch mapping and code-practice measurements are in
+`.overnight/RETURN.md`.
+
+Final importer command:
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_date_marker.py custodian/tests/test_award_reader_required.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix12.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6668 -q --basetemp=.overnight/tmp/pytest-r3-required
+```
+
+Command logs and argv/exit records are in `.overnight/tmp/r3-checks/`.
+The importer command exits 0 with 1,254 tests and 2 subtests in 146.71 seconds.
+Other required commands and actual exits:
+
+| Command | Exit | Evidence |
+|---|---|---|
+| `uv run --locked ruff check .` | 0 | `ruff-check.json` and log; all checks passed |
+| `uv run --locked ruff format --check .` | 0 | `ruff-format-check.json` and log; 943 files formatted |
+| `uv run --locked mypy` | 0 | `mypy.json` and log; 500 source files |
+| `python3 scripts/check_docs.py` | 0 | `docs-check.json` and log; final records check appended below |
+| `cmp AGENTS.md CLAUDE.md` | 0 | `agents-parity.json` and log; both instruction files unchanged |
+| `git diff --check` | 0 | `diff-check.json` and log |
+
+Every uv command uses `UV_OFFLINE=1`. Test/check environment:
+`PYTHONHASHSEED=0`, `EII_DECISION_PROVIDER=none`, test seed 6668, unchanged
+Hypothesis `eii` profile (100 examples, no example database). Python 3.14.6,
+pytest 9.2.0 and Hypothesis 6.170.15 are observed through the locked uv environment
+(`environment.json`, exit 0); Ruff 0.17.4 and mypy 2.4.1 remain the exact
+`pyproject.toml`/lock pins. The initial system-interpreter package-version probe
+exited 1 because that interpreter has no Hypothesis; the locked-environment probe
+above supplies the evidence. Temporary, uv-cache and test paths are inside
+`.overnight/tmp/`. No network, `.env`, `.private`, `data/`, real proof cache or
+lead-only replay was used.
+
+Plant command prefix: `uv run --locked python -m pytest -q
+--hypothesis-seed=6668 --basetemp=.overnight/tmp/pytest-r3-plants`.
+Each mutation was restored before its green command; byte equality is asserted.
+The source guard, full argv, actual exits and restoration assertions are recorded
+in `.overnight/tmp/r3-plants/results.json`, with each raw red/green log adjacent.
+
+| Guard deleted alone | Negative test nodes in `custodian/tests/test_award_reader_required.py` | Red exit | Restored exit |
+|---|---|---|---|
+| Required projection-key subset guard | `test_reader_refuses_each_missing_required_key` (all four cases), `test_one_key_deletions_always_refuse` | 1 | 0 |
+| `proof_date_marker(proof)` after projection | `test_reader_revalidates_projected_date` (zero and false) | 1 | 0 |
+
+Packaging evidence: ordinary `git add` exits 128 because the shared worktree
+metadata is read-only. A bare shared local clone with its own index, objects,
+refs and exclusion file is created inside `.overnight/tmp/r3-delivery.git`;
+its commits descend from the exact supplied HEAD. No shared metadata is changed.
+The first local commit attempt exits 128 for an unset author identity; a synthetic
+agent identity is set only for the successful local command. The implementation
+commit is the full hash in the row above. The records commit and verified bundle
+are named in `.overnight/RETURN.md`; only selected task files enter either commit.
+Different-maker review and stored-proof replay remain with the lead. No source,
+transport, privacy, publication, comparison or receipt rule is relaxed.
+
+Final records verification append: `python3 scripts/check_docs.py`,
+`cmp AGENTS.md CLAUDE.md` and `git diff --check` each exit 0 after the record
+updates (`final-docs-check.json`, `final-agents-parity.json`,
+`final-diff-check.json`). The task-local Git index's `python3 scripts/check_tree.py`
+also exits 0, all eight rules (`task-tree-check.json`). Source and tests are
+unchanged from implementation `925612322a470b13bb7d32c3f02661149460cb2a`.
+Code-practice inspection: no copied block, no duplicate helper, no function over
+100 new lines; the longest new function is
+`test_comparison_defaults_keep_closed_single_deletion_outcomes`, nine lines
+from `def` through its last statement. The existing `_proof_reader` spans
+58 lines including its 38-line nested `read`. Strict self-review: APPROVE for
+the local correction and evidence; independent approval is not claimed.
+Muhasabah: PASS for scope, source attribution, real exits and explicit lead-owned
+review/replay limits. The verified delivery bundle and full per-file diff counts
+are reported in `.overnight/RETURN.md`.

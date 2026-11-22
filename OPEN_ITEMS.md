@@ -6256,3 +6256,12 @@ The date marker required by L-1495 is recorded separately from comparison
 reasons under proposed decision 0095. The strings item remains closed;
 independent different-maker review and the lead's offline replay of the
 round-two marker remain open. No worker replay or real-cache result is claimed.
+
+S2-P66 round-three correction to PO-S2-P66-01 (2026-11-22): the supplied cf1
+review rejected a dated parser row losing only `award_date` at the version-two
+reader boundary. The correction requires all projected source keys and validates
+the date/marker pair after projection, with exact `schema_missing` one-key
+negatives and red/green guard plants. Local tests and checks are recorded in
+PROGRESS.md; this does not stand in for different-maker approval or the lead's
+stored-proof replay. Both remain open; no random failure or new source input is
+introduced.
