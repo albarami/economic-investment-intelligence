@@ -51,6 +51,40 @@ def bilingual():
     return tuple(pages), bodies
 
 
+def bilingual_utf8(copies: int = 1):
+    """The bilingual inventory with a declared UTF-8 charset on every page.
+
+    ``copies`` repeats the ten pages under distinct invented paths, each copy
+    with its own marker so no two pages share bytes (S2-P45 uses the live
+    agency manifest's size: one landing and fifty-four sub-pages)."""
+    import eii_custodian.publicdata.investment_build as build
+
+    pages, bodies = bilingual()
+    declared = {
+        url: body.replace(b"<body>", b'<head><meta charset="utf-8"></head><body>')
+        for url, body in bodies.items()
+    }
+    if copies == 1:
+        return pages, declared
+    out_pages = []
+    for copy in range(copies):
+        for page in pages:
+            address = page.url.replace("agency.invalid/", f"agency.invalid/c{copy}/")
+            declared[address] = declared[page.url].replace(
+                b"<main>", f"<main><p>Invented copy {copy}.</p>".encode()
+            )
+            out_pages.append(
+                build.PageSpec(
+                    page.kind,
+                    address,
+                    page.minimum_blocks,
+                    page.minimum_paragraphs,
+                    page.language,
+                )
+            )
+    return tuple(out_pages), declared
+
+
 def test_bilingual_normal_seam_exact_quotations(tmp_path: Path, monkeypatch):
     import eii_custodian.publicdata.investment_quotation as q
 
