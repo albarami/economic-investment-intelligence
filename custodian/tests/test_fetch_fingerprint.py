@@ -1504,21 +1504,19 @@ def test_refused_form_in_scanned_module_gives_no_fingerprint_and_refetches(
     assert harness.seen == [e.url for e in harness.entries]
 
 
-@pytest.mark.xfail(
-    reason=(
-        "stated limit: a repository module under code_root but outside the "
-        "runtime roots is bound by nothing; the real-roots test proves "
-        "production keeps every loaded module under the runtime roots "
-        "(decision 0081 item 4)"
-    ),
-    strict=True,
-)
-def test_preloaded_repo_module_outside_runtime_dirs_is_bound(
+def test_stated_limit_preloaded_module_outside_runtime_dirs_is_not_bound(
     harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """scripts/preflight.py in production: under code_root, outside
-    runtime_dirs, loaded at process start by a bound launcher module
-    (preflight_cmd.py)."""
+    """Pins a stated limit (decision 0081 item 4): a module under code_root
+    but outside the runtime roots, preloaded before the run begins, is bound
+    by nothing, so an edit to it between runs still reuses. Production keeps
+    every loaded module under the runtime roots (the real-roots test). If a
+    later change binds such a module, this test fails and the limit is
+    restated. Production has no such module: scripts/ is itself a runtime
+    root, so scripts/preflight.py, loaded at process start by the launcher
+    module preflight_cmd.py, is bound by the loaded-module digest. Replaces a
+    strict expected failure, which the ledger's zero-skip rule refuses and
+    which any unrelated error would also satisfy."""
     _clean_syn_modules()
     roots = _stub_roots(tmp_path, monkeypatch)
     side = tmp_path / "side"
@@ -1532,20 +1530,19 @@ def test_preloaded_repo_module_outside_runtime_dirs_is_bound(
     _rewrite(side / "syn_side.py", "PACING_SECONDS = 0")
     outcome = harness.run(resume=True, code_roots=roots)
     stale = [line for line in outcome.lines if line.startswith("REUSE SYN-first ")]
-    assert not stale, f"stale reuse after editing syn_side.py: {stale}"
+    assert outcome.failure is None
+    assert len(stale) == 1, f"the stated limit no longer holds: {outcome.lines}"
 
 
-@pytest.mark.xfail(
-    reason=(
-        "stated limit: the run-time guard watches the runtime roots only; "
-        "production keeps every loaded module under them (decision 0081 "
-        "item 4)"
-    ),
-    strict=True,
-)
-def test_module_outside_runtime_dirs_loaded_after_begin_trips_the_guard(
+def test_stated_limit_module_outside_runtime_dirs_loaded_after_begin_is_unwatched(
     harness: Harness, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Pins a stated limit (decision 0081 item 4): the run-time guard watches
+    the runtime roots only, so a module outside them loaded after the run
+    begins leaves the entry's fingerprint in place. Production keeps every
+    loaded module under the runtime roots. If a later change makes the guard
+    trip here, this test fails and the limit is restated. Replaces a strict
+    expected failure, which the ledger's zero-skip rule refuses."""
     roots = _stub_roots(tmp_path, monkeypatch)
     side = tmp_path / "side"
     side.mkdir()
@@ -1565,7 +1562,8 @@ def test_module_outside_runtime_dirs_loaded_after_begin_trips_the_guard(
     finally:
         sys.modules.pop("syn_side_late", None)
     item = record(harness)["entries"]["SYN-first"]
-    assert item.get("reuse_unavailable") == "resume_fingerprint_unproven", item.keys()
+    assert "reuse_unavailable" not in item, item.keys()
+    assert "fingerprint" in item, item.keys()
 
 
 def test_named_file_edit_between_runs_refetches(
