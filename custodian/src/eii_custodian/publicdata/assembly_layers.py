@@ -36,6 +36,7 @@ def build_layers(build: Production) -> None:
         sales_export_rows,
     )
     from .property.quarter import quarter_aggregates
+    from .property.sale import sale_aggregates
     from .property.use_map import load_use_map
     from .singles.bank_credit import parse_bank_credit
     from .singles.dcool import parse_dcool
@@ -46,6 +47,7 @@ def build_layers(build: Production) -> None:
     deals: list[Deal] = []
     identifiers: set[str] = set()
     deal_sources = []
+    sale_sources = []
     family_rows: dict[str, list[dict[str, object]]] = defaultdict(list)
     family_sources: dict[str, set[str]] = defaultdict(set)
     parsers: dict[
@@ -141,6 +143,8 @@ def build_layers(build: Production) -> None:
             deals.extend(result.deals)
             identifiers.update(result.identifiers)
             deal_sources.append(entry.key)
+            if source == "prop_sales":
+                sale_sources.append(entry.key)
         elif source in COLLECTED_FAMILIES:
             payload = build.raw(entry, family_archive=True)
             if not isinstance(payload, list):
@@ -190,6 +194,10 @@ def build_layers(build: Production) -> None:
             for entry in build.entries
             if entry.key in deal_sources
         }
+        if sale_sources:
+            sale_rows = sale_aggregates(deals)
+            refuse_release_identifiers(sale_rows, frozenset(identifiers))
+            build.table("pub_property_sale", list(sale_rows), tuple(sale_sources))
         quarter_rows = quarter_aggregates(deals, as_of_by_source=as_of_by_source)
         refuse_release_identifiers(quarter_rows, frozenset(identifiers))
         expected = expected_as_of(deals, as_of_by_source)

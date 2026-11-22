@@ -1919,7 +1919,7 @@ A8 adds, and the source table that holds each:
 |---|---|---|---|
 | Licence issues by activity and municipality | `lic_issued` | `pub_licence_issued` | held; only for the codes it covers (PUB-69) |
 | Licence cancellations by activity and municipality | `lic_cancelled` | `pub_licence_cancelled` | held; to May 2025, with the bulk months flagged |
-| Property prices by district | `prop_sales` | `pub_property_sale` | held; to 31 December 2025, with the deal count |
+| Property prices by district | `prop_sales` | `pub_property_sale` | writer built and proved on invented fixtures; the real receipt and held-series confirmation remain pending; contract coverage to 31 December 2025, with the deal count |
 | Hotel demand and room rates | `hotel_segment` | `pub_hotel_monthly` | held; to March 2025 |
 | Consumer prices | `cpi_group` | `pub_price_index` | held; monthly 2020 to 2025 |
 | Producer prices | none yet; the producer price indices of `price_ext` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A10) are collected in S2-T19 as its candidate source | none | open: no source table yet; the series joins the list of card C30 only through [07](07_ECONOMIC_METHODS.md) |
