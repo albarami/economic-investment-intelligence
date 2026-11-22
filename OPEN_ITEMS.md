@@ -3137,6 +3137,102 @@ These lines close the three entries of the section "S2-P30 — Audit-box disposi
 - NEEDED: read each green hosted run's job time against the cap. If a run comes within 15 minutes of it, a recorded change to the cap or to the parts.
 - NEEDED BY: watched at every merge until the S2 gate.
 
+New records proposed for merge train S2-13 at WORK `8697b3ce3b3d18387b3d83a2dc3912c1f567adea`, pull request 114.
+Requests from supplied review-return PROPOSED OPEN ITEMS sections and the S2-13 specification-update brief are included.
+Next free number at the joined HEAD is OI-375; runtime preparation renumbers the whole block if needed.
+No existing open item is closed by this input. Sources resolve under `.overnight/IN/evidence/`.
+
+## OI-375 — S2-T14 no-key test observations
+
+- ID: OI-375
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-T14.krv1.return.md, PROPOSED OPEN ITEMS, both bullets
+- CONCERNS: TASKS.md S2-T14 sixth acceptance item; custodian/tests/test_night_lights.py, test_night_absent_key_build_succeeds
+- EVIDENCE: The reviewer observes that the empty glob is also empty when the directory never exists, and that snapshot_selection_invalid cannot arise under the fetch-stage seam. It still approves the scoped test; these observations do not establish a missing production guard.
+- NEEDED: Retain the observations for the next test edit: consider an explicit directory-nonexistence assertion and describe the assembly assertion as seam documentation. No assertion or seam is changed by this ledger input.
+- NEEDED BY: No gate; next edit of this test.
+
+## OI-376 — S2-P39 confirmation-four wording follow-up
+
+- ID: OI-376
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-P39.cf4.return.md, N1, N2 and PROPOSED OPEN ITEMS item 1
+- CONCERNS: custodian/tests/test_fetch_fingerprint.py, test_preloaded_repo_module_outside_runtime_dirs_is_bound; decision 0081 item 4
+- EVIDENCE: The xfail reason still attributes the production-set proof to the real-roots test; decision 0081 still describes an unbound remainder although the new production-shape test asserts an empty set.
+- NEEDED: In a later reviewed change, name test_production_shape_loads_no_checkout_module_outside_the_bound_set in the reason, and delete the remainder parenthetical or state that the set is empty. Do not weaken either test or claim a new approval here.
+- NEEDED BY: Next wording correction; the source marks these findings non-rejecting.
+
+## OI-377 — S2-P39 round-four ledger attribution and code-practice figures
+
+- ID: OI-377
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-P39.cf4.return.md, N3 and PROPOSED OPEN ITEMS items 2-4
+- CONCERNS: PROGRESS.md S2-P39 round 4; AGENTS.md rule 38
+- EVIDENCE: The round-four row cites an untracked member-removal script and its parent rather than the final commit. The reviewer gives four files at +133/-5, test file +117/-2 and longest new function about 40 lines, plus copied-body observations. log.ready.md supplies the attributed correction and tracked test anchors; it has not been appended to PROGRESS.md.
+- NEEDED: Append those correction inputs with original 84c63fdf3964aa16b14b885b62f529866050a677 and its full pick from commits.json, the tracked deciders and the attributed figures. Preserve all earlier rows. Close only when the correction is recorded.
+- NEEDED BY: Train S2-13 ledger, pull request 114.
+
+## OI-378 — S2-GW working-paper wording needs recorded application
+
+- ID: OI-378
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.rv1.return.md, PROPOSED OPEN ITEMS item 4
+- CONCERNS: Decision 0085 items 4, 5 and 9; gate checklist C-P4, C-P5 and C-09
+- EVIDENCE: The builder did not change the untracked working papers, while the tracked record states their new wording. A later application record is NOT FOUND IN EVIDENCE. The working papers were not read by this preparation.
+- NEEDED: The lead applies the already-reviewed decision wording to the working papers and records that the papers now carry it. No new gate rule is proposed.
+- NEEDED BY: Before the gate review uses those papers.
+
+## OI-379 — S2-GW conditional S2-T44 move needs the measurement outcome
+
+- ID: OI-379
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.rv1.return.md, PROPOSED OPEN ITEMS item 5
+- CONCERNS: Decision 0085 item 2; TASKS.md S2-T44 criterion 1; document 14 ENHANCEMENT BACKLOG, Slow work moved by decision 0085
+- EVIDENCE: The move is conditional on the measurement round running when the record was filed not settling criterion 1. Its outcome is NOT FOUND IN EVIDENCE in the supplied sources. Existing OI-319, OI-341 and PO-S2-129 retain the underlying performance work; this item is only the requested condition record.
+- NEEDED: The lead records that round outcome. If it settles the criterion, apply the decision own reversal condition and tick only on its proof; otherwise retain the moved/open status. No new measurement round is requested.
+- NEEDED BY: Before relying on the conditional move in gate evidence.
+
+## OI-380 — S2-GW confirmation wording in decision 0085
+
+- ID: OI-380
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-GW.cf1.return.md, Findings — PROPOSED OPEN ITEMS items 1-2
+- CONCERNS: Decision 0085 Decision items 1 and 8; document 14 PLN-32 and ENHANCEMENT BACKLOG
+- EVIDENCE: After the two-stage update, item 1 quotes the earlier PLN-32 wording without identifying it as such; item 8 retains the word-for-word label that the document 14 row has already corrected. The confirmer marks both as records-only and non-rejecting.
+- NEEDED: Make item 1 identify or incorporate the two-stage extension, and relabel item 8 as unchanged in depth, bound and plants or copy the source text verbatim. Use a reviewed records correction; change no requirement or bound.
+- NEEDED BY: Next decision-record wording correction.
+
+## OI-381 — S2-TSKIP staged amendment inventory in decision 0084
+
+- ID: OI-381
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-TSKIP.rv1.return.md, Proposed open items P1
+- CONCERNS: Decision 0084 Amends row and item 7; document 14 Slice S2 gate bullet
+- EVIDENCE: The reviewer says the Amends row lists documents and rule files whose command/pick-up changes are deferred by item 7. The joined decision 0085 now supplies the tender two-state gate wording, so the old missing-gate-wording observation is superseded; the broad amendment inventory still needs stage attribution.
+- NEEDED: Clarify the staged amendment inventory in the background-lane documentation change, distinguishing already-landed gate wording from the deferred command, handoff and pick-up work. OI-370 already owns that implementation; this item adds no new implementation scope.
+- NEEDED BY: The background-lane documentation change, before its dependent starts.
+
+## OI-382 — S2-TSKIP append-only commit and verdict correction
+
+- ID: OI-382
+- TYPE: OPEN (review-requested records or nonblocking observation)
+- RAISED BY: S2-TSKIP.rv1.return.md, Proposed open items P3
+- CONCERNS: PROGRESS.md S2-TSKIP local/uncommitted row; AGENTS.md rule 38
+- EVIDENCE: The original work is committed as 9cf80a091bd8b57f0d8a35d4af8bfdaab929e817. rv1 rejected that target; subsequent cf1 rejected the second commit and cf2 approved the final target. log.ready.md carries the sourced correction and commits.json the full mapping, but no tracked row has been changed here.
+- NEEDED: Append the initial original/pick and historical rejection, followed by the final original/pick and cf2 approval, using the complete mapping. Do not rewrite the local/uncommitted historical row or imply approval of the rejected initial target.
+- NEEDED BY: Train S2-13 ledger, pull request 114.
+
+## OI-383 — Tender own run must retain the intake-triple resume check
+
+- ID: OI-383
+- TYPE: PROPOSED OPEN ITEM (own-run integration requirement)
+- OWNER: S2-TSEP
+- RAISED BY: `.overnight/BRIEF.md`, DO item 3
+- CONCERNS: Decision 0084 items 1, 5 and 7; decision 0081 intake-triple binding; S2-P39 F4
+- EVIDENCE: Lead repair a0232ada retains `test_changed_intake_triple_refetches_tenders` with the ordinary tender skip lifted and adds `test_ordinary_resume_skips_the_tender_row`. This proves no own-run integration; decision 0084 item 7 defers that run.
+- NEEDED: The tender row's own run must call the resume plan's intake-triple check (`ResumePlan._fingerprint_matches`) and carry F4's changed-triple refetch test through its own-run path without lifting the ordinary skip. Preserve the ordinary-run skip test and the existing intake proof; record the deciding check in S2-TSEP's evidence. OI-370 remains the wider own-run/pick-up item.
+- NEEDED BY: S2-TSEP own-run resume delivery, before the decision 0084 item 6 S7-T09 start check.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
