@@ -26,13 +26,11 @@ from eii_custodian.publicdata.review.activity import (
     entry_by_key,
     finalise_spine,
     load_activity_inputs,
-    load_seed_reviews,
     merge_feed_rows,
     parse_feed_rows,
     parse_isic_rows,
     read_review_csv,
     review_binding,
-    spine_path,
     write_queue_csv,
     write_review_csv,
 )
@@ -792,18 +790,25 @@ def test_queue_csv_round_trip(tmp_path: Path) -> None:
     assert rows[1][0] == "5610101"
 
 
-def test_committed_seed_has_no_mapped_row() -> None:
-    """The committed file holds one unreviewed row and no claimed decision."""
-    reviews = load_seed_reviews()
+def test_invented_unsigned_seed_has_no_mapped_row(tmp_path: Path) -> None:
+    """An invented unsigned seed remains unsigned and cannot finalise."""
+    path = tmp_path / "activity_spine.csv"
+    unsigned = _review("5610901", "unreviewed", isic_class="5610", role="", on="")
+    write_review_csv(path, (unsigned,))
+    reviews = read_review_csv(path)
     assert len(reviews) == 1
     assert all(row.status == "unreviewed" for row in reviews)
     assert all(row.reviewed_by_role == "" for row in reviews)
     assert all(row.reviewed_on == "" for row in reviews)
-    restaurant = reviews[0]
-    assert restaurant.name_ar == "مطعم"
-    assert restaurant.isic_class == "5610"
-    assert restaurant.status == "unreviewed"
-    assert spine_path().name == "activity_spine.csv"
+    spine = build_spine(
+        (_activity("5610901", 1),),
+        _classes("5610"),
+        reviews,
+        (),
+        supplier_membership=_NO_SUPPLIERS,
+    )
+    with pytest.raises(SpineError, match="mandatory review missing"):
+        finalise_spine(spine)
 
 
 def test_changed_classification_title_requires_a_new_review() -> None:

@@ -227,12 +227,11 @@ def test_person_signature_keeps_existing_path():
     assert spine.rows[0].status == "mapped"
 
 
-def test_empty_committed_audits_admit_nothing():
-    path = a.spine_path().with_name("activity_spine_audits.json")
+def test_empty_invented_audits_admit_nothing(tmp_path):
+    path = audit_file(tmp_path, [])
     assert json.loads(path.read_text()) == []
-    reviews = a.load_seed_reviews()
-    assert not any(row.status in {"mapped", "not_mappable_rejected"} for row in reviews)
-    assert a.load_recorded_binding(a.spine_path(), reviews) is None
+    with pytest.raises(a.SpineError, match="model audit has no records"):
+        build(rows(1), path)
 
 
 @pytest.mark.parametrize("seed", [True, 1.5, "3141592653", 4294967296, 999999999])
@@ -455,3 +454,45 @@ def test_bound_audit_hash_is_checked_before_any_model_signing(tmp_path):
         a.SpineError, match="model audit file hash differs from binding"
     ):
         build(reviews, path, bound_hash=bound_hash)
+
+
+def test_changed_rejected_title_refused(tmp_path):
+    reviews = rows(1, rejected=True)
+    path = audit_file(tmp_path, [batch(reviews)])
+    binding = replace(
+        a.review_binding(a.CODE_SYSTEM_VERSION, CLASSES),
+        audit_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+    )
+    with pytest.raises(
+        a.SpineError, match="classification title differs from the reviewed title"
+    ):
+        a.build_spine(
+            (a.ActivityRow(reviews[0].code, reviews[0].name_ar, 1, 0),),
+            (replace(CLASSES[0], label_en="INVENTED changed title"),),
+            reviews,
+            (),
+            supplier_membership=NONE,
+            reviewed_binding=binding,
+            audit_path=path,
+        )
+
+
+def test_missing_rejected_title_refused(tmp_path):
+    reviews = rows(1, rejected=True)
+    path = audit_file(tmp_path, [batch(reviews)])
+    binding = replace(
+        a.review_binding(a.CODE_SYSTEM_VERSION, CLASSES),
+        audit_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+    )
+    with pytest.raises(
+        a.SpineError, match="classification title differs from the reviewed title"
+    ):
+        a.build_spine(
+            (a.ActivityRow(reviews[0].code, reviews[0].name_ar, 1, 0),),
+            (),
+            reviews,
+            (),
+            supplier_membership=NONE,
+            reviewed_binding=binding,
+            audit_path=path,
+        )

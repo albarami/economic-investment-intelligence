@@ -1111,5 +1111,14 @@ class SpineTriageTest(unittest.TestCase):
         self.assertEqual(output.getvalue(), "FALLBACK unsigned queue\n")
 
 
+def load_tests(
+    loader: unittest.TestLoader, tests: unittest.TestSuite, pattern: str | None
+) -> unittest.TestSuite:
+    """The named command covers admission; discovery loads its own module once."""
+    if pattern is None:
+        tests.addTests(loader.loadTestsFromName("scripts.tests.test_spine_review"))
+    return tests
+
+
 if __name__ == "__main__":
     unittest.main()

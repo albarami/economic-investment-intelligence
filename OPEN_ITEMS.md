@@ -1929,6 +1929,8 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 
 - DONE SO FAR: 2026-11-22, S2-P57 BT-1: assembly derives mandatory playbook and supplier review membership from the reviewed baskets and verified active/cancelled feeds; its stage record binds the baskets hash and records the classes and codes. Invented-fixture tests include a cancelled-only supplier and planted R1–R5 refusals; evidence is recorded in PROGRESS.md. No real cache is read, mapping signed or acceptance box ticked; the lead's recomputation, signing and independent audit remain owed under decision 0075 item 5.
 
+- UPDATE: 2026-11-22, S2-P60: offline preparation, audited candidate assembly and finalise-check are added to the allowed spine_triage command. Preparation freezes verified receipts, reviewed baskets, membership, title identities and earlier review bytes; assembly checks exact signer/auditor coverage, maker independence and zero judgement differences, preserves earlier signed rows and binds exact audit bytes. Rejected decisions also require their judgement title identity. Tests that required the committed unsigned seed now use invented fixtures. Only invented inputs were used; no real queue is signed and OI-203 remains OPEN. Evidence and limitations: PROGRESS.md, **S2-P60 — offline activity review preparation and admission**; different-maker review and the lead's real-cache signing/audit remain owed.
+
 ## OI-204 — The terms of the classification file are not read
 
 - ID: OI-204

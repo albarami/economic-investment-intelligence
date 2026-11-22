@@ -51559,3 +51559,58 @@ with the lead; no task criterion or slice gate is ticked.
 S2-P58 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona senior statistical-pipeline engineer for public regression figures with exact decimals and complete source chains; strict self-review persona a numbers auditor; skills project-orientation, task-standards, test-driven-development, sanad-provenance, dimensional-analysis, verification-before-completion), on base 132133938f1f4b03f287c88df82dddce98a1f1a6, for PO-S2-P55-01. Producers of PUB-71 and PUB-72 on the assembly path. `eii_core.calc.public_methods` gains `private_employer_share` (PUB-71: private over all employed residents through `coverage_share`, national to one decimal and zones 69 and 70 to none, each rounded once half up by `rounded`) and `licence_density_pair` (PUB-72: licences of activity 5610101 per 10,000 residents through `licence_density`, Al Daayen and national, no decimal, half up). The PUB-71 replay in `custodian/data_tests/local_expectations.py` now calls `private_employer_share` (moved, not copied). New `series/section10.py` `produce` computes and validates every figure whose selected inputs are all present, then writes `series/regression/<id>.json` in the `build_series` envelope with the snapshot receipts as source chain; `Production.series_stage` calls the new `Production.section10` after `build_series`'s clear, and a parse refusal raises the closed `assembly_section10_input_invalid`, now on the fetch/build allow-list. `final_audit` reports its own complete comparison as the audit's regressions. PUB-73 has no producer (PO-S2-P58-01): it stays not measured and `require_complete` still refuses `assembly_gate_pending`. No anchor, expected value, tolerance or comparison changed. Tests first: `core/tests/test_section10_figures.py` (25 tests, two Hypothesis exact-rational oracle and order properties) exit 2 at base (import error); `custodian/tests/test_assembly_section10_producers.py` (22 tests, invented inputs) exit 2 at base and, with the new modules on the base adapters, 16 failed, 6 passed (exit 1); after the change 47 passed (exit 0). Each guard deleted alone, then restored: duplicate_zone, null_pair, zone_missing, negative_count, no_denominator, geography_invalid, population_duplicate, municipality_missing, population_missing, the inputs-selected skip, the unreviewed-indicator refusal, `validate_figure`, the skip-reason and not-selected filters, the duplicate-source refusal, the closed-name translation, the series-stage call, the audit's final comparison and the replay's zone_missing mapping each exit 1; the allow-list name exit 1. Commands (UV_OFFLINE=1): pytest over the 54 importer test files of `core/tests` and `custodian/tests` 2187 passed, exit 0; `ruff check .` exit 0; `ruff format --check .` exit 0; `mypy` exit 0 (501 files); `check_docs.py` exit 0; `check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. `./eii test` and `custodian/data_tests` not run (brief). Not reviewed by another maker yet.
 S2-P58 round 2 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona as round 1, senior statistical-pipeline engineer for public regression figures; strict self-review persona the round-1 numbers auditor; skills test-driven-development, sanad-provenance, dimensional-analysis, verification-before-completion), on base e505afdb (this commit's parent; its full hash holds an eleven-digit run, so it is not written here), for the lead's ruling on PO-S2-P58-01. PUB-73 producer: `eii_core.calc.public_methods.places_in_country` (inclusive box test on the four bbox bounds, exact country compare, one count per record) and `series/section10.py` `pub73` / `place_records` (only `bbox` and `addresses` of the receipt-proven places file through DuckDB with a bound path, read in batches of 2048) with `establishments_2020` from the existing `frame/establishments.establishment_rows`. `Production.section10` passes the verified snapshot path of `places_ovt/part-00014` (the listing entry is skipped; a receipt of another key refuses `places_receipt_mismatch`). Tests first: `core/tests/test_section10_figures.py` exit 2 at base (import error), then 41 passed (exit 0), with a Hypothesis exact-rational oracle and order and duplication properties; `custodian/tests/test_assembly_section10_producers.py` exit 2 at base (import error), then 49 passed (exit 0), on invented parquet written by DuckDB COPY in the test's temporary folder. Each guard deleted alone, then restored: in-box predicate (10 failed, exit 1), exact country (4 failed, exit 1), places_column_missing (2 failed, exit 1), places_parquet_invalid (1 failed, exit 1), places_bbox_invalid (3 failed, exit 1), places_addresses_invalid (4 failed, exit 1), listing filter (1 failed, exit 1), places_receipt_mismatch (1 failed, exit 1). Commands (UV_OFFLINE=1): pytest over the two files above plus `test_restricted_expectation_guards.py` and `test_assembly_section10.py` 178 passed, exit 0; pytest over the 34 test files of `core/tests` and `custodian/tests` that import `public_methods`, `section10`, `assembly_adapters` or `Production` 1548 passed, exit 0; `ruff check .` exit 0; `ruff format --check .` exit 0; `mypy` exit 0 (501 files); `check_docs.py` exit 0; `check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Not run: `./eii test`, `custodian/data_tests` and the real cache (brief). Not reviewed by another maker yet.
 S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona as round 2, senior statistical-pipeline engineer for public regression figures; strict self-review persona a numbers auditor who rejects a reader that admits less strictly than its siblings or a refusal tested only below the production boundary; skills test-driven-development, verification-before-completion), on base 4eb4979e22cf7962e627a53e49665d9b184e08a3, for lens-2 findings 1 to 3 on that commit. `series/section10.place_records` now calls the existing `places/read._require_schema` before reading columns, as every other places reader does, and refuses `places_schema_invalid` (closed `ValueError`; `Production.section10` turns it into `assembly_section10_input_invalid`). Test fixtures write the places schema metadata as the places-reader fixtures do. One list `MALFORMED` of twelve malformed places files (column missing x2, bbox invalid x3, addresses invalid x4, schema missing, schema wrong, not parquet) drives both the direct reason test (exact reason) and a new adapter test through `Production.section10` with valid PUB-71/72 inputs (exact closed name, no record under `series/regression`); a new negative changes only the places receipt's `source_id`. Red first: 4 failed, 60 passed (the four schema cases; exit 1); green: 64 passed (exit 0). Guard deletions, each alone then restored byte-for-byte: schema guard 4 failed (exit 1); receipt `source_id` half 1 failed (exit 1); column guard 2 failed in the direct reason test (exit 1; at the adapter the DuckDB read still refuses under the same closed name); bbox raise 1 failed (exit 1); addresses raise 1 failed (exit 1); parquet translation 1 failed (exit 1). Commands with `UV_OFFLINE=1`: pytest of `core/tests/test_section10_figures.py`, `custodian/tests/test_assembly_section10_producers.py`, `custodian/tests/test_restricted_expectation_guards.py`, `custodian/tests/test_places_read.py`, `test_places_read_survivors.py`, `test_places_read_survivors2.py`: 288 passed, exit 0; ruff check exit 0; ruff format --check exit 0; mypy exit 0 (501 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. `./eii test` not run (brief).
+## S2-P60 — offline activity review preparation and admission
+
+- Date: 2026-11-22. Base: `8f75f027a17a16d1e40c98396fbf502ef3e207bd`.
+  Builder: OpenAI GPT-6 through Codex; senior data-governance engineer for
+  classification mappings. Strict self-review persona: sanad auditor. Skills:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer, muhasabah-gate; the brief supplies
+  test-driven-development, security-review and verification-before-completion
+  equivalent rules. Independent different-maker approval remains with the lead.
+- Scope: `spine_triage.py --mode prepare`, `--mode assemble` and
+  `--mode finalise-check`; verified source receipts and basket-derived membership,
+  minimal untranslated signer packets, frozen inputs, maker independence, exact
+  coverage and audit decisions, preserved earlier rows, exact audit-byte binding
+  and mandatory finalisation. Rejected decisions bind their classification title,
+  including refusal when that title disappears. The committed review, baskets,
+  binding and audit files are unchanged; unsigned-seed assumptions moved into
+  invented fixtures. OI-203 stays open for the lead's real review.
+- Environment: Linux, Python 3.14.6, uv 0.11.31, pytest 9.2.0,
+  Hypothesis 6.170.15; `UV_OFFLINE=1`. Only invented caches under documented
+  temporary paths were used. No network, real cache, secret file or private
+  directory was read. The original worktree Git metadata is read-only; commit
+  and bundle metadata are maintained inside the workspace, without changing the
+  containing clone. No push, merge or independent review is claimed.
+- Verification commands and real exits on the final source:
+  `uv run --locked python -m unittest scripts.tests.test_spine_triage -v`
+  exit 0, 71 tests; `uv run --locked python -m pytest
+  custodian/tests/test_activity*.py scripts/tests/test_spine_review_properties.py
+  --hypothesis-seed=2026112260 -vv` exit 0, 378 passed, none skipped;
+  `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0, 943 files;
+  `uv run --locked mypy` exit 0, 503 source files;
+  `python3 scripts/check_docs.py` exit 0;
+  `python3 scripts/check_tree.py` exit 0, eight rules;
+  `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0.
+  Documentation/tree checks use the workspace-local candidate index.
+- Red/green evidence: every new explicit refusal guard was removed alone and
+  restored; the accepted plant inventory has 40 red exit-1 / restored exit-0
+  pairs, including shared path/output guards, diagnostic handlers, title removal,
+  exact Arabic text, duplicate return codes, eligibility boundaries, preservation
+  and exact audit bytes. A newly added missing-rejected-title test first failed
+  (exit 1, no refusal) and passed after the binding correction (exit 0).
+  Property tests cover empty and single batches, sample-size boundaries,
+  rejected/mapped mixtures, order invariance and queue eligibility partitions.
+- Development failures are retained in the return evidence: initial test imports
+  needed the repository's fixture search paths; fixture sign-off defaults, a
+  reused output id and the exact missing-receipt reason were corrected. Initial
+  lint/type failures were corrected without exclusions. One title-binding plant
+  was mistakenly invoked with unittest instead of pytest, yielding red 1 and
+  restored 1; it is excluded from the 40 accepted pairs and its corrected pytest
+  plant records red 1 / restored 0. These are diagnosed development errors, not
+  random failures or waived checks. The earlier 70-test green is superseded by
+  the 71-test run after the exact-text edge case was added.
+- Evidence: workspace return `.overnight/RETURN.md` and its named logs under
+  `.overnight/evidence/`; no real signing, source acquisition, task checkbox,
+  slice approval or whole-project test is claimed.

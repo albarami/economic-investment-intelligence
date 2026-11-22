@@ -164,9 +164,77 @@ class Parser(argparse.ArgumentParser):
         raise Refusal("arguments refused")
 
 
+def review_main(argv: list[str], root: Path) -> int:
+    """Three offline modes; no provider or gateway construction is reachable."""
+    from spine_review import (
+        assemble_audited_review,
+        finalise_check,
+        prepare_review_inputs,
+    )
+
+    parser = Parser(description="Offline audited activity review")
+    parser.add_argument(
+        "--mode", required=True, choices=("prepare", "assemble", "finalise-check")
+    )
+    parser.add_argument("--run-id", required=True)
+    for name in (
+        "cache",
+        "review",
+        "manifest",
+        "signer-rows",
+        "auditor-rows",
+        "maker-record",
+    ):
+        parser.add_argument("--" + name, type=Path)
+    parser.add_argument("--preparer-maker")
+    try:
+        args = parser.parse_args(argv)
+        required = {
+            "prepare": (args.cache, args.review, args.preparer_maker),
+            "assemble": (
+                args.manifest,
+                args.signer_rows,
+                args.auditor_rows,
+                args.maker_record,
+            ),
+            "finalise-check": (args.manifest, args.review),
+        }
+        if any(value is None for value in required[args.mode]):
+            raise Refusal("arguments refused")
+        if args.mode == "prepare":
+            target = prepare_review_inputs(
+                root, args.cache, args.review, args.run_id, args.preparer_maker
+            )
+            counts = json.loads((target / "manifest.json").read_bytes())["counts"]
+            print(" ".join(f"{key}={value}" for key, value in sorted(counts.items())))
+        elif args.mode == "assemble":
+            assemble_audited_review(
+                root,
+                args.manifest,
+                args.signer_rows,
+                args.auditor_rows,
+                args.maker_record,
+                args.run_id,
+            )
+            print("OK audited candidate")
+        else:
+            finalise_check(root, args.manifest, args.review, args.run_id)
+            print("OK finalised spine")
+    except Refusal as error:
+        print("REFUSED " + str(error))
+        return 3
+    except (OSError, ValueError, TypeError, KeyError, SpineError, CacheError):
+        print("REFUSED review_input_invalid")
+        return 3
+    return 0
+
+
 def main(argv: list[str] | None = None, *, root: Path | None = None) -> int:
     """Exit 0 unsigned output, 3 refusal, 4 complete keyed-failure fallback."""
     root = Path(__file__).resolve().parents[1] if root is None else root.resolve()
+    actual = sys.argv[1:] if argv is None else argv
+    if "--mode" in actual or any(value.startswith("--mode=") for value in actual):
+        return review_main(actual, root)
     parser = Parser(description=__doc__)
     for name in ("queue", "cache", "review", "membership"):
         parser.add_argument("--" + name, type=Path, required=True)

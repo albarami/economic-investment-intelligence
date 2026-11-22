@@ -35,9 +35,9 @@ Outputs are local, uncommitted files under
   method/rubric/route identity and run accounting, with no payload or scores.
 
 Gateway records retain DAT-126 and null `human_disposition` and are written only
-under `evals/typed_decisions/runs/`. A person reviews each meaning, transfers that
-row into the S2-T04 review CSV, records their reviewer role and date and carries
-the matching binding. Previously signed rows must be preserved. Rebuild and
+under `evals/typed_decisions/runs/`. A reviewer signs each meaning under decision 0075, records the reviewer role
+and date and carries the matching binding and, for model decisions, the
+independent audit evidence described below. Previously signed rows must be preserved. Rebuild and
 finalise through S2-T04. Unsigned legacy acknowledgements also require individual
 review; copying the queue or suggestions into the review path cannot complete it.
 
@@ -61,3 +61,80 @@ Exit 0 means an unsigned queue was written. Exit 3 means input or authorisation
 refusal, with a fixed diagnostic. Exit 4 means keyed failure: no follow-on call
 or retry, the complete baseline queue and unresolved suggestions are written.
 There is no application import, table, screen or automatic mapping.
+
+## Offline audited review modes (decision 0075, OI-203)
+
+The lead order is **prepare, triage with provider none, sign, audit, assemble,
+finalise-check**, followed by the lead's review and commit of the candidate trio.
+These modes never construct a gateway, fetch a source or change committed review
+files. Use a fresh run identifier for every output folder. All paths must be
+inside the repository without symlinks or traversal; the verified cache must be
+under `data/public_cache`. The examples are later lead-shell commands, not worker
+instructions to read a real cache.
+
+```sh
+uv run --locked python scripts/spine_triage.py --mode prepare --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --preparer-maker PREPARER --run-id oi203-prepared
+EII_DECISION_PROVIDER=none uv run --locked python scripts/spine_triage.py --queue data/public_cache/spine_review/oi203-prepared/queue.csv --cache data/public_cache --review custodian/publicdata/review/activity_spine.csv --membership data/public_cache/spine_review/oi203-prepared/membership.json --run-id oi203-triage
+uv run --locked python scripts/spine_triage.py --mode assemble --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --signer-rows data/public_cache/signer.csv --auditor-rows data/public_cache/auditor.csv --maker-record data/public_cache/makers.json --run-id oi203-candidate
+uv run --locked python scripts/spine_triage.py --mode finalise-check --manifest data/public_cache/spine_review/oi203-prepared/manifest.json --review data/public_cache/spine_review/oi203-candidate/activity_spine.csv --run-id oi203-final
+```
+
+`prepare` reuses the assembly's verified active and cancelled feed readers and
+reviewed basket membership. It writes `queue.csv`, `membership.json`,
+`queue.binding.json`, `signer_packet.json` and `manifest.json` under
+`data/public_cache/spine_review/<run-id>/`. The packet contains only code, exact
+Arabic name, prefix and source-provided English and Arabic class titles; an
+absent Arabic title stays empty. The manifest binds the exact baskets, review,
+existing binding and audit bytes, source receipts and attribution, recomputed
+membership, spine input identities and output hashes. Standard output contains
+only eligible-code, mandatory-acknowledgement and excluded-pattern-group counts.
+The preparer's maker is frozen with the packet.
+
+The signer returns the exact eight-column review CSV contract documented above,
+covering every queue row exactly once. Eligible rows permit only `mapped` with
+the prefix and `reviewer_approved`, or `not_mappable_rejected` with an empty
+class and `reviewer_rejected`. Mandatory legacy and invalid-prefix rows keep
+their derived status and reason, empty class, and individual signed
+acknowledgements; they are not eligible model mapping decisions. All names and
+code lengths stay unchanged. Signed rows need the actual ISO signing date.
+
+Freeze the signer's returned file before drawing `audit_sample` with the
+recorded seed. Give an independent auditor only the sampled minimal packets,
+without signer answers. The auditor returns the same CSV contract for exactly
+the sampled codes, its own role and the actual audit date. Its decisions must
+match in every judgement field. The maker record is a JSON object with exactly
+`preparer_maker`, `signer_role`, `auditor_role`, `batch_id`, `seed`, `audit_date`.
+Roles use `model review: <maker> <model>, <persona>`; maker comparison ignores
+case. The signer differs from both preparer and auditor. The seed, date,
+independence, draw and zero-error requirements are decision 0075 item 4's
+existing admission contract. A disagreement refuses the batch; arrange fresh
+code-by-code signing and a fresh seeded audit under item 3, never edit the
+auditor's decision to match. Empty eligible batches produce no new audit batch.
+
+`assemble` rederives frozen inputs and verifies returned coverage and decisions
+before publishing anything. It preserves earlier review rows outside the queue
+and earlier audit records, then calls the normal admission and finalisation
+checks on a temporary candidate. It writes `activity_spine.csv`,
+`activity_spine_audits.json`, `activity_spine.binding.json` and `assembly.json`
+into a fresh run folder. The binding hashes the exact emitted audit bytes;
+`assembly.json` hashes the frozen manifest, returned files and emitted trio.
+Rejections bind their prefix's classification title just as approvals bind
+their class title. Temporary validation files are removed on refusal; no
+candidate folder is published.
+
+`finalise-check` rederives membership and inputs from the preparation manifest,
+loads the selected candidate through the ordinary spine admission guards and
+calls `finalise_spine`. It writes `result.json` binding the manifest, review,
+binding and audit hashes, source snapshot and resulting spine manifest. A
+mandatory unsigned row exits nonzero, with no result folder. Run this before
+installing the candidate trio into the committed review folder, because the
+preparation manifest also freezes the earlier committed review bytes.
+
+Offline-mode exit 0 means the stated output was published; exit 3 means refusal.
+New helper refusals have closed reason tokens, including
+`frozen_inputs_changed`, `prepared_output_changed`, `signer_coverage_differs`,
+`signer_maker_conflict`, `audit_decision_differs` and
+`mandatory_review_missing`. Invalid JSON (including duplicate keys), missing
+files, malformed source inputs and other admission failures remain refusals;
+CLI diagnostics never echo source text or a path. Invented-fixture success does
+not sign the real queue or close OI-203.
