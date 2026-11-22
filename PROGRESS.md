@@ -50352,3 +50352,12 @@ exited 0, then the same test command exited 0. The temporary runner
 changed relative to that implementation commit. The local commit is amended
 with this evidence only, keeping one task commit above base; the final hash
 and regenerated bundle/checksum are recorded in `.overnight/RETURN.md`.
+
+## S2-P48 records: lead acceptance of decision 0089 and review evidence — 2026-11-22
+
+- Lead: Anthropic Opus 5.5 (lead). Reviewed head `a3eed2d2`; base `1f7fd252`.
+- Lead real-cache replay (lead's shell only): `UV_OFFLINE=1 EII_DECISION_PROVIDER=none uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py -q -p no:cacheprovider`: 10 passed in 514 s, exit 0.
+- Lead verification of `a3eed2d2`: the importer suites plus ruff, format, mypy, check_docs, check_tree, `cmp AGENTS.md CLAUDE.md` and `git diff --check` all exit 0.
+- Review 1 (Anthropic Opus 5.5, numbers and provenance lens): APPROVED for `a3eed2d2`. Its own plant of the period constant went red. Four records-only points: (1) the owner of the PRV-115 status of the two pairs, (2) the period constant (not a defect: document 07 card C8 binds Census 2020), (3) a verb number in document 03, (4) lead acceptance of decision 0089 before merge.
+- Review 2 (Moonshot AI Kimi K3.1 Pro): APPROVED for `a3eed2d2`, no findings. Its own plant R22 (an empty cached formula value) went red 1, cmp 0, green 0.
+- Records applied in this commit (records only; no code or test byte changed): decision 0089 accepted under L-1443 with the S5/OI-170 owner sentence in item 3 and an Acceptance section; the document 03, document 04, docs index and frame README wording follows.

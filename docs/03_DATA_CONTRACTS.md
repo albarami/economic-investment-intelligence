@@ -883,8 +883,8 @@ guessed from a translated title or path.
 
 ### C8 national census indicator vocabulary
 
-Proposed [decision 0089](decisions/0089-c8-national-census-release-indicators.md)
-items 1 to 3 names two additional pairs in `pub_census_national` only:
+[Decision 0089](decisions/0089-c8-national-census-release-indicators.md)
+items 1 to 3 name two additional pairs in `pub_census_national` only:
 `private_employed_residents`/`persons` (Private) and
 `employed_residents`/`persons` (Total). Both are unaltered Census 2020 Table 76
 counts on the uniquely labelled Both Sexes row in column B, with period `2020`

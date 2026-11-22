@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed by task S2-P48; lead decision and different-maker acceptance owed |
+| Status | Accepted by the lead under L-1443 |
 | Date | 2026-11-22 |
 | Scope | Documents 03 and 04; PO-S2-48; card C8 of document 07 |
 
@@ -33,7 +33,9 @@ but PO-S2-48 R3 FOLLOW-UP records the missing producer and indicator vocabulary.
    Public count names do not enable audit selectors or settle applicability.
    DAT-128 and PRV-115's applicability review and fail-closed rules still apply.
    No census value is committed. No rule for a zero-denominator zone is added;
-   the existing `C8:zone_denominator` refusal remains.
+   the existing `C8:zone_denominator` refusal remains. Their status under PRV-115
+   is set by the privacy design of slice S5 (OI-170), as DAT-128 sets it for
+   `employed`.
 
 ## Evidence and remaining decisions
 
@@ -43,3 +45,10 @@ producer — 2026-11-22**. Those checks establish no real-file correctness.
 PO-S2-48 remains OPEN for the lead's real-cache replay, this proposal's
 acceptance and different-maker acceptance of the implementation. No task box
 is ticked by this proposal.
+
+## Acceptance
+
+The lead accepted this decision on 2026-11-22 under ruling L-1443, after the
+lead's real-cache replay of `custodian/data_tests/test_pinned_methods.py` (10
+passed, exit 0) and two different-maker reviews of the implementation that both
+returned APPROVED (Anthropic and Moonshot AI). PO-S2-48 closes on merge.

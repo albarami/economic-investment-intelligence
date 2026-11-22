@@ -138,7 +138,7 @@
 | [0084](decisions/0084-public-tenders-in-a-separate-run.md) | Public tenders in a separate lead-shell run: the ordinary run's `own_run` skip and exact `own_run_pending` absence built first for the slice S2 gate; tenders-only form, handoff and identity-bound pick-up in the background lane before S7-T09 | Accepted, 2026-11-21, under the owner-delegated background-work decision |
 | [0085](decisions/0085-the-slice-s2-gate-wording-under-the-slow-work-rule.md) | The slice S2 gate wording under the slow-work rule: slow work with a dependent before go-live runs in the background, slow work with none moves word for word to the after-go-live list; S2-T44 criterion 1 moved with OI-319, OI-341 and PO-S2-129, tenders recorded as picked up or pending; no check, test, plant or bound changed | Accepted, 2026-11-21; the owner's words of 2026-11-21 (OWNER_RULES 34) |
 | [0086](decisions/0086-custodian-part-limit-and-watch.md) | Three complete custodian parts, each with a 1,200-second limit everywhere and a 720-second green hosted watch | Accepted, 2026-11-21; the owner's words and the delegated advisor decision, applied by lead ruling L-1404 |
-| [0089](decisions/0089-c8-national-census-release-indicators.md) | Two national-only C8 release indicator/unit pairs and the Table 76 producer; audit-count pairs unchanged | Proposed, 2026-11-22; S2-P48, PO-S2-48; lead decision and different-maker acceptance owed |
+| [0089](decisions/0089-c8-national-census-release-indicators.md) | Two national-only C8 release indicator/unit pairs and the Table 76 producer; audit-count pairs unchanged | Accepted by the lead under L-1443, 2026-11-22; S2-P48, PO-S2-48 |
 
 ## Identifiers and change control
 

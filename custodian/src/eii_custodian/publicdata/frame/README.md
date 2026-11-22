@@ -199,7 +199,7 @@ national-only `private_employed_residents` and `employed_residents` indicators
 (unit `persons`, period `2020`), and appends them beside `est_census` rows.
 The selected hash and full receipt remain under that source with method
 `frame.census.table76.v1: Both Sexes Private / Total`. Missing or malformed
-inputs refuse. Proposed decision 0089 names the two pairs; DAT-128's audit
-selectors are unchanged. PO-S2-48 stays open for the lead's real-cache replay,
-proposal acceptance and different-maker acceptance. Fixtures prove no real
+inputs refuse. Decision 0089 names the two pairs; DAT-128's audit
+selectors are unchanged. The lead's real-cache replay passed and the decision
+was accepted under L-1443; PO-S2-48 closes on merge. Fixtures prove no real
 census value or completed release.
