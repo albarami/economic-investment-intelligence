@@ -50203,3 +50203,11 @@ Lead (Anthropic Opus 5.5). Part B `b2c329aa` was merged onto part A `c0a18fd4` (
 - resolves PO-S2-P47-B-01 point 1: the part row `bldg_ovt/part-00288` gets the skip reason `not_required_part_decision_0090` and leaves `fetch/large.py` `REQUIRED_KEYS` (decision 0090 item 2 says so), so no build fetches it.
 
 Test first: `test_part_00288_is_registered_skipped_and_never_streamed` (`custodian/tests/test_large_intake.py`) failed on the empty skip reason (1 failed) and passes after the change. Two plants each gave 1 failed, then restore, `cmp` 0 and 1 passed: the skip reason emptied, and 00288 put back in `REQUIRED_KEYS`. Two forced test changes: the 00288 case leaves the large-intake parametrisation, and `test_flagship_check_receives_zone_69` reads part 00384 as its building entry, because a skipped row is not read as a building file.
+
+## S2-P47 lead records step on the real cache — the 512 STAC item rows and the reviewed outside-part file — 2026-11-22
+
+Lead shell (Anthropic Opus 5.5), real public cache, offline. The pinned collection holds 512 item links. Every item file name has the shape `99999/99999.aaaa`, with the same five digits in the folder and the file. The pattern `(?P<part>[0-9]{5})/(?P=part)\.json` matches 512 of 512, with 512 distinct parts.
+- `uv run --locked python scripts/stac_item_rows.py data/public_cache --item-name-pattern '(?P<part>[0-9]{5})/(?P=part)\.json'` exit 0: `sources.yaml` gains the 512 item rows in place of the three placeholders, and `assembly_sources.py` gains the closed `BLDG_OVT_KEYS` tuple. The same command with `--check` exits 0.
+- Part B's L4 command (`outside_review_document` over the frame build's municipality union, bound to the pinned `bnd_hdx`) printed 3 and wrote `custodian/publicdata/review/national_boundary_outside.json` (version 1, 3 sorted part hashes; file sha256 prefix `b6ded87d80`).
+
+`custodian/data_tests/test_national_buildings.py` on this cache copy exits 1 with `building_manifest_absent`, because that copy's last build stopped at the frame step before any building table was written. The data test is replayed after the lead's resumed build on this head.
