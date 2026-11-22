@@ -397,6 +397,8 @@ the real verification loader, including the named midnight plant. Fixture
 checks are recorded in PROGRESS.md; closure awaits the lead's live run 3 and
 independent code review. The separate Arabic-name reader gap remains OI-256.
 
+- Offline evidence 2026-11-22 (S2-P54): both public-frame callers share the places build-log context; an invented missing Arabic tag logs exactly `stage places arabic_tag_missing` while `Production.frame` still refuses with `assembly_places_incomplete`. Base red, binding-deletion red, reset-deletion red and restored green are recorded in PROGRESS.md; 1525 places/importer tests pass. No acceptance box changes; live places evidence and independent maker review remain pending.
+
 ### S2-T07 — Calculation layer and method regressions
 - Goal: Implement deterministic Public calculations in `eii_core.calc` with method-card regression tests.
 - Acceptance criteria: [x] no calculation reads files or databases; [ ] each implemented worked example has arithmetic and data tests; [x] comparisons return facts rather than prose.
