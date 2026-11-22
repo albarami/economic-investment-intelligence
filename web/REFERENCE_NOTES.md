@@ -23,7 +23,7 @@ The section "Confirmations assigned to this task" is not about a library. It rec
 
 ## MapLibre GL JS 6
 
-Used here for the basemap, camera, building extrusion and label rendering (docs/10_FRONTEND.md section "Stack and pins" row "`maplibre-gl`"). Series 6; the pins.toml rows are `maplibre-gl` and `@mapbox/mapbox-gl-rtl-text`.
+Used here for the basemap, camera, building extrusion and label rendering (docs/10_FRONTEND.md section "Stack and pins" row "`maplibre-gl`"). Series 6; the pins.toml rows are `maplibre-gl` and `@mapbox/mapbox-gl-rtl-text`. S3-P1b B0 retains the recorded MapLibre pin 6.17.0 and retreat 5.x (last registry release recorded there: 5.24.1); no retreat is tried.
 
 ### Pages read
 
@@ -57,6 +57,8 @@ Used here for the basemap, camera, building extrusion and label rendering (docs/
 | P26 | https://maplibre.org/maplibre-gl-js/docs/API/classes/NavigationControl/ | NavigationControl - MapLibre GL JS | 2026-11-20 |
 | P27 | https://maplibre.org/maplibre-gl-js/docs/API/classes/LngLatBounds/ | LngLatBounds - MapLibre GL JS | 2026-11-20 |
 | P28 | https://maplibre.org/maplibre-gl-js/docs/API/functions/setRTLTextPlugin/ | setRTLTextPlugin - MapLibre GL JS; retained under decision 0042 item 7 | 2026-11-20 |
+| P29 | https://maplibre.org/maplibre-style-spec/layers/ | Layers - MapLibre Style Spec; fill-extrusion | 2026-11-22 |
+| P30 | https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/ | Map - MapLibre GL JS; querySourceFeatures, setFilter, setPixelRatio | 2026-11-22 |
 
 ### Runs
 
@@ -140,6 +142,10 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | S47 | LngLatBounds.extend accepts supplied geographic bounds or points. | READ | P27 | "Extend the bounds to include a given LngLatLike or LngLatBoundsLike." |
 | S48 | With lazy true, the plugin finishes loading before RTL text renders. | READ | P28 | "rtl text will then be rendered only after the plugin finishes loading." |
 | S49 | The package lock holds the exact interface-font pins @fontsource/ibm-plex-sans and @fontsource/ibm-plex-sans-arabic 5.3.0, and the map-font pins @fontsource/noto-sans and @fontsource/noto-sans-arabic 5.3.0. | OBSERVED | R11 | - |
+| S50 | READ on 2026-11-22 for S3-P1b B0: fill-extrusion-height is specified in metres, with zero as its default. | READ | P29 | "Units in meters. Defaults to" |
+| S51 | READ on 2026-11-22 for S3-P1b B0: querySourceFeatures may return split or duplicate geometries at tile boundaries. | READ | P30 | "feature geometries may be split or duplicated across tile boundaries" |
+| S52 | READ on 2026-11-22 for S3-P1b B0: setFilter selects which source features a layer renders. | READ | P30 | "Sets the filter for the specified style layer" |
+| S53 | READ on 2026-11-22 for S3-P1b B0: setPixelRatio overrides the map's device pixel ratio. | READ | P30 | "Sets the map's pixel ratio" |
 
 ### Slice S1 confirmation
 
@@ -154,7 +160,7 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 
 ## deck.gl 9.4
 
-Used here for the data layers, interleaved with the basemap through `@deck.gl/maplibre` (docs/10_FRONTEND.md section "Stack and pins"). Series 9.4; the pins.toml rows are `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers` and `@deck.gl/extensions`.
+Used here for the data layers, interleaved with the basemap through `@deck.gl/maplibre` (docs/10_FRONTEND.md section "Stack and pins"). Series 9.4; the pins.toml rows are `@deck.gl/core`, `@deck.gl/layers`, `@deck.gl/geo-layers` and `@deck.gl/extensions`. S3-P1b B0 retains their recorded pin 9.4.1 and retreat 9.3.12; the MapLibre module retains pin 9.4.1 and retreat replacement @deck.gl/mapbox, untried here.
 
 ### Pages read
 
@@ -171,6 +177,13 @@ Used here for the data layers, interleaved with the basemap through `@deck.gl/ma
 | P9 | https://github.com/visgl/deck.gl/blob/master/modules/core/src/effects/lighting/sun-light.ts | SunLight source - deck.gl | 2026-11-16 |
 | P10 | https://deck.gl/docs/api-reference/geo-layers/tile-3d-layer | Tile3DLayer - deck.gl | 2026-11-16 |
 | P11 | https://github.com/visgl/loaders.gl/blob/master/modules/3d-tiles/src/tiles-3d-loader.ts | Tiles3DLoader source - loaders.gl | 2026-11-16 |
+| P12 | https://deck.gl/docs/api-reference/core/lighting-effect | LightingEffect - deck.gl; experimental shadows reread | 2026-11-22 |
+| P13 | https://deck.gl/docs/api-reference/core/sun-light | SunLight (Experimental) - deck.gl; reread | 2026-11-22 |
+| P14 | https://deck.gl/docs/api-reference/core/directional-light | DirectionalLight - deck.gl; reread | 2026-11-22 |
+| P15 | https://deck.gl/docs/api-reference/layers/solid-polygon-layer | SolidPolygonLayer - deck.gl | 2026-11-22 |
+| P16 | https://deck.gl/docs/api-reference/layers/geojson-layer | GeoJsonLayer - deck.gl | 2026-11-22 |
+| P17 | https://deck.gl/docs/developer-guide/performance | Performance Optimization - deck.gl; data changes reread | 2026-11-22 |
+| P18 | https://deck.gl/docs/api-reference/core/deck | Deck - deck.gl; layerFilter and the shadow render pass | 2026-11-22 |
 
 ### Runs
 
@@ -216,6 +229,13 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S22 | Root completion starts traversal using the current viewport; late completion after exit destroys the tileset (docs/10_FRONTEND.md FE-148). | OBSERVED | R3 | - |
 | S23 | P6 reread on 2026-11-23: the shadow effect is experimental and needs the _shadow prop of a directional light; a layer's shadowEnabled prop toggles it per layer (docs/10_FRONTEND.md FE-143; decision 0048). | READ | P6 | "For rendering experimental shadow effect, _shadow prop of DirectionalLight must be set to true" |
 | S24 | P8 reread on 2026-11-23: _shadow is an optional boolean of a directional light, default false, that enables the experimental shadow effect; the sun light inherits it. | READ | P8 | "Enable experimental shadow effect, default value is false" |
+| S25 | READ on 2026-11-22 for S3-P1b B0: shadows remain experimental; a directional light needs _shadow enabled and shadowEnabled controls the layer. | READ | P12 | "For rendering experimental shadow effect" |
+| S26 | READ on 2026-11-22 for S3-P1b B0: SunLight uses a timestamp in milliseconds. | READ | P13 | "Unix timestamp in milliseconds" |
+| S27 | READ on 2026-11-22 for S3-P1b B0: DirectionalLight's experimental _shadow option defaults to false. | READ | P14 | "Enable experimental shadow effect, default value is" |
+| S28 | READ on 2026-11-22 for S3-P1b B0: SolidPolygonLayer renders filled or extruded polygons; extruded false gives flat geometry. | READ | P15 | "all polygons will be flat" |
+| S29 | READ on 2026-11-22 for S3-P1b B0: GeoJsonLayer's getElevation supplies polygon extrusion height in metres with cartographic projection. | READ | P16 | "height will be interpreted as meters" |
+| S30 | READ on 2026-11-22 for S3-P1b B0: keeping the same data object avoids unnecessary buffer regeneration. | READ | P17 | "supply the same data object" |
+| S31 | READ on 2026-11-22 for S3-P1b B0: layerFilter receives a renderPass name, including shadow, and determines whether the layer draws. | READ | P18 | "drawing to shadow map" |
 
 
 ### Slice S1 confirmation
@@ -240,6 +260,7 @@ The module `@deck.gl/maplibre` is used here through `MapLibreOverlay`, interleav
 | P1 | https://deck.gl/docs/api-reference/maplibre/overview | MapLibreOverlay - deck.gl | 2026-11-12 |
 | P2 | https://deck.gl/docs/developer-guide/base-maps/using-with-maplibre | Using with MapLibre - deck.gl | 2026-11-12 |
 | P3 | https://deck.gl/docs/whats-new | What's New - deck.gl | 2026-11-12 |
+| P4 | https://deck.gl/docs/api-reference/maplibre/overview | MapLibreOverlay - deck.gl; interleaved context and pixel ratio reread | 2026-11-22 |
 
 ### Runs
 
@@ -273,6 +294,7 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S10 | Globe integration uses the experimental GlobeView of deck.gl. | READ | P1 | "Globe integration uses deck.gl's experimental GlobeView" |
 | S11 | Interleaved mode needs WebGL2. | READ | P1 | "Interleaved mode only works when WebGL2 is available" |
 | S12 | The retreat uses @deck.gl/mapbox in place of this module (docs/10_FRONTEND.md section "Stack and pins"); it has not been installed or run for this retreat here: not verified. | PACK | docs/10_FRONTEND.md section "Stack and pins" | - |
+| S13 | READ on 2026-11-22 for S3-P1b B0: interleaved layers share MapLibre's WebGL2 context; useDevicePixels is ignored there. | READ | P4 | "useDevicePixels and device are ignored in interleaved mode" |
 
 ### Slice S1 confirmation
 

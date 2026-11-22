@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import reference_notes_support as sup
 
 import reference_notes_tables as tables
+from reference_notes_parse import check_address
 
 REPO = Path(__file__).resolve().parents[2]
 SCRIPT = REPO / "scripts" / "check_reference_notes.py"
@@ -200,6 +201,27 @@ class RealNotes(unittest.TestCase):
         self.assertEqual(before_real, after_real)
         self.assertEqual(set(after_tree), listing)
 
+    def test_buildings_style_spec_address_is_narrowly_allowed(self) -> None:
+        self.assertIsNone(
+            check_address("https://maplibre.org/maplibre-style-spec/layers/")
+        )
+        for url, reason in (
+            (
+                "https://maplibre.org/maplibre-style-spec/unknown/",
+                "not on the list of official addresses",
+            ),
+            (
+                "https://invented.invalid/maplibre-style-spec/layers/",
+                "not on the list of official addresses",
+            ),
+            (
+                "https://maplibre.org/maplibre-style-spec/layers/?secret=x",
+                "has a query or a fragment",
+            ),
+        ):
+            with self.subTest(url=url):
+                self.assertEqual(check_address(url), reason)
+
     def test_tables_have_their_sizes(self) -> None:
         self.assertEqual(len(tables.LIBRARIES[tables.WEB]), 3)
         self.assertEqual(len(tables.LIBRARIES[tables.DOCS]), 3)
@@ -211,7 +233,7 @@ class RealNotes(unittest.TestCase):
             len(lib.rows) for lib in tables.LIBRARIES[tables.DOCS]
         ]
         self.assertEqual(pin_rows, [2, 4, 2, 1, 3, 2])
-        self.assertEqual(len(tables.OFFICIAL), 15)
+        self.assertEqual(len(tables.OFFICIAL), 16)
         self.assertEqual(len(tables.CLAIM_WORDS), 13)
         self.assertEqual(len(tables.RULES), 23)
         self.assertEqual(len(tables.TABLES), 5)
