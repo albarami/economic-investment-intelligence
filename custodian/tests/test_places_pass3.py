@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places.invented import place_row, write_places
+from custodian.tests.repository_root import repository_root
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_places_area_files import (
@@ -35,6 +36,7 @@ from eii_custodian.publicdata.places.area_files import (
 from eii_custodian.publicdata.places.area_requests import _CANDIDATE_AREAS
 from eii_custodian.publicdata.places.areas import AreaCutoff, AreaError, AreaMode
 from eii_custodian.publicdata.places.integrate import (
+    _tag,
     areas_before_stage,
     run_places_before_gazetteer,
 )
@@ -181,10 +183,17 @@ def test_frame_error_is_one_log_line(
     assert any(line.startswith("COVERAGE ") for line in outcome.lines)
 
 
+def test_committed_review_has_arabic_tag() -> None:
+    """The repository ships the Arabic tag settled by ruling L-644."""
+    review = repository_root(Path(__file__)) / "custodian/publicdata/review"
+    assert _tag(review) == "ar"
+    assert (review / "arabic_tag.txt").read_bytes() == b"ar\n"
+
+
 def test_places_error_removes_a_stale_points_file(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A swallowed places error names its reason and drops an earlier points file."""
+    """The committed tag reaches the stage; its error drops an earlier points file."""
 
     def boom(_config: object) -> None:
         raise PlacesError("pub_place_field")
@@ -193,9 +202,7 @@ def test_places_error_removes_a_stale_points_file(
         "eii_custodian.publicdata.places.integrate.run_places_stage", boom
     )
     cache = tmp_path / "cache"
-    review = tmp_path / "review"
-    review.mkdir()
-    (review / "arabic_tag.txt").write_text("ar\n", encoding="utf-8")
+    review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     folder = cache / "places_ovt" / "part-00014"
     folder.mkdir(parents=True)
     write_places(folder / "syn.parquet", [place_row()])

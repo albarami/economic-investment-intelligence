@@ -391,7 +391,7 @@ awaits the lead's selected-cache probe, live run 3 and independent code review.
 - Depends: S2-T01, S2-T02.
 - Requirements: PUB-47, PUB-49, PUB-50, PUB-57, PUB-78, PUB-91, PUB-92, PUB-93.
 - Amendment ([decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 27): [ ] the live run of part B is finished, so that the real places of the flagship story are fetched with their receipts and built under this task's criteria above; this line ticks none of them.
-- Delivery: hard; personas Data; status in progress: part A merged in pull request 62; all nine boxes await part B live places, receipts, reviewed source/category keys, real areas, verification and candidate checks. OI-218 and OI-302 remain open. Train S2-11 (pull request 111) carries the task's reconciliation records; this status line grants no slice-gate approval.
+- Delivery: hard; personas Data; status in progress: part A merged in pull request 62; all nine boxes await part B live places, receipts, reviewed source/category keys, real areas, verification and candidate checks. OI-218 and OI-302 remain open. Train S2-11 (pull request 111) carries the task's reconciliation records; this status line grants no slice-gate approval. S2-P51 adds the committed `arabic_tag.txt` (`ar` plus newline), with repository-reader and invented-cache stage regression evidence; PO-S2-P51-01 records the fix and OI-256 remains unchanged.
 S2-T06 correction OI-302: the LR3 change forwards one build-start UTC date to
 the real verification loader, including the named midnight plant. Fixture
 checks are recorded in PROGRESS.md; closure awaits the lead's live run 3 and
