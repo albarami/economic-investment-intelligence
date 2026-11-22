@@ -50157,3 +50157,7 @@ Lead: Anthropic, Claude Opus 5.5. CF1 (OpenAI GPT-6 sol) rejected 1acb2cb4 on CF
 | early refusal disabled alone (`if False:`), -k skip_reason_refuses | 1 failed | 1 |
 | restored (cmp identical), same | 1 passed | 0 |
 | ruff check, ruff format --check, mypy | clean | 0 |
+
+## S2-P42 — Award workbook formula cells read by cached value — 2026-11-22
+
+S2-P42 on base `6f40a51abb79a6499b309b9555eac0cf5ff2a87d` (Linux, `UV_OFFLINE=1`, `EII_DECISION_PROVIDER=none`, `TMPDIR=$PWD/.overnight/tmp`, no network): `awards._xlsx` now reads the intake sheet with `cached_formulas=True` (shared reader default unchanged); new and changed invented-fixture tests red at base with `schema_missing` (8 failed, 6 passed, exit 1), green after (14 passed, exit 0); the 20 test files importing the awards or workbook reader 857 passed, exit 0; plant without `cached_formulas=True` 8 failed, exit 1; plant of the fixture without its formula shape 1 failed, exit 1; both restored by cmp; ruff, format, mypy, check_docs, check_tree, cmp, diff --check exit 0.

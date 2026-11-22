@@ -112,12 +112,16 @@ def _xlsx(
     stored_dates: dict[str, str] | None = None,
     row_numbers: list[int] | None = None,
 ) -> list[list[str]]:
-    """Share the coordinate-preserving reader, retaining the intake formula refusal."""
+    """Share the coordinate-preserving reader; a formula reads by its cached value.
+
+    The owner's sheet stores 'Approved Value Number' as formula cells with cached
+    values; nothing is evaluated, and a formula without a cached value refuses.
+    """
     from .page_html import ShapeError
     from .page_workbook import read_sheet
 
     try:
-        result = read_sheet(body, sheet, date_cells=True)
+        result = read_sheet(body, sheet, cached_formulas=True, date_cells=True)
         if stored_dates is not None:
             stored_dates.update(result.stored_dates)
         if row_numbers is not None:
