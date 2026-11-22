@@ -35,7 +35,6 @@ REQUIRED_KEYS = (
     "cus_imp_2019",
     "trade_ext/qatar-imports-2014-2018",
     "places_ovt/part-00014",
-    "bldg_ovt/part-00288",
     "bldg_ovt/part-00384",
     "bldg_ovt/part-00385",
     "bldg_wsf3d",

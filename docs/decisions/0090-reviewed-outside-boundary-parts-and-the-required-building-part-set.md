@@ -1,4 +1,4 @@
-# Decision 0089: Reviewed wholly-outside boundary parts and the required building part set
+# Decision 0090: Reviewed wholly-outside boundary parts and the required building part set
 
 | | |
 |---|---|
@@ -67,7 +67,9 @@ Item 00288 lies south of the boundary.
    `in_box_bounds`, is not required. The pinned part set must equal the required
    set, or the build refuses `bldg_ovt_part_set_incomplete`. On the pinned
    collection the measured result is {00384, 00385}, so part 00288 leaves the
-   fixed part list. Its registry rows stay, under the registry's own review.
+   fixed part list. Its part row stays registered with the skip reason
+   `not_required_part_decision_0090`, so no build fetches it, and it leaves the
+   large-intake key list; its STAC item row stays.
 3. **Evidence.** The per-part table and the counts of the Context section are
    from the lead's probes 5, 6 and 7 of task S2-P47, as recorded there.
 4. **Rows of part 00288.** The 204 frame-box rows of part 00288 lie outside the

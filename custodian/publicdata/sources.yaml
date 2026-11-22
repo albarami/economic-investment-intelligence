@@ -5659,7 +5659,7 @@ sources:
     row_count_min: null
     row_count_max: null
     reconciliation: "none"
-    skip_reason: ""
+    skip_reason: "not_required_part_decision_0090"
     extension: "parquet"
     basis_note: |
       recorded_bytes: 528953830
