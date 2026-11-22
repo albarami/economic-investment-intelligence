@@ -19,6 +19,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from custodian.tests.singles_entries import tender_entry
 from custodian.tests.test_build_resume import (
     LATER,
     START,
@@ -634,14 +635,14 @@ def test_ordinary_resume_skips_the_tender_row(
 ) -> None:
     roots = _stub_roots(tmp_path, monkeypatch, brancher=lambda e, large: "a")
     harness.entries = (
-        replace(harness.entries[0], kind="paged_cards", source_id="tenders_pub"),
+        tender_entry(),
         harness.entries[1],
     )
     _interrupt(harness, code_roots=roots)
     outcome = harness.run(resume=True, code_roots=roots)
     assert outcome.failure is None
-    tender = [line for line in outcome.lines if line.split()[1:2] == ["SYN-first"]]
-    assert tender == ["SKIP SYN-first own_run"]
+    tender = [line for line in outcome.lines if line.split()[1:2] == ["tenders_pub"]]
+    assert tender == ["SKIP tenders_pub own_run"]
     assert harness.seen == [harness.entries[1].url]
 
 

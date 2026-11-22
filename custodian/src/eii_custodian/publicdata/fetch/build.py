@@ -33,7 +33,6 @@ from eii_custodian.publicdata.fetch.kinds import (
     read_terms_page,
 )
 from eii_custodian.publicdata.fetch.own_run import (
-    OWN_RUN_KEYS,
     handoff_completed_archive,
     is_own_run_entry,
     is_tender_entry,
@@ -720,16 +719,13 @@ def run_build(
             )
             lines.append(fail_line(entry.key, "", failure.check, "", entry.skip_reason))
             break
-        if not _own_run and entry.key in OWN_RUN_KEYS and not is_own_run_entry(entry):
-            # The registered tender key in any other shape is a changed row.
-            # A different key that only shares the tender source id stays on
-            # the ordinary skip below (decision 0084 items 2 and 7).
+        if is_tender_entry(entry) and not is_own_run_entry(entry):
             failure = FetchFailure(
                 1, entry.source_id, "", "own_run_row_changed", "", ""
             )
             lines.append(fail_line(entry.key, "", failure.check, "", ""))
             break
-        if is_tender_entry(entry) and not _own_run:
+        if is_own_run_entry(entry) and not _own_run:
             lines.append(skip_line(entry.key, "own_run"))
             if _run is not None:
                 try:
