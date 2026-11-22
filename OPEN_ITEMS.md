@@ -6224,3 +6224,25 @@ tracks the split file keys under its existing permission record.
 ## S2-18-RF1 — Hosted timing failure of one section 10 property test (2026-11-22, lead)
 
 Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-11-22 on train S2-18 head `8f75f027a1` failed one test: `custodian/tests/test_assembly_section10.py::test_final_audit_refuses_exactly_a_mismatch_or_an_unrecorded_figure`, with Hypothesis `DeadlineExceeded` (273 ms against the 200 ms default) on the all-absent case. The other 15184 tests passed. Cause: each example runs a full final audit, which parses the 1.2 MB source registry. Locally the runtime is up to 195 ms on a dedicated core, so the test sits at the timer's edge. Disposition: the domain is finite (4 × 3 × 3 = 36 states), so the test now enumerates all of it with `pytest.mark.parametrize` and has no per-example timer. This is exhaustive, so it is a stronger test than a sample, with no assertion change. The same class was handled for the tender tests under PO-S2-P46-03. A green rerun alone did not close this item; it closes when the train merges with the change.
+
+## S2-P64 bounded open records (2026-11-22, task S2-T49)
+
+- DONE SO FAR: `registers/bundle.py` re-verifies a lead-staged, pin-verified
+  projection bundle (`register_bundle/` plus `register_bundle_pin.json` in the
+  allowed cache) and `Production.register_tables` consumes only it; raw register
+  paths and `EII_*_REGISTER_FILE` settings are never opened by assembly. Both
+  tables are credited to keys `biz_register` and `fc_register/file`, bound in
+  `assembly/register_tables.json` with per-period receipt lineage and kept-month
+  coverage, drawn by `draw_tables` and counted "in use" by source completeness.
+  New handoff refusal codes: `register_bundle_missing`, `register_bundle_pin`,
+  `register_bundle_manifest`, `register_bundle_receipt`, `register_bundle_source`,
+  `register_bundle_table`, `register_bundle_period`; existing codes reused for the
+  same rules (`frame_hash_mismatch`, `receipt_*`, `snapshot_*`, `release_*`,
+  `registration_egress`).
+- NEEDED: the lead's real-file adapter run and the staged bundle produced from
+  real, hash-verified inputs; a different-maker review of this offline
+  implementation. Neither is claimed by this record.
+- LIMITS: invented stand-in fixtures only; no live register read, no release
+  command, no admission-policy or registration-key-exception change, no slice
+  gate. The published-tower basis and sole-proprietor questions stay open as
+  before.

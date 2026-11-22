@@ -2691,6 +2691,13 @@ validated tables. The later full-release owner must preserve this manifest
 chain and apply the rest of DAT-83; these reusable builders do not implement the
 placeholder release command or the other tables' privacy checks.
 
+Assembly handoff (S2-T49, S2-P64): the `register_tables` phase consumes only a
+lead-staged, pin-verified `register_bundle/` and `register_bundle_pin.json` in
+the allowed cache; it re-verifies the manifest chain, receipts, table bytes and
+released rows against the run's own frame hash before crediting keys
+`biz_register` and `fc_register/file`, keeping per-period lineage. A missing
+kept snapshot month is reported `snapshot_not_kept`, never filled.
+
 ## Structured Public address reader — decision 0079
 
 `structured-address-v1` is a fixed application-schema read of `pub_address_point` under DAT-168: exact equality on the three published address strings, order by `feature_key`, at most six fetched rows to signal truncation, at most five returned candidates. Both stores hold the composite index `(zone_number, street_number, building_number, feature_key)`. It returns no utility account, parcel number, person join, score or guessed match. Its selected source-registry/receipt lineage supplies publisher, dataset, terms/basis, retrieval date and hash. The table is persisted Public data; a query or its response is not persisted. Decision 0079 item 5 adds this separate offline route without changing the keyed-provider route.

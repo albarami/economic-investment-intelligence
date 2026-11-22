@@ -51337,6 +51337,31 @@ S2-P57 BT-1 delivery-check correction: the delivery Ruff pass reported RUF043 (e
 
 S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline engineer for reviewed public-data releases; strict self-review persona provenance auditor (rule 19). Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate, with the brief supplying test-driven-development and verification-before-completion rules. Base `7f6584782d8fb269ba0158c2c1f4a862a0a167d0`; Linux, `UV_OFFLINE=1`, provider `none`, seed 6157 and workspace-local temporary/isolated bytecode paths. F2 captures baskets bytes once, reuses the extracted safe YAML parser and hashes the parsed bytes; F3 wraps only SpineError and the named OSError, RegistryError, KeyError and TypeError classes as `assembly_membership_invalid`, preserving the cause. Seven new regressions first failed on the unchanged base (exit 1), then the required activity-spine and assembly-producer suites passed 112 tests (exit 0); the shared YAML-reader registry suite passed 81 tests (exit 0). Eight isolated plants (each catch arm, the entire catch, the moved YAML catch and a hash reread) each gave red 1 / byte restoration true / green 0. F1 moves the sentence directly below the section 6 requirements table; PUB-34 is byte-identical to `e7edf546135657e09bfa0497822d216e8572bf71` and its saved comparison diff is empty. Ruff check, formatter check, mypy and document check exited 0; final tree, instruction-byte and diff checks, full delivery commit, per-file counts and all exact command/exit records are in `.overnight/RETURN.md` and `.overnight/tmp/r2-evidence/`. No block copied; the existing YAML parser body was moved and read_yaml delegates. No acceptance status changes; independent-maker review and OI-203 real-cache work remain lead-owned.
 
+## S2-P64 — register_tables assembly integration (2026-11-22, task S2-T49)
+
+- `registers/bundle.py` (`load_bundle`) re-verifies a lead-staged
+  `register_bundle/` (the published `current/` output) plus
+  `register_bundle_pin.json`: pin schema and manifest hash, manifest keys and
+  bindings, per-entry receipt shape/digest/metadata/files and period rules,
+  declared table byte hashes, row counts and a closed table-file set, the run's
+  own frame ownership hash, and the released rows through `validate_release`.
+  Refusals are named: `register_bundle_*`, `frame_hash_mismatch`, `receipt_*`,
+  `snapshot_*`, `release_*`, `registration_egress`.
+- `Production.register_tables` is ordered after `frame` in `PHASES`,
+  `INVENTORY` and `adapters`; it binds both Parquet tables, the manifest and
+  pin digests, both current receipts (keys `biz_register`, `fc_register/file`),
+  row-level source tags and a value-safe `assembly/register_tables.json` with
+  per-period lineage and kept-month coverage. `draw_tables` and source
+  completeness (`register_in_use`) account for both tables; missing months stay
+  `snapshot_not_kept`.
+- Tests (`custodian/tests/test_register_tables.py`): 44 cases on invented
+  stand-in staged bundles — red on HEAD (phase absent, `AttributeError`), green
+  after; one-change refusals for missing/wrong pin, manifest, frame, source,
+  table bytes, receipts, periods, person column and identifier egress; symlinked
+  and unreadable staged paths refused; 34 isolated guard removals each red.
+- The writer path (`registers.intake`, `registers.build`) is unchanged; the
+  lead's real-file run and release evidence remain pending. No gate claimed.
+
 ## Train S2-18 records — 2026-11-22
 
 | Date | Item | Evidence | By |

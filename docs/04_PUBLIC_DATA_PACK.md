@@ -2272,6 +2272,13 @@ no further environment setting. Separate lead-reviewed byte hashes pin both
 sibling indexes, so an index overwrite cannot silently change historical
 selection. Who retains future monthly files remains open.
 
+The release assembly consumes these projections only through a lead-staged,
+pin-verified `register_bundle/` (the published `current/` output) plus
+`register_bundle_pin.json` in the allowed cache: the `register_tables` phase
+re-checks pin, manifest, receipts, table bytes and released rows against the
+run's own frame before crediting both keys (S2-T49, S2-P64). Assembly never
+opens a register path or setting.
+
 
 ### S2-P52 GeoParquet intake record
 

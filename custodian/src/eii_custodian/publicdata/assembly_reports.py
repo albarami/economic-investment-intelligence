@@ -40,6 +40,7 @@ MONEY_FIELDS = frozenset(
         "compensation",
         "operating_surplus",
         "average_annual_wage",
+        "capital_qar",
     }
 )
 RATIO_FIELDS = frozenset({"share", "percentage", "density", "rate", "ratio"})
@@ -95,6 +96,13 @@ ADMIN_FIELDS = frozenset(
         "feature_key",
         "as_of",
         "number_of_shares_2400",
+        "registered_cell",
+        "zone",
+        "licence_number",
+        "block_en",
+        "block_ar",
+        "register_order",
+        "tax_classification_year",
     }
 )
 
@@ -252,6 +260,7 @@ TEXT_FIELDS = frozenset(
         "calendar",
         "period_kind",
         "series_key",
+        "registration_number",
     }
 )
 NUMERIC_TEXT = re.compile(
@@ -667,6 +676,7 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
     for phase in (
         "reviewed_selections",
         "frame",
+        "register_tables",
         "gis_property_singles",
         "fsq",
         "series_stage",
