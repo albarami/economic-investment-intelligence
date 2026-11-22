@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import json
 import os
 import shlex
 import shutil
@@ -13,6 +14,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TextIO
 
+import ci_aggregate
 import ci_plant_cases as cases
 import run_tests
 
@@ -51,6 +53,15 @@ SEED = "1000000001"
 SUITE_TIMEOUT_SECONDS = 300
 SCANNER_FOLDER = Path("data") / "tools" / "gitleaks"
 USAGE = "usage: ci_plants.py run"
+CONTROL_PLANTS = {cases.RUNNER: "passing-test", cases.AGGREGATE: "passing-shards"}
+SHARDS = (
+    run_tests.Suite(
+        "planted-one", "pytest", ".", ("planted_shards/one",), SUITE_TIMEOUT_SECONDS
+    ),
+    run_tests.Suite(
+        "planted-two", "pytest", ".", ("planted_shards/two",), SUITE_TIMEOUT_SECONDS
+    ),
+)
 
 
 class PlantError(Exception):
@@ -228,12 +239,54 @@ def run_check(
             err=buffer,
         )
         return status, buffer.getvalue()
+    if case.command == cases.AGGREGATE:
+        return run_shards(copy, environment)
     return execute(
         shlex.split(case.command),
         copy / case.folder,
         environment,
         COMMAND_TIMEOUT_SECONDS,
     )
+
+
+def matrix_result(results: Sequence[str]) -> str:
+    """One matrix job's result: failure if a leg failed, else skipped, else success.
+
+    A job-level condition cannot read the matrix, so a skipped shard is the whole
+    matrix job skipped; the plant marks that case by naming a shard.
+    """
+    for result in ("failure", "skipped"):
+        if result in results:
+            return result
+    return "success"
+
+
+def run_shards(copy: Path, environment: Mapping[str, str]) -> tuple[int, str]:
+    """Run each planted shard alone, then judge the results as the `tests` job."""
+    buffer = io.StringIO()
+    marker = copy / cases.SKIP_MARKER
+    skipped = marker.read_text(encoding="utf-8").split() if marker.is_file() else []
+    results: list[str] = []
+    for suite in SHARDS:
+        if suite.name in skipped:
+            buffer.write(f"shard {suite.name}: skipped\n")
+            results.append("skipped")
+            continue
+        status = run_tests.main(
+            ["--seed", SEED, "--suite", suite.name],
+            suites=SHARDS,
+            root=copy,
+            environ=environment,
+            out=buffer,
+            err=buffer,
+        )
+        results.append("success" if status == 0 else "failure")
+    needs = {
+        "suite": {"result": matrix_result(results)},
+        "web-spikes": {"result": "success"},
+    }
+    status = ci_aggregate.main([json.dumps(needs)], buffer)
+    return status, buffer.getvalue()
 
 
 def run_case(
@@ -248,8 +301,8 @@ def run_case(
     try:
         if key not in controls:
             clean = make_copy(root, scratch / f"{case.name}-clean", environment)
-            if case.command == cases.RUNNER:
-                cases.PLANTS["passing-test"](clean, environment)
+            if case.command in CONTROL_PLANTS:
+                cases.PLANTS[CONTROL_PLANTS[case.command]](clean, environment)
             prepare(clean, root, case, environment)
             controls[key] = run_check(case, clean, environment)
         status, output = controls[key]

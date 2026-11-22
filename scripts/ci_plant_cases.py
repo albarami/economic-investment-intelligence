@@ -20,6 +20,10 @@ WEB_FORMAT = "npm run format:check"
 WEB_TYPES = "npm run typecheck"
 SCAN = "uv run --locked python scripts/ci_history_scan.py scan"
 RUNNER = "in-process: run_tests.main over one planted suite"
+AGGREGATE = "in-process: run_tests.main per planted shard, then ci_aggregate"
+SHARD_ONE = "planted_shards/one/test_one.py"
+SHARD_TWO = "planted_shards/two/test_two.py"
+SKIP_MARKER = "planted_shards/skipped"
 TOKEN_SEED = 7654321
 TOKEN_ALPHABET = string.ascii_uppercase + "234567"
 TOKEN_BODY = 16
@@ -93,6 +97,20 @@ def plant_token_history(copy: Path, environment: Mapping[str, str]) -> None:
     git(copy, environment, "commit", "-q", "-m", "chore: remove")
 
 
+def write_files(*files: tuple[str, str]) -> Plant:
+    """Return a plant that writes every listed file."""
+    plants = [write_file(path, text) for path, text in files]
+
+    def plant(copy: Path, environment: Mapping[str, str]) -> None:
+        for each in plants:
+            each(copy, environment)
+
+    return plant
+
+
+PASSING = "def test_planted() -> None:\n    assert True\n"
+FAILING = "def test_planted() -> None:\n    assert False\n"
+
 PLANTS: dict[str, Plant] = {
     "local-path": append_line("README.md", "see /ho" + "me/planted/file"),
     "eight-digits": append_line("README.md", "number " + "1234" + "5678 here"),
@@ -120,6 +138,11 @@ PLANTS: dict[str, Plant] = {
         "def test_planted() -> None:\n    assert True\n",
     ),
     "token-history": plant_token_history,
+    "passing-shards": write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
+    "failing-shard": write_files((SHARD_ONE, PASSING), (SHARD_TWO, FAILING)),
+    "skipped-shard": write_files(
+        (SHARD_ONE, PASSING), (SHARD_TWO, PASSING), (SKIP_MARKER, "planted-two\n")
+    ),
 }
 
 CASES: tuple[Case, ...] = (
@@ -195,6 +218,20 @@ CASES: tuple[Case, ...] = (
         "FAIL tests-failed: planted: 1 failed",
     ),
     Case(
+        "tests-aggregate-failed-shard",
+        "tests-shard-failed",
+        AGGREGATE,
+        "failing-shard",
+        "FAIL shard-result: suite: failure",
+    ),
+    Case(
+        "tests-aggregate-skipped-shard",
+        "tests-shard-skipped",
+        AGGREGATE,
+        "skipped-shard",
+        "FAIL shard-result: suite: skipped",
+    ),
+    Case(
         "secrets-token-in-history",
         "secrets",
         SCAN,
@@ -216,5 +253,7 @@ CLASSES = (
     "web-format",
     "web-types",
     "tests",
+    "tests-shard-failed",
+    "tests-shard-skipped",
     "secrets",
 )

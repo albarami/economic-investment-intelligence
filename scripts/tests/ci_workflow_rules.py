@@ -4,17 +4,23 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+
+import ci_aggregate  # noqa: E402
+import run_tests  # noqa: E402
+
 WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
 # A workflow file change changes its pin in the same commit, so it is seen in review.
 PINNED_SHA256 = {
-    "ci.yml": "1fa31a3034a2d2ae6677d1ba95116b033fafe80ffa5c31be6cee3cc55777d45b",
+    "ci.yml": "0d1dcce59e0fc7b3ff7342fbd8cc0978a129c016a549537f117c2ea2fb8ee91a",
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }
@@ -49,6 +55,10 @@ FORBIDDEN_TOKENS = (
 )
 RUN_WEAKENERS = ("|| true", "set +e", "||true")
 SCANNER_FETCH = "uv run --locked python scripts/hooks_gitleaks.py fetch"
+# The one admitted condition: the final `tests` job waits for every shard and
+# always runs, so a failed, cancelled or skipped shard reaches its verdict.
+AGGREGATE_LINES = "    needs: [suite, web-spikes]\n    if: ${{ always() }}\n"
+AGGREGATE_RUN = 'python3 -I scripts/ci_aggregate.py "$NEEDS"'
 
 _WEAKENER_STEP_RE = re.compile(r"(?m)^\s*continue-on-error:\s*true\s*$")
 
@@ -195,7 +205,33 @@ def check_required_jobs(workflows: dict[str, Any]) -> list[str]:
         seen.append((filename, job_id, display))
     if len(seen) != len(REQUIRED_CHECKS):
         problems.append("required job count differs")
-    return problems
+    return [*problems, *_shard_problems(workflows.get("ci.yml"))]
+
+
+def _shard_problems(document: object) -> list[str]:
+    """Require the suite matrix to equal SUITES and `tests` to judge every shard."""
+    jobs = document.get("jobs") if isinstance(document, dict) else None
+    if not isinstance(jobs, dict):
+        return []
+    suite = jobs.get("suite")
+    strategy = suite.get("strategy") if isinstance(suite, dict) else None
+    if not isinstance(strategy, dict) or strategy.get("fail-fast") is not False:
+        return ["ci.yml: job suite is not a matrix with fail-fast false"]
+    matrix = strategy.get("matrix")
+    names = [item.name for item in run_tests.SUITES]
+    if not isinstance(matrix, dict) or matrix != {"suite": names}:
+        return ["ci.yml: job suite matrix differs from the SUITES table"]
+    tests = jobs.get("tests")
+    if not isinstance(tests, dict):
+        return []
+    if tests.get("needs") != sorted(ci_aggregate.NEEDED):
+        return ["ci.yml: job tests does not need exactly the aggregated jobs"]
+    if tests.get("if") != "${{ always() }}":
+        return ["ci.yml: job tests does not always run"]
+    runs = [str(step.get("run", "")).strip() for step in tests.get("steps") or []]
+    if AGGREGATE_RUN not in runs:
+        return ["ci.yml: job tests does not run the aggregate verdict"]
+    return []
 
 
 def check_required_steps(
@@ -294,7 +330,7 @@ def _scanner_before_tests(workflows: dict[str, Any]) -> list[str]:
     jobs = ci.get("jobs")
     if not isinstance(jobs, dict):
         return problems
-    for job_id in ("tests", "planted-failures"):
+    for job_id in ("suite", "planted-failures"):
         job = jobs.get(job_id)
         if not isinstance(job, dict):
             continue
@@ -325,6 +361,8 @@ def check_no_weakeners(raw_texts: dict[str, str]) -> list[str]:
     """Rule 5: refuse continue-on-error, retries, conditions and softened commands."""
     problems: list[str] = []
     for name, text in raw_texts.items():
+        if name == "ci.yml":
+            text = text.replace(AGGREGATE_LINES, "", 1)
         for token in FORBIDDEN_TOKENS:
             if token in text:
                 problems.append(f"{name}: forbidden token {token!r}")

@@ -306,5 +306,7 @@ class RunnerUsage(unittest.TestCase):
                 self.assertEqual(out, [])
                 self.assertEqual(
                     err,
-                    [f"eii: usage error: {detail}. Usage: ./eii test [--seed N]"],
+                    [
+                        f"eii: usage error: {detail}. Usage: ./eii test [--seed N] [--suite NAME]"
+                    ],
                 )
