@@ -3,6 +3,7 @@
 import json
 from copy import deepcopy
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -359,6 +360,23 @@ def test_each_registry_url_requires_admitted_host(tmp_path, monkeypatch, field):
     path.write_text(yaml.safe_dump({"sources": output["sources"]}))
     with pytest.raises(registry.RegistryError, match=r"^host_refused$"):
         registry.load_registry(path)
+
+
+@pytest.mark.parametrize("field", ["url", "landing_url", "terms_url"])
+@given(st.text(alphabet="abcdefghijklmnopqrstuvwxyz", min_size=1, max_size=63))
+@example("a")
+@example("z" * 63)
+@example("www.skyscrapercenter.com.invented")
+@example("invented.www.skyscrapercenter.com")
+def test_unlisted_landmark_host_stays_refused(field, label):
+    row = generator.generate(research())["sources"][0]
+    with patch.object(
+        allowlist, "ALLOWED_HOSTS", allowlist.ALLOWED_HOSTS | {"syn.example.invalid"}
+    ):
+        assert registry._entry(row)
+        row[field] = "https://" + label + ".invalid/page"
+        with pytest.raises(registry.RegistryError, match=r"^host_refused$"):
+            registry._entry(row)
 
 
 def test_committed_landmark_pages_resolve_exactly_once(monkeypatch):

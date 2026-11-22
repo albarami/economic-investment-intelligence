@@ -51196,3 +51196,140 @@ Lead shell (Anthropic Opus 5.5), real public cache, offline. The pinned collecti
   with the lead. No live acquisition, source reading, height acceptance,
   readiness, S2-T20 completion or C-20 claim is made. Existing terms follow-ups
   remain open. No network, forbidden input, push or merge was used.
+
+
+## S2-P53-cit3 — Landmark fetch-host regression correction — 2026-11-22
+
+- Brief: `.overnight/BRIEF.md`, round-three six-regression correction.
+  Task base: `0077ed22dd6722550a5a0b26d235abd1803ec593`.
+  The delivery commit and bundle checksum are recorded in the return report;
+  all new Git metadata and artefacts stay inside the assigned workspace.
+- Builder persona: senior public-data registry engineer. Strict self-review
+  persona: fetch-boundary auditor; only explicitly reviewed hosts are admitted,
+  and every host check retains its planted violation. Skills applied:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer and muhasabah-gate. The brief supplies
+  the test-first and systematic-debugging rules; their named superpowers
+  packages are not installed in this session.
+- Decision 0093 item 3 preserves the chain. Document 04, PUB-03 and
+  **S2-P53-cit terms readings and PUB-03 hosts**, already explicitly admit
+  all fifteen new citation/terms hosts; `visitqatar.com` reuses its previous
+  admission. No row is removed or corrected, no host is newly admitted in
+  this round, and no terms reading is invented. Existing unread-terms items
+  remain open. The per-host disposition is in `.overnight/RETURN.md`.
+- Root causes: the CDSE fixture replaced the global allow-list before loading
+  every registry row, so unrelated landmark declarations failed. It now uses
+  the existing safe YAML reader and `_entry` validator to validate only its
+  optional CDSE declaration. Its invented-only allow-list and blocked socket
+  fixture remain unchanged. The trade delta check now binds landmark review
+  frames to Document 04's explicit host admission record and adds only that
+  exact delta, retaining PRE_P18 and the trade-source configuration check.
+- No production refusal branch is added, removed or changed. The production
+  public-data modules and scripts are byte-identical to the task base:
+  `git diff --exit-code 0077ed22 -- custodian/src scripts`, exit 0.
+  The existing registry `host_refused` branch is exercised independently for
+  `url`, `landing_url` and `terms_url`. Each property trial first validates an
+  otherwise valid invented landmark row, changes only that URL field and
+  asserts the exact `host_refused` reason. Generated unknown DNS labels span
+  lengths one through sixty-three; explicit cases pin both ends and named-host
+  lookalikes. Numeric, privacy-cell, tie and duplicate-key domains do not
+  belong to this host-admission correction.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis
+  6.170.15, PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1. Seed 53 and the unchanged
+  repository Hypothesis profile; test temporary paths remain under
+  `.overnight/tmp/`. No network or repository `data/` input is used.
+- Failing-first command: `uv run --locked python -m pytest
+  custodian/tests/test_cdse_cache.py custodian/tests/test_trade_publisher_readings.py
+  -q -p no:cacheprovider --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-red`, exit 1: exactly the six reported
+  failures and 55 passes. Log: `.overnight/OUT/baseline.log`.
+- First extended focused run, adding `custodian/tests/test_landmark_registry.py`
+  and using `--basetemp=.overnight/tmp/pytest-focused`: exit 1, 3 failed,
+  104 passed. The six original failures were corrected; new exact assertion
+  matches needed to allow pytest's diagnostic text after their reason code.
+  The correction preserves the anchored specific code followed by newline
+  or end of string. Initial lint exited 1 for one import order; initial
+  format-check exited 1 for one expression layout. Both were corrected.
+- Six isolated guard deletions ran through
+  `uv run --locked python .overnight/OUT/guard_probe.py GUARD`, with
+  `UV_OFFLINE=1` and workspace-local TMPDIR. The probe changes one function
+  AST in its own pytest process, not a tracked file. Each returned exit 1:
+  `registry-url`, `registry-landing_url`, `registry-terms_url` each produced
+  one failed and two passed cases; `registry-whole` produced three failures;
+  `delta` produced two failures of the unchanged IMF/World Bank plants;
+  `frame` produced one failure because the specific reviewed-frame reason
+  disappeared. Logs: `.overnight/OUT/probe-GUARD.log`. No source restoration
+  or regenerated baseline is needed for these isolated-process deletions.
+- Focused green command: the same extended selection, seed 53 and
+  `--basetemp=.overnight/tmp/pytest-focused-final`, exit 0: 107 passed.
+  Log: `.overnight/OUT/focused-final.log`. It includes all six repaired
+  regressions, the existing plants, the new unlisted-host property and the
+  new reviewed-frame host plant.
+- Checks already completed: `uv run --locked ruff check .`, exit 0;
+  `uv run --locked ruff format --check .`, exit 0 (947 files);
+  `uv run --locked mypy`, exit 0 (503 source files);
+  `cmp AGENTS.md CLAUDE.md`, exit 0; `git diff --check`, exit 0.
+  `python3 scripts/check_docs.py` before the documentation addition exited 0
+  (1280 text files, 144 Markdown files). Final documentation and whole-folder
+  custodian results are appended below when complete; no whole-suite success
+  is claimed by this evidence entry.
+
+
+### S2-P53-cit3 whole-folder execution interruption
+
+- The original `uv run --locked python -m pytest custodian/tests -q
+  -p no:cacheprovider --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-full` session returned exit 143 (SIGTERM),
+  with no pytest summary and no reported test failure. Its log contains 4488
+  completed-test dots. The next collected case was
+  `custodian/tests/test_gis_snapshot.py::test_all_dates_mode_is_separate_complete_and_explicitly_selected[plant9]`.
+  Collection-only diagnosis exited 0: 11552 tests collected. No test was
+  removed, skipped or changed, and the incomplete run is not pass evidence.
+- The interruption's source is not established; OPEN_ITEMS.md records it.
+  A separate workspace-local supervisor runs the same entire folder again,
+  with seed 53, basetemp `.overnight/tmp/pytest-full-supervised`, offline
+  environment and an eighteen-minute remaining-time bound. Its result is
+  recorded separately, preserving exit 143 regardless of the later outcome.
+  The supervisor writes the child process's real return code, timeout flag,
+  command and start/end UTC times to
+  `.overnight/OUT/custodian-full-supervised.result.json`.
+
+- Supervision correction: an initial detached launcher returned exit 0 but
+  produced no pytest log or result; the follow-up existence check exited 2.
+  That launcher is not execution evidence. The same supervisor was then
+  started in a retained foreground tool session with a terminal, at
+  2026-11-22 18:38 UTC; its log and child-pid file were observed. The worker
+  polls that session while preserving the original SIGTERM outcome.
+
+
+### S2-P53-cit3 final bounded handoff
+
+- The supervised whole-folder run started at 2026-11-22T18:38:46.391306+00:00 and
+  ended at 2026-11-22T18:56:46.460622+00:00. Its eighteen-minute remaining-time bound
+  expired; the supervisor terminated the test process group and recorded
+  the child exit as 143, with
+  `brief_deadline_timeout: true`. The supervisor itself exits 0 after writing
+  this result; that wrapper exit is not pytest pass evidence. The log holds
+  7230 completed-test dots and no failure report or final pytest summary;
+  the next collected case is `custodian/tests/test_pinned_c8.py::test_c8_raw_schema_plants[national_denominator-national_denominator]`. Whole-folder validation remains
+  incomplete. Neither incomplete run is counted as a pass. The original
+  interruption stays open; no retry, skip, tolerance or baseline hides it.
+- All six original regressions are covered by the focused green result,
+  exit 0 with 107 passed. No production module or host admission changed.
+  Final acceptance requires the lead to obtain the complete required
+  `custodian/tests` summary under the existing test policy; no test or bound
+  may be weakened. This handoff does not grant independent approval or
+  a slice-gate claim.
+- Code practice, delivered code: longest new function by AST span is
+  `test_pub03_rejects_unreviewed_landmark_frame_host`, 10 lines; including
+  decorators the new host property spans 15 lines. Changed existing
+  `check_p18_fetch_host_delta` is 31 lines and CDSE `entry` is 16 lines.
+  The distinct landmark review-frame host helper is 8 lines. None copied;
+  no new function exceeds 100 lines and no existing helper is duplicated.
+- Strict self-review: REJECT completion because the required whole-folder
+  test result is incomplete; no code defect is asserted from a SIGTERM.
+  Muhasabah: completion FAIL, with the limitation disclosed; provenance,
+  unchanged boundaries and the focused correction are evidenced above.
+  Exact delivery commit, line counts, command exits and checksum are in
+  `.overnight/RETURN.md`. Documentation and staged whitespace checks are
+  rerun after this evidence is appended and their outcomes recorded there.

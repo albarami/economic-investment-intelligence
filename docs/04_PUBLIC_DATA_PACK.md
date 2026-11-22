@@ -2332,6 +2332,13 @@ the existing registry marker `terms to be read`, retaining that check date.
 That marker establishes no permission or prohibition. All snapshots remain
 uncommitted, including openly licensed text, under decision 0093 item 3.
 
+The S2-P53-cit3 regression check binds the fetch-host delta to the exact
+landmark page-and-terms review frames and this host admission record.
+The earlier trade-source checks and their extra-host plants remain in force;
+unlisted landmark hosts refuse with `host_refused` in each registry URL slot.
+The invented CDSE cache fixture validates its own source declaration under
+its isolated host policy, without loading unrelated landmark declarations.
+
 | Publisher | Terms page | Publisher words or unread record | Checked on |
 |---|---|---|---|
 | Business Destinations | Not located in the supplied research | terms to be read | 2026-11-22 |

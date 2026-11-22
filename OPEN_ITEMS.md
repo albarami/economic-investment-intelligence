@@ -6181,3 +6181,30 @@ The registry and host-installation hold in the historical S2-P53 entries is
 addressed by this part; it supplies no live acquisition, receipt, tie or
 height-completeness proof. Independent different-maker review remains with
 the lead, as do S2-T20, C-20 and OI-310.
+
+
+## S2-P53-cit3 — Whole-folder execution interrupted by SIGTERM
+
+On 2026-11-22 the worker's full `custodian/tests` execution returned exit 143
+(SIGTERM), with no pytest summary or reported assertion failure. Base:
+`0077ed22dd6722550a5a0b26d235abd1803ec593`; seed 53, `UV_OFFLINE=1`.
+Command: `uv run --locked python -m pytest custodian/tests -q
+-p no:cacheprovider --hypothesis-seed=53
+--basetemp=.overnight/tmp/pytest-full`. Evidence:
+`.overnight/OUT/custodian-full.log`, 4488 completed-test dots; next collected
+case `test_gis_snapshot.py::test_all_dates_mode_is_separate_complete_and_explicitly_selected[plant9]`.
+The termination's source is unconfirmed. A separately recorded whole-folder
+supervised run does not, by itself, identify or close this interruption.
+The lead owns runner diagnosis; no test or bound is weakened.
+
+
+S2-P53-cit3 supervised outcome: the separate full-folder command with
+`--basetemp=.overnight/tmp/pytest-full-supervised` ran from
+2026-11-22T18:38:46.391306+00:00 to 2026-11-22T18:56:46.460622+00:00, then its explicitly recorded
+eighteen-minute remaining-time bound stopped the process group. Child exit:
+143; 7230 completed-test dots, no final pytest
+summary. This known deadline stop does not establish the cause of the
+original SIGTERM or a completed full-suite result. The six regression fixes
+have 107 passing focused tests. Before acceptance, the lead must obtain a
+complete `custodian/tests` result under the existing test policy; no test,
+plant, timeout or tolerance is weakened.
