@@ -244,3 +244,27 @@ def test_loaded_record_keeps_the_exact_validated_bytes(tmp_path, monkeypatch):
     assert record.body == before
     assert record.rows[0].height_kind == "roof"
     assert record.pending == ""
+
+
+@pytest.mark.parametrize("plant", ["absolute", "parent", "symlink"])
+def test_citation_cache_boundary_has_closed_refusal(tmp_path, monkeypatch, plant):
+    from custodian.tests.test_publicdata_heights import _rewrite_receipt
+
+    cache, row, digest, rows, verify = _cited_page(tmp_path, monkeypatch)
+    verify()
+    directory = cache / row.key
+    if plant == "symlink":
+        relocated = tmp_path / "SYN-relocated-entry"
+        directory.rename(relocated)
+        directory.symlink_to(relocated, target_is_directory=True)
+    else:
+        key = str(directory) if plant == "absolute" else "../cache/" + row.key
+        row = replace(row, key=key)
+        _rewrite_receipt(cache, row.key, digest, {"key": row.key})
+        monkeypatch.setattr(landmarks, "_registry_by_url", lambda: {row.url: row})
+    with pytest.raises(HeightError) as error:
+        landmarks.verify_landmark_receipts(cache, rows)
+    assert (error.value.name, error.value.detail) == (
+        "landmark_heights_citation",
+        "page_snapshot",
+    )

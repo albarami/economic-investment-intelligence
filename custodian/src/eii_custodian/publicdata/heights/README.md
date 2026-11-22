@@ -164,6 +164,11 @@ spaces remain significant. An absent excerpt refuses
 `landmark_heights_citation` / `excerpt_absent`; an unrelated height or kind
 refuses `height_excerpt_mismatch`.
 
+Malformed citation envelopes, including invalid UTF-8 and empty inputs, refuse
+`landmark_heights_citation` / `page_snapshot`. Citation reads reuse the page
+archive's constrained cache directory helper; absolute keys, parent traversal
+and symlinked entry directories refuse with that same closed reason.
+
 No live publisher/page metadata or host is installed by this offline task:
 the brief forbids committing researched names, URLs and hosts. The lead must
 resolve that constraint before the separate reviewed registry and PUB-03 host

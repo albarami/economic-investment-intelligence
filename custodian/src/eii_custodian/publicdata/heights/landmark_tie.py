@@ -97,7 +97,15 @@ def _emit(
         payload = json.loads(envelope.body)
         identity = payload["inputs"][0]["identity"]
         raw = read_snapshot(landmarks._page_directory(cache, entry), identity)
-    except (PageError, SnapshotError, json.JSONDecodeError, KeyError, TypeError):
+    except (
+        PageError,
+        SnapshotError,
+        json.JSONDecodeError,
+        UnicodeDecodeError,
+        KeyError,
+        IndexError,
+        TypeError,
+    ):
         raise landmarks._refuse_citation("page_snapshot") from None
     row = landmarks.LandmarkHeight(
         selected.landmark_id,

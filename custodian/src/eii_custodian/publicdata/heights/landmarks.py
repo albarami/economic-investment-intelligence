@@ -130,9 +130,9 @@ def _registry_entry(row: LandmarkHeight) -> Entry:
 
 def _page_directory(cache: Path, entry: Entry) -> Path:
     """A public page's bytes are its raw snapshot; a file's are the row's own."""
-    from eii_custodian.publicdata.fetch.receipts import cache_directory
+    from eii_custodian.publicdata.fetch.page_records import cache_directory
 
-    directory = cache_directory(cache, entry.key)
+    directory = cache_directory(cache, entry)
     if entry.kind == "public_page":
         return directory / ("inputs/input-0" if not entry.columns else "raw")
     return directory
@@ -147,6 +147,7 @@ def verify_landmark_receipts(
     page bytes; the receipt must then name the registry row's source and key,
     the cited URL, publisher, licence basis, retrieval day and page hash.
     """
+    from eii_custodian.publicdata.fetch.page_records import PageError
     from eii_custodian.publicdata.fetch.snapshots import (
         SnapshotError,
         read_snapshot,
@@ -161,7 +162,7 @@ def verify_landmark_receipts(
                 _page_directory(cache, entry), citation.page_sha256
             )
             retrieved_day = utc(snapshot.sidecar["retrieved_utc"]).date().isoformat()
-        except SnapshotError:
+        except (PageError, SnapshotError):
             raise _refuse_citation("page_snapshot") from None
         side = snapshot.sidecar
         if snapshot.sha256 != citation.page_sha256:

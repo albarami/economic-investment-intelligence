@@ -232,3 +232,38 @@ def test_tie_emission_refusals_have_valid_snapshots(
         "landmark_heights_citation",
         detail,
     )
+
+
+@pytest.mark.parametrize("body", [b"\xff", b'{"inputs": []}'])
+def test_malformed_citation_envelope_has_closed_refusal(tmp_path, monkeypatch, body):
+    from eii_custodian.publicdata.fetch.page_records import selected_page
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import (
+        publish_snapshot,
+        read_snapshot,
+        reviewed_selections,
+    )
+    from eii_custodian.publicdata.heights import landmark_tie, landmarks
+    from eii_custodian.publicdata.review.cache_fixture import select_fixture
+
+    selected, point = fetched_selection(tmp_path, monkeypatch)
+    row = landmarks._registry_by_url()[selected[0].page["page_url"]]
+    envelope = selected_page(tmp_path, row)
+    sidecar = dict(envelope.sidecar, sha256=sha256_hex(body), bytes=len(body))
+    malformed = publish_snapshot(tmp_path / row.key, "json", body, sidecar)
+    select_fixture(tmp_path, row.key, malformed.sha256)
+    # Isolate envelope consumption from selected_page's own shape checks;
+    # the selected bytes, index and receipt still pass the snapshot verifier.
+    monkeypatch.setattr(
+        landmark_tie,
+        "selected_page",
+        lambda cache, entry: read_snapshot(
+            cache / entry.key, reviewed_selections(cache)[entry.key]
+        ),
+    )
+    with pytest.raises(landmarks.HeightError) as error:
+        tie_landmarks(selected, [point], [building()], tmp_path)
+    assert (error.value.name, error.value.detail) == (
+        "landmark_heights_citation",
+        "page_snapshot",
+    )
