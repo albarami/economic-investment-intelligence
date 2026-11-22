@@ -208,11 +208,20 @@ def test_producer_refuses_invalid_sale_as_of(
             next(e for e in load_registry() if e.source_id == "prop_resi_units"),
             key="prop_resi_units",
         )
-        additional = ((resi_row, [_resi()], foreign_as_of + "T00:00:00Z"),)
+        additional = (
+            (
+                resi_row,
+                [_resi(registration_date="2025-07-02")],
+                foreign_as_of + "T00:00:00Z",
+            ),
+        )
+    raw = _rows("c14_worked_example.json")
+    if foreign:
+        control = _producer(tmp_path / "control", row, raw, additional=additional)
+        control.gis_property_singles()
+        assert "pub_property_sale" in control.tables
     monkeypatch.setattr(sale_module, "sale_aggregates", break_as_of)
-    build = _producer(
-        tmp_path, row, _rows("c14_worked_example.json"), additional=additional
-    )
+    build = _producer(tmp_path / "plant", row, raw, additional=additional)
     with pytest.raises(AdditionError, match=r"^price_as_of_missing$"):
         build.gis_property_singles()
     assert "pub_property_sale" not in build.tables
