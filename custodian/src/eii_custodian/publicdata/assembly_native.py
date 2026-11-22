@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
@@ -115,13 +116,21 @@ def read_native(build: Production, entry: Entry, identity: str) -> None:
         build.files[relative] = file_hash(local(build.cache, relative))
 
 
-def _fetched_from(sidecar: dict[str, object], page_url: str, entry: Entry) -> bool:
+def _fetched_from(
+    sidecar: dict[str, object],
+    page_url: str,
+    entry: Entry,
+    pages: Sequence[Mapping[str, object]],
+) -> bool:
     """True when an archived page's receipt shows it was fetched from page_url.
 
     A sub-page receipt keeps its URL exactly. The landing page is the entry's
     own fetch, whose receipt keeps the final address (build.py stores
     ``final_url``): a redirect on the entry's own host is that same page, bound
-    to the entry's key here and to the pinned identity by the caller.
+    to the entry's key here and to the pinned identity by the caller. The
+    archive keeps the first receipt of a body, so a landing whose bytes equal
+    another page's would carry that page's receipt: the final address must
+    name no page of the manifest, and the landing's digest no other page.
     """
     fetched = sidecar.get("fetch_url")
     if fetched == page_url:
@@ -132,6 +141,8 @@ def _fetched_from(sidecar: dict[str, object], page_url: str, entry: Entry) -> bo
         and isinstance(fetched, str)
         and host_of(entry.url) != ""
         and host_of(fetched) == host_of(entry.url)
+        and all(page.get("url") != fetched for page in pages)
+        and sum(page.get("sha256") == sidecar.get("sha256") for page in pages) == 1
     )
 
 
@@ -173,7 +184,7 @@ def read_investment(
     for page in manifest["pages"]:
         raw = read_snapshot(local(build.cache, entry.key), page["sha256"])
         if raw.sidecar.get("source_id") != entry.source_id or not _fetched_from(
-            raw.sidecar, page["url"], entry
+            raw.sidecar, page["url"], entry, manifest["pages"]
         ):
             raise AssemblyError("assembly_investment_refused")
         if page["url"] == entry.url:

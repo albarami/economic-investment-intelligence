@@ -260,13 +260,9 @@ def test_draw_over_investment_tables(tmp_path: Path, monkeypatch) -> None:
 
 def _agency_selected(tmp_path, monkeypatch, bodies=None):
     from custodian.tests import test_investment_build as fixture
-    from custodian.tests.test_investment_bilingual import bilingual
+    from custodian.tests.test_investment_bilingual import bilingual_utf8
 
-    pages, originals = bilingual()
-    originals = {
-        url: body.replace(b"<body>", b'<head><meta charset="utf-8"></head><body>')
-        for url, body in originals.items()
-    }
+    pages, originals = bilingual_utf8()
     if bodies:
         originals.update(bodies)
     row = fixture._agency_entry()
