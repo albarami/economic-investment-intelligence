@@ -6118,6 +6118,10 @@ Q1–Q6 / DR2–DR3 / DR7.
   the exact publisher quotation for both registry rows and document 04. The
   original supplied quotation is retained; no invented quotation or blanket
   mirror licence is asserted.
+  - CORRECTION 2026-11-22 (lead records commit of S2-P52, after review rv1 R3
+    and rv2 finding 2): the component notice is now quoted verbatim in both
+    rows' terms_words and in document 04, from the License Notice of the original repository (https://github.com/zhu-xlab/GlobalBuildingAtlas#license-notice), read by the lead on 2026-11-22, README sha256 457739ed96b61d3eaa8eb085942b1d67727974f6b869bd564fd1921e45d26f0b; the quotation
+    part of this item is resolved.
 - First live answering host: supplied research records direct file responses;
   the lead must confirm the answering host for each full fetch. No redirect
   host is newly admitted. An unlisted redirect remains refused and needs a

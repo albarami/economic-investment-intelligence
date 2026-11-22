@@ -28444,7 +28444,7 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "parquet"
-    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; exact ODbL component quotation and publisher meaning of declared nodata remain pending. Calibration only, no published building class."
+    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; ODbL component notice quoted in terms_words from the original repository's License Notice, read 2026-11-22; publisher meaning of declared nodata remains pending. Calibration only, no published building class."
 
   - key: "bldg_gba/e050_n30_e055_n25"
     refetch: {value: none, reason: frequency_unconfirmed}
@@ -28473,7 +28473,7 @@ sources:
     reconciliation: "none"
     skip_reason: ""
     extension: "parquet"
-    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; exact ODbL component quotation and publisher meaning of declared nodata remain pending. Calibration only, no published building class."
+    basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; ODbL component notice quoted in terms_words from the original repository's License Notice, read 2026-11-22; publisher meaning of declared nodata remains pending. Calibration only, no published building class."
 
   - key: "cepii_baci"
     refetch: {value: none, reason: frequency_unconfirmed}

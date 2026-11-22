@@ -89,7 +89,7 @@ global file of `download.geoservice.dlr.de` (CC BY 4.0, credit "Copyright DLR
 (year of production)"); and `bldg_gba/e050_n25_e055_n20` and
 `bldg_gba/e050_n30_e055_n25`, the two GlobalBuildingAtlas GeoParquet mirror
 tiles from `data.source.coop` (CC BY-NC 4.0 with a reported ODbL polygon
-component, calibration only; exact component notice wording remains pending).
+component, calibration only; the ODbL component notice is quoted in the registry terms).
 The original dataset citation is https://github.com/zhu-xlab/GlobalBuildingAtlas/
 and the hosted conversion is https://source.coop/tge-labs/globalbuildingatlas-lod1.
 Each GBA key uses the existing large-file fetch path: fixed chunks are hashed
@@ -153,7 +153,7 @@ and the manifest carry these same counts. Absent recorded heights are skipped.
 `no_footprint` means
 no candidate covers the point; `largest_overlap` accepts zero-area candidates,
 so there is no separate `no_overlap` outcome. `shared_footprint` counts distinct
-(file, row) winners used by more than one recorded building, including a winner
+(file, kept-row index) winners used by more than one recorded building, including a winner
 whose height later rounds to no usable value. `matched` equals `overall.count`;
 sub-precision recorded heights are omitted from error pairs as before. No pairs
 gives `no_pairs`, with the declared `all` class and no invented metric.
