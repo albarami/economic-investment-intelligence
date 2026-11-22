@@ -542,7 +542,7 @@ TEXT_REASONS: Mapping[type[Exception], tuple[tuple[re.Pattern[str], str], ...]] 
         comtrade_policy_on_a_row_that_is_not_comtrade_api|comtrade_policy\ on\ a\ row\ that\ is\ not\ comtrade_api
         nationality_field_requires_public_splits_nationality|nationality\ field\ requires\ public_splits\ nationality
         held_table_is_not_registered_for_its_source|held\ table\ is\ not\ registered\ for\ its\ source
-        cdse_backup_must_remain_optional_and_unread|CDSE\ backup\ must\ remain\ optional\ and\ unread
+        satellite_backup_must_remain_optional_and_unread|CDSE\ backup\ must\ remain\ optional\ and\ unread
         variables_is_not_a_non_empty_list_of_text|variables\ is\ not\ a\ non\-empty\ list\ of\ text
         held_past_count_must_be_a_positive_integer|held\ past_count\ must\ be\ a\ positive\ integer
         chain_intermediate_sha256_is_not_a_sha_256|chain_intermediate_sha256\ is\ not\ a\ SHA\-256

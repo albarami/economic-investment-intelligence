@@ -52950,3 +52950,11 @@ the local correction and evidence; independent approval is not claimed.
 Muhasabah: PASS for scope, source attribution, real exits and explicit lead-owned
 review/replay limits. The verified delivery bundle and full per-file diff counts
 are reported in `.overnight/RETURN.md`.
+
+## Train S2-20 forced join fix after the lead whole test (2026-11-23)
+
+- Base: train head `ae143446` on main `37af82e2`. The lead's whole test of that head (seed 3375728576) failed 2 tests in suite python-guards: `scripts/tests/test_import_boundary_real.py::test_real_tree_static_passes` and `scripts/tests/gateway/test_import_boundary_gateway.py::test_real_tree_forbids_gateway_in_core`. Both report `FAIL cdse-cache: custodian/src/eii_custodian/publicdata/assembly_refusal_policy.py`.
+- Cause: S2-P56's closed reason word for the registry refusal "CDSE backup must remain optional and unread" contained the guarded marker `cdse_backup`. The real-tree guard keeps that marker out of every file outside the backup's own cache tooling. S2-P56 left train S2-19 and was joined here, so this train is the first whole test of it.
+- Fix: the reason word becomes `satellite_backup_must_remain_optional_and_unread`. The pattern, the registry message and every other row are unchanged. The guard keeps its markers and gains no exemption.
+- Plant: on the old file, `test_import_boundary_real.py` exits 1 (1 failed, 5 passed); on the fix it exits 0.
+- Guard pre-check on the fix (ruling L-1511): the two guard files, `test_cdse_isolation.py`, `test_assembly_refusals.py` and `test_cdse_transport.py` gave exit 0, 1461 passed and 13 subtests passed. ruff check, ruff format --check, check_docs and git diff --check exited 0. The whole test of the new head and another maker's confirmation follow (rule 33).
