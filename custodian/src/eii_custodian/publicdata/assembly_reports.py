@@ -573,9 +573,16 @@ def gather_audit(build: Production) -> dict[str, Any]:
     if build.pin_pending_reason:
         # Ruling L-1494: the pending phase's own closed reason rides the
         # S2-T09 row of the build report; the gate still refuses the pending
-        # build, it never credits a pair that was not written.
+        # build, it never credits a pair that was not written. The gathered
+        # evidence is dropped with it: whatever pair sits on the disk — a
+        # stale pair of an earlier run or one rewritten after the sweep —
+        # this pending run wrote none of it, so the row can never say
+        # recorded.
         pin_evidence = replace(
             pin_evidence,
+            source_keys=(),
+            checks={"completion_evidence": False},
+            receipt_sha256={},
             details={
                 **pin_evidence.details,
                 "pending_reason": build.pin_pending_reason,

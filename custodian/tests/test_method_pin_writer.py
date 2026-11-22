@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -219,7 +220,7 @@ def test_property_an_unbound_configuration_never_writes_a_pair(config, rows):
 
 
 def _pending_run_build(
-    tmp_path: Path, *, stale_pair: bool = False
+    tmp_path: Path, *, stale_pair: bool = False, rewrite_pair: bool = False
 ) -> tuple[Any, dict[str, Any], dict[str, Any], dict[str, Any]]:
     """A gather-rooted Production whose head phases are invented stubs.
 
@@ -228,7 +229,9 @@ def _pending_run_build(
     earlier phase is replaced by a stub that writes only its declared invented
     outputs, and one stub registers an invented 25-row table so the figure
     draw has its review universe. The pin inputs stay unbound: the pending
-    state of ruling L-1494, entered the way the live build enters it.
+    state of ruling L-1494, entered the way the live build enters it. With
+    ``rewrite_pair`` a stub rewrites a valid pair after the run's sweep, the
+    stale-credit shape of round 4 (review N1).
     """
     build, record, artifact, config = stage_method_pin_gather_build(
         tmp_path, stage_outputs=False
@@ -264,6 +267,19 @@ def _pending_run_build(
         )
 
     build.gis_property_singles = gis_property_singles
+    if rewrite_pair:
+        from eii_custodian.publicdata.assembly_method_pins import write_pin_pair
+
+        busyness = build.busyness
+
+        def rewrite_and_stub() -> dict[str, str]:
+            # Round 4 (review N1): a valid pair written after the run's sweep
+            # by a phase that is not the pin phase. The pending pin phase must
+            # still never credit it.
+            write_pin_pair(build.cache, config, producer_rows(artifact["pins"]))
+            return busyness()
+
+        build.busyness = rewrite_and_stub
     return build, record, artifact, config
 
 
@@ -323,6 +339,74 @@ def test_pending_pin_state_never_credits_a_stale_pair_of_an_earlier_run(
     row = _s2_t09_row(build.cache, "assembly/s2_t08_confirmations.json")
     assert row["state"] == "pending"
     assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+
+
+# S2-P63 round 4 (review N1): one input changed from the round-3 pending
+# plant — the pair on disk is a *valid* pair of an earlier run, not junk that
+# would fail validation anyway. The pending phase wrote nothing, so the S2-T09
+# row stays pending whatever the disk holds, and the gate keeps refusing.
+def test_pending_pin_state_never_credits_a_valid_stale_pair_on_disk(
+    tmp_path: Path,
+) -> None:
+    build, *_ = stage_method_pin_gather_build(tmp_path)
+    assert (build.cache / PIN_ARTIFACT).is_file()
+    assert (build.cache / PIN_CONFIG).is_file()
+    build.pin_generation_config = None
+    build.pin_rows = ()
+    assert build.method_pins() == {}
+    row = gathered_s2_t09_confirmation(build)
+    assert row["state"] == "pending"
+    assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        require_complete(otherwise_complete_audit_with_s2_t09(row))
+
+
+def test_pending_pin_state_never_credits_a_pair_rewritten_after_the_sweep(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _pending_run_build(tmp_path, rewrite_pair=True)
+    with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+        build.run()
+    # The rewritten pair is on disk, but the pending phase did not write it:
+    # the report row stays pending and the gate keeps refusing.
+    assert (build.cache / PIN_ARTIFACT).is_file()
+    assert (build.cache / PIN_CONFIG).is_file()
+    row = _s2_t09_row(build.cache, "assembly/s2_t08_confirmations.json")
+    assert row["state"] == "pending"
+    assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+
+
+@hypothesis_settings(deadline=None, max_examples=20)
+@given(
+    disk=st.sampled_from(("absent", "junk", "valid", "artifact_only", "config_only"))
+)
+def test_property_a_pending_phase_never_credits_whatever_pair_is_on_disk(disk):
+    # Oracle written from ruling L-1494 and review N1, never from the module's
+    # code: a pending phase wrote no pair, so whatever state the disk holds —
+    # no pair, junk, a valid pair of an earlier run, or either half alone —
+    # the S2-T09 row is pending with the closed reason and the gate refuses.
+    with tempfile.TemporaryDirectory() as folder:
+        build, *_ = stage_method_pin_gather_build(Path(folder))
+        artifact_file = build.cache / PIN_ARTIFACT
+        config_file = build.cache / PIN_CONFIG
+        if disk == "absent":
+            artifact_file.unlink()
+            config_file.unlink()
+        elif disk == "junk":
+            artifact_file.write_text("SYN junk of an earlier run", encoding="utf-8")
+            config_file.write_text("SYN junk of an earlier run", encoding="utf-8")
+        elif disk == "artifact_only":
+            config_file.unlink()
+        elif disk == "config_only":
+            artifact_file.unlink()
+        build.pin_generation_config = None
+        build.pin_rows = ()
+        assert build.method_pins() == {}
+        row = gathered_s2_t09_confirmation(build)
+        assert row["state"] == "pending"
+        assert row["details"] == {"pending_reason": "pin_inputs_missing"}
+        with pytest.raises(AssemblyError, match=r"^assembly_gate_pending$"):
+            require_complete(otherwise_complete_audit_with_s2_t09(row))
 
 
 def test_a_later_bound_run_leaves_no_stale_pending_reason(tmp_path: Path) -> None:
@@ -403,6 +487,101 @@ def test_phase_refuses_symlinked_configuration_output_and_leaves_no_half_pair(
     assert not (build.cache / PIN_CONFIG).is_symlink()
     assert not (build.cache / PIN_CONFIG).exists()
     assert outside.read_text(encoding="utf-8") == "SYN body outside the cache"
+
+
+# S2-P63 round 4 (review N2): the assembly folder itself is a symlink to a
+# folder outside the cache. The refused write never deletes through the
+# symlinked parent: nothing was written inside the cache envelope, so there is
+# no half pair to remove, and the outside file survives with its body
+# unchanged.
+def test_phase_refuses_a_symlinked_assembly_folder_and_never_touches_outside(
+    tmp_path: Path,
+) -> None:
+    build, *_ = _staged_phase_build(tmp_path)
+    outside = tmp_path / "outside-cache"
+    outside.mkdir()
+    body = "SYN body outside the cache"
+    victim = outside / "s2_t09_pin_artifact.json"
+    victim.write_text(body, encoding="utf-8")
+    assembly = build.cache / "assembly"
+    shutil.rmtree(assembly)
+    assembly.symlink_to(outside)
+    with pytest.raises(AssemblyError, match=r"^pin_output_pair_unwritten$"):
+        build.method_pins()
+    assert victim.read_text(encoding="utf-8") == body
+    assert assembly.is_symlink()
+    assert PIN_ARTIFACT not in build.files
+    assert PIN_CONFIG not in build.files
+
+
+@hypothesis_settings(deadline=None, max_examples=30)
+@given(
+    cache_is_link=st.booleans(),
+    parent_is_link=st.booleans(),
+    artifact_shape=st.sampled_from(("absent", "file", "link")),
+    config_shape=st.sampled_from(("absent", "file", "link")),
+)
+def test_property_half_pair_cleanup_never_reaches_past_the_cache(
+    cache_is_link, parent_is_link, artifact_shape, config_shape
+):
+    # Oracle written from rule 13 and review N2, never from the module's code:
+    # the best-effort cleanup may remove a half only inside a cache whose root
+    # and assembly folder resolve without a symlink; nothing is ever deleted
+    # through a symlinked root or parent, so every regular file outside the
+    # cache survives with its body unchanged, and when the envelope is real
+    # no half pair survives inside it.
+    from eii_custodian.publicdata.assembly_method_pins import _drop_half_pair
+
+    with tempfile.TemporaryDirectory() as folder:
+        tmp = Path(folder)
+        store = tmp / "store"
+        outside = tmp / "outside"
+        store.mkdir()
+        outside.mkdir()
+        cache = tmp / "cache"
+        if cache_is_link:
+            cache.symlink_to(store)
+        else:
+            cache.mkdir()
+        holder = store if cache_is_link else cache
+        assembly = holder / "assembly"
+        if parent_is_link:
+            assembly.symlink_to(outside)
+        else:
+            assembly.mkdir()
+        for name, shape in (
+            (PIN_ARTIFACT, artifact_shape),
+            (PIN_CONFIG, config_shape),
+        ):
+            if shape == "file":
+                (assembly / Path(name).name).write_text(
+                    "SYN half body of " + name, encoding="utf-8"
+                )
+            elif shape == "link":
+                victim = outside / ("victim-" + Path(name).name)
+                victim.write_text("SYN victim body of " + name, encoding="utf-8")
+                (assembly / Path(name).name).symlink_to(victim)
+        before = {
+            entry.name: (
+                entry.read_text(encoding="utf-8")
+                if entry.is_file() and not entry.is_symlink()
+                else None
+            )
+            for entry in outside.iterdir()
+        }
+        _drop_half_pair(cache)
+        after = {
+            entry.name: (
+                entry.read_text(encoding="utf-8")
+                if entry.is_file() and not entry.is_symlink()
+                else None
+            )
+            for entry in outside.iterdir()
+        }
+        assert after == before
+        if not cache_is_link and not parent_is_link:
+            for name in (PIN_ARTIFACT, PIN_CONFIG):
+                assert not (cache / name).exists()
 
 
 # S2-P63 round 2 (review RV1 F1): the widened pair guard also covers the

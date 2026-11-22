@@ -38,7 +38,15 @@ def _drop_half_pair(cache: Path) -> None:
             pass
         except AssemblyError:
             # A symlinked half never resolves inside the cache: remove the
-            # link itself, never its target, so no half pair survives.
+            # link itself, never its target, so no half pair survives. A
+            # refused parent — the assembly folder, or the cache root, is a
+            # symlink — means nothing was written inside the cache envelope,
+            # so no half pair exists to remove and nothing is ever deleted
+            # through such a link.
+            try:
+                local(cache, str(Path(name).parent))
+            except AssemblyError:
+                continue
             (cache / name).unlink(missing_ok=True)
 
 
