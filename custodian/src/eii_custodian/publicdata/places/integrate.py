@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import date
 from pathlib import Path
@@ -48,6 +49,16 @@ _BUILD_LINES: ContextVar[list[str] | None] = ContextVar(
 _READER_ERRORS = (yaml.YAMLError, OSError, UnicodeError, ValueError, TypeError)
 
 
+@contextmanager
+def build_lines(lines: list[str]) -> Iterator[None]:
+    """Route nested places notes to this build, restoring the caller's log."""
+    token = _BUILD_LINES.set(lines)
+    try:
+        yield
+    finally:
+        _BUILD_LINES.reset(token)
+
+
 def frame_when_ready(
     cache: Path,
     entries: Sequence[Entry],
@@ -83,8 +94,7 @@ def frame_when_ready(
     )
 
     log = lines if lines is not None else []
-    token = _BUILD_LINES.set(log)
-    try:
+    with build_lines(log):
         try:
             result = build_public_frame(
                 cache,
@@ -104,8 +114,6 @@ def frame_when_ready(
                 write_municipality_output(
                     cache, result.tables["municipality"], result.sources
                 )
-    finally:
-        _BUILD_LINES.reset(token)
 
 
 def areas_before_stage(

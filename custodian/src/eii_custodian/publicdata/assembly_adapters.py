@@ -398,20 +398,21 @@ class Production:
             write_municipality_output,
         )
         from .heights.model import BUILDINGS_RELATIVE
-        from .places.integrate import areas_before_stage
+        from .places.integrate import areas_before_stage, build_lines
 
         invalidate_buildings(self.cache)
         areas_before_stage(self.cache, self.lines, self.review)
         try:
-            result = build_public_frame(
-                self.cache,
-                self.entries,
-                self.review,
-                selections=self.selected,
-                build_date=datetime.fromisoformat(
-                    self.stamp or self.clock().replace("Z", "+00:00")
-                ).date(),
-            )
+            with build_lines(self.lines):
+                result = build_public_frame(
+                    self.cache,
+                    self.entries,
+                    self.review,
+                    selections=self.selected,
+                    build_date=datetime.fromisoformat(
+                        self.stamp or self.clock().replace("Z", "+00:00")
+                    ).date(),
+                )
         except BuildingError as exc:
             self.lines.append(f"FAIL buildings check={exc.name}")
             if exc.name == "building_frame_absent":

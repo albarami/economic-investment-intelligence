@@ -182,6 +182,40 @@ def test_frame_refuses_missing_places_after_inventory(tmp_path, monkeypatch):
     assert not (prepared.cache / "assembly/frame.json").exists()
 
 
+def test_assembly_logs_places_refusal_without_changing_assembly_error(
+    tmp_path, monkeypatch
+):
+    from eii_custodian.publicdata.frame import build
+    from eii_custodian.publicdata.places.integrate import (
+        _BUILD_LINES,
+        run_places_before_gazetteer,
+    )
+
+    prepared, state = prepared_frame(tmp_path, monkeypatch)
+    (prepared.cache / "places_s2_t06/place_points.json").unlink()
+    administrative_frame = build.build_frame
+
+    def frame_with_places(*args, **kwargs):
+        result = administrative_frame(*args, **kwargs)
+        run_places_before_gazetteer(
+            state.cache,
+            state.review,
+            state.entries,
+            (prepared.boundary,),
+            result.tables["grid_cell"],
+            {},
+        )
+        return result
+
+    monkeypatch.setattr(build, "build_frame", frame_with_places)
+    previous = _BUILD_LINES.get()
+    with pytest.raises(AssemblyError, match=r"^assembly_places_incomplete$"):
+        state.frame()
+    assert state.lines == ["stage places arabic_tag_missing"]
+    assert _BUILD_LINES.get() is previous
+    assert not (prepared.cache / "assembly/frame.json").exists()
+
+
 def test_assembly_build_outcome_preserves_missing_inventory_refusal(
     tmp_path, monkeypatch
 ):
