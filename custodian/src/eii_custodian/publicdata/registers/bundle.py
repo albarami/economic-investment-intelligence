@@ -96,7 +96,7 @@ def _receipt(entry: object) -> tuple[str, str, str, str, dict[str, Any]]:
     }:
         refuse("register_bundle_receipt")
     use, side = entry["use"], entry["receipt"]
-    if use not in {"current", "snapshot"}:
+    if not isinstance(use, str) or use not in {"current", "snapshot"}:
         refuse("register_bundle_receipt")
     if not isinstance(side, dict) or set(side) != _RECEIPT_KEYS:
         refuse("receipt_schema")
@@ -157,14 +157,12 @@ def _coverage(
     coverage: dict[str, tuple[str, ...]] = {}
     for source, kept in snapshots.items():
         months = raw[source]
-        if (
-            not isinstance(months, list)
-            or len(set(months)) != len(months)
-            or months != sorted(months)
-        ):
+        if not isinstance(months, list):
             refuse("register_bundle_manifest")
         for value in months:
             month(value)
+        if len(set(months)) != len(months) or months != sorted(months):
+            refuse("register_bundle_manifest")
         if set(months) != kept:
             refuse("register_bundle_period")
         coverage[source] = tuple(months)
@@ -204,6 +202,7 @@ def _pinned_manifest(directory: Path, pin: Path) -> tuple[dict[str, Any], str, s
         manifest["version"] != VERSION
         or manifest["method"] != METHOD
         or manifest["provenance"] != "Public"
+        or not isinstance(manifest["release_kind"], str)
         or manifest["release_kind"] not in {"public_only", "protected"}
     ):
         refuse("register_bundle_manifest")
@@ -219,6 +218,7 @@ def _specs(raw: object) -> dict[str, tuple[int, str]]:
         if (
             not isinstance(item, dict)
             or set(item) != {"name", "rows", "sha256"}
+            or not isinstance(item["name"], str)
             or type(item["rows"]) is not int
             or item["rows"] < 0
             or not isinstance(item["sha256"], str)

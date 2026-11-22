@@ -51373,6 +51373,15 @@ S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline e
   guards (duplicate declared table, duplicate current receipt, unsorted or
   repeated coverage months, the duplicate JSON-key hook) and every remaining
   branch now have one-change negatives asserting the exact refusal code (F3).
+- Round 3 (2026-11-22, Moonshot review cf2 fixes): the type-confusion family
+  is closed — `receipts[].use`, `manifest.release_kind` and `tables[].name`
+  are type-checked before set or dict membership, and `snapshot_coverage`
+  months pass `month()` before `set()`/`sorted()`, so a decoded JSON value of
+  the wrong type always meets a closed `RegisterError` code. One parametrized
+  matrix substitutes every JSON type into every decoded slot (cases for all
+  nine rows of the family), four Hypothesis properties bound each acceptance
+  set to its legal values over arbitrary JSON, and each new guard was deleted
+  alone and shown red. The key-names pin list (cf1 note N2) is a plant too.
 - The writer path (`registers.intake`, `registers.build`) keeps the same
   refusal codes through the shared receipt check; the lead's real-file run and
   release evidence remain pending. No gate claimed.

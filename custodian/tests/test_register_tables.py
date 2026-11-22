@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 from custodian.tests.test_production_adapters import context
 from custodian.tests.test_registers import capture, commerce, inputs
-from hypothesis import given
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 import h3
@@ -80,14 +80,19 @@ def _production(tmp_path: Path, frame, snapshots=(), **stage_kwargs):
     return state
 
 
+def _repin(tmp_path: Path) -> None:
+    manifest_path = tmp_path / BUNDLE / "manifest.json"
+    pin = json.loads((tmp_path / PIN).read_text())
+    pin["manifest_sha256"] = digest(manifest_path.read_bytes())
+    (tmp_path / PIN).write_text(json.dumps(pin))
+
+
 def _rewrite_manifest(tmp_path: Path, mutate) -> None:
     manifest_path = tmp_path / BUNDLE / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     mutate(manifest)
     manifest_path.write_text(json.dumps(manifest, sort_keys=True))
-    pin = json.loads((tmp_path / PIN).read_text())
-    pin["manifest_sha256"] = digest(manifest_path.read_bytes())
-    (tmp_path / PIN).write_text(json.dumps(pin))
+    _repin(tmp_path)
 
 
 def _rebuild_rows(tmp_path: Path, frame, name: str):
@@ -1206,3 +1211,213 @@ def test_receipt_bad_period_refused(tmp_path: Path, frame) -> None:
     _rewrite_manifest(tmp_path, mutate)
     with pytest.raises(RegisterError, match=r"^snapshot_month$"):
         state.register_tables()
+
+
+# The fuzzing matrix: every JSON type substituted into every decoded slot the
+# reader hashes, sorts, indexes or calls before a type check. Each must meet a
+# closed ``RegisterError`` with the code in use, never another exception.
+_JSON_PLANTS: tuple[tuple[str, object], ...] = (
+    ("null", None),
+    ("bool", True),
+    ("int", 0),
+    ("float", 1.5),
+    ("empty_str", ""),
+    ("empty_list", []),
+    ("nested_list", [[]]),
+    ("object_list", [{}]),
+    ("object", {}),
+    ("mixed_list", ["2026-11", 1]),
+    ("key_names", ["version", "manifest_sha256"]),
+)
+
+_TYPE_PLANT_CODES: dict[str, dict[str, str]] = {
+    "receipt_use": {"_": "register_bundle_receipt"},
+    "receipt_period": {"_": "snapshot_month"},
+    "receipts_item": {"_": "register_bundle_receipt"},
+    "receipt_side": {"_": "receipt_schema"},
+    "receipt_sha256": {"_": "register_bundle_receipt"},
+    "receipts_body": {
+        "_": "register_bundle_manifest",
+        "empty_list": "register_bundle_source",
+        "nested_list": "register_bundle_receipt",
+        "object_list": "register_bundle_receipt",
+        "mixed_list": "register_bundle_receipt",
+        "key_names": "register_bundle_receipt",
+    },
+    "snapshot_coverage": {
+        "_": "register_bundle_manifest",
+        "empty_list": "register_bundle_period",
+        "nested_list": "snapshot_month",
+        "object_list": "snapshot_month",
+        "mixed_list": "snapshot_month",
+        "key_names": "snapshot_month",
+    },
+    "pin_body": {"_": "register_bundle_pin"},
+    "manifest_body": {"_": "register_bundle_manifest"},
+    "release_kind": {"_": "register_bundle_manifest"},
+    "manifest_version": {"_": "register_bundle_manifest"},
+    "manifest_frame": {"_": "frame_hash_mismatch"},
+    "table_name": {"_": "register_bundle_table"},
+    "table_rows": {"_": "register_bundle_table"},
+    "table_sha256": {"_": "register_bundle_table"},
+}
+
+_TYPE_PLANT_VALUES: dict[str, object] = dict(_JSON_PLANTS)
+
+
+def _plant_wrong_type(tmp_path: Path, slot: str, value: object) -> None:
+    """Substitute one decoded JSON value; every other input stays valid."""
+    manifest_path = tmp_path / BUNDLE / "manifest.json"
+    if slot == "pin_body":
+        (tmp_path / PIN).write_text(json.dumps(value))
+        return
+    if slot == "manifest_body":
+        manifest_path.write_text(json.dumps(value))
+        _repin(tmp_path)
+        return
+    manifest = json.loads(manifest_path.read_text())
+    entries = manifest["receipts"]
+    if slot == "receipt_use":
+        entries[0]["use"] = value
+    elif slot == "receipt_period":
+        entries[0]["receipt"]["period"] = value
+        _fix_receipt_sha(manifest)
+    elif slot == "receipts_item":
+        entries[0] = value
+    elif slot == "receipt_side":
+        entries[0]["receipt"] = value
+    elif slot == "receipt_sha256":
+        entries[0]["receipt_sha256"] = value
+    elif slot == "receipts_body":
+        manifest["receipts"] = value
+    elif slot == "snapshot_coverage":
+        manifest["snapshot_coverage"]["biz_register"] = value
+    elif slot == "release_kind":
+        manifest["release_kind"] = value
+    elif slot == "manifest_version":
+        manifest["version"] = value
+    elif slot == "manifest_frame":
+        manifest["frame_sha256"] = value
+    elif slot == "table_name":
+        manifest["tables"][0]["name"] = value
+    elif slot == "table_rows":
+        manifest["tables"][0]["rows"] = value
+    elif slot == "table_sha256":
+        manifest["tables"][0]["sha256"] = value
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True))
+    _repin(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("slot", "plant"),
+    [(slot, name) for slot in _TYPE_PLANT_CODES for name, _ in _JSON_PLANTS],
+    ids=[f"{slot}:{name}" for slot in _TYPE_PLANT_CODES for name, _ in _JSON_PLANTS],
+)
+def test_wrongly_typed_json_value_refused(tmp_path: Path, frame, slot, plant) -> None:
+    """A malformed JSON value meets the slot's closed refusal code only."""
+    snapshots = (capture(period="2026-11"),) if slot == "snapshot_coverage" else ()
+    state = _production(tmp_path, frame, snapshots)
+    _plant_wrong_type(tmp_path, slot, _TYPE_PLANT_VALUES[plant])
+    codes = _TYPE_PLANT_CODES[slot]
+    code = codes.get(plant, codes["_"])
+    with pytest.raises(RegisterError, match=rf"^{code}$"):
+        state.register_tables()
+
+
+def _json_extend(child):
+    return st.lists(child, max_size=4) | st.dictionaries(st.text(), child, max_size=4)
+
+
+_JSON_VALUE = st.recursive(
+    st.none()
+    | st.booleans()
+    | st.integers()
+    | st.floats(allow_nan=False, allow_infinity=False)
+    | st.text(),
+    _json_extend,
+    max_leaves=10,
+)
+
+
+@pytest.fixture
+def staged_text(tmp_path: Path, frame) -> str:
+    """One staged bundle per test call; every example rewrites from this text."""
+    _stage(tmp_path, tmp_path / "stage", frame, (capture(period="2026-11"),))
+    return (tmp_path / BUNDLE / "manifest.json").read_text()
+
+
+def _replace_manifest(tmp_path: Path, manifest) -> None:
+    (tmp_path / BUNDLE / "manifest.json").write_text(
+        json.dumps(manifest, sort_keys=True)
+    )
+    _repin(tmp_path)
+
+
+# Every example rewrites the staged files from staged_text, so the shared
+# function-scoped fixture is a deliberate replay point, not stale state.
+_REUSE = settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+
+
+@_REUSE
+@given(value=_JSON_VALUE)
+def test_release_kind_accepts_only_legal_strings(
+    staged_text, tmp_path: Path, frame, value
+) -> None:
+    manifest = json.loads(staged_text)
+    manifest["release_kind"] = value
+    _replace_manifest(tmp_path, manifest)
+    try:
+        load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frozenset(frame.cells))
+    except RegisterError:
+        assert value not in ("public_only", "protected")
+    else:
+        assert value in ("public_only", "protected")
+
+
+@_REUSE
+@given(value=_JSON_VALUE)
+def test_receipt_use_accepts_only_current(
+    staged_text, tmp_path: Path, frame, value
+) -> None:
+    manifest = json.loads(staged_text)
+    manifest["receipts"][0]["use"] = value
+    _replace_manifest(tmp_path, manifest)
+    try:
+        load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frozenset(frame.cells))
+    except RegisterError:
+        assert value != "current"
+    else:
+        assert value == "current"
+
+
+@_REUSE
+@given(value=_JSON_VALUE)
+def test_coverage_months_accepts_only_the_kept_set(
+    staged_text, tmp_path: Path, frame, value
+) -> None:
+    manifest = json.loads(staged_text)
+    manifest["snapshot_coverage"]["biz_register"] = value
+    _replace_manifest(tmp_path, manifest)
+    try:
+        load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frozenset(frame.cells))
+    except RegisterError:
+        assert value != ["2026-11"]
+    else:
+        assert value == ["2026-11"]
+
+
+@_REUSE
+@given(value=_JSON_VALUE)
+def test_table_name_accepts_only_the_declared_name(
+    staged_text, tmp_path: Path, frame, value
+) -> None:
+    manifest = json.loads(staged_text)
+    legal = manifest["tables"][0]["name"]
+    manifest["tables"][0]["name"] = value
+    _replace_manifest(tmp_path, manifest)
+    try:
+        load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frozenset(frame.cells))
+    except RegisterError:
+        assert value != legal
+    else:
+        assert value == legal
