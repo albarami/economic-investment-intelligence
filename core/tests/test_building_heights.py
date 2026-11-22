@@ -888,6 +888,7 @@ def test_gba_counts_no_footprint_zero_overlap_unusable_ties_and_shared():
         "matched": 4,
         "no_footprint": 1,
         "unusable_height": 1,
+        "recorded_height_unusable": 0,
         "tied_height": 1,
         "shared_footprint": 1,
     }
@@ -1013,31 +1014,30 @@ def test_gba_read_counts_are_additive_and_order_independent(files):
     assert sum_gba_read_counts(reversed(counts)) == combined
 
 
-@given(
-    st.lists(
-        st.lists(
-            st.tuples(
-                st.decimals(
-                    min_value=0,
-                    max_value=100,
-                    places=3,
-                    allow_nan=False,
-                    allow_infinity=False,
-                ),
-                st.sampled_from(["SYN-a", "SYN-b"]),
-                st.integers(min_value=0, max_value=3),
-                st.decimals(
-                    min_value="0.001",
-                    max_value="100",
-                    places=3,
-                    allow_nan=False,
-                    allow_infinity=False,
-                ),
-            ),
-            unique_by=lambda row: (row[1], row[2]),
-        )
-    )
+_GBA_MATCHES = st.lists(
+    st.tuples(
+        st.decimals(
+            min_value=0,
+            max_value=100,
+            places=3,
+            allow_nan=False,
+            allow_infinity=False,
+        ),
+        st.sampled_from(["SYN-a", "SYN-b"]),
+        st.integers(min_value=0, max_value=3),
+        st.decimals(
+            min_value="0.001",
+            max_value="100",
+            places=3,
+            allow_nan=False,
+            allow_infinity=False,
+        ),
+    ),
+    unique_by=lambda row: (row[1], row[2]),
 )
+
+
+@given(st.lists(_GBA_MATCHES))
 @example([])
 @example([[]])
 def test_gba_match_counts_ignore_input_scan_order(rows):
@@ -1075,6 +1075,82 @@ def test_gba_match_counts_withhold_an_unusable_recorded_pair():
         "matched": 0,
         "no_footprint": 0,
         "unusable_height": 0,
+        "recorded_height_unusable": 1,
         "tied_height": 0,
         "shared_footprint": 0,
     }
+    assert result["recorded_buildings"] == sum(
+        result[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    )
+
+
+@pytest.mark.parametrize("recorded", [None, Decimal("0.004")])
+@pytest.mark.parametrize(
+    ("height", "outcome"),
+    [
+        (None, "no_footprint"),
+        (Decimal("0.004"), "unusable_height"),
+        (Decimal("20"), "recorded_height_unusable"),
+    ],
+)
+def test_gba_match_outcome_precedence(recorded, height, outcome):
+    from eii_core.calc.building_heights import gba_match_counts
+
+    matches = [] if height is None else [(Decimal("1"), "SYN-a", 0, height)]
+    result = gba_match_counts([(recorded, matches)])
+    assert result["recorded_buildings"] == int(recorded is not None)
+    for name in (
+        "matched",
+        "no_footprint",
+        "unusable_height",
+        "recorded_height_unusable",
+    ):
+        assert result[name] == int(recorded is not None and name == outcome)
+
+
+@given(
+    st.lists(
+        st.tuples(
+            st.one_of(st.none(), st.decimals(allow_nan=True, allow_infinity=True)),
+            _GBA_MATCHES,
+        )
+    )
+)
+@example([(Decimal("0.004"), [(Decimal("1"), "SYN-a", 0, Decimal("20"))])])
+def test_gba_match_outcomes_partition_recorded_buildings(rows):
+    from eii_core.calc.building_heights import gba_match_counts
+
+    result = gba_match_counts(rows)
+    assert result["recorded_buildings"] == sum(
+        recorded is not None for recorded, _ in rows
+    )
+    assert result["recorded_buildings"] == sum(
+        result[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    )
+
+
+def test_gba_match_accounting_refuses_a_planted_count(monkeypatch):
+    from eii_core.calc import building_heights
+
+    class BrokenCounts:
+        @staticmethod
+        def fromkeys(keys, value):
+            counts = dict.fromkeys(keys, value)
+            counts["recorded_buildings"] = 1
+            return counts
+
+    monkeypatch.setattr(building_heights, "dict", BrokenCounts, raising=False)
+    with pytest.raises(ValueError, match=r"^gba match accounting$"):
+        building_heights.gba_match_counts([])

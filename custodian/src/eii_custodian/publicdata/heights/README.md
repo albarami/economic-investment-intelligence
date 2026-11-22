@@ -141,7 +141,13 @@ value at one point refuse the build (`wsf3d_overlap`).
 GBA calibration reuses this spatial index as a deterministic bbox prefilter.
 An exhaustive-fixture comparison proves the same winners, tie order and
 counters. Core reports `recorded_buildings`, `matched`, `no_footprint`,
-`unusable_height`, `tied_height` and `shared_footprint`. `no_footprint` means
+`unusable_height`, `recorded_height_unusable`, `tied_height` and `shared_footprint`.
+The primary outcomes partition every building with a recorded height: no winner
+gives `no_footprint`; an unusable winner height gives `unusable_height`; then an
+unusable recorded height gives `recorded_height_unusable`; otherwise `matched`.
+Core refuses an incomplete partition with `gba match accounting`; calibration
+and the manifest carry these same counts. Absent recorded heights are skipped.
+`no_footprint` means
 no candidate covers the point; `largest_overlap` accepts zero-area candidates,
 so there is no separate `no_overlap` outcome. `shared_footprint` counts distinct
 (file, row) winners used by more than one recorded building, including a winner

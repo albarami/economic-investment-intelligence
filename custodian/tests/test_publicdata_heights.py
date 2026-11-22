@@ -2963,6 +2963,9 @@ def test_gba_calibration_measures_error_by_class_in_the_manifest(
     assert by_class["all"] == calibration["overall"]
     assert calibration["class_basis"] == "none_published"
     assert calibration["matched"] == 2
+    assert calibration["recorded_height_unusable"] == 0
+    assert calibration["recorded_buildings"] == 2
+    assert calibration["no_footprint"] == calibration["unusable_height"] == 0
     counts = _manifest(out_dir)["sources"]["bldg_gba"]
     assert counts["rows_in_bounds"] == counts["rows_kept"] == 2
     assert any("PASS heights" in line for line in lines)
@@ -3642,6 +3645,10 @@ def test_gba_calibration_drops_a_recorded_height_below_the_precision() -> None:
         "median_absolute_error_m": "0.00",
         "reason": "",
     }
+    assert block["recorded_height_unusable"] == 1
+    assert block["recorded_buildings"] == 2
+    assert block["matched"] == block["overall"]["count"]
+    assert block["no_footprint"] == block["unusable_height"] == 0
     assert set(block["by_class"]) == {"tower"}
     with pytest.raises(ValueError, match="recorded must be positive"):
         fallback_errors([{"recorded": Decimal("0.004"), "3dglobfp": Decimal("40")}])
@@ -4226,6 +4233,7 @@ def test_gba_index_preserves_exhaustive_winners_and_counts(monkeypatch):
             "matched",
             "no_footprint",
             "unusable_height",
+            "recorded_height_unusable",
             "tied_height",
             "shared_footprint",
         )
@@ -4234,6 +4242,7 @@ def test_gba_index_preserves_exhaustive_winners_and_counts(monkeypatch):
         "matched": 3,
         "no_footprint": 1,
         "unusable_height": 1,
+        "recorded_height_unusable": 0,
         "tied_height": 2,
         "shared_footprint": 1,
     }

@@ -329,6 +329,7 @@ def gba_match_counts(
             "matched",
             "no_footprint",
             "unusable_height",
+            "recorded_height_unusable",
             "tied_height",
             "shared_footprint",
         ),
@@ -350,9 +351,21 @@ def gba_match_counts(
             counts["tied_height"] += 1
         if height_value(winner[-1]) is None:
             counts["unusable_height"] += 1
-        elif height_value(recorded) is not None:
+        elif height_value(recorded) is None:
+            counts["recorded_height_unusable"] += 1
+        else:
             counts["matched"] += 1
     counts["shared_footprint"] = sum(count > 1 for count in winners.values())
+    if counts["recorded_buildings"] != sum(
+        counts[name]
+        for name in (
+            "matched",
+            "no_footprint",
+            "unusable_height",
+            "recorded_height_unusable",
+        )
+    ):
+        raise ValueError("gba match accounting")
     return counts
 
 
