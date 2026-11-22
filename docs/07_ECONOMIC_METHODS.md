@@ -717,6 +717,8 @@ deal_count   = the number of kept rows in the group
 zero kept rows: NO_DATA, and the median is null
 ```
 
+**Code.** `eii_custodian.publicdata.property.sale.sale_aggregates`, called by the `prop_sales` branch of `eii_custodian.publicdata.assembly_layers.build_layers` over the kept `bulletin.Deal` rows.
+
 **Worked example.** The deal counts are pinned by the public data pack. The median prices in riyals are not in the pack, so they are not a passing regression until they are written here. The slice S7 gate fails for those medians until then (MTH-51).
 
 | Quantity | Value |

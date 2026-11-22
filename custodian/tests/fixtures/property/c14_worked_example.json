@@ -1,0 +1,42 @@
+[
+  {
+    "registration_date": "2025-10-02",
+    "encrypted_transaction_number": "SYN-TX-C14-A",
+    "encrypted_parcel_number": "SYN-PX-C14-A",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-LAND-1",
+    "property_type": "SYN-EN-DO-NOT-READ",
+    "lstkhdm": "SYN-USE-AR",
+    "usage": "SYN-USE-RESI",
+    "area_square_meters": 20,
+    "share_area": null,
+    "price_per_square_foot": null,
+    "price_per_square_meter": null,
+    "number_of_shares_2400": null,
+    "share_value": null,
+    "property_value": 200
+  },
+  {
+    "registration_date": "2025-10-09",
+    "encrypted_transaction_number": "SYN-TX-C14-B",
+    "encrypted_parcel_number": "SYN-PX-C14-B",
+    "sm_lbldy": "SYN Coast AR",
+    "municipality_name": "SYN Coast",
+    "sm_lmntq": "SYN North AR",
+    "district_name": "SYN North",
+    "nw_l_qr": "SYN-LAND-1",
+    "property_type": "SYN-EN-DO-NOT-READ",
+    "lstkhdm": "SYN-USE-AR",
+    "usage": "SYN-USE-RESI",
+    "area_square_meters": 20,
+    "share_area": null,
+    "price_per_square_foot": null,
+    "price_per_square_meter": null,
+    "number_of_shares_2400": null,
+    "share_value": null,
+    "property_value": 400
+  }
+]

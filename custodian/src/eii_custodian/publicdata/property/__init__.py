@@ -1,9 +1,10 @@
-"""Kept deals and the quarterly aggregates of card C41 (PUB-107).
+"""Kept deals and the annual and quarterly property-sale aggregates.
 
 The package reads the Arabic label and the usage field of the two sales
 bulletins through the reviewed ``property_use_map.csv``, keeps deals by the
-rule of card C14 and writes only the aggregates of ``pub_property_quarter``:
-identifiers stay inside the build as join keys and never reach a release row.
+rule of card C14 and writes only the aggregates of ``pub_property_sale`` and
+``pub_property_quarter``: identifiers stay inside the build as join keys and
+never reach a release row.
 """
 
 from eii_custodian.publicdata.property.bulletin import (
@@ -24,6 +25,7 @@ from eii_custodian.publicdata.property.quarter import (
     quarter_aggregates,
     square_feet,
 )
+from eii_custodian.publicdata.property.sale import sale_aggregates
 from eii_custodian.publicdata.property.use_map import (
     ANY_USAGE,
     LAND_MARKER,
@@ -53,6 +55,7 @@ __all__ = [
     "quarter_aggregates",
     "quarter_of",
     "refuse_release_identifiers",
+    "sale_aggregates",
     "sales_export_rows",
     "square_feet",
     "use_lookup",
