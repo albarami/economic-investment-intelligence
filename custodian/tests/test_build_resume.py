@@ -754,21 +754,29 @@ def test_exception_log_keeps_existing_secret_guard(
 
 
 def test_paged_archive_retains_original_retrieval_time(
-    paged: Harness, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from custodian.tests.test_build_own_run import _fake_tender_adapter, _own_run
+
+    from eii_custodian.publicdata import assembly_tenders
     from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
-    paged.interrupt()
-
-    def assemble(self: Production) -> tuple[str, ...]:
-        self.stamp = LATER
-        self.fetch_archive()
-        return ()
-
-    monkeypatch.setattr(Production, "run", assemble)
-    assert paged.run(resume=True).failure is None
-    assert paged.seen == [paged.entries[1].url]
-    folder = paged.cache / "SYN-first"
+    seen: list[str] = []
+    _fake_tender_adapter(monkeypatch, seen)
+    archive = assembly_tenders.archive_pages
+    monkeypatch.setattr(
+        assembly_tenders,
+        "archive_pages",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssemblyError("SYN stop")),
+    )
+    first = _own_run(tmp_path)
+    assert first.failure is not None
+    assert first.failure.check == "assembly_tender_pages_incomplete"
+    monkeypatch.setattr(assembly_tenders, "archive_pages", archive)
+    resumed = _own_run(tmp_path, resume=True, stamp=LATER)
+    assert resumed.failure is None
+    assert seen == ["tenders_pub"]
+    folder = tmp_path / "public_cache_tenders/tenders_pub"
     index = next((folder / "index").glob("*.json"))
     snapshot = read_snapshot(folder, index.stem)
     assert snapshot.sidecar["retrieved_utc"] == START

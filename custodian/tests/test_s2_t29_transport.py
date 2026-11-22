@@ -642,7 +642,7 @@ def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
     )
 
 
-def test_build_public_ordinary_run_skips_tenders(tmp_path, monkeypatch, capsys):
+def test_build_public_own_run_tender_dispatch(tmp_path, monkeypatch, capsys):
     from custodian.tests.singles_entries import tender_entry
     from custodian.tests.test_tenders import _chain
 
@@ -671,15 +671,10 @@ def test_build_public_ordinary_run_skips_tenders(tmp_path, monkeypatch, capsys):
         "open_https",
         lambda *args, **kwargs: pytest.fail("tender reached generic file reader"),
     )
-    # Decision 0084: the ordinary run makes no tender list, page or terms
-    # request; the source's own run is not part of this command form. This
-    # row's changed terms address does not bind the review, so assembly then
-    # refuses it rather than recording it as pending.
-    assert command.run(tmp_path, {}, [], sleep=lambda _: None) == 1
-    assert sent == []
+    assert command.run(tmp_path, {}, ["--tenders-only"], sleep=lambda _: None) == 1
+    assert sent and "/AvailableMinistriesTenders/1" in sent[0]
     captured = capsys.readouterr()
     output = captured.out + captured.err
-    assert "SKIP tenders_pub own_run" in output
-    assert "FAIL tenders_pub" not in output
-    assert "FAIL assembly snapshot_selection_invalid" in output
+    assert "FAIL tenders_pub" in output
+    assert "language" in output
     assert not list((tmp_path / "data/public_cache" / entry.key).rglob("index/*.json"))

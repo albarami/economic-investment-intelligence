@@ -56,8 +56,15 @@ EXCLUDED_SCOPES: frozenset[str] = frozenset(
         "_heights",
         "_archive_investment_attempts",
         "_comtrade_dispatch",
+        # Separate tender entry point. Its assembly imports run after the
+        # ordinary fetch loop and must not enter that loop's machinery.
+        "run_tenders_only",
     }
 )
+_OWN_RUN_MODULE = "eii_custodian.publicdata.fetch.own_run"
+# Called only from run_tenders_only, and only to adopt an already completed
+# archive. The assembly imports inside it are outside the fetch loop.
+OWN_RUN_EXCLUDED_SCOPES: frozenset[str] = frozenset({"handoff_completed_archive"})
 
 # One branch root per dispatch branch. Modules these roots pull are already
 # shared machinery today (their lazy imports sit inside kept scopes); the map
@@ -609,7 +616,10 @@ class CodeRoots:
     named_files: Mapping[str, Path] = field(default_factory=dict)
     seeds: tuple[str, ...] = MACHINERY_SEEDS
     scope_excludes: Mapping[str, frozenset[str]] = field(
-        default_factory=lambda: {_BUILD_MODULE: EXCLUDED_SCOPES}
+        default_factory=lambda: {
+            _BUILD_MODULE: EXCLUDED_SCOPES,
+            _OWN_RUN_MODULE: OWN_RUN_EXCLUDED_SCOPES,
+        }
     )
     branch_roots: Mapping[str, tuple[str, ...]] = field(
         default_factory=lambda: BRANCH_ROOTS

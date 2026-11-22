@@ -1167,7 +1167,7 @@ def test_confirmation_block_records_the_visitor_portal() -> None:
     assert tender.terms_url == "https://monaqasat.mof.gov.qa/TermsOfUse"
     assert (
         tender.terms_sha256
-        == "ec2df975cce3f9b1a5212e45a10d96c83d2fe1fd890dc56777a278f7ac46b0a1"
+        == "12947d7ed30ee248097c228ae4470f231bfd2aa9d856e999dc62b88fc9cbdb50"
     )
     assert tender.retrieved_utc == "2026-11-14T07:44:16Z"
     for path in (

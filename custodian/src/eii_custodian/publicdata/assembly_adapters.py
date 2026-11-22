@@ -175,10 +175,22 @@ class Production:
             from .singles.families import decode_family_archive
 
             decode = decode_family_archive
-        payload, receipt = read_cached(self.cache, entry, digest=digest, decode=decode)
+        from .fetch.own_run import is_own_run_entry, is_tender_entry, own_run_cache
+
+        if is_tender_entry(entry) and not is_own_run_entry(entry):
+            raise AssemblyError("snapshot_selection_invalid")
+
+        source_cache = (
+            own_run_cache(self.cache) if is_own_run_entry(entry) else self.cache
+        )
+        payload, receipt = read_cached(
+            source_cache, entry, digest=digest, decode=decode
+        )
         self.receipts[entry.key] = receipt
         if standard_json:
-            return json.loads(read_snapshot(local(self.cache, entry.key), digest).body)
+            return json.loads(
+                read_snapshot(local(source_cache, entry.key), digest).body
+            )
         return payload
 
     def needed_frame(self) -> FrameResult:
@@ -230,34 +242,21 @@ class Production:
             raise AssemblyError("assembly_fetch_refused")
         if self.intake_refusal:
             raise AssemblyError(self.intake_refusal)
-        from .assembly_tenders import archive_pages
-        from .fetch.own_run import is_tender_entry
+        from .fetch.own_run import is_own_run_entry
 
-        pages = {}
-        for entry in self.entries:
-            if (
-                entry.kind == "paged_cards"
-                and not entry.skip_reason
-                and not is_tender_entry(entry)
-            ):
-                reused_times = getattr(self.fetched, "reused_times", {})
-                if entry.key in reused_times:
-                    pages[entry.key] = archive_pages(
-                        self.cache,
-                        entry,
-                        self.stamp or self.clock(),
-                        retrieved_utc=reused_times[entry.key],
-                    )
-                else:
-                    pages[entry.key] = archive_pages(
-                        self.cache, entry, self.stamp or self.clock()
-                    )
+        if any(
+            entry.kind == "paged_cards"
+            and not entry.skip_reason
+            and not is_own_run_entry(entry)
+            for entry in self.entries
+        ):
+            raise AssemblyError("assembly_tender_pages_incomplete")
         return self.record(
             "fetch_archive",
             {
                 "lines": self.fetched.lines,
                 "manifests": self.fetched.manifests,
-                "tender_archives": pages,
+                "tender_archives": {},
             },
         )
 
@@ -290,14 +289,31 @@ class Production:
 
     def reviewed_selections(self) -> dict[str, str]:
         selected = reviewed_selections(self.cache)
-        from .fetch.own_run import OWN_RUN_PIN_REFUSAL, is_tender_entry
+        from .confirm_s2_t13 import (
+            completion_evidence,
+            load_confirmation,
+            own_run_pending,
+        )
+        from .fetch.own_run import is_own_run_entry, is_tender_entry, own_run_cache
 
-        # Any tender row, whatever its kind, refuses its pin before any read.
-        tender = [entry for entry in self.entries if is_tender_entry(entry)]
-        if any(entry.key in selected for entry in tender):
-            raise AssemblyError(OWN_RUN_PIN_REFUSAL)
-        pending = self._own_run_pending(tender)
-        if not selected and (not self.entries or len(pending) != len(self.entries)):
+        if any(
+            is_tender_entry(entry) and not is_own_run_entry(entry)
+            for entry in self.entries
+        ):
+            raise AssemblyError("snapshot_selection_invalid")
+
+        confirmation = (
+            load_confirmation(self.review / "s2_t13_confirmation.yaml")
+            if any(is_own_run_entry(entry) for entry in self.entries)
+            else None
+        )
+        if not selected and (
+            not self.entries
+            or not all(
+                confirmation is not None and own_run_pending(confirmation, entry, None)
+                for entry in self.entries
+            )
+        ):
             raise AssemblyError("snapshot_selection_invalid")
         keys = {entry.key for entry in self.entries}
         investment_keys = {
@@ -316,11 +332,16 @@ class Production:
                 continue
             if entry.skip_reason or entry.kind in {"citation_only", "besttime"}:
                 continue
-            if entry.key in pending:
-                continue
             if entry.key not in selected:
+                if confirmation is not None and own_run_pending(
+                    confirmation, entry, None
+                ):
+                    continue
                 raise AssemblyError("snapshot_selection_invalid")
-            directory = local(self.cache, entry.key)
+            source_cache = (
+                own_run_cache(self.cache) if is_own_run_entry(entry) else self.cache
+            )
+            directory = local(source_cache, entry.key)
             stored_key = entry.key
             if entry.key in {"places_ovt", "bldg_ovt"}:
                 stored_key = entry.key + "/listing"
@@ -335,6 +356,15 @@ class Production:
             ):
                 raise AssemblyError("assembly_lineage_missing")
             self.receipts[entry.key] = snapshot.sidecar
+            if is_own_run_entry(entry):
+                assert confirmation is not None
+                completion_evidence(confirmation, entry, snapshot.sidecar)
+                from .assembly_tenders import verify_archive_terms, verify_intake_match
+
+                verify_archive_terms(snapshot.body, snapshot.sidecar)
+                verify_intake_match(
+                    self.cache, snapshot.body, self.stamp or self.clock()
+                )
             if entry.source_id in {"fdi_projects", "investqa_pages"}:
                 from .assembly_native import read_investment
 
@@ -355,17 +385,6 @@ class Production:
                 ),
             },
         )
-
-    def _own_run_pending(self, own_run: list[Entry]) -> set[str]:
-        """Keys of own-run entries absent for decision 0084's technical reason."""
-        if not own_run:
-            return set()
-        from .confirm_s2_t13 import load_confirmation, own_run_pending
-
-        confirmation = load_confirmation(self.review / "s2_t13_confirmation.yaml")
-        return {
-            entry.key for entry in own_run if own_run_pending(confirmation, entry, None)
-        }
 
     def frame(self) -> dict[str, str]:
         from .building_inputs import (
