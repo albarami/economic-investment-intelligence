@@ -761,6 +761,7 @@
 - OPTIONS: **Recommendation:** pin the icon package and vendor its files with the licence text in the first slice that uses an icon, and re-run the confirmation there. Alternative: add the icon package to `pins.toml` now.
 - NEEDED BY: the first slice that serves a font file or an icon (slice S3 for fonts, FE-97).
 - Ruling L-1363 (c) (2026-11-21, lead; `.overnight/IN/ruling-L1363.txt`): `web/package.json` holds no icon package and the S3 interface uses no icon, so OI-89's own recommendation applies (pin and vendor the icon package in the first slice that uses an icon); the fonts are local Fontsource imports, so S3-T09 box 6's icon half is recorded as not used in S3 and its fonts half as met.
+- UPDATE: 2026-11-22, S3-T09 box 6 (package i42): the fonts half of this item is met for slice S3 and its box is ticked — the deciding dist check chained into `npm run check:hosts:dist` proves that every `@font-face` and font import of the built output resolves to a file the application serves, never a third-party host or an embedded data URL, that both IBM Plex families are delivered and that the two OFL licence texts sit in `dist/licences/` with their pinned SHA-256 (DES-24, FE-97; OI-43's vendoring recommendation is closed the same way), and the build no longer inlines the small Arabic font files as data URLs. The icon half stays with this item's own recommendation, recorded as not used in S3 under L-1363 (c): the first slice that uses an icon pins and vendors the icon package with its licence text and re-runs the confirmation.
 
 ## OI-90 — Hook framework, scanner version and the set of hooks
 
@@ -3557,6 +3558,15 @@ No existing open item is closed by this input.
 - NEEDED: different-maker implementation/security review, the lead’s capped keyed bootstrap and production evidence, allowance check covering both runs and scheduled refresh, and later scheduled-refresh evidence. No live box is ticked by the offline implementation.
 - NEEDED BY: the S2-T16 live handoff before its dependent S3 work.
 - CHECK-HARNESS EVENT (2026-11-23): the first boundary-check run failed its unchanged-tree assertion while a concurrent pytest process created bytecode files. Evidence: the before/after mismatch names newly added `.pyc` files, and `test_import_boundary_real._tree_fingerprint` includes those files. Verification therefore uses the unchanged boundary suite alone, with bytecode writes disabled; the initial failure stays in the evidence. This event changes no guard or task box.
+## OI-387 — Random failure under load: one web node-test case (S3-T09 package i42 run)
+
+- ID: OI-387
+- TYPE: RANDOM FAILURE (a green re-run does not close it, AGENTS.md rule 39)
+- RAISED BY: the builder of package i42, 2026-11-22, from the S3-T09 box 6 whole-run evidence
+- CONCERNS: one case of `cd web && npm run test:checks` (1234 tests), the suite's own `node --test` runner; the failing case's name was not kept (the run's log held only the summary tail)
+- EVIDENCE: the first whole run, taken while the full vitest suite ran concurrently on the same machine (91 vitest workers plus software-rendered browser tests), finished 1233 passed / 1 failed, exit 1. A second whole run of the same command alone on the same tree finished with exit 0 and no failing case. The load shape, not a change of the tree, is the only difference between the two runs.
+- NEEDED: find the failing case (run the suite with a full log), then decide whether it is a load-isolation defect of that case or of the runner; do not retry, skip or loosen any check.
+- NEEDED BY: before the next ledger that depends on the whole `test:checks` suite.
 
 ## Change control
 

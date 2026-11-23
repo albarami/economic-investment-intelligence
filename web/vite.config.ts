@@ -41,6 +41,14 @@ function fontLicences(): Plugin {
 const matched = new Set<string>();
 
 export default defineConfig({
+  build: {
+    // DES-24, FE-97: every bundled font ships as a file the application
+    // serves, beside its licence text under dist/licences/, never inlined
+    // as a data URL inside the CSS.
+    assetsInlineLimit(filePath: string) {
+      return /\.(woff2?|ttf|otf)$/.test(filePath) ? false : undefined;
+    },
+  },
   plugins: [
     react(),
     fontLicences(),

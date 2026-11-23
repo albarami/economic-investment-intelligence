@@ -290,6 +290,23 @@ button.figure-cell {
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Figures in table cells (DES-31, DES-35; document 10, section 8): a table
+ * cell that shows a number through the Fact chip family aligns to the
+ * start edge and keeps tabular lining figures; one rule serves both
+ * languages, because numerals never mirror in Arabic.
+ */
+td .chip,
+th .chip {
+  text-align: start;
+}
+
+td .chip-num,
+th .chip-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
 .mark {
   display: inline-flex;
   align-items: center;

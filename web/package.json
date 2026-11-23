@@ -18,7 +18,7 @@
     "check:versions": "node scripts/check-exact-versions.mjs",
     "check:boundary": "node scripts/check-import-boundary.mjs",
     "check:hosts": "node scripts/check-no-third-party-hosts.mjs",
-    "check:hosts:dist": "node scripts/check-no-third-party-hosts.mjs --dist",
+    "check:hosts:dist": "node scripts/check-no-third-party-hosts.mjs --dist && node scripts/check-local-fonts.mjs --dist",
     "check:dev": "node scripts/check-dev-server.mjs",
     "test:checks": "node --test --test-concurrency=2 \"spikes/performance/tests/run.node-test.mjs\" \"scripts/tests/*.node-test.mjs\" \"tests/credit-place/*.node-test.mjs\" \"tests/node/*.node-test.mjs\" \"spikes/glyphs/tests/*.node-test.mjs\" \"spikes/performance/tests/*.node-test.mjs\" spikes/look/tests/*.node-test.mjs",
     "spike:glyphs:build": "vite build --config spikes/glyphs/vite.config.ts",
