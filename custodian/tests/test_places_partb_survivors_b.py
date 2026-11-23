@@ -136,6 +136,26 @@ def test_pairing_a_row_with_no_closed_key_makes_no_request(tmp_path: Path) -> No
     )
 
 
+def test_a_showcase_row_with_empty_record_makes_no_request(tmp_path: Path) -> None:
+    """A gazetteer-matched empty record stays unrequested on the public path."""
+    review = _review(
+        tmp_path / "review",
+        show=[
+            _show_row("SYN-NO-RECORD", "places_ovt", ""),
+            _show_row("SYN-GOOD", "places_ovt", "SYN-P-A"),
+        ],
+    )
+    points = {
+        ("places_ovt", ""): (51.5, 25.3),
+        ("places_ovt", "SYN-P-A"): (51.5, 25.3),
+    }
+    assert area_requests(review, points) == (
+        AreaRequest(
+            "SYN-GOOD", "51.500000", "25.300000", AreaMode.WALK, AreaCutoff.MINUTES_10
+        ),
+    )
+
+
 def test_a_flagship_row_with_no_place_key_makes_no_request(tmp_path: Path) -> None:
     """A flagship row without a place key makes no request.
 

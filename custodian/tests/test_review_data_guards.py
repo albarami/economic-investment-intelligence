@@ -69,6 +69,8 @@ def test_duplicate_category(tmp_path: Path, second: str) -> None:
     [
         ("duplicate", "showcase_area_duplicate"),
         ("source", "showcase_area_source"),
+        ("empty_source", "showcase_area_source"),
+        ("unknown_source", "showcase_area_source"),
         ("pin", "showcase_area_gazetteer_mismatch"),
         ("key", "showcase_area_gazetteer_mismatch"),
     ],
@@ -79,8 +81,13 @@ def test_showcase_guard(tmp_path: Path, change: str, reason: str) -> None:
     rows = [row]
     if change == "duplicate":
         rows.append(dict(row))
-    elif change == "source":
-        row["source_id"] = "bldg_ovt"
+    elif change in {"source", "empty_source", "unknown_source"}:
+        row["source_id"] = {
+            "source": "bldg_ovt",
+            "empty_source": "",
+            "unknown_source": "SYN-UNKNOWN",
+        }[change]
+        gazetteer = (_gazetteer(row),)
     elif change == "pin":
         row["record_key"] = "SYN-OTHER"
     else:
@@ -265,8 +272,9 @@ def test_area_hostile_leaves(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("overlap", [False, True])
+@pytest.mark.parametrize("failure", [None, "provider_error"])
 def test_required_counts_in_stage(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, overlap: bool
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, overlap: bool, failure: str | None
 ) -> None:
     import json
 
@@ -274,13 +282,21 @@ def test_required_counts_in_stage(
     from shapely.geometry import box
 
     from eii_custodian.publicdata.places import stage
-    from eii_custodian.publicdata.places.areas import AreaResult
+    from eii_custodian.publicdata.places.areas import AreaError, AreaResult
 
     review = _review(tmp_path, verified="", candidates=False)
     areas = [
         _area(),
         {**_area(), "place_key": "SYN-SECOND", "record_key": "SYN-SECOND-PIN"},
     ]
+    if failure is not None:
+        areas.append(
+            {
+                **_area(),
+                "place_key": "SYN-FAILED",
+                "record_key": "SYN-PIN",
+            }
+        )
     (review / "showcase_areas.yaml").write_text(yaml.safe_dump(areas))
     gazetteer = [_gazetteer(row) for row in areas]
     (review / "showcase_gazetteer.yaml").write_text(yaml.safe_dump(gazetteer))
@@ -296,6 +312,8 @@ def test_required_counts_in_stage(
 
     class Areas:
         def area(self, point_key, point, mode, cutoff):
+            if point_key == "SYN-FAILED":
+                raise AreaError("SYN-polygon-failed")
             polygon = box(51.4995, 25.2995, 51.5015, 25.3015)
             if point_key != "SYN-AREA":
                 polygon = (
@@ -315,10 +333,21 @@ def test_required_counts_in_stage(
     monkeypatch.setattr(stage, "_provider", lambda config: Areas())
     outcome = stage.run_places_stage(_config(tmp_path, review, places))
     report = json.loads((outcome.directory / "build_report.json").read_text())
+    by_area = {"SYN-AREA": 1, "SYN-SECOND": int(overlap)}
+    if failure is not None:
+        by_area["SYN-FAILED"] = 0
     assert report["required_verification"] == {
-        "by_area": {"SYN-AREA": 1, "SYN-SECOND": int(overlap)},
+        "by_area": by_area,
         "total": 1,
     }
+    assert outcome.complete is False
+    assert report["complete"] is False
+    assert report["decision"] == "pending"
+    assert "census_comparison_pending" in report["report"]
+    assert "fsq_pending" in report["report"]
+    assert [note for note in report["report"] if note.startswith("showcase")] == (
+        ["showcase area error: SYN-polygon-failed"] if failure is not None else []
+    )
 
 
 def test_cache_containment(tmp_path: Path) -> None:
