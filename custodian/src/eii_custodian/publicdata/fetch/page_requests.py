@@ -10,7 +10,13 @@ from types import MappingProxyType
 from urllib.parse import parse_qsl, urlsplit
 
 from .allowlist import approve
-from .certificate_pins import Pin, PinError, validate_pin, verified_context
+from .certificate_pins import (
+    Pin,
+    PinError,
+    offer_http11,
+    validate_pin,
+    verified_context,
+)
 from .page_schema import SCHOOL_FIELDS
 from .transport import TransportFault
 
@@ -157,6 +163,6 @@ def page_context(host: str, supplied: ssl.SSLContext | None = None) -> ssl.SSLCo
     if host in PIN_HOSTS:
         raise PinError("certificate_chain_incomplete")
     # Never carry an augmented context onto a full-chain host.
-    result = ssl.create_default_context()
+    result = offer_http11(ssl.create_default_context())
     result.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     return result

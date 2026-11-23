@@ -136,6 +136,10 @@ def test_f2_tender_requires_root_chain(tmp_path, monkeypatch):
         minimum_version = ssl.TLSVersion.TLSv1_2
         security_level = 2
         suites = ("ECDHE-RSA-AES128-GCM-SHA256",)
+        alpn: list[str] | None = None
+
+        def set_alpn_protocols(self, protocols):
+            self.alpn = protocols
 
         def get_ciphers(self):
             return [{"name": n, "protocol": "TLSv1.2"} for n in self.suites]
@@ -158,6 +162,7 @@ def test_f2_tender_requires_root_chain(tmp_path, monkeypatch):
         is context
     )
     assert not context.verify_flags & ssl.VERIFY_X509_PARTIAL_CHAIN
+    assert context.alpn == ["http/1.1"]
 
 
 @pytest.mark.parametrize("scoped", [False, True, "pin"])

@@ -740,7 +740,8 @@ DER filenames and independent security approval for each of the four active
 records remain pending. The fifth, `icv.qa`, record is retired from active pin
 selection and stays PENDING; reviving it needs a new ruling and issuer check.
 Initial, redirected and terms requests each select their own verifying context;
-an unpinned full-chain host receives fresh ordinary trust. A page pin must belong
+an unpinned full-chain host receives fresh ordinary trust. Each of these contexts, pinned or not, and the
+tender context offer ALPN `http/1.1`, as the standard library's own HTTPS context does (S2-P77). A page pin must belong
 to the row's reviewed URL hosts and decode as exactly one non-self-signed
 certificate authority. It completes the chain rather than restricting the issuer.
 The retained version-1 capture seam is unreachable from the eight version-2
