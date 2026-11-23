@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { lineAt } from './scan-utils.mjs';
 
 const INERT_HOSTS = [
   // XML namespace identifiers in react-dom
@@ -116,14 +117,6 @@ const HOST_STOP = new Set([
   '\n',
   '\r',
 ]);
-
-function lineAt(text, index) {
-  let line = 1;
-  for (let cursor = 0; cursor < index; cursor += 1) {
-    if (text[cursor] === '\n') line += 1;
-  }
-  return line;
-}
 
 function readHost(text, start) {
   let end = start;

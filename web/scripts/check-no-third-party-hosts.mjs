@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { acceptedLicence, scanTags, scanText } from './host-scan-rules.mjs';
+import { formatInternal, relativePath, usage, walk } from './scan-utils.mjs';
 
 const BINARY_EXTENSIONS = [
   '.woff',
@@ -30,22 +31,6 @@ const BINARY_EXTENSIONS = [
 const WALK_DIRECTORIES = ['src', 'public'];
 const ASSET_ATTRIBUTES = ['src', 'href', 'srcset'];
 const BUILT_SCRIPT_EXTENSIONS = ['.js', '.mjs'];
-
-function usage(message) {
-  const error = new Error(message);
-  error.usage = true;
-  return error;
-}
-
-function formatInternal(error) {
-  const code = error.code || error.name;
-  let message = String(error.message).split('\n')[0];
-  const prefix = `${code}: `;
-  if (message.startsWith(prefix)) message = message.slice(prefix.length);
-  message = message.replace(/\s*'[^']*'/g, '');
-  message = message.replace(/[\s,]+$/g, '');
-  return `FAIL internal-error: ${code}: ${message}`;
-}
 
 function parseArgs(argv) {
   let root = null;
@@ -81,10 +66,6 @@ function statRoot(root) {
   if (!info.isDirectory()) throw usage('root is not a directory');
 }
 
-function relativePath(root, full) {
-  return path.relative(root, full).split(path.sep).join('/');
-}
-
 function extensionOf(name) {
   const base = path.basename(name);
   const dot = base.lastIndexOf('.');
@@ -113,30 +94,6 @@ function assetHits(html, rel) {
     }
   }
   return hits;
-}
-
-function walk(dir, visit) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isSymbolicLink()) {
-      let info;
-      try {
-        info = fs.statSync(full);
-      } catch (error) {
-        visit({ full, error });
-        continue;
-      }
-      if (info.isDirectory()) continue;
-      visit({ full });
-      continue;
-    }
-    if (entry.isDirectory()) {
-      walk(full, visit);
-      continue;
-    }
-    if (entry.isFile()) visit({ full });
-  }
 }
 
 function scanFile(root, full, failures, built) {
