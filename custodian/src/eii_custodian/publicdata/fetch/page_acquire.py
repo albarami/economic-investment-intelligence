@@ -98,7 +98,9 @@ def validate_entry(entry: Entry, review: Mapping[str, Any]) -> None:
         "schools_private_directory": "arcgis_query",
         "awards_owner_scrape": "html_table",
     }
-    if expected_kind.get(entry.source_id) != review["kind"]:
+    if expected_kind.get(entry.source_id, "citation_snapshot") != review["kind"]:
+        raise ShapeError("schema_missing")
+    if review["kind"] == "citation_snapshot" and entry.release_tables:
         raise ShapeError("schema_missing")
     if entry.commit_allowed:
         raise ShapeError("commit_refused")

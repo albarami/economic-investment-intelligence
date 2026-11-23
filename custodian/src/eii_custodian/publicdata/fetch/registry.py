@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+from eii_custodian.publicdata.fetch.allowlist import approve
 from eii_custodian.publicdata.fetch.cadence import Cadence, parse_cadence
 
 LICENCE_BASES = frozenset(
@@ -468,6 +469,12 @@ def _entry(row: object) -> Entry:
             raise RegistryError("company web must remain lead-shell-only")
     if kind not in KINDS:
         raise RegistryError("unknown kind")
+    if source_id.startswith("landmark_") and any(
+        not approve(url).ok
+        for name in ("url", "landing_url", "terms_url")
+        if (url := _text(row, name))
+    ):
+        raise RegistryError("host_refused")
     if kind == "register_file":
         expected_keys = {
             "biz_register": "biz_register",

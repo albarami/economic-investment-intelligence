@@ -3,3 +3,5 @@
 version: 1
 pending: basemap_building_ids_unconfirmed
 entries: []
+# Empty format sample only; real entries live in the reviewed cache record
+# review/landmark_heights.yaml (proposed decision 0093, S2-P53).

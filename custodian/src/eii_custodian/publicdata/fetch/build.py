@@ -469,6 +469,9 @@ def _seeded_assembly(
     seed: int | None,
     resume: bool,
     code_roots: CodeRoots | None,
+    pin_generation_config: Mapping[str, object] | None,
+    pin_rows: Sequence[Mapping[str, object]],
+    pin_auto_supply: bool,
     _own_run: bool = False,
 ) -> BuildOutcome:
     """Open the run journal, fetch under it, then run the production assembly."""
@@ -543,6 +546,9 @@ def _seeded_assembly(
         environ or {},
         fetcher=fetch_only,
         reconciliation_selection=reconciliation_selection,
+        pin_generation_config=pin_generation_config,
+        pin_rows=pin_rows,
+        pin_auto_supply=pin_auto_supply,
     )
     try:
         build.run()
@@ -550,7 +556,11 @@ def _seeded_assembly(
         # No exception text crosses the source/credential boundary. Preserve
         # an existing structured fetch failure and its network exit code.
         if build.fetched is not None and build.fetched.failure is not None:
-            return cast(BuildOutcome, build.fetched)
+            fetched = cast(BuildOutcome, build.fetched)
+            _write_log(
+                cache, build.lines, list(fetched.terms), list(fetched.terms_attempts)
+            )
+            return replace(fetched, lines=tuple(build.lines))
         if build.fetched is None:
             from eii_custodian.publicdata.busyness.security import assert_clean
 
@@ -584,6 +594,23 @@ def _seeded_assembly(
             "assembly_intake_invalid",
             "assembly_tender_pages_incomplete",
             "assembly_tender_terms_incomplete",
+            "pin_inputs_missing",
+            "pin_output_pair_unwritten",
+            "pin_customs_window_missing",
+            "pin_c14_snapshot_missing",
+            "pin_c5_basket_empty",
+            "pin_c5_basket_duplicate",
+            "pin_c5_settings_mismatch",
+            "pin_c5_parent_review_mismatch",
+            "pin_lineage_receipt_missing",
+            "pin_lineage_selection_mismatch",
+            "pin_c14_medians_missing",
+            "pin_c14_medians_duplicate",
+            "pin_c7_weights_missing",
+            "pin_c7_weights_duplicate",
+            "pin_c6_release_source",
+            "pin_c14_period_mismatch",
+            "pin_c7_weight_settings",
         }:
             reason = str(exc)
         assembly_failure = FetchFailure(
@@ -650,9 +677,18 @@ def run_build(
     resume: bool = False,
     _run: RunRecord | None = None,
     code_roots: CodeRoots | None = None,
+    pin_generation_config: Mapping[str, object] | None = None,
+    pin_rows: Sequence[Mapping[str, object]] = (),
+    pin_auto_supply: bool = False,
     _own_run: bool = False,
 ) -> BuildOutcome:
-    """Run the production assembly when a seed is supplied; retain the fetch seam."""
+    """Run seeded assembly with explicit pin inputs; retain the fetch seam.
+
+    The producer-result handoff is separate from the fetch-only recursion:
+    only the assembly receives the recorded configuration and pin rows. Its
+    existing writer persists the pair and its receipt-resolving consumer
+    decides completion; absent inputs retain the pending phase.
+    """
     entries = tuple(entry for entry in entries if entry.kind != "company_web")
     if _own_run and (
         not _fetch_only or len(entries) != 1 or not is_own_run_entry(entries[0])
@@ -683,6 +719,9 @@ def run_build(
             seed=seed,
             resume=resume,
             code_roots=code_roots,
+            pin_generation_config=pin_generation_config,
+            pin_rows=pin_rows,
+            pin_auto_supply=pin_auto_supply,
             _own_run=_own_run,
         )
     # One injected UTC clock sample governs every verification in this build.

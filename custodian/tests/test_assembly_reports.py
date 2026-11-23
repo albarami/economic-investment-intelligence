@@ -387,7 +387,7 @@ def test_missing_method_pin_record_refused_at_require_complete(
 
     from eii_custodian.publicdata.assembly_reports import require_complete
 
-    build, record, _ = stage_method_pin_gather_build(tmp_path, stage_record=False)
+    build, record, *_ = stage_method_pin_gather_build(tmp_path, stage_record=False)
     record_path = build.review / "s2_t09_source_checks.yaml"
     assert not record_path.exists()
     assert (build.cache / "assembly/s2_t09_pin_artifact.json").is_file()

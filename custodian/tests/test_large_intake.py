@@ -552,6 +552,10 @@ def test_build_passes_stream_to_both_dispatches(entries, tmp_path, monkeypatch):
 
 
 def test_command_supplies_real_stream_without_fetching(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from commands import build_public
     from eii_custodian.publicdata.fetch.build import BuildOutcome
 

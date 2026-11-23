@@ -1084,6 +1084,10 @@ def test_boundary_input_requires_its_public_chain_and_archives_original_bytes(tm
 
 
 def test_ordinary_build_with_snapshot_variable_never_enters_the_mode(tmp_path):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from commands.build_public import run
     from eii_custodian.publicdata.fetch.build import BuildOutcome
 

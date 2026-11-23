@@ -248,6 +248,11 @@ class Commands(unittest.TestCase):
 
     def test_build_public_usage_and_unreachable(self) -> None:
         root = support.make_temp(self, "eii-cmd-public-")
+        from custodian_tests_support import (
+            stage_tracked_configuration,
+        )
+
+        stage_tracked_configuration(root)
         code, stdout, stderr = support.run_main(
             ("build-public", "extra-argument"),
             {"PATH": ""},

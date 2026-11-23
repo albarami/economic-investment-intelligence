@@ -2,6 +2,9 @@
 
 The producer never opens a public snapshot or invents a regression value; callers
 supply every checked pin row. Configuration pins carry empty source lineage.
+Under decision 0094 a deferred result pin may stay pending: such a row carries
+empty values and empty lineage, never a stand-in value, and no other pin may
+take that shape.
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ from typing import Any, cast
 from .method_card_validation import (
     CONFIGURATION_PINS,
     REQUIRED_PINS,
+    S7_DEFERRED_PINS,
     _canonical,
     _mapping,
 )
@@ -45,7 +49,16 @@ def produce_pin_artifact(
         if not isinstance(settings, dict):
             raise ValueError("pin_artifact_missing")
         lineage = row["source_lineage"]
-        if pin in CONFIGURATION_PINS:
+        values = row["values"]
+        if pin in S7_DEFERRED_PINS and values == {}:
+            # The closed pending representation of decision 0094: a deferred
+            # result pin stays unpinned with no value and no lineage, only its
+            # recorded settings; a lineage beside a missing value is refused.
+            if lineage != []:
+                raise ValueError("pin_pending_lineage_forbidden")
+        elif values == {}:
+            raise ValueError("pin_pending_not_deferred")
+        elif pin in CONFIGURATION_PINS:
             if lineage != []:
                 raise ValueError("pin_configuration_lineage_forbidden")
         elif not isinstance(lineage, list) or not lineage:

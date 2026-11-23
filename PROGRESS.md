@@ -51337,6 +51337,55 @@ S2-P57 BT-1 delivery-check correction: the delivery Ruff pass reported RUF043 (e
 
 S2-P57 BT-1 round 2 — 2026-11-22: builder OpenAI Codex, senior data-pipeline engineer for reviewed public-data releases; strict self-review persona provenance auditor (rule 19). Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate, with the brief supplying test-driven-development and verification-before-completion rules. Base `7f6584782d8fb269ba0158c2c1f4a862a0a167d0`; Linux, `UV_OFFLINE=1`, provider `none`, seed 6157 and workspace-local temporary/isolated bytecode paths. F2 captures baskets bytes once, reuses the extracted safe YAML parser and hashes the parsed bytes; F3 wraps only SpineError and the named OSError, RegistryError, KeyError and TypeError classes as `assembly_membership_invalid`, preserving the cause. Seven new regressions first failed on the unchanged base (exit 1), then the required activity-spine and assembly-producer suites passed 112 tests (exit 0); the shared YAML-reader registry suite passed 81 tests (exit 0). Eight isolated plants (each catch arm, the entire catch, the moved YAML catch and a hash reread) each gave red 1 / byte restoration true / green 0. F1 moves the sentence directly below the section 6 requirements table; PUB-34 is byte-identical to `e7edf546135657e09bfa0497822d216e8572bf71` and its saved comparison diff is empty. Ruff check, formatter check, mypy and document check exited 0; final tree, instruction-byte and diff checks, full delivery commit, per-file counts and all exact command/exit records are in `.overnight/RETURN.md` and `.overnight/tmp/r2-evidence/`. No block copied; the existing YAML parser body was moved and read_yaml delegates. No acceptance status changes; independent-maker review and OI-203 real-cache work remain lead-owned.
 
+## S2-P64 — register_tables assembly integration (2026-11-22, task S2-T49)
+
+- `registers/bundle.py` (`load_bundle`) re-verifies a lead-staged
+  `register_bundle/` (the published `current/` output) plus
+  `register_bundle_pin.json`: pin schema and manifest hash, manifest keys and
+  bindings, per-entry receipt shape/digest/metadata/files and period rules,
+  declared table byte hashes, row counts and a closed table-file set, the run's
+  own frame ownership hash, and the released rows through `validate_release`.
+  Refusals are named: `register_bundle_*`, `frame_hash_mismatch`, `receipt_*`,
+  `snapshot_*`, `release_*`, `registration_egress`.
+- `Production.register_tables` is ordered after `frame` in `PHASES`,
+  `INVENTORY` and `adapters`; it binds both Parquet tables, the manifest and
+  pin digests, both current receipts (keys `biz_register`, `fc_register/file`),
+  row-level source tags and a value-safe `assembly/register_tables.json` with
+  per-period lineage and kept-month coverage. `draw_tables` and source
+  completeness (`register_in_use`) account for both tables; missing months stay
+  `snapshot_not_kept`.
+- Tests (`custodian/tests/test_register_tables.py`): 106 cases on invented
+  stand-in staged bundles — round 1 set red on HEAD (phase absent,
+  `AttributeError`), round-2 set red on round-1 code (9 failed), green
+  after; one-change refusals for missing/wrong pin, manifest, frame, source,
+  table bytes, receipts, periods, person column and identifier egress; symlinked
+  and unreadable staged paths refused; isolated guard removals recorded red in
+  the round-2 break table (`.overnight/RETURN.md`).
+- Round 2 (2026-11-22, Anthropic review rv2 fixes): `load_bundle` now refuses a
+  symlinked or absent `register_bundle/` or `tables/` directory as
+  `register_bundle_missing` before any read, so staged bytes cannot escape the
+  allowed cache (F1); receipt validation is shared, not re-implemented — the
+  metadata half of `validate_capture` moved to `provenance.validate_receipt`,
+  which `bundle._receipt` calls, restoring the `receipt_metadata` pending-wording
+  and `receipt_terms_date` refusals on the assembly side (F2); `load_bundle` was
+  split into `_pinned_manifest`, `_specs` and `_tables`, and the verified pin
+  digest is returned on the `Bundle` instead of re-read. The four uncovered
+  guards (duplicate declared table, duplicate current receipt, unsorted or
+  repeated coverage months, the duplicate JSON-key hook) and every remaining
+  branch now have one-change negatives asserting the exact refusal code (F3).
+- Round 3 (2026-11-22, Moonshot review cf2 fixes): the type-confusion family
+  is closed — `receipts[].use`, `manifest.release_kind` and `tables[].name`
+  are type-checked before set or dict membership, and `snapshot_coverage`
+  months pass `month()` before `set()`/`sorted()`, so a decoded JSON value of
+  the wrong type always meets a closed `RegisterError` code. One parametrized
+  matrix substitutes every JSON type into every decoded slot (cases for all
+  nine rows of the family), four Hypothesis properties bound each acceptance
+  set to its legal values over arbitrary JSON, and each new guard was deleted
+  alone and shown red. The key-names pin list (cf1 note N2) is a plant too.
+- The writer path (`registers.intake`, `registers.build`) keeps the same
+  refusal codes through the shared receipt check; the lead's real-file run and
+  release evidence remain pending. No gate claimed.
+
 ## Train S2-18 records — 2026-11-22
 
 | Date | Item | Evidence | By |
@@ -51972,3 +52021,1017 @@ S2-P58 round 3 — builder (Anthropic Claude Opus 5.5 via Claude Code; persona a
 | 2026-11-22 | Train join identity | `train/s2-19` on main `88aea3ca`. Merge joins: `500dd2ab` (S2-P61), `04757e0e` (S2-HYPO), `7369e854` (S2-P62), `5ea04b3e` (S2-P59), `eb33e087` (S2-RDP). The lead's `train_identity.py` shows each merge join holds exactly its task's own change, file by file; the one difference is the S2-HYPO `PROGRESS.md` row, where an eight-digit seed is written in words (records only). S2-P58 (`1f5311f0`, `7316df48`, `d0672abe`) and S2-P60 (`f8a01897` to `4f1c487d`, ten commits) are cherry-picked own commits, because their branches carry earlier train history. Their added and removed lines equal those of the approved commits, file by file, with three exceptions, all records or the rule-44 command line: union of `OPEN_ITEMS.md` and `PROGRESS.md` (main first; one blank line); `AGENTS.md`/`CLAUDE.md` rule 44, where S2-P60's two word-level edits to the `spine_triage.py` command forms were applied to main's newer line, word for word, and the two files stay byte-identical. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | S2-P56 leaves this train | The joiner (OpenAI gpt-6.1-sol via Codex) found that S2-P56's approved JSON refusal inventory names a source that `custodian/tests/test_publicdata_registry.py` refuses in any non-Python test file. The join of S2-P56 also needs a forced change of `places/integrate.py`. Under rule 33, a forced code or test change needs the task's own confirmation, so S2-P56 leaves this train for a fix round and a later train. | Lead (Anthropic Opus 5.5) |
 | 2026-11-22 | PO-S2-51 disposition (C1 pinned data test) | The lead ran `test_pinned_c1` on main `88aea3ca` against the real public cache from the lead's shell: PASSED. Moonshot Kimi K3.1 Pro via Abacus reviewed the C1 source chain: APPROVED (both sources carry an open licence with a dataset basis matching document 04). | Lead (Anthropic Opus 5.5) |
+
+## S2-CI round 3 — the whole "required check passes while a suite did not really run" family (2026-11-22)
+
+| Date | Round | Actual execution evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-CI round 2 (appended, not rewriting) | Round 2 fix `25394c85a659696cd6f45f5e274c8441b0ba8533` made `scripts/ci_aggregate.py` compare the matrix list with the SUITES table; review CF1 (OpenAI) REJECTED it because a matrix `exclude` left the list whole and the aggregate passed. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-CI round 3 on `25394c85` | `ci_aggregate.shape_problems` now refuses rows 1 to 10 of the family itself and the workflow guard calls it; job `static-checks` runs `ci_aggregate.py .github/workflows/ci.yml` (shape only); planted case `tests-aggregate-excluded-guards` added (plants 16 cases, 16 blocked). Red first: test file collection exit 2 before the code, and with the round-2 aggregate restored 38 failed (exit 1). Twelve guard deletions, each alone, each exit 1. Real exits with `UV_OFFLINE=1`: unittest discover of `scripts/tests` 0 (1011 tests), ruff check 0, ruff format --check 0, mypy 0, check_docs 0, check_tree 0, `cmp AGENTS.md CLAUDE.md` 0, `git diff --check` 0, `ci_plants.py run` 0; `./eii test --suite python-guards` (seed 1795377184) 1: 1,170 passed, 7 setup errors in `test_clean_environment` from the overnight sandbox's uv cache (PO-S2-CI-03). | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-CI round 4 on `cbaa7b56` (review CF2 F1: `SHELLOPTS: noexec`) | `scripts/ci_aggregate.py` replaces its deny-lists with an exact allow-list: workflow root keys, `contents: read` and no root `env`; per protected job (`static-checks`, `suite`, `web-spikes`, `tests`) only declared keys and values and no job `env`; steps equal to the declared sequence `JOB_STEPS` key for key, each step `env` equal to its declared mapping; suite strategy `fail-fast: false` alone. New reasons `workflow-key`, `workflow-env`, `workflow-permissions`, `job-value`, `job-env`, `step-extra`, `step-order`, `step-env`, `strategy-keys`. Fifth aggregate plant `tests-aggregate-noexec-suite-env` (plants 17 cases, 17 blocked, exit 0). Fifteen guards each deleted alone, each exit 1 (the removed-step guard first survived and gained its own row). Real exits with `UV_OFFLINE=1`: `ci_aggregate.py .github/workflows/ci.yml` 0 (RESULT: PASSED); `python -m unittest scripts.tests.test_ci_shards scripts.tests.test_ci_plants -v` 1 (`ModuleNotFoundError: ci_support`, an import path unchanged from the base) and with `PYTHONPATH=scripts/tests` 0 (44 tests); unittest discover of `scripts/tests` 0 (1018 tests); ruff check 0; ruff format --check 0; mypy 0; check_docs 0; check_tree 0; `cmp AGENTS.md CLAUDE.md` 0; `git diff --check` 0. No seed drawn; no whole test run. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-CI round 5 on `bfad8547` (review CF3 F2: `CI: null`) | `scripts/ci_aggregate.py` `env_problems` compares key membership as well as values, so a variable present with a null value is refused at root, job and step (`CI: null` on the comparison step prints `FAIL step-env: web-spikes: Compare spike screenshots: CI`), and an explicit `env: null` prints `not a mapping`; new helper `same` matches every declared value by type as well as value (strategy, job values, step values with their `with` block, workflow root keys), refusing `fail-fast: 0`, `timeout-minutes: 90.0`, `persist-credentials: 0`, `package-manager-cache: 0` and a root key `1` for `on`. 13 one-change rows (8 env, 5 type), each exact line and exit 1, red on `bfad8547` (exit 0, `RESULT: PASSED`); property tests extended with null, false and 0 values and integer keys, plus a type-strict oracle of `same`. Eight guard deletions, each alone, each exit 1; restored, exit 0. Real exits with `UV_OFFLINE=1`: unittest discover `scripts/tests -p 'test_ci*'` 0 (77 tests), `ci_aggregate.py .github/workflows/ci.yml` 0 (`RESULT: PASSED`), on the review's `null-CI.yml` 1, ruff check 0, ruff format --check 0, mypy 0, check_docs 0, `cmp AGENTS.md CLAUDE.md` 0, `git diff --check` 0. | Builder (Anthropic Opus 5.5) |
+
+## S2-P65 — `pub_property_sale` writer, card C14 — 2026-11-22
+
+- Builder: Moonshot AI Kimi K3.1 Pro High through Devin; principal property-market statistician and release engineer. Strict self-review: sanad auditor (rules 16 and 19). Skills: project-orientation, task-standards, test-driven-development, systematic-debugging, sanad-provenance, property-based-testing, github-flow and verification-before-completion. Base: `88aea3ca5bde655a6a0e3fccd84fb8600e4bdd69`. Linux, Python 3.14.6, `UV_OFFLINE=1`, no network, no `.env`, `.private` or `data/` read.
+- `sale_aggregates` groups the existing kept `prop_sales` `bulletin.Deal` rows by district, year and reviewed `use_key`, reuses `property.quarter._median`, and writes exactly the document 03 section 7 columns. The existing assembly writes `pub_property_sale` before `pub_property_quarter`, checks release identifiers and binds the table to the `prop_sales` receipt. No real receipt or held-series result is claimed.
+- Failing first: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_property_sale.py -vv -p no:cacheprovider` exited 2 at collection (`ModuleNotFoundError: eii_custodian.publicdata.property.sale`). Restored implementation: the same file exited 0, 16 passed. The changed and importing test command exited 0, 218 passed. The Hypothesis exact-rational oracle includes empty, one, ties, boundaries, ordering and duplicate-value classes; its seed is printed in each verbose run.
+- Six isolated guard deletions each exited 1 and each restoration exited 0: other-bulletin filtering, non-null price filtering, empty-price median fallback, sale-source selection, sale-table gating and identifier-leak checking. Unmapped label asserts `unmapped_label`; nonpositive price and area each assert one excluded row with `nonpositive_price` or `nonpositive_area`; unmatched district asserts one `unmatched_district`. Identifier planting asserts `identifier_leak`.
+- Final repository evidence: `UV_OFFLINE=1 uv run --locked ruff check .` exit 0; `UV_OFFLINE=1 uv run --locked ruff format --check .` exit 0 (942 files); `UV_OFFLINE=1 uv run --locked mypy` exit 0 (501 files); `python3 scripts/check_docs.py` exit 0; `python3 scripts/check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Mutation campaign skipped under decision 0055 items 1 to 4 and the brief.
+- Delivery limitation: shared git metadata is read-only and `git commit` is denied by user command policy, including with workspace-local metadata. Consequently this row records an uncommitted verified diff on the named base, not a task commit or completion. `.overnight/RETURN.md` carries the full evidence and blocked bundle status. Independent-maker review remains pending.
+
+## S2-P65 round 2 — stored-reader and annual snapshot-date corrections — 2026-11-22
+
+- Builder: Moonshot AI Kimi K3.1 Pro High through Devin; senior data-pipeline engineer and release engineer. Strict self-review: sanad auditor (rules 16 and 19). Skills: project-orientation, task-standards, test-driven-development, sanad-provenance, property-based-testing, github-flow, writing-plans, systematic-debugging and verification-before-completion. Round-1 base: `6e85c31de79a8a03fee56ae08052fcb1c53ada82`. Linux, Python 3.14.6, `UV_OFFLINE=1`, provider `none`, no network, no `.env`, `.private` or `data/` read.
+- RV1 finding 1 failed first with exactly `assembly_draw_field_unknown` at the stored figure reader (exit 1, seed 1795374876), while the planted unlisted numeric field retained the same refusal. Adding `median_price_per_m2` to `MONEY_FIELDS` turned the median money-classification, deal-count and receipt-lineage assertions green (exit 0). RV1 finding 2 then failed first as one missing annual `as_of` plus missing and foreign-date plants that did not raise (three failures, exit 1, seed 1795374897). Reusing `group_as_of`, `stamp_price_as_of` and per-row `require_price_as_of`, and adding the measure to `PRICE_MEASURES`, turned all five producer/refusal checks green (exit 0). Document 03 section 7.3 now records the annual `as_of` column. Strict self-review then strengthened the foreign plant to use the actual second selected snapshot: the first all-source membership check let it reach `price_as_of_mismatch` (exit 1, seed 1795375295); the final per-`prop_sales` check refuses it first as exactly `price_as_of_missing` (exit 0).
+- The four requested attacks pass through the real parser/producer as applicable: four distinct deals with tied central prices and stored-reader figures, zero price among valid deals, negative area among valid deals, and December/January annual separation. The final property-sale file passed 23 tests (exit 0, seed 1795374927), retaining the exact-rational Hypothesis oracle and its empty, one, tie, order, duplicate-value and group-key classes. The changed and direct-importing suites passed 589 tests (exit 0).
+- Four isolated new-guard deletions each exited 1 and each exact restoration exited 0: money-field membership, price-measure membership, annual stamping and pre-registration snapshot validation. Missing and foreign dates each assert exactly `price_as_of_missing` and no registered sale table; the unknown numeric plant asserts exactly `assembly_draw_field_unknown`.
+- The first broad importer run had 588 passes and one inherited C14 synchronization failure (exit 1): round 1's approved code pointer changed a governed documentation span without updating `governed_sections_sha256`. The validator's own span/hash functions computed the corrected record value; all 174 method-card tests then passed (exit 0), and the final broad run passed 589 tests. No method pin, gate expectation or tolerance changed.
+- Final repository evidence on the corrected working tree: `UV_OFFLINE=1 uv run --locked ruff check .` exit 0; `UV_OFFLINE=1 uv run --locked ruff format --check .` exit 0 (942 files); `UV_OFFLINE=1 uv run --locked mypy` exit 0 (501 files); `python3 scripts/check_docs.py` exit 0; `python3 scripts/check_tree.py` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Full commit hash, exact command inventory, per-file counts, refusal inventory and bundle verification are in `.overnight/RETURN.md`. Independent-maker review remains pending; no live receipt, held-series result or slice-gate approval is claimed.
+- S2-P65 round 3 on base `14013b8bac3f1f5489ad61a7755a6837abe0522d` (round-2 builder persona, strict self-review and skills): the uncorrupted foreign-date control failed first with exactly `price_as_of_mismatch` (exit 1); moving only the residential registration to Q3 made the control and both exact `price_as_of_missing` plants pass (2 passed, exit 0). Deleting only annual pre-registration date validation made both plants fail (exit 1); exact restoration passed (2 passed, exit 0). Required property-sale, price-as-of, quarter and assembly-report modules: 101 passed, exit 0; ruff check, ruff format check (942 files), mypy (501 files), docs check, rule-file identity and diff check each exit 0. Full commit, counts, commands and refusal inventory are in `.overnight/RETURN.md`; independent review remains pending.
+
+## S2-P56 — closed refusal reasons across assembly stages — 2026-11-22
+
+OpenAI Codex (GPT-6), senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects dropped refusal names, exception-controlled log
+text and changed refusal conditions. Skills: project-orientation, task-standards,
+github-flow, sanad-provenance, al-muhasibi, strict-reviewer and muhasabah-gate;
+test-driven-development, systematic-debugging and verification-before-completion
+equivalent rules are supplied by the brief. Base `36efeb02c8bc9935e5597218f3f5578ba425824c`; the single resulting
+commit and bundle checksum are recorded in `.overnight/RETURN.md`. Linux, managed
+Python, `UV_OFFLINE=1 EII_DECISION_PROVIDER=none`; temporary, Hypothesis, Ruff and
+mypy paths remain under `.overnight/tmp/`. Final Hypothesis seed 56; invented
+Production seed 17. No network, live cache, repository `data/`, `.env` or `.private`
+input was read. Shared Git metadata is read-only: the branch and commit use the
+workspace-local metadata copy, without changing the shared repository metadata.
+
+The existing `build_lines` binding is shared with an assembly-only observer. It
+records `REFUSED <stage> <reason>` from a closed literal vocabulary, handles escaped
+and caught refusals, retains distinct closed causes, and preserves the exception
+object, existing FAIL reason and exits. The failed-fetch outcome retains the same
+failure object and network exit while its pending stage line is flushed. Legacy
+producer logging and the fetch fingerprint boundary are preserved.
+
+The supplied study's 265 inventory rows include three explicit non-refusal rows;
+262 refusal rows have 908 distinct invented exception/message delivery
+plants in `test_assembly_refusals.py`. The first base run gives 543 missing-line
+assertion failures. Silent-refusal, caught-series/wrapped-cause and fetch-exit
+plants were shown red before their changes. 30 individual guard/observation
+deletions each fail an actual targeted test with exit 1 in an isolated process;
+root files are unchanged by these probes. Every original producer raise and its
+enclosing if conditions compare equal to the base in `refusal-invariants.json`.
+
+| Command or check | Actual result | Exit |
+|---|---|---|
+| Changed/importer run over the recorded 131-file selection, with raise-site trace and seed 56 | 5225 passed, 192 warnings in 1393.59s (0:23:13) | 0 |
+| Final focused file and original context-binding tests | 49 passed, 908 deselected in 4.72s | 0 |
+| Final invented-URL persisted-log plants | 2 passed | 0 |
+| Ruff check and format check | clean | 0 each |
+| mypy | no issues in 503 source files | 0 |
+| check_docs.py; check_tree.py on workspace-local index | clean | 0 each |
+| cmp AGENTS.md CLAUDE.md; git diff --check | clean | 0 each |
+
+The first importer run had six failures (exit 1): an assembly import entered the
+fetch fingerprint and standalone legacy note output changed. Both were corrected
+by the dependency-free binding and optional assembly callback; all original tests
+remain unchanged. Exploratory generator defects (null/surrogate class names and
+duplicate parameter IDs), the build-log test filename and failure-field typo are
+recorded with their real exits in the return. No random failure is closed merely
+by a green rerun. The final importer collection preceded the last small test-only
+additions and replacement of two fault-message URLs by invented URLs; the final
+focused and persisted-log plants cover those final test inputs. Production code
+is unchanged throughout the final importer run. Checked code/fixture fingerprint:
+`a0cf19c69f8c35ce2532885d40eb38142024f5ca799ecd8e79cae2399c920309`, with the exact file/hash list in `checked-source-manifest.json`.
+
+Full commands, source-row/word/test coverage, edge classes, every guard deletion,
+all earlier real exits and per-file line counts are in `.overnight/RETURN.md` and
+`.overnight/tmp/p56-evidence/commands.jsonl`. No acceptance box is ticked, no live
+release or slice gate is claimed, and independent maker review remains pending
+under PO-S2-P56-01.
+
+## S2-P56 round 2 — explicit-cause planted test and record clarifications — 2026-11-22
+
+OpenAI Codex, senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects a branch without a planted violation.
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate; test-driven-development and
+verification-before-completion equivalent rules supplied by the round-2 brief.
+Base `d27da212c96442f57e598370f8ce1e39111b760a`; the single resulting commit,
+bundle and checksum are recorded in `.overnight/RETURN.md`. Python 3.14.6,
+`UV_OFFLINE=1 EII_DECISION_PROVIDER=none`, Hypothesis seed 56; temporary files
+and tool caches remain under `.overnight/tmp/`. No network or real source cache
+was used. The new test reuses `planted_error` and checks exact closed lines,
+exception identity and the specified leak pattern for explicit cause, implicit
+context, suppressed context and a cause cycle. The source is byte-identical to
+the base after restoring the context-only plant; no production guard changed.
+
+R1 correction to the earlier S2-P56 evidence: `refusal-invariants.json` was local,
+uncommitted comparison evidence, not a committed reproducible test, and is not
+reproduced by this round. R3/R4 clarifications are appended to document 12,
+"Closed assembly refusal diagnostics (S2-P56)". PO-S2-P56-01 records R5's
+exception-delivery limit; PO-S2-P56-02 leaves R2's separate `plan` stage open.
+
+| Round | Commands, counts, real exits and evidence |
+|---|---|
+| S2-P56 R2 | `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_assembly_refusals.py -k test_exception_chains_keep_closed_lines_and_exception_identity --hypothesis-seed=56`: context-only plant 2 failed, 2 passed, 955 deselected, exit 1; restored source 4 passed, 955 deselected, exit 0. The same pytest command without `-k`, adding `custodian/tests/test_places_build_lines.py custodian/tests/test_fetch_fingerprint.py`: 1145 passed, exit 0. `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check`: exit 0 each. `python3 scripts/check_docs.py`: first exit 1 because the workspace-local Git metadata lacked the existing `.overnight/` exclusion; after copying the original local exclusion policy, exit 0. Initial local-Git setup exited 1 because `.git` is read-only; explicit workspace-local `GIT_DIR`/`GIT_WORK_TREE` resolved it, without changing shared metadata. Full commands and logs: `.overnight/tmp/p56-r2-evidence/commands.jsonl` and sibling logs (initial documentation-scan local paths and identity redacted). Independent maker approval and lead-owned integration evidence remain pending; no slice gate is claimed. |
+
+
+## S2-P56 round 3 — reachable rows in every refusal class table — 2026-11-22
+
+OpenAI Codex, senior build-pipeline engineer for auditable release builds;
+strict self-review persona rejects any specific reason that falls into a broader
+word. Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+strict-reviewer and muhasabah-gate; test-driven-development and
+verification-before-completion equivalent rules supplied by the brief (the
+skill packages are not installed). Base `f26877525301f54dfe9707ccb6502a338d601f0b`;
+the single delivered commit and bundle checksum are recorded in
+`.overnight/RETURN.md`. Linux, Python 3.14.6, `UV_OFFLINE=1`,
+`EII_DECISION_PROVIDER=none`, Hypothesis seed 56, invented Production seed 17;
+all temporary files, tool caches and delivery Git metadata are workspace-local.
+No network, real cache, `.env`, `.private` or repository `data/` input was read.
+
+| Round | Commands, counts, real exits and evidence |
+|---|---|
+| S2-P56 R3 | `uv run --locked python -m pytest custodian/tests/test_assembly_refusals.py -q -k all_policy_words --hypothesis-seed=56` with a distinct workspace-local `--basetemp`: class guard first on the base, 2 failed (the specific missing-fields row and the dead basket duplicate), 474 passed, 958 deselected, exit 1; fixed policy and fixtures, 475 passed, 959 deselected, exit 0. Delete only the specific missing-fields rule: 1 failed, 473 passed, 959 deselected, exit 1; restore, reintroduce only the dead duplicate: 1 failed, 475 passed, 959 deselected, exit 1; restore bytes, `cmp` exit 0; final focused run 475 passed, 959 deselected, exit 0. The same pytest command without `-k`: 1434 passed in 147.93s, exit 0. The guard covers all 474 pattern rows of 14 class tables, asserting the first matching row's identity and its exact closed word. Fixture rows `gis_property_singles:25` and `final_audit:06` assert `missing_fields_unknown_fields`; 909 inventory plants remain. Ruff check and format check initially exited 1 for import ordering and assertion wrapping; corrected, each exits 0. `uv run --locked mypy`: 503 source files, exit 0. `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md`, `git diff --check`: exit 0 each. Exact argv and logs: `.overnight/tmp/p56-r3-evidence/commands.jsonl` and sibling logs. No producer refusal condition changed or new refusal branch was added. PO-S2-P56-03 leaves exact-type subclass fallback detail open; independent maker review remains pending, with no slice-gate claim. |
+
+
+## S2-P56 round 4 — Python inventory fixture and joined-reader confirmation — 2026-11-22
+
+Builder: OpenAI Codex, senior build-pipeline engineer (S2-P56 builder).
+Strict self-review persona: strict-reviewer, rejecting guard exceptions, lost cases,
+changed expected reasons and weakened assertions. Skills: project-orientation,
+task-standards, github-flow, sanad-provenance, strict-reviewer and muhasabah-gate;
+test-driven-development and verification-before-completion equivalents are in the
+round-4 brief. This self-review does not substitute for another maker's review.
+Base `b94dad801d4b7c8910ca96c91b6eb1fc6abb795f`; implementation commit
+`29f11de87303044e99a9a0f429f55dd6db6bbbba`. Linux, Python 3.14.6,
+`UV_OFFLINE=1 EII_DECISION_PROVIDER=none`; Hypothesis seed 56, existing invented
+build seed 17. Git metadata, caches, logs and test temporary paths are workspace
+local under `.overnight/tmp/`. No network, real cache, release build, `.env`,
+`.private` or repository `data/` input is used.
+
+The existing registry guard fails first on HEAD: one failure, exit 1, identifying
+the JSON inventory. The same inventory is now a normal Python literal fixture;
+its importer uses a direct import. Exact deep equality against the base's JSON
+and the base test's expanded comprehension proves all 262 rows and all 909 cases,
+their order, messages and exact expected reasons unchanged. Canonical payload
+SHA-256: `336f1caf739ac6763e34a875870abe40b8f5b95d480ad501a133a9d32d575e1d`.
+The fixture-integrity test pins that payload without modifying the existing
+non-Python guard. Changing only an expected reason, removing a row, reversing
+row order, duplicating a row and emptying the list each gives exit 1; the unchanged
+payload gives exit 0. These isolated process-local plants do not mutate the
+fixture during the importer run.
+
+CONFIRMED: the joined `places/integrate.py` keeps both reader loops and every
+refusal. `_building_entries` and `_buildings_from_registry` are AST-identical to
+train base `2e7061a23a57b03ad207c6c578403c0d5f9bac7e`. `_cache_points` is
+AST-identical after removing only its two `_observe(exc)` additions and handler
+bindings. Each observer is inside the correct reader's `PlacesError` handler,
+before the unchanged `continue`. Deleting only the places observer gives one
+failed and one passed reader case, exit 1. Restoring it and deleting only the
+building observer reverses the failed reader case, exit 1. Restored bytes match
+exactly and both reader cases pass, exit 0. No production code or refusal branch
+changes in this round.
+
+| Command / evidence | Actual result | Exit |
+|---|---|---|
+| Registry fixture guard on base, seed 56 | 1 failed, 80 deselected | 1 |
+| Registry guard, canonical-payload test and both reader cases | 4 passed, 1513 deselected | 0 |
+| Approved JSON / expanded-case equality and joined-loop AST proof | 262 rows, 909 cases equal; all three functions verified | 0 |
+| Independent observer deletions, seed 56 | 1 failed, 1 passed each; both restored | 1 each |
+| Restored observer cases, seed 56 | 2 passed, 1434 deselected | 0 |
+| Five isolated payload-integrity plants | Exact checksum assertion fails for each individual mutation | 1 each |
+| Unchanged payload-integrity check | Passes | 0 |
+| `uv run --locked ruff check .` | All checks passed | 0 |
+| `uv run --locked ruff format --check .` | 959 files already formatted | 0 |
+| `uv run --locked mypy` | 514 source files, no issues | 0 |
+| `python3 scripts/check_docs.py` | 1294 text files, 144 Markdown files checked | 0 |
+| `python3 scripts/check_tree.py`, after local-index setup | Eight rules pass | 0 |
+| `cmp AGENTS.md CLAUDE.md`; `git diff --check`; staged whitespace check | Identical bytes / clean diff | 0 each |
+
+Deterministic setup failures are retained: the first equality helper invocation
+exits 1 because its temporary script location lacks the repository import path;
+explicitly adding the workspace import path fixes that helper. A first local
+`git add` exits 128 and the tree check exits 1 because the bare metadata copy has
+no index. Setting its local non-bare configuration and initializing its index
+from HEAD resolves the cause; the shared Git metadata is unchanged. These are
+setup corrections, not random failures or a guard exception. Full argv, exits,
+durations and logs: `.overnight/tmp/p56-r4/commands.jsonl`; importer selection:
+`.overnight/tmp/p56-r4/importers.json`. Final importer evidence and final commit
+and bundle checksums are appended below or recorded in `.overnight/RETURN.md`.
+No acceptance box, independent-maker approval, live release or slice gate is claimed.
+
+Round-4 environment correction: the first importer invocation inherited the
+workspace-local `GIT_DIR` and `GIT_WORK_TREE`, which would interfere with tests
+that initialize their own Git repositories. It was stopped by session control,
+exit 130; its buffered output gives no completed test count, so none is claimed.
+The temporary command runner now unsets both variables specifically for pytest,
+while documentation/tree checks and local commits retain workspace-local metadata.
+The targeted registry test `test_cache_path_is_gitignored` then passes, exit 0,
+with seed 56. The corrected importer invocation has its own log and basetemp,
+`importing-tests-isolated`; this is an explicit environment correction, not a
+hidden retry. No product, test assertion or tracked Git metadata is changed.
+
+Round-4 separate checks with corrected pytest Git isolation: the complete
+`custodian/tests/test_publicdata_registry.py` gives 81 passed, exit 0, and
+`test_places_build_lines.py` plus `test_fetch_fingerprint.py` give 186 passed,
+exit 0, all with seed 56. A source-text cross-check of the AST-selected importer
+manifest also finds two tests referring to the changed modules only through
+literal targets; their separate run is recorded as `importing-literal-references`.
+
+Round-4 literal-reference supplement: `custodian/tests/test_investment_build.py` and `custodian/tests/test_investment_parse.py` give 115 passed, exit 0, with seed 56. The fixture AST is only its docstring and one literal assignment; the source name remains present as ordinary text. No encoded representation is used.
+
+Round-4 assertion-integrity audit: AST counters retain all 69 original assertions in `test_assembly_refusals.py`; the current file has 70, adding only the canonical-payload assertion. No original assertion node is lost or changed.
+
+Round-4 final importer result: the corrected 93-file invocation recorded in
+`.overnight/tmp/p56-r4/importers.json` and `commands.jsonl` gives **5159 passed,
+192 warnings, 854 subtests passed in 1285.46s**, exit **0**, seed **56**.
+It includes the complete registry, refusal-inventory, build-log context and
+fingerprint test files, all direct importers of the original P56 modules, and
+the registry-driven building-area tests. The warnings are the existing invented
+raster fixtures' NotGeoreferencedWarning. The two literal-reference importer
+files separately give 115 passed, exit 0; standalone registry and context /
+fingerprint commands give 81 and 186 passed respectively, exit 0 each. Counts
+from separate commands overlap and are not added as unique tests. The original
+arbitrary-message/class-name Hypothesis property passes in the full refusal file.
+No new or changed production refusal branch, numeric operation or privacy guard
+exists in this fixture-only round. The exact finite payload equality and the
+individual row/order/duplicate/reason/empty and observer plants provide the
+round's edge evidence. The implementation remains exactly commit
+`29f11de87303044e99a9a0f429f55dd6db6bbbba`; subsequent changes are task records.
+Strict self-review: APPROVE; muhasabah: PASS. Different-maker approval remains
+pending under PO-S2-P56-01; no live release or slice gate is claimed.
+| 2026-11-22 | S2-RDP H1 and H2 (slice S2, S2-T06), build | New lead-shell helpers `scripts/review_place_keys.py` (H1) and `scripts/review_attribution_tokens.py` (H2) with `scripts/tests/test_review_place_keys.py` on invented Parquet only (26 tests, two Hypothesis properties). `uv run --locked python -m unittest scripts.tests.test_review_place_keys`: exit 0, 26 ran. ruff check exit 0, ruff format --check exit 0, mypy exit 0 (503 files). Each refusal guard deleted alone turns the suite red (exits in the task's return). Neither helper was run on a real cache. Base main `154333b5`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 and H2 round 2 (slice S2, S2-T06), build | Design review finding F-3: H1 writes a key only when the matched place survives the build's own `places/build.py` `_keep` exclusions and `places/display.py` `resolve_duplicates`, called directly, not copied; otherwise the row stays null with `excluded_by_keep_<reason>` or `duplicate_dropped`. `attribution_missing` is reported apart as `attribution=true|false|na`. The frame grid is not rebuilt, so `no_cell` is not evaluated (open point in the task's return). Added `kept=` and `attribution=` to the printed line and to `--check`. Frame-boundary tests now use an invented `bnd_hdx` archive through the real reader. `uv run --locked python -m unittest scripts.tests.test_review_place_keys`: exit 0, 38 ran. pytest exit 0 (38 passed). ruff check exit 0, ruff format --check exit 0, mypy exit 0 (503 files), check_docs exit 0, check_tree exit 0. Each new guard deleted alone turns the suite red; the 17 round-1 plants were re-run and are still red. Neither helper was run on a real cache. Base main `154333b5`, on round-1 commit `3f6d5065`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 and H2 round 3 (slice S2, S2-T06), build | Lens-1 findings F-1 to F-5 (all accepted by the lead; ruling L-1462 otherwise stands). F-1: a repeated `place_key` refuses `duplicate_place_key` before writing and in `--check`; each proposal fills only its own row. F-2: `_keep` now reads the reviewed `places_ovt_attribution.csv`, so `attribution_missing` withholds the key (`excluded_by_keep_attribution_missing`) and `--check` fails a filled key whose place is excluded; the separate `attribution=` field is removed (H2 and the reviewer's table now come before H1). F-3: every selected, active `bldg_ovt` part must verify through the existing receipt reader, or `buildings_file_unverified`. F-4: parsing, decoding, filesystem and snapshot failures print one closed reason (`review_file_unparsable`, `filesystem_refused`, `snapshot_refused`) on both helpers, with no failure text; every CLI test asserts stderr empty. F-5: the reload negative submits a changed row and keeps the original bytes. `UV_OFFLINE=1`. unittest exit 0 (54 ran); pytest exit 0 (54 passed, 4 subtests); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. 41 plants, each guard deleted alone (13 new, 28 earlier, including the write-before-validate plant and both second-hash `require_receipt` guards, now observable by a stale-receipt test): every one exit 1. Neither helper was run on a real cache. On round-2 commit `054bd167`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 round 4 (slice S2, S2-T06), build | Lens-2 finding 1: `fill` now loads both review files and computes every proposal and updated row first, then stages and reloads both outputs through the build's own readers (`stage`), and only then replaces both targets (`write_reviewed`); on any refusal neither target changes and no staged file remains. Lens-2 findings 2 and 3 were closed by round 3. New negatives on invented Parquet: a refusal planted only in the second file (`aliases_form`, `overwrite_refused`, `duplicate_place_key`, `reload_mismatch`), each asserting its exact reason and both files' bytes and the folder listing unchanged, plus an exhaustive case over each kind in the first, second or both files. Red before the change: pytest exit 1 (8 failed, all second-file cases). Four plants, each alone (replace the first file before the second is validated; no removal of a failed stage; no removal of staged files on a later refusal; no reload check): every one exit 1. Records: rule 44's H1 text states that neither file is written on a refusal and the accepted `no_cell` limit; OPEN_ITEMS.md PO-S2-RDP-01 UPDATE records ruling L-1462. `UV_OFFLINE=1`. pytest exit 0 (58 passed, 19 subtests); unittest exit 0 (58 ran); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Neither helper was run on a real cache. On round-3 commit `dc86b21b`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+| 2026-11-22 | S2-RDP H1 round 5 (slice S2, S2-T06), build | Lens-1 confirmation finding R1 (accepted by the lead): `write_reviewed` now keeps a same-directory copy of each target's original, with its mode, before the first replacement; if a replacement raises, every target already replaced is restored and every staged and kept file is removed before the ordinary `filesystem_refused`. A restore that itself fails prints `FAILED rollback_failed`, exits 3 and leaves the unrestored original beside its file. New negatives on the valid invented pair, each changing one input: the second target's replacement fails (`REFUSED filesystem_refused`, both files' bytes, modes and the folder listing unchanged); the first target's replacement fails (same); the copy of the second original fails (same); the restore of the first also fails (exit 3, `FAILED rollback_failed`, second file unchanged, one kept file equal to the first original). Red before the change: pytest exit 1 (3 failed; the first-replacement control passed). Seven plants, each alone (no rollback; no `rollback_failed` branch; kept originals not removed; no removal of a failed copy; mode not copied; unrestored original removed; restore failure not caught): every one exit 1, each restored exit 0. Records: rule 44's H1 text says neither file is left changed on any refusal and names the exit-3 outcome. `UV_OFFLINE=1`. pytest exit 0 (62 passed, 19 subtests); unittest exit 0 (62 ran); ruff check exit 0; ruff format --check exit 0; mypy exit 0 (503 files); check_docs exit 0; check_tree exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Neither helper was run on a real cache. On round-4 commit `b1ee59d8`. Awaiting review by another maker. | Builder (Anthropic Opus 5.5) |
+## S2-P53 — Reviewed landmark cache record and citation snapshots — 2026-11-22
+
+- Maker: OpenAI Codex; model: GPT-6 family (exact serving revision not exposed).
+  Builder persona: senior provenance engineer for reference datasets. Strict
+  self-review persona: sanad reviewer of copied height tokens and hashed pages.
+  Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer, muhasabah-gate; the brief's TDD and
+  verification-before-completion rules were applied. No independent maker's
+  review or approval is claimed.
+- Base: `e7edf546135657e09bfa0497822d216e8572bf71`.
+  Implementation commit: `19183a0685ddc3ad5ae231c7d03c5c3a96a606e2`.
+  The provided Git metadata is read-only: branch creation exited 128. The
+  implementation commit is on `feat/s2-p53-landmark-cache` in the separate
+  workspace-local Git directory; its bundle is the delivery, with no push,
+  merge, external write or change to the provided Git metadata.
+- Implemented: deterministic selection with the four ordered refusal reasons,
+  literal metric unit tokens and all-researched-page numeric-token conflict
+  checking; seven exact-name/footprint tie outcomes; code-emitted rows bound to
+  verified page snapshots and receipts; required roof/architectural kind; one
+  local cache record with the committed file retained as an empty format sample;
+  excerpt and duplicate-YAML-key refusals; closed empty-list pending reporting.
+  The manifest hashes the bytes retained with the parsed record, without a later
+  read of the mutable hand-list file.
+- Fetch path: existing `public_page`, version-two `citation_snapshot`, empty
+  shape/columns/period fields and no release tables, `commit_allowed: false`.
+  Existing bounded acquisition, exact URL/host policy, sanitization, archive,
+  receipt and source-publication helpers are reused. One source per publisher
+  and multiple page keys are tested on invented metadata. The actual command
+  reaches a citation PASS and verified raw snapshot, then the deliberately
+  incomplete fixture stops at `assembly/snapshot_selection_invalid`; this is
+  not a successful whole public build. `_validate` and its `commit_refused`
+  guard are byte-unchanged, and existing public-page refusal test files are
+  unchanged.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  PyYAML 6.0.3, Shapely 2.2.0, ruff 0.17.4, mypy 2.4.1. Final tests use seed 53
+  and the unchanged `eii` Hypothesis profile. No network, source-host call,
+  real-cache read, credential file, full `./eii test`, push or hosted run.
+- `uv run --locked python -m pytest custodian/tests/test_landmark*.py custodian/tests/test_publicdata_heights.py custodian/tests/test_heights_fixture_clock.py custodian/tests/test_page*.py custodian/tests/test_s2_t29*.py custodian/tests/test_publicdata_registry.py custodian/tests/test_registry*.py -q --hypothesis-seed=53`: exit 0, 1325 passed, one warning from the existing invented duplicate-ZIP-member plant. Earlier runs on earlier implementation states passed 1314 and 1322 respectively; no failure was hidden by those runs.
+- `uv run --locked python -m pytest custodian/tests/test_landmark*.py -q --hypothesis-seed=53`: final post-deletion exit 0, 75 passed. This also checks the last two fixture repairs, which reduce the duplicate-claim plants to one changed field apiece.
+- `uv run --locked python -m pytest scripts/tests/test_commands.py scripts/tests/test_public_assembly_command.py scripts/tests/test_build_public_token_scope.py -q --hypothesis-seed=53`: exit 0, 67 passed and 46 subtests passed.
+- Transport/importer check of the modules using ordinary HTTPS, plus receipt completeness: exit 0, 521 passed. `uv run --locked python -m pytest custodian/tests/test_public_snapshots.py custodian/tests/test_snapshot_refusals.py -q --hypothesis-seed=53`: exit 0, 103 passed. The complete transport command and all fail-first/check exits are retained in the delivery's verification ledger.
+- Isolated guard deletion: final full pass covers 56 branches, each individual
+  pytest run exits 1, with every original source hash restored. The two repaired
+  duplicate-claim fixture cases were then replayed separately: both deletion
+  runs exit 1; the 75-test restoration check exits 0. Source hashes of all final
+  deletion cases match the implementation commit above. Earlier historical
+  deletion passes (55, 55 and 56 cases) are retained separately. The protected
+  `page_records._validate` commit guard was never deleted or edited.
+- Final `uv run --locked ruff check .`: exit 0. `uv run --locked ruff format --check .`: exit 0, 945 files formatted. `uv run --locked mypy`: exit 0, 502 source files. `python3 scripts/check_docs.py`: exit 0, 1278 text files and 144 Markdown files before this evidence append. `python3 scripts/check_tree.py`: exit 0, eight rules. `cmp AGENTS.md CLAUDE.md`: exit 0. `git diff --check` and the local staged-diff check: exit 0.
+- Failures remain recorded: fail-first tests and guard deletions are expected
+  red results; initial import/format and test-fixture defects were repaired.
+  One EOF-less mocked response was interrupted with exit 130, then fixed to
+  return body and EOF. An inappropriate unittest invocation exited 1 because
+  its module paths were wrong; the supported pytest invocation above exercises
+  the tests. A diagnostic docs check under the alternate Git context exited 1
+  on operational files; the prescribed command includes new untracked source
+  files and passed without changing an exclusion or a check. Details and the
+  premature-wording correction are appended in OPEN_ITEMS.md.
+- Limits: the brief simultaneously requires concrete publisher/page rows and
+  host admission and forbids committing their researched URLs/hosts. No such
+  metadata was installed or guessed; this missing admission is explicit in
+  OPEN_ITEMS.md and the return. The shape-only reading also does not confirm
+  the research's semantic subject-kind token. Live fetch, real selection/ties,
+  independent row review, per-reference-kind error and OI-310 remain open.
+  Proposed decision 0093 requires owner acceptance before code merge. No
+  S2-T20 box is ticked and C-20 is unclaimed.
+- Code practice: longest new function is `load_landmark_record`, 45 lines by
+  AST span; no new function exceeds 100 lines. None copied: existing entry
+  validation and serialization were moved into shared helpers; the existing
+  award normalizer, visible-text parser and acquisition machinery are reused.
+  The return gives additions/removals per file against the base.
+
+
+## S2-P53 round 2 — Exact research subject-kind code — 2026-11-22
+
+- Maker: OpenAI Codex, GPT-6 family; builder persona: senior provenance engineer for reference datasets; strict self-review persona: sanad reviewer of literal tokens. Skills: project-orientation, task-standards, sanad-provenance, github-flow, strict-reviewer, muhasabah-gate; the brief's test-driven-development and verification-before-completion rules were applied directly because those named skills are not installed. Authority: `.overnight/BRIEF.md`, **Subject** and **Do**; parent `4064824ea09ac0a0d193eed46dd2da0f223c5a06`. One closed `ADMITTED_SUBJECT_KIND` supplies the exact `completed_highrise_building` comparison; the invented candidate and heights README use that contract. Initial focused test command `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_landmark_select.py -k 'research_subject_kind or subject_kind_requires' -q --hypothesis-seed=53` exited 1 (2 failed, 1 passed); after the fix the selector file exited 0 (32 passed). Five isolated plants each exited 1: old constant (1 failed), subject predicate deleted (2 failed), whole building guard deleted (2 failed), completed predicate deleted (1 failed, 11 passed), prefix matching (1 failed, 1 passed); source bytes restored and checked after the plants. The changed refusal is `not_building`; each new exclusion changes only `subject_kind` and asserts that exact outcome; the existing missing-completed case covers the other predicate. `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_publicdata_heights*.py custodian/tests/test_landmark*.py custodian/tests/test_heights_fixture_clock.py -q --hypothesis-seed=53` exited 0 (242 passed). `UV_OFFLINE=1 uv run --locked ruff check .` exited 0; `UV_OFFLINE=1 uv run --locked ruff format --check .` exited 0 (945 files); `UV_OFFLINE=1 uv run --locked mypy` exited 0 (502 source files); `python3 scripts/check_docs.py` exited 0 (1278 text files, 144 Markdown files); `python3 scripts/check_tree.py` exited 0 (8 rules); `cmp AGENTS.md CLAUDE.md` and `git diff --check` exited 0. Environment: Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, PyYAML 6.0.3; seed 53 and unchanged eii profile. No network, real research rows, forbidden input files, data directory or full test command was used. Registry and host admission remain lead-owned and unchanged; the historical round-1 semantic-token uncertainty above is superseded only by the lead's confirmation in this round's brief. Strict self-review: APPROVE for this bounded correction; independent different-maker review remains lead-owned, with no build approval claimed. Muhasabah: PASS. No new production function, no copied block; longest new test function is `test_research_subject_kind_is_admitted` (5 lines by AST span). Provided Git metadata is read-only; one child commit and its bundle are delivered through workspace-local Git metadata under `.overnight/tmp/delivery.git`, with the full delivered commit hash, per-file additions/removals and checksum in `.overnight/RETURN.md`. No push or merge.
+  Delivery correction: the first workspace-local commit attempt exited 128 because author identity was unset; no commit was created. The delivery uses a command-scoped generic agent identity, without changing repository or global configuration.
+
+
+## S2-P53 round 3 — Receipt-date regression and helper reuse — 2026-11-22
+
+- Maker: OpenAI Codex, GPT-6 family; builder persona: senior provenance engineer for reference datasets; strict self-review persona: sanad reviewer of literal tokens. Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer, muhasabah-gate; the brief's test-driven-development and verification-before-completion rules applied directly (named skills not installed). Authority: task brief **Do**, lens-1 findings F-1 through F-4; full parent commit `41d37dc8cea0a38de86d2fda1aece23f7d4ff1c7`. The invented candidate now has `retrieved_on="2026-11-20"`, while the unchanged assertion requires the receipt day (`STAMP[:10]`). Plant (c), taking `page["retrieved_on"]` in `_emit`, ran once: exit 1, 2 failed and 234 passed, with `receipt_date` reached by the regression and the height-mismatch negative case detecting the wrong refusal reason. The receipt expression was restored. F-2 reuses `landmarks._page_directory`, F-3 uses `dict.fromkeys(KINDS, 0)`, and F-4 calls `_registry_entry` directly and removes its wrapper. No refusal condition, reason, withholding rule or tolerance was introduced or modified. The six-file command `uv run --locked python -m pytest -q -p no:cacheprovider --hypothesis-seed=53 --basetemp=.overnight/tmp/pytest-restored custodian/tests/test_landmark_select.py custodian/tests/test_landmark_tie.py custodian/tests/test_landmark_cache.py custodian/tests/test_landmark_snapshots.py custodian/tests/test_landmark_command.py custodian/tests/test_publicdata_heights.py` exited 0, 236 passed. The plant used the same command with `--basetemp=.overnight/tmp/pytest-date-plant`. `uv run --locked ruff check .` exited 0; `uv run --locked ruff format --check .` exited 0 (945 files); `uv run --locked mypy` exited 0 (502 source files); `python3 scripts/check_docs.py` exited 0 (1278 text files, 144 Markdown files); `python3 scripts/check_tree.py` exited 0 (8 rules); `cmp AGENTS.md CLAUDE.md` and `git diff --check` exited 0. Environment: `UV_OFFLINE=1`, workspace-local `UV_CACHE_DIR` and `TMPDIR`; Python 3.14.6, uv 0.11.31, pytest 9.2.0, Hypothesis 6.170.15, PyYAML 6.0.3, Shapely 2.2.0; seed 53 and unchanged Hypothesis profile. Evidence: delivery report and workspace-local OUT logs. Code practice: no new function, longest changed function `load_landmark_record` (45 lines by AST span), none copied. Strict self-review: APPROVE for this bounded correction; muhasabah PASS. Independent different-maker approval remains lead-owned. Delivery uses separate workspace-local Git metadata and one child commit, with its full hash, per-file counts and bundle checksums in the return; no push, merge, network, `.env`, `.private`, `data/` read or full test command. Existing source-admission and C-20 limits remain unchanged.
+
+## S2-P53 round 4 — Closed envelope refusals and citation cache boundary — 2026-11-22
+
+- Maker: OpenAI Codex, GPT-6 family; builder persona: senior provenance engineer for reference datasets; strict self-review persona: fetch-boundary reviewer. Skills: project-orientation, task-standards, github-flow, sanad-provenance, strict-reviewer, muhasabah-gate; the brief's test-driven-development, security-review and verification-before-completion rules applied directly (those named skills are not installed). Authority: task brief **Do**, accepted lens-2 findings 1 and 2; full parent commit `1c4dee1e564818f24249cdb25d39f445f73ed4b8`. `_emit` now translates UnicodeDecodeError and IndexError into `landmark_heights_citation` / `page_snapshot`; `_page_directory` reuses `page_records.cache_directory(cache, entry)` and receipt verification translates PageError alongside SnapshotError to that same closed refusal. Five invented negative cases assert the exact name/detail: invalid UTF-8, empty inputs, absolute key, parent-traversal key and symlinked entry directory. Envelope tests retain real published, pinned, verified snapshots and isolate envelope consumption from selected_page's separate shape checks. Path cases keep valid matching receipts and change only the path representation or entry-folder symlink. Initial focused invocation exited 1 with two test-import defects and three expected boundary failures; the import was corrected before the decisive fail-first invocation exited 1 with all five intended failures. Patched focused invocation exited 0 (5 passed). Four isolated deletions each exited 1: UnicodeDecodeError catch (1 failed), IndexError catch (1 failed), constrained-directory helper bypass (3 failed), PageError translation (3 failed); each source was byte-restored immediately, each restoration exited 0, and restored SHA-256 values and full commands are in `.overnight/OUT/guard-deletions.json`. Required tests: `uv run --locked python -m pytest custodian/tests/test_landmark_select.py custodian/tests/test_landmark_tie.py custodian/tests/test_landmark_cache.py custodian/tests/test_landmark_snapshots.py custodian/tests/test_landmark_command.py custodian/tests/test_publicdata_heights.py custodian/tests/test_page_records_survivors_1.py custodian/tests/test_page_records_survivors_2.py custodian/tests/test_s2_t29_pages.py -q -p no:cacheprovider --hypothesis-seed=53 --basetemp=.overnight/tmp/pytest-final` exited 0 (405 passed). `uv run --locked ruff check .`, `uv run --locked ruff format --check .` (945 files), `uv run --locked mypy` (502 source files), `python3 scripts/check_docs.py` (1278 text files, 144 Markdown files), `python3 scripts/check_tree.py` (8 rules), `cmp AGENTS.md CLAUDE.md` and `git diff --check` all exited 0. Environment: `UV_OFFLINE=1`, workspace-local UV_CACHE_DIR and TMPDIR, Python 3.14.6, pytest 9.2.0, seed 53, unchanged eii Hypothesis profile. Full logs and verification ledger are under `.overnight/OUT/`. No new production function; longest new test function `test_malformed_citation_envelope_has_closed_refusal` is 32 lines by AST span; none copied. Strict self-review: APPROVE for this bounded correction; muhasabah PASS. Independent different-maker review remains lead-owned. Provided Git metadata stays read-only; delivery uses workspace-local Git metadata, one child commit and its bundle, with full delivered hash and per-file counts in `.overnight/RETURN.md`. No push, merge, network, forbidden-file read, data-directory read or full test command; existing source-admission and C-20 limits remain unchanged.
+
+
+## S2-P53-cit — Landmark citation registry metadata
+
+- Date: 2026-11-22. Maker: OpenAI Codex, GPT-6 family. Builder persona:
+  senior data engineer for public-source registries. Strict self-review persona:
+  sanad auditor. Skills: project-orientation, task-standards, github-flow,
+  sanad-provenance, property-based-testing, strict-reviewer, muhasabah-gate.
+  The brief's test-driven-development and verification-before-completion rules
+  were applied directly; those named skill packages are not installed.
+- Authority: task brief **Do**, handover item 1, lead rulings L-1454, L-1456
+  and L-1475; decision 0026 items 3 and 5; decision 0093 items 1 to 3;
+  AGENTS.md rules 5, 19, 35 and 38. Full parent commit:
+  `31fbcb3cce07ed87945b34a042e23c33811c12d4`. The one delivered child hash
+  and bundle checksum are recorded in the workspace delivery return, avoiding
+  a self-referential commit hash in this committed evidence row.
+- `scripts/landmark_citation_rows.py` reuses `researched_pages`, `read_yaml`,
+  `sha256_hex`, `safe_https_shape` and `host_of`. It emits source rows,
+  citation declarations and hosts, copying no landmark record fields. Its
+  output is installed in `sources.yaml`, `review/s2_t29_sources.yaml` and
+  `fetch/allowlist.py`. Committed metadata is compared field for field with
+  generated output; all supplied primary and secondary URL occurrences resolve
+  to exactly one row. The committed-only integration test calls the existing
+  `_registry_entry` and `validate_entry`, without reading the research or data
+  cache. Generator tests use invented inputs only.
+- The supplied research has 91 citation occurrences yielding 70 distinct URLs
+  under 15 publisher source IDs. Their page-and-terms host set has 16 hosts,
+  of which 15 are new; `visitqatar.com` already existed. The research SHA-256 is
+  `431265e3013067cc8e3826fe754a27b316a58f0b3d8e7e125ac2b6367006477f`. Wikipedia's 19 text citations record CC-BY-SA-4.0; the
+  other 51 pages record owner_decision / decision 0026. Every page remains
+  commit_allowed false, with empty columns, shape, period fields and release
+  tables. Terms readings are recorded with checked date 2026-11-22, and seven
+  unread publishers are appended in OPEN_ITEMS.md. Document 04 names the
+  concrete sources, quotes and PUB-03 hosts; DHA-102 retains the real-use list.
+  Decision 0093 and its index now record the supplied owner acceptance.
+- Fail-first: the new tests before the generator existed exited 2 (missing
+  module at collection). With the generator but before admission, they exited
+  1: 3 failed, 20 passed (missing host enforcement and committed rows). An
+  initial metadata-installation probe exited 1: 2 failed, 21 passed because
+  declarations were inserted under the wrong YAML section and the test used
+  the wrong HeightError string shape; both were corrected. A subsequent probe
+  exposed a missing test import (1 failed, 22 passed); the test was corrected.
+  The focused invented-generator and host-contract command then exited 0,
+  40 passed, including Hypothesis cases under the unchanged eii profile.
+- The first prescribed selection exited 1: 5 failed, 1759 passed, 9769
+  deselected. Four failures were the expected registry-count, owner-count,
+  nightly-exclusion and exact-host contracts affected by the added metadata
+  (the generated-building consumer calls the count guard too). The remaining
+  failure was the CDSE transport fixture replacing the complete allowlist:
+  its metadata-only test now reads and validates only its CDSE declaration,
+  preserving the fixture's socket and host restrictions and asserting the
+  exact existing refusal. Closed inventories remain exact, expanded by the
+  reviewed additions. The five affected nodes then exited 0, 5 passed.
+- Isolated guard-deletion proof: ten refusal sites, each removed alone, each
+  test process exit 1; each immediate byte-restoration run exited 0. Nine
+  additional isolated plants (second-page omission, ordering, URL deduplication,
+  empty input, one page, source-record leak, key collision, unread marker and
+  commit permission) each exited 1, then 0 after byte restoration. Physical
+  metadata plants: deleting one page row gave exit 1 and the exact citation
+  detail registry_row; deleting one page host gave exit 1 / host_refused;
+  deleting the Wikimedia terms host gave exit 1 / host_refused. Each physical
+  restoration resolved the same citation with exit 0. Full per-plant commands,
+  expected/actual exits and restoration hashes are in the workspace OUT ledger
+  and summarized in the return. Seed 53 throughout; no guard, tolerance,
+  baseline or attack size was weakened.
+- Environment: UV_OFFLINE=1; workspace-local uv cache, pytest base directories
+  and plant temporary paths; Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+  PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1 and Shapely 2.2.0. No network,
+  forbidden input file, live source snapshot or data directory was read. No full
+  eii test, public fetch, push or merge was run. A diagnostic audit initially
+  exited 1 because a scripts-only import was used from the repository root;
+  the corrected namespace import and exact metadata audit exited 0.
+- Initial Ruff check exited 1 (import order, unused import and raw regex
+  spellings); these were corrected. Formatter applications exited 0. Final
+  Ruff lint, formatter check (947 files), mypy (503 source files), documentation
+  check, tree check (8 rules), AGENTS/CLAUDE byte comparison and whitespace
+  checks are recorded below after the final test selection finishes.
+- Code practice: longest new production function `_row`, 43 lines by AST
+  span; none copied. No new function exceeds 100 lines. Per-file added and
+  removed lines are in the delivery return. Provided Git metadata stays
+  read-only; a workspace-local Git directory prepares one conventional commit
+  and its prerequisite-bound bundle. Independent different-maker approval
+  remains the lead's responsibility; no build or merge approval is claimed.
+  S2-T20, C-20, live receipts, building ties, live selection and OI-310 remain
+  open. Self-review and muhasabah verdicts follow the final verification row.
+- Final verification: `UV_OFFLINE=1 uv run --locked python -m pytest
+  custodian/tests -q -p no:cacheprovider -k "heights or landmark or registry or
+  allowlist or page" --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-final` exited 0: 1776 passed, 9769
+  deselected, one expected warning from the invented duplicate-ZIP fixture.
+  The later documentation check exited 1 on the invented user-info URL's
+  email-shaped literal. That fixture now assembles the identical URL with
+  the repository's existing join pattern; no refusal or input value changed.
+  The final `custodian/tests/test_landmark_registry.py` selection under the
+  same seed exited 0, 39 passed; `python3 scripts/check_docs.py` then exited
+  0, checking 1280 text files and 144 Markdown files. This deterministic
+  fixture correction is not a random failure or an exception to the scan.
+- `UV_OFFLINE=1 uv run --locked ruff check .`: exit 0.
+  `UV_OFFLINE=1 uv run --locked ruff format --check .`: exit 0, 947 files.
+  `UV_OFFLINE=1 uv run --locked mypy`: exit 0, 503 source files.
+  `python3 scripts/check_tree.py`: exit 0, 8 rules.
+  `cmp AGENTS.md CLAUDE.md`, `git diff --check` and the workspace-local
+  `git diff --cached --check`: exit 0. Final metadata equality probe: exit 0.
+- Longest new function including tests:
+  `test_generator_refusals_change_one_input`, 48 lines by AST span; longest
+  new production function `_row`, 43 lines. None copied. Strict self-review:
+  APPROVE for this bounded metadata implementation and bundle handoff;
+  independent different-maker approval is still lead-owned. Muhasabah: PASS.
+
+## S2-P53-cit2 — Landmark citation terms frame corrections — 2026-11-22
+
+- Brief: S2-P53-cit round two, findings 1 and 2 of the supplied independent
+  review. Base commit: `7c1549079921da61c5227759e013daa1330b22f6`.
+  The delivery commit and bundle checksum are recorded in the return report.
+- Builder persona: senior public-data registry engineer. Strict self-review
+  persona: citation-frame auditor; the fetch frame stays exactly as strict,
+  only declarations change. Skills: project-orientation, task-standards,
+  github-flow, sanad-provenance, property-based-testing, strict-reviewer and
+  muhasabah-gate. The brief's TDD and verification rules apply directly;
+  no installed skill package supplies those named superpowers skills.
+- `_declaration` now takes the row's terms URL and emits the page first and
+  each distinct nonempty terms URL once. No acquisition, transport, URL/host
+  check, privacy rule or numeric method changes. PUB-106 now places the list
+  in the uncommitted independently reviewed cache record under decision 0093
+  item 1; the committed file is described only as the empty format sample.
+- Regeneration used `scripts/landmark_citation_rows.py` with the same supplied
+  research: SHA-256
+  `431265e3013067cc8e3826fe754a27b316a58f0b3d8e7e125ac2b6367006477f`.
+  The generated declarations replace only their reviewed-URL lists, retaining
+  the surrounding YAML formatting. Offline equality audit: exit 0; all 70
+  landmark declarations exactly match generated output, 63 gained a distinct
+  terms URL, and every generated source row still matches committed metadata.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis
+  6.170.15, PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1. Seed 53; unchanged
+  repository Hypothesis profile. Test temporary files stay under
+  `.overnight/tmp/`; no network or source snapshots are used.
+- Failing-first command: `uv run --locked python -m pytest
+  custodian/tests/test_landmark_registry.py custodian/tests/test_publicdata_registry.py
+  custodian/tests/test_s2_t19_registry.py -q -p no:cacheprovider
+  --hypothesis-seed=53 --basetemp=.overnight/tmp/pytest-red`:
+  exit 1, 3 failed and 167 passed. Failures were the page/terms property,
+  distinct-terms fetch (`blocked_host`), and committed terms membership.
+- An intermediate run with `--basetemp=.overnight/tmp/pytest-green` began
+  before declaration regeneration completed: exit 1, 1 failed and 169 passed,
+  solely the committed membership assertion. Two initial textual regeneration
+  attempts exited 1 before writing any file because the longest YAML keys use
+  explicit-key syntax. Supporting that existing syntax completed regeneration;
+  the exact metadata audit above proves the resulting declarations.
+- Five isolated plants each exited 1: omit terms, keep empty terms, duplicate
+  equal page/terms, reverse page/terms order, and delete one committed terms
+  URL. The first four exercise the new property; the last exercises committed
+  metadata. Both planted files were restored byte for byte before final tests.
+  Commands, exits, logs and restoration hashes are in `.overnight/OUT/`.
+- No production refusal branch is added or changed. The negative fetch case
+  changes only `reviewed_urls` to omit the otherwise valid terms URL, asserts
+  exactly `blocked_host`, proves the terms transport was never called, and
+  proves no snapshot index was published. The existing frame check is unchanged;
+  there is no new guard requiring an isolated deletion test.
+- Final prescribed pytest selection, same command as the failing-first run
+  with `--basetemp=.overnight/tmp/pytest-final`: exit 0, 170 passed. This
+  includes every restored property/metadata plant and the exact-frame negative.
+- Verification: `uv run --locked ruff check .`, `uv run --locked ruff format
+  --check .` (947 files), `uv run --locked mypy` (503 source files),
+  `python3 scripts/check_docs.py` (1280 text files, 144 Markdown files),
+  `cmp AGENTS.md CLAUDE.md` and `git diff --check`: each exit 0. After adding
+  these records the docs and whitespace checks run again before packaging.
+  The acquisition, request-frame, page-records, allow-list and registry modules
+  are byte-identical to the base. Longest new function is the fetch regression
+  test at 47 lines; changed production `_declaration` is 18 lines; none copied.
+- Strict self-review: APPROVE for the bounded two-finding correction and
+  offline handoff; muhasabah PASS. Independent different-maker review stays
+  with the lead. No live acquisition, source reading, height acceptance,
+  readiness, S2-T20 completion or C-20 claim is made. Existing terms follow-ups
+  remain open. No network, forbidden input, push or merge was used.
+
+
+## S2-P53-cit3 — Landmark fetch-host regression correction — 2026-11-22
+
+- Brief: `.overnight/BRIEF.md`, round-three six-regression correction.
+  Task base: `0077ed22dd6722550a5a0b26d235abd1803ec593`.
+  The delivery commit and bundle checksum are recorded in the return report;
+  all new Git metadata and artefacts stay inside the assigned workspace.
+- Builder persona: senior public-data registry engineer. Strict self-review
+  persona: fetch-boundary auditor; only explicitly reviewed hosts are admitted,
+  and every host check retains its planted violation. Skills applied:
+  project-orientation, task-standards, github-flow, sanad-provenance,
+  property-based-testing, strict-reviewer and muhasabah-gate. The brief supplies
+  the test-first and systematic-debugging rules; their named superpowers
+  packages are not installed in this session.
+- Decision 0093 item 3 preserves the chain. Document 04, PUB-03 and
+  **S2-P53-cit terms readings and PUB-03 hosts**, already explicitly admit
+  all fifteen new citation/terms hosts; `visitqatar.com` reuses its previous
+  admission. No row is removed or corrected, no host is newly admitted in
+  this round, and no terms reading is invented. Existing unread-terms items
+  remain open. The per-host disposition is in `.overnight/RETURN.md`.
+- Root causes: the CDSE fixture replaced the global allow-list before loading
+  every registry row, so unrelated landmark declarations failed. It now uses
+  the existing safe YAML reader and `_entry` validator to validate only its
+  optional CDSE declaration. Its invented-only allow-list and blocked socket
+  fixture remain unchanged. The trade delta check now binds landmark review
+  frames to Document 04's explicit host admission record and adds only that
+  exact delta, retaining PRE_P18 and the trade-source configuration check.
+- No production refusal branch is added, removed or changed. The production
+  public-data modules and scripts are byte-identical to the task base:
+  `git diff --exit-code 0077ed22 -- custodian/src scripts`, exit 0.
+  The existing registry `host_refused` branch is exercised independently for
+  `url`, `landing_url` and `terms_url`. Each property trial first validates an
+  otherwise valid invented landmark row, changes only that URL field and
+  asserts the exact `host_refused` reason. Generated unknown DNS labels span
+  lengths one through sixty-three; explicit cases pin both ends and named-host
+  lookalikes. Numeric, privacy-cell, tie and duplicate-key domains do not
+  belong to this host-admission correction.
+- Environment: `UV_OFFLINE=1`; Python 3.14.6, pytest 9.2.0, Hypothesis
+  6.170.15, PyYAML 6.0.3, Ruff 0.17.4, mypy 2.4.1. Seed 53 and the unchanged
+  repository Hypothesis profile; test temporary paths remain under
+  `.overnight/tmp/`. No network or repository `data/` input is used.
+- Failing-first command: `uv run --locked python -m pytest
+  custodian/tests/test_cdse_cache.py custodian/tests/test_trade_publisher_readings.py
+  -q -p no:cacheprovider --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-red`, exit 1: exactly the six reported
+  failures and 55 passes. Log: `.overnight/OUT/baseline.log`.
+- First extended focused run, adding `custodian/tests/test_landmark_registry.py`
+  and using `--basetemp=.overnight/tmp/pytest-focused`: exit 1, 3 failed,
+  104 passed. The six original failures were corrected; new exact assertion
+  matches needed to allow pytest's diagnostic text after their reason code.
+  The correction preserves the anchored specific code followed by newline
+  or end of string. Initial lint exited 1 for one import order; initial
+  format-check exited 1 for one expression layout. Both were corrected.
+- Six isolated guard deletions ran through
+  `uv run --locked python .overnight/OUT/guard_probe.py GUARD`, with
+  `UV_OFFLINE=1` and workspace-local TMPDIR. The probe changes one function
+  AST in its own pytest process, not a tracked file. Each returned exit 1:
+  `registry-url`, `registry-landing_url`, `registry-terms_url` each produced
+  one failed and two passed cases; `registry-whole` produced three failures;
+  `delta` produced two failures of the unchanged IMF/World Bank plants;
+  `frame` produced one failure because the specific reviewed-frame reason
+  disappeared. Logs: `.overnight/OUT/probe-GUARD.log`. No source restoration
+  or regenerated baseline is needed for these isolated-process deletions.
+- Focused green command: the same extended selection, seed 53 and
+  `--basetemp=.overnight/tmp/pytest-focused-final`, exit 0: 107 passed.
+  Log: `.overnight/OUT/focused-final.log`. It includes all six repaired
+  regressions, the existing plants, the new unlisted-host property and the
+  new reviewed-frame host plant.
+- Checks already completed: `uv run --locked ruff check .`, exit 0;
+  `uv run --locked ruff format --check .`, exit 0 (947 files);
+  `uv run --locked mypy`, exit 0 (503 source files);
+  `cmp AGENTS.md CLAUDE.md`, exit 0; `git diff --check`, exit 0.
+  `python3 scripts/check_docs.py` before the documentation addition exited 0
+  (1280 text files, 144 Markdown files). Final documentation and whole-folder
+  custodian results are appended below when complete; no whole-suite success
+  is claimed by this evidence entry.
+
+
+### S2-P53-cit3 whole-folder execution interruption
+
+- The original `uv run --locked python -m pytest custodian/tests -q
+  -p no:cacheprovider --hypothesis-seed=53
+  --basetemp=.overnight/tmp/pytest-full` session returned exit 143 (SIGTERM),
+  with no pytest summary and no reported test failure. Its log contains 4488
+  completed-test dots. The next collected case was
+  `custodian/tests/test_gis_snapshot.py::test_all_dates_mode_is_separate_complete_and_explicitly_selected[plant9]`.
+  Collection-only diagnosis exited 0: 11552 tests collected. No test was
+  removed, skipped or changed, and the incomplete run is not pass evidence.
+- The interruption's source is not established; OPEN_ITEMS.md records it.
+  A separate workspace-local supervisor runs the same entire folder again,
+  with seed 53, basetemp `.overnight/tmp/pytest-full-supervised`, offline
+  environment and an eighteen-minute remaining-time bound. Its result is
+  recorded separately, preserving exit 143 regardless of the later outcome.
+  The supervisor writes the child process's real return code, timeout flag,
+  command and start/end UTC times to
+  `.overnight/OUT/custodian-full-supervised.result.json`.
+
+- Supervision correction: an initial detached launcher returned exit 0 but
+  produced no pytest log or result; the follow-up existence check exited 2.
+  That launcher is not execution evidence. The same supervisor was then
+  started in a retained foreground tool session with a terminal, at
+  2026-11-22 18:38 UTC; its log and child-pid file were observed. The worker
+  polls that session while preserving the original SIGTERM outcome.
+
+
+### S2-P53-cit3 final bounded handoff
+
+- The supervised whole-folder run started at 2026-11-22T18:38:46.391306+00:00 and
+  ended at 2026-11-22T18:56:46.460622+00:00. Its eighteen-minute remaining-time bound
+  expired; the supervisor terminated the test process group and recorded
+  the child exit as 143, with
+  `brief_deadline_timeout: true`. The supervisor itself exits 0 after writing
+  this result; that wrapper exit is not pytest pass evidence. The log holds
+  7230 completed-test dots and no failure report or final pytest summary;
+  the next collected case is `custodian/tests/test_pinned_c8.py::test_c8_raw_schema_plants[national_denominator-national_denominator]`. Whole-folder validation remains
+  incomplete. Neither incomplete run is counted as a pass. The original
+  interruption stays open; no retry, skip, tolerance or baseline hides it.
+- All six original regressions are covered by the focused green result,
+  exit 0 with 107 passed. No production module or host admission changed.
+  Final acceptance requires the lead to obtain the complete required
+  `custodian/tests` summary under the existing test policy; no test or bound
+  may be weakened. This handoff does not grant independent approval or
+  a slice-gate claim.
+- Code practice, delivered code: longest new function by AST span is
+  `test_pub03_rejects_unreviewed_landmark_frame_host`, 10 lines; including
+  decorators the new host property spans 15 lines. Changed existing
+  `check_p18_fetch_host_delta` is 31 lines and CDSE `entry` is 16 lines.
+  The distinct landmark review-frame host helper is 8 lines. None copied;
+  no new function exceeds 100 lines and no existing helper is duplicated.
+- Strict self-review: REJECT completion because the required whole-folder
+  test result is incomplete; no code defect is asserted from a SIGTERM.
+  Muhasabah: completion FAIL, with the limitation disclosed; provenance,
+  unchanged boundaries and the focused correction are evidenced above.
+  Exact delivery commit, line counts, command exits and checksum are in
+  `.overnight/RETURN.md`. Documentation and staged whitespace checks are
+  rerun after this evidence is appended and their outcomes recorded there.
+## S2-P63 — the production writer of the S2-T09 pin pair — 2026-11-22
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-P63, owning tasks S2-T08/S2-T09, OI-283 | Built: `custodian/src/eii_custodian/publicdata/assembly_method_pins.py` (`write_pin_pair`, fixed refusals `pin_inputs_missing`, `pin_output_pair_unwritten`), the `method_pins` Production phase between `busyness` and `final_audit` (`assembly.PHASES`, `assembly_inventory.INVENTORY`, `Production.adapters`, `Production.files` and the `assembly/method_pins.json` manifest updated together, both named outputs bound and every declared output removed at the start of a new run), and the closed pending representation of decision 0094 in `method_card_producer.produce_pin_artifact` (a deferred result pin may carry empty values and empty lineage, never a stand-in value; new fixed refusals `pin_pending_not_deferred`, `pin_pending_lineage_forbidden`; every other pin row with empty values refused). The consumer path `gather_audit → method_pin_evidence → completion_evidence` is unchanged; decision 0094's five deferrals are the only ones and the S7 refusal by name is unchanged. No live value, public snapshot, `data/` path, `.env` or `.private` was read; the writer reads only the recorded generation configuration and the producer results bound to the build. Tests: red on HEAD first (`uv run --locked python -m pytest custodian/tests/test_method_pin_writer.py custodian/tests/test_method_card_pins.py -q -p no:cacheprovider` exit 1, 24 failed / 246 passed: the phase, the wiring, the pending shapes and the property oracle all missing), green after on the changed and importing files (exit 0, 304 passed over `test_method_pin_writer.py`, `test_method_card_pins.py`, `test_assembly_reports.py`; exit 0, 269 passed over the production/assembly/inventory/order/io/resume sets; final exit 0, 650 passed over the changed and importing files with `--hypothesis-seed=3847291056`, twice, before and after the lint/format fixes). Every new guard was deleted alone and rerun red (B1 `pin_inputs_missing` 2 failed exit 1; B2 the OSError conversion 1 failed exit 1; B3 the half-pair removal 1 failed exit 1; B4 `pin_pending_not_deferred` 7 failed exit 1; B5 `pin_pending_lineage_forbidden` 3 failed exit 1; B6 the PHASES entry 3 failed exit 1; B7 the adapters entry 1 failed exit 1; B8 the INVENTORY item 2 failed exit 1; B9 the `Production.files` binding 1 failed exit 1; B10 the phase manifest 1 failed exit 1), each restored green. Checks: `ruff check .` exit 0; `ruff format --check .` exit 0 after `ruff format .` reformatted four touched files; `mypy` exit 0 (501 source files); `python3 scripts/check_docs.py` exit 0 (1,274 text / 144 Markdown); `python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. A whole-custodian-suite run was started (`uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -x --hypothesis-seed=3847291056`) and was terminated by the run environment at 49 percent with no test failure up to that point; it is an incomplete run, not a verification, and the lead's whole test remains the gate evidence. OI-283 stays OPEN: live S2-T08 part B inputs, the different-maker source checks and the governed method-card blocks remain pending; no slice-gate approval is claimed. | Builder: OR GLM 5.3 via Droid (principal public-data release engineer persona; strict self-review persona: the sanad auditor). Skills: test-driven-development, systematic-debugging, sanad-provenance, verification-before-completion. |
+| 2026-11-22 | S2-P63 round 2 (reviews RV1/RV2), owning tasks S2-T08/S2-T09, OI-283 | Fixed: F1 (both reviews) — the pair guard now catches every refusal of either write (`except (OSError, AssemblyError, ValueError, TypeError)` in `assembly_method_pins.write_pin_pair`), and `_drop_half_pair` removes a symlinked half through the `AssemblyError` fallback of `local` without following it; the choice is the widened cleanup, because the pre-write validation of RV2 would only close the refused-path hole and leave the `ValueError` serialization hole open, while the widened cleanup closes both (written down in the module docstring and `.overnight/RETURN.md`). F2 (RV1) — `pin_inputs_missing` and `pin_output_pair_unwritten` added to the admitted `AssemblyError` reasons of `fetch/build.py`'s assembly failure, so the command reports the phase's own closed reasons instead of `assembly_build_refused`; the earlier stop at `method_pins` is kept because the plan's own closed refusals of missing producer/configuration input and of a usable half-pair forbid a pending pair state (PLAN.md "Closed refusals" and "Failing-first tests"), so RV1's sentence was added to the S2-T08 TASKS line and to OI-283 instead of a pending state. F3 (RV1 observation) — `method_card_validation.validate_source_check_record` now binds a pending deferred record row of decision 0094 to its artifact row's closed pending representation: `values == {}` and `source_lineage == []`, refusing `pin_pending_value_forbidden`, `pin_pending_lineage_forbidden` and `pin_artifact_missing`. RV2 — the duplicated `_producer_rows` helper moved to `method_card_pin_fixtures.producer_rows` and imported by both test modules; the round-1 return's nonexistent `c7.shared_b_given_b` corrected to `c7.shared_b_given_a` (that return file is not in this workspace; the correction is recorded here and in `.overnight/RETURN.md`); this row's round-1 `busyness`` typo fixed in place as RV2's record point directed. No live value, public snapshot, `data/` path, `.env` or `.private` was read. Tests: red first (`uv run --locked python -m pytest custodian/tests/test_method_pin_writer.py -q -p no:cacheprovider` exit 1, 3 failed / 12 passed: the symlinked-configuration negative and both command-reason cases; `... test_method_card_pins.py -q -p no:cacheprovider` exit 1, 4 failed / 258 passed: the three pending-representation plants and the property oracle), green after (`... test_method_pin_writer.py test_method_card_pins.py test_assembly_reports.py test_production_adapters.py test_assembly_order.py test_terms_pin_failures.py -q -p no:cacheprovider` exit 0, 463 passed, the added unserializable-setting negative included). Every new guard was deleted alone and rerun red (R2-B1 the widened pair handler 2 failed exit 1, the symlinked-configuration and the unserializable-setting negatives; R2-B2 the `_drop_half_pair` symlink fallback 1 failed exit 1; R2-B3 the two command reasons 2 failed exit 1; R2-B4 the pending-representation rule 4 failed exit 1), each restored green from the kept copy. Checks: `ruff check .` exit 0; `ruff format --check .` exit 0 (940 files); `mypy` exit 0 (501 source files); `python3 scripts/check_docs.py` exit 0 (1,274 text / 144 Markdown); `python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. OI-283 stays OPEN: live S2-T08 part B inputs, the different-maker source checks and the governed card blocks remain pending; no slice-gate approval is claimed. | Builder: OR GLM 5.3 via Droid (principal public-data release engineer persona; strict self-review persona: the sanad auditor). Skills: test-driven-development, systematic-debugging, verification-before-completion. |
+| 2026-11-22 | S2-P63 round 3 (ruling L-1494), owning tasks S2-T08/S2-T09, OI-283 | Changed: the `method_pins` phase no longer stops the live build while the S2-T08 part B inputs are unbound. `assembly_method_pins` gains `pin_inputs_bound` (the one boundness truth, a `TypeGuard` so the writer keeps its narrowing) and the constant `PIN_INPUTS_MISSING`; `write_pin_pair` refuses unbound inputs exactly as before for direct callers. `Production` gains `pin_pending_reason`: the pending phase writes no pair, no artifact and no manifest, records `pin_inputs_missing`, and returns no declared outputs (`Production._declared_outputs`, used by `run`, which also resets the reason each run); `run_steps` accepts the read-only pending step and the build continues to `final_audit`, `draw` and `reports`, so their defects are found. `gather_audit` merges the phase's closed pending reason into the S2-T09 confirmation row's `details` (`pending_reason`) of the build report; `require_complete` still refuses the pending build (`assembly_gate_pending`), and the command's admitted reasons are unchanged (the pending case now reports the gate's `assembly_gate_pending`, the failed pair write still `pin_output_pair_unwritten`). No live value, public snapshot, `data/` path, `.env` or `.private` was read. Documents: the TASKS.md S2-T08 evidence line and OI-283's deferral paragraph and DONE SO FAR now state the pending behaviour instead of the earlier stop. Tests: red first (`uv run --locked python -m pytest custodian/tests/test_method_pin_writer.py -q -p no:cacheprovider` exit 1, 10 failed / 14 passed: the pending phase, the pending reason, the full-run reach of reports, the stale-pair negative, the bound re-run and the command case), green after (the same file exit 0, 24 passed; the changed and importing files `test_method_pin_writer.py`, `test_method_card_pins.py`, `test_assembly_reports.py`, `test_production_adapters.py`, `test_assembly_order.py`, `test_terms_pin_failures.py` exit 0, 471 passed). Every new guard was deleted alone and rerun red (R3-B1 the pending branch of `method_pins` 9 failed exit 1; R3-B2 the `_declared_outputs` use in `run` 3 failed exit 1, `assembly_output_invalid` before reports; R3-B3 the pending-reason merge in `gather_audit` 3 failed exit 1; R3-B4 the `pin_pending_reason` reset in `run` 1 failed exit 1, the stale reason surviving a bound re-run), each restored green. Checks: `ruff check .` exit 0; `ruff format --check .` exit 0 (940 files) after `ruff format .` reformatted the touched test file; `mypy` exit 0 (501 source files) after the `TypeGuard` narrowing; `python3 scripts/check_docs.py` exit 0 (1,274 text / 144 Markdown); `python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. The whole custodian suite was not run (the machine and time budget; the lead's fresh-seed whole test on the merge result stays the gate evidence, as in rounds 1 and 2). OI-283 stays OPEN: live S2-T08 part B inputs, the different-maker source checks and the governed card blocks remain pending; no slice-gate approval is claimed. | Builder: OR GLM 5.3 via Droid (principal public-data release engineer persona; strict self-review persona: the sanad auditor). Skills: test-driven-development, verification-before-completion. |
+| 2026-11-22 | S2-P63 round 4 (review cf1 N1/N2), owning tasks S2-T08/S2-T09, OI-283 | Fixed: N1 (`assembly_reports.py`, the `pin_pending_reason` branch of `gather_audit`) — a pending phase always yields a pending S2-T09 row whatever pair is on disk: the `replace` now also passes `source_keys=()`, `checks={"completion_evidence": False}` and `receipt_sha256={}`, so a valid stale pair or one rewritten after the run's sweep is never credited as `recorded` and `require_complete` keeps refusing (`assembly_gate_pending`). N2 (`assembly_method_pins.py`, the `_drop_half_pair` fallback) — before unlinking a symlinked half, the fallback re-`local()`s the half's parent folder and continues on refusal, so nothing is ever deleted through a symlinked `assembly` folder or cache root and the round-2 symlinked-leaf behaviour is unchanged. Family sweeps: (a) N1 family — the only audit row that reads a run artifact from disk while its own phase pends is the S2-T09 row (fixed); every other disk-read audit value (`assembly/heights.json`, `assembly/series_stage.json`, `assembly/investment_capture.json`) is a declared inventory output swept at run start and digest-bound by `final_audit`'s `bound_files` before `gather_audit`, and the S2-T12/T13/T15/T17/T19 rows read review inputs hash-bound to this run's receipts, so none can report `recorded` from a file its own run did not write; (b) N2 family — every `unlink`/`rmtree`/`replace`/`rename` in the `assembly*` modules was listed: `assembly_adapters.py:102-105` (the run sweep) and `:807-808` (heights) act only on `local()`-validated paths with a refusal aborting before any deletion, `assembly_method_pins.py:36` is `local()`-validated, and only `:42` (fixed) acted through a symlinked parent; `fetch/build.py:1837` and `heights/step.py:159` unlink heights outputs through an unvalidated parent and are listed as an open item, unfixed. No live value, public snapshot, `data/` path, `.env` or `.private` was read. Tests red first (`uv run --locked python -m pytest custodian/tests/test_method_pin_writer.py -q -p no:cacheprovider -k '<the five new tests>'` exit 1, 5 failed: C1 the valid stale pair, C3 the pair rewritten after the sweep in a real `build.run()`, C4 the symlinked assembly folder, and the two property oracles), green after (the same five exit 0; the changed and importing files `test_method_pin_writer.py`, `test_method_card_pins.py`, `test_assembly_reports.py`, `test_production_adapters.py`, `test_assembly_order.py`, `test_terms_pin_failures.py` exit 0, 476 passed, twice, before and after `ruff format`). Every new guard was deleted alone and rerun red (R4-B1 the three N1 credit-zeroing fields exit 1, 3 failed; R4-B2 the N2 parent check exit 1, 2 failed), each restored green. Checks: `ruff check .` exit 0; `ruff format --check .` exit 0 (940 files) after `ruff format` reformatted the touched test file; `mypy` exit 0 (501 source files); `python3 scripts/check_docs.py` exit 0 (1,274 text / 144 Markdown); `python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. The whole custodian suite was not run (the lead's fresh-seed whole test on the merge result stays the gate evidence, as in rounds 1 to 3). OI-283 stays OPEN and its deferral paragraph and DONE SO FAR now state the round-4 no-stale-credit and path-safety guarantees; no slice-gate approval is claimed. | Builder: OR GLM 5.3 via Droid (principal public-data release engineer persona; strict self-review persona: the sanad auditor and a path-safety tester). Skills: test-driven-development, verification-before-completion. |
+
+
+## Train S2-20 pick1 — approved S2-P53 and S2-P63 joins — 2026-11-22
+
+Builder persona: senior release engineer preserving approved task behavior. Strict self-review persona: byte-difference reviewer; this is not the different-maker confirmation required by decision 0032 item 2. Sources: task brief `.overnight/BRIEF.md`, decision 0032 items 1–3, approved S2-P53 `ae75e9f781014380251051028645d7b5e5fdda62`, approved S2-P63 `deced4a7dc8a826f779f1d5510f8ba2f0fa5f82f`, initial train `6ef348b21295754a190cd34c0b20ef1f46cf44ec`. The S2-P53 join is `3bc82795d34938afa16b8e407c54423c51cf5380`; the second join and delivery checks are identified in `.overnight/RETURN.md`.
+
+Skills and equivalent rules: project-orientation located the existing importers and task records; task-standards fixed the release-engineer and strict-review personas; github-flow preserved two no-ff Conventional Commit joins on the assigned train; sanad-provenance ties evidence to exact source commits and retained command logs; spec-to-code-compliance equivalent records check retained both the PUB-106 landmark placement and main's single GBA class, and checked pending-pin documentation against the retained production branch; test-driven-development equivalent rule reproduced the refusal-stub failure before changing its expected output set; verification-before-completion equivalent rule requires actual exits; strict-reviewer and muhasabah-gate keep independent confirmation and incomplete checks explicit.
+
+Environment: Linux, Python 3.14.6, uv 0.11.31, `UV_OFFLINE=1`, workspace-local environment and temporary paths under `.overnight/tmp`, pinned engine group installed from the prepared offline cache. No live input, network, `.env`, `.private` or repository `data/` was read for the join. The initial shared Git metadata refused the merge with exit 128 (read-only `ORIG_HEAD` lock). Delivery therefore uses workspace-local metadata `.overnight/git` and an offline bundle of the existing objects; the shared metadata is unchanged. Initial local checkout refused to overwrite the already-present tracked tree and reported missing committer identity (exit 128); loading the matching initial index and configuring a synthetic local identity resolved those setup errors without changing tracked bytes.
+
+Evidence so far (append-only; final outcomes follow):
+
+- First registry run before engine setup: exit 1, 1 failed / 80 passed; the failure was missing `shapely`. An isolated reproduction also exited 1 for that missing import. `uv sync --managed-python --all-packages --locked --group engine`, offline: exit 0.
+- Combined registry total and BACI policy tests after engine setup: exit 0, 2 passed. Both main's extra GBA row and S2-P53's citation rows are included in the total; the approved BACI exclusion set needs no further edit.
+- Refusal-stub join regression: `test_exception_identity_and_existing_fail_word_are_unchanged[reports]` exited 1 with `assembly_output_invalid` instead of its exact expected `assembly_input_refused`; after changing only the stub's expected output set for the unbound pin phase, the same case exited 0, 1 passed. The main S2-P56 and S2-P63 sources are named beside that expected set.
+- Isolated count plants omit main's added row or S2-P53's citation rows, one at a time, in a process-local copy of the existing test function: each exits 1 at the count equality. Logs: `.overnight/OUT/omit-main.log`, `.overnight/OUT/omit-p53.log`; argv and real child exits: `.overnight/OUT/count-plants.json`. No production guard is added or changed by these expected-value resolutions.
+- The original broad importer execution was interrupted with exit 130 after the separately reproduced stub defect; its partial dots are not pass evidence (`.overnight/OUT/importers-before-fixture-fix.log`). The corrected run uses seed `532063`, unchanged Hypothesis profile and the explicit 227-file direct-importer/changed-test selection in `.overnight/tmp/importer-tests.json`; its command and exit are retained in `.overnight/OUT/importers-result.json`.
+- Initial static checks on the combined production tree: Ruff check exit 0; Ruff format check exit 0 (976 files); mypy exit 0 (522 source files); documentation check exit 0 (1,313 text / 145 Markdown); tree check exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; local `git diff --check` exit 0. Records and the stub expected-set correction are checked again before delivery.
+
+The forced-difference inventory, exact source/target lines, per-file additions/removals and final checks are delivered in `.overnight/RETURN.md` and `.overnight/OUT/`. Main's production refusal observation and S2-P63's pending-state reset/dynamic output declaration coexist in `Production.run`; no production assertion, exception reason, case or security rule is removed. Approval of these forced code/test differences by another maker, hosted checks and the lead's fresh-seed whole test remain required under decision 0032; this local join grants no slice-gate approval.
+
+- Completed focused checks, seed `532063`: standalone `custodian/tests/test_publicdata_registry.py` exit 0, 81 passed; standalone `custodian/tests/test_method_card_pins.py` exit 0, 262 passed; joined pin-writer/refusal/order selection exit 0, 1,557 passed. Exact argv, elapsed times and logs: `.overnight/OUT/focused-results.json`.
+- Isolated join-contribution deletion plants remove only (a) the pending-state reset, (b) the dynamic declared-output call, or (c) main's run-step log binding: each child exits 1. The failures respectively show `pending` instead of exact `recorded`, `assembly_output_invalid` instead of exact `assembly_gate_pending`, and the missing exact `REFUSED heights assembly_input_refused` line. No tracked file was mutated by these process-local plants; commands and logs are in `.overnight/OUT/join-plants.json`.
+- Static verification after the expected-output-set correction and initial evidence append: all eight child commands exit 0, including both working and staged whitespace checks. `.overnight/OUT/static-results.json` retains exact argv and exits; the source, format, type, documentation, tree and parity counts match the initial static checks above.
+
+- Retained explicit refusal in the combined `Production.run`: an invented complete-plan harness first passes with its valid seed, then changes only that seed to a boolean and requires exact `^figure_seed_invalid$` plus the exact preparation refusal log. Guard intact: exit 0, 1 passed. Deleting only that seed guard in a process-local function copy: exit 1 (did not raise). Restored: exit 0, 1 passed, `.overnight/OUT/seed-restored.log`. The first standalone seed-plant probe exited 4 for a missing repository import path; the supervisor exited 3 because that was not the required red-test result. After adding the repository root to the scratch probe's import path, the actual deletion test exited 1 as required. Both child exits remain in `.overnight/OUT/join-plants.json`; no repository source changed for either probe.
+
+- The spec-to-code-compliance skill's separate read-only requirement checker returned `implemented` for the resolved PUB-106/height-README clauses: the cache-record loader and retained-byte manifest path preserve S2-P53, and the GBA read/calibration/manifest chain preserves main's `all` class and `none_published` basis. Evidence: `.overnight/OUT/records-compliance.md`. This is same-maker scoped consistency evidence, not another maker's approval or train confirmation; no code, test or source input was changed by the checker.
+
+- Complete remaining task-owned/primary-importer selection (14 files), seed `532063`: exit 0, `568 passed in 41.54s`. The selection excludes only files already completed in the separate registry, method-card and boundary runs. Exact files, argv and log: `.overnight/OUT/task-files-result.json`.
+
+- Final 227-file direct-importer/changed-test run, unchanged profile and seed `532063`: exit 130, `(to show a full traceback on KeyboardInterrupt use --full-trace)`. Exact command, duration and log: `.overnight/OUT/importers-result.json`. This is not passed importer evidence; completion is not approved. The task time limit prevents a completed further whole selection. Focused checks remain recorded separately, and the lead must complete the importer selection before acceptance.
+
+## S2-P66 — Closed award page states, partial pending exact headings (2026-11-22)
+
+| Date | Task | Evidence | By |
+|---|---|---|---|
+| 2026-11-22 | S2-T29 / PUB-04; proposed decision 0095 amends decision 0091 item 4 | Base `88aea3ca5bde655a6a0e3fccd84fb8600e4bdd69`; implementation `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`. Closed no-award marker, null empty award date, exact marker forwarding and shared mismatch/receipt counter pass the required awards and direct importer suites: 1,195 tests and 2 subtests, exit 0, seed 6666. All 21 isolated plants give red 1 and restored green 0; the first 19 record byte restoration and the last two restore exactly to the staged source. Ruff, formatter, mypy, documents, staged tree, instruction-byte identity and both working/staged diff checks each exit 0. Production heading text remains missing (PO-S2-P66-01); no completion, real rate, independent approval or replay is claimed. | OpenAI Codex; award-proof engineer; strict self-review: sanad auditor |
+
+Skills: project-orientation, task-standards, github-flow, sanad-provenance,
+property-based-testing, strict-reviewer and muhasabah-gate. Test-driven-development
+and verification-before-completion use the brief's equivalent rules. Environment:
+prepared pinned Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, Ruff 0.17.4, mypy
+2.4.1; `UV_OFFLINE=1`, `PYTHONHASHSEED=0`, provider unset (default `none`), workspace
+temporary and UV-cache paths. No network, stored source page, `.env`, `.private`
+or repository `data/` read; invented fixture paths only. No database or whole-test
+command. Git delivery uses workspace-local `.overnight/git` because the supplied
+shared metadata is read-only; no shared ref, remote or base branch changed.
+
+The exact required test argv (executed with `UV_OFFLINE=1`, workspace `TMPDIR`
+and `UV_CACHE_DIR`) is:
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6666 -q
+```
+
+Append-only failure record: first unit red run 7 failed / 15 passed (exit 1);
+a strengthened receipt assertion and corrected reader-constructor fixture gave
+8 failed / 14 passed (exit 1) before production edits. The first green run passed
+22 tests (exit 0). The initial broad awards run reported six exact-schema
+assertion failures and 550 passes (exit 1): four expected receipt dictionaries
+needed the newly required zero-valued `proof_award_absent` counter. No assertion
+was removed. The focused schema follow-up passed 111 tests (exit 0). The expanded
+new-state file passed 30 tests before the final counter parameter was added; the
+final required run includes that extra case. A later Ruff check caught an assigned
+lambda (exit 1), replaced by a local function; formatter check then caught its
+blank line (exit 1), and the formatter applied that correction. Final checks are
+green. An overbroad 321-file transitive selection was deliberately cancelled
+(exit 130) to respect the timed brief; its log is retained and supplies no passing
+evidence. The final required selection comprises 30 files. These are recorded
+deterministic development failures/cancellation, not an unexplained random failure.
+
+Exact check commands: `uv run --locked ruff check .`,
+`uv run --locked ruff format --check .`, `uv run --locked mypy`,
+`python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`,
+`cmp AGENTS.md CLAUDE.md`, `git diff --check` and
+`git --git-dir=.overnight/git --work-tree=. diff --cached --check`, each exit 0.
+The staged tree check uses workspace-local Git metadata. Test arguments, raw logs,
+real exits and guard substitutions are in `.overnight/tmp/required-tests-command.json`,
+`required-tests.log`, `required-tests-exit.txt`, `plants.json`, `extra-plants.json`
+and `precommit-checks.json`. The return report lists refusal branches, per-file
+line counts, code-practice evidence and both delivery commits. Different-maker
+review and stored-proof replay remain with the lead.
+
+S2-P66 delivery verification append: the final new-state file passes 31 tests,
+exit 0, seed 6666. After restoring all plants, every required static/check command
+again exits 0; actual argv/exits are in `.overnight/tmp/delivery-checks.json`.
+The implementation remains exactly `c19c4b6e8dc465e734e42a2a4f938025aa528e5f`;
+this follow-up changes only TASKS.md, PROGRESS.md and OPEN_ITEMS.md. The exact
+non-award headings, independent review and lead replay remain pending.
+| 2026-11-22 | S2-P66 lead declaration commit | The lead wrote the four exact non-award h3 headings (read from the stored pages in the lead's shell) into the awards declaration's `shape.sections`. Focused award and declaration tests: 844 passed, exit 0. Offline `scripts/awards_proofs.py replay` on the lead's cache: exit 0, `refused_count` 0, `proof_award_absent` 13, `incomplete` false, no cache file written. |
+
+
+## S2-P66 round two — ruled date marker and declared-heading regression (2026-11-22)
+
+| Date | Task | Evidence | Maker and personas |
+|---|---|---|---|
+| 2026-11-22 | S2-P66 round two; S2-T29, ruling L-1495, proposed decision 0095 items 2 to 4 | Base `1efc5438230c202de569fd69372780660513037c`. Restores the ruled date marker as `proof_date_status: proof_date_absent`, separately from comparison reasons; company, registration and value alone still decide the result. Shared receipt totals count marked links once. Production headings are loaded from the lead declaration, never copied. Local isolated plants: 26 × red 1 / restored green 0. Final delivery verification and implementation hash are appended below. | OpenAI Codex; principal award-proof engineer; strict self-review: sanad auditor |
+
+Skills used: project-orientation, task-standards, github-flow, sanad-provenance, property-based-testing, strict-reviewer (self-review only), muhasabah-gate. The requested test-driven-development and verification-before-completion skill files were not found among the installed skill roots; the brief's equivalent rules were applied: tests first, isolated one-change negatives, exact refusal reasons, individual guard deletion and real exits. No new library or pin was used. Independent different-maker review remains lead-owned.
+
+Plan executed: add invented-page marker and production-heading tests; preserve and validate the marker through the existing parser/reader/shared checker; recompute the counter through the existing totals helper; update decision 0095, document 03 and task records; plant each relevant guard separately; restore exact bytes, verify and package local commits.
+
+Retained development evidence, seed 6667: the initial new-test command (`uv run --locked python -m pytest custodian/tests/test_award_date_marker.py -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-first`) exited 1 with 23 failed and 8 passed before implementation. The first implementation run of that file exited 0 with 31 passed. An initial broad award/declaration run exited 1 with 12 failed and 996 passed: eleven expected dictionaries omitted the newly required marker/counter, and one mocked version-two parser row omitted the date field. The expectations now include the new fields and that mock carries the production parser's date shape. No assertion, skip, retry, tolerance or baseline was removed. Initial format check exited 1 for two unformatted files; applying the formatter corrected it.
+
+The first unknown-marker deletion produced red 0 / restored green 0 because the pair guard redundantly checked the marker's value. The pair guard now checks field presence, leaving the unknown-value guard independently necessary; its isolated deletion now produces red 1 / restored green 0. The initial malformed-date plant runner stopped with exit 1 before mutation because its source snippet matched twice. A unique awarded-date snippet fixed the harness; the isolated run then produced red 1 / restored green 0. These are deterministic authoring/plant findings, not random failures; no green rerun alone closes a random failure.
+
+The first expanded green run passed 1,234 tests and 2 subtests, exit 0. Three further additive edge tests (multiple proof rows counted once, missing proof value and name-not-compared) were then added. The final new file passed 42 tests, exit 0 (`uv run --locked python -m pytest custodian/tests/test_award_date_marker.py -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-final-new`). A final expanded run on that additive test state is recorded in the delivery append.
+
+Expanded award, declaration, page-shape and direct-importer command (all invented fixtures, no network):
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_date_marker.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6667 -q --basetemp=.overnight/tmp/pytest-r2-required
+```
+
+Every uv command uses `UV_OFFLINE=1`. Final commands and plants use `PYTHONHASHSEED=0`; test seed is 6667, with the unchanged installed Hypothesis `eii` profile. Temporary paths and command logs are inside `.overnight/tmp/`. No `.env`, `.private`, repository `data/`, real proof cache or source host was read by the worker, and no service start/stop or lead-only replay occurred. Earlier lead-cache evidence remains attributed to the lead's supplied record.
+
+Plant commands all use `uv run --locked python -m pytest -q --hypothesis-seed=6667 --basetemp=.overnight/tmp/pytest-r2-plants` followed by the listed node(s). Individual argv, source paths, exits and byte-restoration assertions are retained in `.overnight/tmp/r2-plants/results.json`; each raw red and green log is adjacent.
+
+| Plant | Test node(s) | Red exit | Restored exit |
+|---|---|---|---|
+| `parsed_marker` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `dated_marker` | `custodian/tests/test_award_date_marker.py::test_date_count_is_orthogonal_to_comparison` | 1 | 0 |
+| `unknown_marker` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-unknown]` | 1 | 0 |
+| `marker_date_pair` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-missing]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-dated]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-no_date]` | 1 | 0 |
+| `reader_validation` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[reader-unknown]` | 1 | 0 |
+| `reader_forwarding` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `checker_validation` | `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-missing]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-dated]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-unknown]`, `custodian/tests/test_award_date_marker.py::test_inconsistent_date_marker_refuses_one_change[checker-no_date]` | 1 | 0 |
+| `checker_forwarding` | `custodian/tests/test_award_date_marker.py::test_date_marker_survives_parser_reader_and_both_checkers` | 1 | 0 |
+| `date_counter` | `custodian/tests/test_award_date_marker.py::test_date_count_is_orthogonal_to_comparison` | 1 | 0 |
+| `full_recompute` | `custodian/tests/test_award_date_marker.py::test_date_counter_mismatch_refuses[mismatch-award_links]` | 1 | 0 |
+| `sample_recompute` | `custodian/tests/test_award_date_marker.py::test_date_counter_mismatch_refuses[mismatch-award_check]` | 1 | 0 |
+| `receipt_unknown_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[unknown-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[unknown-award_check]` | 1 | 0 |
+| `receipt_fetch_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[fetch_failed-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[fetch_failed-award_check]` | 1 | 0 |
+| `receipt_absent_marker` | `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[award_absent-award_links]`, `custodian/tests/test_award_date_marker.py::test_receipt_date_marker_is_closed[award_absent-award_check]` | 1 | 0 |
+| `production_heading_guard` | `custodian/tests/test_award_date_marker.py::test_production_reviewed_headings_on_invented_pages` | 1 | 0 |
+| `malformed_date` | `custodian/tests/test_award_page_states.py::test_malformed_nonempty_awarded_date_refuses` | 1 | 0 |
+| `two_award_headers` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[two_awards]` | 1 | 0 |
+| `missing_date_span` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[no_date]` | 1 | 0 |
+| `duplicate_date_span` | `custodian/tests/test_award_page_states.py::test_no_award_exception_refuses_each_other_shape[two_dates]` | 1 | 0 |
+| `missing_sibling` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[no_sibling]` | 1 | 0 |
+| `table_selector` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[no_table]` | 1 | 0 |
+| `empty_table` | `custodian/tests/test_award_page_states.py::test_empty_table_with_empty_date_refuses` | 1 | 0 |
+| `malformed_amount` | `custodian/tests/test_award_page_states.py::test_existing_award_structure_and_value_refusals[currency]` | 1 | 0 |
+| `reader_url` | `custodian/tests/test_s2_p46_awards.py::test_proof_reader_exact_url_refusal` | 1 | 0 |
+| `reader_empty` | `custodian/tests/test_s2_p46_awards.py::test_empty_parsed_proof_refuses_in_reader` | 1 | 0 |
+| `checker_candidates` | `custodian/tests/test_award_checks_survivors_1.py::test_empty_or_nonmapping_proof_refuses` | 1 | 0 |
+
+S2-P66 round-two final verification append: the exact final source and test state
+passes **1,237 tests and 2 subtests, exit 0**, seed 6667, in the expanded command
+above (31 test files). The final marker file separately passes 42 tests, exit 0.
+The unchanged property profile exercises date absence independently of match
+outcomes, duplicate intake links, empty/one frames and the thirty/thirty-one
+sample boundary; multiple proof rows count date absence once. All 26 isolated
+plants produce red 1 / restored green 0 with exact byte restoration. Individual
+logs are in `.overnight/tmp/r2-checks/` and `.overnight/tmp/r2-plants/`.
+
+Environment observed locally: Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15,
+Ruff 0.17.4, mypy 2.4.1, decision provider `none`. The required static commands
+(`uv run --locked ruff check .`, `uv run --locked ruff format --check .`,
+`uv run --locked mypy`, `python3 scripts/check_docs.py`,
+`python3 scripts/check_tree.py`, `cmp AGENTS.md CLAUDE.md` and
+`git diff --check`) all exit 0. Ruff reports 942 formatted files; mypy checks
+500 source files. Raw output and argv/exits are retained under
+`.overnight/tmp/r2-checks/`.
+
+Packaging correction: the planned commit delivery was refused when normal
+`git add` exited 128 because the shared worktree Git metadata is read-only.
+No task commit was created, so the full containing base commit remains
+`1efc5438230c202de569fd69372780660513037c`. The brief explicitly allows a patch
+when commits are refused: deliver `.overnight/patches/S2-P66-r2.patch` and
+`SHA256SUMS`, with the checksum and code-practice counts in `.overnight/RETURN.md`.
+No bundle is claimed. The ordinary tree check exits 0 on the unchanged shared
+index. A disposable index and object directory inside this workspace stage all
+task paths, including the new test file, for verification only: task-index
+`python3 scripts/check_tree.py` and `git diff --cached --check` both exit 0
+(`.overnight/tmp/r2-index-check.json`). Shared Git state is untouched.
+
+Self-audit: PASS for the worker implementation and evidence; no independent
+approval or lead-cache replay is claimed. Proposed decision 0095 remains
+proposed, S2-T29/OI-277 remain open, and review plus the lead's replay of the
+round-two marker remain the only S2-P66 follow-ups. No source schema, trust,
+privacy, retry, publication or assembly refusal was relaxed.
+
+
+## S2-P66 round three — required proof keys at the reader boundary (2026-11-22)
+
+| Date | Task | Evidence | Maker and personas |
+|---|---|---|---|
+| 2026-11-22 | S2-P66 round three; S2-T29; proposed decision 0095 item 3 | Base `594b30ddc3f005b0fc64d9a9df0e118b54ff334e`; implementation `925612322a470b13bb7d32c3f02661149460cb2a`. Every projected source key is required in version two; date access no longer supplies a missing-field default, and the projected pair is revalidated through the existing helper. Importer suites: 1,254 passed and 2 subtests passed, exit 0; seed 6668. Two isolated new-guard deletions: each red 1 / restored green 0. | OpenAI Codex; senior data-pipeline engineer, provenance; strict self-review persona: reviewer deleting one field at a time from every valid record. |
+
+The supplied `.overnight/IN/CF1-KIMI.md` finding is reproduced before the fix:
+all seven initial cases fail, exit 1, including a missing dated `award_date`
+returning a row and the other three missing projection keys raising `KeyError`.
+The first implementation run passes 80 tests, exit 0, across the required-key,
+marker and page-state files. The final new file passes 13 tests, exit 0; six
+additional single-side comparison deletions retain decision 0088 items 2 to 4's
+closed comparison outcomes. One Hypothesis generator varies the deleted key,
+dated input and insertion order, without changing the installed profile. The
+final importer run includes all direct importer files found by `rg`, the prior
+round's expanded suite, and the new file; no failed test is retried or skipped.
+
+Skills: project-orientation: reused the existing reader, marker helper and invented-page fixtures; task-standards: adopted the brief's builder and deletion-review personas; github-flow: isolated Conventional Commits on the supplied base without a remote operation; sanad-provenance: bound every result to local command logs and decision 0095; sharp-edges: swept defaults and exposed required-key and falsy-date projection gaps; property-based-testing: generated single-key deletions over all four required keys, dates and key order; spec-to-code-compliance: traced decision 0095 item 3 through the reader and its negatives (requested read-only checker dispatch failed before starting, so this is local tracing, not workflow or independent approval); strict-reviewer: self-reviewed exact refusal reasons and unchanged comparison semantics; muhasabah-gate: checked scope, evidence and unclaimed lead work. Installed copies of test-driven-development, systematic-debugging, executing-plans, using-git-worktrees, verification-before-completion, receiving-code-review and requesting-code-review were not found in the installed skill roots; their brief-equivalent rules were applied: reproduce the finding, sweep its family, write tests first, change only the existing workspace, plant each new guard alone, verify real exits and prepare a reviewable bundle. No new library or pin is used.
+
+Plan executed: reproduce the missing-key failure; add named and generated
+one-deletion negatives; require keys before projection and reuse the existing
+pair validator afterward; classify all defaulted reads in the four-module
+family; delete each new guard separately and restore exact bytes; run importer
+and static checks; append task records; package commits and the return report.
+The sweep table, refusal-branch mapping and code-practice measurements are in
+`.overnight/RETURN.md`.
+
+Final importer command:
+
+```sh
+uv run --locked python -m pytest custodian/tests/test_assembly_source_review.py custodian/tests/test_assembly_tenders.py custodian/tests/test_assembly_terms_boundary.py custodian/tests/test_award_all_links.py custodian/tests/test_award_checks_survivors_1.py custodian/tests/test_award_double_space.py custodian/tests/test_award_page_states.py custodian/tests/test_award_date_marker.py custodian/tests/test_award_reader_required.py custodian/tests/test_award_proof_formats.py custodian/tests/test_awards_incremental.py custodian/tests/test_awards_survivors_1.py custodian/tests/test_awards_survivors_2.py custodian/tests/test_awards_survivors_3.py custodian/tests/test_build_own_run.py custodian/tests/test_fetch_fingerprint.py custodian/tests/test_page_acquire_survivors_1.py custodian/tests/test_page_acquire_survivors_2.py custodian/tests/test_page_acquire_survivors_3.py custodian/tests/test_page_schema_survivors_1.py custodian/tests/test_page_schema_survivors_2.py custodian/tests/test_page_shapes_survivors_1.py custodian/tests/test_page_shapes_survivors_2.py custodian/tests/test_s2_p42_awards_formulas.py custodian/tests/test_s2_p43_awards_wiring.py custodian/tests/test_s2_p46_awards.py custodian/tests/test_s2_t29_awards.py custodian/tests/test_s2_t29_fix.py custodian/tests/test_s2_t29_fix2.py custodian/tests/test_s2_t29_fix12.py custodian/tests/test_s2_t29_live_awards.py custodian/tests/test_s2_t29_live_shapes.py scripts/tests/test_awards_proofs.py --hypothesis-seed=6668 -q --basetemp=.overnight/tmp/pytest-r3-required
+```
+
+Command logs and argv/exit records are in `.overnight/tmp/r3-checks/`.
+The importer command exits 0 with 1,254 tests and 2 subtests in 146.71 seconds.
+Other required commands and actual exits:
+
+| Command | Exit | Evidence |
+|---|---|---|
+| `uv run --locked ruff check .` | 0 | `ruff-check.json` and log; all checks passed |
+| `uv run --locked ruff format --check .` | 0 | `ruff-format-check.json` and log; 943 files formatted |
+| `uv run --locked mypy` | 0 | `mypy.json` and log; 500 source files |
+| `python3 scripts/check_docs.py` | 0 | `docs-check.json` and log; final records check appended below |
+| `cmp AGENTS.md CLAUDE.md` | 0 | `agents-parity.json` and log; both instruction files unchanged |
+| `git diff --check` | 0 | `diff-check.json` and log |
+
+Every uv command uses `UV_OFFLINE=1`. Test/check environment:
+`PYTHONHASHSEED=0`, `EII_DECISION_PROVIDER=none`, test seed 6668, unchanged
+Hypothesis `eii` profile (100 examples, no example database). Python 3.14.6,
+pytest 9.2.0 and Hypothesis 6.170.15 are observed through the locked uv environment
+(`environment.json`, exit 0); Ruff 0.17.4 and mypy 2.4.1 remain the exact
+`pyproject.toml`/lock pins. The initial system-interpreter package-version probe
+exited 1 because that interpreter has no Hypothesis; the locked-environment probe
+above supplies the evidence. Temporary, uv-cache and test paths are inside
+`.overnight/tmp/`. No network, `.env`, `.private`, `data/`, real proof cache or
+lead-only replay was used.
+
+Plant command prefix: `uv run --locked python -m pytest -q
+--hypothesis-seed=6668 --basetemp=.overnight/tmp/pytest-r3-plants`.
+Each mutation was restored before its green command; byte equality is asserted.
+The source guard, full argv, actual exits and restoration assertions are recorded
+in `.overnight/tmp/r3-plants/results.json`, with each raw red/green log adjacent.
+
+| Guard deleted alone | Negative test nodes in `custodian/tests/test_award_reader_required.py` | Red exit | Restored exit |
+|---|---|---|---|
+| Required projection-key subset guard | `test_reader_refuses_each_missing_required_key` (all four cases), `test_one_key_deletions_always_refuse` | 1 | 0 |
+| `proof_date_marker(proof)` after projection | `test_reader_revalidates_projected_date` (zero and false) | 1 | 0 |
+
+Packaging evidence: ordinary `git add` exits 128 because the shared worktree
+metadata is read-only. A bare shared local clone with its own index, objects,
+refs and exclusion file is created inside `.overnight/tmp/r3-delivery.git`;
+its commits descend from the exact supplied HEAD. No shared metadata is changed.
+The first local commit attempt exits 128 for an unset author identity; a synthetic
+agent identity is set only for the successful local command. The implementation
+commit is the full hash in the row above. The records commit and verified bundle
+are named in `.overnight/RETURN.md`; only selected task files enter either commit.
+Different-maker review and stored-proof replay remain with the lead. No source,
+transport, privacy, publication, comparison or receipt rule is relaxed.
+
+Final records verification append: `python3 scripts/check_docs.py`,
+`cmp AGENTS.md CLAUDE.md` and `git diff --check` each exit 0 after the record
+updates (`final-docs-check.json`, `final-agents-parity.json`,
+`final-diff-check.json`). The task-local Git index's `python3 scripts/check_tree.py`
+also exits 0, all eight rules (`task-tree-check.json`). Source and tests are
+unchanged from implementation `925612322a470b13bb7d32c3f02661149460cb2a`.
+Code-practice inspection: no copied block, no duplicate helper, no function over
+100 new lines; the longest new function is
+`test_comparison_defaults_keep_closed_single_deletion_outcomes`, nine lines
+from `def` through its last statement. The existing `_proof_reader` spans
+58 lines including its 38-line nested `read`. Strict self-review: APPROVE for
+the local correction and evidence; independent approval is not claimed.
+Muhasabah: PASS for scope, source attribution, real exits and explicit lead-owned
+review/replay limits. The verified delivery bundle and full per-file diff counts
+are reported in `.overnight/RETURN.md`.
+
+## Train S2-20 forced join fix after the lead whole test (2026-11-23)
+
+- Base: train head `ae143446` on main `37af82e2`. The lead's whole test of that head (seed 3375728576) failed 2 tests in suite python-guards: `scripts/tests/test_import_boundary_real.py::test_real_tree_static_passes` and `scripts/tests/gateway/test_import_boundary_gateway.py::test_real_tree_forbids_gateway_in_core`. Both report `FAIL cdse-cache: custodian/src/eii_custodian/publicdata/assembly_refusal_policy.py`.
+- Cause: S2-P56's closed reason word for the registry refusal "CDSE backup must remain optional and unread" contained the guarded marker `cdse_backup`. The real-tree guard keeps that marker out of every file outside the backup's own cache tooling. S2-P56 left train S2-19 and was joined here, so this train is the first whole test of it.
+- Fix: the reason word becomes `satellite_backup_must_remain_optional_and_unread`. The pattern, the registry message and every other row are unchanged. The guard keeps its markers and gains no exemption.
+- Plant: on the old file, `test_import_boundary_real.py` exits 1 (1 failed, 5 passed); on the fix it exits 0.
+- Guard pre-check on the fix (ruling L-1511): the two guard files, `test_cdse_isolation.py`, `test_assembly_refusals.py` and `test_cdse_transport.py` gave exit 0, 1461 passed and 13 subtests passed. ruff check, ruff format --check, check_docs and git diff --check exited 0. The whole test of the new head and another maker's confirmation follow (rule 33).
+
+## S2-C2 — Explicit method-pin input handoff — 2026-11-23
+
+| Date | Task | Evidence |
+| --- | --- | --- |
+| 2026-11-23 | S2-C2; S2-T09 box 1, contributes to S2-T08 boxes 7 and 8; OI-283 | Base `56350b6a89`; code `0038b20b51`. Builder: OpenAI Codex, GPT-6 family, senior data-pipeline engineer for reproducible method pins. Strict self-review persona: the reviewer who removes a pin half, supplies a foreign or stale receipt binding, or changes configuration bytes after hashing; not a different-maker approval. `commands.build_public.run` now forwards explicit keyword-only `pin_generation_config` and `pin_rows` through `run_build` and `_seeded_assembly` into `Production`, retaining `write_pin_pair`, its canonical configuration bytes and the receipt-resolving completion consumer; no second writer/cache and no changed decision-0094 exception. Gap proof: ordinary-entrypoint unbound-input probe exit 1, one failed; explicit-handoff tests written first exit 1, eight failed, then exit 0, eight passed; ordinary selection with its added property exit 0, nine passed; changed writer file exit 0, 38 passed before final importing verification. Final verification: all 68 importing/changed test files exited 0, 4,564 tests passed, no failures or skips, seed 36, four independent processes; the complete file list and per-file commands/exits are in `.overnight/OUT/test-results.json` and `.overnight/OUT/test-files.txt`; the existing invented GIS fixtures emitted 192 NotGeoreferencedWarning warnings. Thirteen individual consumer/serialization/forwarding plants each exited 1 with the guard/assignment removed and 0 restored; details and exact reasons in `.overnight/RETURN.md` and `.overnight/tmp/plants.json`. Environment: `UV_OFFLINE=1`, workspace-local UV cache, `TMPDIR` inside the worktree, pinned engine group; final test seed 36. Initial exploratory test seeds were automatic and not captured; no claim of their reproduction seed is made. `ruff check .` exit 0; `ruff format --check .` exit 0, 979 files; `mypy --cache-dir .overnight/tmp/mypy-cache` exit 0, 522 source files; documentation/tree/mirror/diff checks before this records append: `python3 scripts/check_docs.py` exit 0 (1,317 text and 146 Markdown files), `python3 scripts/check_tree.py` exit 0 (eight rules), `cmp AGENTS.md CLAUDE.md` exit 0, `git diff --check` exit 0; checks after the records append are reported in `.overnight/RETURN.md`. Other exits retained: serial broad run intentionally interrupted, 130, then the whole selection dispatched without exclusions to four test processes; temporary plant runner twice exited 1 on identified source-offset/indexing defects, corrected to resolve the exact forwarding marker, with every planted test then red/restored green; first clone commit exited 128 for missing identity, resolved with a synthetic maker identity, exit 0. Isolated spec-check agent could not start (thread-store error), so it supplies no review. No network, push, live source read or read of `data/`, `.env` or `.private`. OI-283 explicitly carries the absent plain-CLI live supplier: the lead must bind and confirm the real reviewed configuration, producer rows and current receipts at the live run. TASKS.md is unchanged and box 1 stays unticked; fixture integration is not a live build, source review or slice gate. Skills: project-orientation, found/reused the existing writer and consumer; task-standards, applied the assigned personas; test-driven-development equivalent, red entrypoint tests before code; sanad-provenance, invented receipt lineage and persisted-byte evidence; sharp-edges, keyword-only inputs and exact negative reasons; property-based-testing, generated settings and ordering-after-hash oracle; verification-before-completion equivalent, actual exits and individual guard plants; github-flow, one task branch and shared-clone Conventional Commits; spec-to-code-compliance, attempted isolation failed and supplier gap explicitly retained; muhasabah-gate, disclosed unmet live/review obligations. |
+
+## S2-C2 round 2 — Required-pin producer prerequisite — 2026-11-23
+
+| Date | Task | Evidence |
+| --- | --- | --- |
+| 2026-11-23 | S2-C2 round 2; S2-T09 box 1; OI-283 | Source head `15d25df82e`; no code commit. Builder: OpenAI Codex, senior data-pipeline engineer. Strict self-review persona: reviewer supplying a pin without a producer, a value without receipt lineage, or a configuration other than the reviewed tracked file; no different-maker approval claimed. STOP under the brief's Do item 1 and ruling L-1520(b): `c5.hhi`, `c5.prior12`, `c5.latest12` and `c5.trend` have no producer on the ordinary build path. Source search finds `supplier_metrics` only defined/exported in production code and called in tests; its prior total is a local intermediate. The existing C6 digest, C7 census table and C14 sale aggregate producers do not yet supply pin rows. `.overnight/OUT/pin_producers.md` holds one row per required pin and one proposal per missing C5 producer. AST/table coverage check exit 0: 29 unique required rows, 16 configuration, 8 result and 5 deferred, exactly matching the validator sets; evidence `.overnight/OUT/probe-coverage.json`. No configuration, implementation, test, guard or numerical value added; no changed/importer test files and no plants applicable on this stop path. Static checks with `UV_OFFLINE=1`, workspace-local UV cache, `TMPDIR` inside the worktree and pinned engine group: `uv run --locked --group engine ruff check .` exit 0; `ruff format --check .` exit 0 (979 files); `mypy --cache-dir .overnight/tmp/mypy-cache` exit 0 (522 source files); `python3 scripts/check_docs.py` exit 0 (1317 text files, 146 Markdown files); `python3 scripts/check_tree.py` exit 0 (8 rules); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Logs are in `.overnight/OUT/`; final records checks and bundle metadata are in `.overnight/RETURN.md`. No test seed: no test or draw ran. The isolated spec-compliance checker could not start due to a thread-store error; no review result exists. OI-283 updated, TASKS.md unchanged, decision-0094 pins still pending; no live build, source review or gate closure. Skills: project-orientation, traced the existing producer/writer/consumer chain; task-standards, applied the assigned personas; test-driven-development equivalent, stopped before building when prerequisite failed; sanad-provenance, separated calculators from same-run receipt-backed results; sharp-edges, rejected supplied rows as proof of production; spec-to-code-compliance, isolated check unavailable and direct source evidence retained without independent verdict; verification-before-completion equivalent, checked the table against AST constants and recorded actual static exits; github-flow, records-only task bundle without push; muhasabah-gate, disclosed all unmet implementation/live/review obligations. |
+
+
+## S2-C2 round 3 — Same-run method-pin producers and tracked settings — 2026-11-23
+
+| Date | Task | Evidence |
+| --- | --- | --- |
+| 2026-11-23 | S2-C2 round 3; S2-T09 box 1; OI-283; ruling L-1521 | Base `28aac669b0`; implementation `f283a48926`; integration correction `43713688d2`. Maker: OpenAI Codex, GPT-6 family. Builder: senior data-pipeline engineer. Strict self-review: calculator boundaries, receipt lineage and anchored settings; no different-maker approval. C5 now calls `supplier_metrics` and receives its exact prior total in `eii_core.calc`; zero prior/latest cases and the trend-sign property are tested. C6 copies the selected places-file digest, C7 copies census resident/person weights and C14 copies annual medians with deal counts from existing same-run producers. No pin adapter reopens a public snapshot or computes/rounds a figure. The ordinary command reads the canonical tracked `custodian/publicdata/review/s2_t09_generation_config.json`, enables automatic collection and reuses `write_pin_pair`; explicit API callers without rows retain the prior pending behavior. Unknown pack choices remain named and pending; the tracked defaults cannot clear completion. Invented-cache plain-CLI completion is true, not live evidence. Final importing/changed selection: 99 Python files, exit 0, 5364 passed and 55 subtests, seed 1521; existing invented GIS fixtures emitted 192 NotGeoreferencedWarning warnings. Final test-only refinements (invented C14 target, isolated hash-only edit and zero-prior pin status) plus writer/inventory/register regressions: exit 0, 387 passed, seed 1521. Forty-one unique guard/status/unit plants each exit 1 removed and 0 restored, with fresh per-case bytecode caches; exact cases and reasons are in `.overnight/RETURN.md` and `.overnight/OUT/all-final-plants.json`. Environment: `UV_OFFLINE=1`, locked engine group, `TMPDIR` inside the active worktree. Changed arithmetic/CLI tests were red before implementation; retained earlier runs include source-tree importer exit 1 (114 failed, 4914 passed), first committed-clone importer exit 1 (47 failed, 5007 passed), and initial clone collection exit 2 before the documented offline engine sync (exit 0). Identified causes were untracked configuration/fetch fingerprints, mandatory-file fixture setup and the loader's accidental assembly import; the existing fingerprint boundary was preserved by reusing the safe-path helper. One focused run overlapped deliberate guard mutation (exit 1, one failed); exact-node and fresh-bytecode corrections to the plant harness are retained, not treated as random rerun closure. Initial exploratory seeds were automatic and not captured. Final static checks before this append: ruff check exit 0; ruff format check exit 0 (985 files); mypy exit 0 (525 source files); check_docs exit 0 (1324 text, 146 Markdown); check_tree exit 0 (eight rules); AGENTS/CLAUDE byte comparison and diff check each exit 0. Post-record checks and verified bundle hashes are in `.overnight/RETURN.md`. Shared-clone task branch, Conventional Commits; no network, push, live build or read of repository `data/`, `.env` or `.private`. TASKS.md, OI-283 and the S2 plan carry the missing reviewed settings, crosswalk/source review and lead live run; box 1 stays unticked and decision 0094's later pins remain pending. Code practice: no copied block or duplicate helper; longest new function `expected_rows`, 57 lines, no new function over the limit. Skills: project-orientation, reused selected producers/writer/consumer; task-standards, named personas; test-driven-development equivalent, red first; sanad-provenance, selected receipt and persisted-byte binding; dimensional-analysis, QAR/kg/ratio checks and unit plant; sharp-edges, malformed/duplicate/empty/symlink cases; spec-to-code-compliance, MTH-03/card/decision mapping and explicit live limits; property-based-testing, trend sign/ties/exact totals; receiving/requesting-code-review equivalents, verified ruling and prepared bounded handoff; verification-before-completion equivalent, real exits and restored plants; github-flow, isolated task branch/bundle without push; muhasabah-gate, source/scope/assumption audit with independent/live approval unclaimed. |
+
+## S2-C2 round 4 — Exact CLI diagnostics and C5 comparison windows — 2026-11-23
+
+| Date | Task | Evidence |
+| --- | --- | --- |
+| 2026-11-23 | S2-C2 round 4; S2-T09 box 1; OI-283; MTH-03 | Base `25d90f30fb86055113b3220ba69f5bbd7578130f`; code `08c4f2c4056a6f21d224d1402e95fd46fdeaf61c`. Maker: OpenAI; model: Codex, GPT-6 family (deployed variant not exposed). Builder persona: senior data-pipeline engineer for reproducible method pins; strict self-review persona: rv1 reviewer, without different-maker approval. F1: four CLI negatives compare complete stderr and stdout, retain exit/absent-artifact checks and reject longer/secondary errors; the adjacent writer diagnostic now compares the complete line tuple. Suspicion A passed and its tests are retained: every card's pin round-trips exact finite Decimals and arbitrary-precision integers through the writer, and the C5 adapter preserves exact rational outputs; no serializer was changed. Suspicion B failed and was fixed wholly within eii_core.calc: trend period is the latest window, base_period the full prior window; emit validates both comparison windows against its actual inputs. The invented-cache test binds those windows to the exact listed selected receipts; one-input mismatches assert period mismatch or pin_customs_window_missing. Final calculator/method-pin selection: exit 0, 1261 passed, seed 1521; final serialization assertion refinements: exit 0, 3 passed. Eight final individual diagnostic/guard/metadata/precision plants each exited 1 corrupted/deleted and 0 restored; exact commands and logs: `.overnight/OUT/plants.json`, final runner exit 0. An initial redundant reversed-window guard survived deletion (0/0) and was removed; coverage already refuses reversal. An earlier restored precision property exceeded the unchanged deadline (205.94 ms versus 200 ms): its unrelated full-source fixture was replaced with the existing lightweight writer fixture, rather than changing any bound; `.overnight/OUT/plants-deadline.json` retains that failure. Earlier red runs include 12 failed/5 passed in the initial test setup, 2 failed/11 passed for B, 4 failed/105 passed for preliminary exact CLI expectations, and 4 failed/1257 passed in the first broad run; causes and corrections are in `.overnight/RETURN.md`. Environment: UV_OFFLINE=1, UV_NO_SYNC=1, TMPDIR inside this worktree, pinned prepared Python/engine environment; all fixtures invented. Ruff check, format check (986 files), mypy (525 source files), docs (1325 text/146 Markdown), tree (eight rules), mirror comparison and staged/unstaged whitespace checks exit 0; post-record individual checks are in `.overnight/OUT/verification.json` and the return. Shared Git metadata refused branch creation (128); a workspace-local Git directory holds the task branch and Conventional Commit, with no push or network. No real cache, data/, .env or .private was read. Pending settings, decision 0094's pending results and S2-T09 box 1 are unchanged; the lead's live run, source review and governed card writes remain owed. Skills: project-orientation, reused existing fixture/writer/receipt helpers; task-standards, applied the assigned personas; test-driven-development equivalent, diagnostic/window reds before fixes; sanad-provenance, exact selected-receipt chains; dimensional-analysis equivalent, QAR totals versus dimensionless ratios and window labels; property-based-testing, exact serialization/integer/Decimal/Fraction round-trips; sharp-edges, wrong diagnostics, absent/reversed/outside windows and precision boundaries; spec-to-code-compliance equivalent, MTH-03/TST-198/decision-0094 scope; receiving-code-review equivalent, verified F1 and both suspicions; requesting-code-review equivalent, prepared bounded different-maker handoff; verification-before-completion equivalent, real exits and restored single plants; github-flow, isolated task commit and bundle; strict-reviewer, scoped self-review only; muhasabah-gate, audited evidence and retained live/independent limits. |
+
+## S2-C2 round 5 — Exact Decimal representation in the pin oracle — 2026-11-23
+
+| Date | Task | Evidence |
+|---|---|---|
+| 2026-11-23 | S2-C2 round 5; S2-T09 box 1; OI-283 | Base `b74bd37179`. Maker: Anthropic (the lead), after the cf1 finding of another maker. The findings: `Decimal(actual) == value` and `Fraction` equality accepted `0` for `-0`, `1000` for `1E+3` and `1.23` for `1.2300`. The fix is test-only. `custodian/tests/test_method_pin_precision.py` now asserts `Decimal(actual).as_tuple() == value.as_tuple()` for a Decimal, in both the card round-trip and the C5 adapter property. It adds the examples `-0`, `1E+3` and `1.2300` to each, and adds a planted normalising serializer that must fail the oracle. The serializer itself (`str` of the Decimal) already kept the representation, so production code is unchanged. Guard deletion: reverting the oracle to equality turns the plant test red (exit 1); the restored file is byte-identical (cmp), and the file passes again (4 passed, exit 0). S2-T09 box 1 stays unticked (OI-283). |
+
+## S2-P67 — custodian shard headroom
+
+| Date | Commit | Evidence | Maker, personas and skills |
+|---|---|---|---|
+| 2026-11-23 | Code `b504151177`, base `56350b6a89`; records follow separately | Ruling L-1517 item 2. Measured each original part once on a shared Linux machine, Python 3.14.6, affinity `6,7,16,17`, seed `1794000123`, `UV_OFFLINE=1`, `TMPDIR=$PWD/.overnight/tmp`, provider `none`, bytecode disabled. The parent `uv run --locked python` executed the recorded inline driver; each N of 1, 2, 3 ran child argv `taskset -c 6,7,16,17 UV-PYTHON -P -s -m pytest -c pyproject.toml --rootdir . --hypothesis-seed 1794000123 custodian/tests -p pytest_custodian_part --custodian-part N --collect-only -q` then the same command with `--durations=0 -q --junit-xml .overnight/OUT/part-N.xml` in place of collection flags; `UV-PYTHON` denotes the parent driver's `sys.executable`, omitting only its private path; the exact driver is transcribed in `.overnight/OUT/measurement-driver.py`. All six exits zero. part 1: 4310 passed, 0 warnings, wall 1003.371 s; part 2: 5365 passed, 192 warnings, wall 939.867 s; part 3: 4084 passed, 1 warnings, wall 840.072 s. Complete collection: 13759 cases in 363 modules. Selected 5 parts, SHA modulo; predicts part 1: 1944 cases, 383.624 s (31.969 percent); part 2: 2767 cases, 650.693 s (54.224 percent); part 3: 2147 cases, 592.711 s (49.393 percent); part 4: 3787 cases, 521.383 s (43.449 percent); part 5: 3114 cases, 669.142 s (55.762 percent). Each prediction includes the largest observed overhead, 15.021 s; no idle scaling. Proposed decision 0097 records the measured alternatives. Every limit, seed rule, process-group kill and other suite is preserved; matrix and pin follow the exact suite list, six required check names unchanged. Module-split TDD red exit 1 then focused green exit 0. Direct missing-file, two-parts and off-by-one plants exit 1, valid control exits 0. Every individually deleted guard produces a focused red exit 1, then is restored. Correction evidence: the initial focused run exited 1 on two subtests because the cross-runner timeout expectation still listed three entries; changed only that expected tuple to five entries and reran its full file, then the focused group. Initial clone docs exited 2 because the no-checkout clone had not materialised its base files; restored the clone from HEAD and restaged the task files before green docs/tree checks. Both earlier exits are retained below. Checks: `uv run --locked ruff format .` exit 0; `uv run --locked python .overnight/tmp/coverage_plants.py` exit 0; `uv run --locked python .overnight/tmp/guard_plants.py 5` exit 0; `uv run --locked python -m pytest scripts/tests/test_custodian_parts.py scripts/tests/test_runner_usage.py scripts/tests/test_ci_workflows.py scripts/tests/test_ci_shards.py scripts/tests/test_runner_failures.py scripts/tests/test_runner_environment.py --hypothesis-seed 1794000123 -q` exit 1; `uv run --locked python -m unittest scripts.tests.mutation_runner -v` exit 0; `uv run --locked ruff check .` exit 0; `uv run --locked ruff format --check .` exit 0; `uv run --locked mypy` exit 0; `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0; `uv run --locked python -m pytest scripts/tests/test_runner_usage.py --hypothesis-seed 1794000123 -q` exit 0; `uv run --locked python -m pytest scripts/tests/test_custodian_parts.py scripts/tests/test_runner_usage.py scripts/tests/test_ci_workflows.py scripts/tests/test_ci_shards.py scripts/tests/test_runner_failures.py scripts/tests/test_runner_environment.py --hypothesis-seed 1794000123 -q` exit 0; clone index checks: `python3 scripts/check_docs.py` exit 2; `python3 scripts/check_docs.py` exit 0; `python3 scripts/check_tree.py` exit 0; `python3 scripts/check_docs.py` exit 0; `python3 scripts/check_tree.py` exit 0. Logs and per-module table: `.overnight/OUT/`, `.overnight/RETURN.md`. Full `./eii test` deliberately left to the lead; independent-maker review and hosted timing remain open (PO-S2-P67-01). | OpenAI Codex, GPT-6 family (exact variant not exposed); builder senior test-infrastructure engineer; strict self-review looks for files run twice, never run or moved without notice, or silently changed limits, seeds and checks. Skills: project-orientation, task-standards, test-driven-development and verification-before-completion brief equivalents, sharp-edges, property-based-testing, sanad-provenance, spec-to-code-compliance and dimensional-analysis brief equivalents, github-flow, strict-reviewer, muhasabah-gate. Per-skill actions recorded in the return. |
+
+## S2-P67 round 2 — every custodian suite consumer follows the five-part split
+
+| Date | Commit and base | Evidence | Maker, personas and skills |
+|---|---|---|---|
+| 2026-11-23 | Code `27366d05e7c954f03c5a698e0b18702ba7d23e6d`; starting base `53f3f29171b0b2d8957104350164861e4f7a5475` | Ruling L-1517 item 2; rv1 finding 1. Added only the literal fourth and fifth custodian names to the existing exact list in `test_restricted_selection_plants`; every tracked suite-name/count consumer was swept, with file/line dispositions and raw matches in `.overnight/RETURN.md` and `.overnight/OUT/sweep-inventory.md`. No other stale current list found; dated evidence and expressly superseded decisions preserved, including decision 0097. Append-only correction to the original S2-P67 row: original code `b504151177ce4e9a27027c2c43edf36400c8bd0f`, original base `56350b6a892965850c12fecdfd05855df0a7c88a`, original records `93cb430b0490e923261576160706cb1591245748`; the starting base is the lead's 0097 renumbering commit. Python 3.14.6; inherited affinity and explicit taskset `16,17`; `UV_OFFLINE=1`, workspace `TMPDIR`, bytecode disabled, provider `none`. Commands below used that environment and affinity. `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_restricted_expectation_guards.py` before the fix: exit 1, 1 failed and 78 passed at the exact stale-list assertion; same full file after the fix: exit 0, 79 passed. Each expected name was then omitted alone: the selected `test_restricted_selection_plants` with `--hypothesis-seed 1794000123` exited 1 at the intended list comparison for each omission; inline driver exit 0 verified both and restored the source. Final full-file pytest with `--hypothesis-seed 1794000123`: exit 0, 79 passed. Initial quiet runs used the existing automatic clock seed, not captured; the final run's seed is explicit. `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py'`: exit 0, 1159 tests in 661.436 s, OK; existing ResourceWarnings retained. `uv run --locked ruff check .`: exit 0; `uv run --locked ruff format --check .`: exit 0, 979 files; `uv run --locked mypy`: exit 0, 522 source files; `python3 scripts/check_docs.py`: exit 0, 1318 text files and 147 Markdown files; `python3 scripts/check_tree.py`: exit 0, eight rules; `cmp AGENTS.md CLAUDE.md`: exit 0; `git diff --check`: exit 0. Logs: `.overnight/OUT/`. Git's first commit attempt was refused for missing author configuration; its individual exit was not captured by the initial compound shell (which exited 0 after its final read-only command); the corrected standalone commit with an invented agent identity exited 0. No source refusal, calculation, limit, watch, seed rule, process-group kill, required check name or workflow pin changed. Local Git metadata and bundle stay in the workspace; no push or external fetch. The whole `./eii test`, different-maker review and hosted headroom remain with the lead under PO-S2-P67-01. | OpenAI Codex, GPT-6 (exact backend variant not exposed); senior test-infrastructure engineer; rv1 strict self-review persona, not independent approval. Skills: project-orientation traced consumers; task-standards fixed personas and scope; test-driven-development equivalent proved red then green; receiving-code-review equivalent verified rv1 and swept its class; sharp-edges preserved exact equality and planted each missing entry; spec-to-code-compliance bounded equivalent compared code and historical records; requesting-code-review equivalent supplies the reviewable diff and pending gate; verification-before-completion equivalent records real exits and artifact checks in the return; sanad-provenance ties claims to full hashes and logs; github-flow uses a local task branch and bundle; strict-reviewer checks unchanged controls in self-review; muhasabah-gate distinguishes local evidence from pending independent and hosted results. |
+
+### S2-C2 round 6 — scripts tests reach the custodian fixture under the runner's `-P` (slice S2; 2026-11-23)
+
+- Maker: Anthropic (the lead). Base `9e6c7ff6fc`, the approved round 5.
+- **The fault.** The lead's guard pre-check of train S2-20 round 3 (ruling L-1511) ran `./eii test --seed 1500000017 --suite python-guards`. It exited 1 with 2 collection errors, in `scripts/tests/test_build_public_token_scope.py` and `scripts/tests/test_public_assembly_command.py`: `ModuleNotFoundError: No module named 'custodian'`.
+  - The S2-C2 commit "fix: preserve fetch boundaries and stage tracked command settings" imports `custodian.tests.method_pin_config_fixture` at module level in both files.
+  - The suite runs `python -P`, so the repository root is off `sys.path`. The earlier verifies used `python -m pytest`, which puts the working folder on the path, so they passed.
+  - The lazy imports in `test_cdse_key.py` and `test_commands.py` worked only because `test_requalify.py` inserts the root during collection. Run alone, they failed: 3 failed.
+- **The fix.** A new `scripts/tests/custodian_tests_support.py` puts the root on the path once and re-exports `stage_tracked_configuration`. All four files import it from there. No fixture code is copied.
+- **Red first.** At `9e6c7ff6`, `uv run --locked python -P -s -m pytest -c pyproject.toml --rootdir . -q` on the two files: 2 errors during collection. On `test_cdse_key.py` and `test_commands.py`: 3 failed, 10 passed.
+- **Green.** The same command on the four files: 72 passed, 55 subtests passed, exit 0. `ruff check .` and `ruff format --check .` both exit 0.
+- **Sweep.** No other module-level cross-tree import of a `tests` package exists under `scripts/tests`, `product/tests` or `core/tests` (git grep). Same-tree imports such as `product.tests` inside `product/tests` already pass.
+- **Cause fixed.** The lead's importer-suite verify now runs pytest exactly as `./eii test` does (`python -P -s -m pytest -c pyproject.toml --rootdir .`; ruling L-1546).
+- **Whole guards suite.** `./eii test --seed 2718281829 --suite python-guards`: 1411 passed and 2 failed. Both failures are in `scripts/tests/test_s1_followup.py` (the private-pattern-file cases). They come from the lead's temporary folder, whose last part was the single letter `t`; the test asserts that no part of the temporary path appears in the output. The same file passes 9 of 9 with a temporary folder without single-letter parts, and still fails 2 of 9 with the old one, so the cause is the folder, not this change. The lead's whole test uses its own per-run folder.
+
+## S2-P69 — custodian hang guard and suite job cap
+
+| Date | Commit | Evidence | Maker, personas and skills |
+|---|---|---|---|
+| 2026-11-23 | Code `71f61e9af4`, base `4d39ac7757` (train S2-20 round 3) | Decision 0101 under the owner's relayed words of 2026-11-23 08:22 and ruling L-1559. **Red first:** the new and changed tests in `test_runner_usage.py`, `test_custodian_parts.py` and `test_runner_failures.py`, run before the runner change with `uv run --locked python -P -s -m pytest -q -p no:cacheprovider` on the three files filtered to the limit cases: 11 failed, 15 passed. **Green:** the three whole files after the change: 33 passed, 39 subtests passed, exit 0. **Planted violation:** with the hosted branch of `suite_timeout` disabled, the hosted-limit cases: 3 failed, 4 passed; restored: the plant marker count is 0. **Workflow:** `test_ci_workflows.py` and `test_ci_shards.py` after the cap, pin and plant-text move: 48 passed, 154 subtests passed, exit 0. `ruff check scripts`, `ruff format --check scripts` (210 files) and `mypy` (526 source files) exit 0; `check_docs.py` OK. The importer-suite verify of the changed modules and the lead's whole test of the train follow in the train ledger. | Builder: the lead (Anthropic Opus); persona senior test-infrastructure engineer; strict reviewer persona strict CI and hang-guard reviewer from another maker (OpenAI). Skills: project-orientation, task-standards, test-driven-development, systematic-debugging, verification-before-completion, sanad-provenance, muhasabah-gate. |
+
+- **S2-P69 correction (2026-11-23, review S2-P69.rv1 proposed open item 2; the row above is unchanged).** Full commits: code `71f61e9af4`, records `6eb2a59092`, base `4d39ac7757`. Environment: Linux, Python 3.14.6, `UV_OFFLINE=1`, `TMPDIR=<worktree>/.overnight/tmp/suite-tmp`, provider `none`. **Red first** (exit 1): `uv run --locked python -P -s -m pytest -q -p no:cacheprovider scripts/tests/test_runner_usage.py scripts/tests/test_custodian_parts.py scripts/tests/test_runner_failures.py -k "custodian or hosted or limit"`, 11 failed, 15 passed, 15 deselected. **Green** (exit 0): the same three files without `-k`, 33 passed, 39 subtests passed. **Planted violation** (exit 1): with `suite_timeout`'s hosted branch replaced by `if False`, `-k "selected_limit or hosted_limit or hosted_runner"` on `test_runner_failures.py` and `test_runner_usage.py`, 3 failed, 4 passed; restored, the plant marker count is 0. **Workflow** (exit 0): `scripts/tests/test_ci_workflows.py scripts/tests/test_ci_shards.py`, 48 passed, 154 subtests passed. **Importer-suite verify** (exit 0): `python3 ../../bin/importer_suites.py . 4d39ac7757 71f61e9af4 --run`: ensure_env, pytest, ruff, format, mypy, docs, tree, agents and diffcheck all 0. **Review:** S2-P69.rv1 (OpenAI Codex) APPROVED `6eb2a590`; its records points are applied in this commit: README.md's custodian limit sentence, the docs/README.md decision index, and this correction. The non-blocking duplicate test double is PO-S2-P69-02.
+
+
+## Train S2-20 round 4 records — 2026-11-23
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-23 | S2-C2 verdict | Head `bedd9f212d` (rounds 1 to 4 by OpenAI gpt-6.1-sol via Codex; rounds 5 and 6 by Anthropic Opus 5.5, the lead). Moonshot Kimi K3.1 Pro via Abacus rejected `25d90f30fb` (rv1) and `b74bd37179` (cf1), approved `9e6c7ff6fc` (cf2, no findings) and approved `bedd9f212d` (cf3, no findings). | Lead (Anthropic Opus 5.5) |
+| 2026-11-23 | S2-P67 verdict | Head `92b2312437` (builder OpenAI gpt-6.1-sol via Codex, rounds 1 and 2). Moonshot Kimi K3.1 Pro via Abacus rejected `53f3f29171` (rv1: one stale exact suite list) and approved `92b2312437` (cf1). PO-S2-P67-01 is answered for the whole test by the row below; hosted headroom stays open there. | Lead (Anthropic Opus 5.5) |
+| 2026-11-23 | S2-P69 verdict | Head `6eb2a59092` (builder Anthropic Opus 5.5, the lead; decision 0101). OpenAI gpt-6.1-sol via Codex approved `6eb2a59092` (rv1); its records points are the records move `3c68f4368b` (README.md, docs/README.md, PROGRESS.md, OPEN_ITEMS.md only). | Lead (Anthropic Opus 5.5) |
+| 2026-11-23 | Train join identity | `train/s2-20` round 4 on `2e9fe374df`: joins `cd42797e26` (S2-C2 `9e6c7ff6fc`), `952bf81df8` (S2-P67 `92b2312437`), `4d39ac7757` (S2-C2 round 6 `bedd9f212d`), then S2-P69 `71f61e9af4`, `6eb2a59092`, `3c68f4368b`. The lead's `train_identity.py`: 0 files differ. Moonshot Kimi K3.1 Pro via Abacus rejected the first confirmation only on the lead's brief wording of its check 4 (S2-P67's two matrix legs sit inside the base-to-head diff) and confirmed APPROVED `3c68f4368b` with that check scoped (six comparisons pass; the six required check names unchanged). | Lead (Anthropic Opus 5.5) |
+| 2026-11-23 | Guard pre-check (ruling L-1511) | `./eii test --seed 2961741039 --suite python-guards` on `3c68f4368b`: exit 1, 1,417 passed and 1 failed, `test_interrupt_kills_the_process_group` ("counts unavailable in 30.0 s", no `FAIL interrupted`). Cause found by the S2-P70 review and checked by the lead: this pre-check, like round 3's, was started with `&` from a non-interactive shell, so its pytest inherited SIGINT as ignored and the test could not be interrupted. The whole test below ran the same test after a SIGINT reset and passed it. Both occurrences are appended to OI-227; task S2-P70 makes the test install the default handler itself. | Lead (Anthropic Opus 5.5) |
+| 2026-11-23 | Lead whole test on the joined head | `./eii test --seed 3623534165` on `3c68f4368b` (the joined head; it contains main `37af82e2`, so the squash-merge result has the same tree), started through `tmp/eiitest_bg2.sh` with SIGINT reset to default: exit 0, 17799 passed, 0 failed, 0 skipped in 10 suites (python-guards 1418, python-core 855, custodian-1 1944, custodian-2 2767, custodian-3 2202, custodian-4 3800, custodian-5 3114, product 816, web-checks 882, web-unit 1). No OI-227 occurrence in this run. | Lead (Anthropic Opus 5.5) |

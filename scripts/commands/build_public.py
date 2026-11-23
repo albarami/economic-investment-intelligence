@@ -102,6 +102,9 @@ def run(
     atlas_stream: StreamTransport | None = None,
     benchmark_stream: StreamTransport | None = None,
     large_stream: StreamTransport | None = None,
+    *,
+    pin_generation_config: Mapping[str, object] | None = None,
+    pin_rows: Sequence[Mapping[str, object]] = (),
 ) -> int:
     """Validate the arguments before any input or credential read.
 
@@ -109,6 +112,10 @@ def run(
     ``--seed N --resume``, ``--tenders-only [--resume]``, ``--cdse-backup`` alone or
     ``--gis-imagery-snapshot`` alone;
     anything else is a usage error and opens nothing.
+
+    The plain command loads tracked generation settings. The pin phase collects
+    this run's producer rows; unspecified pack settings keep the phase pending.
+    Explicit inputs remain available to existing callers and tests.
     """
     if tuple(args) == ("--company-web",):
         return run_company_web(
@@ -140,6 +147,15 @@ def run(
             table.write_usage()
             return 2
         seed = int(args[1])
+    pin_auto_supply = False
+    if not tenders_only and pin_generation_config is None and not pin_rows:
+        from eii_custodian.publicdata.method_pin_config import load_generation_config
+
+        try:
+            pin_generation_config = load_generation_config(root)
+            pin_auto_supply = True
+        except ValueError as exc:
+            return exits.finish(1, "build-public", str(exc))
     token = "" if tenders_only else earthdata_token(environ)
     opener = open_https if transport is None else transport
     if transport is None and token:
@@ -298,6 +314,9 @@ def run(
         environ=environ,
         seed=seed,
         resume=resume,
+        pin_generation_config=pin_generation_config,
+        pin_rows=pin_rows,
+        pin_auto_supply=pin_auto_supply,
     )
     for line in outcome.lines:
         print(line)

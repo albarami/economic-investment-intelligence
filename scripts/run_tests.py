@@ -13,12 +13,15 @@ from typing import TextIO
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import ci_environment
 import run_tests_counts as counts
 import run_tests_exec as runner_exec
 
+TEST_FORM = "test [--seed N] [--suite NAME]"
+
 
 class UsageError(Exception):
-    """The command line is not `./eii test` with an optional seed."""
+    """The command line is not `./eii test` with an optional seed and suite."""
 
 
 @dataclass(frozen=True)
@@ -30,6 +33,7 @@ class Suite:
     cwd: str
     args: tuple[str, ...]
     timeout: int
+    hosted_timeout: int | None = None
 
 
 @dataclass(frozen=True)
@@ -45,26 +49,22 @@ class SuiteResult:
 SUITES: tuple[Suite, ...] = (
     Suite("python-guards", "pytest", ".", ("scripts/tests",), 3600),
     Suite("python-core", "pytest", ".", ("core/tests",), 600),
-    Suite(
-        "python-custodian-1",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
-        1200,
-    ),
-    Suite(
-        "python-custodian-2",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "2"),
-        1200,
-    ),
-    Suite(
-        "python-custodian-3",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "3"),
-        1200,
+    *(
+        Suite(
+            f"python-custodian-{part}",
+            "pytest",
+            ".",
+            (
+                "custodian/tests",
+                "-p",
+                "pytest_custodian_part",
+                "--custodian-part",
+                str(part),
+            ),
+            1800,
+            hosted_timeout=2400,
+        )
+        for part in range(1, 6)
     ),
     Suite("python-product", "pytest", ".", ("product/tests",), 600),
     Suite(
@@ -94,31 +94,50 @@ _SEED_DETAIL = "seed must be ten decimal digits from 1000000000 to 4294967295"
 
 
 def suite_timeout(suite: Suite, environ: Mapping[str, str]) -> int:
-    """Use the table limit on every runner (decision 0027 item 4)."""
+    """Select the suite's limit: its hosted limit on a GitHub-hosted runner, if it
+    has one, and its table limit everywhere else (decision 0101)."""
+    if suite.hosted_timeout is not None and ci_environment.is_hosted_runner(environ):
+        return suite.hosted_timeout
     return suite.timeout
 
 
-def parse_arguments(argv: Sequence[str]) -> int | None:
-    """Read an optional seed. Raise UsageError at the first fault."""
+@dataclass(frozen=True)
+class Arguments:
+    """The optional seed and the optional name of the one suite to run."""
+
+    seed: int | None
+    suite: str | None
+
+
+def parse_arguments(argv: Sequence[str], names: Sequence[str] = ()) -> Arguments:
+    """Read an optional seed and suite name. Raise UsageError at the first fault."""
     seed: int | None = None
+    suite: str | None = None
     index = 0
     while index < len(argv):
         word = argv[index]
-        if word != "--seed":
+        if word not in ("--seed", "--suite"):
             raise UsageError(f'unknown flag or argument "{word}"')
-        if seed is not None:
-            raise UsageError("--seed given twice")
+        if (seed if word == "--seed" else suite) is not None:
+            raise UsageError(f"{word} given twice")
         if index + 1 >= len(argv):
-            raise UsageError("--seed needs a value")
+            raise UsageError(f"{word} needs a value")
         value = argv[index + 1]
         index += 2
+        if word == "--suite":
+            if value not in names:
+                raise UsageError(
+                    f'unknown suite "{value}"; known suites: {", ".join(names)}'
+                )
+            suite = value
+            continue
         if len(value) != 10 or not value.isascii() or not value.isdigit():
             raise UsageError(_SEED_DETAIL)
         number = int(value)
         if number < _SEED_MIN or number > _SEED_MAX:
             raise UsageError(_SEED_DETAIL)
         seed = number
-    return seed
+    return Arguments(seed, suite)
 
 
 def run_suite(
@@ -240,11 +259,13 @@ def _main(
     now: Callable[[], float],
 ) -> int:
     try:
-        parsed_seed = parse_arguments(argv)
+        arguments = parse_arguments(argv, [suite.name for suite in suites])
     except UsageError as error:
-        stderr.write(f"eii: usage error: {error}. Usage: ./eii test [--seed N]\n")
+        stderr.write(f"eii: usage error: {error}. Usage: ./eii {TEST_FORM}\n")
         return 2
-    seed = parsed_seed if parsed_seed is not None else int(now())
+    if arguments.suite is not None:
+        suites = [suite for suite in suites if suite.name == arguments.suite]
+    seed = arguments.seed if arguments.seed is not None else int(now())
     stdout.write(f"seed={seed}\n")
     stdout.flush()
     parent = dict(os.environ if environ is None else environ)
@@ -263,7 +284,7 @@ def _main(
             result = _internal(suite.name, error)
         elapsed = now() - started
         results.append(result)
-        _print_suite(stdout, result, elapsed, suite.timeout)
+        _print_suite(stdout, result, elapsed, suite_timeout(suite, parent))
     passed = sum(item.counts.passed for item in results if item.counts is not None)
     failed = sum(item.counts.failed for item in results if item.counts is not None)
     skipped = sum(item.counts.skipped for item in results if item.counts is not None)

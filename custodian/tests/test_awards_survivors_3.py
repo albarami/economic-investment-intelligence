@@ -357,6 +357,7 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
                 key: None,
                 ("SYN registration" if version == 2 else "syn_reg"): "SYN-reg",
                 ("SYN amount" if version == 2 else "syn_value"): "12.50",
+                **({"award_date": "2031-02-03"} if version == 2 else {}),
             }
         ],
     )
@@ -366,7 +367,12 @@ def test_proof_null_and_nonnull_projection(tmp_path, monkeypatch, version):
         def proof(url):
             projected = proof_reader(url)
             assert projected == [
-                {"syn_company": "", "syn_reg": "SYN-reg", "syn_value": "12.50"}
+                {
+                    "syn_company": "",
+                    "syn_reg": "SYN-reg",
+                    "syn_value": "12.50",
+                    **({"award_date": "2031-02-03"} if version == 2 else {}),
+                }
             ]
             seen.append(url)
             return projected

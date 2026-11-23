@@ -291,6 +291,10 @@ def test_browser_agent_and_bounded_normal_seam(monkeypatch):
 
 
 def test_build_public_joined_dispatch(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from commands import build_public
     from eii_custodian.publicdata.fetch.registry import load_registry
 
@@ -384,6 +388,10 @@ def test_build_public_joined_trade_bindings(
     tmp_path, monkeypatch, capsys, source, plant
 ):
     """T18 keeps the real command closure, dispatch and source parsers."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from custodian.tests.test_gravity_atlas_review import CLOCK, modules
 
     from commands import build_public as command
@@ -459,6 +467,10 @@ def test_build_public_joined_trade_bindings(
 
 @pytest.mark.parametrize("plant", ["none", "primary", "query", "secret", "opener"])
 def test_build_public_joined_comtrade(tmp_path, monkeypatch, capsys, plant):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from custodian.tests.fixtures.comtrade.invented import (
         body_for,
         invented_entry,
@@ -535,6 +547,12 @@ def test_build_public_joined_comtrade(tmp_path, monkeypatch, capsys, plant):
 
 def test_build_public_joined_grid_headers(tmp_path, monkeypatch, capsys):
     """The real HTTP opener scopes the token to Earthdata, including terms reads."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+    stage_tracked_configuration(tmp_path / "complete")
+    stage_tracked_configuration(tmp_path / "held")
+
     from types import SimpleNamespace
 
     from commands import build_public as command

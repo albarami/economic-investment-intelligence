@@ -715,6 +715,10 @@ def test_night_hosts_are_allow_listed():
 
 
 def test_night_absent_key_continues_and_omits_the_layer(tmp_path, monkeypatch, capsys):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
 
     seen: list[str] = []
@@ -755,6 +759,10 @@ def test_night_absent_key_build_succeeds(tmp_path, monkeypatch, capsys):
     The assembly stage is bound to its own fetch stage through the existing
     ``Production.fetch_archive`` method, so the run needs no reviewed pins.
     """
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
     from eii_custodian.publicdata.assembly_adapters import Production
 
@@ -790,6 +798,10 @@ def test_night_absent_key_build_succeeds(tmp_path, monkeypatch, capsys):
 
 def test_skipped_month_keeps_its_skip_line_and_one_omit(tmp_path, monkeypatch, capsys):
     """A skipped month still gets its skip line; other months share one omit line."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
 
     seen: list[str] = []
@@ -830,6 +842,10 @@ def test_skipped_month_keeps_its_skip_line_and_one_omit(tmp_path, monkeypatch, c
 
 
 def test_night_present_key_fetches_the_month(tmp_path, monkeypatch, capsys):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
 
     body = night_file(tmp_path / "SYN.h5").read_bytes()

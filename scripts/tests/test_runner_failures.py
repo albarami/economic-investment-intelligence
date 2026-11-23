@@ -204,6 +204,76 @@ class RunnerFailures(unittest.TestCase):
             support.visible(out),
         )
 
+    def test_custodian_part_launches_with_the_selected_limit(self) -> None:
+        part = next(
+            suite for suite in run_tests.SUITES if suite.name == "python-custodian-1"
+        )
+        hosted = {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"}
+        seen: list[int] = []
+
+        def fake_launch(
+            cmd: Sequence[str], cwd: Path, env: Mapping[str, str], timeout: int
+        ) -> run_tests_exec.Launched:
+            seen.append(timeout)
+            return run_tests_exec.Launched(status=None, output="", timed_out=True)
+
+        for environ, limit in ((hosted, 2400), ({}, 1800)):
+            seen.clear()
+            original = run_tests_exec.launch
+            run_tests_exec.launch = fake_launch
+            try:
+                with self.subTest(limit=limit):
+                    status, out, _err = support.call(
+                        ["--seed", support.FIXTURE_SEED],
+                        (part,),
+                        self.root,
+                        {**support.parent_env(), **environ},
+                    )
+                    self.assertEqual(seen, [limit])
+                    self.assertEqual(status, 1, out)
+                    visible = support.visible(out)
+                    self.assertIn(
+                        f"FAIL timeout: python-custodian-1: no result within {limit} s; "
+                        "the process group was killed",
+                        visible,
+                    )
+                    # The share of the limit is printed against the selected limit.
+                    self.assertTrue(
+                        any(f"of {limit} s limit)" in line for line in out), out
+                    )
+            finally:
+                run_tests_exec.launch = original
+
+    def test_hosted_limit_lets_a_slow_suite_finish_and_the_table_limit_kills_it(
+        self,
+    ) -> None:
+        # Planted case of decision 0101: one suite that runs longer than its table
+        # limit and shorter than its hosted limit passes on a hosted runner and is
+        # still killed with FAIL timeout everywhere else.
+        support.put(
+            self.root,
+            "fx/limit/test_limit.py",
+            "import time\n\ndef test_limit():\n    time.sleep(8)\n",
+        )
+        suite = run_tests.Suite(
+            "fx-limit", "pytest", ".", ("fx/limit",), 3, hosted_timeout=90
+        )
+        hosted = {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"}
+        status, out, _err = support.call(
+            ["--seed", support.FIXTURE_SEED],
+            (suite,),
+            self.root,
+            {**support.parent_env(), **hosted},
+        )
+        self.assertEqual(status, 0, out)
+        self.assertIn("RESULT: PASSED", support.visible(out))
+        status, out, _err = self._run((suite,))
+        self.assertEqual(status, 1, out)
+        self.assertIn(
+            "FAIL timeout: fx-limit: no result within 3 s; the process group was killed",
+            support.visible(out),
+        )
+
     def test_unknown_kind_is_one_internal_error_line(self) -> None:
         suite = run_tests.Suite("fx-bogus", "bogus", ".", (), 5)
         status, out, _err = self._run((suite,))

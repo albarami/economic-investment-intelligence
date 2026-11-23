@@ -313,6 +313,10 @@ def test_new_source_cadences():
 
 
 def test_build_public_page_dispatch(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from commands import build_public
     from eii_custodian.publicdata.fetch import page_records
 

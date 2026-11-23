@@ -18,9 +18,11 @@ from typing import Any
 
 from .allowlist import approve, host_of
 from .award_checks import (
+    AWARD_ABSENT,
     AwardError,
     double_space_only,
     match_register,
+    proof_date_marker,
     validate_check_receipt,
 )
 from .award_links import (
@@ -521,18 +523,28 @@ def _proof_reader(
             body = store.save(url, response)
         _obstacle(body)
         rows = parse_body(body, proof_entry, declaration)
+        if version_two and rows == [AWARD_ABSENT]:
+            return [dict(AWARD_ABSENT)]
         if not rows:
             raise AwardError("schema_missing")
         if version_two:
-            return [
-                {
-                    profile[key]: ""
-                    if row[profile["proof_columns"][key]] is None
-                    else str(row[profile["proof_columns"][key]])
-                    for key in ("company", "registration", "value")
+            projected = []
+            for row in rows:
+                if not {"award_date", *profile["proof_columns"].values()} <= row.keys():
+                    raise AwardError("schema_missing")
+                proof = {
+                    **{
+                        profile[key]: ""
+                        if row[profile["proof_columns"][key]] is None
+                        else str(row[profile["proof_columns"][key]])
+                        for key in ("company", "registration", "value")
+                    },
+                    "award_date": str(row["award_date"] or ""),
+                    **proof_date_marker(row),
                 }
-                for row in rows
-            ]
+                proof_date_marker(proof)
+                projected.append(proof)
+            return projected
         return [
             {key: "" if value is None else str(value) for key, value in row.items()}
             for row in rows

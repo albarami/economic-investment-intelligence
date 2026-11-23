@@ -26,11 +26,11 @@ from eii_custodian.publicdata.fetch.receipts import sha256_hex as file_sha256
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 
-from .calibration import gba_calibration
+from .calibration import gba_calibration, landmark_calibration
 from .landmarks import (
-    LANDMARK_HEIGHTS_PATH,
     apply_landmark_heights,
-    load_landmark_heights,
+    landmark_heights_path,
+    load_landmark_record,
     verify_landmark_receipts,
 )
 from .manifest import (
@@ -162,7 +162,9 @@ def build_heights(
     selected = reviewed_selections(cache) if selections is None else selections
     source_chain = verify_building_manifest(cache, entries, selected, buildings_path)
     rules = load_rules(rules_path if rules_path is not None else RULES_PATH)
-    landmarks = load_landmark_heights()
+    landmark_path = landmark_heights_path(cache)
+    landmark_record = load_landmark_record(landmark_path)
+    landmarks = landmark_record.rows
     verify_landmark_receipts(cache, landmarks)
     buildings, landmark_citations = apply_landmark_heights(
         load_buildings(buildings_path), landmarks
@@ -175,7 +177,8 @@ def build_heights(
     counts = height_counts(choices, globfp_matches)
     errors = fallback_errors(candidates)
     heights_body = dump_sorted(rows)
-    landmark_bytes = LANDMARK_HEIGHTS_PATH.read_bytes()
+    landmark_bytes = landmark_record.body
+    landmark_status = landmark_calibration(landmarks, landmark_record.pending)
     input_files: list[dict[str, object]] = [
         {
             "key": "building_table",
@@ -186,7 +189,11 @@ def build_heights(
         },
         {
             "key": "landmark_heights",
-            "path": LANDMARK_HEIGHTS_RELATIVE,
+            "path": (
+                LANDMARK_HEIGHTS_RELATIVE
+                if landmark_path.parent == cache / "review"
+                else "publicdata/review/landmark_heights.yaml"
+            ),
             "role": "read",
             "sha256": file_sha256(landmark_bytes),
         },
@@ -205,7 +212,9 @@ def build_heights(
         input_files,
         terms_attempts=terms_attempts,
         landmark_citations=landmark_citations,
-        gba_calibration=gba_calibration(buildings, results["bldg_gba"]),
+        gba_calibration=dict(
+            gba_calibration(buildings, results["bldg_gba"]), **landmark_status
+        ),
     )
     write_outputs(
         out_dir,

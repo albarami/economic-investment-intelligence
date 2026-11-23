@@ -92,6 +92,8 @@ class RunnerUsage(unittest.TestCase):
             "python-custodian-1",
             "python-custodian-2",
             "python-custodian-3",
+            "python-custodian-4",
+            "python-custodian-5",
             "python-product",
             "web-checks",
             "web-unit",
@@ -109,7 +111,7 @@ class RunnerUsage(unittest.TestCase):
                     "--custodian-part",
                     "1",
                 ),
-                1200,
+                1800,
             ),
             (
                 "python-custodian-2",
@@ -120,7 +122,7 @@ class RunnerUsage(unittest.TestCase):
                     "--custodian-part",
                     "2",
                 ),
-                1200,
+                1800,
             ),
             (
                 "python-custodian-3",
@@ -131,7 +133,29 @@ class RunnerUsage(unittest.TestCase):
                     "--custodian-part",
                     "3",
                 ),
-                1200,
+                1800,
+            ),
+            (
+                "python-custodian-4",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "4",
+                ),
+                1800,
+            ),
+            (
+                "python-custodian-5",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "5",
+                ),
+                1800,
             ),
             ("python-product", ("product/tests",), 600),
         )
@@ -174,27 +198,40 @@ class RunnerUsage(unittest.TestCase):
                             self.assertEqual(
                                 run_tests.suite_timeout(suite, os.environ), expected
                             )
-                        else:
+                        elif not suite.name.startswith("python-custodian-"):
+                            # The custodian parts have their own hosted limit
+                            # (decision 0101), tested below.
                             self.assertEqual(
                                 run_tests.suite_timeout(suite, os.environ),
                                 suite.timeout,
                             )
 
-    def test_custodian_limit_is_one_value_on_every_runner(self) -> None:
+    def test_custodian_limit_on_a_hosted_runner(self) -> None:
+        # Decision 0101: 2,400 s on a GitHub-hosted runner, 1,800 s everywhere
+        # else; only both hosted variables with their exact values select it.
         parts = [
             suite
             for suite in run_tests.SUITES
             if suite.name.startswith("python-custodian-")
         ]
-        for environ in (
-            {},
-            {"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"},
-        ):
+        self.assertEqual(len(parts), 5)
+        rows: tuple[tuple[dict[str, str], int], ...] = (
+            ({}, 1800),
+            ({"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"}, 2400),
+            ({"GITHUB_ACTIONS": "true"}, 1800),
+            ({"RUNNER_ENVIRONMENT": "github-hosted"}, 1800),
+            ({"GITHUB_ACTIONS": "false", "RUNNER_ENVIRONMENT": "github-hosted"}, 1800),
+            ({"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "self-hosted"}, 1800),
+        )
+        for environ, expected in rows:
             with self.subTest(environ=environ):
                 self.assertEqual(
                     tuple(run_tests.suite_timeout(suite, environ) for suite in parts),
-                    (1200, 1200, 1200),
+                    (expected,) * 5,
                 )
+        others = [suite for suite in run_tests.SUITES if suite not in parts]
+        self.assertTrue(all(suite.hosted_timeout is None for suite in others))
+        self.assertTrue(all(suite.hosted_timeout == 2400 for suite in parts))
 
     def test_each_suite_prints_its_own_duration(self) -> None:
         first = run_tests.SuiteResult("first", counts.Counts(2, 0, 1, (), True), (), ())
@@ -306,5 +343,7 @@ class RunnerUsage(unittest.TestCase):
                 self.assertEqual(out, [])
                 self.assertEqual(
                     err,
-                    [f"eii: usage error: {detail}. Usage: ./eii test [--seed N]"],
+                    [
+                        f"eii: usage error: {detail}. Usage: ./eii test [--seed N] [--suite NAME]"
+                    ],
                 )

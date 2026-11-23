@@ -257,6 +257,11 @@ def test_gravity_hosts_credentials_and_query(monkeypatch) -> None:
 
 
 def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path / "cmd")
+    stage_tracked_configuration(tmp_path / "cmd-ok")
+
     from dataclasses import replace
 
     from custodian.tests.fixtures.gravity.invented import configuration
@@ -327,6 +332,10 @@ def test_gravity_entry_and_command(tmp_path: Path, monkeypatch, capsys) -> None:
 
 
 def test_gravity_production_binding_is_separate(tmp_path: Path, monkeypatch) -> None:
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from custodian.tests.fixtures.gravity.invented import configuration
 
     import commands.build_public as build_public

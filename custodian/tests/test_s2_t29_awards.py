@@ -265,6 +265,10 @@ def test_workbook_profile_and_sparse_blanks(tmp_path):
 
 
 def test_awards_normal_command_intake(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import json
 
     from commands import build_public

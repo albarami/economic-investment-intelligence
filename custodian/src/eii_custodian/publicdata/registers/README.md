@@ -120,3 +120,27 @@ network denial and atomic publication failure. `validate_release` enforces the
 register schemas and scans other tables; their full schemas stay with their own
 builders. No independent review, actual register read, real geocoding check,
 retention proof, full application release or store load is claimed here.
+
+## Assembly handoff
+
+The release assembly never reads a register file, its siblings or either
+environment setting. The lead alone runs this package's build under the sibling
+intake protocol, then stages the published `current/` output — `manifest.json`
+and `tables/` — as `register_bundle/` inside the allowed assembly cache and
+writes `register_bundle_pin.json` beside it holding the manifest's byte hash.
+The `register_tables` phase re-verifies the pin, the manifest's closed key set
+and bindings, every receipt's digest, metadata, files and period rules, the
+declared table byte hashes and row counts, the frame's ownership hash against
+the run's own `grid_cell` set, and the released rows through `validate_release`,
+refusing by name at the first mismatch. A bundle path that is not a real
+directory — a symlinked `register_bundle/` or `tables/` — is refused as
+missing, so every byte read stays inside the allowed cache. Only the bundle's
+released rows, file digests and receipt lineage are bound: current receipts
+credit both registry keys, historical receipts stay per-period in the phase
+record, and a missing kept month stays `snapshot_not_kept`.
+
+Trust root: the receipt list is bound to the released tables only through the
+lead's manifest pin. Raw register files are never retained in the cache, so the
+reader cannot re-derive a receipt from file bytes; a stale receipt list
+repacked under a fresh pin passes all checks. Reviewing and pinning the
+manifest is therefore the sole control over the receipt-to-table binding.

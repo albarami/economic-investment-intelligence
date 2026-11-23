@@ -50,15 +50,26 @@ def nodeids(proc: subprocess.CompletedProcess[str]) -> list[str]:
     ]
 
 
+def assert_modules_collected(whole: Sequence[str], modules: Sequence[str]) -> None:
+    """Refuse a file missing even from the unsplit collection."""
+    if {node.split("::", 1)[0] for node in whole} != set(modules):
+        raise AssertionError("custodian collection differs from test files")
+
+
 def assert_partition(whole: Sequence[str], parts: Sequence[Sequence[str]]) -> None:
-    """Prove no test id is lost, duplicated, or assigned to an empty part."""
-    if len(parts) != 3 or any(not part for part in parts):
-        raise AssertionError("all three custodian parts must be nonempty")
+    """Prove exact test coverage and whole-module ownership in nonempty parts."""
+    if len(parts) != 5 or any(not part for part in parts):
+        raise AssertionError("all five custodian parts must be nonempty")
     seen: set[str] = set()
+    modules: set[str] = set()
     for part in parts:
         selected = set(part)
         if seen & selected:
             raise AssertionError("custodian parts overlap")
+        selected_modules = {node.split("::", 1)[0] for node in selected}
+        if modules & selected_modules:
+            raise AssertionError("custodian module belongs to multiple parts")
+        modules.update(selected_modules)
         seen.update(selected)
     if seen != set(whole):
         raise AssertionError("custodian parts do not cover the whole collection")

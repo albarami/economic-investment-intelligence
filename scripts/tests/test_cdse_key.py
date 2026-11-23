@@ -80,6 +80,10 @@ class CdseWiring(unittest.TestCase):
                 self.assertEqual(list(Path(folder).iterdir()), [])
 
     def test_default_never_selects_backup(self) -> None:
+        from custodian_tests_support import (
+            stage_tracked_configuration,
+        )
+
         entries = load_registry()
         self.assertTrue(any(e.source_id == "satellite_cdse_backup" for e in entries))
         with (
@@ -87,6 +91,7 @@ class CdseWiring(unittest.TestCase):
             patch.object(command, "run_build") as build,
             contextlib.redirect_stdout(io.StringIO()),
         ):
+            stage_tracked_configuration(Path(folder))
             build.return_value.lines = ()
             build.return_value.failure = None
             command.run(
@@ -107,6 +112,10 @@ class CdseWiring(unittest.TestCase):
         def offline(url: str) -> Response:
             return Response(url, b"", ())
 
+        from custodian_tests_support import (
+            stage_tracked_configuration,
+        )
+
         with (
             tempfile.TemporaryDirectory() as folder,
             patch.dict(os.environ, {}, clear=True),
@@ -121,7 +130,8 @@ class CdseWiring(unittest.TestCase):
             contextlib.redirect_stdout(io.StringIO()),
         ):
             root = Path(folder)
-            self.assertEqual(list(root.iterdir()), [])
+            stage_tracked_configuration(root)
+            before = sorted(path.relative_to(root) for path in root.rglob("*"))
             self.assertEqual(command.run(root, {}, (), transport=offline), 0)
             reader.assert_not_called()
             build.assert_called_once()
@@ -131,7 +141,9 @@ class CdseWiring(unittest.TestCase):
                 any(e.source_id == "satellite_cdse_backup" for e in selected)
             )
             self.assertIs(build.call_args.args[1], offline)
-            self.assertEqual(list(root.iterdir()), [])
+            self.assertEqual(
+                sorted(path.relative_to(root) for path in root.rglob("*")), before
+            )
 
     def test_unknown_extra_flags_refused_before_reader(self) -> None:
         with (

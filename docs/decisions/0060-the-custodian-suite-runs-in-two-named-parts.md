@@ -10,6 +10,8 @@
 | Purpose | Keep every custodian test running once, under its unchanged 600-second suite limit, on the slower hosted runner. |
 | Read first | AGENTS.md rules 12, 36, 37 and 39; [decision 0027](0027-hosted-web-checks-time-limit.md); TASKS.md S2-T34 |
 
+The original split and limit below are historical: [decision 0086](0086-custodian-part-limit-and-watch.md) supersedes them, and proposed [decision 0097](0097-custodian-shard-headroom.md) records the current headroom split under ruling L-1517 item 2.
+
 ## Context
 
 The hosted `tests` check of pull request 87 failed with `python-custodian: no result within 600 s; the process group
