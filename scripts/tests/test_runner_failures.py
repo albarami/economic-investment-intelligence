@@ -377,12 +377,21 @@ class RunnerFailures(unittest.TestCase):
             target=self._interrupt_when_ready,
             args=(pid_path, started, suite.timeout, finished, child_started),
         )
-        worker.start()
+        previous = signal.signal(signal.SIGINT, signal.default_int_handler)
         try:
-            status, out, _err = self._run((suite,))
+            worker.start()
+            try:
+                status, out, _err = self._run((suite,))
+            finally:
+                finished.set()
+                worker.join(timeout=5)
+        except KeyboardInterrupt:
+            self.fail(
+                "SIGINT reached the test after the runner returned; "
+                f"child-start seconds={child_started}; suite limit={suite.timeout} s"
+            )
         finally:
-            finished.set()
-            worker.join(timeout=5)
+            signal.signal(signal.SIGINT, previous)
         self.assertEqual(status, 1, out)
         self.assertIn(
             "FAIL interrupted",
