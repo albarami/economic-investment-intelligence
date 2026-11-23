@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Status | Proposed; drafted under package S2-D0102 for the owner or lead's acceptance |
+| Status | Accepted by the owner, 2026-11-23 13:48 ("Yes on both", relayed by the advisor; extract owner-relayed-20261123-1348); this record's text is reviewed by another maker before merge |
 | Date | 2026-11-23 |
-| Scope | AGENTS.md and CLAUDE.md rule 44; [TASKS.md](../../TASKS.md) S2-T49 and S2-T08; `.overnight/IN/S2-PATH.md` rows 25 and 91 to 93; `custodian/src/eii_custodian/publicdata/registers/README.md` **Sibling intake protocol**, **Verification boundary** and **Assembly handoff** |
+| Scope | AGENTS.md and CLAUDE.md rule 44; [TASKS.md](../../TASKS.md) S2-T49 and S2-T08; the S2 path boxes S2-T49#1 to #3 and S2-T08#14 of decision 0098; `custodian/src/eii_custodian/publicdata/registers/README.md` **Sibling intake protocol**, **Verification boundary** and **Assembly handoff** |
 | Amends | AGENTS.md and CLAUDE.md rule 44 and their Status row |
 | Purpose | Admit the existing register projection command to rule 44 so the lead may run it; it is permission to run an existing tool, not a new check and not a new data source |
 | Read first | [decision 0022](0022-real-register-companies-with-a-synthetic-world.md) item 1; [decision 0033](0033-the-part-a-defaults-of-the-register-and-employment-world.md) item 1; [decision 0074](0074-company-level-fields-of-the-owners-company-workbook.md) items 1 and 6; [decision 0098](0098-s2-sources-follow-their-first-field-reader.md) item 5; AGENTS.md rules 3, 11, 13, 14 and 44 |
@@ -12,8 +12,8 @@
 ## Context and evidence
 
 Four S2 path boxes are BLOCKED because the existing register projection tool is
-not a rule-44 command: S2-T49#1 to #3 and S2-T08#14 (`.overnight/IN/S2-PATH.md`,
-rows 25 and 91 to 93). The tool is the package
+not a rule-44 command: S2-T49#1 to #3 and S2-T08#14 (the S2 path boxes of
+decision 0098). The tool is the package
 `custodian/src/eii_custodian/publicdata/registers/`, an offline lead-operated
 adapter for [decision 0022](0022-real-register-companies-with-a-synthetic-world.md)
 item 1 whose automated tests use invented stand-in bytes only. The S2-P64
@@ -93,8 +93,8 @@ the staged bundle the already-merged phase verifies.
    the run and is never worked around.
 
 7. **Boxes.** This record and its rule-44 amendment clear the records
-   precondition of `.overnight/IN/S2-PATH.md` rows 25 (S2-T08#14) and 91 to 93
-   (S2-T49#1 to #3). Those boxes then need the lead's actual run, the staged
+   precondition of the S2 path boxes S2-T08#14 and S2-T49#1 to
+   #3. Those boxes then need the lead's actual run, the staged
    and phase-verified bundle, the registry rows and the normal review and gate
    evidence; they stay unproven until each has its own. Everything else stays
    open: S2-T49's remaining real-file evidence, the S2-P64 different-maker
@@ -117,7 +117,7 @@ or outputs requires a new decision under rule 46.
 - `custodian/src/eii_custodian/publicdata/registers/README.md` (**Sibling
   intake protocol**, **Verification boundary**, **Assembly handoff**) and the
   package's `__main__.py` argument list.
-- `.overnight/IN/S2-PATH.md`, rows 25 and 91 to 93 (the blocked boxes).
+- The S2 path boxes S2-T08#14 and S2-T49#1 to #3 (the blocked boxes).
 - [TASKS.md](../../TASKS.md), task S2-T49 (goal, scope and delivery status).
 - [decision 0022](0022-real-register-companies-with-a-synthetic-world.md) item 1
   (the two environment settings and the lead's own shell);

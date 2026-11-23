@@ -53171,3 +53171,13 @@ Edge classes: inherited ignored SIGINT (real red 1 / green 0); incoming handler 
 | Date | Task / base | Change and evidence | Maker / personas |
 |---|---|---|---|
 | 2026-11-23 | S2-D0102; base `65f7b77c` (train S2-21 squash head) | Documents only. Drafts [decision 0102](docs/decisions/0102-register-projection-run-in-rule-44.md) (Status Proposed) admitting `uv run --locked python -m eii_custodian.publicdata.registers --frame-cells FRAME_CELLS_JSON --frame-sha256 FRAME_SHA256 --biz-index-sha256 BIZ_INDEX_SHA256 --fc-index-sha256 FC_INDEX_SHA256 --output OUTPUT_DIR --release-kind RELEASE_KIND` under `EII_REGISTER_FILE`/`EII_FC_REGISTER_FILE` to rule 44, lead's own shell only, per the registers README's sibling intake protocol and assembly handoff; unblocks the records precondition of S2-PATH rows 25 and 91 to 93 (S2-T08#14, S2-T49#1–#3) without running the tool or ticking a box. Same change appends the command with its lead-shell-only note to rule 44 and "; amended by decision 0102 on 2026-11-23" to the Status row of CLAUDE.md and AGENTS.md (byte-identical, `cmp` exit 0); OPEN_ITEMS.md gains one UPDATE line under the S2-P64 S2-T49 NEEDED item; no existing row changed. Checks: `python3 scripts/check_docs.py` exit 0 (1331 text files, 150 Markdown); `cmp AGENTS.md CLAUDE.md` exit 0; `git diff --check` exit 0. Environment: Linux, Python 3.14.4, no network, no `data/` or `.private/` read, no real value, path or organisation name written. No acceptance, run, review or gate is claimed. | Devin (Cognition), SWE-2 High; senior data-governance architect; strict self-review: privacy reviewer of rules 3, 11, 12, 13, 14 |
+
+## S2 records change — owner acceptance of decisions 0091, 0095 and 0102; OI-359 disposition — 2026-11-23
+
+- Lead edit on top of S2-D0102 (Cognition Devin draft, lead commit `05de204c5e`):
+  - The Status rows of decisions 0091, 0095 and 0102 now read Accepted by the owner, 2026-11-23 13:48 (lead ruling L-1580). The acceptance review by another maker (OpenAI) found 0091 and 0095 acceptable with no defect.
+  - Decision 0102 now cites the S2 path boxes by name instead of a run-folder file.
+  - The decision index (docs/README.md) shows the three statuses and the new 0102 row.
+  - OPEN_ITEMS.md records the OI-359 access-path disposition (lead ruling L-1581); the item stays open for the live export evidence.
+- No code, test or check changed. Commands: `python3 scripts/check_docs.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check`, each with its exit recorded in the commit's ledger line below.
+- Exits on the lead edit: check_docs 0 (1331 text files, 150 Markdown files), cmp 0, git diff --check 0.
