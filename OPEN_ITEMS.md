@@ -4202,6 +4202,8 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 
 - P05 DISPOSITION — 2026-11-20: LEFT OPEN (S2-T07). The committed `activity_spine.csv` still holds an `unreviewed` food-service row, and OI-16/OI-203 still require a human signer and reviewed input binding, after OI-172's basket confirmation. A class replay cannot claim that binding from an unsigned row or a prefix. No class test or skipped skeleton is added, no review is fabricated, and no red/green or acceptance-box closure is claimed. The lead's signed-spine replay remains owed.
 
+- U10 UPDATE — 2026-11-23: test built, real replay owed after the signed spine. The class-membership seam `class_members` (`eii_custodian.publicdata.review.activity`) admits only mapped rows with an admitted signature and refuses an unknown class, a class with no admitted mapped code, and an unsigned mapped row, each with a fixed reason; the data test `test_pinned_c2_isic_5610` builds the spine from the committed review files exactly as the S2-T04 triage does and asserts 2,510 / 7,878 = 0.32 through `eii_core.calc`. While the spine stays unsigned the test fails with the refusal reason and never skips. This item stays OPEN until the lead's real-cache replay on the signed spine.
+
 ### PO-S2-53 — One check value is divided under the caller's decimal context
 
 - ID: PO-S2-53

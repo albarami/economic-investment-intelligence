@@ -23,6 +23,8 @@ from eii_core.calc.public_methods import (
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
 from eii_custodian.publicdata.fetch.page_workbook import read_sheet
+from eii_custodian.publicdata.fetch.registry import load_registry, parse_yaml
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.census import (
     C8_SOURCES,
     c8_national_counts,
@@ -37,6 +39,14 @@ from eii_custodian.publicdata.frame.crosswalk import (
 )
 from eii_custodian.publicdata.frame.layers import COUNTS, layer_rows
 from eii_custodian.publicdata.frame.population import population_rows
+from eii_custodian.publicdata.review.activity import (
+    SpineError,
+    basket_membership,
+    class_members,
+    load_activity_inputs,
+    read_activity_rows,
+    spine_path,
+)
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
 _CACHE_NAME = "eii_data_tests_cache"
@@ -627,6 +637,58 @@ def test_pinned_c2_municipal_restaurants(
         assert (fact.geography, fact.geography_kind) == (geography, "public")
     for fact in (result["undated_count"], result["bulk_share_percent"]):
         assert (fact.geography, fact.geography_kind) == ("national", "national")
+
+
+def c2_class_members(isic_class: str) -> tuple[str, ...]:
+    """Build the spine from the committed review files and take one class.
+
+    The spine is built exactly as the S2-T04 triage builds it: the reviewed
+    cached feeds, the committed review file with its binding and audits, and
+    the basket membership of the committed baskets document.
+    """
+    cache = _cache.CACHE
+    entries = load_registry()
+    selected = reviewed_selections(cache)
+    activities, _, _ = read_activity_rows(cache, entries, selected)
+    playbook, suppliers = basket_membership(
+        parse_yaml(spine_path().with_name("baskets.yaml").read_bytes()), activities
+    )
+    inputs = load_activity_inputs(
+        cache, playbook, supplier_membership=suppliers, selections=selected
+    )
+    return class_members(inputs.spine, inputs.classes, isic_class)
+
+
+def test_pinned_c2_isic_5610():
+    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
+    active_rows, active_chain = pinned("lic_active")
+    try:
+        members = set(c2_class_members("5610"))
+    except SpineError as error:
+        pytest.fail("C2 ISIC 5610 membership refused: " + error.detail)
+    class_cancelled = [
+        row for row in cancelled_rows if row["rmz_lnsht_ltjry"] in members
+    ]
+    counts, _, _, _ = c2_national_totals(class_cancelled, cancelled_chain)
+    window = tuple(
+        f"{year}-{month:02}" for year in (2022, 2023, 2024) for month in range(1, 13)
+    )
+    cancellations = sum((counts[period] for period in window if period in counts), D(0))
+    cancellations_fact = reading(
+        cancellations, "count", "2022-01/2024-12", cancelled_chain
+    )
+    stock = sum(
+        (
+            D(str(row["dd_lrkhs_lnsht"]))
+            for row in active_rows
+            if row["rmz_lnsht_ltjry"] in members
+        ),
+        D(0),
+    )
+    stock_fact = reading(stock, "count", "2025-05", active_chain)
+    assert cancellations_fact.value == D(2510)
+    assert stock_fact.value == D(7878)
+    assert rounded(ratio(cancellations_fact.value, stock_fact.value), 2) == "0.32"
 
 
 def test_pinned_c5_heading_checks_only():

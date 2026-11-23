@@ -648,6 +648,33 @@ def finalise_spine(spine: Spine) -> Spine:
     return spine
 
 
+def class_members(
+    spine: Spine, isic_classes: Sequence[IsicClass], isic_class: str
+) -> tuple[str, ...]:
+    """Return the codes whose reviewed decision is ``mapped`` to one class.
+
+    A member is a mapped row of the class with an admitted signature: the
+    spine build has already refused unsigned mapped rows and any model-signed
+    row without a bound, zero-error audited batch, so a recorded reviewer role
+    is the admission; those checks are never repeated here. A class with no
+    admitted row is a refusal, never an empty answer.
+    """
+    if not isinstance(isic_class, str) or isic_class not in {
+        row.code for row in isic_classes
+    }:
+        raise SpineError("class is not in the classification: " + str(isic_class))
+    members: list[str] = []
+    for row in spine.rows:
+        if row.status != "mapped" or row.isic_class != isic_class:
+            continue
+        if row.reviewed_by_role.strip() == "":
+            raise SpineError("mapped row has no admitted signature: " + row.code)
+        members.append(row.code)
+    if not members:
+        raise SpineError("class has no admitted mapped code: " + isic_class)
+    return tuple(sorted(members))
+
+
 def class_bucket_counts(
     activities: Sequence[ActivityRow], isic_classes: Sequence[IsicClass]
 ) -> ClassBucketCounts:
