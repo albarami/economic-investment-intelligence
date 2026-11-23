@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Draft written by task S0-T13 on 2026-11-12; pages P21 to P24, statements S39 to S44 and runs R9 and R10 added by task S3-T27 on 2026-11-19; every row is as true as the page or run it names, on the date it names |
+| Status | Draft written by task S0-T13 on 2026-11-12; pages P21 to P24, statements S39 to S44 and runs R9 and R10 added by task S3-T27 on 2026-11-19; the parse5 and css-tree section added by task S3-T09-i42 on 2026-11-23; every row is as true as the page or run it names, on the date it names |
 | Date | 2026-11-23 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
-| Purpose | Record the official pages read and the idioms that changed from earlier major versions for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), and the two confirmations of DES-25 and DES-45 recorded in the section "Confirmations assigned to this task". |
+| Purpose | Record the official pages read and the idioms that changed from earlier major versions for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), the two confirmations of DES-25 and DES-45 recorded in the section "Confirmations assigned to this task", and the documentation and pins of the parse5 and css-tree packages adopted by the local-font check. |
 | Read first | [docs/10_FRONTEND.md](../docs/10_FRONTEND.md) section 2, [the notes for DuckDB, PostgreSQL and the Claude API](../docs/REFERENCE_NOTES.md) |
 
 ## How to read these notes
@@ -303,6 +303,48 @@ Same setup and folders as the Runs table of the MapLibre section.
 | exact pin and the retreat that replaces the module | not yet confirmed | @deck.gl/maplibre, @deck.gl/mapbox | docs/10_FRONTEND.md section "Stack and pins"; TASKS.md S1-T12 |
 | interleaved mode with the pinned MapLibre on WebGL2 | confirmed: one MapLibreOverlay of deck.gl 9.4.1 interleaved with MapLibre 6.17.0 on WebGL2; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md FE-04 |
 | layers under labels through beforeId | confirmed: the overlay layer inserted before the first label; insertion before style load appeared after first idle; PROGRESS.md heading "S1-T01 — Arabic glyph and label-order spike: task log" | - | docs/10_FRONTEND.md section "Map layers" |
+
+## parse5 8 and css-tree 3
+
+Used here by the local-font check of `check:hosts:dist`, which reads the built HTML and CSS under browser parsing semantics (TASKS.md S3-T09); the exact pins are the devDependency versions `parse5` 8.1.1 and `css-tree` 3.2.1 of `web/package.json`, tooling pins rather than rows of pins.toml.
+
+### Pages read
+
+| Id | Address | Page title | Date read |
+|---|---|---|---|
+| P1 | https://github.com/inikulin/parse5/blob/master/README.md | README.md - parse5; repository file, read as the installed copy of the pinned package | 2026-11-23 |
+| P2 | https://github.com/csstree/csstree/blob/master/README.md | README.md - css-tree; repository file, read as the installed copy of the pinned package | 2026-11-23 |
+
+### Idioms that changed
+
+| Id | Earlier form | Current form | Kind | Source | Quote |
+|---|---|---|---|---|---|
+| I1 | Hand-written tag and attribute scanning of the built HTML | Document walk of the parse5 parse tree, attribute values decoded | OBSERVED | R1 | - |
+| I2 | Hand-written tokenising of the built CSS | css-tree AST walk, Raw nodes re-read by the old tokenizer | OBSERVED | R2 | - |
+
+### Statements
+
+| Id | Statement | Kind | Source | Quote |
+|---|---|---|---|---|
+| S1 | parse5 parses HTML into a document tree, so the check sees attribute character references decoded and script and comment text stays inert. | READ | P1 | "Parse HTML into a document tree and serialize it back to HTML" |
+| S2 | css-tree recovers from malformed CSS by wrapping the content it cannot structure in a Raw node instead of discarding it, which is why the check re-reads Raw nodes. | READ | P2 | "it doesn't throw away bad content, but wraps it in a special node type" |
+| S3 | The parse5 8.1.1 parser options include sourceCodeLocationInfo, which the check uses for diagnostic offsets. | OBSERVED | R1 | - |
+| S4 | css-tree 3.2.1 keeps an escape-spelled url( such as u\72l( as a Function node, not a Url node. | OBSERVED | R2 | - |
+
+### Runs
+
+Setup: run inside `web/` against the installed packages; no network.
+
+| Id | Package and version | Date | Command | Output |
+|---|---|---|---|---|
+| R1 | parse5 8.1.1 | 2026-11-23 | `grep -n sourceCodeLocationInfo node_modules/parse5/dist/parser/index.d.ts` | `55:    sourceCodeLocationInfo?: boolean;` |
+| R2 | css-tree 3.2.1 | 2026-11-23 | `node -e` walking `@font-face{src:u\72l(x)} @media a{b:c}` | `StyleSheet,Atrule,Block,Declaration,Value,Function,Identifier,AtrulePrelude,MediaQueryList,MediaQuery,Raw` |
+
+### Slice S1 confirmation
+
+| Field | Value | Rows in pins.toml | Pack source |
+|---|---|---|---|
+| exact pins of the two parser packages of the local-font check | not yet confirmed | - | TASKS.md S3-T09 |
 
 ## Confirmations assigned to this task
 

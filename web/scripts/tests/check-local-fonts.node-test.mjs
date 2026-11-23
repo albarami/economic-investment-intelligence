@@ -670,6 +670,249 @@ test('an unwalkable directory inside dist fails as an internal error', () => {
   assert.match(result.stdout, /^FAIL internal-error: EACCES: /);
 });
 
+// CF1B — real parsers: the HTML is tokenized by parse5 (character references
+// decoded, raw-text rules for script and style) and the CSS by css-tree (input
+// preprocessing, so a CRLF terminates a hex escape as one whitespace).
+
+test('a character reference in rel still names a font preload', () => {
+  const html =
+    '<!doctype html><link rel="pre&#108;oad" as="font" ' +
+    'href="data:font/woff2;base64,AA" crossorigin>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-embedded: dist/index.html:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('a character reference in as still names a font preload', () => {
+  const html =
+    '<!doctype html><link rel="preload" as="fo&#110;t" ' +
+    'href="data:font/woff2;base64,AA" crossorigin>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-embedded: dist/index.html:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('a character reference in href still names an embedded font', () => {
+  const html =
+    '<!doctype html><link rel="preload" as="font" ' +
+    'href="&#100;ata:font/woff2;base64,AA">';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-embedded: dist/index.html:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('a script spelling inside a quoted attribute stays inert', () => {
+  const html =
+    '<!doctype html><meta name=probe content="<script>"><style>' +
+    '@font-face{font-family:Review;src:url(data:font/woff2;base64,AA)}' +
+    '</style>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-url-embedded: dist/index.html:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('a </style prefix inside style text does not end the block', () => {
+  const html =
+    '<!doctype html><style>/* </stylesheet> */' +
+    '@font-face{font-family:Review;src:url(data:font/woff2;base64,AA)}' +
+    '</style>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-url-embedded: dist/index.html:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('parseFontCss applies CSS input preprocessing itself', async () => {
+  const { parseFontCss } = await import('../font-css.mjs');
+  const parsed = parseFontCss(
+    '@\\46\r\nONT-FACE{src:url(data:font/woff2;base64,AA)}',
+  );
+  assert.equal(parsed.faces.length, 1, JSON.stringify(parsed));
+  assert.equal(parsed.faces[0].urls[0].value, 'data:font/woff2;base64,AA');
+});
+
+test('a CRLF-terminated escape still spells font-face', () => {
+  const css =
+    '@\\46\r\nONT-FACE{font-family:Review;' +
+    'src:url(data:font/woff2;base64,AA)}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  // The CRLF is one newline, so the data URL sits on line 2.
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-url-embedded: dist/assets/a.css:2: data:font/woff2;base64,AA',
+  );
+});
+
+test('an external base puts a relative font preload outside the origin', () => {
+  const html =
+    '<!doctype html><base href="https://fonts.invalid/assets/">' +
+    '<link rel="preload" as="font" href="review.woff2" crossorigin>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-external: dist/index.html:1: review.woff2',
+  );
+});
+
+test('a base directory rebases relative font references', () => {
+  const html =
+    '<!doctype html><base href="/other/">' +
+    '<link rel="preload" as="font" href="review.woff2" crossorigin>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-missing: dist/index.html:1: review.woff2',
+  );
+});
+
+test('an escape-spelled url in src is still a font reference', () => {
+  const css =
+    '@font-face{font-family:Review;src:u\\72l(data:font/woff2;base64,AA)}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-url-embedded: dist/assets/a.css:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('an escape-spelled url function with a plain argument is a font url', () => {
+  const css =
+    '@font-face{font-family:Review;src:u\\72l(data:font/woff2;base64,AA)}' +
+    '@font-face{font-family:Review2;src:u\\72l(review-hidden.woff2)}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  const result = run(['--root', makeDist(css), '--dist']);
+  assert.equal(result.status, 1, result.stdout);
+  for (const line of [
+    'FAIL font-url-embedded: dist/assets/a.css:1: data:font/woff2;base64,AA',
+    'FAIL font-file-missing: dist/assets/a.css:1: review-hidden.woff2',
+  ]) {
+    assert.ok(
+      result.stdout.split('\n').includes(line),
+      `${line}\n${result.stdout}`,
+    );
+  }
+});
+
+test('an escape-spelled url in an import prelude is still a font import', () => {
+  const css =
+    '@import u\\72l(data:font/woff2;base64,AA);' + FACE_LATIN + FACE_ARABIC;
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-import-external: dist/assets/a.css:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('an escape-spelled src property still names the declaration', () => {
+  const css =
+    '@font-face{font-family:Review;sr\\63:url(data:font/woff2;base64,AA)}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-url-embedded: dist/assets/a.css:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('an escape-spelled family identifier still delivers the family', () => {
+  const css =
+    '@font-face{font-family:\\49 BM Plex Sans;src:url(latin.woff2)}' +
+    FACE_ARABIC;
+  const home = makeDist(css);
+  fs.writeFileSync(path.join(home, 'dist/assets/latin.woff2'), 'invented');
+  assertPass(run(['--root', home, '--dist']));
+});
+
+test('an escape-spelled url function with a clean argument is a font url', () => {
+  const css =
+    '@font-face{font-family:Review;src:u\\72l(hidden)}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-file-missing: dist/assets/a.css:1: hidden',
+  );
+});
+
+test('an at-rule inside raw selector text is still read', () => {
+  const css =
+    '.probe[data-x=@font-face{src:url(data:font/woff2;base64,AA)}]{color:red}' +
+    FACE_LATIN +
+    FACE_ARABIC;
+  assertFail(
+    run(['--root', makeDist(css), '--dist']),
+    'FAIL font-url-embedded: dist/assets/a.css:1: data:font/woff2;base64,AA',
+  );
+});
+
+test('every character-reference spelling of preload and font refuses', () => {
+  const data = 'data:font/woff2;base64,AA';
+  const entities = (word) =>
+    [...word].flatMap((character, index) => {
+      const code = character.codePointAt(0);
+      return [
+        `${word.slice(0, index)}&#${code};${word.slice(index + 1)}`,
+        `${word.slice(0, index)}&#x${code.toString(16)};${word.slice(index + 1)}`,
+      ];
+    });
+  const cases = [
+    ...entities('preload').map(
+      (rel) => `<link rel="${rel}" as="font" href="${data}">`,
+    ),
+    ...entities('font').map(
+      (as) => `<link rel="preload" as="${as}" href="${data}">`,
+    ),
+  ];
+  const line = `FAIL font-preload-embedded: dist/index.html:1: ${data}`;
+  for (const tag of cases) {
+    const result = run([
+      '--root',
+      makeDist(FACE_LATIN + FACE_ARABIC, `<!doctype html>${tag}`),
+      '--dist',
+    ]);
+    assert.equal(result.status, 1, `${tag}\n${result.stdout}`);
+    assert.ok(result.stdout.split('\n').includes(line), tag);
+  }
+});
+
+test('every escape position and terminator still spells font-face', () => {
+  const word = 'font-face';
+  const terminators = ['', ' ', '\t', '\n', '\r\n', '\f', '\r'];
+  // CR, LF, CRLF and FF are each one newline under CSS input preprocessing.
+  const lineBreaks = new Set(['\n', '\r\n', '\f', '\r']);
+  const blocks = [];
+  const expected = [];
+  let line = 1;
+  for (let index = 0; index < word.length; index += 1) {
+    const hex = word.codePointAt(index).toString(16).padStart(6, '0');
+    for (const terminator of terminators) {
+      blocks.push(
+        `@${word.slice(0, index)}\\${hex}${terminator}${word.slice(index + 1)}` +
+          '{font-family:Review;src:url(data:font/woff2;base64,AA)}',
+      );
+      if (lineBreaks.has(terminator)) line += 1;
+      expected.push(
+        `FAIL font-url-embedded: dist/assets/a.css:${line}: ` +
+          'data:font/woff2;base64,AA',
+      );
+    }
+  }
+  const result = run([
+    '--root',
+    makeDist(blocks.join('') + FACE_LATIN + FACE_ARABIC),
+    '--dist',
+  ]);
+  assert.equal(result.status, 1, `${result.stdout}\n${result.stderr}`);
+  const failures = result.stdout
+    .split('\n')
+    .filter((entry) => entry.startsWith('FAIL font-url-embedded:'));
+  assert.deepEqual(failures, expected);
+});
+
 test('usage', async (t) => {
   await t.test('the check needs --dist', () => {
     const result = run(['--root', WEB]);

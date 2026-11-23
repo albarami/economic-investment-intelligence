@@ -168,8 +168,14 @@ function markerPattern() {
   );
 }
 
+// The two pinned dev-tooling parsers of check-local-fonts.mjs (ruling
+// L-1531): the only bare package specifiers a script may import, matched
+// exactly so a look-alike name or subpath still fails.
+const ALLOWED_PACKAGE_IMPORTS = new Set(['css-tree', 'parse5']);
+
 function importReason(item, file, scripts) {
   if (item.specifier.startsWith('node:')) return null;
+  if (ALLOWED_PACKAGE_IMPORTS.has(item.specifier)) return null;
   if (!item.specifier.startsWith('.')) return 'non-node-import';
   // Resource URLs do not import modules; retain their existing checks.
   if (item.form === 'new URL()') return null;
@@ -226,6 +232,31 @@ test('imports', () => {
       sample,
     );
   assert.deepEqual(importViolations("import fs from 'node:fs';\n"), []);
+});
+
+test('only the two pinned parser packages import by name', () => {
+  for (const name of ['parse5', 'css-tree']) {
+    assert.deepEqual(
+      importViolations(`${IMP} { x } ${FROM} '${name}';\n`),
+      [],
+      name,
+    );
+  }
+  for (const specifier of [
+    'parse5/subpath',
+    'css-tree2',
+    'PARSE5',
+    'postcss',
+    '#parse5',
+  ]) {
+    assert.deepEqual(
+      importViolations(`${IMP} { x } ${FROM} '${specifier}';\n`).map(
+        (item) => item.reason,
+      ),
+      ['non-node-import'],
+      specifier,
+    );
+  }
 });
 
 // These fixtures differ only in the module specifier; all target modules exist.

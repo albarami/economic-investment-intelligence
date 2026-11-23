@@ -1,10 +1,11 @@
 /*
- * Tokenizes CSS enough to find every active @font-face rule and font import.
- * Comments are skipped, at-keywords and identifiers match case-insensitively
- * with CSS escapes decoded, and rule and declaration boundaries are respected,
- * so a font cannot be hidden from or smuggled past the scanner by spelling or
- * commenting. A rule that CSS deactivates (fully commented out, or an
- * at-keyword without its block) is never reported.
+ * Tokenizes CSS enough to find @font-face rules and font imports. Comments
+ * are skipped, at-keywords and identifiers match case-insensitively with CSS
+ * escapes decoded, and rule and declaration boundaries are respected. Since
+ * round 3 this is no longer the primary reader: font-css.mjs parses with
+ * css-tree and uses this tokenizer only as the cross-check over Raw nodes —
+ * content css-tree cannot structure — and for urlsInRaw, which reads the
+ * url() tokens of one Raw text.
  */
 
 const WHITESPACE = new Set([' ', '\t', '\n', '\r', '\f']);
@@ -12,7 +13,7 @@ const HEX = /[0-9A-Fa-f]/;
 const IDENT_START = /[A-Za-z_\u0080-\uffff-]/;
 const IDENT_PART = /[A-Za-z0-9_\u0080-\uffff-]/;
 
-function decodeEscape(text, index) {
+export function decodeEscape(text, index) {
   // text[index] is the backslash.
   const after = text[index + 1];
   if (after === undefined) return { value: '', next: index + 1 };
@@ -255,6 +256,12 @@ function parseImport(tokens, next) {
   }
   if (!target) return null;
   return { import: target, next: Math.min(cursor + 1, tokens.length) };
+}
+
+export function urlsInRaw(text) {
+  return [...cssTokens(text)]
+    .filter((token) => token.kind === 'url')
+    .map((token) => ({ value: token.value, index: token.index }));
 }
 
 export function parseFontCss(text) {

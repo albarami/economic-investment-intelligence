@@ -144,6 +144,8 @@ OFFICIAL = (
     ("github.com", "/carbon-design-system/"),
     ("raw.githubusercontent.com", "/carbon-design-system/"),
     ("platform.claude.com", "/docs/en/"),
+    ("github.com", "/inikulin/parse5"),
+    ("github.com", "/csstree/csstree"),
 )
 
 
@@ -194,6 +196,11 @@ LIBRARIES: dict[str, tuple[Library, ...]] = {
                 "interleaved mode with the pinned MapLibre on WebGL2",
                 "layers under labels through beforeId",
             ),
+        ),
+        Library(
+            "parse5 8 and css-tree 3",
+            (),
+            ("exact pins of the two parser packages of the local-font check",),
         ),
     ),
     DOCS: (
