@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed: the owner's option (a) with three conditions, relayed by the advisor on 2026-11-23; built in S2-P71 Part 2 round 4; the owner's "a2 yes" of 2026-11-23 (items 4 and 5) built in round 5; the declared shape of every listed field enforced in round 6 (review finding 1 of round 5); the owner's "a3" of 2026-11-23 (about 18:10; items 1, 3, 6 and 7) built in round 7; the build report's `version` (item 8), approved by the advisor on 2026-11-23 under the owner's delegation, built in round 9; lead review and owner acceptance of this record asked |
+| Status | Accepted 2026-11-23 by the lead (ruling L-1647): every item is the owner's own choice (option (a) with three conditions, "a2 yes" and "a3", 2026-11-23) or the advisor's under the owner's delegation (item 8); built in S2-P71 Part 2 rounds 4 to 9, approved by another maker (`49e4c848`) and merged in train S2-24 |
 | Date | 2026-11-23 |
 | Scope | `custodian/src/eii_custodian/publicdata/registers/` (`contracts.py`, `validate.py`, `build.py`, `provenance.py`); the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)**; [TASKS.md](../../TASKS.md) S2-T49 |
 | Amends | Document 03 **Register file projections (S2-T49)**: the sentence "No scan coverage is narrowed; coincidental token matches also refuse", for the fields listed below only; and its L-1288 paragraph, so that a typed number, still no identifier string, meets every key (item 4) |
