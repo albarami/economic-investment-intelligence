@@ -97,13 +97,15 @@ covering every queue row exactly once. Eligible rows permit only `mapped` with
 the prefix and `reviewer_approved`, or `not_mappable_rejected` with an empty
 class and `reviewer_rejected`. Mandatory legacy and invalid-prefix rows keep
 their derived status and reason, empty class, and individual signed
-acknowledgements by a person; model-review roles on these rows refuse with
+acknowledgements by a person or, under decision 0103, by the batch's signer
+role; every other model-like role on these rows refuses with
 `acknowledgement_role_invalid`. All names and code lengths stay unchanged.
 Signed rows need the actual ISO signing date.
 
 The seed is derived, never chosen (L-1469 as amended by L-1471 and L-1472,
 reading of decision 0075 item 3). Use `derived_audit_seed` in
-`scripts/spine_review.py` with the signed eligible rows and the list returned by
+`scripts/spine_review.py` with the signed rows (the eligible decisions and, under
+decision 0103, the signer-acknowledged rows) and the list returned by
 `previous_refusals(root, review)` to fill `makers.json`:
 `1000000000 + int(sha256(b"oi203-audit-seed:" + J + b":" + P)) % 3294967296`.
 J is compact canonical UTF-8 JSON (`ensure_ascii=False`, sorted keys, separators
@@ -150,7 +152,9 @@ before sending anything to the auditor. It writes `draw.json` and
 `audit_packet.json` in a fresh run folder. The draw binds the exact preparation
 manifest, signer-file and maker-record hashes, seed, batch id and ordered sampled
 codes. The audit packet copies only those codes' minimal entries from
-`signer_packet.json`; it contains no signer status, reason or role. Preserve the
+`signer_packet.json`; a drawn acknowledgement code's entry carries its code,
+name and derived status, reason and class, never a signer choice. The packet
+contains no signer status, reason or role. Preserve the
 draw as the pre-audit evidence. Since `signer_packet.json` lists every eligible
 code, restriction of the auditor to the sample rests on the packet the lead sends.
 Give the independent auditor only `audit_packet.json`,

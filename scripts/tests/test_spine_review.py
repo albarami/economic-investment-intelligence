@@ -947,7 +947,13 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
         elif plant == "acknowledgement_decision":
             signed[-1] = replace(signed[-1], status="unreviewed")
         elif plant == "acknowledgement_role":
-            signed[-1] = replace(signed[-1], reviewed_by_role=record["signer_role"])
+            # Decision 0103: the signer's own role is admitted; another is not.
+            signed[-1] = replace(
+                signed[-1],
+                reviewed_by_role=record["signer_role"].replace(
+                    "invented_signer", "other_signer"
+                ),
+            )
         elif plant == "auditor_coverage":
             audited.pop()
         elif plant == "auditor_identity":

@@ -288,6 +288,7 @@ def decision_rows(
     if {row.code for row in signed} != set(queue):
         raise Refusal("signer_coverage_differs")
     eligible = {row.code for row in eligible_rows(context.inputs)}
+    decisions: list[ReviewRow] = []
     for row in signed:
         held = queue[row.code]
         if row.code_length != held.code_length or row.name_ar != held.name_ar:
@@ -301,11 +302,18 @@ def decision_rows(
                 raise Refusal("signer_decision_invalid")
             if row.reviewed_by_role != role:
                 raise Refusal("signer_role_differs")
-        elif (row.status, row.reason, row.isic_class) != (held.status, held.reason, ""):
+            decisions.append(row)
+        elif (row.status, row.reason, row.isic_class) != (
+            held.status,
+            held.reason,
+            "",
+        ):
             raise Refusal("acknowledgement_decision_invalid")
+        elif row.reviewed_by_role == role:
+            decisions.append(row)  # decision 0103: the batch signer's own rows.
         elif _MODEL_LIKE.match(row.reviewed_by_role):
             raise Refusal("acknowledgement_role_invalid")
-    return tuple(row for row in signed if row.code in eligible)
+    return tuple(decisions)
 
 
 def audit_record(
@@ -424,6 +432,20 @@ def draw_audit(
     )
     sampled = drawn["sampled_codes"]
     audit_packet = [entry for entry in packet if entry["code"] in sampled]
+    # Decision 0103: a drawn acknowledgement code carries its derived facts to
+    # the auditor; the packet itself stays blind about the signer's choices.
+    covered = {entry["code"] for entry in audit_packet}
+    audit_packet.extend(
+        dict(
+            code=row.code,
+            name_ar=row.name_ar,
+            status=row.status,
+            reason=row.reason,
+            isic_class=row.isic_class,
+        )
+        for row in context.inputs.spine.queue
+        if row.code in sampled and row.code not in covered
+    )
     frozen_context(root, manifest)
     if input_hashes(root, returned) != evidence:
         raise Refusal("returned_inputs_changed")

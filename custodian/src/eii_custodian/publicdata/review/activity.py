@@ -819,6 +819,9 @@ _MODEL_ROLE = re.compile(
     r"model review: ([A-Za-z][A-Za-z0-9_-]*) ([^,\r\n]+), ([^,\r\n]+)"
 )
 _MODEL_DECISIONS = frozenset({"mapped", "not_mappable_rejected"})
+# Decision 0103: a model-signed derived acknowledgement row is audited exactly
+# like a model-signed mapped or rejected row.
+_MODEL_SIGNED_STATUSES = _MODEL_DECISIONS | _ACKNOWLEDGED
 _AUDIT_FIELDS = frozenset(
     {
         "batch_id",
@@ -892,7 +895,7 @@ def _audit_codes(value: object, detail: str, *, nonempty: bool) -> tuple[str, ..
         not isinstance(value, list)
         or (nonempty and not value)
         or any(
-            not isinstance(code, str) or re.fullmatch(r"[0-9]{7}", code) is None
+            not isinstance(code, str) or re.fullmatch(r"[0-9]{6,7}", code) is None
             for code in value
         )
         or len(set(value)) != len(value)
@@ -942,7 +945,7 @@ def _require_model_audits(
 ) -> None:
     for row in reviews:
         if (
-            row.status in _MODEL_DECISIONS
+            row.status in _MODEL_SIGNED_STATUSES
             and _MODEL_LIKE.match(row.reviewed_by_role)
             and _MODEL_ROLE.fullmatch(row.reviewed_by_role) is None
         ):
@@ -950,7 +953,7 @@ def _require_model_audits(
     signed = {
         row.code: row
         for row in reviews
-        if row.status in _MODEL_DECISIONS
+        if row.status in _MODEL_SIGNED_STATUSES
         and row.reviewed_by_role.startswith(_MODEL_PREFIX)
     }
     if not signed and (binding is None or not binding.audit_sha256):
