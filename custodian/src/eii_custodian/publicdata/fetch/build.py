@@ -475,6 +475,13 @@ def _seeded_assembly(
     _own_run: bool = False,
 ) -> BuildOutcome:
     """Open the run journal, fetch under it, then run the production assembly."""
+    # Production.run imports the first two before it calls the fetcher; load
+    # them before RunRecord.begin so its baseline binds them (loaded-module
+    # digest).
+    from eii_custodian.publicdata import (  # noqa: F401
+        assembly_method_pins,
+        assembly_refusals,
+    )
     from eii_custodian.publicdata.assembly import AssemblyError
     from eii_custodian.publicdata.assembly_adapters import Production
 
