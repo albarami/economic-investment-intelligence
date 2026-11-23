@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 import yaml
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.common import AdditionError
@@ -240,6 +240,8 @@ def test_population_order_and_duplicates(items: list[tuple[str, bool]]) -> None:
         assert (p.place_id in expected) == (included and kind != "other")
 
 
+# File-backed examples retain isolation but cannot bound shared-runner I/O time.
+@settings(deadline=None)
 @given(
     st.text(alphabet="abcdefghijklmnopqrstuvwxyz_", min_size=1, max_size=20),
     st.integers(min_value=1, max_value=999999),
@@ -398,6 +400,7 @@ def test_csv_hostile_leaves(tmp_path: Path, kind: str) -> None:
                 assert len(result) == 1
 
 
+@settings(deadline=None)
 @given(
     st.text(alphabet="abcdefghijklmnopqrstuvwxyz", min_size=1, max_size=20),
     st.sampled_from(["restaurant", "italian_restaurant", "other"]),
