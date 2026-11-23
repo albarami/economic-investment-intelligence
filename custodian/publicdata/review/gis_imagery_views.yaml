@@ -1,5 +1,4 @@
-# The list is empty: no service path was confirmed on 2026-11-15.
-# The lead and the owner choose the views.
+# Historical: no service path was confirmed on 2026-11-15; the lead and owner now record a legitimate empty legacy list under decision 0079: item 1 assigns dated national snapshots to S2-T51; item 2 requires its separate closed acquisition; item 3 excludes that background acquisition from earlier gates; item 4 permits explicitly selected verified all-date imagery in releases, supporting a free choice of dates. Unselected legacy fixed views keep their export guards.
 version: 1
 image_sr: 3857
 views: []

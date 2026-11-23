@@ -2807,6 +2807,30 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The lead records whether the list is made and, if it is, the dated list of every file the ceiling of 300 MiB refuses, each with the figure or card it feeds, so that none is missed.
 - NEEDED BY: the next pass of S2-T08 part B.
 
+### OI-308 — S2-R8D dated inventory draft (2026-11-23; to complete after L6)
+
+OI-308 remains OPEN. This is a draft of the dated refused-file inventory, not
+the lead's measured list. The S2-PATH table 1 row 24 names the two streamed
+sources below; `custodian/src/eii_custodian/publicdata/fetch/large.py`,
+`REQUIRED_KEYS` and `receive`, confirms their bounded chunked transport on head
+`6d5466e3bb` (file last changed in `88aea3ca5b`). Document 04 section 2's
+source-use rows identify their consumers. Neither registry membership nor the
+streaming implementation establishes that a particular live file was refused.
+
+| Known source | Figure/card use | Existing treatment | L6 evidence still owed |
+|---|---|---|---|
+| `cus_imp_2019` | Earlier imports in `pub_customs_import`; supplier basket unit values, D7 import context and the C30 imports series, with PUB-44's code roll-up caveat | Existing streamed large intake and bounded JSON-row decoding; no per-file ceiling is raised here | Actual selected file/receipt hash and retrieval date, refused-file observation/reason and declared or measured bytes, chosen bounded-read evidence and every affected figure/card |
+| `bldg_wsf3d` | PUB-106 / S2-T20 WSF 3D cell-mean height fallback and its error measurement | Existing streamed large intake; heights read the cells over the building table's bounds | Actual selected file/receipt hash and retrieval date, refused-file observation/reason and declared or measured bytes, bounded-read evidence and affected height artifact/method |
+
+Owner: S2-T08 gate/live-build lead. After L6, record the actual command, full
+head, seed, run/receipt references and dated complete list of every file the
+ordinary ceiling refuses, each with its figure/card and named per-source
+ceiling or bounded read. Reconcile the earlier seven-file claim against that
+observed inventory; the two rows above are neither exhaustive nor a measured
+count. Do not reconstruct the list from `REQUIRED_KEYS`, invent byte counts or
+close S2-T08#13/OI-308 from this draft. Decision 0098 items 2, 6 and 8 and
+**Unresolved path holds**, U8, retain this evidence on the S2 path.
+
 ## OI-309 — The other six registry rows not read by the live build
 
 - ID: OI-309
