@@ -41,9 +41,12 @@ SCHOOL_QUERY_KEYS = frozenset(
 )
 
 
-def _html_without_form_secrets(body: bytes) -> bytes:
-    root = Tree(body).root
+def _form_secret_tree(body: bytes) -> Node:
+    """The one permitted first-wins parse of a fetched page (L-1614)."""
+    return Tree(body, duplicate_attributes="first").root
 
+
+def _render_form_stripped(root: Node) -> bytes:
     def render(node: Node) -> str:
         if (
             node.tag == "input"
@@ -83,6 +86,28 @@ def _html_without_form_secrets(body: bytes) -> bytes:
         return start + text + "</" + node.tag + ">"
 
     return render(root).encode()
+
+
+def _html_without_form_secrets(body: bytes) -> bytes:
+    return _render_form_stripped(_form_secret_tree(body))
+
+
+def _has_password_input(root: Node) -> bool:
+    """L-1615: a rendered password field marks a real sign-in wall."""
+    return any(
+        node.tag == "input" and (node.attrs.get("type") or "").lower() == "password"
+        for node in root.descendants()
+    )
+
+
+def _citation_obstacle(body: bytes, root: Node) -> str | None:
+    """L-1615: a sign-in link word alone never refuses a citation snapshot."""
+    lower = body.lower()
+    if any(word in lower for word in (b"robot check", b"paywall")):
+        return "refusal_body"
+    if _has_password_input(root):
+        return "credentials"
+    return None
 
 
 def validate_entry(entry: Entry, review: Mapping[str, Any]) -> None:
@@ -208,13 +233,33 @@ def fetch(
                     check_target(target)
                     if host_of(target) in PIN_HOSTS:
                         page_context(host_of(target))
+                # L-1619: a citation snapshot requires exactly status 200
+                # before any scan or storage; other kinds are unchanged.
+                if review["kind"] == "citation_snapshot" and response.status != 200:
+                    raise ShapeError("http_status")
                 if len(response.body) > review["max_bytes"]:
                     raise ShapeError("metadata_bytes")
             enabled = (
                 entry.source_id == "schools_private_directory"
                 and url != entry.terms_url
             )
-            obstacle_reason = obstacle(response.body) if response is not None else None
+            # L-1615: on a citation page a password field, not the "sign in"
+            # link word, marks the wall; other kinds keep the word scan. The
+            # citation parse is the L-1614 first-wins tree the form-secret
+            # render reuses below; never a second permissive Tree.
+            root = (
+                _form_secret_tree(response.body)
+                if review["kind"] == "citation_snapshot" and response is not None
+                else None
+            )
+
+            def scan(body: bytes) -> str | None:
+                if review["kind"] != "citation_snapshot":
+                    return obstacle(body)
+                assert root is not None
+                return _citation_obstacle(body, root)
+
+            obstacle_reason = scan(response.body) if response is not None else None
             reason = failure.check if failure else obstacle_reason
             if reason or response is None:
                 status = (
@@ -250,16 +295,17 @@ def fetch(
                         page_context(host_of(target))
         if len(response.body) > review["max_bytes"]:
             raise ShapeError("metadata_bytes")
-        if any(
-            x in response.body.lower()
-            for x in (b"sign in", b"sign-in", b"robot check", b"paywall")
-        ):
+        if scan(response.body):
             raise ShapeError("unavailable")
         body = response.body
         representation = "original"
         if extension == "html":
             # The portal's hidden form credential never enters an archive.
-            body = _html_without_form_secrets(body)
+            body = (
+                _render_form_stripped(root)
+                if root is not None
+                else _html_without_form_secrets(body)
+            )
             representation = "form_secret_removed"
         if not projection:
             inputs.append((response, extension, body, representation))

@@ -6,7 +6,9 @@ import csv
 import io
 import math
 import re
+from collections import Counter
 from collections.abc import Mapping
+from dataclasses import dataclass, field
 from datetime import date
 
 from eii_custodian.publicdata.frame.checks import FrameError
@@ -19,9 +21,23 @@ from .contracts import (
     REGISTRATION,
     ROLES,
     SCHEMAS,
+    SOURCE_ROW_KEY,
+    company_key_ok,
     refuse,
+    row_identity,
 )
 from .provenance import Frame
+
+
+@dataclass(repr=False)
+class InputAudit:
+    """Ephemeral identifiers never leave intake; only closed absence counts do."""
+
+    licences: set[str] = field(default_factory=set)
+    notice_absences: int = 0  # {events}; never a date estimate
+    non_registration_absences: int = 0  # {rows}; never a repaired number
+    duplicate_absences: int = 0  # {rows}, not distinct numbers
+    duplicate_registrations: set[str] = field(default_factory=set)
 
 
 def parse_value(value: str, declaration: str) -> str | None:
@@ -34,13 +50,13 @@ def parse_value(value: str, declaration: str) -> str | None:
             refuse("unconfirmed_branch_structure")
         return None
     if kind == "registration":
-        if REGISTRATION.fullmatch(value) is None or len(value) > 10:
+        if REGISTRATION.fullmatch(value) is None:
             refuse("registration_format")
     elif kind == "fc_number":
         if re.fullmatch(r"[0-9]{5}", value) is None:
             refuse("registration_format")
     elif kind == "row_key":
-        if re.fullmatch(r"[a-f0-9]{20}", value) is None:
+        if SOURCE_ROW_KEY.fullmatch(value) is None:
             refuse("row_key_format")
     elif kind == "date":
         if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is None:
@@ -60,7 +76,7 @@ def parse_value(value: str, declaration: str) -> str | None:
         if not math.isfinite(number) or not -bound <= number <= bound:
             refuse("coordinate_format")
     elif kind == "yes_no":
-        if value not in {"Yes", "No"}:
+        if value not in {"yes", "no"}:
             refuse("tax_registered_format")
     elif kind == "text":
         if not value.strip():
@@ -102,7 +118,7 @@ def _project_numbers(row: dict[str, object]) -> None:
                 _numeric_value(name, row[name], "integer?")
 
 
-def _rows(body: bytes, role: str) -> list[dict[str, str | None]]:
+def _rows(body: bytes, role: str, audit: InputAudit) -> list[dict[str, str | None]]:
     try:
         reader = csv.reader(io.StringIO(body.decode("utf-8"), newline=""), strict=True)
         header = next(reader, [])
@@ -116,16 +132,49 @@ def _rows(body: bytes, role: str) -> list[dict[str, str | None]]:
         for record in reader:
             if len(record) != len(header):
                 refuse("input_schema")
-            rows.append(
-                {
-                    name: parse_value(value, schema[name])
-                    for name, value in zip(header, record, strict=True)
-                    if name in schema
-                }
-            )
+            row: dict[str, str | None] = {}
+            for name, value in zip(header, record, strict=True):
+                if name not in schema:
+                    continue
+                if (
+                    role == "establishments"
+                    and name == "registration_number"
+                    and re.fullmatch(r"[A-Za-z]{1,10}", value)
+                ):
+                    audit.non_registration_absences += 1
+                    row[name] = None
+                elif (
+                    role == "events"
+                    and name == "notice_expiration_date"
+                    and re.fullmatch(r"[0-9]{2}-[A-Z][a-z]{2}-[0-9]{3}", value)
+                ):
+                    audit.notice_absences += 1
+                    row[name] = None
+                else:
+                    row[name] = parse_value(value, schema[name])
+            if role == "establishments":
+                licence = row["licence_number"]
+                assert isinstance(licence, str)  # required integer declaration
+                audit.licences.add(licence)
+            rows.append(row)
         return rows
     except (UnicodeError, csv.Error, TypeError, AttributeError):
         refuse("input_csv")
+
+
+def _withhold_duplicate_registrations(
+    rows: list[dict[str, str | None]], audit: InputAudit
+) -> None:
+    """Preserve every establishment; withhold all occurrences of shared numbers."""
+    counts = Counter(row["registration_number"] for row in rows)
+    duplicates = {
+        number for number, count in counts.items() if number is not None and count > 1
+    }
+    audit.duplicate_registrations.update(duplicates)
+    for row in rows:
+        if row["registration_number"] in duplicates:
+            row["registration_number"] = None
+            audit.duplicate_absences += 1
 
 
 def _keyed(
@@ -135,6 +184,8 @@ def _keyed(
     row_keys: set[str | None] = set()
     for row in rows:
         value = row[key]
+        if value is None and key == "registration_number":
+            value = row_identity(str(row["row_key"]))
         if value is None:
             refuse("missing_registration_key")
         if value in found:
@@ -160,12 +211,18 @@ def _cell(row: Mapping[str, str | None], frame: Frame) -> int | None:
 
 
 def parse(
-    source_id: str, files: Mapping[str, bytes], frame: Frame
+    source_id: str,
+    files: Mapping[str, bytes],
+    frame: Frame,
+    *,
+    audit: InputAudit | None = None,
 ) -> list[dict[str, object]]:
     if source_id not in ROLES or set(files) != ROLES[source_id]:
         refuse("input_schema")
-    parsed = {role: _rows(body, role) for role, body in files.items()}
+    audit = InputAudit() if audit is None else audit
+    parsed = {role: _rows(body, role, audit) for role, body in files.items()}
     if source_id == "biz_register":
+        _withhold_duplicate_registrations(parsed["establishments"], audit)
         companies = _keyed(parsed["establishments"], "registration_number")
         result = []
         for key, source in sorted(companies.items()):
@@ -228,6 +285,10 @@ def validate_card(row: Mapping[str, object], frame: Frame) -> None:
         if name not in CARD_COLUMNS:
             continue
         value = row[name]
+        if name == "registration_number":
+            if not company_key_ok(value):
+                refuse("registration_format")
+            continue
         if name in NUMERIC_COLUMNS:
             _numeric_value(name, value, declaration)
             continue

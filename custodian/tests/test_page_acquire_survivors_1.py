@@ -24,7 +24,7 @@ def run(tmp_path, dec, body, *, row=None, send=None, sleep=lambda _: None):
     return acquire.fetch(
         row or entry(dec),
         dec,
-        send or (lambda u: Response(u, body, ())),
+        send or (lambda u: Response(u, body, (), status=200)),
         tmp_path,
         lambda: STAMP,
         sleep,

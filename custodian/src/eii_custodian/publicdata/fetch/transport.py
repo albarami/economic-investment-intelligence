@@ -90,6 +90,7 @@ class Response:
     body_sha256: str = ""
     headers: Mapping[str, str] = field(default_factory=dict, repr=False)
     evidence: Mapping[str, object] = field(default_factory=dict)
+    status: int | None = None
 
 
 class TransportFault(Exception):
@@ -293,6 +294,7 @@ def open_https(
         with opener.open(request, timeout=HTTP_TIMEOUT_S) as response:
             body = _bounded_body(response, str(url))
             final = str(response.geturl())
+            status = getattr(response, "status", None)
             if (company_active() and not _request_allowed(final)) or (
                 reviewed_urls is not None
                 and (final not in reviewed_urls or not _reviewed_allowed(final))
@@ -350,6 +352,7 @@ def open_https(
         etag=etag,
         body_sha256=digest,
         headers=public_headers,
+        status=status,
     )
 
 
@@ -755,6 +758,7 @@ def open_gis_snapshot(url: str) -> Response:
                 body,
                 (),
                 headers={"Content-Type": response.headers.get("Content-Type", "")},
+                status=getattr(response, "status", None),
             )
     except urllib.error.HTTPError as error:
         return Response(
@@ -763,6 +767,7 @@ def open_gis_snapshot(url: str) -> Response:
             (),
             headers={"Retry-After": error.headers.get("Retry-After", "")},
             evidence={"http_status": error.code},
+            status=error.code,
         )
     except TransportFault:
         raise

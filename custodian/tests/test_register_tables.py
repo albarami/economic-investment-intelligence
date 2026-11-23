@@ -52,6 +52,7 @@ def _stage(
     current_period="2026-11",
     biz_files=None,
     release_kind="public_only",
+    fc_files=None,
 ) -> None:
     """Build an invented bundle and stage it exactly as the lead would."""
     build(
@@ -60,7 +61,7 @@ def _stage(
         frame,
         (
             capture(period=current_period, files=biz_files),
-            capture("fc_register", period=current_period),
+            capture("fc_register", period=current_period, files=fc_files),
         ),
         snapshots,
     )
@@ -148,6 +149,11 @@ def test_production_phase_populates_both_tables_and_phase_evidence(
         "fc_register/file",
     ]
     assert record["snapshot_coverage"]["biz_register"] == ["2026-11"]
+    assert record["field_absences"] == []
+    assert record["activity_check"] == {
+        "status": "not_proved",
+        "reason": "register_publishes_no_code",
+    }
     assert len(record["receipts"]) == 3
 
 
@@ -710,7 +716,7 @@ def test_identifier_egress_plant_refused(tmp_path: Path, frame) -> None:
     rows = _rebuild_rows(tmp_path, frame, "pub_register_company")
     for row in rows:
         if row["source_id"] == "biz_register":
-            row["licence_number"] = "65432"
+            row["name_en"] = "65432"
     sha = write_parquet(
         tmp_path / BUNDLE / "tables/pub_register_company.parquet",
         [(name, column_type(name)) for name in CARD_COLUMNS],

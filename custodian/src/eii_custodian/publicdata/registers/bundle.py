@@ -17,7 +17,8 @@ from typing import Any
 
 from eii_custodian.publicdata.review.cache_fixture import read_parquet
 
-from .contracts import METHOD, REGISTRY_KEYS, ROLES, VERSION, refuse
+from .activity_check import register_activity_check
+from .contracts import ABSENCE_KINDS, METHOD, REGISTRY_KEYS, ROLES, VERSION, refuse
 from .provenance import (
     _RECEIPT_KEYS,
     Frame,
@@ -195,6 +196,8 @@ def _pinned_manifest(directory: Path, pin: Path) -> tuple[dict[str, Any], str, s
         "frame_sha256",
         "receipts",
         "snapshot_coverage",
+        "field_absences",
+        "activity_check",
         "tables",
     }:
         refuse("register_bundle_manifest")
@@ -230,6 +233,49 @@ def _specs(raw: object) -> dict[str, tuple[int, str]]:
     if set(specs) != set(_TABLES):
         refuse("register_bundle_table")
     return specs
+
+
+def _absence_metadata(
+    manifest: dict[str, Any], receipts: tuple[dict[str, Any], ...]
+) -> None:
+    """Bind closed absence counts to their original capture, never to a guess."""
+    if manifest["activity_check"] != register_activity_check(None, {}, None):
+        refuse("register_bundle_activity")
+    absences = manifest["field_absences"]
+    if not isinstance(absences, list):
+        refuse("register_bundle_absence")
+    captures = {
+        (entry["receipt"]["source_id"], entry["receipt"]["period"], entry["use"])
+        for entry in receipts
+    }
+    seen: set[tuple[str, ...]] = set()
+    for entry in absences:
+        if not isinstance(entry, dict) or set(entry) != {
+            "source_id",
+            "period",
+            "use",
+            "field",
+            "reason",
+            "count",
+        }:
+            refuse("register_bundle_absence")
+        if (
+            not isinstance(entry["source_id"], str)
+            or not isinstance(entry["period"], str)
+            or not isinstance(entry["use"], str)
+            or not isinstance(entry["field"], str)
+            or not isinstance(entry["reason"], str)
+            or (entry["source_id"], entry["field"], entry["reason"])
+            not in ABSENCE_KINDS
+            or type(entry["count"]) is not int
+            or entry["count"] <= 0
+        ):
+            refuse("register_bundle_absence")
+        identity = (entry["source_id"], entry["period"], entry["use"])
+        absence_identity = (*identity, entry["field"], entry["reason"])
+        if identity not in captures or absence_identity in seen:
+            refuse("register_bundle_absence")
+        seen.add(absence_identity)
 
 
 def _tables(
@@ -277,6 +323,7 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
     if manifest["frame_sha256"] != frame.sha256:
         refuse("frame_hash_mismatch")
     receipts, current, snapshots = _receipts(manifest["receipts"])
+    _absence_metadata(manifest, receipts)
     coverage = _coverage(manifest["snapshot_coverage"], snapshots)
     specs = _specs(manifest["tables"])
     tables, table_sha256 = _tables(directory, specs)

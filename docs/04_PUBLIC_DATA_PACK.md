@@ -1159,8 +1159,18 @@ parser kinds are separate and closed. Its v2 `as_of` is the retrieval date,
 `publisher_date` is optional provenance and observation periods come from parsed
 rows only (PUB-16). Input representations, original and archived hashes, atomic
 publication and explicit selection are specified in document 03, **S2-T29 cached
-page and awards contracts**. The field-limited school query never requests
-contact or capacity fields; source terms never relax that restriction.
+page and awards contracts**. A duplicate attribute in a snapshot page keeps its
+first value, except on `input`, `form`, `meta` and `base`, whose duplicates
+still refuse `schema_missing`; every shape parser keeps the refusing default.
+On a citation snapshot page a `sign in`/`sign-in` word alone does not refuse:
+the credentials obstacle is a rendered `input` of `type=password`, the page
+requires exactly status 200 with any other status refusing `http_status`,
+and `robot check`/`paywall` words still refuse every kind.
+A bare sign-in wall this scan admits — a sign-in link and button with no
+password field — still refuses `excerpt_absent` under the landmark row's
+verbatim excerpt check when the page holds no height text (decision 0093).
+The field-limited school query never requests contact or capacity fields;
+source terms never relax that restriction.
 
 S2-P46 separates award proof acquisition from source publication under
 [proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)

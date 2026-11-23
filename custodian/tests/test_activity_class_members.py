@@ -13,10 +13,20 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from custodian.tests.test_baskets import invented_review
 from hypothesis import given
 from hypothesis import strategies as st
 
+from eii_custodian.publicdata.fetch.receipts import sha256_hex
+from eii_custodian.publicdata.fetch.registry import load_registry
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review import activity as a
+from eii_custodian.publicdata.review.cache_fixture import (
+    CacheError,
+    class_csv,
+    real_feed_body,
+    write_cached,
+)
 
 _VERSION = "licence_codes_2025_05"
 _NO_SUPPLIERS = a.SupplierMembership(codes=(), complete=True)
@@ -90,17 +100,19 @@ def _class_members(
     isic_class: str = "5610",
     reviewed_binding=None,
     audit_path: Path | None = None,
+    activities=None,
+    classes=CLASSES,
 ) -> tuple[str, ...]:
     """Call ``class_members`` the way every caller must: through build_spine."""
     return a.class_members(
-        _baseline_activities(),
-        CLASSES,
+        _baseline_activities() if activities is None else activities,
+        classes,
         _baseline_reviews() if reviews is None else reviews,
         (),
         supplier_membership=_NO_SUPPLIERS,
         isic_class=isic_class,
         reviewed_binding=(
-            a.review_binding(_VERSION, CLASSES)
+            a.review_binding(_VERSION, classes)
             if reviewed_binding is None
             else reviewed_binding
         ),
@@ -128,6 +140,60 @@ def test_unreviewed_code_of_the_class_refuses_the_whole_class() -> None:
         a.SpineError, match=_anchored("class has an unreviewed code: 5610202")
     ):
         _class_members(reviews)
+
+
+def test_5610_code_claimed_outside_the_review_scope_refuses_the_whole_class() -> None:
+    """One changed input: the review row claims 5610101 is out of scope.
+
+    The spine recomputes status from the feeds and its own scope, never from a
+    claimed reason, and a seven-digit 56-prefixed code is always inside the
+    spine's review scope (FOOD_PREFIX). So for class 5610 "out of scope" is
+    this claim, and the claimed reason can never narrow the class silently:
+    the row stays unreviewed and the whole class refuses.
+    """
+    claimed = replace(_review("5610101", "unreviewed"), reason="outside_review_scope")
+    reviews = (
+        claimed,
+        *(row for row in _baseline_reviews() if row.code != "5610101"),
+    )
+    with pytest.raises(
+        a.SpineError, match=_anchored("class has an unreviewed code: 5610101")
+    ):
+        _class_members(reviews)
+
+
+def test_5610_activity_without_a_review_row_refuses_the_whole_class() -> None:
+    """One changed input: 5610202 is in the feeds with no review row at all."""
+    reviews = tuple(row for row in _baseline_reviews() if row.code != "5610202")
+    with pytest.raises(
+        a.SpineError, match=_anchored("class has an unreviewed code: 5610202")
+    ):
+        _class_members(reviews)
+
+
+def test_out_of_scope_code_of_the_queried_class_refuses_the_whole_class() -> None:
+    """One changed input: the queried class holds a code outside the scope.
+
+    The spine's own outside_review_scope path, unreachable for a 56-prefixed
+    code (FOOD_PREFIX puts every seven-digit one inside the scope), shown on a
+    non-food class: 4100111 has no active licences and no review row, is
+    unreviewed outside the scope, and class 4100 refuses with the same reason
+    instead of answering with part of the class.
+    """
+    classes = (*CLASSES, a.IsicClass("4100", "INVENTED construction class", ""))
+    with pytest.raises(
+        a.SpineError, match=_anchored("class has an unreviewed code: 4100111")
+    ):
+        _class_members(
+            (_review("5610101", "mapped"), _review("5610202", "mapped")),
+            isic_class="4100",
+            activities=(
+                _activity("5610101"),
+                _activity("5610202"),
+                _activity("4100111", 0),
+            ),
+            classes=classes,
+        )
 
 
 def test_class_not_in_the_classification_is_refused() -> None:
@@ -248,6 +314,150 @@ def test_model_signed_code_outside_the_audited_batch_is_refused(tmp_path) -> Non
         match=_anchored("model review code has no audited batch"),
     ):
         _class_members(reviews, reviewed_binding=binding, audit_path=audit_path)
+
+
+def _committed_cache(tmp_path: Path) -> tuple[Path, Path, dict[str, str], str]:
+    """An invented cache with two lic_active snapshots and its committed review.
+
+    The pinned first snapshot holds 5610101 and 5610202; the second snapshot,
+    written unselected, holds 5610303 and is reachable only through a
+    selections map that names its digest. Returns the cache, the review file,
+    the reviewed selections of the pinned snapshots and the second lic_active
+    digest.
+    """
+    entries = load_registry()
+    cache = tmp_path / "cache"
+    write_cached(
+        cache,
+        a.entry_by_key(entries, "lic_active"),
+        real_feed_body(
+            "lic_active",
+            [
+                {
+                    "activity_code": "5610101",
+                    "activity_name_ar": "نشاط 5610101",
+                    "active_count": 10,
+                },
+                {
+                    "activity_code": "5610202",
+                    "activity_name_ar": "نشاط 5610202",
+                    "active_count": 6,
+                },
+            ],
+        ),
+    )
+    write_cached(
+        cache,
+        a.entry_by_key(entries, "lic_cancelled"),
+        real_feed_body(
+            "lic_cancelled",
+            [
+                {
+                    "activity_code": "4630001",
+                    "activity_name_ar": "نشاط 4630001",
+                    "cancelled_count": 4,
+                }
+            ],
+        ),
+    )
+    write_cached(
+        cache,
+        a.entry_by_key(entries, "cls_isic4"),
+        class_csv(
+            [
+                ("5610", "INVENTED restaurants class"),
+                ("5630", "INVENTED beverages class"),
+            ]
+        ),
+    )
+    selected = reviewed_selections(cache)
+    other_body = real_feed_body(
+        "lic_active",
+        [
+            {
+                "activity_code": "5610303",
+                "activity_name_ar": "نشاط 5610303",
+                "active_count": 7,
+            }
+        ],
+    )
+    write_cached(cache, a.entry_by_key(entries, "lic_active"), other_body, select=False)
+    review = tmp_path / "review" / "activity_spine.csv"
+    review.parent.mkdir()
+    a.write_review_csv(
+        review,
+        (
+            _review("5610101", "mapped"),
+            _review("5610202", "mapped"),
+            _review("5610303", "mapped"),
+        ),
+    )
+    binding = a.review_binding(_VERSION, CLASSES)
+    review.with_name("activity_spine.binding.json").write_text(
+        json.dumps(
+            {
+                "code_system_version": binding.code_system_version,
+                "inputs": [
+                    {"name": name, "code": code, "sha256": sha}
+                    for name, code, sha in binding.input_sha256
+                ],
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    baskets = invented_review()
+    baskets["status"] = "reviewed: invented fixture"
+    review.with_name("baskets.yaml").write_text(
+        json.dumps(baskets, ensure_ascii=False), encoding="utf-8"
+    )
+    return cache, review, selected, sha256_hex(other_body)
+
+
+def test_committed_class_members_uses_the_selections_map_given(tmp_path) -> None:
+    """The map given is the map used; a different map reads a different snapshot.
+
+    With no map the pinned selections are used unchanged. The map the data
+    test passes after checking it against the method pins is the map that
+    decides which snapshots the spine reads, so the F3 guarantee no longer
+    depends on two reads of the same file.
+    """
+    cache, review, selected, other_digest = _committed_cache(tmp_path)
+    assert a.committed_class_members(cache, "5610", review_path=review) == (
+        "5610101",
+        "5610202",
+    )
+    assert a.committed_class_members(
+        cache, "5610", selections=selected, review_path=review
+    ) == ("5610101", "5610202")
+    other = {**selected, "lic_active": other_digest}
+    assert other["lic_active"] != selected["lic_active"]
+    assert a.committed_class_members(
+        cache, "5610", selections=other, review_path=review
+    ) == ("5610303",)
+
+
+def test_committed_class_members_refuses_a_map_without_the_named_snapshot(
+    tmp_path,
+) -> None:
+    """One changed input: the map names a snapshot the cache does not hold."""
+    cache, review, selected, _ = _committed_cache(tmp_path)
+    missing = {**selected, "lic_active": "b" * 64}
+    with pytest.raises(
+        CacheError, match=_anchored("lic_active: snapshot_index_invalid")
+    ):
+        a.committed_class_members(cache, "5610", selections=missing, review_path=review)
+
+
+def test_committed_class_members_refuses_an_empty_selections_map(tmp_path) -> None:
+    """One changed input: an empty map names no snapshot for any feed."""
+    cache, review, _, _ = _committed_cache(tmp_path)
+    with pytest.raises(
+        CacheError, match=_anchored("lic_active: snapshot_path_invalid")
+    ):
+        a.committed_class_members(cache, "5610", selections={}, review_path=review)
 
 
 @st.composite

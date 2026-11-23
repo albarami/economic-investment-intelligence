@@ -2647,12 +2647,12 @@ OPEN (S2-T49): the published-card basis of the tower is confirmed by the lead in
 the lead's shell; an inferred geocoder label is not such a basis.
 The closed `pub_register_company` column list is:
 
-`row_key` is excluded. The retained commerce fields are `name_ar`, `name_en`,
+`row_key` is excluded as a standalone column. The retained commerce fields are `name_ar`, `name_en`,
 `establishment_type`, `establishment_subtype`, `legal_form`, `business_type`,
 `business_category`, `classification`, `registration_status`,
 `registration_issue_date`, `registration_expiry_date`, `licence_status`,
 `licence_issue_date`, `licence_expiry_date`, `branches`, `municipality`, `zone`,
-`lon`, `lat`, `registration_number`, `licence_number`, `tax_registered`,
+`lon`, `lat`, `registration_number`, `tax_registered`,
 `tax_registration_number`, `tax_classification_year`, `tax_type`, `capital_qar`,
 `establishment_nationality`, `street_number`, `building_number`,
 `establishment_type_ar`, `establishment_subtype_ar`, `legal_form_ar`,
@@ -2668,24 +2668,96 @@ is nullable `UBIGINT` and must equal the existing frame resolver's result for th
 capture's coordinates. All other columns are nullable `VARCHAR` containing the
 source lexeme, except key `registration_number` and `source_id`, which are non-null.
 The parser validates declared required input fields before writing: the date
-columns hold only complete ISO calendar dates. Declared integer/year lexemes
-other than capital remain strings, including licence and address fields.
+columns hold only complete ISO calendar dates. The sole exception is the financial-centre
+`notice_expiration_date` lexeme matching exactly two ASCII digits, a hyphen, one
+uppercase and two lowercase ASCII letters, a hyphen and three ASCII digits: it
+becomes null, never a parsed or repaired date. Every other non-ISO shape refuses.
+The manifest's `field_absences` records the closed field/reason
+`notice_expiration_date` / `published_non_iso_notice_shape`, positive event count,
+source, capture period and current/snapshot use. An empty optional date is null
+without this malformed-source count. Declared integer/year lexemes
+other than capital remain strings, including address fields.
+`tax_registered` accepts exactly lowercase `yes` and `no`; capitalised forms refuse.
 Unknown card categories stay open text until the pack declares their values.
 No category is inferred from observed rows. Null never means a zero or an
 inferred value.
 
-DAT-11 scans every released string column, including licence and address text,
+DAT-11 scans every released string column, including address text,
 with only the three registration-key columns exempt from key-membership checks.
 Typed numeric Public values (capital, coordinates, counts and cell keys) are not
 identifier strings. The artefact scan is unchanged. This follows the lead's
 L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifiers
 the project generates; it does not prohibit a typed numeric Public capital.
+Under [decision 0105](decisions/0105-register-scan-typed-columns.md) item 4
+(proposed, owner condition 1), a typed number still meets every registration,
+licence and withheld number by the token match, with no prefix or digit-run check.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
+
+Licence numbers are validated at intake but never projected, used as fallback
+keys or written to metadata. An ephemeral set of their input lexemes extends
+the token scan over non-key released fields, including typed numeric values,
+and over complete manifests and reports, including storage-appended table counts.
+The existing dedicated registration-key exemption stays unchanged: an intake
+licence equal to a published registration does not remove that registration.
+A licence column in another release table refuses. Under
+decision 0105 (proposed), the closed list of typed fields there (fourteen
+`pub_register_company` columns, the list's `employee_count`, the manifest's
+receipt times, terms date, periods, absence counts and storage-added row counts
+under the owner's a2, under the owner's a3 the manifest's and the receipt's
+`version`, and under the advisor's note of 2026-11-23 the build report's
+`version`, each admitting only its one fixed text, and the `period` columns of
+`pub_register_snapshot` and `register_company_list`, each only a real `YYYY-MM`
+month), each with its written format checked before the scan,
+admits a token equal to a registration, licence or withheld number only when that
+number has one or two digits or the shape 19xx or 20xx; a longer number still
+refuses `registration_egress`, a value failing its format refuses, and the prefix
+and digit-run checks are unchanged. Every unlisted field is free text, and free
+text (the receipt's text included), the key columns, the other manifest fields
+and the rest of the report keep the full scan; other
+coincidental token matches still refuse. Licence values are never exported to
+support this check; the assembly consumes only the lead-pinned verified bundle.
+
+For this S2 projection only (DAT-02 and DAT-12), a missing commerce registration
+uses `ROW-` plus its validated published twenty-character lowercase hexadecimal
+`row_key` in the key slot, each digit spelled as one letter (`0-9` to `g-p`,
+[decision 0104](decisions/0104-register-row-key-letter-encoding.md) item 1), so
+the released form is exactly `ROW-[a-p]{20}` and holds no digit for the
+unchanged DAT-15 digit-run scan to meet. The published key accepts only
+`[a-f0-9]{20}`, so the spelling is lossless and one-to-one. A `ROW-` identity on
+a financial-centre row of either table refuses `registration_format`. This is a
+row identity, never an invented registration or a licence identifier. Published registrations accept one to six ASCII digits,
+optionally a slash and one to three ASCII digits, bounding the length at ten.
+Under S2-P71 round 2 ruling L-1586, a commerce registration value of one to ten
+ASCII letters is not a registration: its intake value becomes null and its row
+uses the same `ROW-` identity, with a counted row absence of
+`published_non_registration_value`. Every other malformed shape still refuses
+`registration_format`. If a commerce number appears on multiple rows, every
+occurrence becomes null at intake and every row uses its own published `ROW-`
+identity. No row is merged, selected or de-duplicated. A
+`published_duplicate_registration` absence counts affected rows, not distinct
+numbers. Both reasons use field `registration_number` in the same capture-bound
+`field_absences` metadata as the notice-date absence; each field/reason may occur
+once per source, period and use, so both registration reasons may coexist.
+The existing non-null released `registration_number` key slot holds the `ROW-`
+identity, not the withheld source value; no separate registration column is added.
+The duplicate numbers remain only in the ephemeral audit set: egress refuses
+them in every released field (dedicated key slots included), typed numeric
+values, current/historical tables, manifests/reports and storage-added counts.
+Neither the set nor its values is exported. Assembly retains the existing
+lead-pin binding because it cannot re-read the raw inputs.
+Financial-centre keys retain their existing five-digit format. Duplicate
+financial-centre keys and colliding `ROW-` identities still refuse as
+`duplicate_registration_key`; duplicate published row keys whose identities
+differ still refuse `duplicate_row_key`. Cross-register ambiguity still refuses
+as `ambiguous_cross_source_key`. The prefixed key is also scanned outside its
+dedicated key slots. This follows the S2-P71 lead brief's row-key ruling for the
+Public projection; decision 0074 item 5's world-feed keying/enrichment remains
+with S4-T02. No world snapshot or closed-category mapping is implemented here.
 
 The commerce source fills its fields only. `branches` is null under the supplied
 empty-only declaration; a nonempty value requires a branch-structure ruling.
 Its input-only `nationality_group`, `nationality_group_ar` and
-`points_at_location` are excluded alongside `row_key`. The financial-centre
+`points_at_location` and `licence_number` are excluded alongside the standalone `row_key`. The financial-centre
 source fills `registration_number` from `qfc_number`, `name_en`, `name_ar`,
 `licence_status`, `registered_address`, the optional `event` and
 `notice_expiration_date`, and the geocoded `lon`, `lat` and `registered_cell`.
@@ -2705,11 +2777,19 @@ of the two sources need not agree. Neither table invents a registration, cancell
 opening or closure month. Expiry and notice dates are not cancellation dates.
 
 The CSV declarations, their lexeme formats and source-specific required/null
-rules are closed in `registers/contracts.py`; a malformed notice date, missing
-registration key, duplicate source key, duplicate company-month, wrong companion
+rules are closed in `registers/contracts.py`; a notice date outside the sole
+absence shape, missing financial-centre key, duplicate financial-centre key or row identity, duplicate company-month, wrong companion
 join or ambiguous cross-source registration refuses by name. Registrations are
-never prefixed or merged. The tables bind to method `register_file_projection`,
-version `v1`, frame ownership hash and key-scoped receipts carrying attribution,
+never prefixed or merged; only a numberless commerce row uses the `ROW-` identity.
+Neither source publishes an activity-code column: metadata records
+`not_proved` / `register_publishes_no_code`. The stand-in activity-code check
+reuses the activity spine's signed-prefix and legacy-code rules and refuses a
+planted signed-class mismatch as `activity_code_mismatch`, and any other review
+the spine rejects (no sign-off, a malformed review date, a wrong reason or name,
+a status that is not a decision) as `activity_review_invalid`; it does not
+establish DAT-24 on the real source or derive a code from text.
+The tables bind to method `register_file_projection`,
+version `v2`, frame ownership hash and key-scoped receipts carrying attribution,
 terms, retrieval time and every input hash. Both release kinds consume the same
 validated tables. The later full-release owner must preserve this manifest
 chain and apply the rest of DAT-83; these reusable builders do not implement the

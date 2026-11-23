@@ -38,7 +38,7 @@ def test_build_public_fetch_entry_archives_citation_and_receipt(tmp_path, monkey
     row, _ = citation_setup(monkeypatch)
     result = run_build(
         (row,),
-        lambda u: Response(u, BODY, ()),
+        lambda u: Response(u, BODY, (), status=200),
         tmp_path,
         lambda: STAMP,
         lambda _: None,
@@ -139,7 +139,7 @@ def test_one_publisher_has_distinct_page_keys(tmp_path, monkeypatch):
     monkeypatch.setattr(page_records, "load_declaration", load)
     result = run_build(
         (row, other),
-        lambda u: Response(u, BODY, ()),
+        lambda u: Response(u, BODY, (), status=200),
         tmp_path / "cache",
         lambda: STAMP,
         lambda _: None,

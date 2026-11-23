@@ -9,6 +9,7 @@ from typing import Any
 
 from eii_custodian.publicdata.additions.storage import publish
 
+from .activity_check import register_activity_check
 from .contracts import (
     CARD_COLUMNS,
     METHOD,
@@ -17,9 +18,9 @@ from .contracts import (
     column_type,
     refuse,
 )
-from .parse import parse
+from .parse import InputAudit, parse
 from .provenance import Capture, Frame, digest, month, validate_capture
-from .validate import scan_artefact, scan_content, validate_release
+from .validate import scan_content, scan_metadata, validate_release
 
 
 @dataclass(frozen=True, repr=False)
@@ -56,6 +57,9 @@ def build(
         "pub_register_snapshot": [],
     }
     receipts: list[dict[str, object]] = []
+    licences: set[str] = set()
+    withheld_registrations: set[str] = set()
+    absences: list[dict[str, object]] = []
     card_content: set[str] = set()
     kept: dict[str, set[str]] = {"biz_register": set(), "fc_register": set()}
     for is_snapshot, batch in ((False, current), (True, snapshots)):
@@ -69,7 +73,38 @@ def build(
                 kept[item.source_id].add(item.period)
                 if item.period > current_months[item.source_id]:
                     refuse("snapshot_after_current")
-            cards = parse(item.source_id, item.files, frame)
+            audit = InputAudit()
+            cards = parse(item.source_id, item.files, frame, audit=audit)
+            licences.update(audit.licences)
+            withheld_registrations.update(audit.duplicate_registrations)
+            for field, reason, count in (
+                (
+                    "notice_expiration_date",
+                    "published_non_iso_notice_shape",
+                    audit.notice_absences,
+                ),
+                (
+                    "registration_number",
+                    "published_non_registration_value",
+                    audit.non_registration_absences,
+                ),
+                (
+                    "registration_number",
+                    "published_duplicate_registration",
+                    audit.duplicate_absences,
+                ),
+            ):
+                if count:
+                    absences.append(
+                        dict(
+                            source_id=item.source_id,
+                            period=item.period,
+                            use="snapshot" if is_snapshot else "current",
+                            field=field,
+                            reason=reason,
+                            count=count,
+                        )
+                    )
             for card in cards:
                 for name in ("name_en", "name_ar", "registered_address"):
                     value = card[name]
@@ -78,7 +113,10 @@ def build(
             # Reuse the full schema/identifier checks on historical cards too;
             # only their key, month, source and location are subsequently kept.
             validate_release(
-                {"pub_register_company": cards, "pub_register_snapshot": []}, frame
+                {"pub_register_company": cards, "pub_register_snapshot": []},
+                frame,
+                licences=frozenset(licences),
+                withheld_registrations=frozenset(withheld_registrations),
             )
             if is_snapshot:
                 tables["pub_register_snapshot"].extend(
@@ -108,7 +146,12 @@ def build(
                 str(row["registration_number"]),
             )
         )
-    keys = validate_release(tables, frame)
+    keys = validate_release(
+        tables,
+        frame,
+        licences=frozenset(licences),
+        withheld_registrations=frozenset(withheld_registrations),
+    )
     coverage = {source: tuple(sorted(periods)) for source, periods in kept.items()}
     manifest: dict[str, Any] = dict(
         version=VERSION,
@@ -118,6 +161,8 @@ def build(
         frame_sha256=frame.sha256,
         receipts=receipts,
         snapshot_coverage=coverage,
+        field_absences=absences,
+        activity_check=register_activity_check(None, {}, None),
     )
     report = {
         "method": METHOD,
@@ -125,10 +170,21 @@ def build(
         "source_status": "validated",
         "missing_snapshot_reason": "snapshot_not_kept",
     }
-    scan_artefact(manifest, keys)
-    scan_artefact(report, keys)
-    scan_content(manifest, frozenset(card_content))
-    scan_content(report, frozenset(card_content))
+    egress = keys | frozenset(licences) | frozenset(withheld_registrations)
+    for name, artefact in (("manifest", manifest), ("report", report)):
+        scan_metadata(artefact, egress, name)
+        scan_content(artefact, frozenset(card_content))
+    # Storage appends these table descriptors; their counts also cross egress.
+    # Its remaining additions are full SHA-256 digests, already scan-exempt.
+    scan_metadata(
+        {
+            "tables": [
+                {"name": name, "rows": len(rows)} for name, rows in tables.items()
+            ]
+        },
+        egress,
+        "manifest",
+    )
     specs = {
         "pub_register_company": CARD_COLUMNS,
         "pub_register_snapshot": SNAPSHOT_COLUMNS,

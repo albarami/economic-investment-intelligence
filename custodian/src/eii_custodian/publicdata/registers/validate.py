@@ -3,17 +3,25 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+
+from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 
 from .contracts import (
     BARE_DIGITS,
+    FIXED_TEXTS,
+    FORMAT_ONLY_NUMBER,
     NUMERIC_COLUMNS,
     PREFIXES,
-    REGISTRATION,
+    ROW_KEY,
     TABLE_COLUMNS,
+    TYPED_FIELDS,
+    TYPED_SEQUENCES,
+    RegisterError,
+    company_key_ok,
     refuse,
 )
-from .parse import validate_card
+from .parse import parse_value, validate_card
 from .provenance import Frame, month
 
 # Document 03 section 7.2. A drift test binds this closed name list to the pack.
@@ -43,6 +51,13 @@ graph_edge fact_lineage source_registry rules_version suppression_reason surviva
 """.split()
 )
 _DIGIT_TOKEN = re.compile(r"[0-9]+(?:/[0-9]+)?")
+_ROW_TOKEN = re.compile(ROW_KEY.pattern.removesuffix(r"\Z"))
+
+
+def _tokens(value: str) -> Iterator[str]:
+    for pattern in (_DIGIT_TOKEN, _ROW_TOKEN):
+        for token in pattern.finditer(value):
+            yield token.group()
 
 
 def _text(value: str, keys: frozenset[str]) -> None:
@@ -50,7 +65,7 @@ def _text(value: str, keys: frozenset[str]) -> None:
         refuse("identifier_prefix")
     if BARE_DIGITS.search(value):
         refuse("identifier_digit_run")
-    if any(token.group() in keys for token in _DIGIT_TOKEN.finditer(value)):
+    if any(token in keys for token in _tokens(value)):
         refuse("registration_egress")
 
 
@@ -81,6 +96,71 @@ def scan_artefact(value: object, keys: frozenset[str]) -> None:
         refuse("artefact_type")
 
 
+def _typed_keys(keys: frozenset[str]) -> frozenset[str]:
+    """Decision 0105: the keys a typed field still meets (not short, not 19xx/20xx)."""
+    return frozenset(key for key in keys if not FORMAT_ONLY_NUMBER.fullmatch(key))
+
+
+def _field_format(kind: str, value: object) -> None:
+    try:
+        if kind == "count":
+            valid = type(value) is int and value >= 0
+        elif kind == "timestamp":
+            valid = utc(value) is not None
+        elif kind == "date_or_pending":
+            valid = value == "pending" or (
+                isinstance(value, str) and parse_value(value, "date") == value
+            )
+        elif kind in FIXED_TEXTS:
+            valid = type(value) is str and value == FIXED_TEXTS[kind]
+        else:
+            valid = kind == "month" and month(value) == value
+    except (RegisterError, SnapshotError):
+        valid = False
+    if not valid:
+        refuse("typed_field_format")
+
+
+def _typed_value(path: str, kind: str, value: object) -> None:
+    """Decision 0105 item 1: a listed field's declared shape, before any traversal.
+
+    A listed sequence must be a list or tuple whose every item has the format;
+    any other listed field is one value, checked whole, so a list, tuple or
+    mapping there fails its format (no format admits a container).
+    """
+    if path not in TYPED_SEQUENCES:
+        _field_format(kind, value)
+    elif isinstance(value, list | tuple):
+        for item in value:
+            _field_format(kind, item)
+    else:
+        refuse("typed_field_format")
+
+
+def scan_metadata(value: object, keys: frozenset[str], path: str) -> None:
+    """Scan a manifest or report as an artefact; a listed field is typed.
+
+    `path` is the artefact and the mapping keys down to `value`; list positions
+    are not part of it, and a key holding a dot ends typing below it. A listed
+    field's shape and format are checked, never skipped, then it meets
+    `_typed_keys`.
+    """
+    kind = TYPED_FIELDS.get(path)
+    if kind is not None:
+        _typed_value(path, kind, value)
+        scan_artefact(value, _typed_keys(keys))
+    elif isinstance(value, Mapping):
+        for key, item in value.items():
+            scan_artefact(key, keys)
+            typed = path and "." not in str(key)
+            scan_metadata(item, keys, f"{path}.{key}" if typed else "")
+    elif isinstance(value, list | tuple):
+        for item in value:
+            scan_metadata(item, keys, path)
+    else:
+        scan_artefact(value, keys)
+
+
 def scan_content(value: object, content: frozenset[str]) -> None:
     """Card names and published addresses belong in tables, never metadata."""
     if isinstance(value, bytes):
@@ -103,8 +183,13 @@ def scan_content(value: object, content: frozenset[str]) -> None:
 
 
 def _scan_release_value(value: object, keys: frozenset[str]) -> None:
-    """DAT-11 / L-1288: typed numbers are Public facts; all else as artefacts."""
+    """DAT-11 / L-1288: a typed number is no identifier string, so no prefix or
+    digit-run check; its tokens still meet every key (owner condition 1)."""
     if value is None or type(value) in (bool, int, float):
+        if type(value) in (int, float) and any(
+            token in keys for token in _tokens(str(value))
+        ):
+            refuse("registration_egress")
         return
     if isinstance(value, Mapping):
         for key, item in value.items():
@@ -120,6 +205,9 @@ def _scan_release_value(value: object, keys: frozenset[str]) -> None:
 def validate_release(
     tables: Mapping[str, Sequence[Mapping[str, object]]],
     frame: Frame,
+    *,
+    licences: frozenset[str] = frozenset(),
+    withheld_registrations: frozenset[str] = frozenset(),
 ) -> frozenset[str]:
     if not set(tables) <= RELEASE_TABLES:
         refuse("release_table")
@@ -136,16 +224,16 @@ def validate_release(
             if set(row) != set(TABLE_COLUMNS[table]):
                 refuse("release_schema")
             key = row["registration_number"]
-            if (
-                not isinstance(key, str)
-                or REGISTRATION.fullmatch(key) is None
-                or len(key) > 10
-            ):
+            if not company_key_ok(key):
                 refuse("registration_format")
+            assert isinstance(key, str)
+            scan_artefact(key, withheld_registrations)
             keys.add(key)
             if table == "pub_register_company":
                 current_keys.add(key)
             if "period" in row:
+                # Decision 0105 (the owner's a3): a listed period column's
+                # format, `YYYY-MM`, checked on every row before the scan.
                 period = month(row["period"])
                 if table == "pub_register_snapshot" and period < "2026-11":
                     refuse("snapshot_month")
@@ -156,6 +244,8 @@ def validate_release(
                     "fc_register",
                 }:
                     refuse("release_source")
+                if ROW_KEY.fullmatch(key) and source != "biz_register":
+                    refuse("registration_format")
                 if key in owners and owners[key] != source:
                     refuse("ambiguous_cross_source_key")
                 owners[key] = source
@@ -194,6 +284,10 @@ def validate_release(
         if row["registration_number"] not in current_keys:
             refuse("list_company_missing")
     frozen = frozenset(keys)
+    input_only_keys = licences | withheld_registrations
+    egress_keys = frozen | input_only_keys
+    # Decision 0105: a listed column admits only a short or year-shaped number.
+    typed_keys = _typed_keys(egress_keys)
     banned = {
         "person_id",
         "establishment_id",
@@ -201,6 +295,7 @@ def validate_release(
         "group_id",
         "file_id",
         "firm_key",
+        "licence_number",
     }
     for table, rows in tables.items():
         for row in rows:
@@ -209,11 +304,11 @@ def validate_release(
                     column == "registration_number" and table not in TABLE_COLUMNS
                 ):
                     refuse("release_identifier_column")
-                scan_artefact(column, frozen)
+                scan_artefact(column, egress_keys)
                 if column == "registration_number" and table in TABLE_COLUMNS:
                     continue
-                # DAT-11 scans every string column. Typed numeric Public values
-                # (including cell keys, capital, counts and coordinates) are not
-                # identifier strings. Non-key card strings get the same scan.
-                _scan_release_value(value, frozen)
+                # DAT-11 scans every column; numbers meet keys but no string
+                # check. A listed column's format was checked in the loop above.
+                listed = f"{table}.{column}" in TYPED_FIELDS
+                _scan_release_value(value, typed_keys if listed else egress_keys)
     return frozen

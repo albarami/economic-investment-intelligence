@@ -21,7 +21,7 @@ def test_real_command_reaches_citation_fetch_before_assembly(
 
     def transport(url):
         assert url == URL
-        return Response(url, BODY, ())
+        return Response(url, BODY, (), status=200)
 
     result = build_public.run(
         tmp_path, {}, [], transport=transport, sleep=lambda _: None

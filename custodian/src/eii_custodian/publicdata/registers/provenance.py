@@ -14,7 +14,7 @@ import h3
 from eii_custodian.publicdata.fetch.registry import LICENCE_BASES
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 
-from .contracts import REGISTRY_KEYS, ROLES, refuse
+from .contracts import RECEIPT_VERSION, REGISTRY_KEYS, ROLES, refuse
 
 _RECEIPT_KEYS = frozenset(
     {
@@ -104,7 +104,7 @@ def receipt_for(
     if source_id not in ROLES:
         refuse("register_source")
     return dict(
-        version="register_input_v1",
+        version=RECEIPT_VERSION,
         kind="register_file",
         key=REGISTRY_KEYS[source_id],
         source_id=source_id,
@@ -131,7 +131,7 @@ def validate_receipt(
     if not isinstance(side, Mapping) or set(side) != _RECEIPT_KEYS:
         refuse("receipt_schema")
     for name, value in {
-        "version": "register_input_v1",
+        "version": RECEIPT_VERSION,
         "kind": "register_file",
         "key": REGISTRY_KEYS.get(source, ""),
         "source_id": source,
