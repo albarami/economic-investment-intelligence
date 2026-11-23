@@ -43,7 +43,7 @@ S2-T19#5 is ticked for a legitimate empty legacy selection, `views: []`, in
 the dated national snapshots to S2-T51; item 2 requires its separate closed
 acquisition; item 3 excludes background acquisition/completion from earlier
 gates; item 4 requires explicitly selected verified all-date release artifacts.
-The existing S2-T19 decision-0079 amendment records the free choice of dates
+Decision 0064 item 30 supplies the free choice of dates; the existing S2-T19 amendment records it
 and unchanged guards for unselected legacy fixed views. This does not assert
 that S2-T51 has fetched or integrated imagery.
 
@@ -64,7 +64,7 @@ no owner decision choosing that empty list is asserted.
 
 ## Tender confirmations and C-09
 
-S2-T13#5 is ticked as a records-only confirmation. The committed
+S2-T13#5 stays OPEN: the weight block is recorded; the tender confirmation under PLN-25 waits on the L6 `tender_evidence` outcome. The committed
 `custodian/publicdata/review/s2_t13_confirmation.yaml`, **tender**, records the
 visitor-readable `tenders_pub` source, dated terms/page identities, the terms
 reading and decision-0026 owner basis; **weight** confirms area apportioning,
@@ -95,12 +95,12 @@ decision 0084 items 3–6. OI-370's start-day and pre-freeze checks remain owed.
 
 | ID | State | Evidence / accountable owner and deciding step |
 |---|---|---|
-| OI-03 | OPEN (records follow-up only) | Sign-off itself is CLOSED by OPEN_ITEMS.md **OI-03**, decision 0025 and `2c0b9a528d`. Gate lead still appends the winning closure pointer to `custodian/publicdata/review/reconciliation_oi03.md` and supersedes the stale hold; that file still says open. L6 must separately verify the bound local sign-off. No new sign-off is requested. |
+| OI-03 | OPEN (records follow-up only) | Sign-off itself is CLOSED by OPEN_ITEMS.md **OI-03**, decision 0025 and `2c0b9a528d`. OPEN_ITEMS.md **PO-S2-R8D-02 — OI-03 closure-pointer reconciliation** tracks the gate lead's step to append the winning closure pointer to `custodian/publicdata/review/reconciliation_oi03.md` and supersede the stale hold; that file still says open. L6 must separately verify the bound local sign-off. No new sign-off is requested. |
 | OI-235 | OPEN | S2-T08 data lead executes and records all required complete draws, seeds and review IDs; different-maker reviewer checks the actual twenty-figure draw with zero mismatches. Waits on L6, reviewer comparison and L9; ordinary build success is insufficient. |
 | OI-358 | CARRIED | Decision 0098 items 3–4 and **Box carry ledger**, S2-T48's exact moved boxes: company-web field-review/acquisition seat and independent reviewer after final go-live retain E1–E7, original cf1 finding disposition, path/byte identity, W/B guards and actual counts. Existing S2 security/default controls and unresolved validator obligations remain path under items 6, 8 and 9; no successful live search or blanket security exemption. |
 | OI-359 | OPEN | Access disposition is now recorded in OPEN_ITEMS.md **S2 records change**, L-1581 (`fa669eedf1`, corrected `6d5466e3bb`): approved paced named-dataset API access. Lead still supplies attributable receipts for the five named portal rows at L6; no export/fetchability is proved by the disposition. |
 | OI-286 | OPEN | Gate lead appends PR 89's actual hosted merge-check evidence, both then-required custodian parts with run IDs/conclusions. Keep the fixed ZipInfo dates/clock plant. Later tests cannot replace that historical record. |
-| OI-323 | OPEN | Gate lead supplies PR 103's six hosted checks and fresh-seed exact-result command/head/seed/exit/counts under **MERGE TRAIN S2-6**; otherwise lead/owner records the required missing-evidence ruling. L11 does not recreate PR 103 evidence. |
+| OI-323 | OPEN | Gate lead supplies PR 103's six hosted checks and fresh-seed exact-result command/head/seed/exit/counts under **MERGE TRAIN S2-6**, as required by OPEN_ITEMS.md **Train S2-11 records audit — re-opening dispositions (2026-11-21)**, OI-323 NEEDED. L11 does not recreate PR 103 evidence. |
 | PO-S2-128 | OPEN | Gate lead and original runner append the PR 104 exact merge-result row and six hosted conclusions under **MERGE TRAIN S2-7**, retaining the requested seed and runner from OPEN_ITEMS.md's audit reopening. A moved-head run is not that record. |
 | PO-S2-22 | OPEN | S2-T44 web/performance owner replays emptied `send` and proves both named clients end with response timeout before the command limit, or supplies the specified lifecycle case / killed-mutant record; another-maker review follows. This guard proof is not carried merely because a performance measurement moved. |
 | PO-S2-36 | OPEN | S2-T15 data/security lead and OI-197/OI-202 live-fetch lead read the actual places column order at L6, or append the permitted post-fetch refusal disposition. Offline hand-encoded orders do not decide it. |

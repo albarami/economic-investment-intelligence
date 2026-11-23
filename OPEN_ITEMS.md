@@ -6546,3 +6546,17 @@ introduced.
 - EVIDENCE: `.overnight/IN/RV1-VERDICT.md`, finding 1, rejects that missing tracking identity. The working paper attributes an older-row delta; this worker has not measured or verified it. No L6 reconciliation is supplied here.
 - NEEDED: After L6, the S2-T08 lead binds the actual command, full head, seed, exit and live run IDs to the registry and index identities/source chains, verified counts, older-row membership and retained refusal reasons, and explains or resolves the attributed delta. A different-maker records reviewer checks that evidence; the lead appends the dated disposition and its pointer to the final S2 gate record. No count from the working paper is treated as a fresh observation.
 - NEEDED BY: The final S2 gate-record reconciliation after L6, before a closure claim for this delta. PO-S2-REC1-3 remains separately open for S2-T50 after L7.
+- SOURCE CLARIFICATION (2026-11-23, S2-R8D round 3, CF1 P-1): the lead's working paper of 2026-11-23, `.overnight/IN/S2-R6DISP.r1.return.md`, table row labelled PO-S2-REC1-3, gives 10,558 registry rows against 10,621 index rows and a 63 older-row difference. These are the working paper's figures, not observations or independently verified counts from this worker. They define the attributed delta to reconcile under PO-S2-R8D-01; the actual L6 evidence and different-maker review above remain owed.
+
+## PROPOSED OPEN ITEMS — S2-R8D round 3 — 2026-11-23
+
+### PO-S2-R8D-02 — OI-03 closure-pointer reconciliation
+
+- ID: PO-S2-R8D-02
+- TYPE: PROPOSED OPEN ITEM — OPEN (records follow-up only)
+- RAISED BY: OpenAI Codex, S2-R8D round 3, 2026-11-23, addressing CF1 P-4.
+- OWNER: Gate lead (S2 records reconciliation).
+- CONCERNS: docs/gate/S2-R6DISP-round8.md **Refreshed R6DISP rows**, OI-03, assigns a closure-pointer/stale-hold follow-up without its own numbered tracking item. OI-03 itself remains CLOSED.
+- EVIDENCE: OPEN_ITEMS.md **OI-03 — Conflicting restaurant and wage figures**, CLOSED entry of 2026-11-20, records accepted decision 0025 and the bound delegated sign-off. `custodian/publicdata/review/reconciliation_oi03.md` **OI-03 reconciliation evidence status** and **Handoffs** retain the earlier open status and sign-off obligation. CF1's **PROPOSED OPEN ITEMS**, P-4, requires separate tracking of this records follow-up.
+- NEEDED: The gate lead appends the winning dated closure pointer to `custodian/publicdata/review/reconciliation_oi03.md` and supersedes the stale hold with an appended correction, preserving earlier evidence. Append the dated disposition and pointer to the final S2 gate record; obtain different-maker records confirmation. No new sign-off is requested, and L6's separate verification of the bound local sign-off remains owed.
+- NEEDED BY: Final S2 gate-record reconciliation, before claiming this records follow-up closed.
