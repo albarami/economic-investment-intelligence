@@ -13,6 +13,7 @@ from typing import TextIO
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import ci_environment
 import run_tests_counts as counts
 import run_tests_exec as runner_exec
 
@@ -32,6 +33,7 @@ class Suite:
     cwd: str
     args: tuple[str, ...]
     timeout: int
+    hosted_timeout: int | None = None
 
 
 @dataclass(frozen=True)
@@ -59,7 +61,8 @@ SUITES: tuple[Suite, ...] = (
                 "--custodian-part",
                 str(part),
             ),
-            1200,
+            1800,
+            hosted_timeout=2400,
         )
         for part in range(1, 6)
     ),
@@ -91,7 +94,10 @@ _SEED_DETAIL = "seed must be ten decimal digits from 1000000000 to 4294967295"
 
 
 def suite_timeout(suite: Suite, environ: Mapping[str, str]) -> int:
-    """Use the table limit on every runner (decision 0027 item 4)."""
+    """Select the suite's limit: its hosted limit on a GitHub-hosted runner, if it
+    has one, and its table limit everywhere else (decision 0101)."""
+    if suite.hosted_timeout is not None and ci_environment.is_hosted_runner(environ):
+        return suite.hosted_timeout
     return suite.timeout
 
 
@@ -278,7 +284,7 @@ def _main(
             result = _internal(suite.name, error)
         elapsed = now() - started
         results.append(result)
-        _print_suite(stdout, result, elapsed, suite.timeout)
+        _print_suite(stdout, result, elapsed, suite_timeout(suite, parent))
     passed = sum(item.counts.passed for item in results if item.counts is not None)
     failed = sum(item.counts.failed for item in results if item.counts is not None)
     skipped = sum(item.counts.skipped for item in results if item.counts is not None)

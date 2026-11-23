@@ -95,8 +95,8 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
         "FAIL workflow-env: SHELLOPTS",
     ),
     (
-        "    timeout-minutes: 90\n",
-        job_env("90", "SHELLOPTS"),
+        "    timeout-minutes: 150\n",
+        job_env("150", "SHELLOPTS"),
         "FAIL job-env: suite: SHELLOPTS",
     ),
     (
@@ -115,8 +115,8 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
         "FAIL job-env: static-checks: ENV",
     ),
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90\n    env: ${{ fromJSON(vars.E) }}\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150\n    env: ${{ fromJSON(vars.E) }}\n",
         "FAIL job-env: suite: not a mapping",
     ),
     (
@@ -142,8 +142,8 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
         "FAIL workflow-env: SHELLOPTS",
     ),
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90\n    env:\n      SHELLOPTS: null\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150\n    env:\n      SHELLOPTS: null\n",
         "FAIL job-env: suite: SHELLOPTS",
     ),
     (
@@ -164,8 +164,8 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
     # An explicit null env is not a mapping at any scope.
     ("permissions:\n", "env:\npermissions:\n", "FAIL workflow-env: not a mapping"),
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90\n    env: null\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150\n    env: null\n",
         "FAIL job-env: suite: not a mapping",
     ),
     (
@@ -175,7 +175,7 @@ ENV_ROWS: tuple[tuple[str, str, str], ...] = (
     ),
 )
 # Family sweep: a declared value is matched by type as well as value, so
-# 0 never passes for false, 90.0 never for 90 and a key 1 never for true.
+# 0 never passes for false, 150.0 never for 150 and a key 1 never for true.
 TYPE_ROWS: tuple[tuple[str, str, str], ...] = (
     (
         "      fail-fast: false\n",
@@ -183,8 +183,8 @@ TYPE_ROWS: tuple[tuple[str, str, str], ...] = (
         "FAIL strategy-keys: the suite strategy is not fail-fast false alone",
     ),
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90.0\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150.0\n",
         "FAIL job-value: suite: timeout-minutes",
     ),
     (
@@ -257,22 +257,22 @@ STEP_ROWS: tuple[tuple[str, str, str], ...] = (
 # Vector 3: job keys and workflow root keys are exact allow-lists.
 JOB_ROWS: tuple[tuple[str, str, str], ...] = (
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90\n    container: ubuntu:24.04\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150\n    container: ubuntu:24.04\n",
         "FAIL job-key: suite: container",
     ),
     (
-        "    timeout-minutes: 90\n",
-        "    timeout-minutes: 90\n    services:\n      db:\n        image: postgres\n",
+        "    timeout-minutes: 150\n",
+        "    timeout-minutes: 150\n    services:\n      db:\n        image: postgres\n",
         "FAIL job-key: suite: services",
     ),
     (
-        "    runs-on: ubuntu-24.04\n    timeout-minutes: 90\n",
-        "    runs-on: ubuntu-22.04\n    timeout-minutes: 90\n",
+        "    runs-on: ubuntu-24.04\n    timeout-minutes: 150\n",
+        "    runs-on: ubuntu-22.04\n    timeout-minutes: 150\n",
         "FAIL job-value: suite: runs-on",
     ),
     (
-        "    timeout-minutes: 90\n",
+        "    timeout-minutes: 150\n",
         "    timeout-minutes: 1\n",
         "FAIL job-value: suite: timeout-minutes",
     ),
@@ -537,23 +537,23 @@ class Aggregate(unittest.TestCase):
             ),
             # 5 job continue-on-error, 9 job condition
             (
-                "    timeout-minutes: 90\n",
-                "    timeout-minutes: 90\n    continue-on-error: true\n",
+                "    timeout-minutes: 150\n",
+                "    timeout-minutes: 150\n    continue-on-error: true\n",
                 "FAIL job-key: suite: continue-on-error",
             ),
             (
-                "    timeout-minutes: 90\n",
-                "    timeout-minutes: 90\n    if: ${{ true }}\n",
+                "    timeout-minutes: 150\n",
+                "    timeout-minutes: 150\n    if: ${{ true }}\n",
                 "FAIL job-key: suite: if",
             ),
             (
-                "    timeout-minutes: 90\n",
-                "    timeout-minutes: 90\n    defaults:\n      run:\n        shell: sh\n",
+                "    timeout-minutes: 150\n",
+                "    timeout-minutes: 150\n    defaults:\n      run:\n        shell: sh\n",
                 "FAIL job-key: suite: defaults",
             ),
             (
-                "    timeout-minutes: 90\n",
-                "    timeout-minutes: 90\n    needs: [static-checks]\n",
+                "    timeout-minutes: 150\n",
+                "    timeout-minutes: 150\n    needs: [static-checks]\n",
                 "FAIL job-key: suite: needs",
             ),
             # 6 step continue-on-error, 7 step condition, shell or command

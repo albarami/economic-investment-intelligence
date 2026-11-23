@@ -8,6 +8,10 @@
 | Amends | Decision 0086 item 1; document 12 section 2.1; the runner suite table and hosted suite matrix |
 | Purpose | Keep every custodian test in exactly one whole-module shard below the measured headroom target |
 
+## Amendment — decision 0101
+
+[Decision 0101](0101-custodian-part-hang-guard-and-suite-job-cap.md) replaces the 1,200-second custodian part limit and the 720-second hosted watch below: 2,400 seconds on a GitHub-hosted runner, 1,800 seconds everywhere else, and a split at a green hosted time above 1,680 seconds. The text below remains historical.
+
 ## Decision
 
 1. Use five named parts, `python-custodian-1` through `python-custodian-5`, by SHA-256 of the repository-relative POSIX module path modulo 5, plus one. New modules use the same rule. There is no duration table or exceptional module assignment.

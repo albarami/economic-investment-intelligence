@@ -179,8 +179,8 @@ PLANTS: dict[str, Plant] = {
         write_files((SHARD_ONE, PASSING), (SHARD_TWO, PASSING)),
         remove_text(
             ".github/workflows/ci.yml",
-            "    timeout-minutes: 90\n",
-            "    timeout-minutes: 90\n    env:\n      SHELLOPTS: noexec\n",
+            "    timeout-minutes: 150\n",
+            "    timeout-minutes: 150\n    env:\n      SHELLOPTS: noexec\n",
         ),
     ),
 }

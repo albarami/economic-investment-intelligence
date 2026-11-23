@@ -16,6 +16,10 @@ The proposed [decision 0097](0097-custodian-shard-headroom.md) records this impl
 
 Ruling L-1517 item 2 authorises five complete SHA-256 parts, modulo 5, named `python-custodian-1` through `python-custodian-5`, in place of item 1 below. The original decision and evidence remain historical. Items 2 to 4, including the 1,200-second limit, 720-second hosted watch, process-group kill and complete coverage, remain in force. Shared-machine measurements and the split prediction are recorded in PROGRESS.md under **S2-P67 — custodian shard headroom**; hosted confirmation and different-maker review remain pending.
 
+## Amendment — decision 0101
+
+[Decision 0101](0101-custodian-part-hang-guard-and-suite-job-cap.md) replaces the 1,200-second custodian part limit and the 720-second hosted watch below: 2,400 seconds on a GitHub-hosted runner, 1,800 seconds everywhere else, and a split at a green hosted time above 1,680 seconds. The text below remains historical.
+
 ## Context
 
 The owner's words, quoted exactly from the relayed note: “if this 600 limit affect us change it we created this limit i want you to evaluate it and decide should we keep it as is or change it”. The choice to **change** the limit, and the watch threshold, are the advisor's delegated decision, not words attributed to the owner. Lead ruling L-1404 applies that decision to the existing three-part build.

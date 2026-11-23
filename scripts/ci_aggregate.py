@@ -159,7 +159,7 @@ JOB_VALUES: dict[str, dict[str, object]] = {
     name: {"name": name, "runs-on": RUNNER, "timeout-minutes": minutes}
     for name, minutes in (
         ("static-checks", 25),
-        ("suite", 90),
+        ("suite", 150),
         ("web-spikes", 45),
         ("tests", 10),
     )

@@ -34,7 +34,7 @@ class CustodianManifest(unittest.TestCase):
     def test_real_collection_is_an_exact_partition(self) -> None:
         suites = [suite for suite in run_tests.SUITES if suite.name in PART_NAMES]
         self.assertEqual(tuple(suite.name for suite in suites), PART_NAMES)
-        self.assertEqual(tuple(suite.timeout for suite in suites), (1200,) * 5)
+        self.assertEqual(tuple(suite.timeout for suite in suites), (1800,) * 5)
         whole = manifests.nodeids(manifests.collect(support.ROOT, ("custodian/tests",)))
         parts = [
             manifests.nodeids(manifests.collect(support.ROOT, suite.args))
