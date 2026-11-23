@@ -130,6 +130,7 @@ METRIC_KEYS = frozenset(
         "building_height_mean_signed_error",
         "building_height_mean_abs_error",
         "building_height_median_abs_error",
+        "trade_reporter_measure",
     )
 )
 QUALIFIER_KEYS = frozenset(
@@ -162,6 +163,21 @@ QUALIFIER_KEYS = frozenset(
         "hour",
         "field",
         "height_source",
+        # The pub_comtrade_trade catalogue key; period stays in Fact.period.
+        "series_role",
+        "reporter_code",
+        "partner_code",
+        "partner2_code",
+        "frequency",
+        "flow_code",
+        "classification",
+        "classification_revision",
+        "product_code",
+        "aggregation_level",
+        "customs_code",
+        "transport_mode_code",
+        "valuation_basis",
+        "measure",
     }
 )
 KEY = re.compile(r"[a-z][a-z0-9_]*")

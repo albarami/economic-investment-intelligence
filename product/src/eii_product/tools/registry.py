@@ -8,7 +8,7 @@ from typing import cast
 from eii_product.assistant.catalogue.schema import Catalogue
 from eii_product.store.normalise import Fact, ToolResult
 from eii_product.store.parity import ParityCase, ToolDescriptor
-from eii_product.store.protocol import NormalValue, Param, ReleaseStore
+from eii_product.store.protocol import NormalValue, ReleaseStore, ToolInput
 from eii_product.store.registry import PACKAGED
 from eii_product.tools.areas import canonical_json
 from eii_product.tools.make_area import (
@@ -83,7 +83,7 @@ def resolve_descriptor(
 ) -> ToolDescriptor:
     """Bind the context into ``run``. The placeholder carries no facts."""
 
-    def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+    def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
         result = resolve(store, dict(inputs), context)
         payloads.append(_resolve_payload(result))
         return _resolve_placeholder(store, result)
@@ -104,7 +104,7 @@ def require_cases(tools: Sequence[ToolDescriptor], cases: Sequence[ParityCase]) 
 def descriptor(context: MakeAreaContext, payloads: list[bytes]) -> ToolDescriptor:
     """Bind the context into ``run``. The placeholder carries no facts."""
 
-    def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+    def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
         result = make_area(store, dict(inputs), context)
         payloads.append(canonical_payload(result))
         return _placeholder(store, result)
@@ -148,7 +148,7 @@ def _placeholder(store: ReleaseStore, result: MakeAreaResult) -> ToolResult:
 def sector_facts_descriptor() -> ToolDescriptor:
     """Bind the Public-fact tool; parity names are semantic fact ids."""
 
-    def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+    def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
         result = sector_facts(store, inputs)
         return ToolResult(
             store.engine,
@@ -185,6 +185,11 @@ def sector_facts_parity_cases() -> tuple[ParityCase, ...]:
                     in {"licences", "churn", "employer_scale", "visitor_markets"}
                     else "national",
                 ),
+            )
+            + (
+                (("trade", {"flow": "SYN-M", "product_scope": "TOTAL"}),)
+                if topic == "trade"
+                else ()
             ),
         )
         for topic in TOPICS
@@ -194,7 +199,7 @@ def sector_facts_parity_cases() -> tuple[ParityCase, ...]:
 def stage_descriptor(catalogue: Catalogue) -> ToolDescriptor:
     """Store-free stage validation participates in the existing parity harness."""
 
-    def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+    def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
         result = stage(inputs, catalogue)
         return ToolResult(
             store.engine, "stage", 0, "stage", result["status"], store.release_id, ()
@@ -215,7 +220,7 @@ def scan_places_descriptor(
     """Record the full envelope; scalar parity alone does not prove its metadata."""
     import json
 
-    def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+    def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
         result = scan_places(store, inputs, context)
         body = result.model_dump(mode="json")
         del body["engine"], body["call_id"]
@@ -282,7 +287,7 @@ def public_card_descriptors(context: MakeAreaContext) -> tuple[ToolDescriptor, .
     }
 
     def descriptor_for(key: str, queries: tuple[str, ...]) -> ToolDescriptor:
-        def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+        def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
             result = run_card(store, key, inputs, context)
             facts = result.facts if hasattr(result, "facts") else ()
             return ToolResult(
@@ -328,7 +333,7 @@ def public_layer_descriptors() -> tuple[ToolDescriptor, ...]:
             + (("sector_facts_lineage",) if key == "zone_electricity_growth" else ())
         )
 
-        def run(store: ReleaseStore, inputs: Mapping[str, Param]) -> ToolResult:
+        def run(store: ReleaseStore, inputs: Mapping[str, ToolInput]) -> ToolResult:
             month = inputs.get("month_key")
             result = read_layer(store, key, month if isinstance(month, str) else None)
             return ToolResult(

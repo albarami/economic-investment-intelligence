@@ -2,12 +2,21 @@
 
 Churn years come from the calculation layer. C4 component mappings use the
 publisher's stored indicator keys; unknown rows are never guessed.
+
+The ``trade`` topic is S3-T06 part A of decision 0040's "public-source fact
+bindings": the Comtrade reporter-row binding only. Its production read (the
+``sector_facts_comtrade`` SQL and toml), its ``PACKAGED`` registration, document
+08's Reads row and packaged parity stay gated on S2-T23 box 1, which records the
+value's decimal(p,s) contract, the reviewed (measure, unit) map and the
+registry's url and licence. Until then ``TRADE_UNITS`` is empty and the topic
+reads nothing. The source chain keeps ``licence_basis: provider_terms`` and the
+recorded terms words as the registry holds them; nothing is repaired.
 """
 
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import replace
 from decimal import Decimal
 from typing import Any, Literal, cast
@@ -26,12 +35,12 @@ from eii_core.calc.facts import (
 from eii_core.calc.public_methods import AnnualEnergy
 from eii_core.calc.public_series import C2_CALENDAR, bulk_months, complete_years
 from eii_core.calc.sector_economics import Component
-from eii_core.facts import SIZE_BAND, Fact, validate_chain
+from eii_core.facts import SIZE_BAND, UNITS, Fact, validate_chain
 from eii_core.reasons import closed_code
 from eii_core.reasons import reason as closed_reason
 from eii_product.store import ReleaseStore
 from eii_product.store.protocol import Param
-from eii_product.store.registry import PACKAGED
+from eii_product.store.registry import PACKAGED, Inventory
 
 from .fact_builder import STORED_UNITS, build_calculated, build_published
 
@@ -44,7 +53,34 @@ TOPICS = (
     "employer_scale",
     "market_context",
     "visitor_markets",
+    "trade",
 )
+COMTRADE_TABLE = "pub_comtrade_trade"
+COMTRADE_QUERY = "sector_facts_comtrade"
+# The release keeps Qatar as reporter under this key (document 03 "7.3 Columns").
+COMTRADE_REPORTER = "QAT"
+# The catalogue key of pub_comtrade_trade without period, which stays Fact.period.
+COMTRADE_QUALIFIERS = (
+    "series_role",
+    "reporter_code",
+    "partner_code",
+    "partner2_code",
+    "frequency",
+    "flow_code",
+    "classification",
+    "classification_revision",
+    "product_code",
+    "aggregation_level",
+    "customs_code",
+    "transport_mode_code",
+    "valuation_basis",
+    "measure",
+)
+# Reviewed (measure, unit) -> fact unit. Empty until S2-T23 box 1 records it.
+TRADE_UNITS: Mapping[tuple[str, str], str] = {}
+# Locked to fdi_estimates (document 03 section 9); never a trade unit.
+FDI_LOCKED_UNITS = frozenset({"usd_million", "announced_jobs"})
+_TOKEN = r"[A-Za-z0-9_-]+"
 
 
 class ScenarioInputs(BaseModel):
@@ -61,6 +97,15 @@ class ScenarioInputs(BaseModel):
     incentive_key: str | None = None
 
 
+class TradeInputs(BaseModel):
+    """Closed trade selection; source codes are matched verbatim, no period."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+    flow: str
+    product_scope: str
+    partner: str | None = None
+
+
 class Inputs(BaseModel):
     """Closed tool input. Stored activity keys are matched verbatim."""
 
@@ -75,13 +120,21 @@ class Inputs(BaseModel):
         "employer_scale",
         "market_context",
         "visitor_markets",
+        "trade",
     ]
     geography: str
     scenario_inputs: ScenarioInputs | None = None
+    trade: TradeInputs | None = None
 
 
 def _read(store: ReleaseStore, name: str, **params: Param) -> list[dict[str, Any]]:
-    result = store.fetch(PACKAGED.lookup("sector_facts_" + name), params)
+    return _fetch(store, PACKAGED, "sector_facts_" + name, params)
+
+
+def _fetch(
+    store: ReleaseStore, inventory: Inventory, name: str, params: Mapping[str, Param]
+) -> list[dict[str, Any]]:
+    result = store.fetch(inventory.lookup(name), params)
     return [dict(zip(result.columns, row, strict=True)) for row in result.rows]
 
 
@@ -686,11 +739,119 @@ def _norms(ctx: Context) -> None:
     ctx.block("scenario", [])
 
 
+def trade_unit(
+    row: Mapping[str, Any], units: Mapping[tuple[str, str], str]
+) -> str | None:
+    """The reviewed fact unit of a row's closed (measure, unit) pair, or None."""
+    unit = units.get((row["measure"], row["unit"]))
+    if unit is None or unit in FDI_LOCKED_UNITS or unit not in UNITS:
+        return None
+    return unit
+
+
+def comtrade_refusal(
+    row: Mapping[str, Any],
+    lineage_sources: Collection[str],
+    units: Mapping[tuple[str, str], str],
+) -> str | None:
+    """The closed reason a reporter row yields no fact, or None when it binds."""
+    if row["series_role"] != "reporter":
+        return "trade_series_role"
+    if row["reporter_code"] != COMTRADE_REPORTER:
+        return "trade_reporter_invalid"
+    if row["source_id"] not in lineage_sources:
+        return "source_missing"
+    if row["value"] is None:
+        return "trade_coverage_gap"
+    if type(row["value"]) not in (int, Decimal):
+        return "number_required"
+    if units.get((row["measure"], row["unit"])) in FDI_LOCKED_UNITS:
+        return "trade_unit_locked"
+    if trade_unit(row, units) is None:
+        return "trade_unit_unmapped"
+    if type(row["aggregation_level"]) is not int or any(
+        type(row[key]) is not str
+        for key in COMTRADE_QUALIFIERS
+        if key != "aggregation_level"
+    ):
+        return "trade_qualifier_invalid"
+    return None
+
+
+def comtrade_fact(
+    ctx: Context,
+    row: Mapping[str, Any],
+    units: Mapping[tuple[str, str], str],
+    caveats: tuple[str, ...] = (),
+) -> Fact | None:
+    """One reporter cell; the stored value passes byte for byte."""
+    ref, lines, sources = ctx.chain(COMTRADE_TABLE)
+    if comtrade_refusal(row, {line["source_id"] for line in lines}, units):
+        return None
+    qualifiers = {key: str(row[key]) for key in COMTRADE_QUALIFIERS}
+    qualifiers["activity"] = ctx.inputs.activity
+    return build_published(
+        value=row["value"],
+        unit=cast(str, trade_unit(row, units)),
+        metric_key="trade_reporter_measure",
+        period=row["period"],
+        geography={"kind": "national"},
+        release_id=ctx.store.release_id,
+        lineage_ref=ref,
+        lineage_rows=lines,
+        source_rows=sources,
+        qualifiers=qualifiers,
+        caveat_keys=caveats,
+    )
+
+
+def _outside(row: Mapping[str, Any], request: TradeInputs) -> bool:
+    return (
+        row["flow_code"] != request.flow
+        or row["product_code"] != request.product_scope
+        or (request.partner is not None and row["partner_code"] != request.partner)
+    )
+
+
+def trade_reporter(
+    ctx: Context, inventory: Inventory, units: Mapping[tuple[str, str], str]
+) -> None:
+    """Bind Comtrade reporter cells; never a sum, a conversion or a zero."""
+    request = cast(TradeInputs, ctx.inputs.trade)
+    if inventory.get(COMTRADE_QUERY) is None:
+        # Gated on S2-T23 box 1: no packaged read exists, so nothing is read.
+        ctx.block("trade_reporter", [])
+        return
+    rows: Sequence[Mapping[str, Any]] = _fetch(
+        ctx.store,
+        inventory,
+        COMTRADE_QUERY,
+        dict(
+            flow=request.flow,
+            product_code=request.product_scope,
+            partner=request.partner or "",
+        ),
+    )
+    if any(_outside(row, request) for row in rows):
+        raise ValueError("trade_row_outside_request")
+    keys = [tuple(row[k] for k in (*COMTRADE_QUALIFIERS, "period")) for row in rows]
+    if len(keys) != len(set(keys)):
+        ctx.block("trade_reporter", [], reason="duplicate_row_key")
+        return
+    gap = not rows or any(row["value"] is None for row in rows)
+    built = [comtrade_fact(ctx, row, units) for row in rows]
+    ctx.block(
+        "trade_reporter",
+        [fact for fact in built if fact is not None],
+        reason="trade_coverage_gap" if gap else None,
+    )
+
+
 def sector_facts(store: ReleaseStore, raw: Mapping[str, object]) -> dict[str, Any]:
     """Return the BE-49 envelope; invalid arguments are refused before a read."""
     try:
         args = Inputs.model_validate(dict(raw))
-        if re.fullmatch(r"[A-Za-z0-9_-]+", args.activity) is None:
+        if re.fullmatch(_TOKEN, args.activity) is None:
             raise ValueError("activity")
         if (
             re.fullmatch(
@@ -701,6 +862,18 @@ def sector_facts(store: ReleaseStore, raw: Mapping[str, object]) -> dict[str, An
             raise ValueError("geography")
         if args.scenario_inputs is not None and args.topic != "unit_economics":
             raise ValueError("scenario")
+        if (args.trade is not None) != (args.topic == "trade"):
+            raise ValueError("trade")
+        if args.trade is not None and (
+            args.geography != "national"
+            or re.fullmatch(_TOKEN, args.trade.flow) is None
+            or re.fullmatch(r"TOTAL|[0-9]{2}", args.trade.product_scope) is None
+            or (
+                args.trade.partner is not None
+                and re.fullmatch(_TOKEN, args.trade.partner) is None
+            )
+        ):
+            raise ValueError("trade")
     except ValidationError as error:
         faults = error.errors(include_input=False, include_url=False)
         field = faults[0]["loc"][0] if faults and faults[0]["loc"] else None
@@ -750,6 +923,8 @@ def sector_facts(store: ReleaseStore, raw: Mapping[str, object]) -> dict[str, An
         _pay(ctx)
     elif args.topic == "zone_momentum":
         _momentum(ctx)
+    elif args.topic == "trade":
+        trade_reporter(ctx, PACKAGED, TRADE_UNITS)
     else:
         _norms(ctx)
     return dict(

@@ -46,6 +46,10 @@ def test_individual_parity_case_runs_nonempty_on_embedded(case):
     seen = []
     with release_store(all_topic_rows()) as store:
         result = descriptor.run(TracingStore(store, seen), dict(case.inputs))
+    if dict(case.inputs)["topic"] == "trade":
+        # S3-T06 part A: the packaged Comtrade read is gated on S2-T23 box 1.
+        assert (result.status, result.facts, seen) == ("NO_DATA", (), [])
+        return
     assert result.status == "OK"
     assert result.facts
     assert result.tool == case.tool == "sector_facts"
@@ -102,6 +106,7 @@ def test_all_cases_execute_exact_owned_query_union():
         "employer_scale",
         "market_context",
         "visitor_markets",
+        "trade",
     }
     norms = next(c for c in cases if dict(c.inputs)["topic"] == "unit_economics")
     assert dict(norms.inputs) == dict(

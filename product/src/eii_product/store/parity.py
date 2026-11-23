@@ -15,6 +15,7 @@ from eii_product.store.protocol import (
     ReleaseStore,
     StoreHealth,
     StoreRefusal,
+    ToolInput,
 )
 from eii_product.store.registry import Inventory, QueryName, sample_params
 
@@ -24,7 +25,7 @@ class ParityCase:
     """One tool call. Inputs stay paired so the case cannot be reordered silently."""
 
     tool: str
-    inputs: tuple[tuple[str, Param], ...]
+    inputs: tuple[tuple[str, ToolInput], ...]
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,7 @@ class ToolDescriptor:
     """A registered tool. Coverage reads traces, and the names are what it may run."""
 
     key: str
-    run: Callable[[ReleaseStore, Mapping[str, Param]], ToolResult]
+    run: Callable[[ReleaseStore, Mapping[str, ToolInput]], ToolResult]
     queries: tuple[str, ...]
 
 

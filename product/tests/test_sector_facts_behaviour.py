@@ -329,8 +329,11 @@ def test_payload_purity():
 
     for topic in TOPICS:
         with licence_store() as store:
+            trade = dict(flow="SYN-M", product_scope="TOTAL")
             result = sector_facts(
-                store, dict(activity="SYN-a", topic=topic, geography="national")
+                store,
+                dict(activity="SYN-a", topic=topic, geography="national")
+                | (dict(trade=trade) if topic == "trade" else {}),
             )
         payload_is_pure(result["payload"])
     with pytest.raises(AssertionError):

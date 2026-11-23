@@ -183,6 +183,15 @@ def test_sector_cases_preserve_every_topic_argument() -> None:
                 "geography": "municipality:SYN-local",
             },
         ),
+        (
+            "sector_facts",
+            {
+                "activity": "SYN-restaurant",
+                "topic": "trade",
+                "geography": "national",
+                "trade": {"flow": "SYN-M", "product_scope": "TOTAL"},
+            },
+        ),
     )
     for case in cases:
         Inputs.model_validate(dict(case.inputs))

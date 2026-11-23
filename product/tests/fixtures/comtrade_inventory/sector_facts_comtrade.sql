@@ -1,0 +1,8 @@
+-- name: sector_facts_comtrade
+-- params: flow text, product_code text, partner text
+-- returns: source_id text, series_role text, reporter_code text, partner_code text, partner2_code text, frequency text, period text, flow_code text, classification text, classification_revision text, product_code text, aggregation_level bigint, customs_code text, transport_mode_code text, valuation_basis text, measure text, unit text, value numeric
+-- order: series_role, reporter_code, partner_code, partner2_code, frequency, period, flow_code, classification, classification_revision, product_code, aggregation_level, customs_code, transport_mode_code, valuation_basis, measure
+SELECT p.source_id, p.series_role, p.reporter_code, p.partner_code, p.partner2_code, p.frequency, p.period, p.flow_code, p.classification, p.classification_revision, p.product_code, p.aggregation_level, p.customs_code, p.transport_mode_code, p.valuation_basis, p.measure, p.unit, p.value
+FROM pub_comtrade_trade AS p
+WHERE p.series_role = 'reporter' AND p.flow_code = :flow AND p.product_code = :product_code AND (:partner = '' OR p.partner_code = :partner)
+ORDER BY p.series_role ASC NULLS LAST, p.reporter_code ASC NULLS LAST, p.partner_code ASC NULLS LAST, p.partner2_code ASC NULLS LAST, p.frequency ASC NULLS LAST, p.period ASC NULLS LAST, p.flow_code ASC NULLS LAST, p.classification ASC NULLS LAST, p.classification_revision ASC NULLS LAST, p.product_code ASC NULLS LAST, p.aggregation_level ASC NULLS LAST, p.customs_code ASC NULLS LAST, p.transport_mode_code ASC NULLS LAST, p.valuation_basis ASC NULLS LAST, p.measure ASC NULLS LAST

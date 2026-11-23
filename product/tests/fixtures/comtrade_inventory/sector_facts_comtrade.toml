@@ -1,0 +1,96 @@
+# Fixture only: an invented, non-production contract (decimal(20,4) is not the
+# activated policy's bound, which S2-T23 box 1 records).
+[[tables]]
+name = "pub_comtrade_trade"
+anchor = "7.3 Columns"
+key = ["series_role", "reporter_code", "partner_code", "partner2_code", "frequency", "period", "flow_code", "classification", "classification_revision", "product_code", "aggregation_level", "customs_code", "transport_mode_code", "valuation_basis", "measure"]
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "series_role"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "reporter_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "partner_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "partner2_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "frequency"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "flow_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "classification"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "classification_revision"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "product_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "aggregation_level"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "customs_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "transport_mode_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "valuation_basis"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "measure"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "unit"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "value"
+type = "decimal(20,4)"
+nullable = true

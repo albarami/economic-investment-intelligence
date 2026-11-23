@@ -13,6 +13,9 @@ if TYPE_CHECKING:
     from eii_product.store.registry import QueryName
 
 type Param = int | str | bool | date | list[int] | list[str]
+# A tool call's input: a query Param, or one closed nested object such as the
+# sector_facts trade selection. Store queries still bind Param only.
+type ToolInput = Param | dict[str, str]
 type NormalValue = int | Decimal | str | date | None
 type EngineName = Literal["postgres", "embedded"]
 

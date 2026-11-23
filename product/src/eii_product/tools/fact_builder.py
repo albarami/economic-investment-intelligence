@@ -78,6 +78,10 @@ LABELS.update(
         "food": ("Food share", "حصة الغذاء"),
         "beverages": ("Beverages share", "حصة المشروبات"),
         "building_rent": ("Building rent share", "حصة إيجار المبنى"),
+        "trade_reporter_measure": (
+            "Reported trade measure",
+            "مقياس التجارة المبلغ عنه",
+        ),
     }
 )
 STORED_UNITS = {
