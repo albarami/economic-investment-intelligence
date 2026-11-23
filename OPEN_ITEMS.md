@@ -6472,3 +6472,4 @@ introduced.
 ## S2-P69 — custodian hang guard and suite job cap
 
 - PO-S2-P69-01 — OPEN (2026-11-23): decision 0101 is judged by hosted and local custodian parts that finish under 70 percent of their new limits with no `FAIL timeout` over the next five whole tests, and by the S2 merge time. Whether another hosted suite is near its limit was not checked; `python-core`, `python-product` and `web-unit` at 600 seconds were not in the failing run.
+- PO-S2-P69-02 — OPEN (2026-11-23, review S2-P69.rv1, non-blocking code practice): `scripts/tests/test_runner_failures.py` has two timeout-recording `fake_launch` test doubles of five lines each; extract one shared double in a later scripts change. No coverage is affected.
