@@ -23,8 +23,6 @@ from eii_core.calc.public_methods import (
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
 from eii_custodian.publicdata.fetch.page_workbook import read_sheet
-from eii_custodian.publicdata.fetch.registry import load_registry, parse_yaml
-from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.census import (
     C8_SOURCES,
     c8_national_counts,
@@ -41,10 +39,10 @@ from eii_custodian.publicdata.frame.layers import COUNTS, layer_rows
 from eii_custodian.publicdata.frame.population import population_rows
 from eii_custodian.publicdata.review.activity import (
     SpineError,
-    basket_membership,
     class_members,
-    load_activity_inputs,
-    read_activity_rows,
+    committed_activity_inputs,
+    load_recorded_binding,
+    read_review_csv,
     spine_path,
 )
 from eii_custodian.publicdata.series.parse import customs_code, source_period
@@ -647,16 +645,20 @@ def c2_class_members(isic_class: str) -> tuple[str, ...]:
     the basket membership of the committed baskets document.
     """
     cache = _cache.CACHE
-    entries = load_registry()
-    selected = reviewed_selections(cache)
-    activities, _, _ = read_activity_rows(cache, entries, selected)
-    playbook, suppliers = basket_membership(
-        parse_yaml(spine_path().with_name("baskets.yaml").read_bytes()), activities
+    reviews = read_review_csv(spine_path())
+    inputs, playbook, suppliers, _ = committed_activity_inputs(
+        cache, spine_path().with_name("baskets.yaml")
     )
-    inputs = load_activity_inputs(
-        cache, playbook, supplier_membership=suppliers, selections=selected
+    return class_members(
+        inputs.activities,
+        inputs.classes,
+        reviews,
+        playbook,
+        supplier_membership=suppliers,
+        isic_class=isic_class,
+        reviewed_binding=load_recorded_binding(spine_path(), reviews),
+        audit_path=spine_path().with_name("activity_spine_audits.json"),
     )
-    return class_members(inputs.spine, inputs.classes, isic_class)
 
 
 def test_pinned_c2_isic_5610():

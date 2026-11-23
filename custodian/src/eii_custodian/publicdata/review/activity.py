@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.registry import Entry, load_registry, parse_yaml
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.cache_fixture import read_cached, read_rows
 from eii_custodian.publicdata.series.baskets import ACTIVITIES, reviewed_inputs
@@ -525,6 +525,33 @@ def load_activity_inputs(
     )
 
 
+def committed_activity_inputs(
+    cache: Path, baskets: Path, review_path: Path | None = None
+) -> tuple[ActivityInputs, tuple[str, ...], SupplierMembership, dict[str, str]]:
+    """Build the inputs of one committed review folder from its baskets.
+
+    This is the one sequence every caller of the committed review follows:
+    the reviewed selections, both licence feeds, the basket membership of the
+    reviewed baskets document, then the spine of that review. ``review_path``
+    ``None`` means the committed review file. Returns the inputs, the playbook
+    codes, the supplier membership and the reviewed selections.
+    """
+    selected = reviewed_selections(cache)
+    entries = load_registry()
+    activities, _, _ = read_activity_rows(cache, entries, selected)
+    playbook, suppliers = basket_membership(
+        parse_yaml(baskets.read_bytes()), activities
+    )
+    inputs = load_activity_inputs(
+        cache,
+        playbook,
+        supplier_membership=suppliers,
+        review_path=review_path,
+        selections=selected,
+    )
+    return inputs, playbook, suppliers, selected
+
+
 def read_review_csv(path: Path) -> tuple[ReviewRow, ...]:
     """Read the review file and refuse every malformed row."""
     with path.open("r", encoding="utf-8", newline="") as handle:
@@ -649,30 +676,49 @@ def finalise_spine(spine: Spine) -> Spine:
 
 
 def class_members(
-    spine: Spine, isic_classes: Sequence[IsicClass], isic_class: str
+    activities: Sequence[ActivityRow],
+    isic_classes: Sequence[IsicClass],
+    reviews: Sequence[ReviewRow],
+    playbook_codes: Sequence[str],
+    *,
+    isic_class: str,
+    supplier_membership: SupplierMembership,
+    code_system_version: str = CODE_SYSTEM_VERSION,
+    reviewed_binding: ReviewedBinding | None = None,
+    audit_path: Path | None = None,
 ) -> tuple[str, ...]:
     """Return the codes whose reviewed decision is ``mapped`` to one class.
 
-    A member is a mapped row of the class with an admitted signature: the
-    spine build has already refused unsigned mapped rows and any model-signed
-    row without a bound, zero-error audited batch, so a recorded reviewer role
-    is the admission; those checks are never repeated here. A class with no
-    admitted row is a refusal, never an empty answer.
+    The spine is built here by ``build_spine``, so a recorded reviewer role is
+    an admitted signature only after the audit rules of decision 0075 have
+    run; membership is selected from that result alone, never from a spine a
+    caller held. A class with no admitted row is a refusal, never an empty
+    answer.
     """
     if not isinstance(isic_class, str) or isic_class not in {
         row.code for row in isic_classes
     }:
         raise SpineError("class is not in the classification: " + str(isic_class))
-    members: list[str] = []
-    for row in spine.rows:
-        if row.status != "mapped" or row.isic_class != isic_class:
-            continue
-        if row.reviewed_by_role.strip() == "":
-            raise SpineError("mapped row has no admitted signature: " + row.code)
-        members.append(row.code)
+    spine = build_spine(
+        activities,
+        isic_classes,
+        reviews,
+        playbook_codes,
+        supplier_membership=supplier_membership,
+        code_system_version=code_system_version,
+        reviewed_binding=reviewed_binding,
+        audit_path=audit_path,
+    )
+    members = tuple(
+        sorted(
+            row.code
+            for row in spine.rows
+            if row.status == "mapped" and row.isic_class == isic_class
+        )
+    )
     if not members:
         raise SpineError("class has no admitted mapped code: " + isic_class)
-    return tuple(sorted(members))
+    return members
 
 
 def class_bucket_counts(

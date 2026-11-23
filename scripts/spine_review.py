@@ -10,8 +10,6 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from eii_custodian.publicdata.fetch.registry import load_registry, parse_yaml
-from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.activity import (
     _MODEL_LIKE,
     CODE_SYSTEM_VERSION,
@@ -22,12 +20,11 @@ from eii_custodian.publicdata.review.activity import (
     audit_maker,
     audit_rows_sha256,
     audit_sample,
-    basket_membership,
     binding_path,
+    committed_activity_inputs,
     encode_review_code,
     finalise_spine,
     load_activity_inputs,
-    read_activity_rows,
     read_review_csv,
     review_binding,
     write_queue_csv,
@@ -79,18 +76,8 @@ def derive(root: Path, cache: Path, review: Path) -> tuple[Context, dict[str, ob
     baskets = contained(root, review.with_name("baskets.yaml"))
     audit_path = contained(root, review.with_name("activity_spine_audits.json"))
     contained(root, binding_path(review))
-    selected = reviewed_selections(cache)
-    entries = load_registry()
-    activities, _, _ = read_activity_rows(cache, entries, selected)
-    playbook, suppliers = basket_membership(
-        parse_yaml(baskets.read_bytes()), activities
-    )
-    inputs = load_activity_inputs(
-        cache,
-        playbook,
-        supplier_membership=suppliers,
-        review_path=review,
-        selections=selected,
+    inputs, playbook, suppliers, selected = committed_activity_inputs(
+        cache, baskets, review
     )
     previous_refusals(root, review)
     hashes, receipts = source_receipts(cache, selected)
