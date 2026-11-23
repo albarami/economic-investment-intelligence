@@ -122,7 +122,17 @@ INVENTORY = (
     ),
     InventoryItem(
         "method_pins",
-        ("reviewed_selections", "receipts", "pin_generation_config", "pin_rows"),
+        (
+            "reviewed_selections",
+            "receipts",
+            "pub_customs_import",
+            "pub_census_district",
+            "pub_property_sale",
+            "baskets.yaml",
+            "s2_t09_generation_config.json",
+            "pin_generation_config",
+            "pin_rows",
+        ),
         (
             "assembly/method_pins.json",
             "assembly/s2_t09_pin_artifact.json",

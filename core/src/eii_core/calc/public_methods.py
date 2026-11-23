@@ -650,11 +650,11 @@ def supplier_metrics(
     readings = tuple(cell for row in rows for cell in (row.value_row, row.weight_row))
     with localcontext(CALC_CONTEXT):
         total = sum((Fraction(row.value) for row in rows), Fraction(0))
-        if total == 0:
+        if total == 0 and (prior_rows is None or not rows):
             return NoData("no_denominator")
         origins: dict[str, dict[str, object]] = {}
         hhi = Fraction(0)
-        for origin in sorted(grouped):
+        for origin in sorted(grouped) if total else ():
             values = grouped[origin]
             share = sum((Fraction(row.value) for row in values), Fraction(0)) / total
             uv, other, nonpositive = unit_value(
@@ -696,6 +696,7 @@ def supplier_metrics(
             }
         trend: CalculationFact | NoData | None = None
         trend_unrounded = None
+        prior: Fraction | None = None  # {QAR}, exact sum over the prior window.
         if prior_rows is not None:
             _months(prior_months)
             if (
@@ -724,14 +725,15 @@ def supplier_metrics(
                     unit="ratio",
                     metric_key="trend",
                     inputs=(*readings, *(row.value_row for row in prior_rows)),
-                    period=prior_months[0] + ".." + months[-1],
-                    base_period=prior_months[0],
+                    period=window,
+                    base_period=prior_months[0] + ".." + prior_months[-1],
                 )
         return {
             "total_value": show(
                 total, places=2, unit="qar", metric_key="total_value", inputs=readings
             ),
             "total_value_unrounded": total,
+            "prior_total_value_unrounded": prior,
             "origin_count": show(
                 Decimal(len(origins)),
                 places=0,
@@ -740,7 +742,9 @@ def supplier_metrics(
                 inputs=readings,
             ),
             "origins": origins,
-            "hhi": show(hhi, places=2, unit="index", metric_key="hhi", inputs=readings),
+            "hhi": show(hhi, places=2, unit="index", metric_key="hhi", inputs=readings)
+            if total
+            else NoData("no_denominator"),
             **({"trend": trend} if trend is not None else {}),
             "trend_unrounded": trend_unrounded,
         }

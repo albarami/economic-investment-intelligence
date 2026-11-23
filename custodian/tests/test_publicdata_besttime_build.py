@@ -459,6 +459,10 @@ def test_besttime_build_failure_names_missing_place(tmp_path, monkeypatch):
 
 
 def test_besttime_command_environment_reaches_build(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
     from eii_custodian.publicdata.fetch.build import BuildOutcome
 

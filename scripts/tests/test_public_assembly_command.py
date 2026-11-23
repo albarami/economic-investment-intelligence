@@ -6,6 +6,7 @@ from typing import Any
 from unittest.mock import Mock
 
 import pytest
+from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
 
 from commands import build_public
 from eii_custodian.publicdata.fetch.build import BuildOutcome, run_build
@@ -45,6 +46,7 @@ def test_invalid_seed_has_no_reads_or_connections(
 def test_valid_seed_reaches_the_real_build_binding(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, args: list[str], seed: int
 ) -> None:
+    stage_tracked_configuration(tmp_path)
     monkeypatch.setattr(build_public, "load_registry", lambda: ())
     runner = Mock(return_value=BuildOutcome((), None))
     monkeypatch.setattr(build_public, "run_build", runner)

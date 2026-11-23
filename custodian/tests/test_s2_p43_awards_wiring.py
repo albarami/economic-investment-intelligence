@@ -21,6 +21,10 @@ def test_keyed_awards_proof_whole_wiring(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Row S11: the real run and run_build reach the awards proof with no token, in page scope."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     declaration, body = report()
     schema = profile()
     schema["proof_columns"] = {

@@ -343,6 +343,12 @@ def require_aligned(
         raise MeasureMismatch("geography")
 
 
+def _window_inputs(window: str, periods: set[str]) -> set[str]:
+    """The input periods covered by one declared comparison window."""
+    first, last = window.split("..") if ".." in window else (window, window)
+    return {period for period in periods if first <= period <= last}
+
+
 def emit(
     value: Number,
     *,
@@ -371,13 +377,18 @@ def emit(
     }:
         raise MeasureMismatch("geography")
     periods = {r.period for r in inputs}
-    if ".." in period:
+    if ".." in base_period:
+        current = _window_inputs(period, periods)
+        base = _window_inputs(base_period, periods)
+        if not current or not base or current | base != periods:
+            raise MeasureMismatch("period")
+    elif ".." in period:
         first, last = period.split("..")
         if first > last or not all(first <= p <= last for p in periods):
             raise MeasureMismatch("period")
     elif period not in periods:
         raise MeasureMismatch("period")
-    if base_period and base_period not in periods:
+    if base_period and ".." not in base_period and base_period not in periods:
         raise MeasureMismatch("period")
     if base_geography and (base_geography, base_geography_kind) not in {
         (r.geography, r.geography_kind) for r in inputs

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
 
 from commands import build_public
 from eii_custodian.publicdata.assembly import AssemblyError
@@ -289,6 +290,7 @@ def test_resume_rechecks_terms_instead_of_reusing_readings(harness: Harness) -> 
 def test_exact_resume_command_form_reaches_assembly(
     harness: Harness, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
+    stage_tracked_configuration(tmp_path)
     harness.interrupt()
     monkeypatch.setattr(build_public, "CACHE_RELATIVE", "cache")
     monkeypatch.setattr(build_public, "load_registry", lambda: harness.entries)

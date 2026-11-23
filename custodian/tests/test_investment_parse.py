@@ -621,6 +621,10 @@ def test_renamed_required_field_fails_the_build_and_publishes_nothing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """An unknown dashboard field fails the build by source and publishes no rows."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
 
     record = invented_record()

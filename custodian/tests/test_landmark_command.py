@@ -11,6 +11,10 @@ from eii_custodian.publicdata.fetch.transport import Response
 def test_real_command_reaches_citation_fetch_before_assembly(
     tmp_path, monkeypatch, capsys
 ):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     row, _ = citation_setup(monkeypatch)
     monkeypatch.setattr(build_public, "load_registry", lambda: (row,))
     monkeypatch.setattr(build_public, "utc_now", lambda: STAMP)

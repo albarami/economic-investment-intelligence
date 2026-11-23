@@ -13,6 +13,7 @@ from custodian.tests.company_web_fixture import (
     manifest,
     offline_network,  # noqa: F401
 )
+from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
 
 import commands.build_public as build_public
 from eii_custodian.publicdata.company_web.build import run_company_web
@@ -41,6 +42,7 @@ def environment(root: Path, stage: str) -> dict[str, str]:
 
 
 def test_ordinary_command_never_selects_family(tmp_path: Path) -> None:
+    stage_tracked_configuration(tmp_path)
     with patch.object(
         build_public, "run_build", return_value=build.BuildOutcome((), None)
     ) as run:

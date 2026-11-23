@@ -362,6 +362,10 @@ def test_dataset_pin_failure_retains_its_fetch_code_above_assembly(
 def test_command_terms_reader_uses_only_the_existing_checked_chain(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, plant: str
 ) -> None:
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     chain = tmp_path / "SYN-chain.pem"
     pem = intermediate_pem()
     if plant != "missing":

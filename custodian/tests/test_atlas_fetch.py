@@ -198,6 +198,10 @@ def test_atlas_interrupt_keeps_the_complete_manifest(
 
 
 def test_atlas_hosts_and_binding(tmp_path: Path, monkeypatch) -> None:
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path / "bind")
+
     from custodian.tests.fixtures.atlas.invented import configuration
 
     import commands.build_public as build_public

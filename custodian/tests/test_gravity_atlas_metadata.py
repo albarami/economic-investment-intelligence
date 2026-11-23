@@ -15,6 +15,10 @@ from eii_custodian.publicdata.fetch import transport
 @pytest.mark.parametrize("phase", ["page", "terms"])
 @pytest.mark.parametrize("case", ["exact", "overflow", "continuing"])
 def test_metadata_acquisition_bound(source, phase, case, tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     m = modules(source)
     raw = m.fixture.configuration()
     limit = (

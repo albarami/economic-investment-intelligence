@@ -30,7 +30,7 @@ from custodian.tests.method_pin_gather_fixtures import (
     stage_method_pin_gather_build,
 )
 from custodian.tests.test_production_adapters import context
-from hypothesis import given
+from hypothesis import example, given
 from hypothesis import settings as hypothesis_settings
 from hypothesis import strategies as st
 
@@ -644,8 +644,9 @@ def test_build_public_reports_the_phase_s_own_closed_pin_refusals(
     )
     assert outcome.failure is not None
     assert outcome.failure.check == reason
-    assert any(reason in line for line in outcome.lines)
-    assert not any("assembly_build_refused" in line for line in outcome.lines)
+    assert outcome.lines == (
+        f"FAIL assembly {reason} expected=verified ordered outputs observed=NO_DATA",
+    )
 
 
 def test_consumer_refuses_changed_receipt_hash_of_written_pair(
@@ -730,3 +731,156 @@ def test_deferred_pending_pair_reaches_s2_and_is_refused_at_s7(
     s2_t09 = gathered_s2_t09_confirmation(build)
     assert s2_t09["state"] == "recorded"
     require_complete(otherwise_complete_audit_with_s2_t09(s2_t09))
+
+
+def _ordinary_pin_build(tmp_path, monkeypatch, *, mutate=None):
+    """Use the ordinary command and constructor; replace only unrelated phases."""
+    from commands import build_public
+
+    staged, record, artifact, config = _staged_phase_build(tmp_path, mutate=mutate)
+    seen = []
+
+    def run(build):
+        assert build.pin_generation_config is config
+        assert build.pin_rows is staged.pin_rows
+        # The other producers' invented receipt handoff, already exercised by
+        # their adapter tests. The pin phase and its consumer stay real.
+        build.root = staged.root
+        build.review = staged.review
+        build.receipts.update(staged.receipts)
+        build.method_pins()
+        seen.append(build)
+        return ()
+
+    monkeypatch.setattr(build_public, "load_registry", lambda: staged.entries)
+    monkeypatch.setattr(build_public, "CACHE_RELATIVE", "cache")
+    monkeypatch.setattr(Production, "run", run)
+    result = build_public.run(
+        tmp_path,
+        {},
+        [],
+        transport=lambda url: pytest.fail("network called"),
+        pin_generation_config=config,
+        pin_rows=staged.pin_rows,
+    )
+    assert result == 0
+    assert len(seen) == 1
+    return seen[0], record, artifact, config
+
+
+def test_ordinary_entrypoint_binds_pin_inputs_and_persisted_config_hash(
+    tmp_path, monkeypatch
+):
+    build, record, artifact, config = _ordinary_pin_build(tmp_path, monkeypatch)
+    assert json.loads((build.cache / PIN_ARTIFACT).read_bytes()) == artifact
+    assert json.loads((build.cache / PIN_CONFIG).read_bytes()) == config
+    assert {row["settings_sha256"] for row in record["pins"]} == {
+        digest((build.cache / PIN_CONFIG).read_bytes())
+    }
+    assert set(
+        completion_evidence(
+            *_completion_paths(build),
+            gate="S2",
+            registry=build.entries,
+            receipts=build.receipts,
+        )
+    ) == set(PINS)
+
+
+@pytest.mark.parametrize(
+    "change,reason",
+    [
+        ("missing_binding", "pin_lineage_receipt_missing"),
+        ("foreign_binding", "pin_lineage_source_unknown"),
+        ("stale_binding", "pin_lineage_receipt_mismatch"),
+        ("artifact_removed", "pin_input_unreadable"),
+        ("configuration_removed", "pin_input_unreadable"),
+        ("configuration_changed", "pin_settings_hash_mismatch"),
+    ],
+)
+def test_ordinary_pair_consumer_refuses_one_changed_input(
+    tmp_path, monkeypatch, change, reason
+):
+    build, *_ = _ordinary_pin_build(tmp_path, monkeypatch)
+    key = next(iter(build.receipts))
+    if change == "missing_binding":
+        del build.receipts[key]
+    elif change == "foreign_binding":
+        build.entries = tuple(e for e in build.entries if e.key != key)
+    elif change == "stale_binding":
+        build.receipts[key] = {**build.receipts[key], "sha256": digest(b"SYN stale")}
+    elif change == "artifact_removed":
+        (build.cache / PIN_ARTIFACT).unlink()
+    elif change == "configuration_removed":
+        (build.cache / PIN_CONFIG).unlink()
+    else:
+        # Change only the bytes after the review hash: settings still agree.
+        # Removing the hash guard alone must admit this otherwise valid pair.
+        path = build.cache / PIN_CONFIG
+        path.write_bytes(path.read_bytes() + b" \n")
+    with pytest.raises(ValueError, match="^" + reason + "$"):
+        completion_evidence(
+            *_completion_paths(build),
+            gate="S2",
+            registry=build.entries,
+            receipts=build.receipts,
+        )
+
+
+def test_ordinary_entrypoint_allows_only_the_decision_0094_pending_pins(
+    tmp_path, monkeypatch
+):
+    build, *_ = _ordinary_pin_build(tmp_path, monkeypatch, mutate=_pend_deferred)
+    written = json.loads((build.cache / PIN_ARTIFACT).read_bytes())
+    assert {row["pin_id"] for row in written["pins"] if not row["values"]} == set(
+        DEFERRED_TO_S7
+    )
+    assert set(
+        completion_evidence(
+            *_completion_paths(build),
+            gate="S2",
+            registry=build.entries,
+            receipts=build.receipts,
+        )
+    ) == set(PINS)
+
+
+@hypothesis_settings(deadline=None, max_examples=30)
+@example(setting={}, reverse=False)
+@example(setting={"SYN one": None}, reverse=True)
+@example(setting={"SYN a": "same", "SYN b": "same"}, reverse=True)
+@given(
+    setting=st.dictionaries(
+        st.text(alphabet='SYN abcéع\n"\\', max_size=12),
+        st.one_of(st.none(), st.booleans(), st.integers(), st.text(max_size=30)),
+        max_size=6,
+    ),
+    reverse=st.booleans(),
+)
+def test_property_ordinary_configuration_bytes_bind_the_review_hash(setting, reverse):
+    """Serialization preserves arbitrary settings and hashes the persisted bytes."""
+    with tempfile.TemporaryDirectory() as folder, pytest.MonkeyPatch.context() as patch:
+
+        def configure(paths, record, artifact, config):
+            config["pins"]["wilson.period"]["SYN settings"] = setting
+            # The reviewer binds the explicitly recorded bytes before the run.
+            write_record(paths[2].parent, paths[2].name, config)
+            for row in record["pins"]:
+                row["settings_sha256"] = digest(paths[2].read_bytes())
+            if reverse:
+                config["pins"] = dict(reversed(tuple(config["pins"].items())))
+            artifact["pins"][0]["settings"] = config["pins"]["wilson.period"]
+
+        root = Path(folder)
+        build, record, _, config = _ordinary_pin_build(root, patch, mutate=configure)
+        body = (build.cache / PIN_CONFIG).read_bytes()
+        assert json.loads(body) == config
+        assert {row["settings_sha256"] for row in record["pins"]} == {digest(body)}
+        assert set(
+            completion_evidence(
+                *_completion_paths(build),
+                gate="S2",
+                registry=build.entries,
+                receipts=build.receipts,
+            )
+        ) == set(PINS)

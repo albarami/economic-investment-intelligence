@@ -7,6 +7,7 @@ from typing import Any
 from unittest.mock import Mock
 
 import pytest
+from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -38,6 +39,7 @@ def test_command_routes_archive_token(
     archive: bool,
     page_scoped: bool,
 ) -> None:
+    stage_tracked_configuration(tmp_path)
     calls = []
 
     def open_stub(address: str, token: str = "", **kwargs: Any) -> Response:

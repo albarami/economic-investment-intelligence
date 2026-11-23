@@ -257,8 +257,8 @@ def test_supplier_metadata_zero_values_and_missing_weight():
     )["trend"]
     assert str(trend.value) == "1.0000"
     assert trend.metric_key == "trend"
-    assert trend.period == "2024-01..2025-12"
-    assert trend.base_period == "2024-01"
+    assert trend.period == "2025-01..2025-12"
+    assert trend.base_period == "2024-01..2024-12"
 
 
 def momentum(**changes):

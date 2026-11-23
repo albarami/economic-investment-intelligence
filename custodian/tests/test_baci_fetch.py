@@ -183,6 +183,10 @@ def test_baci_manifest_atomicity(tmp_path, monkeypatch):
 
 
 def test_baci_command_injection(tmp_path, monkeypatch, capsys):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from custodian.tests.fixtures.baci.invented import configuration
 
     import commands.build_public as build_public
@@ -509,6 +513,10 @@ def test_baci_redirect_exact_review_before_contact(monkeypatch):
 
 
 def test_baci_production_transports_bind_reviewed_urls(tmp_path, monkeypatch):
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     from custodian.tests.fixtures.baci.invented import configuration
 
     import commands.build_public as build_public

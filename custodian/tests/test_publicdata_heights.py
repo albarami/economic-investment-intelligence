@@ -1174,6 +1174,10 @@ def test_build_public_requires_assembly_pins_before_the_height_phase(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
     """An empty registry cannot pass the complete assembly; B10 stays on the height seam."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
 
     def transport(url: str) -> Response:

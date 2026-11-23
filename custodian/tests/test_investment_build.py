@@ -935,6 +935,10 @@ def test_fail_fast_archives_failed_and_unattempted_inputs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """The shared build retains attempt evidence after its first fetch failure."""
+    from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+
+    stage_tracked_configuration(tmp_path)
+
     import commands.build_public as build_public
     from eii_custodian.publicdata.fetch.allowlist import HostDecision, approve
 

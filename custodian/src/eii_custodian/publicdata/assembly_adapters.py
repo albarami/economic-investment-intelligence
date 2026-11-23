@@ -58,6 +58,7 @@ class Production:
     reconciliation_selection: Selection | None = None
     pin_generation_config: Mapping[str, object] | None = None
     pin_rows: Sequence[Mapping[str, object]] = ()
+    pin_auto_supply: bool = False
     pin_pending_reason: str = ""
     selected: dict[str, str] = field(default_factory=dict)
     receipts: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -147,11 +148,17 @@ class Production:
         pending build after reports, so the step owns no file in that state.
         """
         from .assembly_method_pins import pin_inputs_bound
+        from .method_pin_config import configuration_pending
 
         if item.name == "method_pins" and not pin_inputs_bound(
             self.pin_generation_config, self.pin_rows
         ):
-            return ()
+            if (
+                not self.pin_auto_supply
+                or self.pin_generation_config is None
+                or configuration_pending(self.pin_generation_config)
+            ):
+                return ()
         return item.outputs
 
     def record(self, phase: str, value: object) -> dict[str, str]:
@@ -1037,14 +1044,27 @@ class Production:
             pin_inputs_bound,
             write_pin_pair,
         )
+        from .method_pin_config import configuration_pending
+        from .method_pin_rows import collect_pin_rows
 
-        if not pin_inputs_bound(self.pin_generation_config, self.pin_rows):
+        pin_rows = self.pin_rows
+        if (
+            self.pin_auto_supply
+            and self.pin_generation_config is not None
+            and not pin_rows
+        ):
+            if configuration_pending(self.pin_generation_config):
+                self.pin_pending_reason = "pin_configuration_pending"
+                return {}
+            pin_rows = collect_pin_rows(self, self.pin_generation_config)
+
+        if not pin_inputs_bound(self.pin_generation_config, pin_rows):
             # Ruling L-1494: unbound S2-T08 part B inputs write no pair and
             # never stop the live build; the closed pending reason is recorded
             # for the build report and the gate refuses the pending build.
             self.pin_pending_reason = PIN_INPUTS_MISSING
             return {}
-        output = write_pin_pair(self.cache, self.pin_generation_config, self.pin_rows)
+        output = write_pin_pair(self.cache, self.pin_generation_config, pin_rows)
         self.files.update(output)
         return {
             **self.record("method_pins", {"outputs": sorted(output)}),
