@@ -758,6 +758,18 @@ test('an external base puts a relative font preload outside the origin', () => {
   );
 });
 
+test('an external base puts a root-relative font preload outside the origin', () => {
+  // cf2 of S3-T09 i42: a root-relative reference resolves against the
+  // external base's origin, so the existing dist file is not what loads.
+  const html =
+    '<!doctype html><base href="https://fonts.invalid/assets/">' +
+    '<link rel="preload" as="font" href="/assets/latin-400.woff2" crossorigin>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-preload-external: dist/index.html:1: /assets/latin-400.woff2',
+  );
+});
+
 test('a base directory rebases relative font references', () => {
   const html =
     '<!doctype html><base href="/other/">' +

@@ -206,9 +206,10 @@ function checkReference(context, kind, url, line, cssTargets) {
     context.failures.push(`FAIL ${EMBEDDED_CODE[kind]}: ${text}`);
     return;
   }
-  if (context.baseExternal && !cleanUrl(url).startsWith('/')) {
+  if (context.baseExternal) {
     // The page set its document base outside the served origin, so a
-    // path-relative reference loads from that base, not from dist.
+    // path-relative or root-relative reference loads from that base's
+    // origin, not from dist.
     context.failures.push(`FAIL ${EXTERNAL_CODE[kind]}: ${text}`);
     return;
   }
