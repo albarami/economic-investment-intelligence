@@ -53495,3 +53495,22 @@ Edge classes: inherited ignored SIGINT (real red 1 / green 0); incoming handler 
 - Serialized boundary proof: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'`, with UV_OFFLINE=1 and PYTHONDONTWRITEBYTECODE=1 after all pytest processes ended, exits 0: 37 tests in 10.332 seconds. No boundary code/test, invariant, tolerance or test size was changed. The initial interference remains recorded above and in OPEN_ITEMS.
 - Code practice: no copied blocks; new confirmation reuses reviewed CSV/date loaders, name matching, source hashing, secret checks and the existing duplicate-member JSON decoder. The longest new function is `confirm_handoff`, 59 physical lines (AST span). Final per-file additions/removals and refusal-by-refusal plant evidence are in `.overnight/RETURN.md`. Self-audit passes for the assigned offline implementation; independent different-maker review, live monthly allowance evidence and the scheduled refresh remain pending.
 - Final closure after the inventory and evidence edits: ruff check, ruff format --check, mypy, check_docs, check_tree, cmp AGENTS/CLAUDE and git diff --check each exit 0. Output: 999 Python files already formatted; 530 mypy source files; 1347 text files / 155 Markdown files; eight tree rules. Denied tool calls: none.
+
+## S2-25 merge-result and merge record — 2026-11-23
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-23 | S2-25 merge-result test and merge record | S2-25.wt1: `./eii test --seed 2769236895` on train head `358bf38537` merged onto `6eddd7fa32`: exit 0 (all suites). [PR 132](https://github.com/albarami/economic-investment-intelligence/pull/132) merged as `8dd041c250`; 17 hosted checks passed. APPROVED by Codex B (S2-25.cf2, OpenAI). Kimi S2-25.cf1 REJECTED only because its sandbox refused `check_docs` and `check_reference_notes`; the lead ran both on `358bf38537`: exit 0 and exit 0. | Lead (Anthropic Opus 5.5); approver Codex B (OpenAI) |
+
+## Train S2-26 of slice S2 — 2026-11-24
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-24 | S2-P76 review | S2-P76.rv1 (Moonshot Kimi) REJECTED `2418fbf5f6`. Finding 1 (full suite red) was ruled unsupported by lead ruling L-1667: the cited seed and failures are in none of its inputs. Findings 2 and 3 were real. | Lead (Anthropic Opus 5.5) |
+| 2026-11-24 | S2-P76 round 2 | S2-P76.r2 (OpenAI Codex) `26e98e49ac`: the public empty-record path test, empty and unknown source refusals, and failed-plus-successful polygon counts; eight plants red, then green. Lead run: 70 passed; ruff, format and `git diff --check` 0. | Lead |
+| 2026-11-24 | S2-P76 confirmation | S2-P76.cf1 (Moonshot Kimi) APPROVED `26e98e49ac`: RV1 findings 2 and 3 CLOSED, with quoted lines. | Moonshot Kimi |
+| 2026-11-24 | S2-P79 lead verify | `48d0451f86`: the busyness, BestTime, fingerprint, resume and build-public selection, 783 passed; command parity 0; import boundary 0 with `PYTHONDONTWRITEBYTECODE=1`; ruff, mypy, check_docs and `cmp AGENTS.md CLAUDE.md` 0. | Lead |
+| 2026-11-24 | S2-P79 review | S2-P79.rv1 (Cognition Devin) APPROVED `48d0451f86`. Two recorded runs were judged the least-spend design that keeps every guarantee. Its three low points and the harness point are OI-402 to OI-405. | Cognition Devin |
+| 2026-11-24 | Join proof | `bin/join_pairs_proof.py`, run on the approved commits against the joined commits (`2418fbf5f6` to `8749ef47`, `26e98e49ac` to `8695e6f0`): 23 files SAME, 0 DIFFERENT. S2-P79 is the train base, on main `8dd041c250`. The drafted records were applied by a three-way merge; the one PROGRESS conflict was resolved by keeping both appended sections. | Lead |
+| 2026-11-24 | Decision 0105 | A dated clarification note was appended (L-1672). No item changes. | Lead |
+| 2026-11-24 | Lead whole test of this train | Runs in parallel with the hosted checks (L-1628). Its row goes to the next S2 ledger. | Lead |
