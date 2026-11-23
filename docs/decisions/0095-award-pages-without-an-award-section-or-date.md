@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted by the owner, 2026-11-23 13:48 ("Yes on both", relayed by the advisor; extract owner-relayed-20261123-1348); acceptance review by another maker (OpenAI, 2026-11-23): acceptable, no defect; amends decision 0091 item 4 |
+| Status | Accepted by the owner, 2026-11-23 ("Yes on both", relayed by the advisor in note owner-relayed-20261123-1348); acceptance review by another maker (OpenAI, 2026-11-23): acceptable, no defect; amends decision 0091 item 4 |
 | Date | 2026-11-22 |
 | Scope | PUB-04; S2-T29; document 03 **S2-T29 cached page and awards contracts**; amends decision 0091 item 4 |
 

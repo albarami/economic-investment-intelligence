@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted by the owner, 2026-11-23 13:48 ("Yes on both", relayed by the advisor; extract owner-relayed-20261123-1348); this record's text is reviewed by another maker before merge |
+| Status | Accepted by the owner, 2026-11-23 ("Yes on both", relayed by the advisor in note owner-relayed-20261123-1348); this record's text is reviewed by another maker before merge |
 | Date | 2026-11-23 |
 | Scope | AGENTS.md and CLAUDE.md rule 44; [TASKS.md](../../TASKS.md) S2-T49 and S2-T08; the S2 path boxes S2-T49#1 to #3 and S2-T08#14 of decision 0098; `custodian/src/eii_custodian/publicdata/registers/README.md` **Sibling intake protocol**, **Verification boundary** and **Assembly handoff** |
 | Amends | AGENTS.md and CLAUDE.md rule 44 and their Status row |

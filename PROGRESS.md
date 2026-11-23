@@ -53175,9 +53175,11 @@ Edge classes: inherited ignored SIGINT (real red 1 / green 0); incoming handler 
 ## S2 records change — owner acceptance of decisions 0091, 0095 and 0102; OI-359 disposition — 2026-11-23
 
 - Lead edit on top of S2-D0102 (Cognition Devin draft, lead commit `05de204c5e`):
-  - The Status rows of decisions 0091, 0095 and 0102 now read Accepted by the owner, 2026-11-23 13:48 (lead ruling L-1580). The acceptance review by another maker (OpenAI) found 0091 and 0095 acceptable with no defect.
+  - The Status rows of decisions 0091, 0095 and 0102 now read Accepted by the owner, 2026-11-23 (relayed note owner-relayed-20261123-1348; lead ruling L-1580). The acceptance review by another maker (OpenAI) found 0091 and 0095 acceptable with no defect.
   - Decision 0102 now cites the S2 path boxes by name instead of a run-folder file.
   - The decision index (docs/README.md) shows the three statuses and the new 0102 row.
   - OPEN_ITEMS.md records the OI-359 access-path disposition (lead ruling L-1581); the item stays open for the live export evidence.
 - No code, test or check changed. Commands: `python3 scripts/check_docs.py`, `cmp AGENTS.md CLAUDE.md` and `git diff --check`, each with its exit recorded in the commit's ledger line below.
 - Exits on the lead edit: check_docs 0 (1331 text files, 150 Markdown files), cmp 0, git diff --check 0.
+- Review S2-REC0102.rv1 (xAI Grok 4.7 via Cursor) REJECTED fa669eedf1 on two findings: rule 44 still labelled decisions 0091 and 0102 as proposed. Both are fixed in this commit. Its records point is applied too: status rows cite the relay note instead of a time that note does not carry. check_docs, cmp and git diff --check are rerun below.
+- Exits after the fix: check_docs 0, cmp 0, git diff --check 0.
