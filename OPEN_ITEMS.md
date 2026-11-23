@@ -6301,6 +6301,11 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 - NEEDED: the lead's real-file adapter run and the staged bundle produced from
   real, hash-verified inputs; a different-maker review of this offline
   implementation. Neither is claimed by this record.
+- UPDATE (2026-11-23, S2-D0102, task S2-T49): [decision 0102](docs/decisions/0102-register-projection-run-in-rule-44.md)
+  (Proposed) would admit `python -m eii_custodian.publicdata.registers` to
+  rule 44, clearing the records precondition of the lead's real-file run in
+  S2-PATH rows 25 and 91 to 93; the run, the staged bundle and the
+  different-maker review above stay owed and this item stays open.
 - LIMITS: invented stand-in fixtures only; no live register read, no release
   command, no admission-policy or registration-key-exception change, no slice
   gate. The receipt list binds the tables only through the lead's manifest
