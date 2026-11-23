@@ -5,10 +5,16 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
+from typing import Literal
 
 
 class ShapeError(ValueError):
     """Closed structural reason only, never document content."""
+
+
+# These tags carry form credentials, redirects or the base address; a duplicate
+# attribute on them refuses even when first-wins parsing is selected.
+_DUPLICATE_REFUSED = frozenset({"base", "form", "input", "meta"})
 
 
 @dataclass(eq=False)
@@ -59,8 +65,15 @@ class Node:
 
 
 class Tree(HTMLParser):
-    def __init__(self, body: bytes) -> None:
+    def __init__(
+        self,
+        body: bytes,
+        duplicate_attributes: Literal["refuse", "first"] = "refuse",
+    ) -> None:
         super().__init__(convert_charrefs=True)
+        if duplicate_attributes not in {"refuse", "first"}:
+            raise ShapeError("schema_missing")
+        self._duplicates = duplicate_attributes
         self.root = Node("root")
         self.current = self.root
         try:
@@ -72,9 +85,14 @@ class Tree(HTMLParser):
             raise ShapeError("schema_missing")
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if len(dict(attrs)) != len(attrs):
-            raise ShapeError("schema_missing")
-        node = Node(tag, dict(attrs), parent=self.current)
+        merged = dict(attrs)
+        if len(merged) != len(attrs):
+            if self._duplicates == "refuse" or tag in _DUPLICATE_REFUSED:
+                raise ShapeError("schema_missing")
+            merged = {}
+            for name, value in attrs:
+                merged.setdefault(name, value)
+        node = Node(tag, merged, parent=self.current)
         self.current.children.append(node)
         if tag not in {
             "area",

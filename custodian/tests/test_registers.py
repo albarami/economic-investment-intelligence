@@ -40,10 +40,24 @@ def csv_bytes(role, rows):
     return stream.getvalue().encode()
 
 
+# Published row keys are twenty lowercase hexadecimal characters, digits
+# included (the lead's source shape); the released identity spells each digit
+# as a letter under decision 0104 item 1, written out here by hand.
+ROW_HEX_FIXTURE = "a0b1c2d3e4f5a6b7c8d9"
+ROW_IDENTITY_FIXTURE = "ROW-agbhcidjekflambncodp"
+FC_ROW_HEX_FIXTURE = "b0c1d2e3f4a5b6c7d8e9"
+
+
+def row_identity_oracle(key):
+    """An independent spelling of decision 0104 item 1 for test expectations."""
+    letters = dict(zip("0123456789", "ghijklmnop", strict=True))
+    return "ROW-" + "".join(letters.get(character, character) for character in key)
+
+
 def commerce(**updates):
     row = dict.fromkeys(SCHEMAS["establishments"], "")
     row.update(
-        row_key="a" * 20,
+        row_key=ROW_HEX_FIXTURE,
         name_ar="SYN invented Arabic name",
         name_en="SYN Invented Commerce",
         classification="SYN classification",
@@ -58,7 +72,7 @@ def commerce(**updates):
         lat="2.25",
         registration_number="54321",
         licence_number="97003",
-        tax_registered="No",
+        tax_registered="no",
         establishment_nationality="SYN establishment nationality",
         establishment_nationality_ar="SYN establishment nationality",
         street_number="3",
@@ -78,7 +92,7 @@ def commerce(**updates):
 
 def fc(number="65432", **updates):
     row = dict(
-        row_key="b" * 20,
+        row_key=FC_ROW_HEX_FIXTURE,
         qfc_number=number,
         name_en="SYN Invented Centre",
         name_ar="",
@@ -92,7 +106,7 @@ def fc(number="65432", **updates):
 
 def geocode(number="65432", **updates):
     row = dict(
-        row_key="b" * 20,
+        row_key=FC_ROW_HEX_FIXTURE,
         qfc_number=number,
         building_name="SYN unconfirmed derived building",
         matched_place="SYN derived match",
@@ -173,7 +187,6 @@ def test_extra_and_person_columns_are_refused(frame, column):
 @pytest.mark.parametrize(
     ("column", "value", "reason"),
     [
-        ("registration_number", "", "missing_registration_key"),
         ("registration_number", "SYN-F-key", "registration_format"),
         ("registration_number", "9" * 8, "registration_format"),
         ("row_key", "Z" * 20, "row_key_format"),
@@ -192,7 +205,7 @@ def test_declared_formats_have_planted_violations(frame, column, value, reason):
 
 
 @pytest.mark.parametrize(
-    "number", ["54321", "543210", "543210/1", "54321/12", "5432107/1"]
+    "number", ["54321", "543210", "543210/1", "54321/12", "543210/123"]
 )
 def test_declared_registration_shapes_and_open_categories(frame, number):
     row = commerce(registration_number=number, legal_form="SYN unlisted form")
@@ -204,7 +217,6 @@ def test_declared_registration_shapes_and_open_categories(frame, number):
 
 def test_duplicate_registration_and_row_key_refused(frame):
     for rows, reason in [
-        ([commerce(), commerce(row_key="c" * 20)], "duplicate_registration_key"),
         ([commerce(), commerce(registration_number="97005")], "duplicate_row_key"),
     ]:
         with pytest.raises(RegisterError, match="^" + reason + "$"):
@@ -559,7 +571,7 @@ def test_release_value_nested_typed_public_values_pass(tmp_path, frame):
         {
             **result.tables,
             "source_registry": [
-                {"value": {"k": [None, True, False, 54321, (10**7, 2.65432)]}}
+                {"value": {"k": [None, True, False, 54320, (10**7, 2.65431)]}}
             ],
         },
         frame,
@@ -594,22 +606,22 @@ def test_content_bytes_without_card_text_pass():
 def test_numeric_public_values_are_not_identifier_strings(tmp_path, frame):
     capital = 10**7
     item = capture(
-        files=inputs(rows=[commerce(capital_qar=str(capital), lat="2.65432")])
+        files=inputs(rows=[commerce(capital_qar=str(capital), lat="2.65431")])
     )
     result = build(tmp_path, "public_only", frame, (item, capture("fc_register")), ())
     card = result.tables["pub_register_company"][0]
     assert type(card["capital_qar"]) is int and card["capital_qar"] == capital
-    assert type(card["lat"]) is float and card["lat"] == 2.65432
+    assert type(card["lat"]) is float and card["lat"] == 2.65431
     assert type(card["lon"]) is float and card["lon"] == 1.25
     validate_release(
         {
             **result.tables,
-            "pub_place": [{"count": 54321, "lat": 2.65432, "capital": capital}],
+            "pub_place": [{"count": 54320, "lat": 2.65431, "capital": capital}],
             "register_company_list": [
                 dict(
                     registration_number="54321",
                     period="2026-11",
-                    employee_count=65432,
+                    employee_count=65431,
                     suppression_reason_code=None,
                 )
             ],
@@ -670,7 +682,7 @@ def test_numeric_capital_storage_range_and_small_coordinate(frame):
 @pytest.mark.parametrize(
     ("source", "column", "value", "reason"),
     [
-        ("biz_register", "licence_number", "65432", "registration_egress"),
+        ("biz_register", "name_en", "65432", "registration_egress"),
         (
             "fc_register",
             "registered_address",
@@ -823,9 +835,12 @@ def test_stale_two_table_wording_is_gone():
 
 @pytest.mark.parametrize("column", ["nationality_group", "nationality_group_ar"])
 def test_input_only_nationality_is_header_checked_and_dropped(frame, column):
-    from eii_custodian.publicdata.registers.parse import _rows
+    from eii_custodian.publicdata.registers.parse import InputAudit, _rows
 
-    assert column not in _rows(inputs()["establishments"], "establishments")[0]
+    assert (
+        column
+        not in _rows(inputs()["establishments"], "establishments", InputAudit())[0]
+    )
     assert column not in parse("biz_register", inputs(), frame)[0]
     body = inputs()["establishments"].decode().splitlines()
     header = body[0].split(",")

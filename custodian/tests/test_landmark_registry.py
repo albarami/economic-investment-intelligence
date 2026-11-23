@@ -149,7 +149,7 @@ def test_citation_fetch_distinct_terms_keeps_exact_frame(
 
     def send(url):
         requested.append(url)
-        return Response(url, bodies[url], ())
+        return Response(url, bodies[url], (), status=200)
 
     def fetch():
         return page_records.fetch_page(

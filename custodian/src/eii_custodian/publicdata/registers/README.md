@@ -22,13 +22,20 @@ lexeme validation (ruling L-1304). CSV scalar lexemes
 are validated as strings. The release projects capital to a non-negative BIGINT
 in QAR and coordinates to finite DOUBLE values; other declared card fields keep
 source strings, preserving leading zeros and publisher spelling. Dates must be
-calendar dates in ISO format. Empty optional fields become null; required fields
+calendar dates in ISO format. Only an events `notice_expiration_date` matching
+`[0-9]{2}-[A-Z][a-z]{2}-[0-9]{3}` becomes null without parsing or guessing;
+`field_absences` counts it under `published_non_iso_notice_shape` with source,
+period and current/snapshot use. Every other non-ISO shape refuses.
+Empty optional fields become null; required fields
 do not get default values. Categories whose values have not been declared by
 document 03 remain open text, tested with invented, previously unseen values.
-The only supplied categorical values, the tax flag, are validated as declared.
+The tax flag accepts exactly lowercase `yes` / `no`; `Yes`, `No`, `YES`, empty
+and `y` refuse. Source spelling is preserved, never normalised into that set.
 
 The commerce projection preserves its declared card fields except internal
-`row_key`, the extra `nationality_group` fields and derived `points_at_location`.
+the standalone `row_key`, the extra `nationality_group` fields, derived
+`points_at_location` and `licence_number`. Licence numbers are validated only
+at intake and never appear in a release table, manifest or report.
 The extra nationality-group columns are header-checked and dropped; internal
 row keys and location counts are validated but never released. The
 financial-centre projection
@@ -41,20 +48,89 @@ field needs confirmation that it is published on the card before it can be
 added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
 
-DAT-11 scans every string column, including non-key licence and address strings.
+DAT-11 scans every string column, including non-key address strings.
 A string equal to another registration key refuses. Typed capital, coordinates,
 counts and cell keys are not identifier strings; artefact scanning is unchanged.
 The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
 predate the keeper floor.
 
-Blank registration keys, duplicate keys, cross-source key ambiguity, unknown
-columns, unconfirmed branch structure and malformed notice dates refuse with
-named reasons. There is no key prefix, merge, date repair, inferred cancellation
+An ephemeral input-licence set extends the same token checks to every non-key
+released field, including numeric values, and manifests/reports including table
+counts added by storage. It is never exported. The dedicated key exemption is
+unchanged: an intake licence equal to a published registration passes because
+no licence field is released. A registration or licence token in a non-key field
+still refuses. Under decision 0105 (proposed), the closed typed-field list
+`contracts.TYPED_FIELDS` (the five ISO dates, `zone`, `street_number`,
+`block_en`, `block_ar`, `lon`, `lat`, `capital_qar`, the tax year and the yes/no
+tax flag of `pub_register_company`, the list's `employee_count`, and the
+manifest's receipt times, terms date, periods, absence counts and storage-added
+row counts, under the owner's a3 the manifest's and the receipt's `version`, and
+under the advisor's note of 2026-11-23 the build report's `version`, each
+equal to its one fixed text (`contracts.FIXED_TEXTS`), and the `period` columns of
+the snapshot and list tables, each a real `YYYY-MM` month (else
+`snapshot_month`), each format and declared shape checked before the scan: the two
+snapshot coverage fields are lists of months, every other field one value, and
+a container in place of one value refuses) admits a token equal to a
+registration, licence or withheld number only when that number has one or two
+digits or the shape 19xx or 20xx. Longer numbers, every unlisted field, the other
+manifest fields (the receipt's text included) and the rest of the report keep
+the full scan; other coincidental token
+matches still refuse. Every number of every release table meets every key by the
+token match (decision 0105 item 4), with no string check.
+
+Commerce registrations accept exactly one to six ASCII digits with an optional
+slash followed by one to three ASCII digits (at most ten characters).
+A row without a registration uses `ROW-` plus its published lowercase hexadecimal
+twenty-character `row_key` with each digit spelled as a letter (`0-9` to `g-p`,
+decision 0104 item 1), never its licence number. The released identity is
+exactly `ROW-[a-p]{20}` and holds no digit, so the unchanged eight- and
+eleven-digit scan never meets one in it; the spelling is one-to-one because the
+published key accepts only `[a-f0-9]{20}`. A `ROW-` identity on a
+financial-centre row refuses `registration_format`. The raw row-key column
+remains absent. This S2-P71 lead ruling restores the Public projection only;
+decision 0074 item 5's world-feed treatment and enrichment stay with S4-T02.
+A commerce registration lexeme of one to ten ASCII letters becomes null at
+intake, counted by rows under `published_non_registration_value`; other malformed
+shapes still refuse `registration_format`. Every occurrence of a number published
+on multiple commerce rows becomes null at intake and uses its own `ROW-` identity,
+counted by rows under `published_duplicate_registration`. Rows are never merged,
+picked or de-duplicated. Both counts use the existing `field_absences` capture
+metadata (`registration_number`, source, period and current/snapshot use); the
+bundle reader permits both reasons for one capture, but rejects repeated entries
+of the same field/reason. The existing released `registration_number` key slot
+holds the `ROW-` identity, never the withheld source value; no new column is added.
+
+Withheld duplicate numbers stay only in the ephemeral audit set. The egress scan
+refuses them in every released field, including typed numbers and dedicated key
+slots, across current and historical captures, manifests/reports and storage-added
+counts. No duplicate-number list is exported; assembly retains its existing
+lead-pin trust boundary.
+Financial-centre numbers keep their five-digit declaration. Duplicate
+financial-centre keys and collisions of `ROW-` identities still refuse as
+`duplicate_registration_key`; duplicate published row keys still refuse as
+`duplicate_row_key` when their identities differ. Cross-register ambiguity still
+refuses as `ambiguous_cross_source_key`, with no source prefix added.
+
+Missing financial-centre keys, duplicate financial-centre keys or row identities, cross-source key ambiguity, unknown
+columns, unconfirmed branch structure and other malformed notice dates refuse with
+named reasons. There is no merge, date repair, inferred cancellation
 date or opening/closure column. A historical company need not be in today's
 card table. Its cell belongs to its own snapshot. Empty kept snapshots and
 missing snapshots are distinct; `Built.snapshot_reason` returns
 `snapshot_not_kept` when either requested month is missing for that source.
+
+Projection version `v2` removes the licence column and adds `field_absences` and
+`activity_check` metadata. The activity result is always `not_proved` with reason
+`register_publishes_no_code` for today's code-free schema; a planted stand-in
+signed-class mismatch (a `mapped` review whose class differs from the code's
+first four digits) refuses as `activity_code_mismatch`; any other review the
+existing spine checker rejects (no sign-off, a malformed review date, a wrong
+reason or name, a status that is not a decision) refuses as
+`activity_review_invalid`. A legacy code never maps by prefix. No activity, nationality,
+status or date is invented. The bundle reader checks the closed absence metadata
+against its capture receipts and retains both metadata fields in assembly evidence.
+Old v1 bundles must be rebuilt and pinned again; no compatibility fallback exists.
 
 ## Sibling intake protocol
 

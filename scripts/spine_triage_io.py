@@ -6,6 +6,7 @@ import csv
 import hashlib
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
@@ -139,7 +140,7 @@ def load_context(
 
 
 def source_receipts(
-    cache: Path, selected: dict[str, str]
+    cache: Path, selected: Mapping[str, str]
 ) -> tuple[dict[str, str], tuple[dict[str, object], ...]]:
     """Attribution and exact verified receipt hashes shared by offline modes."""
     hashes: dict[str, str] = {}

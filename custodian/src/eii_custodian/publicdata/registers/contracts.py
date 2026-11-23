@@ -89,18 +89,32 @@ ROLES = {
     "fc_register": frozenset({"companies", "geocoded", "events"}),
 }
 REGISTRY_KEYS = {"biz_register": "biz_register", "fc_register": "fc_register/file"}
-REGISTRATION = re.compile(r"(?:[0-9]{5,6}|[0-9]+/[0-9]{1,2})\Z")
+REGISTRATION = re.compile(r"[0-9]{1,6}(?:/[0-9]{1,3})?\Z")
+# The published row key (lowercase hexadecimal) and its released identity. Each
+# digit is spelled as one letter, 0-9 to g-p (decision 0104 item 1): lossless,
+# one-to-one and digit-free, so no identity holds a rule-9 digit run.
+SOURCE_ROW_KEY = re.compile(r"[a-f0-9]{20}\Z")
+ROW_KEY = re.compile(r"ROW-[a-p]{20}\Z")
+_ROW_LETTERS = str.maketrans("0123456789", "ghijklmnop")
 BARE_DIGITS = re.compile(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])")
 PREFIXES = ("SYN-E-", "SYN-L-", "SYN-G-", "SYN-P-", "SYN-F-")
 METHOD = "register_file_projection"
-VERSION = "v1"
+VERSION = "v2"
+RECEIPT_VERSION = "register_input_v1"
+ABSENCE_KINDS = frozenset(
+    {
+        ("fc_register", "notice_expiration_date", "published_non_iso_notice_shape"),
+        ("biz_register", "registration_number", "published_non_registration_value"),
+        ("biz_register", "registration_number", "published_duplicate_registration"),
+    }
+)
 
 # These source headers are required at intake; their values are dropped before parsing.
 HEADER_ONLY = ("nationality_group", "nationality_group_ar")
 
 # Derived/internal fields are validated at intake but are not Public card facts.
 # In particular an inferred geocoder building is never promoted to a named tower.
-INPUT_ONLY = frozenset({"row_key", "points_at_location"})
+INPUT_ONLY = frozenset({"row_key", "points_at_location", "licence_number"})
 CARD_COLUMNS = (
     *(name for name in SCHEMAS["establishments"] if name not in INPUT_ONLY),
     "registered_address",
@@ -122,9 +136,73 @@ TABLE_COLUMNS = {
     "register_company_list": LIST_COLUMNS,
 }
 NUMERIC_COLUMNS = {"capital_qar": "BIGINT", "lon": "DOUBLE", "lat": "DOUBLE"}
+# Decision 0105: the closed list of typed fields, `table.column` for a release
+# column and `manifest.` or `report.` plus mapping keys for a metadata field.
+# Each format is checked before the scan. In these fields alone a token may
+# equal a registration or licence number of 1 to 2 digits or of the shape 19xx
+# or 20xx; every other field, and every longer number, keeps the full scan.
+TYPED_FIELDS = {
+    "pub_register_company.registration_issue_date": "date",
+    "pub_register_company.registration_expiry_date": "date",
+    "pub_register_company.licence_issue_date": "date",
+    "pub_register_company.licence_expiry_date": "date",
+    "pub_register_company.notice_expiration_date": "date",
+    "pub_register_company.zone": "integer",
+    "pub_register_company.street_number": "integer",
+    "pub_register_company.block_en": "integer",
+    "pub_register_company.block_ar": "integer",
+    "pub_register_company.lon": "longitude",
+    "pub_register_company.lat": "latitude",
+    "pub_register_company.tax_classification_year": "year",
+    "pub_register_company.tax_registered": "yes_no",
+    "pub_register_company.capital_qar": "integer",
+    "register_company_list.employee_count": "count",
+    "pub_register_snapshot.period": "month",
+    "register_company_list.period": "month",
+    "manifest.version": "manifest_version",
+    "manifest.receipts.receipt.version": "receipt_version",
+    "manifest.receipts.receipt.retrieved_utc": "timestamp",
+    "manifest.receipts.receipt.terms_read_on": "date_or_pending",
+    "manifest.receipts.receipt.period": "month",
+    "manifest.snapshot_coverage.biz_register": "month",
+    "manifest.snapshot_coverage.fc_register": "month",
+    "manifest.field_absences.period": "month",
+    "manifest.field_absences.count": "count",
+    "manifest.tables.rows": "count",
+    "report.version": "report_version",
+}
+# Decision 0105 item 1: these listed fields hold a list of months; every other
+# listed field holds one value.
+TYPED_SEQUENCES = frozenset(
+    {
+        "manifest.snapshot_coverage.biz_register",
+        "manifest.snapshot_coverage.fc_register",
+    }
+)
+# Decision 0105 item 1 (the owner's a3; the report's version by the advisor's
+# note of 2026-11-23): a fixed-text format admits its one text alone, so the
+# field can carry nothing else.
+FIXED_TEXTS = {
+    "manifest_version": VERSION,
+    "receipt_version": RECEIPT_VERSION,
+    "report_version": VERSION,
+}
+FORMAT_ONLY_NUMBER = re.compile(r"[0-9]{1,2}|(?:19|20)[0-9]{2}")
 
 
 def column_type(name: str) -> str:
     if name == "registered_cell":
         return "UBIGINT"
     return NUMERIC_COLUMNS.get(name, "VARCHAR")
+
+
+def row_identity(row_key: str) -> str:
+    """The released `ROW-` identity of a validated published row key."""
+    return "ROW-" + row_key.translate(_ROW_LETTERS)
+
+
+def company_key_ok(value: object) -> bool:
+    return isinstance(value, str) and (
+        REGISTRATION.fullmatch(value) is not None
+        or ROW_KEY.fullmatch(value) is not None
+    )

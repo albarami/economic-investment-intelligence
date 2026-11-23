@@ -599,6 +599,8 @@ class Production:
                     for item in bundle.receipts
                 ],
                 "snapshot_coverage": bundle.coverage,
+                "field_absences": bundle.manifest["field_absences"],
+                "activity_check": bundle.manifest["activity_check"],
             },
         )
 

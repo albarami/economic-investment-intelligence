@@ -38,7 +38,7 @@ def fetched_selection(tmp_path, monkeypatch):
     row, _ = citation_setup(monkeypatch)
     result = run_build(
         (row,),
-        lambda u: Response(u, BODY, ()),
+        lambda u: Response(u, BODY, (), status=200),
         tmp_path,
         lambda: STAMP,
         lambda _: None,

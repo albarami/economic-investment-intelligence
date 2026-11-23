@@ -526,17 +526,23 @@ def load_activity_inputs(
 
 
 def committed_activity_inputs(
-    cache: Path, baskets: Path, review_path: Path | None = None
-) -> tuple[ActivityInputs, tuple[str, ...], SupplierMembership, dict[str, str]]:
+    cache: Path,
+    baskets: Path,
+    review_path: Path | None = None,
+    selections: Mapping[str, str] | None = None,
+) -> tuple[ActivityInputs, tuple[str, ...], SupplierMembership, Mapping[str, str]]:
     """Build the inputs of one committed review folder from its baskets.
 
     This is the one sequence every caller of the committed review follows:
     the reviewed selections, both licence feeds, the basket membership of the
     reviewed baskets document, then the spine of that review. ``review_path``
-    ``None`` means the committed review file. Returns the inputs, the playbook
-    codes, the supplier membership and the reviewed selections.
+    ``None`` means the committed review file. ``selections`` ``None`` means
+    the reviewed selections of the cache; a given map is used exactly as
+    given, so a caller that has checked the pins can pass the map it checked.
+    Returns the inputs, the playbook codes, the supplier membership and the
+    selections used.
     """
-    selected = reviewed_selections(cache)
+    selected = reviewed_selections(cache) if selections is None else selections
     entries = load_registry()
     activities, _, _ = read_activity_rows(cache, entries, selected)
     playbook, suppliers = basket_membership(
@@ -741,7 +747,7 @@ def committed_class_members(
     path = spine_path() if review_path is None else review_path
     reviews = read_review_csv(path)
     inputs, playbook, suppliers, _ = committed_activity_inputs(
-        cache, path.with_name("baskets.yaml"), path
+        cache, path.with_name("baskets.yaml"), path, selections=selections
     )
     return class_members(
         inputs.activities,
