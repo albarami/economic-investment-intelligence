@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed: drafted for open item OI-394 under ruling L-1633 item 1; the four choices ruled by the lead under ruling L-1641, 2026-11-23; accepted under the lead's delegation once another maker APPROVES |
+| Status | Accepted 2026-11-23 by the lead under its delegation (rulings L-1633 item 1 and L-1641), after the different-maker review S2-25.rv0106 (APPROVED `07a142f05f`) |
 | Date | 2026-11-23 |
 | Scope | [Document 07](../07_ECONOMIC_METHODS.md) **C12 Reachable-access score** and MTH-46; [document 03](../03_DATA_CONTRACTS.md) DAT-151, DAT-153 and DAT-154 and the `access_score` and `access_score_grid` rows; [document 08](../08_BACKEND.md) the `reachable_access` contract; [TASKS.md](../../TASKS.md) S6-T13 |
 | Amends | Nothing until accepted. Once accepted, it fills the values that document 07 C12, DAT-151, DAT-153 and DAT-154 say are "fixed at slice S2", and closes the C12 entry of document 07's open questions and the matching OPEN entry of document 03 |
@@ -57,7 +57,7 @@ is computed here.
   `m` under traffic key `k` is at most `t` minutes. `N_m(t, k) <= U²`, and it
   never decreases as `t` grows.
 
-## Proposed decision
+## Decision
 
 ### 1. The decay `f`: ruled
 
@@ -90,11 +90,12 @@ Whichever option is ruled, the parameter object names the form by a closed key
 
 **Basis.** The worked example and the research note both use `t0` = 10
 minutes, the research by drive. Document 08 `make_area` offers 5, 10 and 15
-minutes for walk and drive, and sets no drive cut-off above 30 minutes
-anywhere (decision 0023 item 17). `reachable_access` takes "one of the cut-offs
-that method card C12 stores for the chosen mode … not the `make_area` list":
-the tool checks the value against C12's own list, which may hold the same
-numbers. C39 uses 10, 20 and 30 minutes' drive for its own catchments (S6-T20).
+minutes for walk and drive (drive 20 and 30 only for `staffing_and_pay`), and
+sets no drive cut-off above 30 minutes anywhere (decision 0023 item 17).
+`reachable_access` takes "one of the cut-offs that method card C12 stores for
+the chosen mode … not the `make_area` list": the tool checks the value against
+C12's own list, which may hold the same numbers. C39 uses 10, 20 and 30
+minutes' drive for its own catchments (S6-T20).
 
 **Effect on stored rows.**
 
@@ -129,7 +130,7 @@ whose pairs are unit-to-unit and serve every layer (DAT-153).
 
 | Option | Value | Gained | Lost |
 |---|---|---|---|
-| A | every activity spine key that has a reviewed mapping to a `pub_place` category | every activity the product can name has a stored score, so `reachable_access` returns `OK` or a status, never a missing layer, for an activity in the spine | `L` is the size of the mapped spine, the largest of the three; spine keys whose places are few give scores of little meaning |
+| A | every activity spine key that has a reviewed mapping to a `pub_place` category | every activity the product can name has a stored score, so `reachable_access` returns `OK` or a status, never a missing layer, for an activity whose spine key is mapped | `L` is the size of the mapped spine, the largest of the three; spine keys whose places are few give scores of little meaning |
 | B | a closed list of spine keys that the lead names in this record, each with a mapped `pub_place` category | `L` is small and known; each layer is chosen for journey D2 | an activity outside the list returns `NO_DATA` ("a layer is missing", document 08); the lead must name the keys, which this draft does not invent |
 | C | option B plus one reviewed list of gazetteer points, named by its key | adds a supply layer that `pub_place` lacks | needs a reviewed gazetteer list for this use, which no task builds yet; `L` grows by one |
 
@@ -220,7 +221,7 @@ build reads the values this record fixes. The tests read the worked example
 as an invented fixture, which stays binary with `t0` = 10 whatever is ruled
 here.
 
-## What each document will say once this record is accepted
+## What each document says
 
 - Document 07 **C12 Reachable-access score**: the **Inputs** bullet on cut-offs
   and decay, and the decay line of the **Formula**, name the values of items 1
@@ -256,6 +257,7 @@ release also needs a new `world_seed` and a new build.
 ## Sources
 
 - The lead's ruling L-1633 item 1, 2026-11-23 (open item OI-394).
+- The lead's ruling L-1641, 2026-11-23 (the four ruled choices of items 1, 2, 3 and 5).
 - [Document 07](../07_ECONOMIC_METHODS.md): **C12 Reachable-access score**
   (Inputs, Formula, Storage, Worked example, Research note, Limits and
   wording), MTH-46, MTH-66, MTH-67, the open questions on C12, and C6 on

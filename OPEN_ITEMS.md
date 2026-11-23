@@ -3404,13 +3404,14 @@ No existing open item is closed by this input.
 ## OI-394 — C12's decay form, cut-offs, supply layers, modes and presence keys are not pinned
 
 - ID: OI-394
-- TYPE: OPEN, GATE HOLD (S2)
+- TYPE: CLOSED
 - RAISED BY: the lead, 2026-11-23, from ruling L-1633 (1)
 - CONCERNS: document 07 C12 and DAT-151/DAT-153 say these are "fixed at slice S2", but no task or record pins them.
 - EVIDENCE: ruling L-1633 (1): S6-T13 builds C12 with them as one typed, closed parameter object with no defaults, tested on the worked example.
 - NEEDED: a decision record pins the values before the S2 gate.
 - NEEDED BY: the S2 gate.
 - 2026-11-23: decision 0106 (proposed) fixes the values; the four choices are ruled under L-1641; the item closes when 0106 is accepted.
+- 2026-11-23: CLOSED by the acceptance of decision 0106.
 
 ## OI-395 — S6-T13 box 2 and MTH-67
 
