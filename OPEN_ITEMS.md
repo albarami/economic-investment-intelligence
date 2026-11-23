@@ -3412,6 +3412,7 @@ No existing open item is closed by this input.
 - NEEDED BY: the S2 gate.
 - 2026-11-23: decision 0106 (proposed) fixes the values; the four choices are ruled under L-1641; the item closes when 0106 is accepted.
 - 2026-11-23: CLOSED by the acceptance of decision 0106.
+- Records note 2026-11-23: document 08 may also cite decision 0106 at the `cutoff` input; no change of meaning. (S2-25.cf0106, Devin, records only; the item stays CLOSED.)
 
 ## OI-395 — S6-T13 box 2 and MTH-67
 
@@ -3432,6 +3433,17 @@ No existing open item is closed by this input.
 - EVIDENCE: the cf1 proposed point on decision 0105's delegation sentence; the owner's delegation and the advisor's approval under ruling L-1608.
 - NEEDED: a dated clarification in the next decision pack (a decision record is never edited silently).
 - NEEDED BY: the next decision pack.
+
+## OI-397 — The guided-story places in the PUB-52/PUB-53 verification population
+
+- ID: OI-397
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-23, from ruling L-1646 item 2
+- OWNER: the lead
+- CONCERNS: the places named in a prepared guided-story answer join the PUB-52/PUB-53 verification population when the guided-story answers exist (slice S3).
+- EVIDENCE: ruling L-1646 item 2: until then the story set is empty, and every required-verification count records it as empty.
+- NEEDED: add the story-answer places to the verification population once the guided-story answers exist.
+- NEEDED BY: slice S3.
 
 ## Change control
 
