@@ -3410,6 +3410,7 @@ No existing open item is closed by this input.
 - EVIDENCE: ruling L-1633 (1): S6-T13 builds C12 with them as one typed, closed parameter object with no defaults, tested on the worked example.
 - NEEDED: a decision record pins the values before the S2 gate.
 - NEEDED BY: the S2 gate.
+- 2026-11-23: decision 0106 (proposed) fixes the values; the four choices are ruled under L-1641; the item closes when 0106 is accepted.
 
 ## OI-395 — S6-T13 box 2 and MTH-67
 
