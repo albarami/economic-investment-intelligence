@@ -1937,6 +1937,7 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - RESIDUAL, L-1471: a fabricated but correctly chained run of refusals can still be added. It is visible in the committed refusal archive and its Git history. The lead explicitly rules that visibility sufficient for this capability demonstration, with the residual recorded rather than hidden. This is not independent proof that an audit occurred. OI-203's actual real-feed signing and different-maker audit remain open.
 
 - CORRECTION: 2026-11-22, S2-P60 round 5, lead ruling L-1489 amends L-1471's manual-copy step: assembly publishes `refusal.json` and appends the identical object to the working-tree `activity_spine_refusals.json`, keeping earlier record bytes. Every later prepare, draw or assemble refuses `refusal_history_uncommitted` until the lead commits that file, then a fresh preparation is required. Evidence: PROGRESS.md, **S2-P60 round 5 — automatic refusal persistence**. OI-203 remains OPEN.
+- UPDATE: 2026-11-23, S2-P73, [decision 0103](docs/decisions/0103-model-signer-acknowledges-derived-rows.md) ("option b", note owner-relayed-20261123-1434): the model signer may acknowledge the 25 derived acknowledgement rows (18 legacy, 7 invalid prefix) under the same seeded audit. A signer-role acknowledgement row joins the draw, audit and assembly population exactly like a mapped or rejected row; every other model-like role still refuses `acknowledgement_role_invalid`, and a changed derived status, reason or class still refuses `acknowledgement_decision_invalid`. The spine build requires a model-signed acknowledgement row to sit in exactly one bound zero-error audited batch. The seed derivation is unchanged; only the population grows, and a drawn acknowledgement code reaches `audit_packet.json` with its derived status, reason and class. Invented-fixture tests only; no real queue is signed and OI-203 remains OPEN for the lead's real-cache signing and the different-maker audit. Evidence: PROGRESS.md, **S2-P73 — decision 0103, model-signed acknowledgements under the seeded audit**.
 - RESIDUAL, L-1489: deliberately reverting the uncommitted refusal file, or a local reset before push, still hides a refusal. Pushing under rule 40 (no force-push) is what makes the history evidential. Fabricated signed-row free fields (including signing dates, roles and reasons) can change `review_rows_sha256` and P, giving an unbounded seed choice through correctly chained fabricated refusals; the choice is not limited to error counts. The committed archive and its Git history show recorded fabrications but do not authenticate audits. The lead's L-1471 capability-demonstration ruling and actual real-feed signing/different-maker audit obligation remain unchanged.
 
 ## OI-204 — The terms of the classification file are not read
@@ -2208,6 +2209,8 @@ S2-T10 part A — NOT CLOSED: No new causal evidence for the historical interrup
 - INVESTIGATION (2026-11-23, S2-P70; base `3c68f4368b6c85b873d75bf50376642b7910d965`, code `ead413e007420cde708aec0b9829fab688cef1fe`): TYPE remains OPEN for different-maker review. A 21 s injected child-start delay reproduces counts unavailable, the unchanged 30 s timeout and no FAIL interrupted: PID written at 21.180 s, runner ended at 30.017 s, pytest exit 1. The watcher had stopped at 20 s. With its deadline derived from the same 30 s suite budget, PID written at 21.176 s, SIGINT at 21.418 s, FAIL interrupted, killed child and no traceback; pytest exit 0. Reverting only the watcher deadline to 20 s reproduces the failure (PID 21.186 s, timeout 30.033 s, exit 1), then source is restored. Five natural child starts on cores 8-11 with sixteen bounded CPU burners range 0.681–0.916 s (median 0.748 s), all exit 0; all burners are reaped. That sample does not prove a historical >20 s launch or CPU starvation as the historical cause. Full timeline, commands, guard plants and limitations: PROGRESS.md, **S2-P70 — interrupt watcher startup timeline and suite deadline**. No assertion or suite limit is relaxed; completion cancellation prevents a late signal and assertion failures now name measured startup/elapsed seconds. Proposed TYPE change for reviewer decision: CLOSED on acceptance of the deterministic causal mechanism and fix; otherwise retain OPEN for the missing natural slow-start evidence. No automatic closure or slice-gate approval.
 
 - INVESTIGATION (2026-11-23, S2-P70 round 2, RV1 follow-up): TYPE stays OPEN; the lead decides closure after the next whole test. The lead's round-two brief (**Facts the lead verified**) records that today's train S2-20 round-three and round-four guard pre-checks used `( nohup taskset -c … bash -c "./eii test --seed N --suite python-guards …" & )` from a non-interactive shell, inheriting ignored SIGINT. The lead's round-four whole test used a launcher that resets SIGINT first and passed python-guards with 1,418 tests; the lead reproduced a child reporting handler `1` under `trap '' INT` and the default handler after resetting it, and now uses the resetting launcher for guard pre-checks. These are attributed lead facts, not worker whole-test results. RV1's second mechanism reproduces the timeout signature with an early PID: this worker's ignored-SIGINT launch exited 1, child-start seconds=[0.25376168702496216], timeout/no FAIL interrupted. Installing `signal.default_int_handler` before the worker starts and restoring the previous handler in finally turns the identical launch green, exit 0. All assertions and timings remain. This explains the supplied launch-mode occurrences, not every historical OI-227 occurrence. The older startup-window mechanism remains separately recorded; neither a green rerun nor this correction closes the historical cause or the slice gate. Commands, RV1 findings and guard-deletion evidence: PROGRESS.md, **S2-P70 round 2 — RV1 corrections and ignored SIGINT**.
+
+- INVESTIGATION (2026-11-23, train S2-23 ledger): TYPE stays OPEN. The S2-21 ledger commit message called it closed on causal evidence; its confirming review (S2-21 cf1) found that mechanism 1 is shown to be possible, but not shown to be the cause of the failure at seed 2026111499. The S2-23 whole test (seed 3500241558) passed this test; a green run does not close it.
 
 ## OI-228 — Live-frame newline mutant and locale sensitivity
 
@@ -2806,6 +2809,30 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - NEEDED: The lead records whether the list is made and, if it is, the dated list of every file the ceiling of 300 MiB refuses, each with the figure or card it feeds, so that none is missed.
 - NEEDED BY: the next pass of S2-T08 part B.
 
+### OI-308 — S2-R8D dated inventory draft (2026-11-23; to complete after L6)
+
+OI-308 remains OPEN. This is a draft of the dated refused-file inventory, not
+the lead's measured list. The S2-PATH table 1 row 24 names the two streamed
+sources below; `custodian/src/eii_custodian/publicdata/fetch/large.py`,
+`REQUIRED_KEYS` and `receive`, confirms their bounded chunked transport on head
+`6d5466e3bb` (file last changed in `88aea3ca5b`). Document 04 section 2's
+source-use rows identify their consumers. Neither registry membership nor the
+streaming implementation establishes that a particular live file was refused.
+
+| Known source | Figure/card use | Existing treatment | L6 evidence still owed |
+|---|---|---|---|
+| `cus_imp_2019` | Earlier imports in `pub_customs_import`; supplier basket unit values, D7 import context and the C30 imports series, with PUB-44's code roll-up caveat | Existing streamed large intake and bounded JSON-row decoding; no per-file ceiling is raised here | Actual selected file/receipt hash and retrieval date, refused-file observation/reason and declared or measured bytes, chosen bounded-read evidence and every affected figure/card |
+| `bldg_wsf3d` | PUB-106 / S2-T20 WSF 3D cell-mean height fallback and its error measurement | Existing streamed large intake; heights read the cells over the building table's bounds | Actual selected file/receipt hash and retrieval date, refused-file observation/reason and declared or measured bytes, bounded-read evidence and affected height artifact/method |
+
+Owner: S2-T08 gate/live-build lead. After L6, record the actual command, full
+head, seed, run/receipt references and dated complete list of every file the
+ordinary ceiling refuses, each with its figure/card and named per-source
+ceiling or bounded read. Reconcile the earlier seven-file claim against that
+observed inventory; the two rows above are neither exhaustive nor a measured
+count. Do not reconstruct the list from `REQUIRED_KEYS`, invent byte counts or
+close S2-T08#13/OI-308 from this draft. Decision 0098 items 2, 6 and 8 and
+**Unresolved path holds**, U8, retain this evidence on the S2 path.
+
 ## OI-309 — The other six registry rows not read by the live build
 
 - ID: OI-309
@@ -3302,6 +3329,26 @@ No existing open item is closed by this input.
 - EVIDENCE: both failed with `process_identity_mismatch` under concurrent load and passed when run alone. No cause is recorded yet.
 - NEEDED: find why the process identity check mismatches under concurrent load (systematic debugging; record the load shape and the check's inputs), then fix the code or the test's isolation. Do not retry, skip or loosen the check.
 - NEEDED BY: before the next ledger that depends on these cases.
+
+## OI-387 — Hosted runner hang in the sandbox profile install step
+
+- ID: OI-387
+- TYPE: RANDOM FAILURE (a green re-run does not close it, AGENTS.md rule 39)
+- RAISED BY: the lead, 2026-11-23, from the hosted run of pull request 129
+- CONCERNS: the hosted step "Install bubblewrap and AppArmor profiles" of `.github/workflows/ci.yml` (an `apt-get update` and package install)
+- EVIDENCE: in the pull-request-129 run of 2026-11-23 near 11:20 UTC, two matrix jobs hung in that step for 66 minutes, and no test started. The cancelled and failed jobs were rerun and passed. No cause is recorded.
+- NEEDED: record the step's timing in each hosted run, and on a repeat collect the runner's package-manager and AppArmor logs. Do not add a retry, a timeout that turns the step green, or a skip.
+- NEEDED BY: the S2 gate record.
+
+## OI-388 — S2-P72 class-member selection argument and its unit test
+
+- ID: OI-388
+- TYPE: OPEN (addressed by S2-P74, approved, joins train S2-24)
+- RAISED BY: S2-P72 cf2 (Anthropic Opus 5.5, a second Claude seat), 2026-11-23
+- CONCERNS: `committed_class_members` takes `selections` and ignores it (N1), and has no unit test of its own (N2).
+- EVIDENCE: S2-P72 cf2 approved `a3f79aaa` with N1 and N2 as minor points. S2-P74 (approved `d0afbd46`, Anthropic rv1) passes the selections through and adds the unit tests and named refusal tests.
+- NEEDED: close when train S2-24 merges S2-P74, with its commit cited.
+- NEEDED BY: train S2-24.
 
 ## Change control
 
@@ -4200,6 +4247,9 @@ S2-T10 part A — NOT CLOSED: L-834 does not choose between the planted-refusal 
 - NEEDED: the data test of the third row once the spine is reviewed, named with its owner task. Or one line saying why the item is not valid.
 
 - P05 DISPOSITION — 2026-11-20: LEFT OPEN (S2-T07). The committed `activity_spine.csv` still holds an `unreviewed` food-service row, and OI-16/OI-203 still require a human signer and reviewed input binding, after OI-172's basket confirmation. A class replay cannot claim that binding from an unsigned row or a prefix. No class test or skipped skeleton is added, no review is fabricated, and no red/green or acceptance-box closure is claimed. The lead's signed-spine replay remains owed.
+
+- U10 UPDATE — 2026-11-23: test built, real replay owed after the signed spine. The class-membership seam `class_members` (`eii_custodian.publicdata.review.activity`) admits only mapped rows with an admitted signature and refuses an unknown class, a class with no admitted mapped code, and an unsigned mapped row, each with a fixed reason; the data test `test_pinned_c2_isic_5610` builds the spine from the committed review files exactly as the S2-T04 triage does and asserts 2,510 / 7,878 = 0.32 through `eii_core.calc`. While the spine stays unsigned the test fails with the refusal reason and never skips. This item stays OPEN until the lead's real-cache replay on the signed spine.
+- U10 ROUND-3 UPDATE — 2026-11-23: the second review's findings are fixed. `class_members` now refuses a class with any unreviewed seven-digit code of that class's prefix ("class has an unreviewed code: CODE"), so a part-class answer can no longer pass for the whole class; the data test's numbers go through `licence_churn` with their source chains and through both licence chains, `c2_class_members` refuses when the spine's reviewed snapshots and the method pins name different snapshots, and the spine-and-inputs sequence lives in one helper (`committed_class_members`) instead of three copies. The Hypothesis oracle draws legacy rows, space-only roles, model roles and both classes. The item stays OPEN until the lead's real-cache replay on the signed spine.
 
 ### PO-S2-53 — One check value is divided under the caller's decimal context
 
@@ -6501,3 +6551,34 @@ introduced.
   - A read-only trace by another maker found that every portal row uses the same published dataset-API export shape, with no alternative path in the code.
   - Disposition: the portal's published dataset API is the approved access path for these owner-chosen sources (decision 0059). The build stays a paced, allow-listed client of named datasets and never crawls. No robots guard is added, because it would refuse every portal row.
   - NEEDED: the attributable export evidence, which is the receipts of the five rows from the live gate build, before fetchability is claimed. NEEDED BY is unchanged.
+
+## S2-P72 round 3 — records of the second review (PO-S2-52)
+
+- **PROPOSED OPEN ITEM — sealing Spine construction (2026-11-23, second-review finding, non-blocking).** `class_members` is sealed as of round 2: it builds its own spine through `build_spine`, so a forged or `replace`d `Spine` no longer reaches it. `graph._require_mapped_row` still rests on the unwritten rule that callers pass only a `Spine` from `build_spine`; a forged or `dataclasses.replace`d `Spine` can still admit an unaudited model-signed row there. Options: a private marker set only by `build_spine` and checked by every consumer, or passing `ActivityInputs` from `load_activity_inputs` with a non-null `manifest`. Owner: the graph owner.
+
+## PROPOSED OPEN ITEMS — S2-R8D round 2 — 2026-11-23
+
+### PO-S2-R8D-01 — Registry/index delta reconciliation after L6
+
+- ID: PO-S2-R8D-01
+- TYPE: PROPOSED OPEN ITEM — OPEN
+- RAISED BY: OpenAI Codex, S2-R8D round 2, 2026-11-23, addressing RV1 finding 1.
+- OWNER: S2-T08 lead; a different-maker records reviewer checks the deciding disposition.
+- CONCERNS: The registry/index delta attributed by `.overnight/IN/S2-R6DISP.r1.return.md`, table row labelled PO-S2-REC1-3, and repeated as an untracked obligation in docs/gate/S2-R6DISP-round8.md **Refreshed R6DISP rows** at `2c009fd3bc`. The supplied working-paper label conflicts with OPEN_ITEMS.md **PO-S2-REC1-3 — S2-T50 box 4**, which owns the separate national-totals recomputation.
+- EVIDENCE: `.overnight/IN/RV1-VERDICT.md`, finding 1, rejects that missing tracking identity. The working paper attributes an older-row delta; this worker has not measured or verified it. No L6 reconciliation is supplied here.
+- NEEDED: After L6, the S2-T08 lead binds the actual command, full head, seed, exit and live run IDs to the registry and index identities/source chains, verified counts, older-row membership and retained refusal reasons, and explains or resolves the attributed delta. A different-maker records reviewer checks that evidence; the lead appends the dated disposition and its pointer to the final S2 gate record. No count from the working paper is treated as a fresh observation.
+- NEEDED BY: The final S2 gate-record reconciliation after L6, before a closure claim for this delta. PO-S2-REC1-3 remains separately open for S2-T50 after L7.
+- SOURCE CLARIFICATION (2026-11-23, S2-R8D round 3, CF1 P-1): the lead's working paper of 2026-11-23, `.overnight/IN/S2-R6DISP.r1.return.md`, table row labelled PO-S2-REC1-3, gives 10,558 registry rows against 10,621 index rows and a 63 older-row difference. These are the working paper's figures, not observations or independently verified counts from this worker. They define the attributed delta to reconcile under PO-S2-R8D-01; the actual L6 evidence and different-maker review above remain owed.
+
+## PROPOSED OPEN ITEMS — S2-R8D round 3 — 2026-11-23
+
+### PO-S2-R8D-02 — OI-03 closure-pointer reconciliation
+
+- ID: PO-S2-R8D-02
+- TYPE: PROPOSED OPEN ITEM — OPEN (records follow-up only)
+- RAISED BY: OpenAI Codex, S2-R8D round 3, 2026-11-23, addressing CF1 P-4.
+- OWNER: Gate lead (S2 records reconciliation).
+- CONCERNS: docs/gate/S2-R6DISP-round8.md **Refreshed R6DISP rows**, OI-03, assigns a closure-pointer/stale-hold follow-up without its own numbered tracking item. OI-03 itself remains CLOSED.
+- EVIDENCE: OPEN_ITEMS.md **OI-03 — Conflicting restaurant and wage figures**, CLOSED entry of 2026-11-20, records accepted decision 0025 and the bound delegated sign-off. `custodian/publicdata/review/reconciliation_oi03.md` **OI-03 reconciliation evidence status** and **Handoffs** retain the earlier open status and sign-off obligation. CF1's **PROPOSED OPEN ITEMS**, P-4, requires separate tracking of this records follow-up.
+- NEEDED: The gate lead appends the winning dated closure pointer to `custodian/publicdata/review/reconciliation_oi03.md` and supersedes the stale hold with an appended correction, preserving earlier evidence. Append the dated disposition and pointer to the final S2 gate record; obtain different-maker records confirmation. No new sign-off is requested, and L6's separate verification of the bound local sign-off remains owed.
+- NEEDED BY: Final S2 gate-record reconciliation, before claiming this records follow-up closed.

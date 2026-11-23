@@ -507,7 +507,7 @@ class SpineReviewTest(unittest.TestCase):
 
         (self.cache / "invented-link").symlink_to(self.baskets)
         with patch(
-            "spine_review.reviewed_selections",
+            "eii_custodian.publicdata.review.activity.reviewed_selections",
             side_effect=AssertionError("reader reached"),
         ):
             with self.assertRaisesRegex(Refusal, "^input refused$"):
@@ -723,7 +723,8 @@ class SpineReviewTest(unittest.TestCase):
         self.review = folder / "activity_spine.csv"
         (folder / "baskets.yaml").symlink_to(self.baskets)
         with patch(
-            "spine_review.parse_yaml", side_effect=AssertionError("reader reached")
+            "eii_custodian.publicdata.review.activity.parse_yaml",
+            side_effect=AssertionError("reader reached"),
         ):
             with self.assertRaisesRegex(Refusal, "^input refused$"):
                 self.prepare()
@@ -740,7 +741,7 @@ class SpineReviewTest(unittest.TestCase):
         self.baskets = folder / "baskets.yaml"
         (folder / "activity_spine_audits.json").symlink_to(self.cache / "queue.csv")
         with patch(
-            "spine_review.reviewed_selections",
+            "eii_custodian.publicdata.review.activity.reviewed_selections",
             side_effect=AssertionError("reader reached"),
         ):
             with self.assertRaisesRegex(Refusal, "^input refused$"):
@@ -947,7 +948,13 @@ def refusal_case(plant: str, reason: str) -> Callable[[SpineReviewTest], None]:
         elif plant == "acknowledgement_decision":
             signed[-1] = replace(signed[-1], status="unreviewed")
         elif plant == "acknowledgement_role":
-            signed[-1] = replace(signed[-1], reviewed_by_role=record["signer_role"])
+            # Decision 0103: the signer's own role is admitted; another is not.
+            signed[-1] = replace(
+                signed[-1],
+                reviewed_by_role=record["signer_role"].replace(
+                    "invented_signer", "other_signer"
+                ),
+            )
         elif plant == "auditor_coverage":
             audited.pop()
         elif plant == "auditor_identity":

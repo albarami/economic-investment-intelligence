@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
 
-from eii_custodian.publicdata.fetch.registry import Entry, load_registry
+from eii_custodian.publicdata.fetch.registry import Entry, load_registry, parse_yaml
 from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.review.cache_fixture import read_cached, read_rows
 from eii_custodian.publicdata.series.baskets import ACTIVITIES, reviewed_inputs
@@ -525,6 +525,33 @@ def load_activity_inputs(
     )
 
 
+def committed_activity_inputs(
+    cache: Path, baskets: Path, review_path: Path | None = None
+) -> tuple[ActivityInputs, tuple[str, ...], SupplierMembership, dict[str, str]]:
+    """Build the inputs of one committed review folder from its baskets.
+
+    This is the one sequence every caller of the committed review follows:
+    the reviewed selections, both licence feeds, the basket membership of the
+    reviewed baskets document, then the spine of that review. ``review_path``
+    ``None`` means the committed review file. Returns the inputs, the playbook
+    codes, the supplier membership and the reviewed selections.
+    """
+    selected = reviewed_selections(cache)
+    entries = load_registry()
+    activities, _, _ = read_activity_rows(cache, entries, selected)
+    playbook, suppliers = basket_membership(
+        parse_yaml(baskets.read_bytes()), activities
+    )
+    inputs = load_activity_inputs(
+        cache,
+        playbook,
+        supplier_membership=suppliers,
+        review_path=review_path,
+        selections=selected,
+    )
+    return inputs, playbook, suppliers, selected
+
+
 def read_review_csv(path: Path) -> tuple[ReviewRow, ...]:
     """Read the review file and refuse every malformed row."""
     with path.open("r", encoding="utf-8", newline="") as handle:
@@ -646,6 +673,86 @@ def finalise_spine(spine: Spine) -> Spine:
         missing = ",".join(row.code for row in spine.queue)
         raise SpineError("mandatory review missing: " + missing)
     return spine
+
+
+def class_members(
+    activities: Sequence[ActivityRow],
+    isic_classes: Sequence[IsicClass],
+    reviews: Sequence[ReviewRow],
+    playbook_codes: Sequence[str],
+    *,
+    isic_class: str,
+    supplier_membership: SupplierMembership,
+    code_system_version: str = CODE_SYSTEM_VERSION,
+    reviewed_binding: ReviewedBinding | None = None,
+    audit_path: Path | None = None,
+) -> tuple[str, ...]:
+    """Return the codes whose reviewed decision is ``mapped`` to one class.
+
+    The spine is built here by ``build_spine``, so a recorded reviewer role is
+    an admitted signature only after the audit rules of decision 0075 have
+    run; membership is selected from that result alone, never from a spine a
+    caller held. A class with no admitted row is a refusal, never an empty
+    answer.
+    """
+    if not isinstance(isic_class, str) or isic_class not in {
+        row.code for row in isic_classes
+    }:
+        raise SpineError("class is not in the classification: " + str(isic_class))
+    spine = build_spine(
+        activities,
+        isic_classes,
+        reviews,
+        playbook_codes,
+        supplier_membership=supplier_membership,
+        code_system_version=code_system_version,
+        reviewed_binding=reviewed_binding,
+        audit_path=audit_path,
+    )
+    member_list: list[str] = []
+    for row in spine.rows:
+        if (
+            len(row.code) == 7
+            and row.code[:4] == isic_class
+            and row.status == "unreviewed"
+        ):
+            raise SpineError("class has an unreviewed code: " + row.code)
+        if row.status == "mapped" and row.isic_class == isic_class:
+            member_list.append(row.code)
+    members = tuple(sorted(member_list))
+    if not members:
+        raise SpineError("class has no admitted mapped code: " + isic_class)
+    return members
+
+
+def committed_class_members(
+    cache: Path,
+    isic_class: str,
+    *,
+    selections: Mapping[str, str] | None = None,
+    review_path: Path | None = None,
+) -> tuple[str, ...]:
+    """Return one class's admitted members of the committed review.
+
+    This is the one sequence every caller of the committed review follows:
+    the committed review file, the shared committed-spine helper, then the
+    class selection from that spine alone.
+    """
+    path = spine_path() if review_path is None else review_path
+    reviews = read_review_csv(path)
+    inputs, playbook, suppliers, _ = committed_activity_inputs(
+        cache, path.with_name("baskets.yaml"), path
+    )
+    return class_members(
+        inputs.activities,
+        inputs.classes,
+        reviews,
+        playbook,
+        supplier_membership=suppliers,
+        isic_class=isic_class,
+        reviewed_binding=load_recorded_binding(path, reviews),
+        audit_path=path.with_name("activity_spine_audits.json"),
+    )
 
 
 def class_bucket_counts(
@@ -819,6 +926,9 @@ _MODEL_ROLE = re.compile(
     r"model review: ([A-Za-z][A-Za-z0-9_-]*) ([^,\r\n]+), ([^,\r\n]+)"
 )
 _MODEL_DECISIONS = frozenset({"mapped", "not_mappable_rejected"})
+# Decision 0103: a model-signed derived acknowledgement row is audited exactly
+# like a model-signed mapped or rejected row.
+_MODEL_SIGNED_STATUSES = _MODEL_DECISIONS | _ACKNOWLEDGED
 _AUDIT_FIELDS = frozenset(
     {
         "batch_id",
@@ -892,7 +1002,7 @@ def _audit_codes(value: object, detail: str, *, nonempty: bool) -> tuple[str, ..
         not isinstance(value, list)
         or (nonempty and not value)
         or any(
-            not isinstance(code, str) or re.fullmatch(r"[0-9]{7}", code) is None
+            not isinstance(code, str) or re.fullmatch(r"[0-9]{6,7}", code) is None
             for code in value
         )
         or len(set(value)) != len(value)
@@ -942,7 +1052,7 @@ def _require_model_audits(
 ) -> None:
     for row in reviews:
         if (
-            row.status in _MODEL_DECISIONS
+            row.status in _MODEL_SIGNED_STATUSES
             and _MODEL_LIKE.match(row.reviewed_by_role)
             and _MODEL_ROLE.fullmatch(row.reviewed_by_role) is None
         ):
@@ -950,7 +1060,7 @@ def _require_model_audits(
     signed = {
         row.code: row
         for row in reviews
-        if row.status in _MODEL_DECISIONS
+        if row.status in _MODEL_SIGNED_STATUSES
         and row.reviewed_by_role.startswith(_MODEL_PREFIX)
     }
     if not signed and (binding is None or not binding.audit_sha256):

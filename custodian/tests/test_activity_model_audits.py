@@ -496,3 +496,75 @@ def test_missing_rejected_title_refused(tmp_path):
             reviewed_binding=binding,
             audit_path=path,
         )
+
+
+# Decision 0103: a model-signed derived acknowledgement row is audited exactly
+# like a model-signed mapped or rejected row. Invented codes and roles only.
+
+ACK_LEGACY = a.ReviewRow(
+    code="300101",
+    code_length=6,
+    name_ar="نشاط مخترع",
+    isic_class="",
+    status="not_mappable_legacy",
+    reason="legacy_code_length",
+    reviewed_by_role=SIGNER,
+    reviewed_on="2026-11-19",
+)
+ACK_INVALID_PREFIX = replace(
+    replace(ACK_LEGACY, code="9900001", code_length=7),
+    status="not_mappable_invalid_prefix",
+    reason="invalid_isic_prefix",
+)
+
+
+def ack_build(reviews, path):
+    return build(reviews, path)
+
+
+def test_model_signed_acknowledgement_is_admitted_with_a_batch(tmp_path):
+    reviews = (*rows(3), ACK_LEGACY, ACK_INVALID_PREFIX)
+    spine = ack_build(reviews, audit_file(tmp_path, [batch(reviews)]))
+    ack = {row.code: row for row in spine.rows}
+    assert ack["300101"].reviewed_by_role == SIGNER
+    assert ack["300101"].status == "not_mappable_legacy"
+    assert ack["9900001"].status == "not_mappable_invalid_prefix"
+
+
+def test_model_signed_acknowledgement_without_a_batch_is_refused(tmp_path):
+    reviews = (*rows(3), ACK_LEGACY)
+    record = batch(rows(3))
+    with pytest.raises(a.SpineError, match="model review code has no audited batch"):
+        ack_build(reviews, audit_file(tmp_path, [record]))
+
+
+def test_model_signed_acknowledgement_in_two_batches_is_refused(tmp_path):
+    reviews = (*rows(3), ACK_LEGACY)
+    record = batch((*rows(3), ACK_LEGACY))
+    records = [record, {**record, "batch_id": "INVENTED-second"}]
+    with pytest.raises(
+        a.SpineError, match="model review code has multiple audited batches"
+    ):
+        ack_build(reviews, audit_file(tmp_path, records))
+
+
+def test_malformed_model_role_on_acknowledgement_is_refused(tmp_path):
+    with pytest.raises(a.SpineError, match="model review role is malformed"):
+        ack_build(
+            (replace(ACK_LEGACY, reviewed_by_role=" model review: invented"),),
+            audit_file(tmp_path, []),
+        )
+
+
+def test_person_signed_acknowledgement_keeps_its_existing_path():
+    reviews = (replace(ACK_LEGACY, reviewed_by_role="INVENTED person reviewer"),)
+    spine = a.build_spine(
+        (a.ActivityRow(reviews[0].code, reviews[0].name_ar, 1, 0),),
+        CLASSES,
+        reviews,
+        (),
+        supplier_membership=NONE,
+        reviewed_binding=a.review_binding(a.CODE_SYSTEM_VERSION, CLASSES),
+    )
+    assert spine.rows[0].status == "not_mappable_legacy"
+    assert spine.rows[0].reviewed_by_role == "INVENTED person reviewer"

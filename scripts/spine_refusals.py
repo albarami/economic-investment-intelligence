@@ -96,7 +96,7 @@ def refusal_rows(record: Any) -> tuple[ReviewRow, ...]:
         names = {field.name for field in fields(ReviewRow)} - {"code_length"}
         valid_rows = all(
             type(row.code_length) is int
-            and row.code_length == 7
+            and row.code_length == len(row.code)
             and all(isinstance(getattr(row, name), str) for name in names)
             for row in rows
         )

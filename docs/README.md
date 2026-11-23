@@ -150,6 +150,7 @@
 | [0098](decisions/0098-s2-sources-follow-their-first-field-reader.md) | S2 field-reader lanes (Option B), accepted with exact pending carries, corrected background-S3 accident activation and unchanged criteria/tests; unresolved readers remain path | Accepted by the owner, 2026-11-23; carry-validator implementation and independent review remain required |
 | [0101](decisions/0101-custodian-part-hang-guard-and-suite-job-cap.md) | Custodian parts limited to 2,400 seconds on a hosted runner and 1,800 seconds elsewhere; the hosted job `suite` capped at 150 minutes; a split above 1,680 seconds of green hosted time; amends decisions 0086 and 0097 | Accepted, 2026-11-23; the owner's words and the delegated advisor decision, applied by lead ruling L-1559; S2-P69 |
 | [0102](decisions/0102-register-projection-run-in-rule-44.md) | The existing lead-shell register projection command admitted to rule 44; permission to run an existing tool, no new check or source | Accepted by the owner, 2026-11-23 |
+| [0103](decisions/0103-model-signer-acknowledges-derived-rows.md) | The model signer may acknowledge the derived acknowledgement rows of the spine queue under the same seeded audit; amends decision 0075's admission and the keyed-procedure acknowledgement sentence | Accepted by the owner, 2026-11-23 ("option b", relayed by the advisor in note owner-relayed-20261123-1434) |
 
 ## Identifiers and change control
 

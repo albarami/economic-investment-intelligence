@@ -23,6 +23,7 @@ from eii_core.calc.public_methods import (
 from eii_core.calc.public_series import decomposition, ratio, rounded
 from eii_core.calc.sector_economics import Component, sector_norms, share_range
 from eii_custodian.publicdata.fetch.page_workbook import read_sheet
+from eii_custodian.publicdata.fetch.snapshots import reviewed_selections
 from eii_custodian.publicdata.frame.census import (
     C8_SOURCES,
     c8_national_counts,
@@ -37,6 +38,7 @@ from eii_custodian.publicdata.frame.crosswalk import (
 )
 from eii_custodian.publicdata.frame.layers import COUNTS, layer_rows
 from eii_custodian.publicdata.frame.population import population_rows
+from eii_custodian.publicdata.review.activity import SpineError, committed_class_members
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
 _CACHE_NAME = "eii_data_tests_cache"
@@ -627,6 +629,67 @@ def test_pinned_c2_municipal_restaurants(
         assert (fact.geography, fact.geography_kind) == (geography, "public")
     for fact in (result["undated_count"], result["bulk_share_percent"]):
         assert (fact.geography, fact.geography_kind) == ("national", "national")
+
+
+def c2_class_members(isic_class: str) -> tuple[str, ...]:
+    """Build the spine from the committed review files and take one class.
+
+    The spine is built exactly as the S2-T04 triage builds it, and the two
+    licence feeds it reads must be the same snapshots the method pins name.
+    """
+    selected = reviewed_selections(_cache.CACHE)
+    for key in ("lic_active", "lic_cancelled"):
+        if selected.get(key) != _cache._pin(key):
+            pytest.fail(
+                "C2 ISIC 5610 spine and method pins name different snapshots: " + key
+            )
+    return committed_class_members(_cache.CACHE, isic_class, selections=selected)
+
+
+def test_pinned_c2_isic_5610():
+    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
+    active_rows, active_chain = pinned("lic_active")
+    try:
+        members = set(c2_class_members("5610"))
+    except SpineError as error:
+        pytest.fail("C2 ISIC 5610 membership refused: " + error.detail)
+    class_cancelled = [
+        row for row in cancelled_rows if row["rmz_lnsht_ltjry"] in members
+    ]
+    _, dated, undated, national_months = c2_national_totals(
+        cancelled_rows, cancelled_chain
+    )
+    class_counts, _, _, _ = c2_national_totals(class_cancelled, cancelled_chain)
+    window = set(
+        f"{year}-{month:02}" for year in (2022, 2023, 2024) for month in range(1, 13)
+    )
+    class_months = {
+        period: reading(value, "count", period, cancelled_chain)
+        for period, value in class_counts.items()
+        if period in window
+    }
+    stock = sum(
+        (
+            D(str(row["dd_lrkhs_lnsht"]))
+            for row in active_rows
+            if row["rmz_lnsht_ltjry"] in members
+        ),
+        D(0),
+    )
+    result = licence_churn(
+        reading(stock, "count", "2025-05", active_chain),
+        class_months,
+        national_months,
+        C2_CALENDAR,
+        reading(dated + undated, "count", "2025-05", cancelled_chain),
+        reading(dated, "count", "2025-05", cancelled_chain),
+    )
+    assert result["active_count"].value == D(7878)
+    assert result["including_ratio"].exact_unrounded * 7878 == 2510
+    assert result["including_ratio"].value == D("0.32")
+    assert {"lic_active", "lic_cancelled"} <= {
+        chain.lineage_ref for chain in result["including_ratio"].sources
+    }
 
 
 def test_pinned_c5_heading_checks_only():
