@@ -3456,6 +3456,7 @@ No existing open item is closed by this input.
 - EVIDENCE: `fetch/build.py::_seeded_assembly` imports seven repository modules through `Production.run` after `RunRecord.begin` took its module baseline, so `RunScan.unexpected_loaded` was true at fetch-loop entry. Each resume of 2026-11-23 refetched about 772 entries (about 50 min).
 - NEEDED: close with S2-P78's fix and evidence in the same train.
 - NEEDED BY: S2-P78, same train.
+- Correction 2026-11-24 (S2-26.cf1 records point): S2-P78 is not in train S2-26. This item closes in the later S2 train that carries S2-P78's approved fix; the entry above is kept as written.
 
 ## OI-399 — Page-scoped TLS offered no ALPN
 
@@ -3466,6 +3467,7 @@ No existing open item is closed by this input.
 - EVIDENCE: the page-scoped opener's `SSLContext` from `page_context` offered no ALPN.
 - NEEDED: close with S2-P77's fix and evidence in the same train.
 - NEEDED BY: S2-P77, same train.
+- Verification 2026-11-24: S2-P77 joined train S2-26 in round 2 (`2e389148bb` joined as `39570dc90a`, 8 files SAME). S2-P77.rv1 (Cognition Devin) APPROVED `2e389148bb`: the page and pinned contexts offer ALPN `http/1.1` only after the verification refusal. The live page check waits for the next lead-shell fetch run.
 
 ## OI-400 — Five low points of the lead's review hash-compare tool
 
@@ -6802,3 +6804,23 @@ introduced.
 - EVIDENCE: run beside pytest, `test_guard_changes_nothing` saw new `.pyc` files written by concurrent imports. The same suite run alone with `PYTHONDONTWRITEBYTECODE=1` passed 37 of 37, and so did the lead's run.
 - NEEDED: exclude `__pycache__` and `*.pyc` from the fingerprint, or run the boundary child processes with `PYTHONDONTWRITEBYTECODE=1`. The guard itself stays unchanged.
 - NEEDED BY: before the S2 gate record.
+
+## OI-406 — Three low points of the S2-P77 review
+
+- ID: OI-406
+- TYPE: OPEN (records only; not defects)
+- RAISED BY: S2-P77.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `custodian/src/eii_custodian/publicdata/singles/tenders.py`, the page-scoped context, and the clean-environment test.
+- EVIDENCE: (1) the tenders context sets ALPN before its own verification guard; the context is created locally and the refusal still fires before return, so this is ordering only. (2) The S2-P77 builder saw `test_clean_environment.py` fail in `setUpClass` when the default uv cache folder is absent; the file passes alone. (3) `post_handshake_auth`, which the standard default context also sets, stays unset; the builder kept it out of scope.
+- NEEDED: (1) hoist the guard above the ALPN call when the function is next touched; (2) make the clean-environment test fail closed with a clear diagnostic when the uv cache is absent; (3) record whether `post_handshake_auth` should follow the standard default.
+- NEEDED BY: before the S2 gate record.
+
+## OI-407 — A pinned command-list test escaped three checks
+
+- ID: OI-407
+- TYPE: CLOSED (process lesson, ruling L-1678)
+- RAISED BY: the lead, 2026-11-24
+- CONCERNS: train S2-26 round 1 (`bc68ae47cc`): the hosted suite python-guards failed `scripts/tests/test_public_assembly_command.py::test_usage_shows_effective_public_draw_seed`, because S2-P79 added two `build-public` forms to `scripts/commands/table.py` without adding them to that test's pinned list.
+- EVIDENCE: the builder's selection, the lead's verify and S2-P79.rv1 did not run that file. S2-P79.r2 (Anthropic Claude C) `f194c58724` adds both forms in table order and keeps the full equality; its sweep found no other pinning test to change; the test was red at the old head and green after, and it went red again when one table row was deleted.
+- NEEDED: none. From now on, the lead's verify of any change to the command table or the operations scripts also runs `scripts/tests` selected by command, table, usage, public assembly, development, serve and preflight.
+- NEEDED BY: closed.
