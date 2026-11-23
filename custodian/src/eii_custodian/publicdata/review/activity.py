@@ -709,16 +709,50 @@ def class_members(
         reviewed_binding=reviewed_binding,
         audit_path=audit_path,
     )
-    members = tuple(
-        sorted(
-            row.code
-            for row in spine.rows
-            if row.status == "mapped" and row.isic_class == isic_class
-        )
-    )
+    member_list: list[str] = []
+    for row in spine.rows:
+        if (
+            len(row.code) == 7
+            and row.code[:4] == isic_class
+            and row.status == "unreviewed"
+        ):
+            raise SpineError("class has an unreviewed code: " + row.code)
+        if row.status == "mapped" and row.isic_class == isic_class:
+            member_list.append(row.code)
+    members = tuple(sorted(member_list))
     if not members:
         raise SpineError("class has no admitted mapped code: " + isic_class)
     return members
+
+
+def committed_class_members(
+    cache: Path,
+    isic_class: str,
+    *,
+    selections: Mapping[str, str] | None = None,
+    review_path: Path | None = None,
+) -> tuple[str, ...]:
+    """Return one class's admitted members of the committed review.
+
+    This is the one sequence every caller of the committed review follows:
+    the committed review file, the shared committed-spine helper, then the
+    class selection from that spine alone.
+    """
+    path = spine_path() if review_path is None else review_path
+    reviews = read_review_csv(path)
+    inputs, playbook, suppliers, _ = committed_activity_inputs(
+        cache, path.with_name("baskets.yaml"), path
+    )
+    return class_members(
+        inputs.activities,
+        inputs.classes,
+        reviews,
+        playbook,
+        supplier_membership=suppliers,
+        isic_class=isic_class,
+        reviewed_binding=load_recorded_binding(path, reviews),
+        audit_path=path.with_name("activity_spine_audits.json"),
+    )
 
 
 def class_bucket_counts(

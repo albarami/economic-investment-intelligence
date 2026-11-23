@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import tempfile
 from dataclasses import replace
 from pathlib import Path
@@ -25,8 +26,14 @@ CLASSES = (
 )
 SIGNER = "model review: invented_signer invented-model, classification specialist"
 AUDITOR = "model review: invented_auditor invented-model, classification specialist"
-_CODES = ("5610101", "5610202", "5630111", "5610303")
+_CODES = ("5610101", "5610202", "5630111", "5610303", "561000")
 _STATUSES = ("mapped", "unreviewed", "not_mappable_rejected")
+_SPACE_ROLE = "   "
+
+
+def _anchored(message: str) -> str:
+    """Anchor a refusal reason so a longer message cannot also match."""
+    return re.escape(message) + r"\Z"
 
 
 def _activity(code: str, active: int = 1) -> a.ActivityRow:
@@ -57,10 +64,10 @@ def _review(code: str, status: str, *, role: str = "data_reviewer") -> a.ReviewR
 
 
 def _baseline_reviews() -> tuple[a.ReviewRow, ...]:
-    """One mapped, one unreviewed and one rejected code of 5610, one of 5630."""
+    """Two mapped, one rejected code of 5610, one of 5630, all signed."""
     return (
         _review("5610101", "mapped"),
-        _review("5610202", "unreviewed"),
+        _review("5610202", "mapped"),
         _review("5610303", "not_mappable_rejected"),
         _review("5630111", "mapped"),
     )
@@ -102,46 +109,78 @@ def _class_members(
 
 
 def test_class_members_are_the_signed_mappings_of_one_class() -> None:
-    """The happy path: one class holds its mapped codes, never the others."""
-    assert _class_members() == ("5610101",)
+    """The happy path: every signed code of the class, never the others."""
+    assert _class_members() == ("5610101", "5610202")
     assert _class_members(isic_class="5630") == ("5630111",)
+    # A rejected code of the class is never a member.
+    assert "5610303" not in _class_members()
 
 
-def test_class_members_never_count_unreviewed_or_rejected_codes() -> None:
-    """An unreviewed code and a rejected code of the class are never members."""
-    members = _class_members()
-    assert "5610202" not in members  # unreviewed
-    assert "5610303" not in members  # rejected
+def test_unreviewed_code_of_the_class_refuses_the_whole_class() -> None:
+    """One changed input: 5610202 back to unreviewed refuses the class."""
+    reviews = tuple(
+        replace(row, status="unreviewed", reason="awaiting_human_review")
+        if row.code == "5610202"
+        else row
+        for row in _baseline_reviews()
+    )
+    with pytest.raises(
+        a.SpineError, match=_anchored("class has an unreviewed code: 5610202")
+    ):
+        _class_members(reviews)
 
 
 def test_class_not_in_the_classification_is_refused() -> None:
     """One changed input: the class is not one of the classification's codes."""
-    with pytest.raises(a.SpineError, match="class is not in the classification: 9999"):
+    with pytest.raises(
+        a.SpineError,
+        match=_anchored("class is not in the classification: 9999"),
+    ):
         _class_members(isic_class="9999")
 
 
 def test_malformed_class_code_is_not_in_the_classification() -> None:
     """A class code that is not four digits is not in the classification."""
-    with pytest.raises(a.SpineError, match="class is not in the classification: 56"):
+    with pytest.raises(
+        a.SpineError, match=_anchored("class is not in the classification: 56")
+    ):
         _class_members(isic_class="56")
 
 
+def test_non_string_class_input_is_refused() -> None:
+    """One changed input: the class argument is a list, not a class code."""
+    with pytest.raises(
+        a.SpineError,
+        match=_anchored("class is not in the classification: ['5610']"),
+    ):
+        _class_members(isic_class=["5610"])  # type: ignore[arg-type]
+
+
 def test_class_without_admitted_members_is_refused() -> None:
-    """One changed input: the class's only mapped review becomes unreviewed."""
+    """One changed input: the class's only mapped review becomes rejected."""
     reviews = tuple(
-        replace(row, status="unreviewed", reason="awaiting_human_review")
+        replace(
+            row,
+            status="not_mappable_rejected",
+            reason="reviewer_rejected",
+            isic_class="",
+        )
         if row.code == "5630111"
         else row
         for row in _baseline_reviews()
     )
-    with pytest.raises(a.SpineError, match="class has no admitted mapped code: 5630"):
+    with pytest.raises(
+        a.SpineError, match=_anchored("class has no admitted mapped code: 5630")
+    ):
         _class_members(reviews, isic_class="5630")
 
 
 def test_unsigned_mapped_row_is_refused() -> None:
     """A mapped review row without a role is refused by the spine build."""
     reviews = (replace(_review("5610101", "mapped"), reviewed_by_role=""),)
-    with pytest.raises(a.SpineError, match="mapped decision without a reviewer role"):
+    with pytest.raises(
+        a.SpineError, match=_anchored("mapped decision without a reviewer role")
+    ):
         _class_members(reviews)
 
 
@@ -178,12 +217,21 @@ def _model_case(tmp_path: Path, codes: list[str]) -> tuple[Path, a.ReviewedBindi
     return audit_path, binding
 
 
+def _model_reviews() -> tuple[a.ReviewRow, ...]:
+    """The baseline reviews with 5610101 signed by the model signer."""
+    return tuple(
+        replace(row, reviewed_by_role=SIGNER) if row.code == "5610101" else row
+        for row in _baseline_reviews()
+    )
+
+
 def test_model_signed_audited_batch_is_admitted(tmp_path) -> None:
     """A model-signed mapped row of an audited zero-error batch is a member."""
     audit_path, binding = _model_case(tmp_path, ["5610101"])
-    reviews = (replace(_review("5610101", "mapped"), reviewed_by_role=SIGNER),)
+    reviews = _model_reviews()
     assert _class_members(reviews, reviewed_binding=binding, audit_path=audit_path) == (
         "5610101",
+        "5610202",
     )
 
 
@@ -194,49 +242,68 @@ def test_model_signed_code_outside_the_audited_batch_is_refused(tmp_path) -> Non
     a member only while a bound, zero-error audited batch holds its code.
     """
     audit_path, binding = _model_case(tmp_path, ["5610999"])
-    reviews = (replace(_review("5610101", "mapped"), reviewed_by_role=SIGNER),)
-    with pytest.raises(a.SpineError, match="model review code has no audited batch"):
+    reviews = _model_reviews()
+    with pytest.raises(
+        a.SpineError,
+        match=_anchored("model review code has no audited batch"),
+    ):
         _class_members(reviews, reviewed_binding=binding, audit_path=audit_path)
 
 
 @st.composite
 def _cases(draw):
-    """Every invented review set over a fixed code set, human, model or none."""
+    """Invented review sets over both classes, with legacy and odd roles.
+
+    The oracle never mirrors the implementation: it states, from the review
+    rows alone, which refusal the spine build or the class query owes, and
+    which members the class holds.
+    """
     rows = []
     model = False
-    unsigned = False
+    bad: dict[str, str] = {}
+    unreviewed: list[str] = []
+    isic_class = draw(st.sampled_from(("5610", "5630")))
     for code in _CODES:
         status = draw(st.sampled_from(_STATUSES))
+        if code == "561000":
+            # Legacy rows are inert: whatever their review says, they are
+            # never members and never block a class.
+            if status == "unreviewed":
+                rows.append(_review(code, status))
+                continue
+            role = draw(st.sampled_from(("data_reviewer", "", _SPACE_ROLE)))
+            rows.append(_review(code, status, role=role))
+            continue
         if status == "unreviewed":
             rows.append(_review(code, status))
+            if code[:4] == isic_class:
+                unreviewed.append(code)
             continue
-        roles = (
-            ("data_reviewer", "", SIGNER)
-            if status == "mapped"
-            else (
-                "data_reviewer",
-                SIGNER,
-            )
-        )
-        role = draw(st.sampled_from(roles))
+        role = draw(st.sampled_from(("data_reviewer", "", _SPACE_ROLE, SIGNER)))
         if role == SIGNER:
             model = True
-        if role == "":
-            unsigned = True
+        elif role.strip() == "":
+            bad[code] = (
+                "mapped decision without a reviewer role"
+                if status == "mapped"
+                else "rejected decision without a reviewer role"
+            )
         rows.append(_review(code, status, role=role))
-    return tuple(rows), model, unsigned
+    return tuple(rows), isic_class, model, bad, tuple(sorted(unreviewed))
 
 
 @given(_cases())
 def test_class_members_matches_an_independent_oracle(case) -> None:
-    """The property: the answer is exactly the class's admitted mapped codes."""
-    reviews, model, unsigned = case
+    """The property: the answer is the class's admitted mapped codes, or the
+    first refusal the spine build or the class query owes for these rows."""
+    reviews, isic_class, model, bad, unreviewed = case
     expected = tuple(
         sorted(
             row.code
             for row in reviews
-            if row.status == "mapped"
-            and row.isic_class == "5610"
+            if len(row.code) == 7
+            and row.status == "mapped"
+            and row.isic_class == isic_class
             and row.reviewed_by_role.startswith("data_reviewer")
         )
     )
@@ -251,16 +318,32 @@ def test_class_members_matches_an_independent_oracle(case) -> None:
             )
         if model:
             with pytest.raises(
-                a.SpineError, match="model review code has no audited batch"
+                a.SpineError, match=_anchored("model review code has no audited batch")
             ):
-                _class_members(reviews, reviewed_binding=binding, audit_path=audit_path)
-        elif unsigned:
+                _class_members(
+                    reviews,
+                    isic_class=isic_class,
+                    reviewed_binding=binding,
+                    audit_path=audit_path,
+                )
+        elif bad:
+            first = min(bad)
+            with pytest.raises(a.SpineError, match=_anchored(bad[first])):
+                _class_members(reviews, isic_class=isic_class, reviewed_binding=binding)
+        elif unreviewed:
             with pytest.raises(
-                a.SpineError, match="mapped decision without a reviewer role"
+                a.SpineError,
+                match=_anchored("class has an unreviewed code: " + unreviewed[0]),
             ):
-                _class_members(reviews, reviewed_binding=binding)
+                _class_members(reviews, isic_class=isic_class, reviewed_binding=binding)
         elif not expected:
-            with pytest.raises(a.SpineError, match="class has no admitted mapped code"):
-                _class_members(reviews, reviewed_binding=binding)
+            with pytest.raises(
+                a.SpineError,
+                match=_anchored("class has no admitted mapped code: " + isic_class),
+            ):
+                _class_members(reviews, isic_class=isic_class, reviewed_binding=binding)
         else:
-            assert _class_members(reviews, reviewed_binding=binding) == expected
+            assert (
+                _class_members(reviews, isic_class=isic_class, reviewed_binding=binding)
+                == expected
+            )
