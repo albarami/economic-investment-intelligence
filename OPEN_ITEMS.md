@@ -6533,3 +6533,16 @@ introduced.
 ## S2-P72 round 3 — records of the second review (PO-S2-52)
 
 - **PROPOSED OPEN ITEM — sealing Spine construction (2026-11-23, second-review finding, non-blocking).** `class_members` is sealed as of round 2: it builds its own spine through `build_spine`, so a forged or `replace`d `Spine` no longer reaches it. `graph._require_mapped_row` still rests on the unwritten rule that callers pass only a `Spine` from `build_spine`; a forged or `dataclasses.replace`d `Spine` can still admit an unaudited model-signed row there. Options: a private marker set only by `build_spine` and checked by every consumer, or passing `ActivityInputs` from `load_activity_inputs` with a non-null `manifest`. Owner: the graph owner.
+
+## PROPOSED OPEN ITEMS — S2-R8D round 2 — 2026-11-23
+
+### PO-S2-R8D-01 — Registry/index delta reconciliation after L6
+
+- ID: PO-S2-R8D-01
+- TYPE: PROPOSED OPEN ITEM — OPEN
+- RAISED BY: OpenAI Codex, S2-R8D round 2, 2026-11-23, addressing RV1 finding 1.
+- OWNER: S2-T08 lead; a different-maker records reviewer checks the deciding disposition.
+- CONCERNS: The registry/index delta attributed by `.overnight/IN/S2-R6DISP.r1.return.md`, table row labelled PO-S2-REC1-3, and repeated as an untracked obligation in docs/gate/S2-R6DISP-round8.md **Refreshed R6DISP rows** at `2c009fd3bc`. The supplied working-paper label conflicts with OPEN_ITEMS.md **PO-S2-REC1-3 — S2-T50 box 4**, which owns the separate national-totals recomputation.
+- EVIDENCE: `.overnight/IN/RV1-VERDICT.md`, finding 1, rejects that missing tracking identity. The working paper attributes an older-row delta; this worker has not measured or verified it. No L6 reconciliation is supplied here.
+- NEEDED: After L6, the S2-T08 lead binds the actual command, full head, seed, exit and live run IDs to the registry and index identities/source chains, verified counts, older-row membership and retained refusal reasons, and explains or resolves the attributed delta. A different-maker records reviewer checks that evidence; the lead appends the dated disposition and its pointer to the final S2 gate record. No count from the working paper is treated as a fresh observation.
+- NEEDED BY: The final S2 gate-record reconciliation after L6, before a closure claim for this delta. PO-S2-REC1-3 remains separately open for S2-T50 after L7.
