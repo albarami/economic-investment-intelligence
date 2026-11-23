@@ -3959,3 +3959,38 @@ INVENTORY_CASES = [
         "stage": "require_complete",
     },
 ]
+
+
+# S2-P76 extends the inventory without changing the approved S2-P56 payload.
+REVIEW_DATA_GUARD_CASES = [
+    {
+        "anchor": "places/review.py:load_categories, load_showcase_areas, _area; places/stage.py:run_places_stage; places/area_requests.py:area_requests",
+        "plants": [
+            ["PlacesError", "duplicate_category", "duplicate_category"],
+            ["PlacesError", "showcase_area_duplicate", "showcase_area_duplicate"],
+            ["PlacesError", "showcase_area_source", "showcase_area_source"],
+            [
+                "PlacesError",
+                "showcase_area_gazetteer_mismatch",
+                "showcase_area_gazetteer_mismatch",
+            ],
+        ],
+        "row": "frame:S2-P76",
+        "stage": "frame",
+    },
+    {
+        "anchor": "additions/property_venues.py:load_venue_crosswalk",
+        "plants": [
+            ["AdditionError", "venue_key_form", "venue_key_form"],
+            ["AdditionError", "venue_key_digit_run", "venue_key_digit_run"],
+        ],
+        "row": "additions:S2-P76",
+        "stage": "additions",
+    },
+    {
+        "anchor": "busyness/build.py:_inputs; heights/landmarks.py:checked_cache_path",
+        "plants": [["BuildInputError", "cache_path_refused", "cache_path_refused"]],
+        "row": "busyness:S2-P76",
+        "stage": "busyness",
+    },
+]

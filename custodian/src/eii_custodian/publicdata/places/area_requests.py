@@ -11,6 +11,7 @@ from eii_custodian.publicdata.places.areas import AreaCutoff, AreaMode
 from eii_custodian.publicdata.places.review import (
     load_flagship_candidates,
     load_showcase_areas,
+    load_showcase_gazetteer,
 )
 
 _CANDIDATE_AREAS = (
@@ -26,7 +27,10 @@ def area_requests(
 ) -> tuple[AreaRequest, ...]:
     """One list for the producer and the provider. Coordinates are canonical text."""
     found: dict[tuple[str, str, int], AreaRequest] = {}
-    for item in load_showcase_areas(review / "showcase_areas.yaml", None)[1]:
+    gazetteer = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
+    for item in load_showcase_areas(
+        review / "showcase_areas.yaml", None, gazetteer=gazetteer
+    )[1]:
         _remember(
             found,
             item,

@@ -364,9 +364,9 @@ def test_fetch_publishes_venue_rows_and_a_parser_failure_publishes_nothing(
     (review / "venue_crosswalk.csv").write_text(
         "source_key,published_name,venue_key,place_id,reviewer_role,reviewed_on\n"
         "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,"
-        "SYN Hall,syn_hall,,reviewer,2026-01-02\n"
+        "SYN Hall,venue:visits_museum:1,,reviewer,2026-01-02\n"
         "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,"
-        "SYN Hall AR,syn_hall,,reviewer,2026-01-02\n",
+        "SYN Hall AR,venue:visits_museum:1,,reviewer,2026-01-02\n",
         encoding="utf-8",
     )
     outcome = run_build(

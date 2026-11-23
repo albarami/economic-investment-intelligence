@@ -64,3 +64,15 @@ output. Without the date it still refuses with `bad_check_date`. Empty bytes,
 a wrong header, malformed or future dates, duplicate place/date pairs, orphan
 places, unknown statuses and refused sources keep their existing refusals;
 showcase and flagship checks and pending coverage are unchanged.
+
+The category loader refuses repeated `basic_category` tokens, identical or conflicting,
+with `duplicate_category`. Showcase areas require unique `place_key`s
+(`showcase_area_duplicate`) and the `places_ovt` source (`showcase_area_source`). The
+stage and area-request producer pass the gazetteer to the loader; an area pin must
+match its `(place_key, source_id, record_key)` (`showcase_area_gazetteer_mismatch`).
+An empty area list stays valid. `required_verification` selects kept food-service ids
+inside the showcase walks plus explicitly supplied story ids (empty pending OI-397).
+Only counts are added to `build_report.json`: `required_verification.by_area` keyed
+by `place_key`, and the unique total under `required_verification.total`. These are
+counts of kept records, before verification-dependent display selection. A missing
+polygon contributes no membership; existing pending and blocked coverage remains.

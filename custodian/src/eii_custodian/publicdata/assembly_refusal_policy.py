@@ -98,7 +98,7 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         unmapped_usage unmapped_venue_name unreviewed_venue use_map_ambiguous
         use_map_columns use_map_conflict use_map_field_empty use_map_source
         value_out_of_column venue_crosswalk venue_crosswalk_conflict venue_name_conflict
-        venue_place_conflict
+        venue_place_conflict venue_key_form venue_key_digit_run
     """.split()
         ),
         AreaError: frozenset(
@@ -242,13 +242,14 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         arabic_tag arabic_tag_missing attribution_header attribution_row axis_range
         axis_swapped bad_check_date building_duplicate building_id category_header
         category_row caveat_missing census_lineage crs decision_fields
-        duplicate_place_date duplicate_token evidence_mismatch failed_candidate
+        duplicate_category duplicate_place_date duplicate_token evidence_mismatch failed_candidate
         footprint_missing frame_boundary_missing frame_refused fsq_licence_missing
         geometry_not_bytes geometry_type geometry_wkb hand_edited link_form loader
         missing_column missing_key missing_link missing_role no_provider not_provisional
         orphan_place_id parquet passed_keys_mismatch place_id places_file_unreceipted
         pub_place_field range receipt_mismatch receipt_missing record_missing
-        review_list review_row schema_versions showcase_area stale_digest stale_manifest
+        review_list review_row schema_versions showcase_area showcase_area_duplicate showcase_area_source
+        showcase_area_gazetteer_mismatch stale_digest stale_manifest
         stand_in_area unknown_category_class unknown_status verification_source_refused
         verification_source_unknown verified_header
     """.split()
@@ -365,6 +366,7 @@ TEXT_REASONS: Mapping[type[Exception], tuple[tuple[re.Pattern[str], str], ...]] 
     MappingProxyType(
         {
             BuildInputError: _text_rules(r"""
+        cache_path_refused|cache_path_refused
         crosswalk_missing|crosswalk\ missing\ .*
         pub_place_missing|pub_place\ missing\ .*
         pub_place_missing|pub_place\ .*\ missing\ .*

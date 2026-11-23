@@ -39,6 +39,8 @@ from eii_custodian.publicdata.busyness.security import assert_clean
 from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import KeyedRequest, Transport
+from eii_custodian.publicdata.heights.landmarks import checked_cache_path
+from eii_custodian.publicdata.heights.model import HeightError
 from eii_custodian.publicdata.places.read import SOURCE_RELEASE
 
 REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
@@ -88,12 +90,14 @@ def _inputs(
 ) -> tuple[dict[str, Any], dict[str, dict[str, str]]]:
     if not venues:
         return {}, {}
-    crosswalk = {
-        row["place_id"]: row
-        for row in load_crosswalk(cache / "review" / CROSSWALK_FILE)
-    }
+    try:
+        crosswalk_path = checked_cache_path(cache, Path("review") / CROSSWALK_FILE)
+        places_path = checked_cache_path(cache, Path("places_s2_t06/pub_place.jsonl"))
+    except HeightError:
+        raise BuildInputError("cache_path_refused") from None
+    crosswalk = {row["place_id"]: row for row in load_crosswalk(crosswalk_path)}
     places = {}
-    for line in (cache / "places_s2_t06/pub_place.jsonl").read_text().splitlines():
+    for line in places_path.read_text().splitlines():
         row = json.loads(line)
         places[row["place_id"]] = row
     for venue in venues:

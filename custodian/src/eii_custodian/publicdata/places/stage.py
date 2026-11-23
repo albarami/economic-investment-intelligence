@@ -115,7 +115,12 @@ def run_places_stage(config: StageConfig) -> StageOutcome:
     provider = _provider(config)
     attribution = load_attribution(config.review / "places_ovt_attribution.csv", None)
     categories = load_categories(config.review / "places_ovt_categories.csv", None)
-    areas = load_showcase_areas(config.review / "showcase_areas.yaml", None)
+    gazetteer = load_showcase_gazetteer(
+        config.review / "showcase_gazetteer.yaml", None
+    )[1]
+    areas = load_showcase_areas(
+        config.review / "showcase_areas.yaml", None, gazetteer=gazetteer
+    )
     verified_path = config.review / "verified_places.csv"
     known_later: set[str] = set()
     result = build_places(
@@ -147,9 +152,7 @@ def run_places_stage(config: StageConfig) -> StageOutcome:
     points = _points(result.places, _buildings(config))
     resolved, notes = resolve_review(
         (
-            *load_showcase_gazetteer(config.review / "showcase_gazetteer.yaml", None)[
-                1
-            ],
+            *gazetteer,
             *load_flagship_candidates(config.review / "flagship_candidates.yaml", None)[
                 1
             ],
@@ -174,6 +177,10 @@ def run_places_stage(config: StageConfig) -> StageOutcome:
                 "report": list(report),
                 "resolved": [row["place_key"] for row in resolved],
                 "shown": sorted(result.shown_ids),
+                "required_verification": {
+                    "by_area": dict(result.required_verification_by_area),
+                    "total": result.required_verification_total,
+                },
             }
         ),
         "flagship_check.json": check_text,

@@ -107,6 +107,7 @@ def load_categories(
     path, origin = _choose(committed, cache)
     rows = _csv(path, CATEGORY_COLUMNS, "category_header")
     found: list[tuple[str, str]] = []
+    seen: set[str] = set()
     for item in rows:
         label = item["basic_category"].strip()
         kind = item["category_class"].strip()
@@ -114,17 +115,37 @@ def load_categories(
             raise PlacesError("category_row")
         if kind not in CATEGORY_CLASSES:
             raise PlacesError("unknown_category_class")
+        if label in seen:
+            raise PlacesError("duplicate_category")
+        seen.add(label)
         found.append((label, kind))
     return origin, tuple(found)
 
 
 def load_showcase_areas(
-    committed: Path, cache: Path | None
+    committed: Path,
+    cache: Path | None,
+    *,
+    gazetteer: Sequence[Mapping[str, object]] | None = None,
 ) -> tuple[str, tuple[Mapping[str, object], ...]]:
     """Load showcase area definitions. An empty list is the committed header."""
     path, origin = _choose(committed, cache)
     rows = _yaml_list(path)
     checked = tuple(_area(item) for item in rows)
+    seen: set[str] = set()
+    for row in checked:
+        key = str(row["place_key"])
+        if key in seen:
+            raise PlacesError("showcase_area_duplicate")
+        seen.add(key)
+        if gazetteer is not None and not any(
+            all(
+                row[name] == pin.get(name)
+                for name in ("place_key", "source_id", "record_key")
+            )
+            for pin in gazetteer
+        ):
+            raise PlacesError("showcase_area_gazetteer_mismatch")
     return origin, checked
 
 
@@ -300,4 +321,6 @@ def _area(item: object) -> Mapping[str, object]:
         raise PlacesError("showcase_area")
     if not isinstance(row.get("place_key"), str) or row.get("place_key") == "":
         raise PlacesError("showcase_area")
+    if row.get("source_id") != "places_ovt":
+        raise PlacesError("showcase_area_source")
     return row

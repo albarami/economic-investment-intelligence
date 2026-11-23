@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from custodian.tests.fixtures.places.invented import building_row, write_buildings
 from custodian.tests.test_places_area_files import _install_road
-from custodian.tests.test_places_partb_survivors_b import _flag_row, _review, _show_row
+from custodian.tests.test_places_partb_survivors_b import _flag_row, _review
 from custodian.tests.test_places_partb_survivors_c import _receipt, _row
 from custodian.tests.test_places_partb_survivors_d import _PIN
 from hypothesis import given
@@ -98,7 +98,6 @@ def test_area_producer_refuses_corrupt_reviewed_building_body(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, part: str
 ) -> None:
     cache, review = _candidate(tmp_path, monkeypatch, part)
-    _review(review, show=[_show_row("SYN-SHOW", "bldg_ovt", "SYN-B-A")])
     _install_road(cache)
     assert area_requests(review, integrate._cache_points(cache, review))
     body = cache / part / "syn.parquet"
@@ -113,7 +112,6 @@ def test_area_producer_refuses_unpinned_fixed_building_directory(
 ) -> None:
     part = "bldg_ovt/part-00384"
     cache, review = _candidate(tmp_path, monkeypatch, part)
-    _review(review, show=[_show_row("SYN-SHOW", "bldg_ovt", "SYN-B-A")])
     _install_road(cache)
     assert area_requests(review, integrate._cache_points(cache, review))
     pins = cache / "snapshot_pins.json"

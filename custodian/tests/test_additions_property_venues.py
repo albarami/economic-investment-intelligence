@@ -315,9 +315,9 @@ def _museum(folder: Path, rows: list[dict[str, object]], links: str) -> FamilyPa
 
 _LINKS = (
     "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,"
-    "SYN Hall,syn_hall,,reviewer,2026-01-02\n"
+    "SYN Hall,venue:visits_museum:1,,reviewer,2026-01-02\n"
     "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,"
-    "SYN Hall AR,syn_hall,,reviewer,2026-01-02\n"
+    "SYN Hall AR,venue:visits_museum:1,,reviewer,2026-01-02\n"
 )
 
 
@@ -333,7 +333,7 @@ def test_museum_alias_keeps_one_key_and_a_dash_drops_the_row(tmp_path: Path) -> 
         _LINKS,
     )
     assert [row["value"] for row in parsed.rows] == [4, 9]
-    assert {row["venue_key"] for row in parsed.rows} == {"syn_hall"}
+    assert {row["venue_key"] for row in parsed.rows} == {"venue:visits_museum:1"}
     assert parsed.rows[0]["place_id"] is None
     assert "lon" not in parsed.rows[0] and "lat" not in parsed.rows[0]
     assert _coverage(parsed, "missing_measure") == 1
@@ -364,7 +364,7 @@ def test_conflicting_or_unreviewed_crosswalk_rows_are_refused(tmp_path: Path) ->
         _venues(
             tmp_path / "blank",
             "visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,"
-            "SYN Hall,syn_hall,,,2026-01-02\n",
+            "SYN Hall,venue:visits_museum:1,,,2026-01-02\n",
         )
     assert blank.value.name == "unreviewed_venue"
 
@@ -375,7 +375,7 @@ def test_null_health_centre_year_is_not_zero_or_twelve_months(tmp_path: Path) ->
     links = _venues(
         tmp_path / "health",
         "visits_phcc/phcc-patient-visits-by-health-center-and-region,"
-        "SYN Centre,syn_centre,,reviewer,2026-01-02\n",
+        "SYN Centre,venue:visits_phcc:1,,reviewer,2026-01-02\n",
     )
     row: dict[str, object] = {
         "region": "SYN Region",
