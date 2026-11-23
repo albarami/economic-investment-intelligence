@@ -770,6 +770,38 @@ test('an external base puts a root-relative font preload outside the origin', ()
   );
 });
 
+test('an external base puts a root-relative stylesheet outside the origin', () => {
+  // cf3 of S3-T09 i42: every reference kind, not only the preload.
+  const html =
+    '<!doctype html><base href="https://fonts.invalid/assets/">' +
+    '<link rel="stylesheet" href="/assets/a.css">';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-stylesheet-external: dist/index.html:1: /assets/a.css',
+  );
+});
+
+test('an external base puts a root-relative inline font url outside the origin', () => {
+  const html =
+    '<!doctype html><base href="https://fonts.invalid/assets/">' +
+    '<style>@font-face{font-family:Review;' +
+    'src:url(/assets/latin-400.woff2)}</style>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-url-external: dist/index.html:1: /assets/latin-400.woff2',
+  );
+});
+
+test('an external base puts a root-relative inline import outside the origin', () => {
+  const html =
+    '<!doctype html><base href="https://fonts.invalid/assets/">' +
+    '<style>@import url(/assets/a.css);</style>';
+  assertFail(
+    run(['--root', makeDist(FACE_LATIN + FACE_ARABIC, html), '--dist']),
+    'FAIL font-import-external: dist/index.html:1: /assets/a.css',
+  );
+});
+
 test('a base directory rebases relative font references', () => {
   const html =
     '<!doctype html><base href="/other/">' +

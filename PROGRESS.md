@@ -58527,3 +58527,14 @@ Builder: Devin (Cognition, model SWE-2 High), package i42 round 3, in worktree `
 - **Defect.** `web/scripts/check-local-fonts.mjs` exempted references beginning `/` from the external-`<base>` refusal. So with `<base href="https://fonts.invalid/assets/">`, the checker accepted `<link rel="preload" as="font" href="/assets/latin-400.woff2">`, which a browser loads from the external origin.
 - **Fix.** Every otherwise-local reference is refused when the document base is external.
 - **Test.** The committed root-relative regression expects `FAIL font-preload-external`. It failed before the fix (78 passed, 1 failed) and passed after it (79 passed, exit 0). Prettier is clean.
+
+### S3-T09 i42 round 3c — the external-base tests cover every reference kind (slice S3; 2026-11-23)
+
+- Maker: Anthropic (the lead). Base `6acd75f6a3`. Finding F1 of confirmation cf3 (Moonshot Kimi): the root-relative external-base case had a test only for the preload, not for the other three reference kinds.
+- **Change.** Three tests in `web/scripts/tests/check-local-fonts.node-test.mjs` add the missing kinds, each under an external base:
+  - `<link rel="stylesheet" href="/assets/a.css">` gives exactly `FAIL font-stylesheet-external: dist/index.html:1: /assets/a.css`;
+  - an inline `@font-face` with `src:url(/assets/latin-400.woff2)` gives exactly `FAIL font-url-external: dist/index.html:1: /assets/latin-400.woff2`;
+  - an inline `@import url(/assets/a.css)` gives exactly `FAIL font-import-external: dist/index.html:1: /assets/a.css`.
+- **Red first.** With the r3 exemption `context.baseExternal && !cleanUrl(url).startsWith('/')` put back for one run, `node --test scripts/tests/check-local-fonts.node-test.mjs` (from `web/`) exited 1: 82 tests, 78 passed, 4 failed. The four failures were the preload case and the three new cases. The checker was then restored, and cmp and `git diff --quiet` confirm it is byte-identical.
+- **Green.** The same command exited 0, 82 of 82 passing. `npx prettier --check` on the test file exited 0.
+- **Next.** The lead's web verify, then a cf4 confirmation by the cf3 maker.
