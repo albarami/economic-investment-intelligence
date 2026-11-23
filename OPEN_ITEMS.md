@@ -2210,6 +2210,8 @@ S2-T10 part A — NOT CLOSED: No new causal evidence for the historical interrup
 
 - INVESTIGATION (2026-11-23, S2-P70 round 2, RV1 follow-up): TYPE stays OPEN; the lead decides closure after the next whole test. The lead's round-two brief (**Facts the lead verified**) records that today's train S2-20 round-three and round-four guard pre-checks used `( nohup taskset -c … bash -c "./eii test --seed N --suite python-guards …" & )` from a non-interactive shell, inheriting ignored SIGINT. The lead's round-four whole test used a launcher that resets SIGINT first and passed python-guards with 1,418 tests; the lead reproduced a child reporting handler `1` under `trap '' INT` and the default handler after resetting it, and now uses the resetting launcher for guard pre-checks. These are attributed lead facts, not worker whole-test results. RV1's second mechanism reproduces the timeout signature with an early PID: this worker's ignored-SIGINT launch exited 1, child-start seconds=[0.25376168702496216], timeout/no FAIL interrupted. Installing `signal.default_int_handler` before the worker starts and restoring the previous handler in finally turns the identical launch green, exit 0. All assertions and timings remain. This explains the supplied launch-mode occurrences, not every historical OI-227 occurrence. The older startup-window mechanism remains separately recorded; neither a green rerun nor this correction closes the historical cause or the slice gate. Commands, RV1 findings and guard-deletion evidence: PROGRESS.md, **S2-P70 round 2 — RV1 corrections and ignored SIGINT**.
 
+- INVESTIGATION (2026-11-23, train S2-23 ledger): TYPE stays OPEN. The S2-21 ledger commit message called it closed on causal evidence; its confirming review (S2-21 cf1) found that mechanism 1 is shown to be possible, but not shown to be the cause of the failure at seed 2026111499. The S2-23 whole test (seed 3500241558) passed this test; a green run does not close it.
+
 ## OI-228 — Live-frame newline mutant and locale sensitivity
 
 - ID: OI-228
@@ -3327,6 +3329,26 @@ No existing open item is closed by this input.
 - EVIDENCE: both failed with `process_identity_mismatch` under concurrent load and passed when run alone. No cause is recorded yet.
 - NEEDED: find why the process identity check mismatches under concurrent load (systematic debugging; record the load shape and the check's inputs), then fix the code or the test's isolation. Do not retry, skip or loosen the check.
 - NEEDED BY: before the next ledger that depends on these cases.
+
+## OI-387 — Hosted runner hang in the sandbox profile install step
+
+- ID: OI-387
+- TYPE: RANDOM FAILURE (a green re-run does not close it, AGENTS.md rule 39)
+- RAISED BY: the lead, 2026-11-23, from the hosted run of pull request 129
+- CONCERNS: the hosted step "Install bubblewrap and AppArmor profiles" of `.github/workflows/ci.yml` (an `apt-get update` and package install)
+- EVIDENCE: in the pull-request-129 run of 2026-11-23 near 11:20 UTC, two matrix jobs hung in that step for 66 minutes, and no test started. The cancelled and failed jobs were rerun and passed. No cause is recorded.
+- NEEDED: record the step's timing in each hosted run, and on a repeat collect the runner's package-manager and AppArmor logs. Do not add a retry, a timeout that turns the step green, or a skip.
+- NEEDED BY: the S2 gate record.
+
+## OI-388 — S2-P72 class-member selection argument and its unit test
+
+- ID: OI-388
+- TYPE: OPEN (addressed by S2-P74, approved, joins train S2-24)
+- RAISED BY: S2-P72 cf2 (Anthropic Opus 5.5, a second Claude seat), 2026-11-23
+- CONCERNS: `committed_class_members` takes `selections` and ignores it (N1), and has no unit test of its own (N2).
+- EVIDENCE: S2-P72 cf2 approved `a3f79aaa` with N1 and N2 as minor points. S2-P74 (approved `d0afbd46`, Anthropic rv1) passes the selections through and adds the unit tests and named refusal tests.
+- NEEDED: close when train S2-24 merges S2-P74, with its commit cited.
+- NEEDED BY: train S2-24.
 
 ## Change control
 
