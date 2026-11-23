@@ -8,6 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+import yaml
 from custodian.tests.fixtures.places.invented import place_row, write_places
 from custodian.tests.repository_root import repository_root
 from custodian.tests.support.fetch_build import run_build
@@ -348,7 +349,9 @@ def _ready(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path, Path,
 def _road_review(tmp_path: Path) -> tuple[Path, Path]:
     cache = tmp_path / "data" / "public_cache"
     review = _empty_review(tmp_path)
-    (review / "showcase_areas.yaml").write_text(_SHOW, encoding="utf-8")
+    from custodian.tests.test_places_partb_survivors_b import _review as write_review
+
+    write_review(review, show=yaml.safe_load(_SHOW))
     (review / "arabic_tag.txt").write_text("ar\n", encoding="utf-8")
     _install_road(cache)
     return cache, review

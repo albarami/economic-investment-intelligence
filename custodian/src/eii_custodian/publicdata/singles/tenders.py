@@ -24,6 +24,7 @@ from eii_custodian.publicdata.fetch.allowlist import approve
 from eii_custodian.publicdata.fetch.certificate_pins import (
     PinError,
     inspect_intermediate,
+    offer_http11,
 )
 from eii_custodian.publicdata.fetch.page_requests import PIN_HOSTS
 from eii_custodian.publicdata.fetch.registry import Entry
@@ -556,7 +557,7 @@ def chain_context(path: Path, pin: str, *, host: str = TENDER_HOST) -> ssl.SSLCo
         inspect_intermediate(der)
     except PinError:
         raise TenderError("certificate_chain_incomplete") from None
-    context = ssl.create_default_context()
+    context = offer_http11(ssl.create_default_context())
     context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     if context.verify_mode != ssl.CERT_REQUIRED or not context.check_hostname:
         raise TenderError("certificate_chain_incomplete")

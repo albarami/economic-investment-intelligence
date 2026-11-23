@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -100,6 +100,8 @@ class PlacesResult:
     flagship: CheckRecord | None
     names: tuple[str, ...]
     receipts: tuple[FileReceipt, ...]
+    required_verification_by_area: Mapping[str, int] = field(default_factory=dict)
+    required_verification_total: int = 0
 
 
 def build_places(
@@ -165,8 +167,11 @@ def build_places(
         verified, verified_path, verified_cache, kept, build_date
     )
     status = {key: row.status for key, row in latest_status(verifications).items()}
+    area_members: dict[str, frozenset[str]] = {
+        str(row["place_key"]): frozenset() for row in showcase_areas
+    }
     inside, area_notes, stand_in, area_blocked = _inside(
-        showcase_areas, kept, area_provider, boundary
+        showcase_areas, kept, area_provider, boundary, area_members=area_members
     )
     report.extend(area_notes)
     outcome = resolve_duplicates(kept, inside, status)
@@ -221,6 +226,36 @@ def build_places(
         flagship=flagship,
         names=inventory_names(shown_places),
         receipts=(place_receipt, *building_receipts),
+        required_verification_by_area={
+            key: len(required_verification(kept, members, classes, story_ids=()))
+            for key, members in sorted(area_members.items())
+        },
+        required_verification_total=len(
+            required_verification(
+                kept, frozenset().union(*area_members.values()), classes, story_ids=()
+            )
+        ),
+    )
+
+
+def required_verification(
+    places: Sequence[PubPlace],
+    inside: frozenset[str],
+    classes: Mapping[str, str],
+    story_ids: Sequence[str],
+) -> tuple[str, ...]:
+    """Sorted kept food ids in showcase walks, plus explicitly supplied story ids."""
+    return tuple(
+        sorted(
+            set(story_ids)
+            | {
+                place.place_id
+                for place in places
+                if place.place_id in inside
+                and classes.get(place.category, place.category_class)
+                in {"restaurant", "italian_restaurant"}
+            }
+        )
     )
 
 
@@ -351,12 +386,14 @@ def _inside(
     places: Sequence[PubPlace],
     provider: AreaProvider | None,
     boundary: BaseGeometry,
+    *,
+    area_members: dict[str, frozenset[str]] | None = None,
 ) -> tuple[frozenset[str], tuple[str, ...], bool, bool]:
     del boundary
     if provider is None or not specs:
         return frozenset(), (), False, False
     by_id = {place.place_id: place for place in places}
-    polygons = []
+    members_by_area = area_members if area_members is not None else {}
     notes: list[str] = []
     stand_in = False
     blocked = False
@@ -380,7 +417,12 @@ def _inside(
             continue
         if area.stand_in:
             stand_in = True
-        polygons.append(decode_wkb(area.wkb))
+        polygon = decode_wkb(area.wkb)
+        members_by_area[str(spec.get("place_key"))] = frozenset(
+            place.place_id
+            for place in places
+            if polygon.covers(Point(float(place.lon), float(place.lat)))
+        )
     if blocked:
         return (
             frozenset(place.place_id for place in places),
@@ -388,15 +430,8 @@ def _inside(
             stand_in,
             True,
         )
-    inside = {
-        place.place_id
-        for place in places
-        if any(
-            polygon.covers(Point(float(place.lon), float(place.lat)))
-            for polygon in polygons
-        )
-    }
-    return frozenset(inside), tuple(notes), stand_in, False
+    inside = frozenset().union(*members_by_area.values())
+    return inside, tuple(notes), stand_in, False
 
 
 def _fsq(

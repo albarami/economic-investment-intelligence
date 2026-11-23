@@ -45,6 +45,15 @@ def validate_pin(host: str, pin: Pin) -> None:
         raise PinError("certificate_review_pending")
 
 
+def offer_http11(context: ssl.SSLContext) -> ssl.SSLContext:
+    """Offer ALPN ``http/1.1``, as the standard library's own HTTPS context does.
+
+    Some front ends answer 403 to a client hello without ALPN (S2-P77).
+    """
+    context.set_alpn_protocols(["http/1.1"])
+    return context
+
+
 def verified_context(
     host: str, pin: Pin, *, context: ssl.SSLContext | None = None
 ) -> ssl.SSLContext:
@@ -53,6 +62,7 @@ def verified_context(
     result = context if context is not None else ssl.create_default_context()
     if result.verify_mode != ssl.CERT_REQUIRED or not result.check_hostname:
         raise PinError("tls_verification_disabled")
+    offer_http11(result)
     result.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN
     try:
         result.load_verify_locations(cadata=ssl.DER_cert_to_PEM_cert(pin.der))

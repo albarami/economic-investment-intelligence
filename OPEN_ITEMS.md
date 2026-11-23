@@ -3360,6 +3360,7 @@ No existing open item is closed by this input.
 - NEEDED: not recorded.
 - NEEDED BY: the next S2 ledger; it stays open as a random failure.
 - 2026-11-23: same incident as OI-387; the investigation actions are kept there (train S2-24 confirmation, records point).
+- Verification 2026-11-23: the cross-reference to OI-387 is present above, and OI-387 retains the hosted-runner investigation actions; both earlier entries are retained (S2-24.cf1 records point).
 
 ## OI-390 — S2-P74 rv1 non-blocking findings F1 to F3
 
@@ -3444,6 +3445,60 @@ No existing open item is closed by this input.
 - EVIDENCE: ruling L-1646 item 2: until then the story set is empty, and every required-verification count records it as empty.
 - NEEDED: add the story-answer places to the verification population once the guided-story answers exist.
 - NEEDED BY: slice S3.
+- Verification 2026-11-23: S2-25.cf2 (Codex B, OpenAI) reports that the supplied APPROVALS.txt does not record ruling L-1646 item 2; the correspondence remains not recorded. Supply the ruling extract, then append a dated verification or correction without changing the earlier entry.
+
+## OI-398 — Resume never reused an entry
+
+- ID: OI-398
+- TYPE: OPEN (fix in S2-P78, same train)
+- RAISED BY: the lead, 2026-11-23
+- CONCERNS: every live `build-public --resume` journal entry carried `reuse_unavailable resume_fingerprint_unproven`.
+- EVIDENCE: `fetch/build.py::_seeded_assembly` imports seven repository modules through `Production.run` after `RunRecord.begin` took its module baseline, so `RunScan.unexpected_loaded` was true at fetch-loop entry. Each resume of 2026-11-23 refetched about 772 entries (about 50 min).
+- NEEDED: close with S2-P78's fix and evidence in the same train.
+- NEEDED BY: S2-P78, same train.
+- Correction 2026-11-24 (S2-26.cf1 records point): S2-P78 is not in train S2-26. This item closes in the later S2 train that carries S2-P78's approved fix; the entry above is kept as written.
+
+## OI-399 — Page-scoped TLS offered no ALPN
+
+- ID: OI-399
+- TYPE: OPEN (fix in S2-P77, same train)
+- RAISED BY: the lead, 2026-11-23
+- CONCERNS: one landmark citation page answered 403 to the page-scoped opener and 200 with ALPN `http/1.1`, the stdlib default.
+- EVIDENCE: the page-scoped opener's `SSLContext` from `page_context` offered no ALPN.
+- NEEDED: close with S2-P77's fix and evidence in the same train.
+- NEEDED BY: S2-P77, same train.
+- Verification 2026-11-24: S2-P77 joined train S2-26 in round 2 (`2e389148bb` joined as `39570dc90a`, 8 files SAME). S2-P77.rv1 (Cognition Devin) APPROVED `2e389148bb`: the page and pinned contexts offer ALPN `http/1.1` only after the verification refusal. The live page check waits for the next lead-shell fetch run.
+
+## OI-400 — Five low points of the lead's review hash-compare tool
+
+- ID: OI-400
+- TYPE: OPEN (lead tooling outside the repository; not a gate defect)
+- RAISED BY: the lead, 2026-11-23, from ruling L-1652
+- CONCERNS: five low points of the lead's review hash-compare tool.
+- EVIDENCE: a MemoryError on a near-cap manifest gives a traceback instead of REFUSED; ROOT `/` gives an empty label; walk has a double close; the same-tick, same-size edit window remains; the root label uses the basename only.
+- NEEDED: the lead disposes of the five low points in its tooling outside the repository; no gate change is implied.
+- NEEDED BY: not recorded.
+
+## OI-401 — S2-24 confirmation evidence reconciliation is not recorded
+
+- ID: OI-401
+- TYPE: OPEN (records)
+- RAISED BY: S2-25.cf2 (Codex B, OpenAI), 2026-11-23
+- CONCERNS: the supplied approvals extract does not contain the detailed S2-24 confirmation, test counts, seed or hosted results for the comparison recorded under PROGRESS.md headings **Train S2-24 merge records** and **Train S2-25 records**.
+- EVIDENCE: the S2-25.cf2 proposed records point; no existing OPEN_ITEMS.md anchor for this reconciliation was found.
+- NEEDED: attach the original evidence and append a dated reconciliation, preserving every earlier evidence row.
+- NEEDED BY: not recorded.
+- Verification 2026-11-23: the comparison is not recorded until that original evidence and reconciliation are supplied.
+
+## S2-P79 — Venue identity bootstrap remains pending live evidence
+
+- TYPE: OPEN
+- RAISED BY: ruling L-1661, 2026-11-23.
+- CONCERNS: S2-T16 boxes 13 and 14 and decision 0064 item 8.
+- EVIDENCE: L-1661 supersedes L-1646 item 1’s proposed `no_match` bootstrap. The existing reader skipped those rows and retained no returned provider identity. S2-P79 adds a closed `pending` acquisition phase, minimal cache-only identity handoff and explicit hash-bound confirmation; production is a separate recorded run.
+- NEEDED: different-maker implementation/security review, the lead’s capped keyed bootstrap and production evidence, allowance check covering both runs and scheduled refresh, and later scheduled-refresh evidence. No live box is ticked by the offline implementation.
+- NEEDED BY: the S2-T16 live handoff before its dependent S3 work.
+- CHECK-HARNESS EVENT (2026-11-23): the first boundary-check run failed its unchanged-tree assertion while a concurrent pytest process created bytecode files. Evidence: the before/after mismatch names newly added `.pyc` files, and `test_import_boundary_real._tree_fingerprint` includes those files. Verification therefore uses the unchanged boundary suite alone, with bytecode writes disabled; the initial failure stays in the evidence. This event changes no guard or task box.
 
 ## Change control
 
@@ -6709,3 +6764,83 @@ introduced.
 - PO-S2-P71-10 — ANSWERED by lead ruling L-1605 (S2-P71 Part 2 round 6 brief): the four existing test changes below are accepted. Earlier record: OPEN, lead ruling (S2-P71 Part 2 round 5). Owner condition 3 keeps existing tests unchanged, but items A and B reverse what four existing tests asserted, so their colliding values changed and nothing else: `test_registers.py::test_numeric_public_values_are_not_identifier_strings` and `::test_release_value_nested_typed_public_values_pass` (S2-T49, L-1288: a registration token inside a number passed; the values `2.65432`, `54321` and `65432` became `2.65431`, `54320` and `65431`, and the old collisions now refuse in `test_registers_typed_scan.py`), and S2-P71's own `test_registers_restoration.py::test_register_storage_manifest_count_keeps_egress_scan` and the `storage_count` case of `test_registers_round2.py::test_register_duplicate_registration_cross_capture_leak_refuses` (a one-digit key equal to a storage count refused; both now refuse a three-digit key `125` equal to a count of 125 cards, still `registration_egress`). No assertion was weakened, no attack size or tolerance changed; the lead rules whether these forced changes stand.
 - PO-S2-P71-11 — OPEN, lead ruling (S2-P71 Part 2 round 6). The round-6 brief asks every one of the 23 typed fields to refuse `typed_field_format` for an empty, wrapped or nested list or tuple, a mapping, `True` and a float of an integer. The eight manifest fields now do. The fifteen release columns already refuse every such value before any scan, but with the reasons decision 0105 item 1 writes for a value of another type (`release_type`, and `release_count` for `employee_count`), and two existing tests assert `release_type` for `True` in `capital_qar` and `lat` (`test_registers.py`, owner condition 3: existing tests unchanged). Round 6 kept those reasons and its generated test asserts each column's written reason; renaming them to `typed_field_format` would change two existing tests and the decision's written formats. The lead rules whether the written reasons stand.
 - PO-S2-P71-12 — report.version CLOSED by S2-P71 Part 2 round 9, decision 0105 item 8 (proposed): the advisor's note of 2026-11-23 18:32, item 1, under the owner's delegation of fixed-text register fields of 18:08 (L-1608), lists `report.version` as the fixed text `v2`; any other value refuses `typed_field_format`, the rest of the report keeps the full scan, and `test_register_a3_key_two_meets_only_the_report_version` now shows a build with the key `2` passing end to end (with the field unlisted it refuses `registration_egress`). Still OPEN, lead: the receipt text gets no number (the lead rewords it; never listed), and a receipt file's `bytes` stays a condition-1 refusal, which the lead probes; a real collision there (a count of three or more digits equal to a registration) goes to the owner with its counts and the rule is not changed (advisor, limit 3). Different-maker privacy review of the item-8 line stays pending. Earlier record: OPEN, owner (S2-P71 Part 2 round 7). The owner's "a3" names the manifest's `version` (`v2`), but the build report also holds its own `version` `v2` (`build.py`, the report's `version` field), and decision 0105 item 3 keeps the whole report fully scanned. So a short registration or licence `2`, which the lead's counts-only probe found on the real file, still stops the build at the report: `test_register_a3_key_two_meets_only_the_report_version` shows the build refusing `registration_egress` with the key `2`, and passing with only the report's scan removed. Listing `report.version` with the fixed text `v2` would be a further field; the advisor's note bars adding one without the owner, so nothing is built for it. Also still fully scanned, and able to stop a build on a short key: a short number in the lead's receipt text (publisher, dataset, licence, terms or basis note; a3 says to reword it, never to list it) and a receipt file's `bytes` (a byte count, usually three or more digits, so a collision there is a condition-1 refusal in any case). The lead puts the report's `version` to the owner.
+
+## OI-402 — S2-P79 bootstrap cache path alias scope and an uncaught ValueError on resume
+
+- ID: OI-402
+- TYPE: OPEN (low; the change still fails closed)
+- RAISED BY: S2-P79.rv1 (Cognition Devin, APPROVED `48d0451f86`), 2026-11-24
+- CONCERNS: `custodian/src/eii_custodian/publicdata/busyness/handoff.py` `cache_path`, and `fetch/resume.py` `_fingerprint` and `_fingerprint_matches`.
+- EVIDENCE: the symlink walk covers every ancestor up to the root, so a symlinked ancestor above the cache makes bootstrap and confirm always refuse, and the busyness fingerprint binding always refetches. A `ValueError` from `busyness_inputs` inside `_fingerprint` or `_fingerprint_matches` passes the `except OSError` wrappers of `fetch/build.py` as an unhandled exception; this is reachable only if an alias appears mid-run.
+- NEEDED: scope the alias check to the path and its ancestors inside the cache; give that `ValueError` the same closed handling, so that a mid-run alias degrades to an unproven fingerprint.
+- NEEDED BY: before the S2 gate record.
+
+## OI-403 — S2-P79 confirmation rewrites the crosswalk with CRLF line endings
+
+- ID: OI-403
+- TYPE: OPEN (low; cosmetic, content unchanged)
+- RAISED BY: S2-P79.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `confirm_handoff` in `custodian/src/eii_custodian/publicdata/busyness/handoff.py`.
+- EVIDENCE: `csv.DictWriter` defaults to `\r\n`, so a confirmation rewrites every row with CRLF where the seeded file is LF. The write is atomic and revalidated.
+- NEEDED: pass `lineterminator="\n"` to the writer.
+- NEEDED BY: not recorded.
+
+## OI-404 — S2-P79 confirm form reports a malformed argument shape as a changed handoff
+
+- ID: OI-404
+- TYPE: OPEN (low; still a closed refusal)
+- RAISED BY: S2-P79.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `scripts/commands/build_public.py`, the `--busyness-confirm` arity check.
+- EVIDENCE: any four-argument `--busyness-confirm` form is read as SHA256, ROLE and DATE. `--busyness-confirm --seed 1 --resume` therefore exits 1 as `handoff_changed` instead of exiting 2 as a usage error.
+- NEEDED: validate the digest format before the handoff comparison and exit 2 on a malformed digest.
+- NEEDED BY: not recorded.
+
+## OI-405 — Import-boundary tree fingerprint counts bytecode written by concurrent tests
+
+- ID: OI-405
+- TYPE: OPEN (test harness; not a defect of S2-P79)
+- RAISED BY: the S2-P79 builder, confirmed by S2-P79.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `scripts/tests/test_import_boundary_real.py` `_tree_fingerprint`.
+- EVIDENCE: run beside pytest, `test_guard_changes_nothing` saw new `.pyc` files written by concurrent imports. The same suite run alone with `PYTHONDONTWRITEBYTECODE=1` passed 37 of 37, and so did the lead's run.
+- NEEDED: exclude `__pycache__` and `*.pyc` from the fingerprint, or run the boundary child processes with `PYTHONDONTWRITEBYTECODE=1`. The guard itself stays unchanged.
+- NEEDED BY: before the S2 gate record.
+
+## OI-406 — Three low points of the S2-P77 review
+
+- ID: OI-406
+- TYPE: OPEN (records only; not defects)
+- RAISED BY: S2-P77.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `custodian/src/eii_custodian/publicdata/singles/tenders.py`, the page-scoped context, and the clean-environment test.
+- EVIDENCE: (1) the tenders context sets ALPN before its own verification guard; the context is created locally and the refusal still fires before return, so this is ordering only. (2) The S2-P77 builder saw `test_clean_environment.py` fail in `setUpClass` when the default uv cache folder is absent; the file passes alone. (3) `post_handshake_auth`, which the standard default context also sets, stays unset; the builder kept it out of scope.
+- NEEDED: (1) hoist the guard above the ALPN call when the function is next touched; (2) make the clean-environment test fail closed with a clear diagnostic when the uv cache is absent; (3) record whether `post_handshake_auth` should follow the standard default.
+- NEEDED BY: before the S2 gate record.
+
+## OI-407 — A pinned command-list test escaped three checks
+
+- ID: OI-407
+- TYPE: CLOSED (process lesson, ruling L-1678)
+- RAISED BY: the lead, 2026-11-24
+- CONCERNS: train S2-26 round 1 (`bc68ae47cc`): the hosted suite python-guards failed `scripts/tests/test_public_assembly_command.py::test_usage_shows_effective_public_draw_seed`, because S2-P79 added two `build-public` forms to `scripts/commands/table.py` without adding them to that test's pinned list.
+- EVIDENCE: the builder's selection, the lead's verify and S2-P79.rv1 did not run that file. S2-P79.r2 (Anthropic Claude C) `f194c58724` adds both forms in table order and keeps the full equality; its sweep found no other pinning test to change; the test was red at the old head and green after, and it went red again when one table row was deleted.
+- NEEDED: none. From now on, the lead's verify of any change to the command table or the operations scripts also runs `scripts/tests` selected by command, table, usage, public assembly, development, serve and preflight.
+- NEEDED BY: closed.
+
+## OI-408 — Hypothesis deadline on a file-backed property in the hosted run
+
+- ID: OI-408
+- TYPE: RANDOM FAILURE (CLAUDE.md rule 39); fix merged with train S2-26 round 3
+- RAISED BY: the lead, 2026-11-24
+- CONCERNS: `custodian/tests/test_review_data_guards.py::test_category_duplicate_order` and `::test_venue_key_domain` (S2-P76).
+- EVIDENCE: hosted suite python-custodian-2 on PR 133 at `0cc22d6825`: first example 294.81 ms against the 200 ms deadline of the "eii" profile, replay 0.70 ms, then `FlakyFailure`. Each example creates a temporary folder and writes and reads CSV. S2-P76.r3 `fc9fbe18e9` sets `deadline=None` on both, as `test_method_pin_writer.py` does; a 350 ms stalled write was red before and green after. The hosted job was not rerun.
+- NEEDED: a green hosted run of round 3 and of the next trains. A green rerun alone never closes this item.
+- NEEDED BY: before the S2 gate record.
+
+## OI-409 — Older file-backed properties under the same deadline
+
+- ID: OI-409
+- TYPE: OPEN (same class as OI-408)
+- RAISED BY: S2-P76.rv3 (Cognition Devin), 2026-11-24
+- CONCERNS: nine `@given` properties outside S2-P76 that do file or folder work per example under the 200 ms deadline: `custodian/tests/test_register_tables.py` (four), `test_method_pin_precision.py`, `test_activity_class_members.py`, `test_fetch_fingerprint.py`, `test_build_own_run.py` and `test_s2_p42_awards_formulas.py`.
+- EVIDENCE: the review's targeted pass; the hosted failure of OI-408 shows the exposure on shared runners.
+- NEEDED: a sweep that re-enumerates every `@given` body in the repository and removes the exposure in the same way, with no assertion, strategy or example count changed.
+- NEEDED BY: before the S2 gate record.

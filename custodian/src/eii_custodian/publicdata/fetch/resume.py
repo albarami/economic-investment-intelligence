@@ -25,6 +25,7 @@ from .fingerprint import (
     FingerprintUnavailable,
     RunScan,
     _canonical,
+    busyness_inputs,
     default_roots,
     scan_run,
 )
@@ -163,7 +164,9 @@ class RunRecord:
             if row["seed"] != seed:
                 raise ResumeError("resume_seed_mismatch")
             try:
-                scan = scan_run(entries, roots or default_roots(), large=large)
+                scan = scan_run(
+                    entries, roots or default_roots(), large=large, cache=cache
+                )
             except (FingerprintUnavailable, OSError):
                 # Any doubt refetches (L-1379): an unavailable proof never
                 # refuses a resume build; it leaves every item marked
@@ -179,7 +182,7 @@ class RunRecord:
             )
         utc(started)
         try:
-            scan = scan_run(entries, roots or default_roots(), large=large)
+            scan = scan_run(entries, roots or default_roots(), large=large, cache=cache)
         except (FingerprintUnavailable, OSError):
             # Same ruling for an ordinary run: the build fetches with no
             # fingerprint and every fetched item is marked unavailable.
@@ -321,6 +324,10 @@ class RunRecord:
             return None, "resume_fingerprint_unavailable"
         if not scan.closure_intact() or scan.unexpected_loaded():
             return None, "resume_fingerprint_unproven"
+        if entry.kind == "besttime" and record.get("busyness") != busyness_inputs(
+            self.cache, "production"
+        ):
+            return None, "resume_fingerprint_unproven"
         if entry.source_id == "tenders_pub":
             triple = self._intake_triple(entry)
             if triple is None:
@@ -355,6 +362,10 @@ class RunRecord:
             return False
         current = self.scan.records.get(entry.key)
         if current is None:
+            return False
+        if entry.kind == "besttime" and current.get("busyness") != busyness_inputs(
+            self.cache, "production"
+        ):
             return False
         if entry.source_id == "tenders_pub":
             try:

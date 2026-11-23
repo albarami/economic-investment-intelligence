@@ -299,7 +299,7 @@ def test_source_note_does_not_apply_to_another_registry_key_or_field(
     assert missing_forms_for(entry.key) is None
     links = _venues(
         tmp_path,
-        f"{entry.key},SYN Centre,syn_centre,,reviewer,2026-01-02\n",
+        f"{entry.key},SYN Centre,venue:visits_phcc:1,,reviewer,2026-01-02\n",
     )
     with pytest.raises(AdditionError) as refused:
         parse_health_centres(

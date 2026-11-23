@@ -323,3 +323,7 @@ admits needs a further decision record (the owner's condition 2).
 - [PROGRESS.md](../../PROGRESS.md), **S2-P71 Part 2 round 4 — typed columns of
   the register token scan (decision 0105)** and **S2-P71 Part 2 round 5 — the
   owner's a2 and the number columns (decision 0105)**.
+
+## Clarification note (2026-11-24, lead ruling L-1672)
+
+In the Status line, "(item 8)" names item 8 of this record, the build report's version. The delegation it rests on is the owner's word of 2026-11-23, about 18:15, relayed by the advisor: fixed-text or strict-date fields may be added to the closed list on the advisor's answer, under the same three conditions. The advisor's note of 2026-11-23 18:32 applied it. This note changes no item of this record.

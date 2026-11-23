@@ -9,6 +9,7 @@ and parcel identifiers never leave this module.
 from __future__ import annotations
 
 import csv
+import re
 from collections import defaultdict
 from collections.abc import Mapping
 from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
@@ -172,6 +173,10 @@ def load_venue_crosswalk(path: object) -> tuple[dict[str, str], ...]:
             raise AdditionError("venue_crosswalk")
         if row["published_name"] == "" or row["venue_key"] == "":
             raise AdditionError("unreviewed_venue")
+        if re.search(r"(?<![0-9])(?:[0-9]{8}|[0-9]{11})(?![0-9])", row["venue_key"]):
+            raise AdditionError("venue_key_digit_run")
+        if re.fullmatch(r"venue:[a-z0-9_]+:[1-9][0-9]{0,5}", row["venue_key"]) is None:
+            raise AdditionError("venue_key_form")
         if row["reviewer_role"] == "" or not _reviewed_on(row["reviewed_on"]):
             raise AdditionError("unreviewed_venue")
         identity = (row["source_key"], row["published_name"])

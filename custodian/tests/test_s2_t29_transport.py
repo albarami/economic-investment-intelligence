@@ -61,6 +61,10 @@ def test_verified_context_loads_der(monkeypatch):
         verify_mode = ssl.CERT_REQUIRED
         check_hostname = True
         verify_flags = 0
+        alpn: list[str] | None = None
+
+        def set_alpn_protocols(self, protocols):
+            self.alpn = protocols
 
         def load_verify_locations(self, *, cadata):
             loaded.append(cadata)
@@ -68,6 +72,7 @@ def test_verified_context_loads_der(monkeypatch):
     context = Context()
     assert verified_context(pin().host, pin(), context=context) is context
     assert loaded == [ssl.DER_cert_to_PEM_cert(pin().der)]
+    assert context.alpn == ["http/1.1"]
 
 
 def capture(body=b"SYN-page"):
@@ -373,6 +378,9 @@ def test_pin_requires_root_chain(monkeypatch):
         verify_mode = ssl.CERT_REQUIRED
         check_hostname = True
         verify_flags = ssl.VERIFY_X509_PARTIAL_CHAIN
+
+        def set_alpn_protocols(self, protocols):
+            pass
 
         def load_verify_locations(self, *, cadata):
             pass

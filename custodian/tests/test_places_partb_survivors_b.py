@@ -42,6 +42,8 @@ def _review(
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "showcase_areas.yaml").write_text(_body(show), encoding="utf-8")
     (folder / "flagship_candidates.yaml").write_text(_body(flag), encoding="utf-8")
+    gazetteer = [{**_flag_row(str(row["place_key"])), **row} for row in show]
+    (folder / "showcase_gazetteer.yaml").write_text(_body(gazetteer), encoding="utf-8")
     return folder
 
 
@@ -89,23 +91,20 @@ def _flag_row(place_key: str) -> dict[str, object]:
 # --- the request pairing ---------------------------------------------------
 
 
-def test_a_showcase_row_with_no_closed_key_makes_no_request(tmp_path: Path) -> None:
+def test_pairing_a_row_with_no_closed_key_makes_no_request(tmp_path: Path) -> None:
     """An empty source key or record key is refused, whatever the points hold.
 
     A row whose source key or record key is empty makes no request even when
     the points map happens to hold that empty key. A key that is not empty is
     taken as it stands.
     """
-    review = _review(
-        tmp_path / "review",
-        show=[
-            _show_row("SYN-NO-SOURCE", "", "SYN-P-A"),
-            _show_row("SYN-NO-RECORD", "places_ovt", ""),
-            _show_row("SYN-MARK-SOURCE", "XXXX", "SYN-P-A"),
-            _show_row("SYN-MARK-RECORD", "places_ovt", "XXXX"),
-            _show_row("SYN-GOOD", "places_ovt", "SYN-P-A"),
-        ],
-    )
+    rows = [
+        _show_row("SYN-NO-SOURCE", "", "SYN-P-A"),
+        _show_row("SYN-NO-RECORD", "places_ovt", ""),
+        _show_row("SYN-MARK-SOURCE", "XXXX", "SYN-P-A"),
+        _show_row("SYN-MARK-RECORD", "places_ovt", "XXXX"),
+        _show_row("SYN-GOOD", "places_ovt", "SYN-P-A"),
+    ]
     points = {
         ("", "SYN-P-A"): (51.5, 25.3),
         ("places_ovt", ""): (51.5, 25.3),
@@ -113,7 +112,10 @@ def test_a_showcase_row_with_no_closed_key_makes_no_request(tmp_path: Path) -> N
         ("places_ovt", "XXXX"): (51.5, 25.3),
         ("places_ovt", "SYN-P-A"): (51.5, 25.3),
     }
-    assert area_requests(review, points) == (
+    found: dict[tuple[str, str, int], AreaRequest] = {}
+    for row in rows:
+        _remember(found, row, points, AreaMode.WALK, AreaCutoff.MINUTES_10)
+    assert tuple(found[key] for key in sorted(found)) == (
         AreaRequest(
             "SYN-GOOD", "51.500000", "25.300000", AreaMode.WALK, AreaCutoff.MINUTES_10
         ),
@@ -130,6 +132,26 @@ def test_a_showcase_row_with_no_closed_key_makes_no_request(tmp_path: Path) -> N
             "25.300000",
             AreaMode.WALK,
             AreaCutoff.MINUTES_10,
+        ),
+    )
+
+
+def test_a_showcase_row_with_empty_record_makes_no_request(tmp_path: Path) -> None:
+    """A gazetteer-matched empty record stays unrequested on the public path."""
+    review = _review(
+        tmp_path / "review",
+        show=[
+            _show_row("SYN-NO-RECORD", "places_ovt", ""),
+            _show_row("SYN-GOOD", "places_ovt", "SYN-P-A"),
+        ],
+    )
+    points = {
+        ("places_ovt", ""): (51.5, 25.3),
+        ("places_ovt", "SYN-P-A"): (51.5, 25.3),
+    }
+    assert area_requests(review, points) == (
+        AreaRequest(
+            "SYN-GOOD", "51.500000", "25.300000", AreaMode.WALK, AreaCutoff.MINUTES_10
         ),
     )
 

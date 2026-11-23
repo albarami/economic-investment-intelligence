@@ -9,6 +9,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+import yaml
 from custodian.tests.fixtures.places.invented import place_row, write_places
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_places_area_files import (
@@ -477,7 +478,9 @@ def _point(cache: Path, review: Path) -> None:
         "  source_id: places_ovt\n"
         "  record_key: SYN-P-A\n"
     )
-    (review / "showcase_areas.yaml").write_text(text, encoding="utf-8")
+    from custodian.tests.test_places_partb_survivors_b import _review as write_review
+
+    write_review(review, show=yaml.safe_load(text))
     (review / "arabic_tag.txt").write_text("ar\n", encoding="utf-8")
     folder = cache / "places_ovt" / "part-00014"
     folder.mkdir(parents=True)

@@ -86,14 +86,20 @@ LANDMARK_FIXTURE_PATH = (
 
 def landmark_heights_path(cache: Path) -> Path:
     """One local record; the committed empty format sample supplies pending only."""
-    local = cache / "review" / "landmark_heights.yaml"
+    local = checked_cache_path(cache, Path("review/landmark_heights.yaml"))
+    return local if local.is_file() else LANDMARK_HEIGHTS_PATH
+
+
+def checked_cache_path(cache: Path, relative: Path) -> Path:
+    """Refuse a symlinked file or parent and any path escaping the cache."""
+    local = cache / relative
     if (
         local.is_symlink()
         or local.parent.is_symlink()
         or not local.resolve().is_relative_to(cache.resolve())
     ):
         raise HeightError("landmark_heights", "cache_path_refused")
-    return local if local.is_file() else LANDMARK_HEIGHTS_PATH
+    return local
 
 
 def _valid_sha256(text: str) -> bool:

@@ -122,6 +122,8 @@ def test_usage_shows_effective_public_draw_seed() -> None:
         "build-public --tenders-only [--resume]",
         "build-public --gis-imagery-snapshot",
         "build-public --cdse-backup",
+        "build-public --busyness-bootstrap",
+        "build-public --busyness-confirm SHA256 ROLE DATE",
     ]
 
 

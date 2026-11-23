@@ -11,7 +11,10 @@ import re
 from hashlib import sha256
 
 import pytest
-from custodian.tests.fixtures.assembly_refusals import INVENTORY_CASES
+from custodian.tests.fixtures.assembly_refusals import (
+    INVENTORY_CASES,
+    REVIEW_DATA_GUARD_CASES,
+)
 from custodian.tests.test_production_adapters import context
 from hypothesis import given
 from hypothesis import strategies as st
@@ -33,7 +36,7 @@ CASES = [
         "expected": expected,
         "plant": f"syn_{index}",
     }
-    for row in INVENTORY_CASES
+    for row in (*INVENTORY_CASES, *REVIEW_DATA_GUARD_CASES)
     for index, (kind, message, expected) in enumerate(row["plants"])
 ]
 MODULES = {

@@ -10,6 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from eii_custodian.publicdata.busyness.address import read_addresses
+from eii_custodian.publicdata.busyness.handoff import (
+    input_hashes,
+    write_handoff,
+    write_json,
+)
 from eii_custodian.publicdata.busyness.parse import (
     FORECAST_URL,
     QUERY_URL,
@@ -34,6 +39,8 @@ from eii_custodian.publicdata.busyness.security import assert_clean
 from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sidecar_for
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.transport import KeyedRequest, Transport
+from eii_custodian.publicdata.heights.landmarks import checked_cache_path
+from eii_custodian.publicdata.heights.model import HeightError
 from eii_custodian.publicdata.places.read import SOURCE_RELEASE
 
 REVIEW = Path(__file__).resolve().parents[4] / "publicdata/review"
@@ -83,12 +90,14 @@ def _inputs(
 ) -> tuple[dict[str, Any], dict[str, dict[str, str]]]:
     if not venues:
         return {}, {}
-    crosswalk = {
-        row["place_id"]: row
-        for row in load_crosswalk(cache / "review" / CROSSWALK_FILE)
-    }
+    try:
+        crosswalk_path = checked_cache_path(cache, Path("review") / CROSSWALK_FILE)
+        places_path = checked_cache_path(cache, Path("places_s2_t06/pub_place.jsonl"))
+    except HeightError:
+        raise BuildInputError("cache_path_refused") from None
+    crosswalk = {row["place_id"]: row for row in load_crosswalk(crosswalk_path)}
     places = {}
-    for line in (cache / "places_s2_t06/pub_place.jsonl").read_text().splitlines():
+    for line in places_path.read_text().splitlines():
         row = json.loads(line)
         places[row["place_id"]] = row
     for venue in venues:
@@ -113,6 +122,8 @@ def build_busyness(
     clock: Callable[[], str],
     environ: Mapping[str, str],
     review: Path = REVIEW,
+    *,
+    bootstrap: bool = False,
 ) -> str:
     """Validate inputs before sending; stage every answer before publishing anything."""
     # Ruling L-1001 (decision 0059, S2-T16 passage): an empty terms text is a
@@ -132,10 +143,12 @@ def build_busyness(
                 raise ValueError(f"{variable}: required")
         forecast_cost, query_cost = load_requests(review / REQUEST_FILE)
     places, crosswalk = _inputs(cache, review, venues)
+    inputs = input_hashes(cache) if bootstrap else {}
     addresses = read_addresses(cache) if venues else {}
     asked = 0
     rows: list[dict[str, object]] = []
     answers: list[dict[str, object]] = []
+    handoff: list[dict[str, str]] = []
     reasons: dict[str, str] = {}
     categories = {row["category_group"]: 0 for row in venues}
     retrieved = clock()
@@ -147,7 +160,8 @@ def build_busyness(
         ):
             reasons[identifier] = "venue_address_absent"
             continue
-        if crosswalk[identifier]["match"] != "matched":
+        expected_match = "pending" if bootstrap else "matched"
+        if crosswalk[identifier]["match"] != expected_match:
             reasons[identifier] = "no_match"
             continue
         if not budget.reserve(identifier, "forecast", forecast_cost):
@@ -182,6 +196,18 @@ def build_busyness(
         )
         if forecast.reason:
             reasons[identifier] = forecast.reason
+            continue
+        if bootstrap:
+            handoff.append(
+                {
+                    "place_id": identifier,
+                    "venue_id": forecast.venue_id,
+                    "venue_name": forecast.name,
+                    "sha256": answer_digest,
+                    "retrieved_utc": retrieved,
+                }
+            )
+            reasons[identifier] = "identity_pending_review"
             continue
         if forecast.venue_id != crosswalk[identifier]["venue_key"] or not names_match(
             places[identifier]["name"], forecast.name
@@ -231,6 +257,20 @@ def build_busyness(
             for group, count in categories.items()
         },
     }
+    if bootstrap:
+        handoff_digest = write_handoff(cache, handoff, environ)
+        return write_json(
+            cache,
+            "busy_besttime/bootstrap-run.json",
+            {
+                "phase": "bootstrap",
+                "inputs": inputs,
+                "handoff_sha256": handoff_digest,
+                "credits_used": budget.used,
+                "coverage": coverage,
+            },
+            environ,
+        )
     body = "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows).encode()
     digest = sha256_hex(body)
     receipt = sidecar_for(

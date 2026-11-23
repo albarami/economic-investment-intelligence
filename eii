@@ -18,6 +18,8 @@ usage() {
     'build-public --tenders-only [--resume]' \
     'build-public --gis-imagery-snapshot' \
     'build-public --cdse-backup' \
+    'build-public --busyness-bootstrap' \
+    'build-public --busyness-confirm SHA256 ROLE DATE' \
     'build-world' \
     'build-release' \
     'load-release' \

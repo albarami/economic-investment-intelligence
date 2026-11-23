@@ -71,7 +71,7 @@ def load_requests(path: Path) -> tuple[int, int]:
 
 
 def _rows(
-    path: Path, filename: str, columns: tuple[str, ...]
+    path: Path, filename: str, columns: tuple[str, ...], *, unknown_key: bool = False
 ) -> tuple[dict[str, str], ...]:
     try:
         with path.open(encoding="utf-8", newline="") as stream:
@@ -83,7 +83,8 @@ def _rows(
             seen: set[str] = set()
             for cells in reader:
                 if len(cells) != len(columns) or any(
-                    not cell.strip() for cell in cells
+                    not cell.strip() and not (unknown_key and i == 1)
+                    for i, cell in enumerate(cells)
                 ):
                     raise ReviewError(f"{filename} schema: wrong or empty cells")
                 row = dict(zip(columns, cells, strict=True))
@@ -104,8 +105,14 @@ def load_venues(path: Path) -> tuple[dict[str, str], ...]:
 
 def load_crosswalk(path: Path) -> tuple[dict[str, str], ...]:
     """Read G4's reviewed matches; do not infer or repair a match."""
-    rows = _rows(path, CROSSWALK_FILE, CROSSWALK_COLUMNS)
+    rows = _rows(path, CROSSWALK_FILE, CROSSWALK_COLUMNS, unknown_key=True)
     for row in rows:
-        if row["match"] not in {"matched", "no_match"}:
-            raise ReviewError(f"{CROSSWALK_FILE} match: expected matched or no_match")
+        if row["match"] not in {"matched", "no_match", "pending"}:
+            raise ReviewError(
+                f"{CROSSWALK_FILE} match: expected matched, no_match or pending"
+            )
+        if (row["venue_key"] == "") != (row["match"] == "pending") or (
+            row["venue_key"] and not row["venue_key"].strip()
+        ):
+            raise ReviewError(f"{CROSSWALK_FILE} venue_key: empty only for pending")
     return rows
