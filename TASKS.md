@@ -1609,7 +1609,7 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Requirements: MTH-45, MTH-49, BRF-42, BRF-77, MTH-57, MTH-69, MTH-70, MTH-72, MTH-73, FE-111, FE-112.
 - Delivery: hard; personas Methods; status queued.
 ### S6-T13 — Reachable access
-- Goal: Build reachable access, a travel-time catchment score by hour of day where congestion changes travel time (former Later item L2).
+- Goal: Build reachable access, a travel-time catchment score by hour of day where congestion changes travel time (former Later item L2). The parameter values of card C12 are fixed by [decision 0106](docs/decisions/0106-c12-parameters-fixed-at-slice-s2.md).
 - Acceptance criteria: [ ] the score is computed by tested code over the released speeds by hour; [ ] it carries the Simulated class wherever speeds by hour enter, and over a traffic-aware drive-time area of the session the least-real class of its inputs (S6-T19); [ ] the regression example of MTH-46 passes; [ ] the score is never worded as demand or capture; [ ] for card C12, MTH-46, each expected value or numeric finding of a source without an open licence that no committed test pins (the findings of PUB-71 among them; OI-195, OI-276) is checked by a test under `custodian/data_tests/` that reads the uncommitted public cache.
 - Scope: reachable-access method (calculation card C12), component and tests.
 - Depends: S6-T07, S6-T08.

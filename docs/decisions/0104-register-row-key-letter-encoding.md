@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed: lead ruling of 2026-11-23; owner acceptance asked |
+| Status | Accepted 2026-11-23 by the advisor under the owner's delegation (the lead may ask the advisor, not the owner, about the register scan), advisor note of 2026-11-23 22:15, ruling L-1649: the letter spelling is lossless and keeps a bare 8- or 11-digit run out of the release |
 | Date | 2026-11-23 |
 | Scope | `custodian/src/eii_custodian/publicdata/registers/` (`contracts.py`, `parse.py`); the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)**; [TASKS.md](../../TASKS.md) S2-T49 |
 | Amends | The S2-P71 lead brief's row-key ruling for the Public projection, as recorded in document 03 **Register file projections (S2-T49)**: the released `ROW-` identity form only |

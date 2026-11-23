@@ -3359,6 +3359,7 @@ No existing open item is closed by this input.
 - EVIDENCE: two matrix jobs hung in that step for 66 min, no test started; the cancelled and failed jobs were rerun.
 - NEEDED: not recorded.
 - NEEDED BY: the next S2 ledger; it stays open as a random failure.
+- 2026-11-23: same incident as OI-387; the investigation actions are kept there (train S2-24 confirmation, records point).
 
 ## OI-390 — S2-P74 rv1 non-blocking findings F1 to F3
 
@@ -3399,6 +3400,50 @@ No existing open item is closed by this input.
 - EVIDENCE: a citation page of that shape still refuses excerpt_absent at the landmark check unless it carries the reviewed excerpt (decision 0093).
 - NEEDED: not recorded.
 - NEEDED BY: not recorded.
+
+## OI-394 — C12's decay form, cut-offs, supply layers, modes and presence keys are not pinned
+
+- ID: OI-394
+- TYPE: CLOSED
+- RAISED BY: the lead, 2026-11-23, from ruling L-1633 (1)
+- CONCERNS: document 07 C12 and DAT-151/DAT-153 say these are "fixed at slice S2", but no task or record pins them.
+- EVIDENCE: ruling L-1633 (1): S6-T13 builds C12 with them as one typed, closed parameter object with no defaults, tested on the worked example.
+- NEEDED: a decision record pins the values before the S2 gate.
+- NEEDED BY: the S2 gate.
+- 2026-11-23: decision 0106 (proposed) fixes the values; the four choices are ruled under L-1641; the item closes when 0106 is accepted.
+- 2026-11-23: CLOSED by the acceptance of decision 0106.
+- Records note 2026-11-23: document 08 may also cite decision 0106 at the `cutoff` input; no change of meaning. (S2-25.cf0106, Devin, records only; the item stays CLOSED.)
+
+## OI-395 — S6-T13 box 2 and MTH-67
+
+- ID: OI-395
+- TYPE: OPEN (records)
+- RAISED BY: the lead, 2026-11-23, from ruling L-1633 (1)
+- CONCERNS: box 2 allows a score over a live-traffic drive-time area, while MTH-67 says none enters an access score.
+- EVIDENCE: ruling L-1633 (1): MTH-67 governs; box 2 is met with simulated times; the wording of box 2 is reconciled in the S6 records.
+- NEEDED: reconcile the wording of box 2 in the S6 records.
+- NEEDED BY: the S6 records.
+
+## OI-396 — Decision 0105's delegation sentence is superseded
+
+- ID: OI-396
+- TYPE: OPEN (records)
+- RAISED BY: S2-24.cf1 (the train confirmation, OpenAI Codex A), 2026-11-23, which approved `a92fb8e830`
+- CONCERNS: decision 0105 says the further-field delegation was unanswered, while item 8 and the approvals record the owner's delegation of 18:08 and the advisor's approval of 18:32 (ruling L-1608).
+- EVIDENCE: the cf1 proposed point on decision 0105's delegation sentence; the owner's delegation and the advisor's approval under ruling L-1608.
+- NEEDED: a dated clarification in the next decision pack (a decision record is never edited silently).
+- NEEDED BY: the next decision pack.
+
+## OI-397 — The guided-story places in the PUB-52/PUB-53 verification population
+
+- ID: OI-397
+- TYPE: OPEN
+- RAISED BY: the lead, 2026-11-23, from ruling L-1646 item 2
+- OWNER: the lead
+- CONCERNS: the places named in a prepared guided-story answer join the PUB-52/PUB-53 verification population when the guided-story answers exist (slice S3).
+- EVIDENCE: ruling L-1646 item 2: until then the story set is empty, and every required-verification count records it as empty.
+- NEEDED: add the story-answer places to the verification population once the guided-story answers exist.
+- NEEDED BY: slice S3.
 
 ## Change control
 
