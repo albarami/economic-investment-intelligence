@@ -19,7 +19,7 @@ WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
 # A workflow file change changes its pin in the same commit, so it is seen in review.
 PINNED_SHA256 = {
-    "ci.yml": "8ed31e6b6120eeebff667e2d54b19271de501adca16d51631e7f28c2abee411d",
+    "ci.yml": "0b7640ba81ba2c63ec84715359f679d486ceef7257c7dc771c19edc58427fa06",
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }

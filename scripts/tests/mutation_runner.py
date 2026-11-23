@@ -536,6 +536,8 @@ class SourceGuardSelectionTests(unittest.TestCase):
             ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
             ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "2"),
             ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "3"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "4"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "5"),
         ):
             return
         offenders = [option for option in args if option.startswith("-")]
@@ -608,7 +610,7 @@ class SourceGuardSelectionTests(unittest.TestCase):
         )
 
     def test_only_exact_custodian_partition_options_accepted(self) -> None:
-        for value in ("1", "2", "3"):
+        for value in ("1", "2", "3", "4", "5"):
             self._assert_no_selection_options(
                 "python-custodian-" + value,
                 (
@@ -623,7 +625,7 @@ class SourceGuardSelectionTests(unittest.TestCase):
         for args in (
             ("core/tests", "--co"),
             ("core/tests", "-p", "some_plugin"),
-            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "4"),
+            ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "6"),
             ("core/tests", "-x"),
             ("core/tests", "--maxfail=1"),
             ("core/tests", "-c", "alternate.toml"),

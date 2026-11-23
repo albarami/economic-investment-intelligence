@@ -47,26 +47,21 @@ class SuiteResult:
 SUITES: tuple[Suite, ...] = (
     Suite("python-guards", "pytest", ".", ("scripts/tests",), 3600),
     Suite("python-core", "pytest", ".", ("core/tests",), 600),
-    Suite(
-        "python-custodian-1",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "1"),
-        1200,
-    ),
-    Suite(
-        "python-custodian-2",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "2"),
-        1200,
-    ),
-    Suite(
-        "python-custodian-3",
-        "pytest",
-        ".",
-        ("custodian/tests", "-p", "pytest_custodian_part", "--custodian-part", "3"),
-        1200,
+    *(
+        Suite(
+            f"python-custodian-{part}",
+            "pytest",
+            ".",
+            (
+                "custodian/tests",
+                "-p",
+                "pytest_custodian_part",
+                "--custodian-part",
+                str(part),
+            ),
+            1200,
+        )
+        for part in range(1, 6)
     ),
     Suite("python-product", "pytest", ".", ("product/tests",), 600),
     Suite(

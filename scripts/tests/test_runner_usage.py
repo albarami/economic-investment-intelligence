@@ -92,6 +92,8 @@ class RunnerUsage(unittest.TestCase):
             "python-custodian-1",
             "python-custodian-2",
             "python-custodian-3",
+            "python-custodian-4",
+            "python-custodian-5",
             "python-product",
             "web-checks",
             "web-unit",
@@ -130,6 +132,28 @@ class RunnerUsage(unittest.TestCase):
                     "pytest_custodian_part",
                     "--custodian-part",
                     "3",
+                ),
+                1200,
+            ),
+            (
+                "python-custodian-4",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "4",
+                ),
+                1200,
+            ),
+            (
+                "python-custodian-5",
+                (
+                    "custodian/tests",
+                    "-p",
+                    "pytest_custodian_part",
+                    "--custodian-part",
+                    "5",
                 ),
                 1200,
             ),
@@ -193,7 +217,7 @@ class RunnerUsage(unittest.TestCase):
             with self.subTest(environ=environ):
                 self.assertEqual(
                     tuple(run_tests.suite_timeout(suite, environ) for suite in parts),
-                    (1200, 1200, 1200),
+                    (1200, 1200, 1200, 1200, 1200),
                 )
 
     def test_each_suite_prints_its_own_duration(self) -> None:

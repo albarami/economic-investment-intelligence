@@ -84,6 +84,8 @@ jobs:
           - python-custodian-1
           - python-custodian-2
           - python-custodian-3
+          - python-custodian-4
+          - python-custodian-5
           - python-product
           - web-checks
           - web-unit

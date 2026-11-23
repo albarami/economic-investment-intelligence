@@ -668,6 +668,8 @@ def test_restricted_selection_plants():
         "python-custodian-1",
         "python-custodian-2",
         "python-custodian-3",
+        "python-custodian-4",
+        "python-custodian-5",
     ]
     for suite in SUITES:
         if suite.kind == "pytest":
