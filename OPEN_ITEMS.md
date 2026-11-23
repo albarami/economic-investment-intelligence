@@ -6814,6 +6814,7 @@ introduced.
 - EVIDENCE: (1) the tenders context sets ALPN before its own verification guard; the context is created locally and the refusal still fires before return, so this is ordering only. (2) The S2-P77 builder saw `test_clean_environment.py` fail in `setUpClass` when the default uv cache folder is absent; the file passes alone. (3) `post_handshake_auth`, which the standard default context also sets, stays unset; the builder kept it out of scope.
 - NEEDED: (1) hoist the guard above the ALPN call when the function is next touched; (2) make the clean-environment test fail closed with a clear diagnostic when the uv cache is absent; (3) record whether `post_handshake_auth` should follow the standard default.
 - NEEDED BY: before the S2 gate record.
+- NOTE 2026-11-24 (correction, from S2-26.cf2): the PROGRESS row "S2-P77 review" of train S2-26 says ALPN is set "only after the verification refusal"; that overstates the ordering in `tenders.py`. Item 1 above states it correctly: the tenders context sets ALPN before its own verification guard, and the refusal still fires before return.
 
 ## OI-407 — A pinned command-list test escaped three checks
 
@@ -6834,6 +6835,7 @@ introduced.
 - EVIDENCE: hosted suite python-custodian-2 on PR 133 at `0cc22d6825`: first example 294.81 ms against the 200 ms deadline of the "eii" profile, replay 0.70 ms, then `FlakyFailure`. Each example creates a temporary folder and writes and reads CSV. S2-P76.r3 `fc9fbe18e9` sets `deadline=None` on both, as `test_method_pin_writer.py` does; a 350 ms stalled write was red before and green after. The hosted job was not rerun.
 - NEEDED: a green hosted run of round 3 and of the next trains. A green rerun alone never closes this item.
 - NEEDED BY: before the S2 gate record.
+- NOTE 2026-11-24 (from S2-26.cf3): the fix was joined into round 3 of train S2-26 and merged only with pull request 133.
 
 ## OI-409 — Older file-backed properties under the same deadline
 
@@ -6844,3 +6846,14 @@ introduced.
 - EVIDENCE: the review's targeted pass; the hosted failure of OI-408 shows the exposure on shared runners.
 - NEEDED: a sweep that re-enumerates every `@given` body in the repository and removes the exposure in the same way, with no assertion, strategy or example count changed.
 - NEEDED BY: before the S2 gate record.
+
+## OI-410 — Module count of decision 0081 out of date after S2-P78
+
+- ID: OI-410
+- TYPE: OPEN (records)
+- RAISED BY: the lead, 2026-11-24
+- CONCERNS: [decision 0081](docs/decisions/0081-per-entry-fingerprints-for-build-public-resume.md) and S2-P78 (`_seeded_assembly` now preloads `assembly_method_pins` and `assembly_refusals` before `RunRecord.begin`).
+- EVIDENCE: decision 0081 states 20 bound modules and three unbound; after S2-P78 that count is out of date. The review S2-P78.rv1 counts the bound set directly.
+- NEEDED: the lead appends the counted number as a dated note to the decision record's notes heading, if it has one, in the same train.
+- NEEDED BY: train S2-27.
+- 2026-11-24, lead: S2-P78.rv1 counted 27 module files in the loaded-module digest of the seeded path, among them `review/graph.py`, `singles/families.py` and `gis/layers.py`, which decision 0081 lists as unbound. Decision 0081 has no notes heading, so the record is not edited here (an approved decision is amended only by a new record, rule 46); this item stays open for a dated amendment record of the count.

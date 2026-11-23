@@ -53526,3 +53526,21 @@ Edge classes: inherited ignored SIGINT (real red 1 / green 0); incoming handler 
 | 2026-11-24 | S2-P76 round 3 review | S2-P76.rv3 (Cognition Devin) APPROVED `fc9fbe18e9`. Its proposed item, nine older file-backed properties under the same deadline, is OI-409. | Cognition Devin |
 | 2026-11-24 | Join proof, round 3 | `bin/join_pairs_proof.py`: `fc9fbe18e9` to `cd5ce86b`: 1 file SAME, 0 DIFFERENT; cherry-picked onto the round-2 head `0cc22d6825`; nothing was rewritten. | Lead |
 | 2026-11-24 | Round 3 confirmation, hosted run and lead whole test | The new head needs one confirmation by a maker other than the lead, a full hosted run and the lead's whole test with a fresh seed. Their rows go to the next S2 ledger. | Lead |
+
+## S2-26 merge-result and merge record — 2026-11-24
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-24 | S2-26 merge-result test and merge record | [PR 133](https://github.com/albarami/economic-investment-intelligence/pull/133) (train S2-26: S2-P76 round 3, S2-P77, OI-408 and OI-409 records) merged at head `b09bd8ba1b` into main as `a654ea944d`. Conditions held on that exact head: S2-26.cf3 APPROVED (OpenAI Codex B); 17 hosted checks green on the round-3 head; lead whole test S2-26.wt3 exit 0 on the merge result (`./eii test --seed 2872975570`; dynamic lanes of ruling L-1686; every suite passed; main `8dd041c250` an ancestor of the head). | Lead (Anthropic Opus 5.5); approver Codex B (OpenAI) |
+
+The two notes below belong to the S2-P77 and S2-P76 round 3 evidence rows of the heading "Train S2-26 of slice S2"; neither task has a heading of its own, so they are appended here.
+
+- 2026-11-24, note to the S2-P77 evidence (from S2-26.cf2, records only): S2-P77 changed seven files; eight is the joined total of the train round. `scripts/tests/test_launcher.py` also compares the full usage text.
+- 2026-11-24, note to the S2-P76 round 3 evidence (from S2-26.cf3, records only): the three Hypothesis seeds were 4111, 52007 and 913; command `uv run --locked python -m pytest custodian/tests/test_review_data_guards.py -q -p no:cacheprovider`; environment UV_OFFLINE=1, lead shell; 61 passed at each seed.
+
+## S2-P78 resume fingerprint binds the seeded assembly modules — 2026-11-24
+
+- Builder Anthropic Claude B; lead_commit `41f80090f6` on base `8dd041c250`. `_seeded_assembly` preloads `assembly_method_pins` and `assembly_refusals` before `RunRecord.begin`, so the loaded-module digest binds them; four tests red first.
+- Lead verify: `custodian/tests/test_fetch_fingerprint.py` with the resume tests, 271 passed under Hypothesis seeds 3301 and 77021; custodian selection 4200 passed; scripts class sweep (command, table, usage, public_assembly, development, serve, preflight) 189 passed; import boundary, ruff, format, mypy (529 files), check_docs and `git diff --check` all exit 0.
+- review: S2-P78.rv1 (OpenAI Codex B) APPROVED `41f80090f6`; the reviewer counted 27 module files in the seeded path's loaded-module digest (the loaded-digest count, not the whole static closure); the train joined it as `da56d158` with a join proof of three files, all the same.
+- The module count stated in decision 0081 is out of date after this change; OI-410.
