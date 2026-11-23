@@ -370,28 +370,49 @@ class RunnerFailures(unittest.TestCase):
             "    time.sleep(60)\n",
         )
         suite = support.fx_suite("fx-intr", "pytest", ".", ("fx/intr",), timeout=30)
-
-        def poke() -> None:
-            deadline = time.time() + 20
-            while time.time() < deadline:
-                if pid_path.is_file():
-                    time.sleep(0.2)
-                    os.kill(os.getpid(), signal.SIGINT)
-                    return
-                time.sleep(0.05)
-            raise AssertionError("pid file never appeared")
-
-        worker = threading.Thread(target=poke)
+        started = time.monotonic()
+        finished = threading.Event()
+        child_started: list[float] = []
+        worker = threading.Thread(
+            target=self._interrupt_when_ready,
+            args=(pid_path, started, suite.timeout, finished, child_started),
+        )
         worker.start()
         try:
             status, out, _err = self._run((suite,))
         finally:
+            finished.set()
             worker.join(timeout=5)
         self.assertEqual(status, 1, out)
-        self.assertIn("FAIL interrupted", out)
+        self.assertIn(
+            "FAIL interrupted",
+            out,
+            f"child-start seconds={child_started}; "
+            f"runner elapsed={time.monotonic() - started:.3f} s; "
+            f"suite limit={suite.timeout} s; output={out}",
+        )
         self.assertFalse(any(line.startswith("Traceback") for line in out))
         pid = self._await_pid(pid_path, 2)
         self._await_dead(pid, 5)
+
+    def _interrupt_when_ready(
+        self,
+        pid_path: Path,
+        started: float,
+        timeout: int,
+        finished: threading.Event,
+        child_started: list[float],
+    ) -> None:
+        # All times are monotonic seconds, sharing the suite's startup budget.
+        deadline = started + timeout
+        while time.monotonic() < deadline:
+            if pid_path.is_file():
+                child_started.append(time.monotonic() - started)
+                if not finished.wait(0.2):
+                    os.kill(os.getpid(), signal.SIGINT)
+                return
+            if finished.wait(0.05):
+                return
 
     def _no_counts(self, name: str, args: tuple[str, ...], code: str) -> None:
         status, out, _err = self._run((support.fx_suite(name, "pytest", ".", args),))
