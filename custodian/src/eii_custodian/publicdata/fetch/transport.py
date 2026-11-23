@@ -260,6 +260,7 @@ def open_https(
             guard, urllib.request.HTTPSHandler(context=ssl_context)
         )
     request_headers = dict(headers) if headers else {}
+    request_headers.setdefault("User-Agent", "EII-Public-Citation-Client/1.0")
     if browser_agent():
         request_headers["User-Agent"] = "Mozilla/5.0"
     request_headers.update(authorization_header(url, token))

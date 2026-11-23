@@ -14,6 +14,7 @@ PRICE_MEASURES = frozenset(
         "guide_price",
         "deal_value",
         "median_price_per_ft2",
+        "median_price_per_m2",
         "land_median_price_per_ft2",
     }
 )

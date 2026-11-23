@@ -33,6 +33,7 @@ MONEY_FIELDS = frozenset(
         "guide_price",
         "deal_value",
         "median_price_per_ft2",
+        "median_price_per_m2",
         "land_median_price_per_ft2",
         "bond_qar",
         "documents_value_qar",
@@ -40,6 +41,7 @@ MONEY_FIELDS = frozenset(
         "compensation",
         "operating_surplus",
         "average_annual_wage",
+        "capital_qar",
     }
 )
 RATIO_FIELDS = frozenset({"share", "percentage", "density", "rate", "ratio"})
@@ -95,6 +97,13 @@ ADMIN_FIELDS = frozenset(
         "feature_key",
         "as_of",
         "number_of_shares_2400",
+        "registered_cell",
+        "zone",
+        "licence_number",
+        "block_en",
+        "block_ar",
+        "register_order",
+        "tax_classification_year",
     }
 )
 
@@ -252,6 +261,7 @@ TEXT_FIELDS = frozenset(
         "calendar",
         "period_kind",
         "series_key",
+        "registration_number",
     }
 )
 NUMERIC_TEXT = re.compile(
@@ -567,9 +577,28 @@ def gather_audit(build: Production) -> dict[str, Any]:
             },
         )
     )
-    evidence.append(
-        method_pin_evidence(build.root, build.cache, build.entries, build.receipts)
+    pin_evidence = method_pin_evidence(
+        build.root, build.cache, build.entries, build.receipts
     )
+    if build.pin_pending_reason:
+        # Ruling L-1494: the pending phase's own closed reason rides the
+        # S2-T09 row of the build report; the gate still refuses the pending
+        # build, it never credits a pair that was not written. The gathered
+        # evidence is dropped with it: whatever pair sits on the disk — a
+        # stale pair of an earlier run or one rewritten after the sweep —
+        # this pending run wrote none of it, so the row can never say
+        # recorded.
+        pin_evidence = replace(
+            pin_evidence,
+            source_keys=(),
+            checks={"completion_evidence": False},
+            receipt_sha256={},
+            details={
+                **pin_evidence.details,
+                "pending_reason": build.pin_pending_reason,
+            },
+        )
+    evidence.append(pin_evidence)
     decision_name = "0025-reconciliation-of-restaurant-and-wage-figures.md"
     decision_path = build.root / "docs/decisions" / decision_name
     decision = decision_path.read_bytes() if decision_path.is_file() else b""
@@ -667,6 +696,7 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
     for phase in (
         "reviewed_selections",
         "frame",
+        "register_tables",
         "gis_property_singles",
         "fsq",
         "series_stage",

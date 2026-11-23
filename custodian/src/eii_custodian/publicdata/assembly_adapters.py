@@ -16,7 +16,7 @@ from typing import Any
 
 from .assembly import AssemblyError, Step, run_steps
 from .assembly_intake import write_intake_evidence
-from .assembly_inventory import INVENTORY, validate_inventory
+from .assembly_inventory import INVENTORY, InventoryItem, validate_inventory
 from .assembly_io import bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry, RegistryError, parse_yaml, read_yaml
@@ -56,6 +56,9 @@ class Production:
     environ: Mapping[str, str]
     fetcher: Callable[[], Any] | None = None
     reconciliation_selection: Selection | None = None
+    pin_generation_config: Mapping[str, object] | None = None
+    pin_rows: Sequence[Mapping[str, object]] = ()
+    pin_pending_reason: str = ""
     selected: dict[str, str] = field(default_factory=dict)
     receipts: dict[str, dict[str, Any]] = field(default_factory=dict)
     tables: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
@@ -78,6 +81,7 @@ class Production:
             "investment_capture": self.investment_capture,
             "reviewed_selections": self.reviewed_selections,
             "frame": self.frame,
+            "register_tables": self.register_tables,
             "spine_graph": self.spine_graph,
             "additions": self.additions,
             "gis_property_singles": self.gis_property_singles,
@@ -86,45 +90,69 @@ class Production:
             "heights": self.heights,
             "trade_reconciliation": self.trade_reconciliation,
             "busyness": self.busyness,
+            "method_pins": self.method_pins,
             "final_audit": self.final_audit,
             "draw": self.draw,
             "reports": self.reports,
         }
 
     def run(self) -> tuple[str, ...]:
-        if type(self.seed) is not int:
-            raise AssemblyError("figure_seed_invalid")
-        adapters = self.adapters()
-        validate_inventory(adapters)
-        paths = [local(self.cache, path) for item in INVENTORY for path in item.outputs]
-        graph = local(self.cache, "assembly/graph")
-        for path in paths:
-            path.unlink(missing_ok=True)
-        if graph.exists():
-            graph.rmdir()
-        self.fetched = None
-        self.lines.clear()
-        self.files.clear()
-        self.data_files.clear()
-        self.tables.clear()
-        self.source_tables.clear()
-        self.table_sources.clear()
-        self.receipts.clear()
-        self.selected.clear()
-        self.audit.clear()
-        self.frame_result = None
-        self.intake_refusal = ""
-        # Persist the seed before the clock, review, cache or source reader.
-        write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
-        self.stamp = self.clock()
-        steps = tuple(
-            Step(item.name, adapters[item.name], item.outputs) for item in INVENTORY
-        )
-        completed = run_steps(self.cache, steps)
+        from .assembly_refusals import stage_refusals
+
+        with stage_refusals(self.lines, "require_complete"):
+            if type(self.seed) is not int:
+                raise AssemblyError("figure_seed_invalid")
+            adapters = self.adapters()
+            validate_inventory(adapters)
+            paths = [
+                local(self.cache, path) for item in INVENTORY for path in item.outputs
+            ]
+            graph = local(self.cache, "assembly/graph")
+            for path in paths:
+                path.unlink(missing_ok=True)
+            if graph.exists():
+                graph.rmdir()
+            self.fetched = None
+            self.lines.clear()
+            self.files.clear()
+            self.data_files.clear()
+            self.tables.clear()
+            self.source_tables.clear()
+            self.table_sources.clear()
+            self.receipts.clear()
+            self.selected.clear()
+            self.audit.clear()
+            self.frame_result = None
+            self.intake_refusal = ""
+            self.pin_pending_reason = ""
+            # Persist the seed before the clock, review, cache or source reader.
+            write_record(self.cache, "assembly/build.json", {"figure_seed": self.seed})
+            self.stamp = self.clock()
+            steps = tuple(
+                Step(item.name, adapters[item.name], self._declared_outputs(item))
+                for item in INVENTORY
+            )
+        completed = run_steps(self.cache, steps, lines=self.lines)
         from .assembly_reports import require_complete
 
-        require_complete(self.audit)
+        with stage_refusals(self.lines, "require_complete"):
+            require_complete(self.audit)
         return completed
+
+    def _declared_outputs(self, item: InventoryItem) -> tuple[str, ...]:
+        """The pending pin phase declares no outputs: it writes nothing.
+
+        Ruling L-1494: unbound S2-T08 part B inputs never stop the live build.
+        The phase records its closed pending reason and the gate refuses the
+        pending build after reports, so the step owns no file in that state.
+        """
+        from .assembly_method_pins import pin_inputs_bound
+
+        if item.name == "method_pins" and not pin_inputs_bound(
+            self.pin_generation_config, self.pin_rows
+        ):
+            return ()
+        return item.outputs
 
     def record(self, phase: str, value: object) -> dict[str, str]:
         if not isinstance(value, dict):
@@ -402,7 +430,8 @@ class Production:
         from .places.integrate import areas_before_stage, build_lines
 
         invalidate_buildings(self.cache)
-        areas_before_stage(self.cache, self.lines, self.review)
+        with build_lines(self.lines):
+            areas_before_stage(self.cache, self.lines, self.review)
         try:
             with build_lines(self.lines):
                 result = build_public_frame(
@@ -505,6 +534,64 @@ class Production:
                 "report": result.report,
                 "files": paths,
                 "data_files": building_paths,
+            },
+        )
+
+    def register_tables(self) -> dict[str, str]:
+        """Consume the lead-staged, pin-verified register projection bundle."""
+        from .registers.bundle import BUNDLE, PIN, load_bundle
+        from .registers.contracts import REGISTRY_KEYS
+
+        cells = frozenset(
+            int(row["cell"]) for row in self.needed_frame().tables["grid_cell"]
+        )
+        bundle = load_bundle(local(self.cache, BUNDLE), local(self.cache, PIN), cells)
+        for item in bundle.receipts:
+            if item["use"] != "current":
+                continue
+            receipt = dict(item["receipt"])
+            # A register file has no fetch address; the reviewed capture digest
+            # stands as the snapshot identity used by the figure draw.
+            receipt["fetch_url"] = ""
+            receipt["sha256"] = item["receipt_sha256"]
+            self.receipts[str(receipt["key"])] = receipt
+        sources = tuple(sorted(REGISTRY_KEYS.values()))
+        row_sources = {
+            name: [REGISTRY_KEYS[str(row["source_id"])] for row in rows]
+            for name, rows in bundle.tables.items()
+        }
+        for name, rows in bundle.tables.items():
+            self.table(name, rows, sources)
+        self.files.update(
+            {
+                PIN: bundle.pin_sha256,
+                BUNDLE + "/manifest.json": bundle.manifest_sha256,
+                **{
+                    BUNDLE + "/tables/" + name + ".parquet": digest
+                    for name, digest in bundle.table_sha256.items()
+                },
+            }
+        )
+        return self.record(
+            "register_tables",
+            {
+                "manifest_sha256": bundle.manifest_sha256,
+                "frame_sha256": bundle.manifest["frame_sha256"],
+                "release_kind": bundle.manifest["release_kind"],
+                "tables": {name: self.tables[name] for name in bundle.tables},
+                "table_files": bundle.table_sha256,
+                "row_sources": row_sources,
+                "receipts": [
+                    {
+                        "key": item["key"],
+                        "source_id": item["receipt"]["source_id"],
+                        "use": item["use"],
+                        "period": item["receipt"]["period"],
+                        "receipt_sha256": item["receipt_sha256"],
+                    }
+                    for item in bundle.receipts
+                ],
+                "snapshot_coverage": bundle.coverage,
             },
         )
 
@@ -943,6 +1030,26 @@ class Production:
             )
         assert_clean(self.environ, self.lines)
         return self.record("busyness", {"manifests": results, "tables": tables})
+
+    def method_pins(self) -> dict[str, str]:
+        from .assembly_method_pins import (
+            PIN_INPUTS_MISSING,
+            pin_inputs_bound,
+            write_pin_pair,
+        )
+
+        if not pin_inputs_bound(self.pin_generation_config, self.pin_rows):
+            # Ruling L-1494: unbound S2-T08 part B inputs write no pair and
+            # never stop the live build; the closed pending reason is recorded
+            # for the build report and the gate refuses the pending build.
+            self.pin_pending_reason = PIN_INPUTS_MISSING
+            return {}
+        output = write_pin_pair(self.cache, self.pin_generation_config, self.pin_rows)
+        self.files.update(output)
+        return {
+            **self.record("method_pins", {"outputs": sorted(output)}),
+            **output,
+        }
 
     def final_audit(self) -> dict[str, str]:
         from .assembly_reports import gather_audit

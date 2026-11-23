@@ -21,6 +21,7 @@ PHASES = (
     "investment_capture",
     "reviewed_selections",
     "frame",
+    "register_tables",
     "spine_graph",
     "additions",
     "gis_property_singles",
@@ -29,6 +30,7 @@ PHASES = (
     "heights",
     "trade_reconciliation",
     "busyness",
+    "method_pins",
     "final_audit",
     "draw",
     "reports",
@@ -68,7 +70,9 @@ def _output_path(root: Path, name: str) -> Path:
     return path
 
 
-def run_steps(root: Path, steps: tuple[Step, ...]) -> tuple[str, ...]:
+def run_steps(
+    root: Path, steps: tuple[Step, ...], *, lines: list[str] | None = None
+) -> tuple[str, ...]:
     """Run the closed plan in order; stop on a refusal or an incorrect output.
 
     Validate the whole plan before invoking an adapter. Verify each adapter's
@@ -76,27 +80,31 @@ def run_steps(root: Path, steps: tuple[Step, ...]) -> tuple[str, ...]:
     Producers retain their own failure types; this function cannot turn a
     refused producer into a successful trace. No report writer runs early.
     """
-    if tuple(step.name for step in steps) != PHASES:
-        raise AssemblyError("assembly_order_invalid")
-    owned: set[str] = set()
-    for step in steps:
-        for name in step.outputs:
-            _output_path(root, name)
-            if name in owned:
-                raise AssemblyError("assembly_output_invalid")
-            owned.add(name)
+    from .assembly_refusals import stage_refusals
+
+    with stage_refusals(lines, "require_complete"):
+        if tuple(step.name for step in steps) != PHASES:
+            raise AssemblyError("assembly_order_invalid")
+        owned: set[str] = set()
+        for step in steps:
+            for name in step.outputs:
+                _output_path(root, name)
+                if name in owned:
+                    raise AssemblyError("assembly_output_invalid")
+                owned.add(name)
     completed: list[str] = []
     for step in steps:
-        result = step.run()
-        if not isinstance(result, Mapping) or set(result) != set(step.outputs):
-            raise AssemblyError("assembly_output_invalid")
-        for name in step.outputs:
-            path = _output_path(root, name)
-            digest = result[name]
-            try:
-                if not path.is_file() or file_hash(path) != digest:
-                    raise AssemblyError("assembly_output_invalid")
-            except OSError:
-                raise AssemblyError("assembly_output_invalid") from None
+        with stage_refusals(lines, step.name):
+            result = step.run()
+            if not isinstance(result, Mapping) or set(result) != set(step.outputs):
+                raise AssemblyError("assembly_output_invalid")
+            for name in step.outputs:
+                path = _output_path(root, name)
+                digest = result[name]
+                try:
+                    if not path.is_file() or file_hash(path) != digest:
+                        raise AssemblyError("assembly_output_invalid")
+                except OSError:
+                    raise AssemblyError("assembly_output_invalid") from None
         completed.append(step.name)
     return tuple(completed)

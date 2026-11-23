@@ -975,7 +975,19 @@ sources:
       - القيمة الموافق عليها
       - النتيجة المالية
       - البنود الموافق عليها
-      sections: []
+      sections:
+      - heading: "بيانات الشركات التي تم فتحها فنيا"
+        headers: []
+        date_in_heading: false
+      - heading: "بيانات الشركات التي تم فتحها فنيا وماليا"
+        headers: []
+        date_in_heading: false
+      - heading: "بيانات الشركات التي تم فتحها ماليا"
+        headers: []
+        date_in_heading: false
+      - heading: "تنويه هام للشركـات نود إفادة الشركـات الراغبة في المشاركة في المناقصات الحكومية بأنه يشترط أن تكون الشركة مصنفة. كما نود التنويه بأنه تم تأجيل ربط السقوف المالية للمناقصات بالحدود المالية للشركة لقطاع الموردين ومقدمي الخدمات لإتاحة الفرصة لأكبر عدد من الشركات لاستيفاء متطلبات التصنيف المطور ، وسيتم الإعلان على الموقع حين تطبيقها - تعلن وزارة المالية تأجيل إلزامية تقديم شهادة القيمة المحلية كشرط للمشاركة في المناقصات الحكومية حتى بداية عام 2027، وعليه سيتم إشعاركم بالموعد المحدد كما تشجعكم الوزارة ببدء إجراءات الحصول على شهادة القيمة المحلية ويمكنكم الوصول للمعلومات المطلوبة عبر الموقع الإلكتروني الموحد لمشتريات الدولة"
+        headers: []
+        date_in_heading: false
       total_selector: ''
       total_prefix: ''
       last_selector: ''
@@ -1045,6 +1057,1261 @@ sources:
       progress_fields: [shown_page, continuation]
       projection: fc_company_pane@v1
       producer: fc_register_paged_capture@v1
+
+  # S2-P53 generated citation snapshots; source records stay in the cache.
+  landmark_business_destinations/page-888533b0f5dc6e4b33c22d2f1c75143f6b9a42ac51f22d0dcb2fc3dd0b23e16f:
+    version: 2
+    kind: citation_snapshot
+    url: https://www.businessdestinations.com/relax/qatars-cultural-hub/
+    reviewed_urls:
+    - https://www.businessdestinations.com/relax/qatars-cultural-hub/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_dezzzme/page-8b81e2b88e68f782c4f2cb4a5e818574e60c2282c1e922e405c762f2e45c3622:
+    version: 2
+    kind: citation_snapshot
+    url: https://dezzzme.wordpress.com/2012/12/15/museum-of-islamic-art-doha-by-i-m-pei/
+    reviewed_urls:
+    - https://dezzzme.wordpress.com/2012/12/15/museum-of-islamic-art-doha-by-i-m-pei/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_fifa/page-eff7cceac9ecb833f1c3fc6b6677590ba49fab9d7e192d0220a65914c944df25:
+    version: 2
+    kind: citation_snapshot
+    url: https://inside.fifa.com/tournaments/mens/worldcup/qatar2022/news/progress-continues-at-al-bayt-stadium-2879094
+    reviewed_urls:
+    - https://inside.fifa.com/tournaments/mens/worldcup/qatar2022/news/progress-continues-at-al-bayt-stadium-2879094
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_megatalls/page-5e759ef5d7baa23af9df6906b0b625ab59ff9f901d5f128c5b91eb7ac2c6baa8:
+    version: 2
+    kind: citation_snapshot
+    url: https://megatalls.com/cities/doha/
+    reviewed_urls:
+    - https://megatalls.com/cities/doha/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_nabk_mast_climber_rental_qatar/page-bbecec4d5c89a45c793952b5e91ca157ef12245aba1548dd0e7a4abe04cb782c:
+    version: 2
+    kind: citation_snapshot
+    url: https://nabkmastclimber.com/projects/waldorf-astoria-hotel-project
+    reviewed_urls:
+    - https://nabkmastclimber.com/projects/waldorf-astoria-hotel-project
+    - https://nabkmastclimber.com/terms
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_qatar_museums/page-9f6894562fd3fe5e24ae658217428dc4f3a69324ffec4d8facb92e684ada0882:
+    version: 2
+    kind: citation_snapshot
+    url: https://qm.org.qa/en/visit/public-art/richard-serra-east-west-west-east/
+    reviewed_urls:
+    - https://qm.org.qa/en/visit/public-art/richard-serra-east-west-west-east/
+    - https://qm.org.qa/en/terms-and-conditions/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_qatar_museums/page-eb2dfa7db90ac4eb7eb38cd211427e33a40558c6b627cb9931f62c344987d8f3:
+    version: 2
+    kind: citation_snapshot
+    url: https://qm.org.qa/en/visit/heritage-sites/barzan-towers/
+    reviewed_urls:
+    - https://qm.org.qa/en/visit/heritage-sites/barzan-towers/
+    - https://qm.org.qa/en/terms-and-conditions/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_scraperbase_com/page-32caa547d0eac5000f91823c0106708f287051204fe2347d55ef9fd26f327034:
+    version: 2
+    kind: citation_snapshot
+    url: https://www.scraperbase.com/Qatar/Doha
+    reviewed_urls:
+    - https://www.scraperbase.com/Qatar/Doha
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_skyscraperpage_com/page-a4474c164d99fd530665e2e45c1419e2e7872e9ba8cefe248e372243c595d794:
+    version: 2
+    kind: citation_snapshot
+    url: https://skyscraperpage.com/b85565
+    reviewed_urls:
+    - https://skyscraperpage.com/b85565
+    - https://skyscraperpage.com/site/copyright/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_stadiumdb_com/page-315e32f6547b80db29d25db49bed81b61871d6d48512b5fd7e6da793831c810c:
+    version: 2
+    kind: citation_snapshot
+    url: https://stadiumdb.com/stadiums/qat/al_bayt_stadium
+    reviewed_urls:
+    - https://stadiumdb.com/stadiums/qat/al_bayt_stadium
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_the_national/page-60ee1e70fb8ac0e241c4667ebf2831579f11da16e0ffdc1d09e3e693f1ee349b:
+    version: 2
+    kind: citation_snapshot
+    url: https://www.thenationalnews.com/gulf-news/2022/10/15/one-of-the-worlds-most-isolated-artworks-in-the-qatari-desert-in-pictures/
+    reviewed_urls:
+    - https://www.thenationalnews.com/gulf-news/2022/10/15/one-of-the-worlds-most-isolated-artworks-in-the-qatari-desert-in-pictures/
+    - https://www.thenationalnews.com/terms-and-conditions/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-103f0703da7cb06816a1f4e1523e4f498de12ad091d5551e847f99fb58d18680
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/samrya-twin-towers-west/14568
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/samrya-twin-towers-west/14568
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1251d192dac0fcf46be790a026a386a6993d409e1107a0a2ef6f7c16c75604b0
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/al-faisal-tower/1154
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/al-faisal-tower/1154
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1b90316735c27f085b020ab385bd5215e2b8b3ea420809f5fa4e2aae30bf14dd
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/west-bay-office-tower/8941
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/west-bay-office-tower/8941
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1bd5fde27cf4e7540394dad4a68d08f800d51b168a9064234ee13fd367c31573
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/palm-tower-1/14228
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/palm-tower-1/14228
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1cfce47656a092f8f201dd974c2009c2223d93870fc44ff00749dd67d82a65cd
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/world-trade-center-doha/9918
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/world-trade-center-doha/9918
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-23ffdfde2ca30e03e9f2a7c973b7ff6595843e89bed43ba7efe733e2d6e85923
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/samrya-44-hotel-suites/18440
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/samrya-44-hotel-suites/18440
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-24ceca0e589d88c1a3c73a2c85b101d9c6ec98ac95960045192c811666c3d162
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/lusail-plaza-tower-1/36667
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/lusail-plaza-tower-1/36667
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-273ba5582270e180acb2a6a91cd8cb4f8403b7c9a00457d12a8161946878471a
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/lusail-plaza-tower-3/36665
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/lusail-plaza-tower-3/36665
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-2ee741ea52a07fb6558b3dd297c4d661d2f2a832d4b7ac72106c4a7fbbf5191c
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/navigation-tower/1254
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/navigation-tower/1254
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-31be17fd6359869503b552083585a36380b02f3e7496e4b374c2caa2c03e2a0c
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/gateway-towers-aq-1/18412
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/gateway-towers-aq-1/18412
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-376ac80f8c8edd67f364e2ad4eefcb0ca044c713b240c296166c3ee9b4190e79
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/palm-tower-2/14227
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/palm-tower-2/14227
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-3782e77638e60b3652fe01a1f7030ac6c86b282efca434c8220cc1ea84b1b85d
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/lusail-plaza-tower-4/36666
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/lusail-plaza-tower-4/36666
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-380afb564fa93e4ccbba1ac7bc74b1a11c4dbdb0d54bc8475427140ba988c37f
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/fairmont-doha/18094
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/fairmont-doha/18094
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-3afd30c6afaf9498f16338486f9591ed85a5baf7b387a0effaf67e36d56c8695
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/tornado-tower/1677
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/tornado-tower/1677
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-40add4a6ebc347e8c92543719e0e87437801aba697f8f2e336844f3265e8f02b
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/aspire-tower/535
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/aspire-tower/535
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-460b9dd1bfd741acee7e2ff7f52d816931796873d8b3846db50ba29a76913c08
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/intercontinental-hotel-west-bay/1246
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/intercontinental-hotel-west-bay/1246
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-48e95ac789ab0f553a753c6c128b83e40c09f0cbd5688d68910fb47fb25e2ed4
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/aleph-doha-residences/15571
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/aleph-doha-residences/15571
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-49ddcfe82748255c20ac1196e2233934accb4692be8da51828b707ab6ee38e67
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/marriott-marquis-city-center-doha-hotel-south-tower/1684
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/marriott-marquis-city-center-doha-hotel-south-tower/1684
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-4c2a1a36cdf15c46a6a8c1ce1eab88dca7d98df4023d78f38641778791ae94b4
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/merweb-hotel-city-center/1686
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/merweb-hotel-city-center/1686
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-4f7a52d8e113a71de6b09cc423dff87d2e83933177d54c6853990f0782b30c14
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/samrya-twin-towers-east/1819
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/samrya-twin-towers-east/1819
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-54c7d0bca304a5e4c6e0225894a6636933e0133935867faa32f09753e198a45d
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/shangri-la-hotel/1688
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/shangri-la-hotel/1688
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-5c1e38d9cd694b1ac0bb3dba45d76b4d00af0845799f57aba678b7eac95da274
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/city-centre-rotana-doha/1687
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/city-centre-rotana-doha/1687
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-5fce6c15a694244ca317ad1e05053269c4a9333ed5a6d4dec36188f06a103140
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/qatar-petroleum-district-tower-7/18411
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/qatar-petroleum-district-tower-7/18411
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-713e420cf257a59b7b797b6fed2f2ae25d2d939156ef9567362728676a4fa04d
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/raffles-doha/35531
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/raffles-doha/35531
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-715c77448e0a56116b1877403ac7ba22fb92c9ade9db366f02f3751d3577b1cf
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/marriott-marquis-city-center-doha-hotel/1685
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/marriott-marquis-city-center-doha-hotel/1685
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-73af4df8888bba403f4f6e643b2d5cc50d6f351804590845248e1b103c5da734
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/burj-al-mana/36473
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/burj-al-mana/36473
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-8ec9a0f61a5e9d6c31ae56222a48aa7ebc3d44f2113c782f28565d1d5ac843a1
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/pullman-doha-west-bay/8942
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/pullman-doha-west-bay/8942
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-9210431a4a6e6497f5bc8aef1cf0602246ac9fec311b9b2ec97353c50d37cc3d
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/corniche-park-towers/27148
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/corniche-park-towers/27148
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-92b90728b82573af9b2a519e1fc25080d2123eb3222283b4be7964f91ed088ba
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/al-fardan-tower-1/2425
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/al-fardan-tower-1/2425
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-950aa0383994347e966f094efbdfc55178f8c9f8d310893a1cca371a66663a69
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/qatar-international-islamic-bank-headquarters-tower/9917
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/qatar-international-islamic-bank-headquarters-tower/9917
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-9e53d298e85df42001c1528c405cd5272ce803566143b1114bb3b6fb740cad8f
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/lusail-plaza-tower-2/36668
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/lusail-plaza-tower-2/36668
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-acc52baa1d23120e4c53d07773a4d2587a4d858c38ff1b9e10a7a333de892d93
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/gateway-towers-aq-2/18413
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/gateway-towers-aq-2/18413
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-c119ffb0e1111d699ff8bc10ca156bd50a2775b72d0f8a1efdb552515ba8f6bb
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/al-asmakh-tower/26660
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/al-asmakh-tower/26660
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-caa1160fc2786e59b51fbf35bb8bab67eac796dea64544cf8b4a97d22b3703ea
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/kempinski-residences-and-suites/1243
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/kempinski-residences-and-suites/1243
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-eef81aaa60b0da1f951c663fda4ec654ed427fe242a3643cb89cee618638920d
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/al-biddatower/1356
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/al-biddatower/1356
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  ? landmark_the_skyscraper_center_council_on_vertical_urbanism/page-f1fd9da94286099c8b54da135ae2ef18d34914265b20257660f54e69fdaa90de
+  : version: 2
+    kind: citation_snapshot
+    url: https://www.skyscrapercenter.com/building/doha-tower/1083
+    reviewed_urls:
+    - https://www.skyscrapercenter.com/building/doha-tower/1083
+    - https://www.skyscrapercenter.com/index.php/faq
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_visit_qatar/page-3ff6630384fa730007906659b887db974b352195854c6323b9d4add1d55847be:
+    version: 2
+    kind: citation_snapshot
+    url: https://visitqatar.com/intl-en/things-to-do/art-culture/mosques/education-city-mosque
+    reviewed_urls:
+    - https://visitqatar.com/intl-en/things-to-do/art-culture/mosques/education-city-mosque
+    - https://visitqatar.com/intl-en/legal/terms-and-conditions
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_werner_sobek_ag/page-ded802dfa75bb2945d920fbe64326e4d3b0d778158710a84a50fc4fe86b46122:
+    version: 2
+    kind: citation_snapshot
+    url: https://www.wernersobek.com/projects/national-museum-of-qatar/
+    reviewed_urls:
+    - https://www.wernersobek.com/projects/national-museum-of-qatar/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikiarquitectura/page-67f4180d60901c86184deefc7fd019ceae2f3cc04e38d6cba6af8e2431462e4a:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikiarquitectura.com/building/museum-islamic-art/
+    reviewed_urls:
+    - https://en.wikiarquitectura.com/building/museum-islamic-art/
+    - https://en.wikiarquitectura.com/disclaimer/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikiarquitectura/page-d58c524f37b99a713c1becfa9c6fb1c60621a264d48082a7b0b14934b562efe4:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikiarquitectura.com/building/national-museum-qatar/
+    reviewed_urls:
+    - https://en.wikiarquitectura.com/building/national-museum-qatar/
+    - https://en.wikiarquitectura.com/disclaimer/
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-00ca3bd1229a1d4c401e197abdc1644fb12b2ade4f8d185b800548e907450069:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Palm_Towers_Doha
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Palm_Towers_Doha
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-09ebc8205b2113fe2851a8b02e740096c24270243101c740de382d47e8f539d5:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al_Fardan_Towers
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al_Fardan_Towers
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-0b0680820f19ffb345921b4227aa83d4a0fcba0d62cd9b0b2957460b46d9bc40:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Lusail_Plaza_Towers
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Lusail_Plaza_Towers
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-11d5db2af6356b5dac624a1016e5943962487e28dbf3a43ff80588bd5b8fc0e0:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Education_City_Mosque
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Education_City_Mosque
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-18581eeb2274f57faf93cf8f2355d2e373c7cb6ee122d32e271fd24b3a686e7b:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Doha_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Doha_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-1a42ed5c0e02c35d0db22048f75c2b67bade7ba327e4ea340042c5de5017737a:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Navigation_Tower_Doha
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Navigation_Tower_Doha
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-32a253b63d8f99e9a45e76c9e663a829c78172e3b0b5be261e680e01f4c3e5cb:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Qatar_Petroleum_District
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Qatar_Petroleum_District
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-6521569535b142e69ea03f5a78f62dc512cd5735b923dab5b64bffe9552884c1:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Aspire_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Aspire_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-67c5c2d3c0c5076ced4e5ea3d808d21ca8c9318ea22dce86860b915b4a24c3c1:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al_Faisal_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al_Faisal_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-6e56498694f360a8dde91c8fd3378565d5e1b3c2e91a8855b2af2a87778c4ba9:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Barzan_Towers
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Barzan_Towers
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-8366d2b26dc17946d3b088747d59b462f2d91a12bfe2c3bbd5faee623f437b07:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al_Fardan_Residences
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al_Fardan_Residences
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-83f36de33119d0dbc4703b52067fc1155a2ea03fdda6ff4980292fe943006433:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Katara_Towers
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Katara_Towers
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-88bb8679fe7e130c0713291b1788abde53e39f8b378898b20025e44a2ce5fc5a:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al_Mana_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al_Mana_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-8d3645b4a879104a81c763df9e5232d9962c4a4c3f410649d55fbb20bbdb8bcd:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al_Bidda_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al_Bidda_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-a031b7ecd4e42b565307a0a36d6978fec1d1ba1940ba4e2e5dba70582d591300:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/7_%28sculpture%29
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/7_%28sculpture%29
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-f2baab11a74d779cd525b6a728246653892513beb4eebb817730af648f865a32:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Tornado_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Tornado_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-f5a70c91c50e07ef825dc83dc166af8709f15f3bac3a4a388a66cf0ef73675e8:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/Al-Asmakh_Tower
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/Al-Asmakh_Tower
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-f787cf2b37b0b73cc7e8f2f30ecfb2cc1e21bb3d912ec838acd95ef31ed92780:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/World_Trade_Center_Doha
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/World_Trade_Center_Doha
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
+  landmark_wikipedia/page-fc9995c0b127ef734f08f7c27f7e90db98d9432cf1d06012982a748759db9a2b:
+    version: 2
+    kind: citation_snapshot
+    url: https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Qatar
+    reviewed_urls:
+    - https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Qatar
+    - https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+    columns: []
+    as_of: retrieval_date
+    publisher_date: null
+    period_fields: []
+    bounds_basis: unconfirmed
+    bounds_reason: Citation snapshot; no parsed rows or statistical bounds.
+    pins: []
+    evidence: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3
+    hold: null
+    max_bytes: 8388608
+    shape: {}
 
 host_pins:
 - *id010

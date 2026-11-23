@@ -13,7 +13,7 @@ usage() {
     'up' \
     'up --embedded' \
     'down' \
-    'test [--seed N]' \
+    'test [--seed N] [--suite NAME]' \
     'build-public [--seed N]' \
     'build-public --tenders-only [--resume]' \
     'build-public --gis-imagery-snapshot' \

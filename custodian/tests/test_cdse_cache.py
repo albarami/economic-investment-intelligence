@@ -19,8 +19,8 @@ from shapely.geometry import box
 
 from eii_custodian.publicdata.cdse import cache as c
 from eii_custodian.publicdata.cdse import contracts as k
+from eii_custodian.publicdata.fetch import registry
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
-from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
 
@@ -82,7 +82,14 @@ def metadata(t):
 
 
 def entry():
-    base = next(e for e in load_registry() if e.source_id == "satellite_cdse_backup")
+    # Validate only this declaration under the fixture's invented host policy.
+    base = registry._entry(
+        next(
+            row
+            for row in registry.read_yaml(registry.registry_path())["sources"]
+            if row["key"] == "satellite_cdse_backup"
+        )
+    )
     return replace(
         base,
         publisher="Invented fixture publisher",

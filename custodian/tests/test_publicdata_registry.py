@@ -985,8 +985,8 @@ def test_registry_counts_follow_decision_0026() -> None:
     )
     assert (
         len(entries)
-        == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1 - 3 + 1 + stac_item_count
-    )  # GBA now has two file rows; STAC items use the committed closed tuple.
+        == 285 + 4 + 4 + 8 + 1 + 1 + 1 + 2 + 4 + 1 - 3 + 1 + 70 + stac_item_count
+    )  # Main adds the second GBA file; S2-P53-cit adds 70 citation pages.
     assert not any(entry.licence_basis == "none_stated" for entry in entries)
     owners = [entry for entry in entries if entry.licence_basis == "owner_decision"]
     # S2-T28 moves exactly these advisor-confirmed CC BY rows to dataset basis.
@@ -995,8 +995,8 @@ def test_registry_counts_follow_decision_0026() -> None:
     # S2-P29 round B: supplied lead page reading records "Licence: Etalab 2.0".
     # S2-P35 moves Gravity and Atlas to dataset basis on the lead's readings.
     assert (
-        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1 - 2
-    )  # S2-T49 files; S2-T48 company web.
+        len(owners) == 26 + 13 + 3 + 4 - 3 + 8 + 1 - 2 - 1 + 2 + 1 - 2 + 51
+    )  # S2-T49 files; S2-T48 company web; S2-P53-cit non-open citation pages.
     assert {
         entry.key
         for entry in entries
@@ -1215,6 +1215,22 @@ def test_baci_registry_pending_and_nightly_policy() -> None:
         "schools_private_directory",
         "awards_owner_scrape",
         "bldg_gba",
+        # S2-P53-cit: citation acquisitions are not nightly fetches.
+        "landmark_business_destinations",
+        "landmark_dezzzme",
+        "landmark_fifa",
+        "landmark_megatalls",
+        "landmark_nabk_mast_climber_rental_qatar",
+        "landmark_qatar_museums",
+        "landmark_scraperbase_com",
+        "landmark_skyscraperpage_com",
+        "landmark_stadiumdb_com",
+        "landmark_the_national",
+        "landmark_the_skyscraper_center_council_on_vertical_urbanism",
+        "landmark_visit_qatar",
+        "landmark_werner_sobek_ag",
+        "landmark_wikiarquitectura",
+        "landmark_wikipedia",
     }
     assert exclusions(entries) == expected
     planted = [

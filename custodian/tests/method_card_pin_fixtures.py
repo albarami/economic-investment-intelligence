@@ -23,6 +23,7 @@ import yaml
 from custodian.tests.test_source_completeness import entry
 from custodian.tests.test_source_completeness import receipt as build_receipt
 
+from eii_custodian.publicdata.assembly_io import write_record
 from eii_custodian.publicdata.method_card_validation import CONFIGURATION_PINS
 
 PIN_GROUPS = {
@@ -187,7 +188,11 @@ def case(tmp_path):
                 "unpinned_reason": None,
             }
         )
-    config_path = write_json(tmp_path / "invented-generation.json", configuration)
+    # The recorded configuration uses the assembly writer's own canonical
+    # serialization, so the persisted production bytes hash to the recorded
+    # settings hash of every checked row.
+    config_path = tmp_path / "invented-generation.json"
+    write_record(tmp_path, "invented-generation.json", configuration)
     for row in rows:
         row["settings_sha256"] = digest(config_path.read_bytes())
     record = {
@@ -232,6 +237,18 @@ def pending(row):
         values={},
         unpinned_reason="awaiting the live public build of S2-T08 part B",
     )
+
+
+def producer_rows(rows):
+    """Producer results for a pin phase: pin id, values and lineage only."""
+    return [
+        {
+            "pin_id": row["pin_id"],
+            "values": row["values"],
+            "source_lineage": row["source_lineage"],
+        }
+        for row in rows
+    ]
 
 
 def lineage_context(record):

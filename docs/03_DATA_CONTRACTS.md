@@ -805,7 +805,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_sector_accounts` | `activity_code` (ISIC Rev.4); `period`; `indicator` string; `value` decimal(18,2); `unit` string |
 | `pub_wage_table` | `table_code` (names the public table, so conflicting tables are never mixed; master OI-03); `period`; `breakdown_key` string (canonical `dimension=value` pairs or `ALL`); `indicator`; `value` decimal(18,2); `unit` |
 | `pub_customs_import` | `tariff_code` string (as published, 12 digits for 2025 onwards); `description_en`, `description_ar` string; `origin_iso3` string; `period`; `value_qar` decimal(18,2); `weight_kg` decimal(18,2) (Y); `quantity` decimal(18,2) (Y); `quantity_unit` string (Y) |
-| `pub_property_sale` | `district_key`; `municipality_code`; `period` (`YYYY`); `property_type` (from the Arabic source field); `deal_count` int; `median_price_per_m2` decimal(12,2) (Y, null when `deal_count` is 0) |
+| `pub_property_sale` | `district_key`; `municipality_code`; `period` (`YYYY`); `property_type` (from the Arabic source field); `deal_count` int; `median_price_per_m2` decimal(12,2) (Y, null when `deal_count` is 0); `as_of` date (Y, null when `deal_count` is 0; retrieval date of the contributing selected snapshot) |
 | `pub_census_zone` | `zone_code`; `period` (`2020`); `indicator`; `value` decimal(18,4); `unit`; `source_id` |
 | `pub_population_municipality` | `municipality_code`; `period`; `indicator` (`residents`, `employed`); `value` decimal(18,4); `unit` (`persons`); `source_id` |
 | `pub_census_national` | `period`; `indicator` (the audit pairs of DAT-128 plus the two C8 pairs below); `value` decimal(18,4); `unit`; `source_id` |
@@ -1179,9 +1179,26 @@ raised by the redirect guard before a redirected send;
 blocked or unreviewed URLs/redirects, pin and TLS refusals, and archive integrity
 failures refuse the intake with their closed reason. There is no passing threshold. A duplicate proof link must agree
 with every intake row using it: each intake winner must match a row in the
-complete awarded-company table. One or more winner rows are retained; zero
-refuses. The table is bound to its preceding award heading, excluding the
-opened-bids table, and the award date is read from `span#lblAwardedDate`. The registration match report retains every original
+complete awarded-company table. One or more winner rows are retained; an empty
+award table refuses. Under [proposed decision 0095](decisions/0095-award-pages-without-an-award-section-or-date.md)
+items 1 and 2, a page without an award section returns the closed
+`[{"proof_outcome": "proof_award_absent"}]` marker only with zero exact award
+headings, every h3's complete stripped text in the declaration's closed
+`shape.sections[*].heading` list and exactly one awarded-date span. Unknown or
+prefix-only headings, multiple award headings and missing or duplicate date
+spans still refuse `schema_missing`. The four production non-award headings
+were supplied by the lead in declaration commit `1efc5438`. The table is bound to
+its preceding award heading, excluding the
+opened-bids table, and the award date is read from `span#lblAwardedDate`.
+With a nonempty award table an empty or whitespace-only date is null and carries
+`proof_date_status: proof_date_absent`; a set date has no marker. Nonempty
+malformed dates still refuse `snapshot_date_missing`. The proof reader preserves
+the date (null becomes empty text) and marker; it and the checker refuse
+`schema_missing` for an unknown marker or inconsistent date/marker pair. The
+comparison still uses only company, registration and approved value, never the
+date. A per-link marker is recorded beside the result, never as a comparison
+reason, so date absence alone changes neither match nor mismatch.
+The registration match report retains every original
 row and its match/refusal reason. Registration equality precedes exact company
 name equality after the closed normalization in document 04, section 2.4.
 Whitespace-only registrations never match, and duplicate register entries remain
@@ -1192,7 +1209,7 @@ Under decision 0064 item 41, amended by [decision 0088](decisions/0088-award-pro
 `method: awards.report_links@v1`, `scope: all_links`, the sorted distinct nonblank
 `report_urls`, `distinct_frame_count`, `checked_count`, `matched`, `mismatched`,
 `failed_fetches`, `matched_name_not_compared`, `intake_value_absent`,
-`proof_value_absent`, `proof_mismatch`, `match_rate`, `incomplete`, `status` and `results`. Every link is
+`proof_value_absent`, `proof_mismatch`, `proof_award_absent`, `proof_date_absent`, `match_rate`, `incomplete`, `status` and `results`. Every link is
 checked once, with results in URL order, through the existing bounded retry reader and reviewed proof scope.
 S2-P46 adds the per-link acquisition and offline replay contract of
 [proposed decision 0091](decisions/0091-award-proof-acquisition-and-offline-replay.md)
@@ -1200,10 +1217,17 @@ items 1 to 6: proofs survive a shape refusal, are rehashed before reuse, and a
 closed `refused` result still blocks publication after the full frame is checked.
 The immutable `proof_checks` receipt retains the full diagnostic result list and
 `award_readers` records declared width, fallback flag and closed fallback reason.
-The publication receipt retains `award_readers`; its `award_links` schema for
-publishable results is unchanged.
-Each result has `report_url`, `result` and `reason`: a `matched` result uses
-`matched` or `matched_name_not_compared`; a `mismatched` result uses, in fixed
+The publication receipt retains `award_readers`; proposed decision 0095 item 4
+adds the closed `proof_award_absent` mismatch reason and counter to `award_links`.
+Each result has `report_url`, `result` and `reason`, plus optional
+`proof_date_status: proof_date_absent` only for a compared award table with an
+empty date. Both full-link and sample receipts recompute the separate
+`proof_date_absent` counter from these markers, once per link; it adds to none of
+`matched`, `mismatched` or `failed_fetches`. Unknown markers, markers on
+fetch/refused/no-award results and inconsistent counters refuse the existing
+closed metadata validation. A `matched` result uses
+`matched` or `matched_name_not_compared`; the no-award marker produces
+`mismatched` with reason `proof_award_absent`. Other mismatches use, in fixed
 precedence, `intake_value_absent`, `proof_value_absent` or `proof_mismatch`;
 fetch failures use only `proof_fetch_failed`,
 `unreachable`, `http_status` or `body_bytes`. Links whose bounded read fails stay in the checked
@@ -1233,7 +1257,7 @@ exact name equality; otherwise registration and value may earn
 compared-name match, then a match without name comparison, then the fixed
 mismatch precedence. Any failing winner defeats the link; otherwise any name
 not compared labels it. `matched_name_not_compared` is a subset of `matched`,
-and the three mismatch-reason counts sum to `mismatched`. The card shows the
+and the four mismatch-reason counts sum to `mismatched`. The card shows the
 matched total and the name-not-compared subset separately. The seeded sample
 retains the same closed reasons and counters; both receipt validators recompute
 them. For publishable results the register join, denominator, incompleteness and fetch rules remain unchanged.
@@ -2690,6 +2714,17 @@ terms, retrieval time and every input hash. Both release kinds consume the same
 validated tables. The later full-release owner must preserve this manifest
 chain and apply the rest of DAT-83; these reusable builders do not implement the
 placeholder release command or the other tables' privacy checks.
+
+Assembly handoff (S2-T49, S2-P64): the `register_tables` phase consumes only a
+lead-staged, pin-verified `register_bundle/` and `register_bundle_pin.json` in
+the allowed cache; a symlinked `register_bundle/` or `tables/` component is
+refused as missing. It re-verifies the manifest chain, receipts, table bytes
+and released rows against the run's own frame hash before crediting keys
+`biz_register` and `fc_register/file`, keeping per-period lineage. A missing
+kept snapshot month is reported `snapshot_not_kept`, never filled. The receipt
+list is bound to the tables only through the lead's manifest pin; raw register
+files are not retained, so a stale receipt list under a fresh pin is not
+detectable by the reader.
 
 ## Structured Public address reader — decision 0079
 

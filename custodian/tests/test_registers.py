@@ -326,6 +326,20 @@ def test_receipt_chain_is_complete_and_key_scoped(tmp_path, frame, plant):
     assert not (tmp_path / "current").exists()
 
 
+@pytest.mark.parametrize("files", [{}, {"establishments": "not bytes"}])
+def test_capture_file_set_and_body_plants_refused(tmp_path, frame, files):
+    item = replace(capture(), files=files)
+    with pytest.raises(RegisterError, match=r"^receipt_files$"):
+        build(
+            tmp_path,
+            "public_only",
+            frame,
+            (item, capture("fc_register")),
+            (),
+        )
+    assert not (tmp_path / "current").exists()
+
+
 def test_history_keeps_exited_company_and_earlier_location(tmp_path, frame):
     earlier = capture(period="2026-11")
     moved = capture(period="2026-12", files=inputs(rows=[commerce(lon="15.25")]))
@@ -827,3 +841,30 @@ def test_input_only_nationality_is_header_checked_and_dropped(frame, column):
         altered = ("\n".join(",".join(row) for row in rows) + "\n").encode()
         with pytest.raises(RegisterError, match=r"^input_schema$"):
             parse("biz_register", {"establishments": altered}, frame)
+
+
+def test_capture_receipt_not_a_mapping_refused(tmp_path, frame):
+    item = replace(capture(), receipt=5)
+    with pytest.raises(RegisterError, match=r"^receipt_schema$"):
+        build(
+            tmp_path,
+            "public_only",
+            frame,
+            (item, capture("fc_register")),
+            (),
+        )
+    assert not (tmp_path / "current").exists()
+
+
+def test_capture_receipt_missing_key_refused(tmp_path, frame):
+    item = capture()
+    side = {name: value for name, value in item.receipt.items() if name != "version"}
+    with pytest.raises(RegisterError, match=r"^receipt_schema$"):
+        build(
+            tmp_path,
+            "public_only",
+            frame,
+            (replace(item, receipt=side), capture("fc_register")),
+            (),
+        )
+    assert not (tmp_path / "current").exists()

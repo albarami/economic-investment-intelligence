@@ -25,15 +25,41 @@ from eii_custodian.publicdata.places.review import (
 _HEADER = "place_id,check_date,reviewer_role,verification_link,status,source_id\n"
 _BUILD = date(2026, 11, 14)
 _REPO = repository_root(Path(__file__)) / "custodian" / "publicdata" / "review"
+_CDLA = "CDLA-Permissive-2.0"
+_REVIEWED_ATTRIBUTION = (
+    ("AllThePlaces", "CC0-1.0", "Data from AllThePlaces. Available under CC0 1.0."),
+    (
+        "Foursquare",
+        "Apache-2.0",
+        "Data from Foursquare. Copyright 2024 Foursquare Labs, Inc. All rights"
+        " reserved. Available under Apache 2.0. Foursquare data was transformed to"
+        " the Overture schema. Changed: 2026-03-18. NOTICE.txt.",
+    ),
+    ("Microsoft", _CDLA, "Data from Microsoft. Available under CDLA Permissive 2.0."),
+    (
+        "OpenTravel",
+        _CDLA,
+        "Data from OpenTravel Alliance. Available under CDLA Permissive 2.0.",
+    ),
+    ("PinMeTo", _CDLA, "Data from PinMeTo. Available under CDLA Permissive 2.0."),
+    ("Uberall", _CDLA, "Data from Uberall. Available under CDLA Permissive 2.0."),
+    ("meta", _CDLA, "Data from Meta. Available under CDLA Permissive 2.0."),
+)
+
+
+def test_committed_attribution_holds_the_seven_reviewed_tokens() -> None:
+    """The committed table loads as exactly the reviewed tokens, texts and licences."""
+    origin, rows = load_attribution(_REPO / "places_ovt_attribution.csv", None)
+    assert origin == "committed"
+    assert rows == tuple((token, text) for token, _, text in _REVIEWED_ATTRIBUTION)
+    for _, licence_id, text in _REVIEWED_ATTRIBUTION:
+        assert f" Available under {licence_id.replace('-', ' ')}." in text
 
 
 def test_committed_review_files_are_headers_only() -> None:
-    """The committed files hold a header or an empty list and no invented row."""
+    """The still-unfilled files hold a header or an empty list and no invented row."""
     verified = (_REPO / "verified_places.csv").read_text(encoding="utf-8")
     assert verified == _HEADER
-    assert (_REPO / "places_ovt_attribution.csv").read_text(encoding="utf-8") == (
-        "dataset_token,licence\n"
-    )
     assert (_REPO / "places_ovt_categories.csv").read_text(encoding="utf-8") == (
         "basic_category,category_class\n"
     )

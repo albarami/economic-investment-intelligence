@@ -2707,13 +2707,16 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
   - `c14.medians_2024`
   - `c14.medians_2025`
 - DEFERRED TO SLICE S7 ([decision 0094](docs/decisions/0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md)): the S2 gate accepts these five pending pins only while the record row's `unpinned_reason` begins `OI-283: `; every other pin above is owed at slice S2, and the S7 gate refuses each of these five by name until it is pinned. One row per pin:
+- DEFERRED TO SLICE S7 ([decision 0094](docs/decisions/0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md)): the S2 gate accepts these five pending pins only while the record row's `unpinned_reason` begins `OI-283: `; every other pin above is owed at slice S2, and the S7 gate refuses each of these five by name until it is pinned. A pending deferred record row binds its artifact row to the closed pending representation (`values == {}`, `source_lineage == []`); the consumer refuses a stand-in value or lineage beside an unpinned record row (round 2, review RV1). Until S2-T08 part B binds the inputs, the phase stays pending (round 3, ruling L-1494): it writes no pair and no artifact, records its closed pending reason `pin_inputs_missing` in the build report's S2-T09 confirmation row, and the live run continues to `final_audit`, `draw` and `reports`, so their defects are found; `require_complete` still refuses the pending build (`assembly_gate_pending`), and a stale pair of an earlier run is removed before any source read and never credited; the pending S2-T09 row also stays pending whatever pair sits on the disk — a valid stale pair or one rewritten after the sweep — because the pending run wrote none of it (round 4, review N1). One row per pin:
   - `c6.expected_clq` deferred to slice S7: reason, the expected co-location quotients are outputs of the C6 neighbour calculation, whose code is not built at slice S2; computed and pinned by task S6-T10; decision 0094.
   - `c6.expected_p` deferred to slice S7: reason, the expected permutation p values are outputs of the C6 neighbour calculation, whose code is not built at slice S2; computed and pinned by task S6-T10; decision 0094.
   - `c6.expected_q` deferred to slice S7: reason, the expected false-discovery q values are outputs of the C6 neighbour calculation, whose code is not built at slice S2; computed and pinned by task S6-T10; decision 0094.
   - `c7.shared_b_given_a` deferred to slice S7: reason, the expected share shared(B | A) is an output of the C7 shared-reach calculation, whose code is not built at slice S2; computed and pinned by task S7-T05; decision 0094.
   - `c7.shared_a_given_b` deferred to slice S7: reason, the expected share shared(A | B) is an output of the C7 shared-reach calculation, whose code is not built at slice S2; computed and pinned by task S7-T05; decision 0094.
 - DONE SO FAR: Pass 1 supplies the reviewed closed record validator, method-section synchronization, callable fail-closed S2/S7 completion evidence and invented-fixture arithmetic/replay tests. No live value is written; the method document is unchanged. Sixteen configuration-only pins and thirteen source-derived pins remain unpinned; configuration evidence is distinct from source lineage. Package P06 (2026-11-20) adds `method_card_producer.produce_pin_artifact`, threads registry and receipts through completion validation, and `gate_report.method_pin_gate` on the S2 acceptance path, with invented-fixture tests; the committed record and method-card blocks are still pending live build and reviewer checks.
+- DONE SO FAR: Pass 1 supplies the reviewed closed record validator, method-section synchronization, callable fail-closed S2/S7 completion evidence and invented-fixture arithmetic/replay tests. No live value is written; the method document is unchanged. Sixteen configuration-only pins and thirteen source-derived pins remain unpinned; configuration evidence is distinct from source lineage. Package P06 (2026-11-20) adds `method_card_producer.produce_pin_artifact`, threads registry and receipts through completion validation, and `gate_report.method_pin_gate` on the S2 acceptance path, with invented-fixture tests; the committed record and method-card blocks are still pending live build and reviewer checks. Package S2-P63 (2026-11-22) adds the production writer and its `method_pins` phase between `busyness` and `final_audit`: the phase persists the pin artifact and the generation configuration as one pair from the recorded configuration and producer results bound to the build, carries the five deferred result pins only as the closed pending representation (empty values and empty lineage, no stand-in) and refuses every other pending row, an incomplete pin set and a half-written pair; an unbound input keeps the build pending instead (round 3, ruling L-1494): no pair is written, the closed reason `pin_inputs_missing` is recorded in the build report, the run continues to `final_audit`, `draw` and `reports`, and `require_complete` still refuses (`assembly_gate_pending`), with a stale pair of an earlier run removed before any source read and never credited. Round 4 (review N1) also zeroes the gathered S2-T09 evidence while the phase is pending, so no pair on disk — valid, stale or rewritten after the sweep — is ever credited by a pending run, and the half-pair cleanup never deletes through a symlinked assembly folder or cache root (review N2). The live build inputs, the different-maker source checks and the governed card blocks remain pending.
 - P06 review correction: The producer currently assembles an in-memory artifact; method_pin_gate is an uncalled wrapper. Production artifact/configuration writing and S2 acceptance integration remain pending. This review ran no tests and establishes no live closure.
+- Superseded in part (2026-11-22, S2-P63): the production artifact/configuration writer now exists and runs as the `method_pins` phase before `final_audit`, and the S2 acceptance call through `gather_audit` has existed since P06 fix2. The live inputs, the different-maker reviewer checks and the governed card writes of the NEEDED paragraph below remain pending exactly as written; nothing here closes the item.
 - NEEDED: S2-T08 part B produces the exact regression inputs and recorded generation configuration. Confirm the real artifact/configuration paths, schemas, adapters and per-card readers; replay the exact inputs, including C14 riyal medians/deal counts, C5 parent review/windows, live C6 projection/category handling and C7 geometry. A different maker checks every source-derived value against its source/receipt and every setting against the recorded configuration, then checked values enter the governed method-card blocks. Integration owners call completion_evidence from the S2/S7 acceptance paths. Any value still unpinnable remains individually pending with its reason. No invented fixture or open-item entry clears either gate.
 - NEEDED BY: S2-T08 part B and the S2 gate; also the S7 gate under MTH-03/TST-198.
 
@@ -6258,3 +6261,196 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 - PO-S2-19-05 — OPEN, 2026-11-22 (S2-RDP H1): ten place keys of the flagship and showcase lists stay null because no single normalised name match exists in the receipted cache. An alias list is needed to fill them, and none is invented.
 - PO-S2-19-06 — RECORDED, 2026-11-22 (slice S3 environment): the browser suite of `web/` fails on the round-8 control head and on the S3 base in the same way ("Playwright Test did not expect test() to be called here"), so it is not introduced by S3-J2 or S3-P09.
 - PO-S2-19-07 — RECORDED, 2026-11-22 (slice S5 stack): 13 tests fail on the local S5 base `6da11f9e` (`test_release_registry` 4, `test_employment_swap` 9). They fail the same way before and after S5-T06, so they belong to the S5 stack, not to that task.
+
+## S2-CI — hosted tests as parallel suites (2026-11-22)
+
+- **OPEN — PO-S2-CI-01 (first hosted run).** Before the matrix form of the required check `tests` is relied on, the lead compares its first hosted run line by line with the sequential hosted run of PR 124 (15,184 passed plus one failure): every suite of the table appears once with the same passed, failed and skipped counts, and the planted-failures job prints both shard cases as blocked.
+- **OPEN — PO-S2-CI-02 (custodian part 1 time, raised by the builder).** Part `python-custodian-1` ran 1,082 seconds of its 1,200-second limit (90.2%) in the PR 124 run. This change keeps the part whole: document 12 and [decision 0086](docs/decisions/0086-custodian-part-limit-and-watch.md) require a part whose green hosted time passes 720 seconds to be split by a further decision record using decision 0060's method, and that record is the owner's or lead's to write, not a builder's. In the matrix the part still runs alone on one runner, as it did in the sequential run, so its margin is unchanged at about 118 seconds (9.8%). NEEDED: a decision record for the split (for example, part 1 halved by a further bit of the same module-path digest, leaving parts 2 and 3 unchanged, with the mutation runner's part parsing updated).
+- **OPEN — PO-S2-CI-03 (round 3, raised by the builder).** The aggregate `scripts/ci_aggregate.py` now refuses every row of the CF1 family itself (matrix `exclude`, `include` or another axis, a matrix or strategy written as an expression, `continue-on-error`, a condition, `needs`, a shell default or a strategy on jobs `static-checks`, `suite`, `web-spikes` and `tests`, `continue-on-error`, a condition or a shell on their steps, a changed own command, `tests` without `always()` or without both needed jobs). A `tests` job that lost `always()` is skipped when a suite fails, so the same shape check also runs, with the workflow alone, in job `static-checks`, which needs no job. Residual: one change that removes both `always()` from `tests` and the shape step from `static-checks`, merged while a suite fails, is refused only by the workflow guard inside `python-guards`; the aggregate refuses either change alone whenever `tests` runs. NEEDED: the lead decides whether a branch rule or a further independent job closes that combined change. Also, in the builder's overnight sandbox `./eii test --suite python-guards` gave 1,170 passed and 7 setup errors in `test_clean_environment` (FileNotFoundError copying the default uv cache, because the runner removes the redirected `UV_CACHE_DIR`); the lead reruns that suite in an ordinary shell.
+
+- PO-S2-P56-01 — **PROPOSED OPEN ITEM** (2026-11-22): the closed assembly refusal-log implementation and invented-input evidence require independent review by a maker other than the builder before approval or merge. The worker supplies one commit and its bundle; no network, real cache or release build was used. The supplied study includes three rows explicitly labelled informational or not refusals; the return identifies these separately from its refusal-row matrix. NEEDED: review the returned commit, its complete inventory mapping and guard-deletion evidence, and run the lead-owned integration evidence before a slice-gate claim. No logging change closes a release criterion.
+
+- PO-S2-P56-01 round-2 clarification (R5), 2026-11-22: inventory plants raise directly from the stage producer, including rows whose real producer catches the exception and continues or returns a withheld result. For those rows, the asserted stage-call prefix proves exception delivery and log delivery only; it does not prove the real producer's stopping behaviour. Independent review and lead-owned integration evidence remain required.
+- PO-S2-P56-02 — **PROPOSED OPEN ITEM** (R2, 2026-11-22): preparation, plan validation and the closing check currently share the closed stage word `require_complete`. Consider a separate closed `plan` stage word for preparation and validation in a reviewed follow-up. This round adds no stage word and changes no logging policy.
+
+- PO-S2-P56-03 — **PROPOSED OPEN ITEM** (round 3, 2026-11-22): lens-2 finding 3 remains a design limitation: exception subclasses absent from the exact-type policy tables classify to the plain `<stage>_unexpected` fallback. Explicit entries for subclasses of the pinned libraries, each with a plant, are a later reviewed choice. This round changes no subclass policy and claims no class-suffix detail for those exceptions.
+
+- PO-S2-P56-01 round-4 evidence clarification, 2026-11-22: the unchanged fixture guard is red on the base and the inventory moves to a Python literal with exact payload and expanded-case equivalence (262 rows, 909 cases). Both joined reader observers have individual deletion plants. This confirms the forced join locally; fresh different-maker review and lead-owned integration evidence remain required. No release criterion is closed. See PROGRESS.md, S2-P56 round 4.
+## S2-P64 bounded open records (2026-11-22, task S2-T49)
+
+- DONE SO FAR: `registers/bundle.py` re-verifies a lead-staged, pin-verified
+  projection bundle (`register_bundle/` plus `register_bundle_pin.json` in the
+  allowed cache) and `Production.register_tables` consumes only it; raw register
+  paths and `EII_*_REGISTER_FILE` settings are never opened by assembly. Both
+  tables are credited to keys `biz_register` and `fc_register/file`, bound in
+  `assembly/register_tables.json` with per-period receipt lineage and kept-month
+  coverage, drawn by `draw_tables` and counted "in use" by source completeness.
+  New handoff refusal codes: `register_bundle_missing`, `register_bundle_pin`,
+  `register_bundle_manifest`, `register_bundle_receipt`, `register_bundle_source`,
+  `register_bundle_table`, `register_bundle_period`; existing codes reused for the
+  same rules (`frame_hash_mismatch`, `receipt_*`, `snapshot_*`, `release_*`,
+  `registration_egress`).
+- NEEDED: the lead's real-file adapter run and the staged bundle produced from
+  real, hash-verified inputs; a different-maker review of this offline
+  implementation. Neither is claimed by this record.
+- LIMITS: invented stand-in fixtures only; no live register read, no release
+  command, no admission-policy or registration-key-exception change, no slice
+  gate. The receipt list binds the tables only through the lead's manifest
+  pin: raw files are not retained, so a stale receipt list under a fresh pin
+  is undetectable by the reader; pin review is the sole control. The
+  published-tower basis and sole-proprietor questions stay open as before.
+
+- PO-S2-RDP-01 — PROPOSED OPEN ITEM, 2026-11-22 (S2-RDP H1). (1) Area-type landmarks of `showcase_gazetteer.yaml` (the four area names) stay null unless exactly one receipted open place carries one of their names after `trim_collapse_whitespace_casefold`; which public point stands for an area needs a lead ruling, and no point is picked by hand (rule 8). (2) Verified at main `154333b5`: `places/fetch.py` `FILE_KEYS` holds `places_ovt/part-00014`, `bldg_ovt/part-00384` and `bldg_ovt/part-00385`, and `places/integrate.py` `_cache_points` builds area-request points from those keys only, while the stage resolves buildings from every receipted `bldg_ovt` parquet entry of the registry (`_buildings_from_registry`). Today the registry's only other parquet part, `bldg_ovt/part-00288`, carries skip reason `not_required_part_decision_0090`, so the two sets agree; a part added to the registry later would be resolved by the stage but would get no walk or drive area. H1 reads every receipted part, as the stage does. Needed: the lead states whether `_cache_points` should follow the registry.
+- UPDATE (2026-11-22, S2-RDP H1 round 4), PO-S2-RDP-01: ruling L-1462 accepted two round-2 deviations of H1. (a) H1 does not evaluate `_keep`'s `no_cell` exclusion, because the frame grid needs the whole frame; a key for a place outside the real grid is refused by the stage as `record_missing`, so no wrong key reaches a build; this stays open for the later task that gives H1 the frame grid. (b) Duplicate resolution runs with an empty `inside` set and empty status, which is conservative (H1 may leave null a row the stage would accept, and never writes one the stage drops); the build stage is the final gate. Point (1) of this item, the area-type landmarks: the rule in force is the exactly-one-normalised-name rule H1 already applies, so no point is picked by hand. Point (2) stays open.
+
+## S2-P53 — Landmark calibration and live follow-up (2026-11-22)
+
+- Proposed decision 0093 needs owner acceptance before code merge, per R9.
+  Placement is decided for the build (R0); no A-versus-B or licence question
+  is reopened and no value cut is proposed.
+- Resolve the brief's requirement to install publisher/page registry rows and
+  PUB-03 hosts against its explicit prohibition on committing researched URLs,
+  hosts and names. No concrete research metadata was installed offline. The
+  lead must make the reviewed metadata admission before live citation fetch.
+- Confirm the research's semantic `subject_kind` token against the selector's
+  documented completed-high-rise contract. Only keys, nesting and types were
+  inspected under the brief's shape-only restriction; no live selector count
+  is claimed. The corrected research remains the lead's live input.
+- Fetch admitted pages, run selection and exact ties in the lead's shell,
+  independently review the one local record, and load/verify it before clearing
+  pending. Unresolved ties remain counted; any manual tie would need separate
+  lead review and is not implemented. A zero-row list stays pending.
+- Error by reference height kind (roof versus architectural) is not computed
+  by the current GBA measurement. Mixed kinds and the measurement basis remain
+  explicit limitations; OI-310 and C-20 stay open.
+- Permanent page revision links, any share-alike notice needed for local use,
+  and the research's unresolved secondary corroboration lead need the lead's
+  source review. No researched page text or value is recorded here.
+- Test-harness correction: a new mocked HTTPS response initially returned
+  bytes indefinitely instead of EOF. That test process was interrupted (exit
+  130); the fixture now returns body then EOF. This was a deterministic fixture
+  defect, not a random failure or a transport retry. Its subsequent failing
+  assertion and passing check are recorded in the S2-P53 return.
+
+S2-P53 self-review correction: the new mutable cache placement requires the
+manifest hash to bind the bytes actually parsed, rather than a later file read.
+`LandmarkRecord` now keeps that body with the validated rows and pending status.
+The corresponding regression and the final repeated guard-deletion pass are
+recorded in the return. No privacy, source-selection or licence rule changed.
+
+S2-P53 check-context correction: a diagnostic documentation check using the
+standalone Git directory scanned operational `.overnight` files because it
+did not inherit the provided worktree's exclusions (exit 1). The prescribed
+`python3 scripts/check_docs.py` command uses the provided Git context, includes
+new untracked source files, and passed. No check, exclusion policy or committed
+ignore file was changed. This was a deterministic command-context error, not a
+random failure closed by a green rerun.
+
+S2-P53 negative-fixture correction: duplicate-point and duplicate-building
+plants now change one field each (one selected name, or one point geometry).
+Their earlier forms changed more than one independent input. Both specific
+refusals and their isolated guard deletions were rechecked after this repair;
+no production tie rule changed.
+
+Correction to the preceding S2-P53 sentence: the six refusal cases had passed
+when it was written; the isolated deletion repeats were still pending then.
+Their actual exits, rather than that premature wording, are recorded in the
+return and its deletion evidence.
+
+S2-P53 fixture-deletion follow-up: both corrected duplicate-claim guards were
+then deleted separately; each test run exited 1 and each source hash restored.
+The final task-specific run after restoration exited 0 with 75 tests passing.
+
+
+## S2-P53-cit — Publisher terms still to be read (2026-11-22)
+
+The supplied research marks the following readings `terms_not_found`; the
+registry uses `terms to be read` with checked date 2026-11-22. Under decision
+0026 item 3 these remain admitted with `owner_decision`, not excluded. The
+lead must obtain and record the terms reading; no permission is inferred.
+
+- Business Destinations, `landmark_business_destinations`: no terms page located in the supplied research.
+- Dezzzme, `landmark_dezzzme`: no terms page located in the supplied research.
+- FIFA, `landmark_fifa`: no terms page located in the supplied research.
+- NABK Mast Climber Rental Qatar, `landmark_nabk_mast_climber_rental_qatar`: linked terms page could not be read.
+- Scraperbase.com, `landmark_scraperbase_com`: no terms page located in the supplied research.
+- StadiumDB.com, `landmark_stadiumdb_com`: no terms page located in the supplied research.
+- Werner Sobek AG, `landmark_werner_sobek_ag`: no terms page located in the supplied research.
+
+The registry and host-installation hold in the historical S2-P53 entries is
+addressed by this part; it supplies no live acquisition, receipt, tie or
+height-completeness proof. Independent different-maker review remains with
+the lead, as do S2-T20, C-20 and OI-310.
+
+
+## S2-P53-cit3 — Whole-folder execution interrupted by SIGTERM
+
+On 2026-11-22 the worker's full `custodian/tests` execution returned exit 143
+(SIGTERM), with no pytest summary or reported assertion failure. Base:
+`0077ed22dd6722550a5a0b26d235abd1803ec593`; seed 53, `UV_OFFLINE=1`.
+Command: `uv run --locked python -m pytest custodian/tests -q
+-p no:cacheprovider --hypothesis-seed=53
+--basetemp=.overnight/tmp/pytest-full`. Evidence:
+`.overnight/OUT/custodian-full.log`, 4488 completed-test dots; next collected
+case `test_gis_snapshot.py::test_all_dates_mode_is_separate_complete_and_explicitly_selected[plant9]`.
+The termination's source is unconfirmed. A separately recorded whole-folder
+supervised run does not, by itself, identify or close this interruption.
+The lead owns runner diagnosis; no test or bound is weakened.
+
+
+S2-P53-cit3 supervised outcome: the separate full-folder command with
+`--basetemp=.overnight/tmp/pytest-full-supervised` ran from
+2026-11-22T18:38:46.391306+00:00 to 2026-11-22T18:56:46.460622+00:00, then its explicitly recorded
+eighteen-minute remaining-time bound stopped the process group. Child exit:
+143; 7230 completed-test dots, no final pytest
+summary. This known deadline stop does not establish the cause of the
+original SIGTERM or a completed full-suite result. The six regression fixes
+have 107 passing focused tests. Before acceptance, the lead must obtain a
+complete `custodian/tests` result under the existing test policy; no test,
+plant, timeout or tolerance is weakened.
+
+
+## Train S2-20 pick1 — forced join confirmation (2026-11-22)
+
+- PROPOSED OPEN ITEM PO-S2-20-PICK1-01: decision 0032 item 2 requires another maker to confirm the forced code/test combination before this train is accepted. S2-P53's registry count includes main's second GBA row and its citation pages. S2-P63's pending-state reset and declared output set coexist with main's refusal logging in `Production.run`; main's refusal-test stub expects no files for the unbound `method_pins` phase, retaining every assertion and case. Exact differences and validation outcomes are in `.overnight/RETURN.md` and the workspace evidence logs. The local builder's strict self-review does not supply independent confirmation. Hosted checks and the lead's exact-merge fresh-seed whole test remain owed.
+
+- PO-S2-20-PICK1-02: the final broad importer selection is incomplete/failed (real exit 130), with exact log `.overnight/OUT/importers.log`. The task time limit requires return now; no pass is claimed. Complete that required selection before accepting this join.
+## PO-S2-P66-01 — Exact non-award headings and lead replay (2026-11-22)
+
+OPEN. The S2-P66 brief and supplied diagnosis name four tender portal heading
+classes but give none of their exact text. The builder requested the four strings
+and has no reply. Do not infer strings from their translated descriptions or read
+stored pages to fill them. The production awards declaration retains its empty
+`shape.sections` list, so the thirteen diagnosed headed pages are not established
+as recognised by this delivery. Supply the four exact reviewed h3 strings in
+`custodian/publicdata/review/s2_t29_sources.yaml`, retain exact equality, and verify
+them on invented pages before different-maker review. Decision 0095 is Proposed;
+its null-date behavior is tested offline, not claimed as real-cache evidence. The
+lead replays the stored proofs offline after merge; no worker replay occurred.
+Lead update, 2026-11-22: the lead read the stored award pages in the lead's own shell and found
+thirteen pages without the award heading, carrying four distinct h3 texts. It wrote those four exact
+strings into the awards declaration's `shape.sections` in
+`custodian/publicdata/review/s2_t29_sources.yaml` (exact equality kept), without printing them.
+An offline replay (`scripts/awards_proofs.py replay`) on the lead's cache then exited 0 with
+`refused_count` 0, `proof_award_absent` 13, `incomplete` false, and no cache file written. The
+strings item is CLOSED; different-maker review remains.
+S2-T29 and OI-277 remain open. No random failure was introduced; the oversized
+extra test selection was deliberately interrupted (exit 130), not counted as a
+passing run. The required focused selection then passed without retries or skips.
+
+S2-P66 round-two correction to PO-S2-P66-01 (2026-11-22): the committed
+heading test now loads all four reviewed entries from the production declaration,
+one at a time and together, and refuses one appended unreviewed heading.
+The date marker required by L-1495 is recorded separately from comparison
+reasons under proposed decision 0095. The strings item remains closed;
+independent different-maker review and the lead's offline replay of the
+round-two marker remain open. No worker replay or real-cache result is claimed.
+
+S2-P66 round-three correction to PO-S2-P66-01 (2026-11-22): the supplied cf1
+review rejected a dated parser row losing only `award_date` at the version-two
+reader boundary. The correction requires all projected source keys and validates
+the date/marker pair after projection, with exact `schema_missing` one-key
+negatives and red/green guard plants. Local tests and checks are recorded in
+PROGRESS.md; this does not stand in for different-maker approval or the lead's
+stored-proof replay. Both remain open; no random failure or new source input is
+introduced.

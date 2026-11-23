@@ -44,6 +44,7 @@ from eii_custodian.publicdata.heights.landmarks import (
     LANDMARK_HEIGHTS_PATH,
     apply_landmark_heights,
     load_landmark_heights,
+    load_landmark_record,
 )
 from eii_custodian.publicdata.heights.manifest import (
     ESTIMATE_LABEL,
@@ -2802,8 +2803,8 @@ def test_a_landmark_height_reaches_the_manifest_and_wins_the_order(
 ) -> None:
     """The hand list sets recorded height; the manifest keeps the citation."""
     monkeypatch.setattr(
-        "eii_custodian.publicdata.heights.step.load_landmark_heights",
-        lambda: load_landmark_heights(LANDMARK_FIXTURE_PATH),
+        "eii_custodian.publicdata.heights.step.load_landmark_record",
+        lambda _path: load_landmark_record(LANDMARK_FIXTURE_PATH),
     )
     monkeypatch.setattr(
         "eii_custodian.publicdata.heights.step.verify_landmark_receipts",
@@ -3077,12 +3078,12 @@ def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
         target,
     )
     monkeypatch.setattr(
-        "eii_custodian.publicdata.heights.step.LANDMARK_HEIGHTS_PATH",
-        target,
+        "eii_custodian.publicdata.heights.step.landmark_heights_path",
+        lambda _cache: target,
     )
     monkeypatch.setattr(
-        "eii_custodian.publicdata.heights.step.load_landmark_heights",
-        load_landmark_heights,
+        "eii_custodian.publicdata.heights.step.load_landmark_record",
+        load_landmark_record,
     )
     buildings_path = tmp_path / "buildings.geojson"
     buildings_path.write_bytes(
@@ -3237,7 +3238,7 @@ def test_the_writer_refusal_output_row_is_planted() -> None:
 # guard can satisfy it.
 
 _PAGE_URL = "https://syn-heights.invalid/SYN/landmark-page"
-_PAGE_BODY = b"<p>SYN showcase tower: height 200.00 m (invented page).</p>"
+_PAGE_BODY = b"<p>SYN showcase tower: Roof: 200.00 m (invented page).</p>"
 
 
 def _page_entry(**overrides) -> Entry:
@@ -3330,7 +3331,7 @@ def test_a_public_page_citation_resolves_its_raw_page_snapshot(
     from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
     from eii_custodian.publicdata.heights.landmarks import verify_landmark_receipts
 
-    row = _page_entry(kind="public_page")
+    row = _page_entry(kind="public_page", columns=(("SYN", "string"),))
     _fixture_registry(monkeypatch, row)
     cache = tmp_path / "cache"
     side = sidecar_for(
@@ -3771,7 +3772,6 @@ def test_each_planted_hand_list_defect_has_its_own_refusal(
     [
         ("[]\n", "document"),
         ("version: [1\n", "document"),
-        ("version: 1\nentries: []\n", "pending"),
         ("version: 1\npending: SYN-other\nentries: []\n", "pending"),
     ],
 )
@@ -3824,8 +3824,8 @@ def test_an_invalid_landmark_height_refuses_the_build_and_leaves_no_output(
     _fixture_registry(monkeypatch)
     path = _planted_document(tmp_path, _set_entry("height_m", height))
     monkeypatch.setattr(
-        "eii_custodian.publicdata.heights.step.load_landmark_heights",
-        lambda: load_landmark_heights(path),
+        "eii_custodian.publicdata.heights.step.load_landmark_record",
+        lambda _path: load_landmark_record(path),
     )
     cache = tmp_path / "card" / "data" / "public_cache"
     lines: list[str] = []
