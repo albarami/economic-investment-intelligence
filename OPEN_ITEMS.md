@@ -6824,3 +6824,23 @@ introduced.
 - EVIDENCE: the builder's selection, the lead's verify and S2-P79.rv1 did not run that file. S2-P79.r2 (Anthropic Claude C) `f194c58724` adds both forms in table order and keeps the full equality; its sweep found no other pinning test to change; the test was red at the old head and green after, and it went red again when one table row was deleted.
 - NEEDED: none. From now on, the lead's verify of any change to the command table or the operations scripts also runs `scripts/tests` selected by command, table, usage, public assembly, development, serve and preflight.
 - NEEDED BY: closed.
+
+## OI-408 — Hypothesis deadline on a file-backed property in the hosted run
+
+- ID: OI-408
+- TYPE: RANDOM FAILURE (CLAUDE.md rule 39); fix merged with train S2-26 round 3
+- RAISED BY: the lead, 2026-11-24
+- CONCERNS: `custodian/tests/test_review_data_guards.py::test_category_duplicate_order` and `::test_venue_key_domain` (S2-P76).
+- EVIDENCE: hosted suite python-custodian-2 on PR 133 at `0cc22d6825`: first example 294.81 ms against the 200 ms deadline of the "eii" profile, replay 0.70 ms, then `FlakyFailure`. Each example creates a temporary folder and writes and reads CSV. S2-P76.r3 `fc9fbe18e9` sets `deadline=None` on both, as `test_method_pin_writer.py` does; a 350 ms stalled write was red before and green after. The hosted job was not rerun.
+- NEEDED: a green hosted run of round 3 and of the next trains. A green rerun alone never closes this item.
+- NEEDED BY: before the S2 gate record.
+
+## OI-409 — Older file-backed properties under the same deadline
+
+- ID: OI-409
+- TYPE: OPEN (same class as OI-408)
+- RAISED BY: S2-P76.rv3 (Cognition Devin), 2026-11-24
+- CONCERNS: nine `@given` properties outside S2-P76 that do file or folder work per example under the 200 ms deadline: `custodian/tests/test_register_tables.py` (four), `test_method_pin_precision.py`, `test_activity_class_members.py`, `test_fetch_fingerprint.py`, `test_build_own_run.py` and `test_s2_p42_awards_formulas.py`.
+- EVIDENCE: the review's targeted pass; the hosted failure of OI-408 shows the exposure on shared runners.
+- NEEDED: a sweep that re-enumerates every `@given` body in the repository and removes the exposure in the same way, with no assertion, strategy or example count changed.
+- NEEDED BY: before the S2 gate record.
