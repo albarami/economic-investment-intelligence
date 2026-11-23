@@ -5,7 +5,7 @@
 | Status | Accepted, 2026-11-23, by the owner |
 | Date | 2026-11-23 |
 | Owner | The owner |
-| Decided by | The owner's exact words, relayed on 2026-11-23 at 08:05: "option B"; acceptance of Option B for the S2 lanes, retaining every criterion, test and review |
+| Decided by | The owner's exact words, relayed on 2026-11-23 at 08:05: "option B"; acceptance of Option B with the companion inventory's carries, retaining every criterion, test and review. S2-T29#11 and S2-T27#9 are the lead's later corrections under the same lane rule, as distinguished below. |
 | Purpose | Apply the owner's lane rule by source-field use, preserve every S3 and portal-launch input, and carry later work to its real consumer without dropping its obligations. |
 | Amends | TASKS.md S2-T08 source-completeness/confirmation scope, S2-T10 exact carries and Depends exclusions, S2-T49's page-name-inventory ordering, the exact moved-box annotations in **Box carry ledger**, and S2-T44/S2-T51 status words; document 14 PLN-25/PLN-28/PLN-29 only for named pending confirmations, section 10 completion accounting and ENHANCEMENT BACKLOG; matching document 12 TST-168/TST-198/TST-280 and section 5 S2 completion wording, and document 15 REV-33/REV-41 completion records. No other pin, rule, test, bound or tolerance changes. |
 | Read first | TASKS.md S2-T08/S2-T09/S2-T10/S2-T13/S2-T14/S2-T17/S2-T19/S2-T27/S2-T28/S2-T29/S2-T30/S2-T36/S2-T49 and the consumers below; document 03 **7.2 Table catalogue**, **Cache-only announced-project evidence (S2-T30)**, **S2-T36 company-only register cache contract** and **Register file projections (S2-T49)**; document 07 MTH-03/MTH-51/C14/C41; document 14 **10. slice S2** and **11. slice S3**; decisions 0084, 0085 and 0094. |
@@ -20,13 +20,13 @@ His value rule says:
 
 > value is not lost because we are not dropping it just like the tender or mutation.
 
-His subsequent answer **"option B"** accepts the field-reader option and its exact pending carries, rather than a whole-collector reading of S3-T01's Depends line. It does not assert successful acquisition, implemented carry validators, independent maker approval or a passed gate. This record implements the accepted planning amendment through the normal review flow; it authorizes no new spend, credential, public host or external-path access.
+His subsequent answer **"option B"** accepts Option B with the companion inventory's carries, rather than a whole-collector reading of S3-T01's Depends line. The S2-T29#11 move to background S3 and the S2-T27#9 return to the path are the lead's later corrections under the same lane rule; the background-S3 interpretation is the lead's, not the owner's words. The final counts equal the accepted **95 path / 14 background / 24 after go-live**, but their contents differ by these two boxes: the companion inventory held S2-T29#11 on the path and S2-T27#9 in background S4. It does not assert successful acquisition, implemented carry validators, independent maker approval or a passed gate. This record implements the accepted planning amendment through the normal review flow; it authorizes no new spend, credential, public host or external-path access.
 
 The inventory is the supplied set of 133 acceptance boxes, not every checkbox in S2 and not a count of sources. A shared criterion is counted once. Source-level carries inside a path criterion add no box. All full texts, existing tests and dated reopenings remain in [TASKS.md](../../TASKS.md); the exact inventory appears in **Complete box inventory** below.
 
 **Accident correction, verified against the task text.** The package note labels accident activation S2-T29#1. That number actually denotes the additional-page receipt criterion, including dated event calendars. Accident activation is **S2-T29#11**, beginning "the `accident` row of S2-T28 is activated" and retaining its live byte spans, shared bounded reader and planted over-span refusal. S3-T12#11 reads "from S2-T28's dated accident table". Therefore #11 is **background S3**, ready before S3-T12#11 starts and before the S3 gate. #1 remains the whole background-S4 page-receipt box. The companion draft held #11 on the path; this correction moves that actual box, rather than relabelling #1 or deleting a receipt obligation. No real cache was inspected here.
 
-Final whole-box arithmetic, from **Complete box inventory**: path **109 − 15 = 94**; background **3 + 12 = 15** (S3 **1**, S4 **6**, S6 **2**, S7 **6**); after final go-live **21 + 3 = 24**; total **94 + 1 + 6 + 2 + 6 + 24 = 133**. Fifteen former path boxes move, twelve to background and three to after final go-live. The owner's acceptance relay preceded the accident correction; the corrected row universe is unchanged.
+Final whole-box arithmetic, from **Complete box inventory**: path **109 − 14 = 95**; background **3 + 11 = 14** (S3 **1**, S4 **5**, S6 **2**, S7 **6**); after final go-live **21 + 3 = 24**; total **95 + 1 + 5 + 2 + 6 + 24 = 133**. Fourteen former path boxes move, eleven to background and three to after final go-live. The owner's acceptance relay preceded both lead corrections; the corrected row universe is unchanged.
 
 ## Decision
 
@@ -47,7 +47,6 @@ Final whole-box arithmetic, from **Complete box inventory**: path **109 − 15 =
 | Lane / consumer | Cache / accountable seat and reviewer | Blocking start check |
 |---|---|---|
 | Accident, S3-T12#11 | Proposed `data/public_cache_s3_accidents/`; lead bounded-source acquisition seat, independent source/byte-bound reviewer | Original accident year-partition receipts, recorded live spans, hashes, dated table and unchanged plan/refusals verify; explicitly selected identity is bound in the successful public assembly before S3-T12#11 starts and before the S3 gate. No invented bound or map-point allocation. |
-| Reference archive, S4-T03 | Proposed `data/public_cache_s4_references/`; lead reference-acquisition seat, independent source/provenance reviewer | All thirteen S2-T27#9 dated hash-pinned archive outcomes and reviewed hosts verify; statutory-floor fact resolves to its real publisher, date and hash and the floor used by the wage method. Unresolved individual uses remain path holds; no absence is called successful archiving. |
 | Additional pages and events, S4-T08 | Proposed `data/public_cache_s4_pages/`; lead page-acquisition seat, independent schema/TLS/provenance reviewer | Original page/index/receipt/body hashes, observed dates, coverage and parser shape verify for selected event tables. S2-T29#1/#2 travel whole, including their insurance, tariff, supplier/classified and school obligations. Exact failures remain; no complete-events or attendance value is inferred. |
 | Fetched financial-centre names, S4-T05 | Proposed `data/public_cache_s4_fc_names/`; lead public-company-page/name-inventory seat, independent provenance/security reviewer | Complete terminal public Company-page capture, continuation/progress proofs, immutable identity and full name contribution verify, including hidden duplicates and the existing collision plant. Partial capture is not complete and is not `EII_FC_REGISTER_FILE`. |
 | Weather, S4-T09 | Proposed `data/public_cache_s4_weather/`; lead weather-source seat, independent source/calibration reviewer | Selected raw bytes, original receipt/hash, attribution and permitted place/period match; generator reads only tested typical hourly seasonal profiles through its existing allowed mount. Public-cache identity enters the scenario hash; no weather release table. |
@@ -90,7 +89,7 @@ These quotations use stable task/contract anchors. They establish first readers 
 |---|---|
 | S2-T29#11 | TASKS.md S3-T12#11: "from S2-T28's dated accident table, show accidents only on the geography and period the source supports". |
 | S2-T14#3 | S4-T09: "the generator reads the weather only as typical hourly profiles by season made from the hashed cache file of weather_openmeteo, never a dated day, through the allowed mount of the sandbox". |
-| S2-T27#9 | S4-T03: "basic meets wage.minimum"; document 03 **5. Wage bands** identifies the statutory-floor source. This proves the whole box's earliest known need, not an individual archived-file read for all thirteen rows. |
+| S2-T27#9 | Document 04 **2.2** maps `ref_min_wage` to "`pub_wage_table` (one reference row)"; document 07 **Open questions and assumptions**, item 7, says "the statutory minimum is a rule row in `pub_wage_table`". Document 03 DAT-70 includes this Public table in the `public_only` release that S3-T02 loads, and **7.2 Table catalogue** names `sector_facts` (S3-T06) as a consumer. Its **source_registry** contract requires `sha256`; AGENTS.md rules 5, 7 and 19 require the complete source chain. Thus `ref_min_wage` → `pub_wage_table` → S3-T02/S3-T06 is the earliest need; the indivisible thirteen-snapshot box stays path, before S3-T02. |
 | S2-T29#1/#2 | S4-T08: "the dated event snapshots of S2-T29 feed the event model and its trips: only dated events from those snapshots, with no complete-events claim". Both whole criteria retain their other pages. |
 | S2-T36#1/#2 | S4-T05: "the complete inventory of real names that the collision check calls also holds every company name of the financial centre's register (S2-T36)"; document 03 **S2-T36 company-only register cache contract** distinguishes pages from files. |
 | S2-T17#7 / S2-T19#8 | S6-T14: "a series of the closed, versioned list is forecast only when the public data pack holds its source table (S2-T17)". C41's history/frequency metadata is separate from the S2 C14 source/pin dependency. |
@@ -119,7 +118,7 @@ The search boundary for a missing-reader statement is the complete TASKS.md slic
 | U7 | Twenty-figure review stays S2-T08#6. | Actual selected draw membership and source/reviewer evidence remain path; no guessed subset or redraw to escape failure. |
 | U8 | Refused-file treatment stays S2-T08#13. | Actual dated refused-file inventory and every resulting source-specific bound/read remain path (OI-308). |
 | N1 | Cache-only audit and sole collector move together. | Current investment archive/revision preservation, source-chain and announcement caveats stay path; audit evidence is pending, not complete. |
-| N2 | Whole thirteen-reference archive criterion goes before S4-T03. | Individual unlocated archived-file/calibration bindings remain path holds for source selection; no claim all thirteen have a proved S4 field reader. |
+| N2 | Resolved: S2-T27#9 stays path, before S3-T02, through `ref_min_wage` → `pub_wage_table` → S3-T02/S3-T06. | The indivisible thirteen-snapshot criterion retains every original archive/hash/host-review obligation; no claim that every constituent has an individually proved S3 reader. |
 | N3 | Whole additional-page receipt/snapshot boxes go before S4-T08. | No finer split, invented insurance/tariff reader or deletion of any compound obligation. |
 | N4 | Classification/school live reads go before their S7 consumers. | Shared TLS/capture guards #4/#19 and every path-source capture remain path; personal-field guards continue running. |
 | N5 | Fetched page-name inventory goes before S4-T05. | Separate S2-T49 register-file receipts and both-table S3 handoff, with original collision tests, stay path. |
@@ -128,7 +127,7 @@ The search boundary for a missing-reader statement is the complete TASKS.md slic
 | N8 | Supplier-page credential-class wording is not a named positive field reader. | Its exact dated absence and unresolved positive binding remain in the path record under S2-T29#19; shared page obligations remain whole with S4 #1/#2. |
 | N9 | Planning carries are accepted. | Closed selection, assembly, confirmation and consumer-start validators remain required before operational use; current refusals stay. |
 
-N10 is a resolved naming correction: the source-table load is S3-T02's own criterion, not S3-T01's source-free acceptance boxes. None of these dispositions records a live result, solved unknown binding or gate pass. Existing open-item identities remain in OPEN_ITEMS.md; the decision-0098 carry line appends these holds without closing them.
+N10 is a resolved naming correction: the source-table load is S3-T02's own criterion, not S3-T01's source-free acceptance boxes. None of these dispositions records a live result or gate pass, and no unresolved binding is treated as solved. Existing open-item identities remain in OPEN_ITEMS.md; the decision-0098 carry line appends these holds without closing them.
 
 ## Box carry ledger
 
@@ -143,7 +142,6 @@ Every line below means **pending, with a consumer and a start check**. Backgroun
 | S2-T17#7 | background S6 | S6-T14 |
 | S2-T19#8 | background S6 | S6-T14 (metadata handoff before S6-T10) |
 | S2-T19#15 | background S7 | S7-T09 |
-| S2-T27#9 | background S4 | S4-T03 |
 | S2-T27#10 | after go-live | after-go-live owner/lead archive-preservation seat |
 | S2-T29#1 | background S4 | S4-T08 |
 | S2-T29#2 | background S4 | S4-T08 |
@@ -263,7 +261,7 @@ This preserves all 133 supplied box identities and their classification; **Box c
 | S2-T26#3 | path |
 | S2-T26#5 | path |
 | S2-T26#10 | path |
-| S2-T27#9 | background S4 |
+| S2-T27#9 | path |
 | S2-T27#10 | after go-live |
 | S2-T28#22 | path |
 | S2-T29#1 | background S4 |
@@ -326,8 +324,8 @@ No live fetch, actual cache result, external copy, deployment, independent maker
 
 - Owner lane/value words of 2026-11-23 quoted in **Authority and counting boundary**, and exact acceptance "option B", relayed at 08:05 that day; the supplied S2 records package requests the accident correction and three status/dependency repairs. No private-note path is published.
 - [TASKS.md](../../TASKS.md), every box in **Complete box inventory**, and the consuming task/criterion anchors in **Reader evidence**.
-- [Document 03](../03_DATA_CONTRACTS.md), **5. Wage bands**, **7.2 Table catalogue**, **Cache-only announced-project evidence (S2-T30)**, **S2-T36 company-only register cache contract** and **Register file projections (S2-T49)**.
-- [Document 07](../07_ECONOMIC_METHODS.md), MTH-03/MTH-51, C14/C28/C41 and **Public trade and benchmark method inputs — decision 0040**; [document 09](../09_AI_ASSISTANT.md), **Public-source question matrix — decision 0040**.
+- [Document 04](../04_PUBLIC_DATA_PACK.md), **2.2** `ref_min_wage`; [document 03](../03_DATA_CONTRACTS.md), DAT-70, **source_registry**, **5. Wage bands**, **7.2 Table catalogue**, **Cache-only announced-project evidence (S2-T30)**, **S2-T36 company-only register cache contract** and **Register file projections (S2-T49)**.
+- [Document 07](../07_ECONOMIC_METHODS.md), **Open questions and assumptions** item 7, MTH-03/MTH-51, C14/C28/C41 and **Public trade and benchmark method inputs — decision 0040**; [document 09](../09_AI_ASSISTANT.md), **Public-source question matrix — decision 0040**.
 - [Document 14](../14_IMPLEMENTATION_PLAN.md), PLN-25/PLN-28/PLN-29/PLN-32, **10. slice S2**, **11. slice S3** and **ENHANCEMENT BACKLOG**; [document 12](../12_TESTING_AND_QUALITY.md), TST-168/TST-198/TST-280; [document 15](../15_REVIEWER_CHECKLIST.md), REV-33/REV-41.
 - [Decision 0084](0084-public-tenders-in-a-separate-run.md), items 1–6; [decision 0085](0085-the-slice-s2-gate-wording-under-the-slow-work-rule.md), **Two stages of going live** and items 2–9; [decision 0094](0094-s2-t09-closes-with-c6-and-c7-pins-at-later-slices.md), items 1–4; [decision 0055](0055-mutation-testing-moves-to-after-go-live.md), items 1–4.
 - [Award intake implementation](../../custodian/src/eii_custodian/publicdata/fetch/awards.py), `read_intake`, `intake_cutoff`, `fetch_awards`, `_publish_awards` and `read_registers`; [fetch dispatcher](../../custodian/src/eii_custodian/publicdata/fetch/build.py), `awards_intake` dispatch; [register projection contract](../../custodian/src/eii_custodian/publicdata/registers/README.md), **Sibling intake protocol** and **Assembly handoff**. Read only; no source file/cache was read.

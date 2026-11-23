@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (row PLN-31); amended by decision 0055 on 2026-11-18 (mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md); amended by decision 0032 on 2026-11-15; amended by decision 0085 on 2026-11-21 (row PLN-32, the slice S2 tender gate bullet and the slow-work rows of the enhancement backlog) Amended by decision 0098 on 2026-11-23 (exact S2 source carries and completion accounting). |
+| Status | Draft v0.3, amended by decision 0052 on 2026-11-17 (row PLN-31); amended by decision 0055 on 2026-11-18 (mutation work deferred until after go live); amended by decisions 0016, 0017, 0018, 0019 and 0020 on 2026-11-12, and by decisions 0022 and 0023 on 2026-11-13, and by decision 0026 on 2026-11-14; also amended on 2026-11-12 by [decision 0015](decisions/0015-review-rounds-and-the-scope-of-repository-checks.md); amended by decision 0032 on 2026-11-15; amended by decision 0085 on 2026-11-21 (row PLN-32, the slice S2 tender gate bullet and the slow-work rows of the enhancement backlog); amended by decision 0098 on 2026-11-23 (exact S2 source carries and completion accounting). |
 | Date | 2026-11-14 |
 | Owner | albarami |
 | Purpose | Define the gated build sequence, task boundaries, review method and evidence needed to deliver the EII proof of concept. |
