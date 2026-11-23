@@ -6301,6 +6301,11 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 - NEEDED: the lead's real-file adapter run and the staged bundle produced from
   real, hash-verified inputs; a different-maker review of this offline
   implementation. Neither is claimed by this record.
+- UPDATE (2026-11-23, S2-D0102, task S2-T49): [decision 0102](docs/decisions/0102-register-projection-run-in-rule-44.md)
+  (Proposed) would admit `python -m eii_custodian.publicdata.registers` to
+  rule 44, clearing the records precondition of the lead's real-file run in
+  S2-PATH rows 25 and 91 to 93; the run, the staged bundle and the
+  different-maker review above stay owed and this item stays open.
 - LIMITS: invented stand-in fixtures only; no live register read, no release
   command, no admission-policy or registration-key-exception change, no slice
   gate. The receipt list binds the tables only through the lead's manifest
@@ -6486,3 +6491,13 @@ introduced.
 - OPEN — [decision 0098](docs/decisions/0098-s2-sources-follow-their-first-field-reader.md) **Unresolved path holds** preserves the unresolved aspects of U1–U8 and N1–N9 on the path: legacy-view applicability, actual figure draw and refused-file membership (OI-308), ten-family coverage/utility bindings, calibration-only/baseline field bindings, individual reference uses, positive supplier-page binding and closed carry-validator support. No source absence or future-story/default proof is called complete. Known scheduling resolutions move only the exact boxes/constituents named in the record; a newly proved earlier reader brings them forward. Existing task/open-item identities stay open until their own evidence closes them, including OI-277 for current awards coupling, OI-283 for method pins, OI-358 for company web, and OI-319/OI-341/PO-S2-129 and OI-360 on their existing performance/tender terms. Background S3 accident delivery settles before S3-T12#11 starts and before the S3 gate. New closed selection/assembly/start contracts require separately reviewed implementation before a new carry can govern a gate. This appended planning line closes no existing item.
 
 - CLOSED (2026-11-23, train S2-21, the lead), OI-227: the causal evidence its NEEDED and OPTIONS asked for exists. Two mechanisms were reproduced, each without relaxing a timeout or an assertion: (1) a child that writes its pid file after the watcher's former window, "pid file never appeared", matching the historical failure at seed 2026111499 (a 21 s injected child-start delay reproduces it; fixed by S2-P70 round 1, the watcher shares the suite deadline); (2) a pytest launched with SIGINT inherited as ignored, "counts unavailable in 30.0 s" (reproduced under `trap '' INT`; the test now installs the default handler itself, S2-P70 round 2, and the lead's launchers reset SIGINT). The first whole test on a head holding S2-P70 (train S2-21, seed 1419717886, `cb09d6aed7`) passed it, as did the guard pre-check at seed 2507142554. A later failure of this test reopens the item under a new number.
+
+## S2 records change — owner acceptance of decisions 0091, 0095 and 0102, and the OI-359 disposition (2026-11-23)
+
+- UPDATE (2026-11-23, S2 records change, lead ruling L-1580): decisions 0091 and 0095 are Accepted by the owner (2026-11-23, relayed by the advisor in note owner-relayed-20261123-1348). An acceptance review by another maker (OpenAI) found both acceptable with no defect. Still owed, under the S2 path boxes and not by this record: the offline award replay `uv run --locked python scripts/awards_proofs.py replay --cache data/public_cache` on the gate cache, then its lead-shell live form; a recorded approval of S2-P66 by a maker other than its builder.
+- UPDATE (2026-11-23, S2 records change, lead ruling L-1580), S2-T49: decision 0102 is Accepted by the owner, and rule 44 now names the register projection command. This clears only the records precondition. The lead's real-file run, the staged bundle and its different-maker review stay owed, and the item stays open.
+- UPDATE (2026-11-23, S2 records change, lead ruling L-1581), OI-359: **DISPOSITION RECORDED; OPEN for export evidence.**
+  - The lead read the portal's robots file on 2026-11-23 from the lead's shell. It disallows the /api/ prefix and the dataset download paths for every user agent, so no robots-allowed export path exists for any portal row.
+  - A read-only trace by another maker found that every portal row uses the same published dataset-API export shape, with no alternative path in the code.
+  - Disposition: the portal's published dataset API is the approved access path for these owner-chosen sources (decision 0059). The build stays a paced, allow-listed client of named datasets and never crawls. No robots guard is added, because it would refuse every portal row.
+  - NEEDED: the attributable export evidence, which is the receipts of the five rows from the live gate build, before fetchability is claimed. NEEDED BY is unchanged.
