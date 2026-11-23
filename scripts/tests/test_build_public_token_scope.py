@@ -7,7 +7,7 @@ from typing import Any
 from unittest.mock import Mock
 
 import pytest
-from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+from custodian_tests_support import stage_tracked_configuration
 from hypothesis import given
 from hypothesis import strategies as st
 

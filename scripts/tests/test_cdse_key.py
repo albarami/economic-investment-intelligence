@@ -80,7 +80,7 @@ class CdseWiring(unittest.TestCase):
                 self.assertEqual(list(Path(folder).iterdir()), [])
 
     def test_default_never_selects_backup(self) -> None:
-        from custodian.tests.method_pin_config_fixture import (
+        from custodian_tests_support import (
             stage_tracked_configuration,
         )
 
@@ -112,7 +112,7 @@ class CdseWiring(unittest.TestCase):
         def offline(url: str) -> Response:
             return Response(url, b"", ())
 
-        from custodian.tests.method_pin_config_fixture import (
+        from custodian_tests_support import (
             stage_tracked_configuration,
         )
 

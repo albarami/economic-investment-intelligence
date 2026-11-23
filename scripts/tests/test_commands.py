@@ -248,7 +248,7 @@ class Commands(unittest.TestCase):
 
     def test_build_public_usage_and_unreachable(self) -> None:
         root = support.make_temp(self, "eii-cmd-public-")
-        from custodian.tests.method_pin_config_fixture import (
+        from custodian_tests_support import (
             stage_tracked_configuration,
         )
 
