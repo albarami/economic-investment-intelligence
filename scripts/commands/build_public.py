@@ -110,13 +110,16 @@ def run(
 
     No argument, ``--seed N`` (the draw seed), ``--company-web``,
     ``--seed N --resume``, ``--tenders-only [--resume]``, ``--cdse-backup`` alone or
-    ``--gis-imagery-snapshot`` alone;
+    ``--gis-imagery-snapshot`` alone, ``--busyness-bootstrap`` alone, or
+    ``--busyness-confirm SHA256 ROLE DATE``;
     anything else is a usage error and opens nothing.
 
     The plain command loads tracked generation settings. The pin phase collects
     this run's producer rows; unspecified pack settings keep the phase pending.
     Explicit inputs remain available to existing callers and tests.
     """
+    if args and args[0] in {"--busyness-bootstrap", "--busyness-confirm"}:
+        return _busyness_phase(root, environ, args, transport)
     if tuple(args) == ("--company-web",):
         return run_company_web(
             root,
@@ -325,4 +328,58 @@ def run(
         return exits.finish(
             outcome.failure.code, "build-public", outcome.failure.detail
         )
+    return 0
+
+
+def _busyness_phase(
+    root: Path,
+    environ: Mapping[str, str],
+    args: Sequence[str],
+    transport: Transport | None,
+) -> int:
+    """Lead-only explicit acquisition or hash-confirmation; no ordinary assembly."""
+    bootstrap = tuple(args) == ("--busyness-bootstrap",)
+    confirm = len(args) == 4 and args[0] == "--busyness-confirm"
+    if not bootstrap and not confirm:
+        table.write_usage()
+        return 2
+    from eii_custodian.publicdata.busyness.build import build_busyness
+    from eii_custodian.publicdata.busyness.handoff import confirm_handoff, write_json
+    from eii_custodian.publicdata.fetch.fingerprint import default_roots, scan_run
+
+    cache = root / CACHE_RELATIVE
+    try:
+        if confirm:
+            confirm_handoff(cache, args[1], args[2], args[3], environ)
+        else:
+            entries = tuple(
+                entry for entry in load_registry() if entry.kind == "besttime"
+            )
+            if len(entries) != 1:
+                raise ValueError("busyness_registry_inventory")
+            scan = scan_run(
+                entries,
+                default_roots(),
+                large=False,
+                cache=cache,
+                busyness_phase="bootstrap",
+            )
+            write_json(
+                cache, "busy_besttime/bootstrap-fingerprint.json", scan.records, environ
+            )
+            build_busyness(
+                entries[0],
+                open_https if transport is None else transport,
+                cache,
+                utc_now,
+                environ,
+                bootstrap=True,
+            )
+    except (RegistryError, ValueError, OSError, KeyError, TypeError):
+        return exits.finish(1, "build-public", "busyness_phase_failed")
+    print(
+        "busy_besttime identity_bootstrapped"
+        if bootstrap
+        else "busy_besttime identity_confirmed"
+    )
     return 0

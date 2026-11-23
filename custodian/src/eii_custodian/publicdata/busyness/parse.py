@@ -72,8 +72,11 @@ def parse_forecast(body: bytes) -> Forecast:
             )
         if value["status"] != "OK":
             raise ValueError
-        if not isinstance(info["venue_id"], str) or not isinstance(
-            info["venue_name"], str
+        if (
+            not isinstance(info["venue_id"], str)
+            or not isinstance(info["venue_name"], str)
+            or not info["venue_id"].strip()
+            or not info["venue_name"].strip()
         ):
             raise ValueError
         analysis = value["analysis"]

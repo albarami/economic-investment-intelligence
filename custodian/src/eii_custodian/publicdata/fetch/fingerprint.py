@@ -832,7 +832,32 @@ class RunScan:
         return False
 
 
-def scan_run(entries: Sequence[Entry], roots: CodeRoots, *, large: bool) -> RunScan:
+def busyness_inputs(cache: Path, phase: str) -> dict[str, Any]:
+    """Bind cache identity inputs and explicit selection, never provider values."""
+    from eii_custodian.publicdata.busyness.handoff import (
+        HANDOFF_FILE,
+        INPUT_FILES,
+        cache_path,
+    )
+
+    return {
+        "phase": phase,
+        "files": {
+            name: _sha256(path) if path.is_file() else None
+            for name in (*INPUT_FILES, HANDOFF_FILE)
+            for path in (cache_path(cache, name),)
+        },
+    }
+
+
+def scan_run(
+    entries: Sequence[Entry],
+    roots: CodeRoots,
+    *,
+    large: bool,
+    cache: Path | None = None,
+    busyness_phase: str = "production",
+) -> RunScan:
     """Compute the machinery, per-branch closures and per-entry records."""
     closure = _Closure(roots)
     machinery = closure.reach(roots.seeds, scoped=True)
@@ -882,6 +907,10 @@ def scan_run(entries: Sequence[Entry], roots: CodeRoots, *, large: bool) -> RunS
                 "python": python,
                 "uv_lock": uv_lock,
             }
+            if branch == "besttime":
+                if cache is None:
+                    raise FingerprintUnavailable("busyness_cache_unbound")
+                record["busyness"] = busyness_inputs(cache, busyness_phase)
             if branch == "listing":
                 record["siblings"] = [
                     [sibling.key, closed_encode(sibling)]

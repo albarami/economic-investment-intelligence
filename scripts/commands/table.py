@@ -47,6 +47,16 @@ COMMANDS: tuple[Command, ...] = (
         "build-public --gis-imagery-snapshot", "build-public", "Custodian", "real", ""
     ),
     Command("build-public --cdse-backup", "build-public", "Custodian", "real", ""),
+    Command(
+        "build-public --busyness-bootstrap", "build-public", "Custodian", "real", ""
+    ),
+    Command(
+        "build-public --busyness-confirm SHA256 ROLE DATE",
+        "build-public",
+        "Custodian",
+        "real",
+        "",
+    ),
     Command("build-world", "build-world", "Custodian", "placeholder", NOT_YET),
     Command("build-release", "build-release", "Custodian", "placeholder", NOT_YET),
     Command(

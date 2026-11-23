@@ -3445,6 +3445,16 @@ No existing open item is closed by this input.
 - NEEDED: add the story-answer places to the verification population once the guided-story answers exist.
 - NEEDED BY: slice S3.
 
+## S2-P79 — Venue identity bootstrap remains pending live evidence
+
+- TYPE: OPEN
+- RAISED BY: ruling L-1661, 2026-11-23.
+- CONCERNS: S2-T16 boxes 13 and 14 and decision 0064 item 8.
+- EVIDENCE: L-1661 supersedes L-1646 item 1’s proposed `no_match` bootstrap. The existing reader skipped those rows and retained no returned provider identity. S2-P79 adds a closed `pending` acquisition phase, minimal cache-only identity handoff and explicit hash-bound confirmation; production is a separate recorded run.
+- NEEDED: different-maker implementation/security review, the lead’s capped keyed bootstrap and production evidence, allowance check covering both runs and scheduled refresh, and later scheduled-refresh evidence. No live box is ticked by the offline implementation.
+- NEEDED BY: the S2-T16 live handoff before its dependent S3 work.
+- CHECK-HARNESS EVENT (2026-11-23): the first boundary-check run failed its unchanged-tree assertion while a concurrent pytest process created bytecode files. Evidence: the before/after mismatch names newly added `.pyc` files, and `test_import_boundary_real._tree_fingerprint` includes those files. Verification therefore uses the unchanged boundary suite alone, with bytecode writes disabled; the initial failure stays in the evidence. This event changes no guard or task box.
+
 ## Change control
 
 Close an item only with evidence and the named decision or test that resolves it. Record the closure in [PROGRESS.md](PROGRESS.md), preserve the earlier entry, and add a decision record for any material change. Do not silently delete an unresolved item.
