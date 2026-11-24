@@ -348,8 +348,8 @@ def test_a_filled_key_without_its_record_is_refused() -> None:
     assert caught.value.reason == "record_missing"
 
 
-def test_every_committed_key_is_null_and_stays_pending() -> None:
-    """S2-L4 fx1 cleared the one stored key (a shop, not its landmark): all eleven pend."""
+def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None:
+    """S2-L4 redo filled six building references; every other entry stays pending."""
     review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     specs = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
     candidates = load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]
@@ -359,15 +359,45 @@ def test_every_committed_key_is_null_and_stays_pending() -> None:
         for spec in everything
         if spec["record_key"] is not None or spec["source_id"] is not None
     ]
-    assert filled == []
+    assert filled == [
+        "building:0",
+        "building:1",
+        "building:2",
+        "building:4",
+        "building:5",
+        "building:6",
+    ]
     points = {("places_ovt", "SYN-LAND"): _POINT}
-    resolved, report = resolve_review(everything, points, _POINT_GRID)
-    assert resolved == []
-    assert report == tuple(
-        f"gazetteer: source point pending S2-T06: {spec['place_key']}"
-        for spec in everything
+    # The review loaders translate record_ref to the internal record_key.
+    # Resolve each entry so a missing filled record cannot hide pending entries.
+    report = []
+    for spec in everything:
+        if spec["place_key"] in filled:
+            assert spec["source_id"] == "bldg_ovt"
+            assert isinstance(spec["record_key"], str) and spec["record_key"]
+            with pytest.raises(PlacesError, match=r"^record_missing$") as caught:
+                resolve_review((spec,), points, _POINT_GRID)
+            report.append(f"{spec['place_key']}: {caught.value.reason}")
+        else:
+            assert spec["source_id"] is None
+            assert spec["record_key"] is None
+            resolved, pending = resolve_review((spec,), points, _POINT_GRID)
+            assert resolved == []
+            report.extend(pending)
+    assert tuple(report) == (
+        "gazetteer: source point pending S2-T06: landmark:0",
+        "gazetteer: source point pending S2-T06: landmark:1",
+        "gazetteer: source point pending S2-T06: landmark:2",
+        "gazetteer: source point pending S2-T06: landmark:3",
+        "building:0: record_missing",
+        "building:1: record_missing",
+        "building:2: record_missing",
+        "gazetteer: source point pending S2-T06: building:3",
+        "building:4: record_missing",
+        "building:5: record_missing",
+        "building:6: record_missing",
     )
-    assert len(report) == 11
+    assert len(report) == len(everything) == 11
 
 
 def test_a_decision_file_names_its_candidate_and_a_list_stays_pending(
