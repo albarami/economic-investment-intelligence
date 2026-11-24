@@ -4000,6 +4000,7 @@ REVIEW_DATA_GUARD_CASES = [
             ["PlacesError", "landmark_member_outside", "landmark_member_outside"],
             ["PlacesError", "landmark_member_unknown", "landmark_member_unknown"],
             ["PlacesError", "landmark_members_empty", "landmark_members_empty"],
+            ["PlacesError", "landmark_point_outside", "landmark_point_outside"],
             ["PlacesError", "landmark_reason_missing", "landmark_reason_missing"],
             ["PlacesError", "landmark_record_ref", "landmark_record_ref"],
             ["PlacesError", "landmark_source_refused", "landmark_source_refused"],

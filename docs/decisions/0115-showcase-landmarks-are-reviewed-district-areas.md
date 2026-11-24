@@ -18,14 +18,14 @@ Overture place record or building footprint carries their extents: these are
 areas, not points, and no point source the build holds names them.
 
 The licensed boundary archive `bnd_hdx` publishes Qatar's districts as named
-polygons, and the source's own district names cover each landmark exactly:
-Lusail spans Lusail 69, Lusail 70, Lusail West and Wadi Lusail; the West Bay
-waterfront is the two districts the source names Al Dafna 61 and Al Gassar 61;
-Msheireb spans Mushaireb 3, Mushaireb 4 and Mushaireb 13; The Pearl is exactly
-the one district the source names The Pearl. Three of those matches are
-already reviewed rows of `district_crosswalk.csv`; the West Bay pair takes the
-source's own name for the area the landmark row names in Arabic
-(الخليج الغربي), an assumption stated in item 6.
+polygons, and the source's own district names cover three of the landmarks:
+Lusail spans Lusail 69, Lusail 70, Lusail West and Wadi Lusail; Msheireb spans
+Mushaireb 3, Mushaireb 4 and Mushaireb 13; The Pearl is exactly the one
+district the source names The Pearl. Three of those matches are already
+reviewed rows of `district_crosswalk.csv`. The source publishes no district
+named West Bay: that row's extent is the lead's reviewed assumption on the
+source's zone grouping — the three districts of the Al Dafna zones, Al Dafna
+60, Al Dafna 61 and Al Gassar 61 — stated in item 6.
 
 ## Decision
 
@@ -37,7 +37,8 @@ source's own name for the area the landmark row names in Arabic
    `record_key` is derived, never stored: the sorted members joined by `|`.
 2. The four committed rows are filled on this route: `landmark:0` Lusail with
    `QAT001069812`, `QAT001070813`, `QAT003096699` and `QAT001070121`;
-   `landmark:1` West Bay with `QAT006061806` and `QAT006061810`;
+   `landmark:1` West Bay with `QAT006060805`, `QAT006061806` and
+   `QAT006061810`;
    `landmark:2` Msheireb with `QAT006003776`, `QAT006004777` and
    `QAT006013778`; `landmark:3` The Pearl with `QAT006066765`. Every member
    key is checked against the source's district list; the crosswalk's own
@@ -46,7 +47,9 @@ source's own name for the area the landmark row names in Arabic
    its member polygons, the same derivation `administrative_rows` applies to
    each district; it is never moved to a grid cell and it resolves its base
    cell like every other gazetteer point. The stage computes the point only
-   where the frame hands over the archive districts.
+   where the frame hands over the archive districts, and it checks the stored
+   six-decimal point, not the computed one: a stored point the member union
+   or the frame boundary does not cover refuses the run.
 4. Every refusal on the route is closed: the loader raises
    `landmark_source_refused` (a `landmark` row on a source outside
    `places_ovt` and `bnd_hdx.district`, or member fields on any other row),
@@ -55,18 +58,24 @@ source's own name for the area the landmark row names in Arabic
    member), `landmark_member_duplicate` (a repeated member, and at the stage
    a repeated archive district key) and `landmark_reason_missing` (no reason
    or a blank one); the stage raises `landmark_member_unknown` (a member no
-   archive district names) and `landmark_member_outside` (a member polygon
-   the frame boundary does not cover). Each refusal is registered in the
+   archive district names), `landmark_member_outside` (a member polygon
+   the frame boundary does not cover) and `landmark_point_outside` (the
+   stored six-decimal point the member union or the frame boundary does not
+   cover). Each refusal is registered in the
    refusal policy and planted in `REVIEW_DATA_GUARD_CASES`.
 5. `review_place_keys.py` never proposes for a district row — its derived key
    is never null — and `--check` re-derives the key from the file's own
    members instead of the place-matching path, so it accepts the rows and
    never overwrites them.
-6. ASSUMPTION: the West Bay row reads the source's Al Dafna 61 and Al Gassar
-   61 districts as the landmark's extent; the source publishes no district
-   named West Bay, and the row's Arabic name is the source's own name for
-   the area. A reviewer finding a different extent changes `members` and
-   `member_reason` only.
+6. ASSUMPTION: the source publishes no district named West Bay, and no source
+   name settles the landmark's extent. The lead's reviewed ruling takes the
+   three districts of the Al Dafna zones — Al Dafna 60 (`QAT006060805`),
+   Al Dafna 61 (`QAT006061806`) and Al Gassar 61 (`QAT006061810`): zone 60's
+   only district is Al Dafna 60, and zone 61 is the source's Al Dafna -
+   Al Qassar zone. Al Gassar 66 (`QAT006066811`) is not taken: the source
+   groups it in zone 66, the zone of The Pearl (`landmark:3`), not the
+   Al Dafna zones. A reviewer finding a different extent changes `members`
+   and `member_reason` only.
 
 ## Evidence and consequences
 

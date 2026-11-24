@@ -250,8 +250,8 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         geometry_not_bytes geometry_type geometry_wkb hand_edited link_form loader
         missing_column missing_key missing_link missing_role no_provider not_provisional
         landmark_member_duplicate landmark_member_outside landmark_member_unknown
-        landmark_members_empty landmark_reason_missing landmark_record_ref
-        landmark_source_refused
+        landmark_members_empty landmark_point_outside landmark_reason_missing
+        landmark_record_ref landmark_source_refused
         orphan_place_id parquet passed_keys_mismatch place_id places_file_unreceipted
         pub_place_field range receipt_mismatch receipt_missing record_missing
         review_list review_row schema_versions showcase_area showcase_area_duplicate showcase_area_source

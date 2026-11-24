@@ -11,12 +11,14 @@ from tempfile import TemporaryDirectory
 
 import yaml
 from shapely import point_on_surface
+from shapely.geometry import Point
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.geometry import Boundary
+from eii_custodian.publicdata.frame.geometry import index as index_boundaries
 from eii_custodian.publicdata.frame.live import resolve_reviewed_specs
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.area_files import FileAreaProvider
@@ -94,11 +96,7 @@ def _district_points(
     wanted = [item for item in specs if item.get("source_id") == DISTRICT_SOURCE]
     if not wanted:
         return []
-    geoms: dict[str, BaseGeometry] = {}
-    for district in districts:
-        if district.key in geoms:
-            raise PlacesError("landmark_member_duplicate")
-        geoms[district.key] = district.geometry
+    geoms = _district_geoms(districts)
     rows: list[dict[str, object]] = []
     for item in wanted:
         members = item.get("members")
@@ -108,16 +106,30 @@ def _district_points(
             [_district_member(geoms, member, boundary) for member in sorted(members)]
         )
         point = point_on_surface(union)
+        lon, lat = f"{point.x:.6f}", f"{point.y:.6f}"
+        stored = Point(float(lon), float(lat))
+        if not union.covers(stored) or not boundary.covers(stored):
+            raise PlacesError("landmark_point_outside")
         rows.append(
             {
                 "caveat_key": CAVEAT_KEY,
-                "lat": f"{point.y:.6f}",
-                "lon": f"{point.x:.6f}",
+                "lat": lat,
+                "lon": lon,
                 "record_key": item["record_key"],
                 "source_id": DISTRICT_SOURCE,
             }
         )
     return rows
+
+
+def _district_geoms(districts: Sequence[Boundary]) -> dict[str, BaseGeometry]:
+    """Index archive districts by key; a duplicate key is the closed refusal."""
+    try:
+        return index_boundaries(list(districts))
+    except FrameError as exc:
+        if str(exc) != "duplicate boundary key":
+            raise
+        raise PlacesError("landmark_member_duplicate") from exc
 
 
 def _district_member(

@@ -881,8 +881,10 @@ any `members` or `member_reason` on a row of another source, and a `landmark`
 row on a source other than `places_ovt` or `bnd_hdx.district`
 (`landmark_source_refused`). At the stage, a member that names no archive
 district (`landmark_member_unknown`), one whose polygon is not inside the
-frame boundary (`landmark_member_outside`) and a repeated archive district key
-(`landmark_member_duplicate`) each refuse the build.
+frame boundary (`landmark_member_outside`), a repeated archive district key
+(`landmark_member_duplicate`) and a stored six-decimal point the member union
+or the frame boundary does not cover (`landmark_point_outside`) each refuse
+the build.
 For `pub_place_verification` (PUB-52), the required population is the sorted unique
 kept food-service ids (`restaurant` or `italian_restaurant`) inside any showcase walk
 polygon, plus the explicitly supplied prepared-story ids (empty pending OI-397).

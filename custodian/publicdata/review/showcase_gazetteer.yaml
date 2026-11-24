@@ -26,10 +26,11 @@
     "record_ref": null,
     "arabic_review": "pending native review",
     "members": [
+      "QAT006060805",
       "QAT006061806",
       "QAT006061810"
     ],
-    "member_reason": "The West Bay waterfront district is the two boundary districts the source names Al Dafna 61 and Al Gassar 61."
+    "member_reason": "Reviewed assumption on the source's zone grouping: the source publishes no district named West Bay, so the landmark's extent is taken as the three districts of the Al Dafna zones — Al Dafna 60, Al Dafna 61 and Al Gassar 61. Al Gassar 66 is not taken: the source groups it in zone 66, the zone of The Pearl."
   },
   {
     "place_key": "landmark:2",

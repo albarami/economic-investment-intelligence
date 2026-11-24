@@ -979,6 +979,124 @@ def test_the_live_frame_resolves_a_district_member_landmark(
     assert row["cell"] in {item["cell"] for item in result.tables["grid_cell"]}
 
 
+def test_an_off_lattice_stored_point_is_refused() -> None:
+    """A point that rounds off its member refuses; it is never moved or buffered."""
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    geometry = box(51.5000001, 25.3000001, 51.5000003, 25.3000003)
+    districts = (Boundary("SYN-D", "Syn", "Syn", "SYN-M", geometry),)
+    spec = review_file_spec(_district_row(("SYN-D",)))
+    with pytest.raises(PlacesError, match=r"^landmark_point_outside$"):
+        _district_points([spec], districts, geometry)
+
+
+def test_a_stored_point_on_the_member_edge_is_written() -> None:
+    """A stored point on the union and frame edge is covered, so it is written."""
+    from shapely.geometry import Point
+
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    strip = box(51.2, 25.3, 51.2000005, 25.4)
+    districts = (Boundary("SYN-D", "Syn", "Syn", "SYN-M", strip),)
+    spec = review_file_spec(_district_row(("SYN-D",)))
+    (row,) = _district_points([spec], districts, box(51.2, 25.0, 51.7, 25.5))
+    assert (row["lon"], row["lat"]) == ("51.200000", "25.350000")
+    stored = Point(float(row["lon"]), float(row["lat"]))
+    assert strip.covers(stored)
+
+
+def test_the_full_stage_refuses_an_off_lattice_district_point(
+    tmp_path: Path,
+) -> None:
+    """The reviewer's narrow polygon now refuses instead of writing outside."""
+    review, places = _district_setup(tmp_path, members=("SYN-D",))
+    narrow = (_district("SYN-D", 51.5000001, 25.3000001, 51.5000003, 25.3000003),)
+    with pytest.raises(PlacesError, match=r"^landmark_point_outside$"):
+        run_places_stage(_config(tmp_path, review, places, districts=narrow))
+
+
+def test_an_empty_archive_key_propagates_the_frame_refusal() -> None:
+    """The reused index helper keeps its key checks; only duplicates map."""
+    from eii_custodian.publicdata.frame.checks import FrameError
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    districts = (Boundary("", "Syn", "Syn", "SYN-M", box(51.3, 25.3, 51.4, 25.4)),)
+    spec = review_file_spec(_district_row(("SYN-D",)))
+    with pytest.raises(FrameError, match="missing key"):
+        _district_points([spec], districts, box(51.2, 25.0, 51.7, 25.5))
+
+
+def test_a_district_spec_without_a_member_list_is_refused() -> None:
+    """The stage's own boundary refuses a spec whose members are not a list."""
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    spec = review_file_spec(_district_row(("SYN-D", "SYN-E")))
+    spec["members"] = None
+    with pytest.raises(PlacesError, match=r"^landmark_members_empty$"):
+        _district_points([spec], _district_pair(), box(51.2, 25.0, 51.7, 25.5))
+
+
+@given(
+    boxes=st.lists(
+        st.tuples(
+            st.floats(min_value=0, max_value=0.2),
+            st.floats(min_value=0, max_value=0.05),
+            st.floats(min_value=0.0000001, max_value=0.1),
+            st.floats(min_value=0.0000001, max_value=0.1),
+        ),
+        min_size=1,
+        max_size=3,
+    )
+)
+def test_every_written_district_point_stays_covered(
+    boxes: list[tuple[float, float, float, float]],
+) -> None:
+    """Every written point is covered, or the run refuses with the exact reason.
+
+    Edge classes: one to three members, offsets across the frame and
+    widths/heights from a tenth of a micro-degree up. Every member stays
+    inside the boundary, so the only reachable refusal is
+    landmark_point_outside.
+    """
+    from shapely import unary_union
+    from shapely.geometry import Point
+
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    boundary = box(51.2, 25.0, 51.7, 25.5)
+    districts = tuple(
+        Boundary(
+            f"SYN-{index}",
+            "Syn",
+            "Syn",
+            "SYN-M",
+            box(
+                51.3 + west,
+                25.3 + south,
+                51.3 + west + width,
+                25.3 + south + height,
+            ),
+        )
+        for index, (west, south, width, height) in enumerate(boxes)
+    )
+    spec = review_file_spec(_district_row([item.key for item in districts]))
+    union = unary_union([item.geometry for item in districts])
+    try:
+        rows = _district_points([spec], districts, boundary)
+    except PlacesError as caught:
+        assert caught.reason == "landmark_point_outside"
+        return
+    (row,) = rows
+    stored = Point(float(row["lon"]), float(row["lat"]))
+    assert union.covers(stored)
+    assert boundary.covers(stored)
+
+
 @given(perm=st.permutations(["SYN-D", "SYN-E", "SYN-F"]))
 def test_member_permutations_give_identical_points(
     perm: tuple[str, ...],

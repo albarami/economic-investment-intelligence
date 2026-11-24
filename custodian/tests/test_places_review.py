@@ -450,6 +450,25 @@ def test_district_member_item_refuses_hostile_values(
         load_showcase_gazetteer(path, None)
 
 
+def test_a_landmark_on_an_unapproved_source_is_refused(tmp_path: Path) -> None:
+    """A landmark without member fields still refuses a source outside the route."""
+    row = {
+        "place_key": "landmark:9",
+        "kind": "landmark",
+        "name_en": "SYN Place",
+        "name_ar": "مكان تجريبي",
+        "aliases": None,
+        "source_id": "places_ovt",
+        "record_ref": "SYN-LAND",
+        "arabic_review": "pending native review",
+    }
+    specs = load_showcase_gazetteer(_gazetteer_file(tmp_path, [row]), None)[1]
+    assert specs[0]["record_key"] == "SYN-LAND"
+    row["source_id"] = "gis_landmarks"
+    with pytest.raises(PlacesError, match=r"^landmark_source_refused$"):
+        load_showcase_gazetteer(_gazetteer_file(tmp_path, [row]), None)
+
+
 def test_members_on_a_non_district_row_are_refused(tmp_path: Path) -> None:
     """Member evidence on any other source row refuses, not silently ignored."""
     row = _district_row(source_id=None, record_ref=None, member_reason=None)
