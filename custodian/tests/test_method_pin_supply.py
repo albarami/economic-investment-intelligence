@@ -56,7 +56,12 @@ def _cli_diagnostic(reason):
     )
     return (
         f"FAIL build-public: {detail}\n"
-        "eii: exit 1: A check or step failed; the printed `FAIL` lines say which\n"
+        "eii: exit 1: A check or step failed; the printed `FAIL` lines say which; "
+        "an existing final schema, a release kind the loader does not support, a "
+        "host off the loopback address (`host_not_loopback`), an extension the "
+        "target database must not hold, an extension schema that is not a plain "
+        "identifier (`extension_schema_invalid`), or an engine operation that "
+        "failed (`engine_operation_failed`)\n"
     )
 
 
