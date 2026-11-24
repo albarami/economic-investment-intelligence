@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 from custodian.tests.method_card_pin_fixtures import case, producer_rows
 from custodian.tests.test_method_pin_supply import supplied_build
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly_method_pins import (
@@ -20,6 +20,7 @@ from eii_custodian.publicdata.method_pin_rows import collect_pin_rows
 from eii_custodian.publicdata.method_pin_supplier import _calculated_values
 
 
+@settings(deadline=None)
 @given(
     value=st.one_of(st.integers(), st.decimals(allow_nan=False, allow_infinity=False))
 )

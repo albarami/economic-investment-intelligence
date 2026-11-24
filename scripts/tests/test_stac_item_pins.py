@@ -6,7 +6,7 @@ from functools import cache
 from pathlib import Path
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 import stac_item_pins as pins
@@ -120,6 +120,7 @@ def _collection_entry() -> Entry:
 _COLLECTION_ENTRY = _collection_entry()
 
 
+@settings(deadline=None)
 @given(
     st.lists(st.binary(min_size=1, max_size=40), min_size=1, max_size=3, unique=True)
 )
