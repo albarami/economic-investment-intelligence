@@ -1,6 +1,301 @@
-# Reviewed use map of PUB-107: the Arabic label and the usage field of the two
-# sales bulletins to a use_key and a marker. The English label is never read.
-# Marker `land` marks land without a building; any other marker is a published
-# unit-type key of prop_resi_units. The lead fills the reviewed rows from the
-# real files and an expert review; with no row committed every label fails.
+# Reviewed under PUB-107 and L-1854 from the N01 label extract.
+# Exact Arabic labels (including no-break spaces) are preserved.
+# land: bare land; built: no published unit type; residential_unit: published unit.
+# Buildings use *; land uses exact published usage or (none) for absent usage.
 source_id,arabic_label,usage_value,use_key,marker,reviewer,reviewed_on
+prop_resi_units,وحدة سكنية,*,residential,residential_unit,model:anthropic-arabic-property,2026-11-24
+prop_sales,أراضي متعددة الأستخدام,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أراضي متعددة الأستخدام,Multi-use Land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربع فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربع فلل كل فلتين متلاصقتين وملحق لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربع فلل وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربع فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربع فلل كل فلتين متلاصقتين وملحق لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربعة عشر فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربعة فلل من دورين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أربعة فلل من دورين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Commercial,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Commercial / Residential,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Commercial Offices,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Entertainment venues,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Government schools and institutes,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Markets and shops,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Mosques,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi purpose use,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-Use Commercial Land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-use Land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-use commercial Land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-use land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Private areas,unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Residence,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Residential Buildings or Compounds,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Senior staff residences,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,amenities,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,farms,agricultural,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,villas or residential houses,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء ومجلس,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Apartment buildings or residential compounds/villas or houses,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Buffer zone (uninhabited),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Commercial,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Commercial Offices,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Entertainment venues,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Government Land,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Government schools and institutes,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Land with no specified use,unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Markets and shops,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Mosques,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-Use Commercial Land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multi-use land,mixed,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Multiple Commercial Lands,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Private areas,unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Residential Buildings or Compounds,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Schools,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Senior staff residences,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,Unspecified residential land,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,amenities,community,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,farms,agricultural,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,أرض فضاء,villas or residential houses,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,إثنان وعشرون فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,إثنتي عشرة فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,إثنتي عشرة فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,اربعة بيوت سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,اربعة بيوت سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,برج,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,برج سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,برج سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,برجين,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بناء قائم,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بناء قائم,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن من دورين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومحلات تجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومحلات تجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن ومطعم,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيت للسكن وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيتان للسكن ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيتين للسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيتين للسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية ومحلات تجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية ومحلات,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,بيوت سكنية ومخازن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثلاث فلل وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثلاث فلل وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثلاثة فلل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثلاثة فلل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثلاثة فلل وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ثمانية فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,حديقة,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,حوطة,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,حوطة ومحل تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,خمس فلل وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,دكان وغرفة,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ست فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ستة عشر فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,سكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,سوق تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,سوق تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,شقق سكنية ومعرض تجارى,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,شقق فندقية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,شقق فندقية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عشرون فيلا كل فلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة إدارية ومحلات تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة ادارية ومحلات تجارية وشقق سكنية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية سكنية ومحلات تجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية وإدارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجاريه,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية وبيتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية وتجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية ومحلات تجارية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة من مكاتب إدارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة إدارية ومحلات,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة ادارية ومحلات,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية سكنية,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة تجارية وإداري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية وبيتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية ومحل تجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة سكنية ومحلات,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارة من مكاتب إدارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارةسكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارتين,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عمارتين سكنيتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,عماره سكنيه,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فرن آلي,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلتان متلاصقتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلتان من طابقين ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلتان منفصلتان وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلتين منفصلتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فندق,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا + بنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا دور أرضي وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا طابقين و ملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا طابقين و ملحق و مجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من ثلاث طوابق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من دور أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من دور أرضي وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من دورين وبنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابق أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابق أرضي و ملحق و مجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين و ملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملحق + بنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملحق ومجلس وبنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وقبو وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا ومجلس وغرفة,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا ومجلس وغرفة حارس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملحق خارجي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا + بنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا دور أرضي وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا طابقين و ملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا قبو ارضي اول طابق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين و ملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من دور أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من دورين وبنت هاوس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابق أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين ومجل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملاح,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملح,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا من طابقين وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وبيت للسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وقبو وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملاحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملحق خارجي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلا وملحقان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متصلتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان من طابق ارضي+ملحق لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وفيلا منفصلة,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وفيلا منفصلة وملحق لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وملحق خارجي ومجلس خارجي لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وملحق لكل فيلا,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان من دور أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان من طابقين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان وملحقان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان وملحقاتهما,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان وملحقان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان متلاصقتان وم,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان من دور أرضي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان من طابقين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان من طابقين ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان منفصلتان وملحقان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان وملحقاتهما,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتان وملحقان,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتين متلاصقتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,فيلتين منفصلتين,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة سكنية,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة سكنية,villas or residential houses,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة تجارية,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة سكنية,(none),unspecified,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة سكنية,Commercial,commercial,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قسيمة سكنية,villas or residential houses,residential,land,model:anthropic-arabic-property,2026-11-24
+prop_sales,قصر,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,قصر وملحقاته,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,كراج لتصليح السيارات,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,كراج للسيارات,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبانى من شقق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مباني,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى إداري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى إداري وتجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى تجارى سكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى تجاري سكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى سكني وتجاري,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى مكاتب تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى من دورين,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى من دورين ومحلات تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى إداري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى إداري وتجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى تجارى سكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى مكاتب,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى مكاتب تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبنى وساحة سماوي,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبني,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبني تجاري وإداري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبني تجاري وسكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مبني تجاري وسكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجلس,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجلس وملحقاته,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجلسين وملحقاتهما,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع عمارات,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع فلل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع من خمسة فلل سكنية,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع تجاري إداري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع تجاري سكني,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع سكني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع عمارات,*,unspecified,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع فلل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع مكاتب,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مجمع من خمسة فلل,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محطة بترول,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محطة بترول,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محطة بترول وملحقات,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محل تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محل تجاري,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية وشقق سكنية وبيت للسكن,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية ومكاتب إدارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية وشقق,*,mixed,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,محلات تجارية ومكاتب إدارية,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مدرسة,*,community,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مزرعة,*,agricultural,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسجد وبيت إمام,*,community,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي من طابقين وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي ومجلس خارجي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي ومجلس خارجي وملحقاته,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي وملحق خارجي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن مجاني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي ومجلس,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن شعبي وملحق,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,مسكن مجاني,*,residential,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,معارض,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,معرض,*,commercial,built,model:anthropic-arabic-property,2026-11-24
+prop_sales,ملحق خارجي,*,unspecified,built,model:anthropic-arabic-property,2026-11-24

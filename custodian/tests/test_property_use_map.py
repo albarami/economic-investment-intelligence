@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import csv
+from dataclasses import asdict
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 from custodian.tests.repository_root import repository_root
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.assembly_refusals import closed_reason
+from eii_custodian.publicdata.property import use_map
 from eii_custodian.publicdata.property.use_map import (
     ANY_USAGE,
     LAND_MARKER,
@@ -20,7 +27,7 @@ from eii_custodian.publicdata.property.use_map import (
 
 
 def _map_path() -> Path:
-    """The committed review file: header and no row until the lead's read."""
+    """The committed review file of PUB-107."""
     return (
         repository_root(Path(__file__))
         / "custodian"
@@ -45,16 +52,40 @@ def _map() -> tuple[UseMapping, ...]:
     return load_use_map(_fixture_map())
 
 
-def test_committed_map_holds_no_row_and_refuses_every_label() -> None:
-    """Fail closed: a header-only committed map maps no label (PUB-107)."""
+def test_every_committed_row_loads_and_resolves() -> None:
     rows = load_use_map(_map_path())
-    assert rows == ()
+    assert rows
+    for row in rows:
+        assert use_lookup(rows, row.source_id, row.arabic_label, row.usage_value) == row
+
+
+def test_committed_map_still_refuses_invented_labels() -> None:
+    rows = load_use_map(_map_path())
     with pytest.raises(AdditionError) as caught:
         use_lookup(rows, "prop_resi_units", "SYN-UNIT", "")
     assert caught.value.name == "unmapped_label"
     with pytest.raises(AdditionError) as other:
         use_lookup(rows, "prop_sales", "SYN-LAND-1", "SYN-USE-RESI")
     assert other.value.name == "unmapped_label"
+
+
+def test_committed_use_key_outside_the_list_refuses(tmp_path: Path) -> None:
+    row = asdict(load_use_map(_map_path())[0])
+    row["use_key"] = "SYN-UNKNOWN-USE"
+    path = tmp_path / "bad-committed-use.csv"
+    with path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=USE_MAP_COLUMNS)
+        writer.writeheader()
+        writer.writerow(row)
+    with pytest.raises(AdditionError, match=r"^use_map_use_key$"):
+        load_use_map(path)
+
+
+def test_unknown_use_key_has_a_closed_assembly_reason() -> None:
+    assert (
+        closed_reason("gis_property_singles", AdditionError("use_map_use_key"))
+        == "use_map_use_key"
+    )
 
 
 def _write(path: Path, rows: list[str]) -> Path:
@@ -184,6 +215,102 @@ def test_unknown_marker_fails(tmp_path: Path) -> None:
     assert caught.value.name == "unknown_unit_type"
 
 
+def test_built_mapping_has_neither_land_nor_a_published_unit_type(
+    tmp_path: Path,
+) -> None:
+    rows = load_use_map(
+        _write(
+            tmp_path / "built.csv",
+            ["prop_sales,SYN-BUILT,*,residential,built,SYN reviewer,2026-11-24"],
+        )
+    )
+    built = use_lookup(rows, "prop_sales", "SYN-BUILT", "SYN-USAGE")
+    assert not built.land
+    assert built.unit_type is None
+
+
+@given(
+    st.text().filter(
+        lambda value: (
+            value.strip()
+            and value
+            not in {
+                "residential",
+                "commercial",
+                "mixed",
+                "community",
+                "agricultural",
+                "unspecified",
+            }
+        )
+    )
+)
+def test_use_keys_outside_the_closed_vocabulary_refuse(value: str) -> None:
+    with TemporaryDirectory() as folder:
+        path = Path(folder) / "use.csv"
+        with path.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.writer(stream)
+            writer.writerow(USE_MAP_COLUMNS)
+            writer.writerow(
+                [
+                    "prop_sales",
+                    "SYN-X",
+                    "*",
+                    value,
+                    "land",
+                    "SYN reviewer",
+                    "2026-11-24",
+                ]
+            )
+        with pytest.raises(AdditionError, match=r"^use_map_use_key$"):
+            load_use_map(path)
+
+
+def test_closed_use_keys_are_the_ruled_vocabulary() -> None:
+    assert use_map.USE_KEYS == frozenset(
+        {
+            "residential",
+            "commercial",
+            "mixed",
+            "community",
+            "agricultural",
+            "unspecified",
+        }
+    )
+
+
+@pytest.mark.parametrize("key", sorted(use_map.USE_KEYS))
+@pytest.mark.parametrize(
+    ("marker", "land", "unit"),
+    [
+        ("land", True, None),
+        ("built", False, None),
+        ("residential_unit", False, "residential_unit"),
+    ],
+)
+def test_closed_uses_and_markers_load(
+    tmp_path: Path, key: str, marker: str, land: bool, unit: str | None
+) -> None:
+    rows = load_use_map(
+        _write(
+            tmp_path / "closed.csv",
+            [f"prop_sales,SYN-X,*,{key},{marker},SYN reviewer,2026-11-24"],
+        )
+    )
+    assert rows[0].use_key == key
+    assert rows[0].land is land
+    assert rows[0].unit_type == unit
+
+
+def test_empty_usage_is_not_the_absent_usage_token(tmp_path: Path) -> None:
+    path = _write(
+        tmp_path / "empty-usage.csv",
+        ["prop_sales,SYN-X,,residential,land,SYN reviewer,2026-11-24"],
+    )
+    with pytest.raises(AdditionError, match=r"^use_map_field_empty$"):
+        load_use_map(path)
+
+
 def test_a_source_id_outside_the_two_bulletins_fails(tmp_path: Path) -> None:
     path = _write(
         tmp_path / "source.csv",
@@ -222,5 +349,5 @@ def test_reviewer_and_date_are_required_text(tmp_path: Path) -> None:
         tmp_path / "date.csv",
         ["prop_sales,SYN-X,SYN-U,residential,land,SYN reviewer,not-a-date"],
     )
-    with pytest.raises(AdditionError):
+    with pytest.raises(AdditionError, match=r"^period_form$"):
         load_use_map(bad_date)

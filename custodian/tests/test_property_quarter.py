@@ -12,6 +12,7 @@ from custodian.tests.repository_root import repository_root
 from eii_custodian.publicdata.additions.common import AdditionError
 from eii_custodian.publicdata.additions.property_venues import IDENTIFIER_FIELDS
 from eii_custodian.publicdata.fetch.report import coverage_count_line
+from eii_custodian.publicdata.property import use_map as use_map_module
 from eii_custodian.publicdata.property.bulletin import (
     BulletinDeals,
     parse_bulletin,
@@ -20,12 +21,14 @@ from eii_custodian.publicdata.property.bulletin import (
 )
 from eii_custodian.publicdata.property.quarter import (
     SQ_M_PER_SQ_FT,
+    expected_as_of,
     forecast_window,
     held_series_window,
     quarter_aggregates,
     square_feet,
 )
-from eii_custodian.publicdata.property.use_map import load_use_map
+from eii_custodian.publicdata.property.sale import sale_aggregates
+from eii_custodian.publicdata.property.use_map import UseMapping, load_use_map
 
 FIXTURES = (
     repository_root(Path(__file__)) / "custodian" / "tests" / "fixtures" / "property"
@@ -133,6 +136,66 @@ def _unit_row(rows: tuple[dict[str, object], ...]) -> dict[str, object]:
 
 def _blocked(parsed: BulletinDeals, reason: str) -> int:
     return sum(item.count for item in parsed.blocked if item.reason == reason)
+
+
+@pytest.mark.parametrize("absent", [False, True])
+def test_absent_usage_matches_the_closed_no_usage_cell(
+    tmp_path: Path, absent: bool
+) -> None:
+    from custodian.tests.test_property_use_map import _write
+
+    mappings = load_use_map(
+        _write(
+            tmp_path / "no-usage.csv",
+            [
+                f"prop_sales,SYN-LAND-1,{use_map_module.NO_USAGE},unspecified,land,SYN reviewer,2026-11-24"
+            ],
+        )
+    )
+    row = _sale(property_usage=None)
+    if absent:
+        del row["property_usage"]
+    parsed = _parse([row], tmp_path / "frame", mappings, "prop_sales")
+    assert len(parsed.deals) == 1
+    assert parsed.deals[0].use_key == "unspecified"
+
+
+@pytest.mark.parametrize("consumer", ["deal", "quarter", "as_of", "sale"])
+def test_built_sale_enters_use_only(tmp_path: Path, consumer: str) -> None:
+    mapping = UseMapping(
+        "prop_sales",
+        "SYN-BUILT",
+        "*",
+        "residential",
+        "built",
+        "SYN reviewer",
+        "2026-11-24",
+    )
+    parsed = _parse([_sale(nw_l_qr="SYN-BUILT")], tmp_path, (mapping,), "prop_sales")
+    if consumer == "deal":
+        assert len(parsed.deals) == 1
+        assert not parsed.deals[0].land
+        assert parsed.deals[0].unit_type is None
+    elif consumer == "quarter":
+        rows = quarter_aggregates(
+            parsed.deals, as_of_by_source=_as_of_map("prop_sales")
+        )
+        assert len(rows) == 1
+        row = _all_row(rows)
+        assert row["deal_count"] == 1
+        assert row["median_price_per_ft2"] == Decimal("500.00")
+        assert row["land_deal_count"] == 0
+        assert row["land_median_price_per_ft2"] is None
+    elif consumer == "as_of":
+        expected = expected_as_of(parsed.deals, _as_of_map("prop_sales"))
+        assert expected == {
+            ("syn_north", "syn_coast", "2025-Q4", "residential", "all"): _QUARTER_AS_OF
+        }
+    else:
+        rows = sale_aggregates(parsed.deals)
+        assert len(rows) == 1
+        assert rows[0]["deal_count"] == 1
+        assert rows[0]["property_type"] == "residential"
 
 
 def test_worked_example_reproduces_the_card_fixture(tmp_path: Path) -> None:

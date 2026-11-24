@@ -99,7 +99,7 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         table_columns_mismatch table_name unknown_source_field unknown_table
         unknown_unit_type unmapped_label unmapped_municipality unmapped_unit_type
         unmapped_usage unmapped_venue_name unreviewed_venue use_map_ambiguous
-        use_map_columns use_map_conflict use_map_field_empty use_map_source
+        use_map_columns use_map_conflict use_map_field_empty use_map_source use_map_use_key
         value_out_of_column venue_crosswalk venue_crosswalk_conflict venue_name_conflict
         venue_place_conflict venue_key_form venue_key_digit_run
     """.split()

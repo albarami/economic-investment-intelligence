@@ -47,8 +47,8 @@ def _mappings(tmp_path: Path) -> tuple[UseMapping, ...]:
         _write(
             tmp_path / "syn-map.csv",
             [
-                "prop_resi_units,SYN-UNIT,*,syn_use,residential_unit,SYN reviewer,2025-01-01",
-                "prop_sales,SYN-LAND-1,SYN-USE-RESI,syn_use,land,SYN reviewer,2025-01-01",
+                "prop_resi_units,SYN-UNIT,*,residential,residential_unit,SYN reviewer,2025-01-01",
+                "prop_sales,SYN-LAND-1,SYN-USE-RESI,residential,land,SYN reviewer,2025-01-01",
             ],
         )
     )
@@ -126,16 +126,18 @@ def test_property_unmatched_row_does_not_stop_later_deals(tmp_path: Path) -> Non
     ]
 
 
-def test_property_missing_usage_is_empty_not_marker_text(tmp_path: Path) -> None:
+def test_property_missing_usage_is_closed_token_not_other_marker_text(
+    tmp_path: Path,
+) -> None:
     mappings = _mappings(tmp_path)
     # Both reviewed rows are valid. Missing usage matches the wildcard alone;
     # the mutation marker would wrongly make both mappings match.
-    exact = replace(mappings[0], usage_value="XXXX", use_key="syn_exact")
+    exact = replace(mappings[0], usage_value="XXXX", use_key="commercial")
     parsed = _parse(
         [_resi(property_usage=None)], tmp_path / "frame", (*mappings, exact)
     )
     assert len(parsed.deals) == 1
-    assert parsed.deals[0].use_key == "syn_use"
+    assert parsed.deals[0].use_key == "residential"
     assert parsed.blocked == ()
 
 
@@ -221,7 +223,7 @@ def test_property_per_unit_deal_has_no_square_foot_median(tmp_path: Path) -> Non
             "district_key": "syn_north",
             "municipality_code": "syn_coast",
             "period": "2025-Q4",
-            "use_key": "syn_use",
+            "use_key": "residential",
             "unit_type": "all",
             "deal_count": 1,
             "deal_value": Decimal("1.00"),
@@ -236,7 +238,7 @@ def test_property_per_unit_deal_has_no_square_foot_median(tmp_path: Path) -> Non
             "district_key": "syn_north",
             "municipality_code": "syn_coast",
             "period": "2025-Q4",
-            "use_key": "syn_use",
+            "use_key": "residential",
             "unit_type": "residential_unit",
             "deal_count": 1,
             "deal_value": Decimal("1.00"),
