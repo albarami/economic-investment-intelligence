@@ -32,6 +32,7 @@ from eii_custodian.publicdata.fetch.registry import Entry, load_registry
 from eii_custodian.publicdata.frame.build import FrameResult, build_frame
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.live import district_aliases
+from eii_custodian.publicdata.places.review import review_file_row
 from eii_custodian.publicdata.review.cache_fixture import select_fixture
 
 _RETRIEVED = "2026-11-14T00:00:00Z"
@@ -192,7 +193,7 @@ def test_municipality_names_and_place_text_stay_utf_8_in_the_c_locale(
     )
     _write_json(
         review / "showcase_gazetteer.yaml",
-        [_spec("SYN-LAND", "SYN-R", "places_ovt")],
+        [review_file_row(_spec("SYN-LAND", "SYN-R", "places_ovt"))],
     )
     _write_json(review / "flagship_candidates.yaml", [])
     output = tmp_path / "frame-out"
@@ -305,7 +306,7 @@ def test_a_non_object_place_point_does_not_hide_the_next_point(
     )
     _write_json(
         prepared.review / "showcase_gazetteer.yaml",
-        [_spec("SYN-LAND", "SYN-R", "places_ovt")],
+        [review_file_row(_spec("SYN-LAND", "SYN-R", "places_ovt"))],
     )
     result = _build(prepared, tmp_path / "output")
     assert any(row["place_key"] == "SYN-LAND" for row in result.tables["gazetteer"])
@@ -328,7 +329,7 @@ def test_a_point_missing_one_text_key_is_ignored(tmp_path: Path) -> None:
     )
     _write_json(
         prepared.review / "showcase_gazetteer.yaml",
-        [_spec("SYN-LAND", "SYN-R", "places_ovt")],
+        [review_file_row(_spec("SYN-LAND", "SYN-R", "places_ovt"))],
     )
     result = _build(prepared, tmp_path / "output")
     assert any(row["place_key"] == "SYN-LAND" for row in result.tables["gazetteer"])
@@ -386,7 +387,7 @@ def test_flagship_check_receives_zone_69(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     (review / "showcase_areas.yaml").write_text("[]\n", encoding="utf-8")
-    candidate = _spec("SYN-CAND", "SYN-B-A", "bldg_ovt")
+    candidate = review_file_row(_spec("SYN-CAND", "SYN-B-A", "bldg_ovt"))
     candidate["use"] = "commercial"
     _write_json(review / "flagship_candidates.yaml", [candidate])
     _write_json(review / "showcase_gazetteer.yaml", [])

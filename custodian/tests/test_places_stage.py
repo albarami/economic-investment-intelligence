@@ -402,7 +402,7 @@ def _frame_stage_fixture(tmp_path: Path):
         "name_ar": "مكان تجريبي",
         "aliases": None,
         "source_id": "places_ovt",
-        "record_key": "SYN-LAND",
+        "record_ref": "SYN-LAND",
         "arabic_review": "pending native review",
     }
     (review / "showcase_gazetteer.yaml").write_text(

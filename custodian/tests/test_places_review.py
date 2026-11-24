@@ -282,7 +282,7 @@ def test_showcase_area_accepts_only_a_ten_minute_walk(tmp_path: Path) -> None:
         "  mode: walk\n"
         "  cutoff_minutes: 10\n"
         "  source_id: places_ovt\n"
-        "  record_key: SYN-P-A\n",
+        "  record_ref: SYN-P-A\n",
         encoding="utf-8",
     )
     origin, rows = load_showcase_areas(path, None)

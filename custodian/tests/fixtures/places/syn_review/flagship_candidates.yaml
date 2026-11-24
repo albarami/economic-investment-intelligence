@@ -4,6 +4,6 @@
   name_ar: مكان تجريبي
   name_en: SYN Place
   place_key: SYN-CAND
-  record_key: SYN-BLDG
+  record_ref: SYN-BLDG
   source_id: bldg_ovt
   use: public

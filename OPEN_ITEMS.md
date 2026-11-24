@@ -2099,6 +2099,7 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - NEEDED: Complete the lead’s Part B live steps before ticking the eight criteria and before S2-T08.
 - WHY: Fixture approval does not verify a real showcase or select a real flagship.
 - DONE SO FAR: The DATA whole-task verdict P1 at b505c2d approves code but owes: the four concrete files and road receipts; attribution/category rows; Arabic tag; census lineage; places build/report; four showcase and seven candidate keys; showcase areas; real area manifest and rebuild comparison; verification rows; recorded check and provisional decision. Its P1 also says the header-only review-file test must change when real rows are entered. Part A rulings additionally owe the real confidence type (fixtures DOUBLE), record-level source entry rule, PUB-38 labels and the eleventh/withheld attribution-provider check; the withheld name is not reproduced here.
+- UPDATE: 2026-11-24, S2-P91 under ruling L-1769: the place review file identifier is `record_ref`; the live keys and evidence owed above remain pending and all committed values stay null.
 - OPTIONS: **Default:** Keep pending states until these records exist. Confirm the source-language tag under PUB-27 and keep PUB-59 owner confirmation distinct from the provisional choice.
 - NEEDED BY: S2-T06 live completion, before S2-T08 and dependent real-data uses.
 

@@ -284,7 +284,7 @@ def test_area_wrong_mode_refuses_showcase_area(tmp_path: Path) -> None:
     path = tmp_path / "areas.yaml"
     path.write_text(
         "- place_key: SYN-K-1\n  mode: drive\n  cutoff_minutes: 10\n"
-        "  source_id: syn\n  record_key: syn-rk\n",
+        "  source_id: syn\n  record_ref: syn-rk\n",
         encoding="utf-8",
     )
     with pytest.raises(PlacesError) as exc_info:
@@ -298,7 +298,7 @@ def test_area_wrong_cutoff_refuses_showcase_area(tmp_path: Path) -> None:
     path = tmp_path / "areas.yaml"
     path.write_text(
         "- place_key: SYN-K-1\n  mode: walk\n  cutoff_minutes: 5\n"
-        "  source_id: syn\n  record_key: syn-rk\n",
+        "  source_id: syn\n  record_ref: syn-rk\n",
         encoding="utf-8",
     )
     with pytest.raises(PlacesError) as exc_info:
@@ -311,7 +311,7 @@ def test_area_missing_place_key_refuses_showcase_area(tmp_path: Path) -> None:
     path = tmp_path / "areas.yaml"
     path.write_text(
         "- place_key: ''\n  mode: walk\n  cutoff_minutes: 10\n"
-        "  source_id: syn\n  record_key: syn-rk\n",
+        "  source_id: syn\n  record_ref: syn-rk\n",
         encoding="utf-8",
     )
     with pytest.raises(PlacesError) as exc_info:
@@ -324,7 +324,7 @@ def test_area_non_string_place_key_refuses_showcase_area(tmp_path: Path) -> None
     path = tmp_path / "areas.yaml"
     path.write_text(
         "- place_key: 12345\n  mode: walk\n  cutoff_minutes: 10\n"
-        "  source_id: syn\n  record_key: syn-rk\n",
+        "  source_id: syn\n  record_ref: syn-rk\n",
         encoding="utf-8",
     )
     with pytest.raises(PlacesError) as exc_info:
