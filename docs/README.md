@@ -158,6 +158,7 @@
 | [0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md) | One landmark citation page the publisher no longer serves is a registered SKIP by the closed word `page_not_served`; a landmark height citing a skipped row refuses as `registry_skipped` | Proposed, 2026-11-24 |
 | [0108](decisions/0108-fdi-crosswalk-rows-in-the-cache-review-folder.md) | FDI crosswalk rows in the uncommitted cache review folder; committed template schema-only, with origin and byte-hash binding retained | Proposed, 2026-11-24 |
 | [0109](decisions/0109-the-product-suite-runs-in-two-named-parts.md) | The product suite runs in two named parts under the unchanged 600-second limit, by decision 0060's method | Accepted, 2026-11-24; the slow figures are of the slice S6 stack (ruling L-1784) |
+| [0111](decisions/0111-s3-t20-built-locally-before-the-s3-gate.md) | S3-T20 is planned, built and reviewed locally before the slice S3 gate; its merge, tunnel and phone evidence stay after the gate | Proposed, 2026-11-24 |
 
 ## Identifiers and change control
 
