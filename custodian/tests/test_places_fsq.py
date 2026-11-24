@@ -987,24 +987,13 @@ def _at_distance(metres: float) -> tuple[float, float]:
     raise AssertionError("distance did not fall to the requested metres")
 
 
-def test_a_grid_without_the_kept_cells_refuses(tmp_path: Path) -> None:
-    """A kept row whose cell is absent from the grid refuses the build."""
+def test_a_grid_without_the_kept_cells_counts_the_exclusion(tmp_path: Path) -> None:
+    """A kept row whose cell is absent from the grid is counted and withheld."""
     path = tmp_path / "places.parquet"
     write_places(path, [place()])
-    with pytest.raises(PlacesFsqError, match="cell"):
-        build_places(
-            files={"near.parquet": path},
-            expected_sha256={"near.parquet": sha256_hex(path.read_bytes())},
-            frame=FRAME_BOX,
-            grid=_grid((0.0, 0.0)),
-            places=(),
-            mapping=(),
-            labels=(),
-            min_edit_distance=3,
-            release=_RELEASE,
-            attribution=ATTRIBUTION,
-            receipt_sha256="a" * 64,
-        )
+    built = _build(path, (), grid=_grid((0.0, 0.0)))
+    assert built.rows == built.eligible == ()
+    assert built.coverage.no_cell == 1
 
 
 def _build(
@@ -1012,16 +1001,19 @@ def _build(
     places: tuple[PlaceStandIn, ...],
     mapping: tuple[object, ...] = (),
     extra: tuple[tuple[float, float], ...] = (),
+    *,
+    grid: list[dict[str, object]] | None = None,
+    labels: tuple[str, ...] = (),
 ):
     points = ((51.5, 25.3), (51.5, 25.4), *extra)
     return build_places(
         files={"near.parquet": path},
         expected_sha256={"near.parquet": sha256_hex(path.read_bytes())},
         frame=FRAME_BOX,
-        grid=_grid(*points),
+        grid=_grid(*points) if grid is None else grid,
         places=places,
         mapping=mapping,
-        labels=(),
+        labels=labels,
         min_edit_distance=3,
         release=_RELEASE,
         attribution=ATTRIBUTION,

@@ -53,14 +53,13 @@ def test_skipped_fsq_preserves_other_build_stages(tmp_path, monkeypatch):
     assert events == ["investment", "series", "regression"]
 
 
-def test_missing_base_cell_still_refuses(tmp_path):
-    """The frame's nullable lookup must not relax this table's cell refusal."""
+def test_missing_base_cell_withholds_the_table_row(tmp_path):
+    """A missing base cell is a coverage gap, distinct from a FrameError."""
     from custodian.tests.fixtures.places_fsq.invented import place, write_places
 
     path = tmp_path / "places.parquet"
     write_places(path, [place()])
-    with pytest.raises(PlacesFsqError, match=r"^cell$"):
-        _table_row(parse_file(path)[0], [], "2025-01-10")
+    assert _table_row(parse_file(path)[0], [], "2025-01-10") is None
 
 
 def test_ambiguous_base_cell_refuses_with_exact_reason(tmp_path: Path) -> None:

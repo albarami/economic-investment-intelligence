@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.fixtures.places_fsq.invented import place, write_places
+from custodian.tests.test_places_fsq import _build
 
 import h3
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -175,29 +176,15 @@ def test_one_kept_place_carries_the_hand_written_table_fields(tmp_path: Path) ->
     assert built.coverage.name_ar_filled == 0
     assert built.coverage.point_not_country == 0
     assert built.coverage.country_not_point == 0
+    assert built.coverage.no_cell == 0
     assert built.coverage.unmapped_places == 1
     assert built.coverage.duplicate_not_shown == 0
     assert built.coverage.closed_not_shown == 0
     assert built.eligible[0].receipt_sha256 == "a" * 64
     assert built.eligible[0].source_release == "2025-01-10"
-    assert (
-        _reason(
-            lambda: build_places(
-                files={"near.parquet": path},
-                expected_sha256={"near.parquet": digest},
-                frame=FRAME_BOX,
-                grid=[{"cell": 1}],
-                places=(),
-                mapping=(),
-                labels=(),
-                min_edit_distance=2,
-                release="2025-01-10",
-                attribution=ATTRIBUTION,
-                receipt_sha256="a" * 64,
-            )
-        )
-        == "cell"
-    )
+    unlocated = _build(path, (), grid=[])
+    assert unlocated.rows == unlocated.eligible == ()
+    assert unlocated.coverage.no_cell == 1
     assert (
         _reason(
             lambda: build_places(
